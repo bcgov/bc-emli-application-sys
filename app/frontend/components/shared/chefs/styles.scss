@@ -1,0 +1,1007 @@
+@import url("https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
+// Font Awesome icons for: "fa-plus-square, fa-minus-square, fa-cloud
+@import url("https://unpkg.com/@phosphor-icons/web@2.0.3/src/fill/style.css");
+// Phosphor icon for the compliance lightning
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "formiojs/dist/formio.form.css";
+@import "../../../styles/global-theme-variables.scss";
+
+:root {
+  --bs-font-sans-serif: "BC Sans";
+  --bs-body-color: $bcgov-font;
+}
+
+/* ======================================
+
+  		Override formio styles (Start)
+
+====================================== */
+
+// override formio form designer
+.form-designer,
+  // override form viewer
+.form-wrapper,
+  // override preview panel in form builder component editor modal
+.component-preview {
+  /*
+  		moved from the main application
+  */
+
+  // Typography
+  .v-application {
+    font-family: "BCSans", sans-serif !important;
+    line-height: 1.4;
+    font-size: 0.875rem;
+  }
+
+  h1 {
+    font-size: 1.9em;
+  }
+
+  h2 {
+    font-size: 1.7em;
+  }
+
+  h3 {
+    font-size: 1.3em;
+  }
+
+  h4 {
+    font-size: 1.05em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    color: $bcgov-font;
+    line-height: 1.2;
+    font-weight: bold;
+  }
+
+  p {
+    color: $bcgov-font;
+    line-height: 1.7;
+  }
+
+  // links
+  a {
+    color: $bcgov-link;
+
+    &:hover {
+      color: $bcgov-link-hover;
+    }
+  }
+
+  // Horizontal Rule
+  hr {
+    margin-bottom: 1em;
+
+    .orange {
+      border-top: 2px solid $bcgov-yellow;
+    }
+  }
+
+  // General Transition Animation Behavior
+  .component-fade-enter-active,
+  .component-fade-leave-active {
+    transition: opacity 0.3s ease;
+  }
+
+  .component-fade-enter,
+  .component-fade-leave-to {
+    opacity: 0;
+  }
+
+  ///////
+  ///// end moved from the main application
+  ///////
+
+  // layout
+  div[class^="col-"]:nth-child(n + 1) {
+    padding-top: 0; // make nested columns line up vertically alongside components in non-nested adjacent columns
+  }
+
+  // tabs, cards, headings etc..
+  .card-header {
+    font-weight: bold;
+    color: $bcgov-font;
+    opacity: 1;
+
+    .fa-minus-square-o::before,
+    .fa-plus-square-o::before {
+      font-size: 130%;
+      color: black;
+    }
+
+    .fa-minus-square-o::before {
+      content: "\f106";
+    }
+
+    .fa-plus-square-o::before {
+      content: "\f107";
+    }
+  }
+
+  .card-body {
+    border-top: 1px solid var(--chakra-colors-border-light);
+  }
+
+  // Undo "break-all". Breaking in the middle of all words affects readability.
+  .formio-component .table {
+    word-break: break-word;
+  }
+
+  // tabs component
+  .formio-component-simpletabs {
+    & > .card {
+      border: 0;
+
+      & > .card-body {
+        border-style: solid;
+        border-color: rgba(0, 0, 0, 0.125);
+        border-width: 0 1px 1px 1px;
+        border-radius: 0;
+      }
+    }
+
+    & > .card > .card-header {
+      background: none;
+
+      .nav-item {
+        background-color: $bcgov-grey;
+        margin-right: 3px;
+
+        .nav-link {
+          @extend a;
+          font-weight: normal;
+
+          &.active {
+            color: $bcgov-font;
+            background: white;
+
+            &:hover {
+              color: $bcgov-font;
+              cursor: default;
+              text-decoration: none;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // form inputs
+  .form-control {
+    // placeholder text to match bcgov
+    &::placeholder,
+    .choices__placeholder {
+      color: $bcgov-input-placeholder;
+      opacity: inherit;
+    }
+
+    &:not(.is-invalid) {
+      // input borders to match bcgov (exclude invalid fields that should be red)
+      border: 1px solid $bcgov-input-placeholder;
+    }
+  }
+
+  // disabled form inputs
+  .form-control,
+  .form-check-input:not(:checked) {
+    &:disabled,
+    &[disabled="disabled"] {
+      background-color: var(--chakra-colors-greys-grey03);
+      border-color: var(--chakra-colors-greys-grey02);
+      cursor: not-allowed;
+    }
+  }
+
+  // remove alert icons from invalid fields
+  .form-control.is-invalid,
+  .was-validated .form-control:invalid {
+    background-image: none;
+  }
+
+  // add rounded corners to Date / Time Component input groups and red border if invalid
+  .input-group > .flatpickr-input.form-control {
+    & + .form-control.input {
+      border-top-left-radius: 0.25rem;
+      border-bottom-left-radius: 0.25rem;
+    }
+
+    // if validation error make borders red;
+    &.is-invalid + .form-control.input {
+      border: 1px solid #dc3545;
+
+      &:focus {
+        border-color: #dc3545;
+        -webkit-box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+      }
+    }
+  }
+
+  // buttons
+
+  .btn.btn-primary {
+    background-color: $bcgov-blue;
+    border: none;
+    color: white;
+
+    &:hover {
+      background-color: $bcgov-blue;
+      text-decoration: underline;
+    }
+
+    &:disabled,
+    &[disabled="disabled"],
+    &[disabled="disabled"] &:hover {
+      cursor: default;
+      text-decoration: none;
+      background-color: rgba(0, 0, 0, 0.12);
+      opacity: 1;
+      color: rgba(0, 0, 0, 0.26) !important;
+    }
+  }
+
+  // formio submit buttons
+  .formio-component-button .btn {
+    text-transform: uppercase;
+    padding: 8px 16px;
+    line-height: 21px;
+    font-weight: 700;
+    letter-spacing: 0.0892857143em;
+    font-size: 0.875rem;
+  }
+
+  // add margin to create space between the button and form.io inputs
+  .formio-component-button {
+    margin-top: 1rem;
+  }
+
+  // tooltips
+  .tooltip-inner {
+    background-color: #606060;
+    border-radius: 3px;
+    box-shadow: 0 2px 8px 0 rgba(175, 175, 175, 0.5);
+    font-size: var(--chakra-fontSizes-sm);
+  }
+
+  // validation messages and help text
+  .form-text {
+    font-size: var(--chakra-fontSizes-sm);
+    line-height: 1.3;
+  }
+
+  .invalid-feedback {
+    font-size: 100%; // reset this wrapper
+  }
+
+  .form-text.error {
+    background: none !important;
+    color: $bcgov-error;
+  }
+
+  // hide asterisks after input in Data Grid when labels appear as table headers
+  .formio-component-datagrid {
+    label.field-required.control-label--hidden::after {
+      content: "";
+    }
+  }
+
+  // dropdowns
+
+  .choices__list {
+    vertical-align: middle;
+  }
+
+  .choices {
+    overflow: visible;
+
+    &:focus {
+      box-shadow: 0 0 0.25rem rgba(var(--bs-danger-rgb), 0.25);
+    }
+  }
+
+  .choices__list--dropdown {
+    .choices__item {
+      &:not(.is-selected) {
+        color: $bcgov-font;
+      }
+
+      &:hover {
+        background-color: $bcgov-link-hover;
+        color: white;
+      }
+    }
+  }
+
+  .choices__list--multiple {
+    .choices__item {
+      margin-bottom: 0;
+      font-size: 90%;
+    }
+
+    .choices__item,
+    .choices__button {
+      background-color: white;
+      color: $bcgov-link;
+      border-color: $bcgov-link;
+
+      &:hover {
+        background-color: $bcgov-link-hover;
+        border-color: $bcgov-link-hover;
+        color: white;
+      }
+    }
+  }
+
+  // hide 'X' (button that removes selected option) on dropdown, when placeholder exists and no selectiuon has been made
+  .choices__placeholder button {
+    display: none;
+  }
+
+  // radio buttons and checkboxes
+  .form-radio {
+    .form-check {
+      margin-bottom: 0.5rem;
+
+      .form-check-label {
+        font-size: 1em;
+
+        .form-check-input {
+          transform: scale(1.3);
+        }
+
+        span {
+          margin-left: 0.25rem;
+        }
+      }
+    }
+  }
+
+  // form builder misc.
+  .drag-and-drop-alert.alert-info {
+    border: 2px dashed grey;
+    background-color: transparent;
+    color: grey;
+    padding: 30px;
+  }
+}
+
+.formio-component-panel {
+  .card-header {
+    padding: var(--chakra-space-2) var(--chakra-space-6);
+    min-height: var(--chakra-space-10);
+    border-bottom: 0;
+  }
+
+  .card-title {
+    display: flex;
+    justify-content: space-between;
+
+    i {
+      order: 2;
+    }
+  }
+}
+
+.form-wrapper {
+  h2,
+  .formio-section-container > label {
+    @include yellowBarHeader;
+  }
+
+  .card {
+    margin-bottom: var(--chakra-space-6) !important;
+  }
+
+  .card-body {
+    padding: var(--chakra-space-6) !important;
+
+    .col-form-label {
+      font-weight: bold;
+    }
+
+    > .form-group:not(:empty) {
+      // each form field inside a block
+      margin-bottom: var(--chakra-space-6);
+
+      &.formio-component-select .form-group,
+      input {
+        max-width: var(--chakra-sizes-container-sm);
+      }
+
+      a {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .card-panel-addition {
+    padding-top: var(--chakra-space-6);
+    padding-right: var(--chakra-space-6);
+    padding-left: var(--chakra-space-6);
+  }
+
+  .tips {
+    border-left: 4px solid;
+    border-color: $bcgov-blue-secondary;
+    background-color: $blue-light;
+    padding-left: var(--chakra-space-6);
+    padding-top: var(--chakra-space-3);
+    padding-bottom: var(--chakra-space-3);
+    padding-right: var(--chakra-space-6);
+    margin-top: 4px;
+    margin-bottom: 4px;
+
+    .tips-header {
+      color: $bcgov-blue-secondary;
+
+      .i {
+        background-color: $bcgov-blue-secondary;
+        height: 24px;
+        width: 24px;
+        margin-right: 6px;
+      }
+    }
+  }
+
+  // removes asterisk
+  .field-required:after {
+    display: none;
+  }
+
+  // adds optional text for non required input labels
+  .col-form-label:not(.field-required):not(.formio-section-container > .col-form-label):after {
+    content: "(optional)";
+  }
+
+  .compliance {
+    font-size: var(--chakra-fontSizes-xs);
+    color: $bcgov-font;
+    line-height: 1;
+    text-align: left;
+    margin-top: calc(-1 * var(--chakra-space-1));
+    margin-bottom: 6px;
+
+    span {
+      background-color: $bcgov-alert-info !important;
+      display: inline-block;
+      padding: var(--chakra-space-1);
+      position: relative;
+
+      &:after {
+        content: "";
+        display: inline-block;
+        position: absolute;
+        left: var(--chakra-space-2);
+        bottom: -5px;
+        border-top: 6px solid $bcgov-alert-info !important;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+      }
+    }
+
+    &.compliance-warning {
+      span {
+        background-color: $bcgov-alert-warning !important;
+      }
+    }
+
+    .i {
+      width: 24px;
+      height: 24px;
+      margin-right: 6px;
+    }
+  }
+
+  .energy-step-code-warning {
+    border: 1px solid;
+    border-color: $error;
+    background: $error-light;
+    border-radius: 0.25rem;
+    padding-left: var(--chakra-space-6);
+    padding-top: var(--chakra-space-3);
+    padding-bottom: var(--chakra-space-3);
+    padding-right: var(--chakra-space-6);
+    margin-top: 4px;
+    margin-bottom: 4px;
+
+    .i {
+      background-color: $error;
+      height: 24px;
+      width: 24px;
+      margin-right: 6px;
+    }
+  }
+
+  // File upload
+  .formio-component-file {
+    .list-group-header {
+      font-size: var(--chakra-fontSizes-sm);
+      background-color: var(--chakra-colors-greys-grey03);
+      color: var(--chakra-colors-text-secondary);
+      border: 0;
+      padding-top: var(--chakra-space-1);
+      padding-bottom: var(--chakra-space-1);
+    }
+
+    // upload area
+    .fileSelector {
+      background-color: var(--chakra-colors-theme-blueLight);
+      border-color: var(--chakra-colors-theme-blueShadedLight);
+      color: $bcgov-link;
+      font-size: var(--chakra-fontSizes-sm);
+      border-radius: var(--chakra-radii-md);
+      margin-bottom: 0.5rem;
+      transition:
+        background-color 200ms ease-in-out,
+        border-color 200ms ease-in-out;
+
+      a {
+        color: inherit;
+      }
+
+      &:hover {
+        background-color: var(--chakra-colors-semantic-infoLight);
+      }
+    }
+
+    .file {
+      border-radius: var(--chakra-radii-sm);
+      border: 1px solid var(--chakra-colors-border-light);
+      padding: 0 var(--chakra-space-2);
+      font-size: var(--chakra-fontSizes-sm);
+
+      .fileName {
+        [ref="fileStatusRemove"] {
+          color: $bcgov-font-error;
+          margin: 0 var(--chakra-space-1);
+          padding: 6px;
+          border-radius: var(--chakra-radii-full);
+
+          &:hover {
+            background-color: var(--chakra-colors-semantic-errorLight);
+            cursor: pointer;
+          }
+        }
+      }
+
+      .alert {
+        padding: var(--chakra-space-1) var(--chakra-space-2);
+      }
+    }
+  }
+
+  .optional-block-confirmation-checkbox {
+    font-weight: 700;
+
+    &:before {
+      content: "";
+      display: block;
+      height: 1px;
+      background-color: gray;
+      width: 100%;
+      margin-top: 24px;
+      margin-bottom: 24px;
+      // position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
+
+  .submit-fail {
+    &:after {
+      display: none;
+    }
+  }
+
+  .has-error {
+    .help-block {
+      display: block;
+      margin-top: 16px;
+      border: 1px solid var(--chakra-colors-error);
+      border-radius: 8px;
+      background-color: var(--chakra-colors-semantic-errorLight);
+      padding: 12px;
+    }
+  }
+
+  .contact-data-grid,
+  .multi-data-grid {
+    border: none;
+    overflow: visible;
+
+    .contact-field-set {
+      margin-top: 0;
+    }
+
+    .multi-field-set {
+      margin-top: 0;
+    }
+
+    td {
+      padding-left: 0;
+    }
+
+    table,
+    td,
+    tr {
+      border: none !important;
+    }
+
+    .formio-button-add-row {
+      margin-top: 14px;
+      background: transparent;
+      color: var(--chakra-colors-text-primary);
+      border: 1px solid var(--chakra-colors-border-dark);
+
+      &:hover {
+        background: var(--chakra-colors-lighten-100);
+      }
+
+      &:disabled {
+        background: var(--chakra-colors-greys-grey03);
+        color: var(--chakra-colors-greys-grey01);
+        border-color: var(--chakra-colors-border-light);
+      }
+
+      &:active {
+        border-width: 2px;
+        border-color: var(--chakra-colors-focus);
+      }
+
+      i:before {
+        content: "+";
+        font-size: var(--chakra-fontSizes-xl);
+        margin-right: var(--chakra-space-1);
+      }
+    }
+
+    .formio-button-remove-row {
+      width: max-content;
+      background: inherit;
+      color: var(--chakra-colors-error);
+      border: none;
+      display: flex;
+      align-items: center;
+
+      i:before {
+        content: "\2715";
+        font-size: var(--chakra-fontSizes-xs);
+        margin-right: var(--chakra-space-2);
+      }
+    }
+
+    @media (min-width: 766px) {
+      .formio-button-remove-row {
+        padding: var(--chakra-space-2); /* Add padding */
+      }
+
+      .formio-button-remove-row:after {
+        content: "Remove";
+      }
+    }
+  }
+
+  .contact-field-set,
+  .multi-field-set {
+    .fieldset-body {
+      border: 1px solid var(--chakra-colors-border-light);
+      padding-inline: var(--chakra-space-6);
+      padding-block: var(--chakra-space-3);
+      border-radius: var(--chakra-radii-sm);
+      margin-top: var(--chakra-space-4);
+
+      > .row,
+      > .form-group {
+        margin-bottom: var(--chakra-space-4);
+      }
+    }
+
+    .formio-component-simpletextfield {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    legend {
+      font-weight: 700;
+      font-size: var(--chakra-fontSizes-md);
+    }
+
+    .formio-error-wrapper {
+      padding-left: var(--chakra-space-3) !important;
+      margin-left: 0 !important;
+      width: 100%;
+
+      &::before {
+        margin-left: calc(-1 * var(--chakra-space-8)) !important;
+      }
+    }
+
+    .btn.autofill-button {
+      text-transform: capitalize;
+      position: relative;
+      padding-left: 35px; // Adjust padding to make space for the icon
+
+      &::before {
+        content: "\f2ba"; // This is the content code for a specific icon, example here
+        font-family: "FontAwesome"; // Ensure you are using the correct font-family
+        position: absolute;
+        font-weight: 200;
+        left: 10px; // Adjust based on padding and size
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 16px; // Icon size
+        color: inherit; // Icon color
+      }
+    }
+  }
+
+  .btn.revision-button {
+    background: var(--chakra-colors-theme-yellow);
+    color: var(--chakra-colors-border-dark);
+    padding: 15px;
+    padding-right: 18px;
+    position: absolute;
+    left: -40px;
+    top: 7px;
+    z-index: 0;
+
+    &:hover {
+      background: var(--chakra-colors-darken-100);
+    }
+
+    &::before {
+      content: "\f044"; // This is the content code for a specific icon, example here
+      font-family: "FontAwesome"; // Ensure you are using the correct font-family
+      position: absolute;
+      font-weight: 200;
+      left: 10px; // Adjust based on padding and size
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px; // Icon size
+      color: inherit; // Icon color
+    }
+  }
+
+  .btn.submission-change-marker {
+    background: transparent !important;
+    color: var(--chakra-colors-border-dark);
+    padding: 15px;
+    position: absolute;
+    top: 7px;
+    right: 126px;
+    z-index: 1;
+
+    &:hover {
+      background: transparent;
+    }
+
+    &::before {
+      background: var(--chakra-colors-theme-yellow) !important;
+      color: var(--chakra-colors-text-primary);
+      text-transform: uppercase;
+      text-decoration: underline;
+      content: "Answer changed";
+      position: absolute;
+      font-weight: 200;
+      top: 0;
+      padding-left: 20px;
+      padding-right: 4px;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      transform: translateY(-50%);
+      font-size: 14px;
+      width: "fit-content";
+      white-space: nowrap;
+      overflow: hidden;
+      clip-path: polygon(0% 50%, 10% 0%, 100% 0%, 100% 100%, 10% 100%);
+    }
+  }
+
+  // ERROR STATES
+
+  .formio-error-wrapper:not(:empty) {
+    padding: 0 var(--chakra-space-2) var(--chakra-space-2);
+    background-color: transparent;
+    border: 1px solid $bcgov-error;
+    border-left-width: 3px;
+    border-radius: var(--chakra-radii-sm);
+    padding-left: var(--chakra-space-6);
+    padding-right: var(--chakra-space-6);
+    margin-left: calc(-1 * var(--chakra-space-6) - 3px);
+    max-width: calc(var(--chakra-sizes-container-sm) + var(--chakra-space-12)) !important;
+    // to keep the input fields looking the same size
+
+    &::before {
+      content: "➤";
+      font-weight: bold;
+      color: $bcgov-font-error;
+      position: absolute;
+      margin-left: calc(-1 * var(--chakra-space-12));
+      margin-top: var(--chakra-space-1);
+    }
+
+    label:not(.form-check-label) {
+      color: $bcgov-font;
+    }
+
+    .form-text.error {
+      font-weight: bold;
+      font-style: italic;
+      font-size: var(--chakra-fontSizes-xs);
+    }
+  }
+
+  // in a block with button, don't display the padding and border if there are no help content
+  [ref="buttonMessageContainer"] .help-block:empty {
+    padding: 0;
+    border: 0;
+  }
+}
+
+#requirement-form-wrapper {
+  .card-title {
+    display: inline-grid;
+    width: 100%;
+    grid-template-columns: 1fr auto 20px;
+  }
+
+  // style default error box that to look similar to our floating error alert box
+  [id^="error-list-"].alert.alert-danger {
+    padding-top: var(--chakra-space-7);
+    padding-left: var(--chakra-space-6);
+    padding-right: var(--chakra-space-6);
+
+    &::before {
+      content: "!";
+      font-size: 32px;
+      font-weight: bold;
+      display: inline-block;
+      height: 40px;
+      width: 40px;
+      line-height: 32px;
+      text-align: center;
+      border-radius: 100%;
+      color: $bcgov-error;
+      border: 3px solid $bcgov-error;
+      margin-bottom: var(--chakra-space-6);
+    }
+
+    > p::before {
+      //content: "Errors";
+      display: block;
+      font-size: var(--chakra-fontSizes-xl);
+      font-weight: bold;
+      margin-bottom: var(--chakra-space-2);
+    }
+
+    > ul {
+      list-style: decimal;
+    }
+  }
+
+  // the floating error alert box's show/hide
+  .floating-side-box {
+    transition-property: opacity, transform;
+    transition-delay: 300ms;
+    transition-duration: 200ms;
+  }
+
+  &.float-on .floating-side-box {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  &.float-off .floating-side-box {
+    opacity: 0;
+    transform: translateX(200px);
+  }
+}
+
+#permitApplicationFieldsContainer.revision-mode {
+  .card-body {
+    padding-left: 45px !important;
+  }
+}
+
+.formio-component-panel {
+  legend,
+  .form-group > label {
+    margin-bottom: 8px;
+    max-width: fit-content;
+  }
+
+  .fieldset-body label {
+    border-bottom: 0;
+    margin-bottom: 0px;
+    background-color: transparent !important;
+  }
+
+  .revision-requested legend,
+  .form-group.revision-requested > label,
+  .form-group.revision-requested > .checkbox > label {
+    border-bottom: 2px solid;
+    border-color: var(--chakra-colors-theme-yellow);
+    border-color: var(--chakra-colors-semantic-error);
+    background-color: var(--chakra-colors-semantic-warningLight);
+  }
+}
+
+@mixin diff-styles {
+  padding: 12px;
+  border: 1px solid var(--chakra-colors-semantic-warning) !important;
+  background-color: var(--chakra-colors-semantic-warningLight);
+  position: relative;
+  overflow: visible;
+}
+
+@mixin diff-tag-styles($content) {
+  content: $content;
+  position: absolute;
+  top: -15px;
+  left: 86%;
+  color: black;
+  font-size: 14px;
+  border: 1px solid var(--chakra-colors-semantic-error);
+  background-color: var(--chakra-colors-semantic-errorLight);
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+@mixin hidden-diff-explainer($content) {
+  content: $content;
+  position: absolute;
+  bottom: 2px; // Adjust this value as needed
+  left: 4px;
+  color: black; // Style the text as needed
+  font-size: 12px; // Adjust font size as needed
+}
+
+.added-in-diff,
+.changed-in-diff,
+.removed-in-diff {
+  @include diff-styles;
+}
+
+.removed-in-diff::before {
+  @include diff-tag-styles("Removed");
+}
+
+.changed-in-diff::before {
+  @include diff-tag-styles("Changed");
+}
+
+.added-in-diff::before {
+  @include diff-tag-styles("Added");
+}
+
+.removed-in-diff.formio-hidden::after {
+  @include hidden-diff-explainer("A hidden field has been removed and is no longer required for your application.");
+}
+
+.changed-in-diff.formio-hidden::after {
+  @include hidden-diff-explainer("A hidden field has been changed but is currently not required for your application.");
+}
+
+.added-in-diff.formio-hidden::after {
+  @include hidden-diff-explainer("A hidden field has been added that is currently not required for your application.");
+}
+
+.single-requirement-form {
+  button {
+    display: none;
+  }
+}
+
+/* ======================================
+
+			Override formio styles (end)
+
+====================================== */

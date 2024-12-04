@@ -1,0 +1,108 @@
+{
+  "name": "hous-permit-potal",
+  "type": "module",
+  "license": "Apache-2.0",
+  "private": true,
+  "engines": {
+    "node": ">=v20.10.0"
+  },
+  "devDependencies": {
+    "@chakra-ui/cli": "^2.4.1",
+    "@types/leaflet": "^1.9.8",
+    "@types/node": "^20.12.2",
+    "@types/quill": "^2.0.14",
+    "@types/ramda": "^0.29.9",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-react": "^7.22.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^11.0.0",
+    "prettier": "^3.1.0",
+    "prettier-plugin-organize-imports": "^3.2.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "reactotron-apisauce": "^3.0.0",
+    "reactotron-mst": "^3.1.4",
+    "reactotron-react-js": "^3.3.8",
+    "sass": "^1.70.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.3",
+    "vite": "^5.4.9",
+    "vite-plugin-ruby": "^5.0.0"
+  },
+  "dependencies": {
+    "@anycable/web": "^0.8.0",
+    "@bcgov/bc-sans": "^2.1.0",
+    "@chakra-ui/react": "^2.10.3",
+    "@dnd-kit/core": "^6.1.0",
+    "@dnd-kit/modifiers": "^7.0.0",
+    "@dnd-kit/sortable": "^8.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@formio/js": "^5.0.0-rc.37",
+    "@formio/react": "^5.3.0",
+    "@phosphor-icons/react": "^2.0.15",
+    "@react-pdf/renderer": "^3.4.0",
+    "@types/jest": "^29.5.10",
+    "@types/react": "^18.2.38",
+    "@types/react-datepicker": "^6.0.1",
+    "@types/react-dom": "^18.2.17",
+    "apisauce": "^3.0.1",
+    "date-fns": "^2.30.0",
+    "date-fns-tz": "^2.0.1",
+    "follow-redirects": ">=1.15.6",
+    "formiojs": "^4.17.4",
+    "framer-motion": "^10.16.5",
+    "fuse.js": "^7.0.0",
+    "humps": "^2.0.1",
+    "i18next": "^23.7.6",
+    "leaflet": "^1.9.4",
+    "mobx": "^6.11.0",
+    "mobx-persist-store": "^1.1.3",
+    "mobx-react-lite": "^4.0.5",
+    "mobx-state-tree": "^5.4.0",
+    "query-string": "^8.1.0",
+    "quill-delta": "^5.1.0",
+    "ramda": "^0.29.1",
+    "rc-pagination": "^4.0.4",
+    "react-datepicker": "^6.1.0",
+    "react-helmet": "^6.1.0",
+    "react-hook-form": "^7.50.1",
+    "react-i18next": "^13.5.0",
+    "react-leaflet": "^4.2.1",
+    "react-markdown": "^9.0.1",
+    "react-password-strength-bar": "^0.4.1",
+    "react-quill": "^2.0.0",
+    "react-remove-scroll": "^2.5.7",
+    "react-router-dom": "^6.20.0",
+    "react-select": "^5.8.0",
+    "restructure": "^3.0.0",
+    "uuid": "^9.0.1"
+  },
+  "overrides": {
+    "vite": {
+      "rollup": "npm:@rollup/wasm-node"
+    }
+  },
+  "scripts": {
+    "dev": "bin/vite dev",
+    "build": "bundle exec vite build",
+    "lint": "eslint app/frontend/**/*.ts[x]",
+    "prepare": "husky install",
+    "gen:theme-typings": "chakra-cli tokens app/frontend/styles/theme/index.ts",
+    "postinstall": "npm run gen:theme-typings",
+    "build:ssr": "bundle exec vite build --ssr",
+    "generate-pdf": " node public/vite-ssr/ssr.js"
+  },
+  "lint-staged": {
+    "*.{js,css,md,ts,tsx}": [
+      "prettier --write"
+    ],
+    "*.rb": [
+      "stree write"
+    ]
+  }
+}

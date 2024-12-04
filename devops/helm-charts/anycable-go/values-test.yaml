@@ -1,0 +1,13 @@
+route:
+  spec:
+    host: "websockets.test.buildingpermit.gov.bc.ca"
+
+anycable-go:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      cpu: 100m
+      memory: 512Mi
