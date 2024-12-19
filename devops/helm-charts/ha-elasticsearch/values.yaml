@@ -17,10 +17,10 @@ elasticsearch:
     resources:
       requests:
         cpu: "20m"
-        memory: "128Mi"
+        memory: "256Mi"
       limits:
         cpu: "100m"
-        memory: "512Mi"
+        memory: "1024Mi"
     persistence:
       enabled: true
       accessModes:
@@ -32,8 +32,8 @@ elasticsearch:
       enabled: false
     livenessProbe:
       enabled: true
-      initialDelaySeconds: 300
-      periodSeconds: 10
+      initialDelaySeconds: 1200
+      periodSeconds: 15
       timeoutSeconds: 5
       successThreshold: 1
       failureThreshold: 5
@@ -46,10 +46,10 @@ elasticsearch:
     resources:
       requests:
         cpu: "20m"
-        memory: "256Mi"
+        memory: "512Mi"
       limits:
         cpu: "150m"
-        memory: "512Mi"
+        memory: "1024Mi"
     persistence:
       enabled: true
       accessModes:
@@ -61,8 +61,8 @@ elasticsearch:
       enabled: false
     livenessProbe:
       enabled: true
-      initialDelaySeconds: 500
-      periodSeconds: 10
+      initialDelaySeconds: 1200
+      periodSeconds: 15
       timeoutSeconds: 5
       successThreshold: 1
       failureThreshold: 5
