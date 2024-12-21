@@ -21,5 +21,17 @@ export const Heading = {
         borderColor: "theme.yellow",
       },
     },
+    greenline: {
+      // puts a decorative green bar above the header text
+      marginTop: "1em",
+      lineHeight: "150%",
+      _before: {
+        display: "block",
+        width: "36px",
+        height: "8px",
+        borderTop: "4px solid",
+        borderColor: "theme.green",
+      },
+    },
   },
 }

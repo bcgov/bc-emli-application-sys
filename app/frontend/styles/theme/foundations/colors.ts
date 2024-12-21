@@ -7,16 +7,18 @@ export const colors = {
   theme: {
     blue: "#003366",
     blueAlt: "#38598A",
-    blueLight: "#F6F9FC",
+    blueLight: "#ECF6FF",
+    blueText: "#2464A4",
     blueGradient:
       "var(--Gradient-Blue-Background, linear-gradient(125deg, #142B43 -52.7%, #142B43 -52.68%, #054277 47.38%, #142B43 137.55%))",
     blueShadedDark: "rgba(1, 51, 102, 0.90)",
     blueShadedLight: "rgba(1, 51, 102, 0.40)",
     yellow: "#FCBA19",
     yellowLight: "#FEF2D6",
-    green: {
-      100: "#F5FFF8",
-    },
+    green: "#61A744",
+    // green: {
+    //   100: "#F5FFF8",
+    // },
   },
   background: {
     sandboxBase: "#FFC6CB",
