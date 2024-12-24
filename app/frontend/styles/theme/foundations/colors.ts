@@ -6,8 +6,7 @@ export const colors = {
   },
   theme: {
     blue: "#003366",
-    // blueAlt: "#38598A",
-    blueAlt:"#005C97",
+    blueAlt: "#38598A",
     blueLight: "#ECF6FF",
     blueText: "#2464A4",
     blueGradient:

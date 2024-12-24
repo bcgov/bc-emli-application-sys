@@ -1,14 +1,10 @@
-import { Box, Container, Divider, Flex, Heading, Image, Link, Text, VStack ,Button} from "@chakra-ui/react"
+import { Box, Container, Divider, Flex, Heading, Image, Link, Text, VStack } from "@chakra-ui/react"
 import { observer } from "mobx-react-lite"
 import React from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation } from "react-router-dom"
 import { useMst } from "../../../setup/root"
 import { RouterLink } from "../navigation/router-link"
-import {
-  ArrowSquareOut,
-} from "@phosphor-icons/react"
-
 
 export const Footer = observer(() => {
   const location = useLocation()
@@ -42,17 +38,6 @@ export const Footer = observer(() => {
           <Flex py={8} borderY="4px solid" borderColor="theme.yellow" bg="text.primary" color="greys.white">
             <Container maxW="container.lg">
               <Text>{t("site.territorialAcknowledgement")}</Text>
-              <Flex mt="auto" direction={{ base: "column", md: "row" }} gap="2">
-              <Text>{t("site.privacyAndTermsPrefix")}</Text>
-                <Button as="span" variant="link" color="white" onClick={() => {/* handle click */}}>
-                  {t("site.privacyText")}<ArrowSquareOut /> 
-                </Button>
-                <Text>{t("site.midText")}</Text>
-                <Button as="span" variant="link" color="white" onClick={() => {/* handle click */}}>
-                  {t("site.termsText")}<ArrowSquareOut />
-                </Button>
-                <Text>{t("site.privacyAndTermsSuffix")} </Text>
-              </Flex>
             </Container>
           </Flex>
           <Box py={14} bg="greys.grey03" w="full">

@@ -17,7 +17,6 @@ import {
   MenuList,
   Portal,
   Show,
-  Hide,
   Spacer,
   Text,
   VStack,
@@ -106,16 +105,12 @@ export const NavBar = observer(function NavBar() {
   const { sessionStore, userStore, notificationStore, uiStore, sandboxStore } = useMst()
 
   const { currentUser } = userStore
-  const { loggedIn,logout } = sessionStore
+  const { loggedIn } = sessionStore
   const { criticalNotifications } = notificationStore
   const { rmJurisdictionSelectKey } = uiStore
 
   const location = useLocation()
   const path = location.pathname
-
-  const handleClickLogout = async () => {
-    await logout()
-  }
 
   return (
     <PopoverProvider>
@@ -169,7 +164,7 @@ export const NavBar = observer(function NavBar() {
               <Spacer />
             </Show>
             <HStack gap={3} w="full" justify="flex-end">
-              {!loggedIn && <Hide above="md"><HelpDrawer /></Hide>}
+              {!loggedIn && <HelpDrawer />}
               {currentUser?.isSubmitter && !currentUser.isUnconfirmed && (
                 <RouterLinkButton to="/" variant="tertiary" leftIcon={<Folders size={16} />}>
                   {t("site.myPermits")}
@@ -197,46 +192,20 @@ export const NavBar = observer(function NavBar() {
                   {t(`user.roles.${currentUser.role as EUserRoles}`)}
                 </Text>
               )}
-              {/* {(!loggedIn || currentUser?.isSubmitter) && (
+              {(!loggedIn || currentUser?.isSubmitter) && (
                 <Show above="md">
                   <RouterLinkButton variant="tertiary" to="/jurisdictions">
                     {t("home.jurisdictionsTitle")}
                   </RouterLinkButton>
                 </Show>
-              )} */}
+              )}
               {loggedIn && (
                 <NotificationsPopover
                   aria-label="notifications popover"
                   color={currentUser?.isSubmitter || !loggedIn ? "theme.blue" : "greys.white"}
                 />
               )}
-               <Hide above="md">
-               <NavBarMenu />
-                </Hide>
-              <Show above="md">
-                    <RouterLinkButton variant="tertiary" to={""} >
-                    {t("auth.getSupport")}
-                  </RouterLinkButton>
-                </Show>
-              <Show above="md">
-                    <RouterLinkButton variant="tertiary" to={""}  >
-                    {t("auth.giveFeedback")}
-                  </RouterLinkButton>
-                </Show>
-              {(!loggedIn) && (
-                <Show above="md">
-                  <RouterLinkButton variant="tertiary" to="/login">
-                    {t("auth.login")}
-                  </RouterLinkButton>
-                </Show>
-              )}
-               {(loggedIn) && (
-              <Show above="md">
-                    <RouterLinkButton variant="tertiary" onClick={handleClickLogout}>
-                    {t("auth.logout")}
-                  </RouterLinkButton>
-                </Show>
-               )}
+              <NavBarMenu />
             </HStack>
           </Flex>
         </Container>

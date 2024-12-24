@@ -23,7 +23,7 @@ export const Heading = {
     },
     greenline: {
       // puts a decorative green bar above the header text
-      // marginTop: "1em",
+      marginTop: "1em",
       lineHeight: "150%",
       _before: {
         display: "block",
