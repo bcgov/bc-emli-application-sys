@@ -19,6 +19,8 @@ const options = {
         auth: {
           login: "Login",
           adminLogin: "Admin login",
+          getSupport :"Get support",
+          giveFeedback:"Give feedback",
           adminAccountAccess: "If you cannot login with your IDIR, please contact your administrator to gain access.",
           prompt:
             "You must have a BCeID account to use this system. If you don’t have one yet, please register for one based on your use case.",
@@ -65,13 +67,13 @@ const options = {
           tokenExpired: "Your session is no longer valid, please login again",
         },
         landing: {
-          title: "Save energy, upgrade your home",
+          title:"Savings Program Application",
           intro:
-            "",
+          "The CleanBC Better Homes Energy Savings Program offers rebates for up to 100% of the costs for energy-saving home upgrades.",
           easilyUpload: "Easy to follow instructions to help you submit your application",
           bestPractices: "TBD: Standardized requirements across participating jurisdictions",
           easyToFollow: "Easily upload your proof of eligibility",
-          accessMyPermits: "Apply for the Energy Savings Program",
+          applyForRebates:"Apply for rebates",
           accessExplanation: "Use your BC Services Card account to log in and start your Savings Program Application.",
           whoForTitle: "Who is this for?",
           whoFor: [
@@ -140,12 +142,12 @@ const options = {
           moreComingSoon: "(more coming soon)",
           andMore: "...and more",
           additionalContent: {
-            left: "See helpful tips from your local jurisdictions to streamline your digital building permit applications",
-            mid: "Preview the Small-scale/Multi-unit housing checklist",
-            midSub: "(Part 9 BC Building Code)",
-            viewTemplate: "View requirements",
-            end: "Accurately fill out your permit application online with ease",
-            endButton: "Get started now",
+            left: "Get recommendations on home upgrades opportunities using the BC Home Energy Planner",
+            mid: "Speak with an energy coach about home upgrade opportunities",
+            midButton:"Schedule a call",
+            viewTemplate: "Get started",
+            end: "Do a virtual walk-through of your home with an energy specialist",
+            endButton: "Schedule virtual assessment",
           },
         },
         ui: {
@@ -1941,6 +1943,11 @@ const options = {
           },
           territorialAcknowledgement:
             "The B.C. Public Service acknowledges the territories of First Nations around B.C. and is grateful to carry out our work on these lands. We acknowledge thse rights, interests, priorities, and concerns of all Indigenous Peoples - First Nations, Métis, and Inuit - respecting and acknowledging their distinct cultures, histories, rights, laws, and governments.",
+          privacyAndTermsPrefix:"This site is protected by reCAPTCHA and the Google",
+          midText:'and',
+          privacyText:"Privacy Policy",
+          termsText:"Terms of Service",
+          privacyAndTermsSuffix:"apply.",
           home: "Home",
           contact: "Contact us",
           contactEmail: "digital.codes.permits@gov.bc.ca",

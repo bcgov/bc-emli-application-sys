@@ -40,7 +40,7 @@ import { RouterLink } from "../../shared/navigation/router-link"
 import { RouterLinkButton } from "../../shared/navigation/router-link-button"
 import { AddressSelect } from "../../shared/select/selectors/address-select"
 import { JurisdictionSelect } from "../../shared/select/selectors/jurisdiction-select"
-//import { GreenLineSmall } from "../../shared/base/decorative/green-line-small"
+import { GreenLineSmall } from "../../shared/base/decorative/green-line-small"
 
 interface ILandingScreenProps {}
 
@@ -65,19 +65,30 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
       <Flex
         align="center"
         h={{ base: "calc(100vh - 200px)", sm: "364px" }}
-        bgImage="/images/header-background.png"
+        bgImage="/images/header-background.jpeg"
         bgPosition="center 60%"
         bgRepeat="no-repeat"
         bgSize="cover"
         bgColor="theme.blue"
       >
-        <Flex direction="column" justify="center" bgColor="theme.blueShadedLight" w="full" height="full">
-          <Container maxW="container.lg" px={8} display="flex" justifyContent="center" alignItems="center" minH="100vh">
-              <Heading as="h1" fontSize="2xl">
+          <Flex direction="column" justify="center" bgColor="theme.blueShadedLight" w="full" height="full" >
+          <Container maxW="container.lg" px={8}>
+            <Flex
+              direction="column"
+              p={8}
+              maxW="550px"
+              bg="theme.blueShadedDark"
+              color="greys.white"
+              borderRadius="sm"
+              borderLeft="8px solid"
+              borderColor="theme.yellow"
+              gap={2}
+            >
+              <Text fontSize="2xl" fontWeight="bold">
                 {t("landing.title")}
-              </Heading>
-              {t("landing.intro") ?? (<Text fontSize="lg">{t("landing.intro")}</Text>)}
-            
+              </Text>
+              <Text fontSize="lg" fontWeight="light">{t("landing.intro")}</Text>
+            </Flex>
           </Container>
         </Flex>
       </Flex>
@@ -101,8 +112,9 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
               flex={1}
               minW={{ base: "0", md: "50%" }}
             >
-              <Heading as="h2">{t("landing.accessMyPermits")}</Heading>
+              <Heading as="h2">{t("landing.applyForRebates")}</Heading>
               <Text>{t("landing.accessExplanation")}</Text>
+              <GreenLineSmall />
               <Flex gap={6} direction={{ base: "column", md: "row" }}>
                 <RouterLinkButton
                   to={currentUser ? "/" : "/login"}
@@ -116,8 +128,7 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
                   })}
                 </RouterLinkButton>
               </Flex>
-              
-              <Flex mt="auto" direction="column">
+              <Flex  direction={{ base: "column", md: "row" }} gap="2">
                 <Text>
                   {t("landing.continuePrefix")}{' '}
                 </Text>
@@ -128,6 +139,7 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
                   {' '}{t("landing.continueSuffix")}
                 </Text>
               </Flex>
+              
             </Flex>
             <VStack as="section" align="flex-start" spacing={4}>
               <Heading as="h2" variant="greenline" color="theme.blueText">
@@ -172,32 +184,34 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
           <Text>{t("landing.otherWaysDesc")}</Text>
           <Flex mt={8} gap={6} direction={{ base: "column", md: "row" }}>
             <BareBox n={"1"}>
-              {t("landing.additionalContent.mid")}
+              {t("landing.additionalContent.left")}
               <br />
-              <Text as="span" fontWeight={400}>
-                {t("landing.additionalContent.midSub")}
-              </Text>
-
               <RouterLinkButton
                 variant={"primary"}
                 mt={2}
-                leftIcon={<ArrowSquareOut />}
-                to={`/early-access/requirement-templates/${smallScaleRequirementTemplateId}`}
+                to={''}
               >
                 {t("landing.additionalContent.viewTemplate")}
               </RouterLinkButton>
             </BareBox>
 
             <BareBox n={"2"}>
+              {t("landing.additionalContent.mid")}
+              <br />
+              <RouterLinkButton mt={2} variant={"primary"} to={''}>
+                {t("landing.additionalContent.midButton")}
+              </RouterLinkButton>
+            </BareBox>
+            <BareBox n={"3"}>
               {t("landing.additionalContent.end")}
-              <RouterLinkButton mt={2} variant={"primary"} to={loggedIn ? "/permit-applications/new" : "/login"}>
+              <RouterLinkButton mt={2} variant={"primary"} to={''}>
                 {t("landing.additionalContent.endButton")}
               </RouterLinkButton>
             </BareBox>
           </Flex>
         </Container>
       </Box>
-      <Box bg="greys.grey03">
+      {/* <Box bg="greys.grey03">
         <Container maxW="container.lg" py={10} gap="2" textAlign="center">
           <Heading as="h3" fontSize="md">
             {t("landing.createdQ")}
@@ -207,7 +221,7 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
             {t("landing.tellUsYourExperience")}
           </Link>
         </Container>
-      </Box>
+      </Box> */}
     </Flex>
   )
 })
