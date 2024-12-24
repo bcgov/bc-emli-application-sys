@@ -19,8 +19,8 @@ const options = {
         auth: {
           login: "Login",
           adminLogin: "Admin login",
-          getSupport :"Get support",
-          giveFeedback:"Give feedback",
+          getSupport: "Get support",
+          giveFeedback: "Give feedback",
           adminAccountAccess: "If you cannot login with your IDIR, please contact your administrator to gain access.",
           prompt:
             "You must have a BCeID account to use this system. If you don’t have one yet, please register for one based on your use case.",
@@ -67,13 +67,13 @@ const options = {
           tokenExpired: "Your session is no longer valid, please login again",
         },
         landing: {
-          title:"Savings Program Application",
+          title: "Savings Program Application",
           intro:
-          "The CleanBC Better Homes Energy Savings Program offers rebates for up to 100% of the costs for energy-saving home upgrades.",
+            "The CleanBC Better Homes Energy Savings Program offers rebates for up to 100% of the costs for energy-saving home upgrades.",
           easilyUpload: "Easy to follow instructions to help you submit your application",
           bestPractices: "TBD: Standardized requirements across participating jurisdictions",
           easyToFollow: "Easily upload your proof of eligibility",
-          applyForRebates:"Apply for rebates",
+          applyForRebates: "Apply for rebates",
           accessExplanation: "Use your BC Services Card account to log in and start your Savings Program Application.",
           whoForTitle: "Who is this for?",
           whoFor: [
@@ -81,7 +81,7 @@ const options = {
             "You meet income qualification requirements",
             "You have residential utility accounts with BC Hydro, FortisBC or a municipal utility",
             "You're a homeowner looking to make energy-saving home upgrades to your home",
-            "You're a tenant who pays your own energy utility bills and want to help your landlord install energy-saving home upgrades to your rental"
+            "You're a tenant who pays your own energy utility bills and want to help your landlord install energy-saving home upgrades to your rental",
           ],
           iNeedPrefix: "Visit the ",
           iNeed: "CleanBC Better Homes Energy Savings Program",
@@ -100,7 +100,8 @@ const options = {
           duringApplication: "During the application, we will ask for:",
           informationReady: "Have this information ready when you being your registration to speed up the process.",
           otherWays: "Other ways to get started",
-          otherWaysDesc: "These services can help you better understand your home’s energy efficiency, recommend upgrades and assist you with the application process.",
+          otherWaysDesc:
+            "These services can help you better understand your home’s energy efficiency, recommend upgrades and assist you with the application process.",
           reqsVary:
             "Permit requirements vary by local jurisdiction and depend on the geography of the surrounding location.",
           permitImportance:
@@ -144,7 +145,7 @@ const options = {
           additionalContent: {
             left: "Get recommendations on home upgrades opportunities using the BC Home Energy Planner",
             mid: "Speak with an energy coach about home upgrade opportunities",
-            midButton:"Schedule a call",
+            midButton: "Schedule a call",
             viewTemplate: "Get started",
             end: "Do a virtual walk-through of your home with an energy specialist",
             endButton: "Schedule virtual assessment",
@@ -1943,13 +1944,16 @@ const options = {
           },
           territorialAcknowledgement:
             "The B.C. Public Service acknowledges the territories of First Nations around B.C. and is grateful to carry out our work on these lands. We acknowledge thse rights, interests, priorities, and concerns of all Indigenous Peoples - First Nations, Métis, and Inuit - respecting and acknowledging their distinct cultures, histories, rights, laws, and governments.",
-          privacyAndTermsPrefix:"This site is protected by reCAPTCHA and the Google",
-          midText:'and',
-          privacyText:"Privacy Policy",
-          termsText:"Terms of Service",
-          privacyAndTermsSuffix:"apply.",
+          privacyAndTermsPrefix: "This site is protected by reCAPTCHA and the Google",
+          midText: "and",
+          privacyText: "Privacy Policy",
+          termsText: "Terms of Service",
+          privacyAndTermsSuffix: "apply.",
           home: "Home",
           contact: "Contact us",
+          betterHomes: "Better Homes",
+          disclaimer: "Disclaimer",
+          dataAndPrivacy: "Data and privacy",
           contactEmail: "digital.codes.permits@gov.bc.ca",
           contactInstructions_1: "If you have any questions or need assistance, see the contact options below:",
           contactInstructions_2: "Have a question about your digital permit application?",

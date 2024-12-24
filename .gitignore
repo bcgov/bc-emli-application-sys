@@ -63,6 +63,5 @@ deleteme.*
 /allure-results/
 /cypress/downloads/
 /cypress/screenshots/
-/db/schema.db
 
 .npm/
