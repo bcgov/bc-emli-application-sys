@@ -65,6 +65,40 @@ const options = {
           checkYourEmail:
             "Check your email inbox for a confirmation email to finish activating your new Building Permit Hub account.",
           tokenExpired: "Your session is no longer valid, please login again",
+          checkEligibility: {
+            home: "Home",
+            seeEligible: "See if you’re eligible",
+            aboutProgram: "About the Energy Savings Program",
+            programIntro:
+              "The Energy Savings Program (ESP) offers home energy efficiency rebates based on your household income. It is an initiative of CleanBC Better Homes. It is funded by the Province of B.C., the Government of Canada and BC Hydro.",
+            programAffordability:
+              "ESP makes energy-saving home upgrades more affordable to low- and middle-income households. Energy efficiency upgrades can help you lower your monthly energy cost.They can also help you improve year-round comfort in your home, enjoy healthier indoor air quality and reduce your greenhouse gas emissions.",
+            questionInstruction: "Answer a few quick questions to find out if you qualify for the program.",
+            homeQuestion: "What kind of home do you live in?",
+            kindOfHomes: [
+              "Single family home (detached dwelling)",
+              "Secondary suite in a  single family home",
+              "Duplex, triplex, row  or townhome",
+              "Manufactured / mobile home",
+              "Condominium or apartment",
+              "Other",
+              "Unsure",
+            ],
+            propertyAssesmentQuestion: "What is your property’s total assessed value?",
+            assesmentText: "You can find the assessed value of your property on",
+            BCAssessment: "BC Assessment.",
+            assesedValues: ["Over $1,230,000", "At or under $1,230,000", "Unsure"],
+            paymentQuestion: "Do you or a family member pay your own electricity and heating bills?",
+            paymentTextPrefix:
+              "Common utility providers include BC Hydro, FortisBC, Pacific Northern Gas, City of New Westminster, City of Penticton, City of Grand Forks, Nelson Hydro, and District of Summerland.",
+            paymentTextSuffix: "Answer yes if you pay for your own wood, oil, or propane to heat your home.",
+            paymentOption: ["Yes", "No", "Unsure"],
+            totalPeople: "How many people live in your home?",
+            peopleTextPrefix:
+              "Include all adults and children. Include all roommates and tenants who live in the same individually metered suite or home.",
+            peopleTextSuffix: "Do not include people who live in a separate secondary suite.",
+            peopleNumber: ["One", "Two", "Three", "Four", "Five", "Six", "Seven or more"],
+          },
         },
         landing: {
           title: "Savings Program Application",
