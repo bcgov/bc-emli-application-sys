@@ -1,13 +1,11 @@
-import { Box, Container, Divider, Flex, Heading, Image, Link, Text, VStack ,Button} from "@chakra-ui/react"
+import { Box, Button, Container, Divider, Flex, Show, Text, Wrap } from "@chakra-ui/react"
+import { ArrowSquareOut } from "@phosphor-icons/react"
 import { observer } from "mobx-react-lite"
 import React from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation } from "react-router-dom"
 import { useMst } from "../../../setup/root"
 import { RouterLink } from "../navigation/router-link"
-import {
-  ArrowSquareOut,
-} from "@phosphor-icons/react"
 
 export const Footer = observer(() => {
   const location = useLocation()
@@ -42,12 +40,13 @@ export const Footer = observer(() => {
           <Flex py={8} borderY="4px solid" borderColor="theme.yellow" bg="text.primary" color="greys.white">
             <Container maxW="container.lg">
               <Text>{t("site.territorialAcknowledgement")}</Text>
-              <Flex mt="auto" direction={{ base: "column", md: "row" }} gap="2">
+              <Wrap spacing={2} justify="flex-start">
                 <Text>{t("site.privacyAndTermsPrefix")}</Text>
                 <Button
                   as="span"
                   variant="link"
                   color="white"
+                  gap="0.2rem"
                   onClick={() => {
                     /* handle click */
                   }}
@@ -60,6 +59,7 @@ export const Footer = observer(() => {
                   as="span"
                   variant="link"
                   color="white"
+                  gap="0.2rem"
                   onClick={() => {
                     /* handle click */
                   }}
@@ -68,36 +68,38 @@ export const Footer = observer(() => {
                   <ArrowSquareOut />
                 </Button>
                 <Text>{t("site.privacyAndTermsSuffix")} </Text>
-              </Flex>
+              </Wrap>
             </Container>
           </Flex>
-          <Box py={14} bg="greys.grey03" w="full">
-            <Container maxW="container.lg">
-              <Flex direction={{ base: "column", md: "row" }} gap={12}>
-                <Flex direction={"row"} align="center" justify="center" wrap="wrap" gap={8}>
-                  <RouterLink to="" color="text.secondary" style={{ textDecoration: "none" }}>
-                    {t("site.betterHomes")}
-                  </RouterLink>
-                  <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                  <RouterLink to="" color="text.secondary" style={{ textDecoration: "none" }}>
-                    {t("site.disclaimer")}
-                  </RouterLink>
-                  <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                  <RouterLink to="" color="text.secondary" style={{ textDecoration: "none" }}>
-                    {t("site.accessibility")}
-                  </RouterLink>
-                  <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                  <RouterLink to="" color="text.secondary" style={{ textDecoration: "none" }}>
-                    {t("site.copyright")}
-                  </RouterLink>
-                  <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                  <RouterLink to="" color="text.secondary" style={{ textDecoration: "none" }}>
-                    {t("site.dataAndPrivacy")}
-                  </RouterLink>
+          <Show above="md">
+            <Box py={14} bg="greys.grey03" w="full">
+              <Container maxW="container.lg">
+                <Flex direction={{ base: "column", md: "row" }} gap={12}>
+                  <Flex direction={"row"} align="center" justify="center" wrap="wrap" gap={8}>
+                    <RouterLink to="" color="text.secondary" style={{ textDecoration: "none" }}>
+                      {t("site.betterHomes")}
+                    </RouterLink>
+                    <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
+                    <RouterLink to="" color="text.secondary" style={{ textDecoration: "none" }}>
+                      {t("site.disclaimer")}
+                    </RouterLink>
+                    <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
+                    <RouterLink to="" color="text.secondary" style={{ textDecoration: "none" }}>
+                      {t("site.accessibility")}
+                    </RouterLink>
+                    <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
+                    <RouterLink to="" color="text.secondary" style={{ textDecoration: "none" }}>
+                      {t("site.copyright")}
+                    </RouterLink>
+                    <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
+                    <RouterLink to="" color="text.secondary" style={{ textDecoration: "none" }}>
+                      {t("site.dataAndPrivacy")}
+                    </RouterLink>
+                  </Flex>
                 </Flex>
-              </Flex>
-            </Container>
-          </Box>
+              </Container>
+            </Box>
+          </Show>
         </Flex>
       )}
     </>
