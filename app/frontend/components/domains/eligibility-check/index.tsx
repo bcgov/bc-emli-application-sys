@@ -26,8 +26,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
 
   return (
     <Flex direction="column" w="full" bg="greys.white">
-      {/* Breadcrumb Section */}
-      <Container maxW="container.lg" px={8}>
+      {/* <Container maxW="container.lg" px={8}>
         <Breadcrumb>
           <BreadcrumbItem>
             <BreadcrumbLink href="/welcome" color="text.link">
@@ -38,7 +37,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
             <Text as="b">{t("auth.checkEligibility.seeEligible")}</Text>
           </BreadcrumbItem>
         </Breadcrumb>
-      </Container>
+      </Container> */}
 
       {/* Header Section */}
       <Flex
