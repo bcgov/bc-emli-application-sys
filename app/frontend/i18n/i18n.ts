@@ -98,6 +98,19 @@ const options = {
               "Include all adults and children. Include all roommates and tenants who live in the same individually metered suite or home.",
             peopleTextSuffix: "Do not include people who live in a separate secondary suite.",
             peopleNumber: ["One", "Two", "Three", "Four", "Five", "Six", "Seven or more"],
+            alert: {
+              eligible: "You may be eligible to apply for the Energy Savings Program",
+              loginWithCard: "Log in with your BC Services Card Account to start the application process.",
+              loginWithAccount: "Log in with BC Services Card Account",
+              condoEligible: "A condominium or apartment is currently not eligible.",
+              currentlyEligibleHome: "Home types currently eligible for the Energy Savings Program are:",
+              typesOfhome: [
+                "Single-family homes or secondary suites in a single-family home",
+                "Mobile homes that are fixed on a foundation and structurally complete with plumbing, electrical, sewer, and water hooked up permanently",
+                "Duplex, triplex, row, and townhomes",
+              ],
+              seeDetails: "See the full requirement details",
+            },
           },
         },
         landing: {

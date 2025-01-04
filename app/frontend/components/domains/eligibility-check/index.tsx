@@ -1,19 +1,10 @@
-import {
-  Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  Container,
-  Flex,
-  Heading,
-  Image,
-  Text,
-  VStack,
-} from "@chakra-ui/react"
+import { Box, Container, Flex, Heading, Image, Text, VStack } from "@chakra-ui/react"
 import { observer } from "mobx-react-lite"
 import React from "react"
 import { useTranslation } from "react-i18next"
+import ErrorAlert from "../../shared/base/error-alert"
 import QuestionCard from "../../shared/base/question-card"
+import SuccessAlert from "../../shared/base/success-alert"
 
 interface IEligibilityCheckProps {}
 
@@ -26,19 +17,6 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
 
   return (
     <Flex direction="column" w="full" bg="greys.white">
-      {/* <Container maxW="container.lg" px={8}>
-        <Breadcrumb>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/welcome" color="text.link">
-              {t("auth.checkEligibility.home")}
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbItem>
-            <Text as="b">{t("auth.checkEligibility.seeEligible")}</Text>
-          </BreadcrumbItem>
-        </Breadcrumb>
-      </Container> */}
-
       {/* Header Section */}
       <Flex
         align="center"
@@ -91,6 +69,8 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
               answers={t("auth.checkEligibility.kindOfHomes", { returnObjects: true })}
               onAnswerSelect={handleAnswerSelect}
             />
+            {/* Conditions to be added later */}
+            <ErrorAlert />
             <QuestionCard
               question={t("auth.checkEligibility.propertyAssesmentQuestion")}
               answers={t("auth.checkEligibility.assesedValues", { returnObjects: true })}
@@ -109,6 +89,8 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
               onAnswerSelect={handleAnswerSelect}
               type={t("auth.checkEligibility.peopleTextPrefix")}
             />
+            {/* Conditions to be added later */}
+            <SuccessAlert />
           </VStack>
         </VStack>
       </Container>

@@ -16,6 +16,7 @@ import {
   Text,
   UnorderedList,
   VStack,
+  Wrap,
 } from "@chakra-ui/react"
 import {
   ArrowSquareOut,
@@ -157,20 +158,23 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
                   <ListItem key={str}>{str}</ListItem>
                 ))}
               </UnorderedList>
-              <Text>
-                {t("landing.iNeedPrefix")}{" "}
-                <Button
-                  as="span"
-                  variant="link"
-                  onClick={() => {
-                    /* handle click */
-                  }}
-                >
-                  {t("landing.iNeed")}
-                  <ArrowSquareOut />
-                </Button>{" "}
-                {t("landing.iNeedSuffix")}
-              </Text>
+              <Wrap spacing={2} justify="flex-start">
+                <Text>
+                  {t("landing.iNeedPrefix")}
+                  <Button
+                    as="span"
+                    variant="link"
+                    gap="0.2rem"
+                    onClick={() => {
+                      /* handle click */
+                    }}
+                  >
+                    {t("landing.iNeed")}
+                    <ArrowSquareOut />
+                  </Button>
+                  {t("landing.iNeedSuffix")}
+                </Text>
+              </Wrap>
             </VStack>
           </Flex>
         </Flex>
