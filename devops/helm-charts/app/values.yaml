@@ -1,12 +1,12 @@
-OPENSHIFT_NAMESPACE: bb18ab
+OPENSHIFT_NAMESPACE: bfc7dd
 STAGE: dev
-appName: "hous-permit-portal"
+appName: "permit-app"
 
-vaultNamespace: "bb18ab-nonprod"
+vaultNamespace: "bfc7dd-nonprod"
 
 route:
   spec:
-    host: "dev.buildingpermit.gov.bc.ca"
+    host: ""
 
 deployments:
   - process: web

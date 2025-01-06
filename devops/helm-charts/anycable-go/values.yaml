@@ -1,11 +1,7 @@
-OPENSHIFT_NAMESPACE: bb18ab
+OPENSHIFT_NAMESPACE: bfc7dd
 STAGE: dev
 
 name: anycable-go
-
-route:
-  spec:
-    host: "websockets.dev.buildingpermit.gov.bc.ca"
 
 anycable-go:
   nameOverride: "anycable-go"
@@ -17,7 +13,7 @@ anycable-go:
     pullPolicy: IfNotPresent
   env:
     # Assuming that Ruby RPC is available in K8s in the same namespace as anycable-rpc service (see next chapter)
-    anycableRpcHost: hous-permit-portal-anycable-rpc:50051
+    anycableRpcHost: permit-portal-anycable-rpc:50051
     anycableRedisUrl: "redis://redisMasterSet:6379/1"
     anycableRedisSentinels: "redis-ha-headless:26379"
   ingress:
