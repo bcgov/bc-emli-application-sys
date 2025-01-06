@@ -16,6 +16,7 @@ import {
   Text,
   UnorderedList,
   VStack,
+  Wrap,
 } from "@chakra-ui/react"
 import {
   ArrowSquareOut,
@@ -71,7 +72,7 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
         bgSize="cover"
         bgColor="theme.blue"
       >
-          <Flex direction="column" justify="center" bgColor="theme.blueShadedLight" w="full" height="full" >
+        <Flex direction="column" justify="center" bgColor="theme.blueShadedLight" w="full" height="full">
           <Container maxW="container.lg" px={8}>
             <Flex
               direction="column"
@@ -87,7 +88,9 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
               <Text fontSize="2xl" fontWeight="bold">
                 {t("landing.title")}
               </Text>
-              <Text fontSize="lg" fontWeight="light">{t("landing.intro")}</Text>
+              <Text fontSize="lg" fontWeight="light">
+                {t("landing.intro")}
+              </Text>
             </Flex>
           </Container>
         </Flex>
@@ -128,18 +131,22 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
                   })}
                 </RouterLinkButton>
               </Flex>
-              <Flex  direction={{ base: "column", md: "row" }} gap="2">
+              <Flex direction={{ base: "column", md: "row" }} gap="2">
+                <Text>{t("landing.continuePrefix")} </Text>
                 <Text>
-                  {t("landing.continuePrefix")}{' '}
-                </Text>
-                <Text>
-                  <Button as="span" variant="link" style={{color: 'white'}} onClick={() => {/* handle click */}}>
+                  <Button
+                    as="span"
+                    variant="link"
+                    style={{ color: "white" }}
+                    onClick={() => {
+                      /* handle click */
+                    }}
+                  >
                     {t("landing.continueLogin")}
-                  </Button>
-                  {' '}{t("landing.continueSuffix")}
+                  </Button>{" "}
+                  {t("landing.continueSuffix")}
                 </Text>
               </Flex>
-              
             </Flex>
             <VStack as="section" align="flex-start" spacing={4}>
               <Heading as="h2" variant="greenline" color="theme.blueText">
@@ -151,22 +158,32 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
                   <ListItem key={str}>{str}</ListItem>
                 ))}
               </UnorderedList>
-              <Text>
-                {t("landing.iNeedPrefix")}{' '}
-                <Button as="span" variant="link" onClick={() => {/* handle click */}}>
-                  {t("landing.iNeed")}<ArrowSquareOut />
-                </Button>{' '}
-                {t("landing.iNeedSuffix")}
-              </Text>
+              <Wrap spacing={2} justify="flex-start">
+                <Text>
+                  {t("landing.iNeedPrefix")}
+                  <Button
+                    as="span"
+                    variant="link"
+                    gap="0.2rem"
+                    onClick={() => {
+                      /* handle click */
+                    }}
+                  >
+                    {t("landing.iNeed")}
+                    <ArrowSquareOut />
+                  </Button>
+                  {t("landing.iNeedSuffix")}
+                </Text>
+              </Wrap>
             </VStack>
           </Flex>
         </Flex>
       </Container>
       <Box bg="greys.grey03">
         <Container maxW="container.lg" py={10} px={8}>
-        <Heading as="h2" color="theme.blueText">
-          {t("landing.whatToApply")}
-        </Heading>
+          <Heading as="h2" color="theme.blueText">
+            {t("landing.whatToApply")}
+          </Heading>
           <Text py={2}>{t("landing.duringApplication")}</Text>
           <UnorderedList spacing={1} pl={4}>
             {applyNeeds.map((str) => (
@@ -177,7 +194,7 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
         </Container>
       </Box>
       <Box bg="greys.white">
-        <Container maxW="container.lg" py={16} px={8} textAlign="" gap="6">
+        <Container maxW="container.lg" py={16} px={8} gap="6">
           <Heading as="h2" fontSize="md" color="theme.blueText">
             {t("landing.otherWays")}
           </Heading>
@@ -186,11 +203,7 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
             <BareBox n={"1"}>
               {t("landing.additionalContent.left")}
               <br />
-              <RouterLinkButton
-                variant={"primary"}
-                mt={2}
-                to={''}
-              >
+              <RouterLinkButton variant={"primary"} mt={2} to={""}>
                 {t("landing.additionalContent.viewTemplate")}
               </RouterLinkButton>
             </BareBox>
@@ -198,30 +211,19 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
             <BareBox n={"2"}>
               {t("landing.additionalContent.mid")}
               <br />
-              <RouterLinkButton mt={2} variant={"primary"} to={''}>
+              <RouterLinkButton mt={2} variant={"primary"} to={""}>
                 {t("landing.additionalContent.midButton")}
               </RouterLinkButton>
             </BareBox>
             <BareBox n={"3"}>
               {t("landing.additionalContent.end")}
-              <RouterLinkButton mt={2} variant={"primary"} to={''}>
+              <RouterLinkButton mt={2} variant={"primary"} to={""}>
                 {t("landing.additionalContent.endButton")}
               </RouterLinkButton>
             </BareBox>
           </Flex>
         </Container>
       </Box>
-      {/* <Box bg="greys.grey03">
-        <Container maxW="container.lg" py={10} gap="2" textAlign="center">
-          <Heading as="h3" fontSize="md">
-            {t("landing.createdQ")}
-          </Heading>
-          <Text>{t("landing.createdA")}</Text>
-          <Link href={mailto} isExternal mt="4">
-            {t("landing.tellUsYourExperience")}
-          </Link>
-        </Container>
-      </Box> */}
     </Flex>
   )
 })

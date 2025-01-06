@@ -11,6 +11,7 @@ import { EULAScreen } from "../onboarding/eula"
 import { NavBar } from "./nav-bar"
 import { ProtectedRoute } from "./protected-route"
 
+
 const ExternalApiKeysIndexScreen = lazy(() =>
   import("../external-api-key").then((module) => ({ default: module.ExternalApiKeysIndexScreen }))
 )
@@ -37,6 +38,10 @@ const PermitApplicationPDFViewer = lazy(() =>
 
 const EmailConfirmedScreen = lazy(() =>
   import("../authentication/email-confirmed-screen").then((module) => ({ default: module.EmailConfirmedScreen }))
+)
+
+const EligibilityCheck = lazy(() =>
+  import("../eligibility-check").then((module) => ({ default: module.EligibilityCheck }))
 )
 const LoginScreen = lazy(() =>
   import("../authentication/login-screen").then((module) => ({ default: module.LoginScreen }))
@@ -522,6 +527,7 @@ const AppRoutes = observer(() => {
         <Route path="/contact" element={<ContactScreen />} />
         <Route path="/confirmed" element={<EmailConfirmedScreen />} />
         <Route path="/welcome" element={<LandingScreen />} />
+        <Route path="/check-eligible" element={<EligibilityCheck />} />
         <Route
           path="/early-access/requirement-templates/:requirementTemplateId"
           element={<EarlyAccessRequirementTemplateScreen />}
