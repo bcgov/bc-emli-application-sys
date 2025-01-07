@@ -23,10 +23,12 @@ const options = {
           giveFeedback: "Give feedback",
           adminAccountAccess: "If you cannot login with your IDIR, please contact your administrator to gain access.",
           prompt:
-            "You must have a BCeID account to use this system. If you don’t have one yet, please register for one based on your use case.",
-          loginHelp: "Having trouble logging in? ",
+            "Log in with your BC Services Card. It’s a secure way to prove who you are online.",
+          loginHelp: "Don’t have an account? Learn more about BC Services Card Login and how to set up an account.",
           bceidInfo: {
             heading: "Which BCeID should I use?",
+            needHelp: "Need help with your application?",
+            contactCoach: "Contact an energy coach",
             basic: {
               title: "Basic BCeID",
               description: "Use when accessing a service in a personal capacity.",
@@ -44,12 +46,33 @@ const options = {
               seeMore: "See more details",
               register: "Register for Business BCeID",
             },
+            energyCoach: {
+              title: "Contact an energy coach",
+              description: "Request a call with an energy coach for assistance with",
+              fillingRebate: "filling in a rebate application",
+              rebateQuestions: "questions about rebate programs",
+              homeUpgrades:"or home upgrade opportunities in general",
+              requestACall: "Request a call",
+    
+            },
+            virtualAssessment:{
+               title: "Get a virtual assessment",
+               description: "For the highest level of support, schedule a call with an energy specialist to",
+               virtualWalkThrough: "do a virtual walk-through of your home",
+               adviceUpgrades: "get advice on what upgrades are right for you",
+               fillingRebate: "get help filling in a rebate application",
+               scheduleACall: "Schedule a call",
+            }
           },
           logout: "Logout",
           submit: "Submit",
           or: "or",
           bceid_login: "Login with BCeID",
           idir_login: "Login with IDIR",
+          bcservice_login: "Login with BC Services Card Account",
+          noAccount: "Don’t have an account? Learn more about BC Services Card Login and how to set up an account.",
+          troubleLogging: "Have trouble logging in? Service BC Help Desk is here to help.",
+          phoneNumber: "1-888-356-2741",
           role: "Role",
           emailLabel: "Email address",
           userFirstNameLabel: "First name",
@@ -2087,6 +2110,7 @@ const options = {
             acceptInvitation: "Accept invitation",
             eula: "End user license agreement",
             earlyAccess: "Early access",
+            checkEligible:"See if you’re eligible"
           },
         },
         automatedCompliance: {

@@ -1,10 +1,11 @@
-import { Button, Divider, Flex, Heading, Link, Text, VStack } from "@chakra-ui/react"
+import { Button, Divider, Flex, Heading, Link, Text, VStack,HStack, IconButton } from "@chakra-ui/react"
 import React from "react"
 import { useTranslation } from "react-i18next"
-import { BasicBCeIDInfo } from "../../shared/bceid/basic"
-import { BusinessBCeIDInfo } from "../../shared/bceid/business"
 import { CenterContainer } from "../../shared/containers/center-container"
-import { HelpDrawer } from "../../shared/help-drawer"
+import {Phone } from "@phosphor-icons/react"
+import { RouterLinkButton } from "../../shared/navigation/router-link-button"
+import { EnergyCoachInfoBlock } from "../../shared/bcservicecard/energy-coach"
+import { VirtualAssistantInfoBlock } from "../../shared/bcservicecard/virtual-assistant"
 
 interface ILoginScreenProps {
   isAdmin?: boolean
@@ -27,7 +28,7 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
         bg="greys.white"
       >
         <VStack spacing={2} align="start">
-          <Heading as="h1" mb={0}>
+          <Heading as="h1" mb={0} color="theme.blueAlt">
             {isAdmin ? t("auth.adminLogin") : t("auth.login")}
           </Heading>
           {!isAdmin && <Text fontSize="md">{t("auth.prompt")}</Text>}
@@ -37,8 +38,9 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
           {/* @ts-ignore */}
           <input type="hidden" name="authenticity_token" value={document.querySelector("[name=csrf-token]").content} />
           <Button variant="primary" w="full" type="submit">
-            {isAdmin ? t("auth.idir_login") : t("auth.bceid_login")}
+          {t("auth.idir_login")}
           </Button>
+              {/* <RouterLinkButton to="/" w="full"  rightIcon={<ArrowSquareOut size={16} />}>{t("auth.bcservice_login")}</RouterLinkButton> */}
         </form>
         {isAdmin ? (
           <Text>{t("auth.adminAccountAccess")}</Text>
@@ -47,24 +49,19 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
             <Text>
               {t("auth.loginHelp")}
               <Link href="https://www.bceid.ca/clp/account_recovery.aspx" isExternal>
-                {t("ui.clickHere")}
               </Link>
             </Text>
+            <Text>{t("auth.troubleLogging")}</Text>
+                           
+            <Flex direction="row" align="center" gap={2}><Phone size={12.5}/><Text flex={1}>{t("auth.phoneNumber")}</Text></Flex>
             <Divider my={4} />
-            <Heading as="h2" m={0}>
-              {t("auth.bceidInfo.heading")}
+            <Heading as="h2" m={0} color="theme.blueAlt">
+              {t("auth.bceidInfo.needHelp")}
             </Heading>
 
-            <BasicBCeIDInfo />
-            <BusinessBCeIDInfo />
+            <EnergyCoachInfoBlock/>
+            <VirtualAssistantInfoBlock />
 
-            <HelpDrawer
-              renderTriggerButton={({ onClick }) => (
-                <Button variant="link" onClick={onClick}>
-                  {t("ui.help")}
-                </Button>
-              )}
-            />
           </>
         )}
       </Flex>
