@@ -25,7 +25,7 @@ jobs:
       # Step 2: Log in to Artifactory Docker Registry
       - name: Log in to Artifactory
         run: |
-          echo "${{ secrets.ARTIFACTORY_PASSWORD }}" | docker login https://artifacts.developer.gov.bc.ca:443/artifactory -u "${{ secrets.ARTIFACTORY_USERNAME }}" --password-stdin
+          echo "${{ secrets.ARTIFACTORY_PASSWORD }}" | docker login ${{ secrets.ARTIFACTORY_URL }} -u "${{ secrets.ARTIFACTORY_USERNAME }}" --password-stdin
         env:
           DOCKER_CONFIG: /tmp/docker-config
       
@@ -33,16 +33,16 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build \
-            --file ./devops/docker/app/Dockerfile \
-            --tag https://artifacts.developer.gov.bc.ca:443/artifactory/bbfc-local/permit-app:latest \
-            --tag https://artifacts.developer.gov.bc.ca:443/artifactory/bbfc-local/permit-app:${{ github.sha }} \
-            .
-      
+          --file ./devops/docker/app/Dockerfile \
+          --tag ${{ secrets.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPO_NAME }}/permit-app:latest \
+          --tag ${{ secrets.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPO_NAME }}/permit-app:${{ github.sha }} \
+          .
+    
       # Step 4: Push the Docker image to Artifactory
       - name: Push Docker Image to Artifactory
         run: |
-          docker push https://artifacts.developer.gov.bc.ca:443/artifactory/bbfc-local/permit-app:latest
-          docker push https://artifacts.developer.gov.bc.ca:443/artifactory/bbfc-local/permit-app:${{ github.sha }}
-
+          docker push ${{ secrets.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPO_NAME }}/permit-app:latest
+          docker push ${{ secrets.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPO_NAME }}/permit-app:${{ github.sha }}
+      
       - name: Log out from Docker
         run: docker logout ${{ secrets.ARTIFACTORY_URL }}
