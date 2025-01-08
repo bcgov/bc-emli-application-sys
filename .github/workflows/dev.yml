@@ -32,8 +32,8 @@ jobs:
         run: |
           docker build \
             --file ./devops/docker/app/Dockerfile \
-            --tag ${{ secrets.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPO_NAME }}/dev-hous-permit-portal:latest \
-            --tag ${{ secrets.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPO_NAME }}/dev-hous-permit-portal:${{ github.sha }} \
+            --tag ${{ secrets.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPO_NAME }}/permit-app:latest \
+            --tag ${{ secrets.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPO_NAME }}/permit-app:${{ github.sha }} \
             .
       
       # Step 4: Push the Docker image to Artifactory
