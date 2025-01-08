@@ -6,7 +6,7 @@ on:
       branch:
         description: "Branch Name"
         required: true
-        default: "develop"
+        default: "main"
 
 jobs:
   build-and-push-image:
@@ -26,7 +26,9 @@ jobs:
       - name: Log in to Artifactory
         run: |
           echo "${{ secrets.ARTIFACTORY_PASSWORD }}" | docker login ${{ secrets.ARTIFACTORY_URL }} -u "${{ secrets.ARTIFACTORY_USERNAME }}" --password-stdin
-
+        env:
+          DOCKER_CONFIG: /tmp/docker-config
+      
       # Step 3: Build the Docker image
       - name: Build Docker Image
         run: |
@@ -39,5 +41,8 @@ jobs:
       # Step 4: Push the Docker image to Artifactory
       - name: Push Docker Image to Artifactory
         run: |
-          docker push ${{ secrets.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPO_NAME }}/dev-hous-permit-portal:latest
-          docker push ${{ secrets.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPO_NAME }}/dev-hous-permit-portal:${{ github.sha }}
+          docker push ${{ secrets.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPO_NAME }}/permit-app:latest
+          docker push ${{ secrets.ARTIFACTORY_URL }}/${{ secrets.ARTIFACTORY_REPO_NAME }}/permit-app:${{ github.sha }}
+
+      - name: Log out from Docker
+        run: docker logout ${{ secrets.ARTIFACTORY_URL }}
