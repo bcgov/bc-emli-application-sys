@@ -24,7 +24,7 @@ jobs:
 
       # Step 2: Build Image
       - name: Build Docker Image
-        run: cd devops/docker/app && docker build -t permit-app -f Dockerfile .
+        run: docker build -t permit-app -f ./devops/docker/app/Dockerfile .
 
       # Step 3: Tag the Image
       - name: Tag Docker Image
