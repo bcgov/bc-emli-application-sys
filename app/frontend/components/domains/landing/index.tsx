@@ -66,7 +66,7 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
       <Flex
         align="center"
         h={{ base: "calc(100vh - 200px)", sm: "364px" }}
-        bgImage="/images/header-background.jpeg"
+        bgImage="/images/header-background.png"
         bgPosition="center 60%"
         bgRepeat="no-repeat"
         bgSize="cover"
@@ -135,12 +135,12 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
                 <Text>{t("landing.continuePrefix")} </Text>
                 <Text>
                   <Button
-                    as="span"
+                    as="a"
                     variant="link"
+                    href="/login"
+                    color="white"
                     style={{ color: "white" }}
-                    onClick={() => {
-                      /* handle click */
-                    }}
+                    _focus={{ outline: "none", border: "none" }}
                   >
                     {t("landing.continueLogin")}
                   </Button>{" "}

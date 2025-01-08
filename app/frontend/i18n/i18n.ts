@@ -20,10 +20,8 @@ const options = {
           login: "Login",
           adminLogin: "Admin login",
           getSupport: "Get support",
-          giveFeedback: "Give feedback",
           adminAccountAccess: "If you cannot login with your IDIR, please contact your administrator to gain access.",
-          prompt:
-            "Log in with your BC Services Card. It’s a secure way to prove who you are online.",
+          prompt: "Log in with your BC Services Card. It’s a secure way to prove who you are online.",
           loginHelp: "Don’t have an account? Learn more about BC Services Card Login and how to set up an account.",
           bceidInfo: {
             heading: "Which BCeID should I use?",
@@ -51,18 +49,17 @@ const options = {
               description: "Request a call with an energy coach for assistance with",
               fillingRebate: "filling in a rebate application",
               rebateQuestions: "questions about rebate programs",
-              homeUpgrades:"or home upgrade opportunities in general",
+              homeUpgrades: "or home upgrade opportunities in general",
               requestACall: "Request a call",
-    
             },
-            virtualAssessment:{
-               title: "Get a virtual assessment",
-               description: "For the highest level of support, schedule a call with an energy specialist to",
-               virtualWalkThrough: "do a virtual walk-through of your home",
-               adviceUpgrades: "get advice on what upgrades are right for you",
-               fillingRebate: "get help filling in a rebate application",
-               scheduleACall: "Schedule a call",
-            }
+            virtualAssessment: {
+              title: "Get a virtual assessment",
+              description: "For the highest level of support, schedule a call with an energy specialist to",
+              virtualWalkThrough: "do a virtual walk-through of your home",
+              adviceUpgrades: "get advice on what upgrades are right for you",
+              fillingRebate: "get help filling in a rebate application",
+              scheduleACall: "Schedule a call",
+            },
           },
           logout: "Logout",
           submit: "Submit",
@@ -1994,7 +1991,7 @@ const options = {
           },
         },
         site: {
-          title: "Better Homes Energy Savings Program",
+          title: "Better Homes Energy Savings Program application",
           titleLong: "Better Homes Energy Savings Program",
           adminNavBarTitle: "Building Permit Hub - Admin Panel",
           adminPanel: "Admin Panel",
@@ -2110,7 +2107,7 @@ const options = {
             acceptInvitation: "Accept invitation",
             eula: "End user license agreement",
             earlyAccess: "Early access",
-            checkEligible:"See if you’re eligible"
+            checkEligible: "See if you’re eligible",
           },
         },
         automatedCompliance: {
