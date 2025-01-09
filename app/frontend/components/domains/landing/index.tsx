@@ -17,6 +17,7 @@ import {
   UnorderedList,
   VStack,
   Wrap,
+  WrapItem,
 } from "@chakra-ui/react"
 import {
   ArrowSquareOut,
@@ -63,44 +64,35 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
 
   return (
     <Flex direction="column" w="full" bg="greys.white">
-      <Flex
-        align="center"
-        h={{ base: "calc(100vh - 200px)", sm: "364px" }}
-        bgImage="/images/header-background.jpeg"
-        bgPosition="center 60%"
+      <Box
+        h={{ base: "360px" }}
+        position="relative"
+        bgImage={[
+          "linear-gradient(180deg, rgba(0, 0, 0, 0.00) 12.92%, rgba(12, 38, 64, 0.80) 50.36%), url('/images/header-background.png')",
+        ]}
+        backgroundRepeat="no-repeat"
+        bgPosition="center"
         bgRepeat="no-repeat"
         bgSize="cover"
-        bgColor="theme.blue"
+        alignContent="center"
       >
-        <Flex direction="column" justify="center" bgColor="theme.blueShadedLight" w="full" height="full">
-          <Container maxW="container.lg" px={8}>
-            <Flex
-              direction="column"
-              p={8}
-              maxW="550px"
-              bg="theme.blueShadedDark"
-              color="greys.white"
-              borderRadius="sm"
-              borderLeft="8px solid"
-              borderColor="theme.yellow"
-              gap={2}
-            >
-              <Text fontSize="2xl" fontWeight="bold">
-                {t("landing.title")}
-              </Text>
-              <Text fontSize="lg" fontWeight="light">
-                {t("landing.intro")}
-              </Text>
-            </Flex>
-          </Container>
+        {/* Content */}
+        <Flex wrap="wrap" gap={4} alignItems="center" direction="column" textAlign="center" p={4}>
+          <Text fontSize="5xl" fontWeight="bold" color="white" zIndex="1">
+            {t("landing.title")}
+          </Text>
+          <Text fontSize="md" fontWeight="bold" color="white" whiteSpace="normal" zIndex="1" maxW="600px">
+            {t("landing.intro")}
+          </Text>
         </Flex>
-      </Flex>
+      </Box>
+
       <Container maxW="container.lg" py={16} px={8}>
         <Flex as="section" direction="column" gap={20}>
           <Flex gap={6} direction={{ base: "column", md: "row" }}>
-            <IconBox icon={<ClipboardText size={32} />}>{t("landing.easilyUpload")}</IconBox>
-            <IconBox icon={<CheckCircle size={32} />}>{t("landing.bestPractices")}</IconBox>
-            <IconBox icon={<FileArrowUp size={32} />}>{t("landing.easyToFollow")}</IconBox>
+            <IconBox icon={<CheckCircle size={32} />}>{t("landing.checkEligiblity")}</IconBox>
+            <IconBox icon={<ClipboardText size={32} />}>{t("landing.completeSteps")}</IconBox>
+            <IconBox icon={<FileArrowUp size={32} />}>{t("landing.easilyUpgrade")}</IconBox>
           </Flex>
 
           <Flex gap={10} alignItems="stretch" direction={{ base: "column", md: "row" }}>
@@ -115,15 +107,15 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
               flex={1}
               minW={{ base: "0", md: "50%" }}
             >
-              <Heading as="h2">{t("landing.applyForRebates")}</Heading>
-              <Text>{t("landing.accessExplanation")}</Text>
-              <GreenLineSmall />
+              <Heading as="h2">{t("landing.applyForEnergySaving")}</Heading>
+              <Text>{t("landing.checkEligiblityUsingCard")}</Text>
               <Flex gap={6} direction={{ base: "column", md: "row" }}>
                 <RouterLinkButton
-                  to={currentUser ? "/" : "/login"}
+                  to={currentUser ? "/" : "/check-eligible"}
                   variant="primaryInverse"
                   icon={<CaretRight size={16} />}
                   iconPosition="right"
+                  fontWeight="bold"
                 >
                   {t("landing.goTo", {
                     location:
@@ -131,20 +123,19 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
                   })}
                 </RouterLinkButton>
               </Flex>
-              <Flex direction={{ base: "column", md: "row" }} gap="2">
+
+              <Flex mt="auto" direction="column">
                 <Text>{t("landing.continuePrefix")} </Text>
                 <Text>
                   <Button
-                    as="span"
+                    as="a"
                     variant="link"
-                    style={{ color: "white" }}
-                    onClick={() => {
-                      /* handle click */
-                    }}
+                    color="white"
+                    href="/login"
+                    _focus={{ outline: "none", border: "none" }}
                   >
                     {t("landing.continueLogin")}
-                  </Button>{" "}
-                  {t("landing.continueSuffix")}
+                  </Button>
                 </Text>
               </Flex>
             </Flex>
@@ -160,19 +151,10 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
               </UnorderedList>
               <Wrap spacing={2} justify="flex-start">
                 <Text>
-                  {t("landing.iNeedPrefix")}
-                  <Button
-                    as="span"
-                    variant="link"
-                    gap="0.2rem"
-                    onClick={() => {
-                      /* handle click */
-                    }}
-                  >
+                  <Button as="span" variant="link" gap="0.2rem" onClick={() => {}}>
                     {t("landing.iNeed")}
                     <ArrowSquareOut />
                   </Button>
-                  {t("landing.iNeedSuffix")}
                 </Text>
               </Wrap>
             </VStack>
@@ -203,7 +185,7 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
             <BareBox n={"1"}>
               {t("landing.additionalContent.left")}
               <br />
-              <RouterLinkButton variant={"primary"} mt={2} to={""}>
+              <RouterLinkButton mt="2" to={currentUser ? "/" : "/login"} variant="primaryInverse" fontWeight="bold">
                 {t("landing.additionalContent.viewTemplate")}
               </RouterLinkButton>
             </BareBox>
@@ -211,14 +193,8 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
             <BareBox n={"2"}>
               {t("landing.additionalContent.mid")}
               <br />
-              <RouterLinkButton mt={2} variant={"primary"} to={""}>
+              <RouterLinkButton mt="2" to={""} variant="primaryInverse" fontWeight="bold">
                 {t("landing.additionalContent.midButton")}
-              </RouterLinkButton>
-            </BareBox>
-            <BareBox n={"3"}>
-              {t("landing.additionalContent.end")}
-              <RouterLinkButton mt={2} variant={"primary"} to={""}>
-                {t("landing.additionalContent.endButton")}
               </RouterLinkButton>
             </BareBox>
           </Flex>

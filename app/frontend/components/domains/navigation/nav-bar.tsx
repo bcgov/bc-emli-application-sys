@@ -133,24 +133,24 @@ export const NavBar = observer(function NavBar() {
         <Container maxW="container.lg" p={2} px={{ base: 4, md: 8 }}>
           <Flex align="center" gap={2} w="full">
             <RouterLink to="/welcome">
-              <Box w={120} mr={2}>
+              <Box w={150} mr={2}>
                 <Image
                   fit="contain"
-                  htmlHeight="64px"
-                  htmlWidth="166px"
+                  htmlHeight="30.853px"
+                  htmlWidth="145.386px"
                   alt={t("site.linkHome")}
-                  src={currentUser?.isSubmitter || !loggedIn ? "/images/logo.svg" : "/images/logo-light.svg"}
+                  src={currentUser?.isSubmitter || !loggedIn ? "/images/logo.png" : "/images/logo-light.svg"}
                 />
               </Box>
             </RouterLink>
             <Show above="md">
               <Flex direction="column" w="full">
                 <HStack>
-                  <Text fontSize="2xl" fontWeight="normal" mb="0" whiteSpace="nowrap">
+                  <Text fontSize="xl" fontWeight="normal" mb="0" whiteSpace="nowrap">
                     {currentUser?.isSuperAdmin ? t("site.adminNavBarTitle") : t("site.title")}
                   </Text>
 
-                  <Text fontSize="sm" textTransform="uppercase" color="theme.yellow" fontWeight="bold" mb={2} ml={1}>
+                  <Text fontSize="sm" textTransform="uppercase" color="theme.yellow" fontWeight="bold">
                     {t("site.beta")}
                   </Text>
                 </HStack>
@@ -169,7 +169,11 @@ export const NavBar = observer(function NavBar() {
               <Spacer />
             </Show>
             <HStack gap={3} w="full" justify="flex-end">
-              {!loggedIn && <Hide above="md"><HelpDrawer /></Hide>}
+              {!loggedIn && (
+                <Hide above="md">
+                  <HelpDrawer />
+                </Hide>
+              )}
               {currentUser?.isSubmitter && !currentUser.isUnconfirmed && (
                 <RouterLinkButton to="/" variant="tertiary" leftIcon={<Folders size={16} />}>
                   {t("site.myPermits")}
@@ -210,33 +214,28 @@ export const NavBar = observer(function NavBar() {
                   color={currentUser?.isSubmitter || !loggedIn ? "theme.blue" : "greys.white"}
                 />
               )}
-               <Hide above="md">
-               <NavBarMenu />
-                </Hide>
+              <Hide above="md">
+                <NavBarMenu />
+              </Hide>
               <Show above="md">
-                    <RouterLinkButton variant="tertiary" to={""} >
-                    {t("auth.getSupport")}
-                  </RouterLinkButton>
-                </Show>
-              <Show above="md">
-                    <RouterLinkButton variant="tertiary" to={""}  >
-                    {t("auth.giveFeedback")}
-                  </RouterLinkButton>
-                </Show>
-              {(!loggedIn) && (
+                <RouterLinkButton variant="tertiary" to={""}>
+                  {t("auth.getSupport")}
+                </RouterLinkButton>
+              </Show>
+              {!loggedIn && (
                 <Show above="md">
                   <RouterLinkButton variant="tertiary" to="/login">
                     {t("auth.login")}
                   </RouterLinkButton>
                 </Show>
               )}
-               {(loggedIn) && (
-              <Show above="md">
-                    <RouterLinkButton variant="tertiary" onClick={handleClickLogout}>
+              {loggedIn && (
+                <Show above="md">
+                  <RouterLinkButton variant="tertiary" onClick={handleClickLogout}>
                     {t("auth.logout")}
                   </RouterLinkButton>
                 </Show>
-               )}
+              )}
             </HStack>
           </Flex>
         </Container>

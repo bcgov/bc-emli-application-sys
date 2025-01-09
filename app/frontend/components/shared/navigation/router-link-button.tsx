@@ -5,6 +5,7 @@ import { Link as ReactRouterLink } from "react-router-dom"
 export interface IRouterLinkButtonProps extends ButtonProps {
   to: string
   icon?: ReactElement
+  iconPosition?: string
 }
 
 export const RouterLinkButton = forwardRef<HTMLAnchorElement, IRouterLinkButtonProps>(function RouterLinkButton(

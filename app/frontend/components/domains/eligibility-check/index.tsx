@@ -28,15 +28,6 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
             <Heading as="h1" color="white">
               {t("auth.checkEligibility.seeEligible")}
             </Heading>
-            <Box
-              position="absolute"
-              inset="0"
-              bgImage="url('/images/eligibility-header.png')"
-              bgRepeat="no-repeat"
-              bgSize="contain"
-              bgPosition="right"
-              opacity={0.1}
-            />
           </Flex>
         </Container>
       </Flex>
