@@ -22,20 +22,22 @@ jobs:
           ref: ${{ github.event.inputs.branch }}
           lfs: true
 
-      # Step 2: Build Image
+      # Step 2: Login to Artifactory
+      - name: Login to Artifactory
+        run: docker login artifacts.developer.gov.bc.ca -u ${{ secrets.ARTIFACTORY_USERNAME }} -p ${{ secrets.ARTIFACTORY_PASSWORD }}
+      
+      # Step 3: Build Image
       - name: Build Docker Image
         run: docker build -t permit-app -f ./devops/docker/app/Dockerfile .
 
-      # Step 3: Tag the Image
+      # Step 4: Tag the Image
       - name: Tag Docker Image
         run: docker tag permit-app artifacts.developer.gov.bc.ca/bbfc-local/permit-app:latest
       
-      # Step 4: Push the Docker image to Artifactory
+      # Step 5: Push the Docker image to Artifactory
       - name: Push Image to Artifactory
-        run: |
-          docker login artifacts.developer.gov.bc.ca -u ${{ secrets.ARTIFACTORY_USERNAME }} -p ${{ secrets.ARTIFACTORY_PASSWORD }}
-          docker push artifacts.developer.gov.bc.ca/bbfc-local/permit-app:latest
+        run: docker push artifacts.developer.gov.bc.ca/bbfc-local/permit-app:latest
 
-      # Step 5: Logout
+      # Step 6: Logout
       - name: Log out from Docker
         run: docker logout artifacts.developer.gov.bc.ca
