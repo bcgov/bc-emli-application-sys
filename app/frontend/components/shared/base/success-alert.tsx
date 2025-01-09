@@ -22,7 +22,6 @@ function SuccessAlert() {
           <AlertTitle fontSize="md" fontWeight="bold">
             {t("auth.checkEligibility.alert.eligible")}
           </AlertTitle>
-          <AlertDescription fontSize="sm">{t("auth.checkEligibility.alert.loginWithCard")}</AlertDescription>
           <Button size="sm" variant="secondary">
             {t("auth.checkEligibility.alert.loginWithAccount")}
           </Button>
