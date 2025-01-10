@@ -28,15 +28,15 @@ jobs:
       
       # Step 3: Build Image
       - name: Build Docker Image
-        run: docker build -t permit-app -f ./devops/docker/app/Dockerfile .
+        run: docker build -t energy-app -f ./devops/docker/app/Dockerfile .
 
       # Step 4: Tag the Image
       - name: Tag Docker Image
-        run: docker tag permit-app artifacts.developer.gov.bc.ca/bbfc-local/permit-app:latest
+        run: docker tag energy-app artifacts.developer.gov.bc.ca/bbfc-local/energy-app:latest
       
       # Step 5: Push the Docker image to Artifactory
       - name: Push Image to Artifactory
-        run: docker push artifacts.developer.gov.bc.ca/bbfc-local/permit-app:latest
+        run: docker push artifacts.developer.gov.bc.ca/bbfc-local/energy-app:latest
 
       # Step 6: Logout
       - name: Log out from Docker
