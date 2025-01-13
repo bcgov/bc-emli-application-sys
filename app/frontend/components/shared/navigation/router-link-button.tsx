@@ -3,7 +3,7 @@ import React, { ReactElement, forwardRef } from "react"
 import { Link as ReactRouterLink } from "react-router-dom"
 
 export interface IRouterLinkButtonProps extends ButtonProps {
-  to: string
+  to?: string
   icon?: ReactElement
   iconPosition?: string
 }

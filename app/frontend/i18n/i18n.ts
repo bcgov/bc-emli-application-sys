@@ -130,6 +130,9 @@ const options = {
                 "Mobile homes that are fixed on a foundation and structurally complete with plumbing, electrical, sewer, and water hooked up permanently",
               ],
               seeDetails: "See the full eligibility requirements on Better Homes",
+              provideInformation: "You must provide this information when you apply for rebates.",
+              assessedValDescription:
+                "Your property’s assessed value must be $1,230,000 or lower to be eligible for the Energy Savings Program.",
             },
           },
         },

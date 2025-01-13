@@ -11,47 +11,70 @@ import {
   UnorderedList,
 } from "@chakra-ui/react"
 import { ArrowSquareOut, WarningCircle } from "@phosphor-icons/react"
-import React from "react"
-import { useTranslation } from "react-i18next"
+import React, { ReactElement } from "react"
+import { FC, ReactNode } from "react"
 
-function ErrorAlert() {
-  const { t } = useTranslation()
-  let homes: string[] = t("auth.checkEligibility.alert.typesOfhome", { returnObjects: true })
+type ErrorAlertProps = {
+  title: string
+  description?: string
+  items?: string[] // Optional list of error details
+  linkText?: string // Optional link text
+  linkHref?: string // Optional link URL
+  icon?: ReactElement // Optional icon
+  borderColor?: string // Optional border color
+  backgroundColor?: string // Optional background color
+  iconColor?: string // Optional icon color
+}
 
+const ErrorAlert: FC<ErrorAlertProps> = ({
+  title,
+  description,
+  items = [],
+  linkText,
+  linkHref,
+  icon = <WarningCircle size={20} />, // Default icon
+  borderColor = "semantic.error", // Default border color
+  backgroundColor = "semantic.errorLight", // Default background color
+  iconColor = "semantic.error", // Default icon color
+}) => {
   return (
     <Stack
       p={4}
       mt={4}
-      bg="semantic.errorLight"
+      bg={backgroundColor}
       border="1px"
-      borderColor="error"
+      borderColor={borderColor}
       borderRadius="lg"
       width="100%"
       align="stretch"
     >
-      <Alert status="success" variant="subtle" bg="transparent" alignItems="start" p={0}>
-        <IconButton variant="ghost" icon={<WarningCircle size={20} />} zIndex={1} color="error" aria-label="Check" />
+      <Alert status="error" variant="subtle" bg="transparent" alignItems="start" p={0}>
+        <IconButton variant="ghost" icon={icon} zIndex={1} color={iconColor} aria-label="Error Icon" />
         <Stack mt={2}>
           <AlertTitle fontSize="md" fontWeight="bold">
-            {t("auth.checkEligibility.alert.condoEligible")}
+            {title}
           </AlertTitle>
-          <AlertDescription fontSize="sm">
+          <AlertDescription fontSize="sm" fontWeight="normal">
             <Box>
               <Text fontSize="sm" mb={2}>
-                {t("auth.checkEligibility.alert.currentlyEligibleHome")}
+                {description}
               </Text>
-              <UnorderedList fontSize="sm" spacing={1}>
-                {homes.map((home, index) => (
-                  <ListItem key={index}>{home}</ListItem>
-                ))}
-              </UnorderedList>
+              {items.length > 0 && (
+                <UnorderedList fontSize="sm" spacing={1}>
+                  {items.map((item, index) => (
+                    <ListItem key={index}>{item}</ListItem>
+                  ))}
+                </UnorderedList>
+              )}
             </Box>
           </AlertDescription>
-          <Link href="" isExternal>
-            <Text color="text.secondary">
-              {t("auth.checkEligibility.alert.seeDetails")} <ArrowSquareOut />
-            </Text>
-          </Link>
+          {linkText && (
+            <Link href={linkHref} isExternal>
+              <Text fontSize="sm" color="text.secondary">
+                {linkText} <ArrowSquareOut />
+              </Text>
+            </Link>
+          )}
         </Stack>
       </Alert>
     </Stack>
