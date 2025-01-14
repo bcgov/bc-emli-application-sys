@@ -9,6 +9,7 @@ export const colors = {
     // blueAlt: "#38598A",
     blueAlt: "#005C97",
     blueLight: "#ECF6FF",
+    blueLightBg: "#E4F2FF",
     blueText: "#2464A4",
     blueAltGradient: "linear-gradient(124.8deg, #142B43 -52.7%, #142B43 -52.68%, #054277 47.38%, #142B43 137.55%)",
     blueGradient:
@@ -37,6 +38,7 @@ export const colors = {
     grey10: "#FAF9F8",
     grey20: "#F3F2F1",
     grey90: "#3B3A39",
+    grey100: "#1A1A1A",
   },
   border: {
     base: "#606060",

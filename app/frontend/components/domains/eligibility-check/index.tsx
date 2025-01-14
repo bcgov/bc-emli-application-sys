@@ -44,8 +44,10 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
     }
 
     // Calculate home type eligibility based on conditions
+    const homeTypeEligible = homeType === eligibleHomes[4] ? false : true
     const ineligibleHomes = [eligibleHomes[4], eligibleHomes[5], eligibleHomes[6]]
-    const homeTypeEligible = !ineligibleHomes.includes(homeType)
+
+    const areEligibleHomes = !ineligibleHomes.includes(homeType)
     setIsHomeTypeEligible(homeTypeEligible)
 
     // Calculate assesed value eligibility based on conditions
@@ -54,7 +56,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
 
     // Calculate overall eligibility
     const eligibility =
-      homeTypeEligible && assessedValue === assesedValues[1] && paysBills === paymentValue[0] && totalPeople !== ""
+      areEligibleHomes && assessedValue === assesedValues[1] && paysBills === paymentValue[0] && totalPeople !== ""
     setIsEligible(eligibility)
   }, [formData])
 

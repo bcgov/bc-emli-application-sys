@@ -218,20 +218,20 @@ export const NavBar = observer(function NavBar() {
                 <NavBarMenu />
               </Hide>
               <Show above="md">
-                <RouterLinkButton variant="tertiary" to={""}>
+                <RouterLinkButton variant="tertiary" color="greys.grey100" to={""}>
                   {t("auth.getSupport")}
                 </RouterLinkButton>
               </Show>
               {!loggedIn && (
                 <Show above="md">
-                  <RouterLinkButton variant="tertiary" to="/login">
+                  <RouterLinkButton variant="tertiary" color="greys.grey100" to="/login">
                     {t("auth.login")}
                   </RouterLinkButton>
                 </Show>
               )}
               {loggedIn && (
                 <Show above="md">
-                  <RouterLinkButton variant="tertiary" onClick={handleClickLogout}>
+                  <RouterLinkButton variant="tertiary" color="greys.grey100" onClick={handleClickLogout}>
                     {t("auth.logout")}
                   </RouterLinkButton>
                 </Show>

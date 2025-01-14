@@ -125,15 +125,9 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
               <Flex mt="auto" direction="column">
                 <Text>{t("landing.continuePrefix")} </Text>
                 <Text>
-                  <Button
-                    as="a"
-                    variant="link"
-                    color="white"
-                    href="/login"
-                    _focus={{ outline: "none", border: "none" }}
-                  >
+                  <Link color="greys.white" _hover={{ opacity: 0.4 }} href="/login">
                     {t("landing.continueLogin")}
-                  </Button>
+                  </Link>
                 </Text>
               </Flex>
             </Flex>
@@ -149,10 +143,9 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
               </UnorderedList>
               <Wrap spacing={2} justify="flex-start">
                 <Text>
-                  <Button as="span" variant="link" gap="0.2rem" onClick={() => {}}>
-                    {t("landing.iNeed")}
-                    <ArrowSquareOut />
-                  </Button>
+                  <Link href="" isExternal>
+                    {t("landing.iNeed")} <ArrowSquareOut />
+                  </Link>
                 </Text>
               </Wrap>
             </VStack>

@@ -22,7 +22,9 @@ const options = {
           getSupport: "Get support",
           adminAccountAccess: "If you cannot login with your IDIR, please contact your administrator to gain access.",
           prompt: "Log in with your BC Services Card. It’s a secure way to prove who you are online.",
-          loginHelp: "Don’t have an account? Learn more about BC Services Card Login and how to set up an account.",
+          noAccount: "Don’t have an account?",
+          loginHelp: "Learn more about BC Services Card Login and how to set up an account.",
+          noSmartPhone: "Don’t have a smart phone or can’t use the mobile app?",
           bceidInfo: {
             heading: "Which BCeID should I use?",
             needHelp: "Need help with your application?",
@@ -67,7 +69,6 @@ const options = {
           bceid_login: "Login with BCeID",
           idir_login: "Login with IDIR",
           bcservice_login: "Login with BC Services Card Account",
-          noAccount: "Don’t have an account? Learn more about BC Services Card Login and how to set up an account.",
           troubleLogging: "Have trouble logging in? Service BC Help Desk is here to help.",
           phoneNumber: "1-888-356-2741",
           role: "Role",

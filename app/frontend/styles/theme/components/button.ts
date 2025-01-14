@@ -51,7 +51,7 @@ export const Button = {
       _hover: {
         color: "theme.blue",
         textDecor: "none",
-        bg: "lighten.900",
+        bg: "theme.blueLight",
         _disabled: { ...disabledStyles },
         _active: { ...activeStyles },
       },
