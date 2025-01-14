@@ -10,7 +10,7 @@ export const Link = {
     },
 
     _hover: {
-      color: "focus",
+      color: "text.primary",
     },
   },
 }

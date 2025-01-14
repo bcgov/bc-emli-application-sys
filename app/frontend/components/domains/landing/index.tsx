@@ -36,7 +36,7 @@ import { Controller, FormProvider, useForm } from "react-hook-form"
 import { Trans, useTranslation } from "react-i18next"
 import { IJurisdiction } from "../../../models/jurisdiction"
 import { useMst } from "../../../setup/root"
-//import { YellowLineSmall } from "../../shared/base/decorative/yellow-line-small"
+import { colors } from "../../../styles/theme/foundations/colors"
 import { SharedSpinner } from "../../shared/base/shared-spinner"
 import { RouterLink } from "../../shared/navigation/router-link"
 import { RouterLinkButton } from "../../shared/navigation/router-link-button"
@@ -67,9 +67,7 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
       <Box
         h={{ base: "360px" }}
         position="relative"
-        bgImage={[
-          "linear-gradient(180deg, rgba(0, 0, 0, 0.00) 12.92%, rgba(12, 38, 64, 0.80) 50.36%), url('/images/header-background.png')",
-        ]}
+        bgImage={`${colors.theme.blueImageGradient}, url('/images/header-background.png')`}
         backgroundRepeat="no-repeat"
         bgPosition="center"
         bgRepeat="no-repeat"
@@ -127,15 +125,9 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
               <Flex mt="auto" direction="column">
                 <Text>{t("landing.continuePrefix")} </Text>
                 <Text>
-                  <Button
-                    as="a"
-                    variant="link"
-                    color="white"
-                    href="/login"
-                    _focus={{ outline: "none", border: "none" }}
-                  >
+                  <Link color="greys.white" _hover={{ opacity: 0.4 }} href="/login">
                     {t("landing.continueLogin")}
-                  </Button>
+                  </Link>
                 </Text>
               </Flex>
             </Flex>
@@ -151,10 +143,9 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
               </UnorderedList>
               <Wrap spacing={2} justify="flex-start">
                 <Text>
-                  <Button as="span" variant="link" gap="0.2rem" onClick={() => {}}>
-                    {t("landing.iNeed")}
-                    <ArrowSquareOut />
-                  </Button>
+                  <Link href="" isExternal>
+                    {t("landing.iNeed")} <ArrowSquareOut />
+                  </Link>
                 </Text>
               </Wrap>
             </VStack>

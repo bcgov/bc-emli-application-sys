@@ -68,6 +68,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, answers, onAnswer
                   key={index}
                   p={4}
                   border="1px"
+                  bg={selectedAnswer === answer ? "theme.blueLightBg" : "white"}
                   borderColor="border.light"
                   justifyContent="center"
                   width={{ base: "100%", md: "calc(22% - 14px)" }}
