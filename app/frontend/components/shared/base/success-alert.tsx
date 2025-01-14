@@ -5,6 +5,10 @@ import { useTranslation } from "react-i18next"
 
 function SuccessAlert() {
   const { t } = useTranslation()
+
+  const handleReload = () => {
+    window.location.href = "/login"
+  }
   return (
     <Stack
       p={4}
@@ -22,9 +26,12 @@ function SuccessAlert() {
           <AlertTitle fontSize="md" fontWeight="bold">
             {t("auth.checkEligibility.alert.eligible")}
           </AlertTitle>
-          <Button size="sm" variant="secondary">
+          <Button size="sm" variant="secondary" onClick={handleReload}>
             {t("auth.checkEligibility.alert.loginWithAccount")}
           </Button>
+          {/* <RouterLinkButton mt="2" to={"/login"} variant="secondary">
+            {t("auth.checkEligibility.alert.loginWithAccount")}
+          </RouterLinkButton> */}
         </Stack>
       </Alert>
     </Stack>

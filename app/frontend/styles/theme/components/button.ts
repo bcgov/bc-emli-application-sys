@@ -63,7 +63,12 @@ export const Button = {
       borderWidth: 1,
       borderColor: "border.dark",
       textDecor: "none",
-      _hover: { textDecor: "none", bg: "darken.60", _disabled: { ...disabledStyles }, _active: { ...activeStyles } },
+      _hover: {
+        textDecor: "none",
+        bg: "theme.blueLight",
+        _disabled: { ...disabledStyles },
+        _active: { ...activeStyles },
+      },
       _focus: { ...focusStyles },
     },
     secondaryInverse: {
