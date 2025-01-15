@@ -67,6 +67,7 @@ const options = {
           submit: "Submit",
           or: "or",
           bceid_login: "Login with BCeID",
+          bcsc_login: "Login with BC Services Card Account",
           idir_login: "Login with IDIR",
           bcservice_login: "Login with BC Services Card Account",
           troubleLogging: "Have trouble logging in? Service BC Help Desk is here to help.",
@@ -339,8 +340,8 @@ const options = {
           noUnread: "No unread notifications",
         },
         eula: {
-          title: "End-User License Agreement",
-          accept: "Accept agreement",
+          title: "Terms and Conditions",
+          accept: "Accept terms and conditions",
         },
         userEulas: {
           title: "End user license agreement",
@@ -1519,6 +1520,7 @@ const options = {
             idir: "IDIR",
             bceidbasic: "Basic BCeID",
             bceidbusiness: "Business BCeID",
+            bcsc: "BCSC",
           },
           changeBceid: "If you want to change your BCeID information, please go to ",
           changeBceidLinkText: "bceid.ca",
