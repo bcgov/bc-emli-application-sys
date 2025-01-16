@@ -10,6 +10,7 @@ import { LoadingScreen } from "../../shared/base/loading-screen"
 import { EULAScreen } from "../onboarding/eula"
 import { NavBar } from "./nav-bar"
 import { ProtectedRoute } from "./protected-route"
+import { SupportScreen } from "../misc/support-screen"
 
 
 const ExternalApiKeysIndexScreen = lazy(() =>
@@ -528,6 +529,7 @@ const AppRoutes = observer(() => {
         <Route path="/confirmed" element={<EmailConfirmedScreen />} />
         <Route path="/welcome" element={<LandingScreen />} />
         <Route path="/check-eligible" element={<EligibilityCheck />} />
+        <Route path="/get-support" element={<SupportScreen />} />
         <Route
           path="/early-access/requirement-templates/:requirementTemplateId"
           element={<EarlyAccessRequirementTemplateScreen />}
