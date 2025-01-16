@@ -369,6 +369,7 @@ export enum EOmniauthProvider {
   idir = "idir",
   basicBceid = "bceidbasic",
   businessBceid = "bceidbusiness",
+  bcsc = "bcsc",
 }
 
 export enum EAutoComplianceModule {

@@ -18,6 +18,7 @@ class OmniauthUserResolver
 
   OMNIAUTH_PROVIDERS = {
     idir: "idir",
+    bcsc: "bcsc",
     bceid: "bceidboth",
     bceid_business: "bceidbusiness",
     bceid_basic: "bceidbasic"
@@ -93,20 +94,33 @@ class OmniauthUserResolver
         else
           OMNIAUTH_PROVIDERS[:bceid_basic]
         end
+      when ENV["KEYCLOAK_CLIENT"]
+        # if the provider matches the kc client value then it's bcsc
+        "bcsc"
       else
         raw_info.identity_provider
       end
   end
 
   def omniauth_uid
-    @uid ||= raw_info.bceid_user_guid || raw_info.idir_user_guid
+    @uid ||= 
+      if raw_info.identity_provider == ENV["KEYCLOAK_CLIENT"]
+        raw_info.sub.split("@").first
+      else
+        raw_info.bceid_user_guid || raw_info.idir_user_guid
+      end
   end
 
   def omniauth_email
-    @email ||= auth.info.email
+    @email ||= auth.info.email 
   end
 
   def omniauth_username
-    @username ||= raw_info.bceid_username || raw_info.idir_username
+    @username ||= 
+      if raw_info.identity_provider == ENV["KEYCLOAK_CLIENT"]
+        raw_info.sub.split("@").first
+      else
+        raw_info.bceid_username || raw_info.idir_username
+      end
   end
 end

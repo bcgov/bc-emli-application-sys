@@ -35,7 +35,7 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
             {!isAdmin && <Text fontSize="md">{t("auth.bcServiceCardInfo.prompt")}</Text>}
           </VStack>
           <form action="/api/auth/keycloak" method="post">
-            <input type="hidden" name="kc_idp_hint" value={isAdmin ? "idir" : "bceidboth"} />
+            <input type="hidden" name="kc_idp_hint" value={isAdmin ? "idir" : "bcsc"} />
             {/* @ts-ignore */}
             <input
               type="hidden"
