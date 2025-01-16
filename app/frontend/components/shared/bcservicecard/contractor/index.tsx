@@ -1,8 +1,6 @@
-import { Box, Flex, Heading, Link, Text, VStack } from "@chakra-ui/react"
-import { ArrowSquareOut } from "@phosphor-icons/react"
+import { Box, Button, Flex, Heading, Link, Text, VStack } from "@chakra-ui/react"
 import { t } from "i18next"
 import React from "react"
-import { RouterLinkButton } from "../../navigation/router-link-button"
 
 export function ContractorInfoBlock() {
   return (
@@ -22,9 +20,17 @@ export function ContractorInfoBlock() {
         </Heading>
         {/* <Text fontSize="md">{t("auth.bceidInfo.contractor.description")}</Text> */}
       </VStack>
-      <RouterLinkButton to="/" w="full" bg="theme.blue" color="white" rightIcon={<ArrowSquareOut size={16} />}>
+      {/* <RouterLinkButton to="/" w="full" bg="theme.blue" color="white" rightIcon={<ArrowSquareOut size={16} />}>
         {t("auth.bceidInfo.contractor.ctaText")}
-      </RouterLinkButton>
+      </RouterLinkButton> */}
+      <form action="/api/auth/keycloak" method="post">
+        <input type="hidden" name="kc_idp_hint" value="bceidbusiness" />
+        {/* @ts-ignore */}
+        <input type="hidden" name="authenticity_token" value={document.querySelector("[name=csrf-token]").content} />
+        <Button variant="primary" w="full" type="submit">
+          {t("auth.bceidInfo.contractor.ctaText")}
+        </Button>
+      </form>
       <Box>
         <Text fontWeight="bold">{t("auth.noAccount")}</Text>
         <Text></Text>
