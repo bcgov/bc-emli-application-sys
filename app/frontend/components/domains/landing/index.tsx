@@ -143,7 +143,7 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
               </UnorderedList>
               <Wrap spacing={2} justify="flex-start">
                 <Text>
-                  <Link href="" isExternal>
+                  <Link href={t("landing.iNeedLink")} isExternal>
                     {t("landing.iNeed")} <ArrowSquareOut />
                   </Link>
                 </Text>
@@ -176,7 +176,7 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
             <BareBox n={"1"}>
               {t("landing.additionalContent.left")}
               <br />
-              <RouterLinkButton mt="2" to={currentUser ? "/" : "/login"} variant="primaryInverse" fontWeight="bold">
+              <RouterLinkButton mt="2" to={currentUser ? "/" : "/"} variant="primaryInverse" fontWeight="bold">
                 {t("landing.additionalContent.viewTemplate")}
               </RouterLinkButton>
             </BareBox>
@@ -184,7 +184,7 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
             <BareBox n={"2"}>
               {t("landing.additionalContent.mid")}
               <br />
-              <RouterLinkButton mt="2" to={""} variant="primaryInverse" fontWeight="bold">
+              <RouterLinkButton mt="2" to={"/"} variant="primaryInverse" fontWeight="bold">
                 {t("landing.additionalContent.midButton")}
               </RouterLinkButton>
             </BareBox>

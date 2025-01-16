@@ -14,7 +14,7 @@ export function EnergyCoachInfoBlock() {
         t("auth.bcServiceCardInfo.energyCoach.homeUpgrades"),
       ]}
       ctaText={t("auth.bcServiceCardInfo.energyCoach.requestACall")}
-      ctaLink={import.meta.env.VITE_BASIC_BCEID_REGISTRATION_URL}
+      ctaLink=""
     />
   )
 }
