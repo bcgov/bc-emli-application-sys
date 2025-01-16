@@ -37,7 +37,7 @@ export const EULAScreen = observer(function EULAScreen({ withClose }: { withClos
   return (
     <>
       <VStack direction="column" spacing={8} py={20} w="full" h={`calc(100vh - ${navHeight}px)`}>
-        <Heading as="h1" m={0} flex={0} flexBasis="auto">
+        <Heading as="h1" m={0} flex={0} flexBasis="auto" color="theme.blueAlt">
           {t("eula.title")}
         </Heading>
         <Suspense fallback={<LoadingScreen />}>

@@ -88,7 +88,7 @@ class User < ApplicationRecord
 
   def eula_variant
     {
-      submitter: "open",
+      submitter: "terms",
       reviewer: "employee",
       review_manager: "employee",
       regional_review_manager: "employee",
