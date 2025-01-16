@@ -5,10 +5,15 @@ import { BCServiceInfoBlock } from "../info-block"
 export function EnergyCoachInfoBlock() {
   return (
     <BCServiceInfoBlock
-      title={t("auth.bceidInfo.energyCoach.title")}
-      description={t("auth.bceidInfo.energyCoach.description")}
-      bulletPoints={[t("auth.bceidInfo.energyCoach.fillingRebate"), t("auth.bceidInfo.energyCoach.rebateQuestions"), t("auth.bceidInfo.energyCoach.homeUpgrades")]}
-      ctaText={t("auth.bceidInfo.energyCoach.requestACall")}
+      title={t("auth.bcServiceCardInfo.energyCoach.title")}
+      description={t("auth.bcServiceCardInfo.energyCoach.description")}
+      bulletPoints={[
+        t("auth.bcServiceCardInfo.energyCoach.fillingRebate"),
+        t("auth.bcServiceCardInfo.energyCoach.rebateQuestions"),
+        t("auth.bcServiceCardInfo.energyCoach.virtualWalkThrough"),
+        t("auth.bcServiceCardInfo.energyCoach.homeUpgrades"),
+      ]}
+      ctaText={t("auth.bcServiceCardInfo.energyCoach.requestACall")}
       ctaLink={import.meta.env.VITE_BASIC_BCEID_REGISTRATION_URL}
     />
   )

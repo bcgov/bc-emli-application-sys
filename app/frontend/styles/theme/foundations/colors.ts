@@ -11,6 +11,8 @@ export const colors = {
     blueLight: "#ECF6FF",
     blueLightBg: "#E4F2FF",
     blueText: "#2464A4",
+    primary100: "#234075",
+    buttonHover: "linear-gradient(0deg, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0.32) 100%), #234075;",
     blueAltGradient: "linear-gradient(124.8deg, #142B43 -52.7%, #142B43 -52.68%, #054277 47.38%, #142B43 137.55%)",
     blueGradient:
       "var(--Gradient-Blue-Background, linear-gradient(125deg, #142B43 -52.7%, #142B43 -52.68%, #054277 47.38%, #142B43 137.55%))",

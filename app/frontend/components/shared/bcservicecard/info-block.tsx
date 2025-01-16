@@ -1,10 +1,11 @@
 import { Button, Flex, Heading, Link, ListItem, Text, UnorderedList } from "@chakra-ui/react"
 import { ArrowSquareOut, CaretRight } from "@phosphor-icons/react"
 import React from "react"
+import { RouterLinkButton } from "../navigation/router-link-button"
 
 export function BCServiceInfoBlock({ title, description, bulletPoints, ctaText, ctaLink, infoLink = null }) {
   return (
-    <Flex direction="column" gap={2} p={6} rounded="sm" borderWidth={1} borderColor="border.light">
+    <Flex direction="column" gap={2} p={6} rounded="sm" borderWidth={1} borderColor="border.light" bg="greys.white">
       <Heading as="h3" m={0} color="theme.blueAlt">
         {title}
       </Heading>
@@ -20,9 +21,14 @@ export function BCServiceInfoBlock({ title, description, bulletPoints, ctaText, 
           {infoLink}
         </Button>
       )}
-      <Button as={Link} href={ctaLink} isExternal variant="secondary" rightIcon={<ArrowSquareOut />} mt={2}>
+      <RouterLinkButton
+        to={ctaLink}
+        variant="secondary"
+        rightIcon={<ArrowSquareOut size={16} color="border.dark" />}
+        color="theme.primary100"
+      >
         {ctaText}
-      </Button>
+      </RouterLinkButton>
     </Flex>
   )
 }

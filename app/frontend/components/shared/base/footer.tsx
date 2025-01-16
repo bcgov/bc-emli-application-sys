@@ -1,4 +1,4 @@
-import { Box, Button, Container, Divider, Flex, Show, Text, Wrap } from "@chakra-ui/react"
+import { Box, Container, Divider, Flex, Link, Show, Text, Wrap } from "@chakra-ui/react"
 import { ArrowSquareOut } from "@phosphor-icons/react"
 import { observer } from "mobx-react-lite"
 import React from "react"
@@ -42,31 +42,13 @@ export const Footer = observer(() => {
               <Text>{t("site.territorialAcknowledgement")}</Text>
               <Wrap spacing={2} justify="flex-start">
                 <Text>{t("site.privacyAndTermsPrefix")}</Text>
-                <Button
-                  as="span"
-                  variant="link"
-                  color="white"
-                  gap="0.2rem"
-                  onClick={() => {
-                    /* handle click */
-                  }}
-                >
-                  {t("site.privacyText")}
-                  <ArrowSquareOut />
-                </Button>
+                <Link href="" isExternal color="white" gap="0.2rem" _hover={{ opacity: 0.4 }}>
+                  {t("site.privacyText")} <ArrowSquareOut />
+                </Link>
                 <Text>{t("site.midText")}</Text>
-                <Button
-                  as="span"
-                  variant="link"
-                  color="white"
-                  gap="0.2rem"
-                  onClick={() => {
-                    /* handle click */
-                  }}
-                >
-                  {t("site.termsText")}
-                  <ArrowSquareOut />
-                </Button>
+                <Link href="" isExternal color="white" gap="0.2rem" _hover={{ opacity: 0.4 }}>
+                  {t("site.termsText")} <ArrowSquareOut />
+                </Link>
                 <Text>{t("site.privacyAndTermsSuffix")} </Text>
               </Wrap>
             </Container>
