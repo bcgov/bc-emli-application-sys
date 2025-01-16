@@ -1,7 +1,17 @@
+import { colors } from "../foundations/colors"
+
 const disabledStyles = { bg: "greys.grey03", color: "greys.grey01", borderColor: "border.light" }
 const activeStyles = { borderWidth: 1, borderColor: "focus" }
-const focusStyles = { boxShadow: "0 0 0 3px rgba(46,93,215,0.4)" }
-const focusInverseStyles = { boxShadow: "0 0 0 3px rgba(255,255,255,0.4)" }
+const focusStyles = {
+  // boxShadow: "0 0 0 3px rgba(46,93,215,0.4)",
+  outline: `2px solid ${colors.focus}`,
+  outlineOffset: 3,
+}
+const focusInverseStyles = {
+  // boxShadow: "0 0 0 3px rgba(255,255,255,0.4)"
+  outline: `2px solid ${colors.focus}`,
+  outlineOffset: 3,
+}
 
 export const Button = {
   baseStyle: {
@@ -36,7 +46,7 @@ export const Button = {
       _hover: {
         color: "greys.white",
         textDecor: "none",
-        bg: "theme.blueAlt",
+        bg: "theme.blueButtonHover",
         _disabled: { ...disabledStyles },
         _active: { ...activeStyles },
       },
@@ -51,7 +61,7 @@ export const Button = {
       _hover: {
         color: "theme.blue",
         textDecor: "none",
-        bg: "theme.blueLight",
+        bg: "greys.grey80",
         _disabled: { ...disabledStyles },
         _active: { ...activeStyles },
       },
@@ -65,7 +75,7 @@ export const Button = {
       textDecor: "none",
       _hover: {
         textDecor: "none",
-        bg: "theme.blueLight",
+        bg: "greys.grey80",
         _disabled: { ...disabledStyles },
         _active: { ...activeStyles },
       },
@@ -77,7 +87,7 @@ export const Button = {
       borderWidth: 1,
       borderColor: "greys.white",
       textDecor: "none",
-      _hover: { textDecor: "none", bg: "lighten.100", _disabled: { ...disabledStyles }, _active: { ...activeStyles } },
+      _hover: { textDecor: "none", bg: "greys.grey80", _disabled: { ...disabledStyles }, _active: { ...activeStyles } },
       _focus: { ...focusInverseStyles },
     },
     tertiary: {

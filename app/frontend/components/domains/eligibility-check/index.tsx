@@ -114,7 +114,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
                       description={t("auth.checkEligibility.alert.currentlyEligibleHome")}
                       items={eligibleHomeTypes}
                       linkText={t("auth.checkEligibility.alert.seeDetails")}
-                      linkHref=""
+                      linkHref={t("landing.iNeedLink")}
                     />
                   </Text>
                 </Box>
@@ -137,7 +137,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
                       title={t("auth.checkEligibility.alert.provideInformation")}
                       description={t("auth.checkEligibility.alert.assessedValDescription")}
                       linkText={t("auth.checkEligibility.alert.seeDetails")}
-                      linkHref=""
+                      linkHref={t("landing.iNeedLink")}
                       icon={<Warning />}
                       iconColor="semantic.warning"
                       borderColor="semantic.warning"
