@@ -1,4 +1,4 @@
-import { Box, Divider, Flex, Heading, HStack, Link, Text, VStack } from "@chakra-ui/react"
+import { Box, Divider, Flex, Heading, HStack, Link, Text, VStack, Button } from "@chakra-ui/react"
 import { ArrowSquareOut, Phone } from "@phosphor-icons/react"
 import React from "react"
 import { useTranslation } from "react-i18next"
@@ -42,13 +42,12 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
               name="authenticity_token"
               value={document.querySelector("[name=csrf-token]").content}
             />
-            {/* login via IDIR commented */}
-            {/* <Button variant="primary" w="full" type="submit">
-              {t("auth.idir_login")}
-            </Button> */}
-            <RouterLinkButton to="/" bg="theme.blue" color="white" rightIcon={<ArrowSquareOut size={16} />}>
+            <Button variant="primary" w="full" type="submit">
+          {t("auth.bcsc_login")}
+          </Button>
+            {/* <RouterLinkButton to="/" bg="theme.blue" color="white" rightIcon={<ArrowSquareOut size={16} />}>
               {t("auth.bcServiceCardInfo.bcservice_login")}
-            </RouterLinkButton>
+            </RouterLinkButton> */}
           </form>
           {isAdmin ? (
             <Text>{t("auth.adminAccountAccess")}</Text>
