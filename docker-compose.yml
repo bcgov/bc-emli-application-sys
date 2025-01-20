@@ -13,6 +13,7 @@ x-env-vars: &default-env-vars
   DEVISE_JWT_SECRET_KEY: supersecret
   DATABASE_URL: postgres://postgres:password@postgres:5432/app_development
   ELASTICSEARCH_URL: http://elasticsearch:9200
+  
 
 services:
   app:
@@ -36,8 +37,9 @@ services:
       - vite
     environment:
       VITE_RUBY_HOST: vite
-      IS_DOCKER_BUILD: true
+      IS_APP_SERVER: true
       <<: *default-env-vars
+    command: bash -c "bundle exec rails s -b '0.0.0.0' -p 3000"
 
   vite:
     image: hous-permit-portal-dev:latest
