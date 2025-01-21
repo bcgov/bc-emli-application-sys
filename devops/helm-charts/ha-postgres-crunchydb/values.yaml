@@ -35,8 +35,8 @@ crunchy-postgres:
     retentionFullType: count
     repos:
       schedules:
-        full: 0 4 * * *
-        incremental: 0 0,4,12,16,20 * * *
+        full: null   # disable backup for now, original value: 0 4 * * *
+        incremental: null   # disable backup for now, original value: 0 0,4,12,16,20 * * *
       volume:
         accessModes: "ReadWriteOnce"
         storage: 1Gi

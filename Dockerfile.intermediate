@@ -1,0 +1,29 @@
+# Intermediate Image: Node.js + Ruby Gems
+FROM artifacts.developer.gov.bc.ca/bbfc-local/ruby-os-base:latest AS node-gem-base
+
+# Install Node.js
+ARG NODE_VERSION=20.15.0
+RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
+    cd /tmp/node-build-master && ./install.sh && \
+    /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
+    rm -rf /tmp/node-build-master
+
+# Add Node.js to PATH
+ENV PATH="/usr/local/node/bin:$PATH" \
+    npm_config_cache="/app/.npm" \
+    BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_DEPLOYMENT="1" \
+    BUNDLE_WITHOUT="development"
+
+# Copy Gemfile and install Ruby gems
+WORKDIR /app
+COPY Gemfile Gemfile.lock ./
+RUN gem install bundler:2.5.4 && \
+    bundle install
+
+# Copy package.json and install npm dependencies
+COPY package.json package-lock.json ./
+RUN npm install --legacy-peer-deps --maxsockets=50
+
+# Label the image
+LABEL maintainer="Darrel Siegle <darrel.siegle@dxcas.com>"
