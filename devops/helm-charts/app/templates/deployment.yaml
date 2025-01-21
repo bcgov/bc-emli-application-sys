@@ -42,8 +42,10 @@ spec:
         app: "{{ $.Values.appName }}-{{ .process }}"
         deployment: "{{ $.Values.appName }}-{{ .process }}"
     spec:
+      imagePullSecrets:
+        - name: bfc7dd-artifactory-credentials
       containers:
-        - image: "image-registry.openshift-image-registry.svc:5000/{{ $.Values.OPENSHIFT_NAMESPACE }}-{{ $.Values.STAGE }}/permit-app:latest"
+        - image: "artifacts.developer.gov.bc.ca/{{ $.Values.artifactoryRepo }}/energy-app:latest"
           imagePullPolicy: Always
           name: "{{ $.Values.appName }}-{{ .process }}"
           {{- if eq .process "web" }}

@@ -1,6 +1,6 @@
 route:
   spec:
-    host: "websockets.test.buildingpermit.gov.bc.ca"
+    host: ""
 
 anycable-go:
   replicas: 1

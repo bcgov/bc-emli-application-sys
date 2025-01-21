@@ -2,16 +2,15 @@ import { Box, Center } from "@chakra-ui/react"
 import { observer } from "mobx-react-lite"
 import React, { Suspense, lazy, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom"
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { useMst } from "../../../setup/root"
 import { EFlashMessageStatus } from "../../../types/enums"
 import { FlashMessage } from "../../shared/base/flash-message"
 import { LoadingScreen } from "../../shared/base/loading-screen"
+import { SupportScreen } from "../misc/support-screen"
 import { EULAScreen } from "../onboarding/eula"
 import { NavBar } from "./nav-bar"
 import { ProtectedRoute } from "./protected-route"
-import { SupportScreen } from "../misc/support-screen"
-
 
 const ExternalApiKeysIndexScreen = lazy(() =>
   import("../external-api-key").then((module) => ({ default: module.ExternalApiKeysIndexScreen }))
@@ -539,7 +538,8 @@ const AppRoutes = observer(() => {
           element={currentUser?.isSuperAdmin ? <JurisdictionIndexScreen /> : <LimitedJurisdictionIndexScreen />}
         />
         <Route path="/jurisdictions/:jurisdictionId" element={<JurisdictionScreen />} />
-        <Route path="*" element={<NotFoundScreen />} />
+        <Route path="/not-found" element={<NotFoundScreen />} />
+        <Route path="*" element={<Navigate replace to="/not-found" />} />
       </Routes>
       {enableStepCodeRoute && (
         <Routes>

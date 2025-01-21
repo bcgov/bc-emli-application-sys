@@ -1,8 +1,9 @@
 STAGE: dev
+artifactoryRepo: bbfc-local
 
 route:
   spec:
-    host: "dev.buildingpermit.gov.bc.ca"
+    host: ""
 
 pvc:
   spec:

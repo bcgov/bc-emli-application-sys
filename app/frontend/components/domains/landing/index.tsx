@@ -124,8 +124,8 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
 
               <Flex mt="auto" direction="column">
                 <Text>{t("landing.continuePrefix")} </Text>
-                <Text>
-                  <Link color="greys.white" _hover={{ opacity: 0.4 }} href="/login">
+                <Text fontWeight="bold">
+                  <Link variant="primaryInverse" href="/login">
                     {t("landing.continueLogin")}
                   </Link>
                 </Text>
@@ -176,7 +176,7 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
             <BareBox n={"1"}>
               {t("landing.additionalContent.left")}
               <br />
-              <RouterLinkButton mt="2" to={currentUser ? "/" : "/"} variant="primaryInverse" fontWeight="bold">
+              <RouterLinkButton mt="2" to={currentUser ? "/" : "/"} variant="primaryInverse">
                 {t("landing.additionalContent.viewTemplate")}
               </RouterLinkButton>
             </BareBox>
@@ -184,7 +184,7 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
             <BareBox n={"2"}>
               {t("landing.additionalContent.mid")}
               <br />
-              <RouterLinkButton mt="2" to={"/"} variant="primaryInverse" fontWeight="bold">
+              <RouterLinkButton mt="2" to={"/"} variant="primaryInverse">
                 {t("landing.additionalContent.midButton")}
               </RouterLinkButton>
             </BareBox>

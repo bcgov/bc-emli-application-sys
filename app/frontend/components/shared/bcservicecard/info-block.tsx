@@ -21,12 +21,7 @@ export function BCServiceInfoBlock({ title, description, bulletPoints, ctaText, 
           {infoLink}
         </Button>
       )}
-      <RouterLinkButton
-        to={ctaLink}
-        variant="secondary"
-        rightIcon={<ArrowSquareOut size={16} color="border.dark" />}
-        color="theme.primary100"
-      >
+      <RouterLinkButton to={ctaLink} variant="secondary" rightIcon={<ArrowSquareOut size={16} color="border.dark" />}>
         {ctaText}
       </RouterLinkButton>
     </Flex>

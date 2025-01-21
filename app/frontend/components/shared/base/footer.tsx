@@ -1,5 +1,4 @@
-import { Box, Container, Divider, Flex, Link, Show, Text, Wrap } from "@chakra-ui/react"
-import { ArrowSquareOut } from "@phosphor-icons/react"
+import { Box, Container, Divider, Flex, Show, Text } from "@chakra-ui/react"
 import { observer } from "mobx-react-lite"
 import React from "react"
 import { useTranslation } from "react-i18next"
@@ -21,6 +20,7 @@ export const Footer = observer(() => {
     "/welcome",
     "/contact",
     "/check-eligible",
+    "/not-found",
   ]
 
   const shouldShowFooter = onlyShowFooterOnRoutes.some((route) => location.pathname.startsWith(route))
@@ -47,43 +47,23 @@ export const Footer = observer(() => {
               <Container maxW="container.lg">
                 <Flex direction={{ base: "column", md: "row" }} gap={12}>
                   <Flex direction={"row"} align="center" justify="center" wrap="wrap" gap={8}>
-                    <RouterLink
-                      to={t("site.footerLinks.betterHomes")}
-                      color="text.secondary"
-                      style={{ textDecoration: "none" }}
-                    >
+                    <RouterLink to={t("site.footerLinks.betterHomes")} color="text.secondary">
                       {t("site.betterHomes")}
                     </RouterLink>
                     <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                    <RouterLink
-                      to={t("site.footerLinks.disclaimer")}
-                      color="text.secondary"
-                      style={{ textDecoration: "none" }}
-                    >
+                    <RouterLink to={t("site.footerLinks.disclaimer")} color="text.secondary">
                       {t("site.disclaimer")}
                     </RouterLink>
                     <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                    <RouterLink
-                      to={t("site.footerLinks.accessibility")}
-                      color="text.secondary"
-                      style={{ textDecoration: "none" }}
-                    >
+                    <RouterLink to={t("site.footerLinks.accessibility")} color="text.secondary">
                       {t("site.accessibility")}
                     </RouterLink>
                     <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                    <RouterLink
-                      to={t("site.footerLinks.copyright")}
-                      color="text.secondary"
-                      style={{ textDecoration: "none" }}
-                    >
+                    <RouterLink to={t("site.footerLinks.copyright")} color="text.secondary">
                       {t("site.copyright")}
                     </RouterLink>
                     <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                    <RouterLink
-                      to={t("site.footerLinks.dataAndPrivacy")}
-                      color="text.secondary"
-                      style={{ textDecoration: "none" }}
-                    >
+                    <RouterLink to={t("site.footerLinks.dataAndPrivacy")} color="text.secondary">
                       {t("site.dataAndPrivacy")}
                     </RouterLink>
                   </Flex>

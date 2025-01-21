@@ -16,7 +16,7 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
 
   return (
     <CenterContainer h="full">
-      <Flex direction={{ base: "column", md: "row" }} gap={4}>
+      <Flex direction={{ base: "column", md: "row" }} gap={10}>
         <Flex
           direction="column"
           gap={6}
@@ -42,11 +42,11 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
               name="authenticity_token"
               value={document.querySelector("[name=csrf-token]").content}
             />
-            <Button variant="primary" w="full" type="submit">
-          {t("auth.bcsc_login")}
-          </Button>
-            {/* <RouterLinkButton to="/" bg="theme.blue" color="white" rightIcon={<ArrowSquareOut size={16} />}>
-              {t("auth.bcServiceCardInfo.bcservice_login")}
+            <Button variant="primary" w="full" type="submit" rightIcon={<ArrowSquareOut size={16} />}>
+              {t("auth.bcsc_login")}
+            </Button>
+            {/* <RouterLinkButton bg="theme.blue" color="white" rightIcon={<ArrowSquareOut size={16} />} type="submit">
+              {t("auth.bcsc_login")}
             </RouterLinkButton> */}
           </form>
           {isAdmin ? (
