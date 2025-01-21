@@ -3,7 +3,7 @@ kind: Route
 metadata:
   labels:
     app: "{{ $.Values.appName }}-web"
-  name: "permit-portal-route"
+  name: "energy-portal-route"
 spec:
   host: "{{ .Values.route.spec.host }}"
   port:
