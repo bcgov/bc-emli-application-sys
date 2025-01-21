@@ -45,9 +45,6 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
             <Button variant="primary" w="full" type="submit" rightIcon={<ArrowSquareOut size={16} />}>
               {t("auth.bcsc_login")}
             </Button>
-            {/* <RouterLinkButton bg="theme.blue" color="white" rightIcon={<ArrowSquareOut size={16} />} type="submit">
-              {t("auth.bcsc_login")}
-            </RouterLinkButton> */}
           </form>
           {isAdmin ? (
             <Text>{t("auth.adminAccountAccess")}</Text>
