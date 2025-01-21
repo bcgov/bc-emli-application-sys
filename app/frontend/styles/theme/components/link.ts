@@ -13,4 +13,14 @@ export const Link = {
       color: "text.link",
     },
   },
+  variants: {
+    primaryInverse: {
+      color: "white",
+      textDecoration: "underline",
+      _hover: {
+        color: "theme.white",
+        opacity: 0.8,
+      },
+    },
+  },
 }
