@@ -53,13 +53,13 @@ export const Button = {
       _focus: { ...focusStyles },
     },
     primaryInverse: {
-      color: "theme.blue",
+      color: "text.primary",
       borderWidth: 1,
-      borderColor: "theme.blue",
+      borderColor: "text.primary",
       bg: "greys.white",
       textDecor: "none",
       _hover: {
-        color: "theme.blue",
+        color: "text.primary",
         textDecor: "none",
         bg: "greys.grey80",
         _disabled: { ...disabledStyles },

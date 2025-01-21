@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next"
 import ErrorAlert from "../../shared/base/error-alert"
 import QuestionCard from "../../shared/base/question-card"
 import SuccessAlert from "../../shared/base/success-alert"
+import { SubNavBar } from "../navigation/sub-nav-bar"
 
 interface IEligibilityCheckProps {}
 
@@ -15,6 +16,13 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
   const eligibleHomeTypes: string[] = t("auth.checkEligibility.alert.typesOfhome", { returnObjects: true })
   const assesedValues: string[] = t("auth.checkEligibility.assesedValues", { returnObjects: true })
   const paymentValue: string[] = t("auth.checkEligibility.paymentOption", { returnObjects: true })
+
+  const breadCrumb = [
+    {
+      href: "/check-eligible",
+      title: t("auth.checkEligibility.seeEligible"),
+    },
+  ]
 
   const [isEligible, setIsEligible] = useState<null | boolean>(null)
   const [isHomeTypeEligible, setIsHomeTypeEligible] = useState<boolean | null>(null)
@@ -62,6 +70,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
 
   return (
     <Flex direction="column" w="full" bg="greys.white">
+      <SubNavBar staticBreadCrumbs={breadCrumb} borderBottom={"none"} />
       {/* Header Section */}
       <Flex align="center" h={{ base: "calc(40vh - 200px)", sm: "180px" }} bg="theme.blueAltGradient">
         <Container maxW="container.lg" px={8} h="100%">
