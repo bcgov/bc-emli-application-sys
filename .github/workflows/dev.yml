@@ -1,12 +1,24 @@
 name: Build and Push Docker Image to Artifactory
 
 on:
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: "Branch Name"
-        required: true
-        default: "main"
+  push:
+    branches:
+    - dev
+    paths:
+      - app/**
+      - config/**
+      - db/**
+      - eulas/**
+      - lib/**
+      - public/**
+      - spec/**
+      - swagger/**
+      - config.ru
+      - Gemfile
+      - Gemfile.lock
+      - package-lock.json
+      - package.json
+      - Rakefile
 
 jobs:
   build-and-push-image:
