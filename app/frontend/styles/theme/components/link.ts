@@ -1,6 +1,6 @@
 export const Link = {
   baseStyle: {
-    color: "text.link",
+    color: "text.primary",
     textDecoration: "underline",
 
     ["svg"]: {
@@ -10,7 +10,7 @@ export const Link = {
     },
 
     _hover: {
-      color: "text.primary",
+      color: "text.link",
     },
   },
 }
