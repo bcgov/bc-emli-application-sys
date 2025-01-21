@@ -1,5 +1,4 @@
-import { Box, Container, Divider, Flex, Link, Show, Text, Wrap } from "@chakra-ui/react"
-import { ArrowSquareOut } from "@phosphor-icons/react"
+import { Box, Container, Divider, Flex, Show, Text } from "@chakra-ui/react"
 import { observer } from "mobx-react-lite"
 import React from "react"
 import { useTranslation } from "react-i18next"
@@ -21,6 +20,7 @@ export const Footer = observer(() => {
     "/welcome",
     "/contact",
     "/check-eligible",
+    "/not-found",
   ]
 
   const shouldShowFooter = onlyShowFooterOnRoutes.some((route) => location.pathname.startsWith(route))
