@@ -89,6 +89,16 @@ Rails.application.configure do
     protocol: "http"
   }
 
+  # Ensure Rails logger outputs to STDOUT
+  config.logger = ActiveSupport::Logger.new(STDOUT)
+  config.logger.formatter = config.log_formatter
+
+  # Set log level to debug
+  config.log_level = :debug
+
+  # Whitelist IPs for web console access (for Docker or remote environments)
+  config.web_console.allowed_ips = '172.18.0.0/16'
+
   config.after_initialize do
     Rails.application.routes.default_url_options =
       Rails.application.config.action_mailer.default_url_options

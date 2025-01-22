@@ -70,7 +70,7 @@ crunchy-postgres:
       endpoint: "endpointName"
       # region specifies the S3 region to use. If your S3 storage system does not
       # use "region", fill this in with a random value.
-      region: "ca-central-1"
+      region: "ca-central-1" 
       # key is the S3 key. This is stored in a Secret.
       # Please DO NOT push this value to GitHub
       key: "s3keyValue"
