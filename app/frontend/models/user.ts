@@ -31,6 +31,7 @@ export const UserModel = types
     preference: types.frozen<IPreference>(),
     invitedToJurisdiction: types.maybeNull(types.frozen<IJurisdiction>()),
     licenseAgreements: types.maybeNull(types.frozen<ILicenseAgreement[]>()),
+    address: types.maybeNull(types.string),
   })
   .extend(withRootStore())
   .extend(withEnvironment())

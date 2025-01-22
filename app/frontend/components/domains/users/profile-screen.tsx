@@ -1,44 +1,21 @@
-import {
-  Alert,
-  Avatar,
-  Button,
-  Checkbox,
-  Container,
-  Divider,
-  Flex,
-  FormControl,
-  Heading,
-  InputGroup,
-  InputRightElement,
-  Link,
-  Select,
-  Switch,
-  Table,
-  Tag,
-  TagLabel,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react"
-import { Info, Warning } from "@phosphor-icons/react"
+import { Button, Container, Flex, Heading, InputGroup, Select, Switch, Td, Text, Tr } from "@chakra-ui/react"
 import { observer } from "mobx-react-lite"
 import React, { useState } from "react"
 import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form"
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { useMst } from "../../../setup/root"
 import { EUserRoles } from "../../../types/enums"
+import ErrorAlert from "../../shared/base/error-alert"
 import { EmailFormControl } from "../../shared/form/email-form-control"
 import { TextFormControl } from "../../shared/form/input-form-control"
-import { UserEulas } from "../../shared/user-eulas"
 
 interface IProfileScreenProps {}
 
 export const ProfileScreen = observer(({}: IProfileScreenProps) => {
   const { t } = useTranslation()
+  const required: string = t("user.required")
+
   const [isEditingEmail, setIsEditingEmail] = useState(false)
 
   const { userStore } = useMst()
@@ -48,13 +25,15 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
     currentUser.unconfirmedEmail || (currentUser.isUnconfirmed && currentUser.confirmationSentAt)
 
   const getDefaults = () => {
-    const { firstName, lastName, nickname, certified, organization, preference } = currentUser
+    const { firstName, lastName, nickname, certified, organization, preference, email, address } = currentUser
     return {
       firstName,
       lastName,
       certified,
       organization,
       preferenceAttributes: preference,
+      email,
+      address,
     }
   }
   const formMethods = useForm({
@@ -62,7 +41,7 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
     defaultValues: getDefaults(),
   })
   const { handleSubmit, formState, control, reset, setValue } = formMethods
-  const { isSubmitting } = formState
+  const { isSubmitting, errors } = formState
 
   const navigate = useNavigate()
 
@@ -72,62 +51,23 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
     reset(getDefaults())
   }
 
+  // Remember: Need to check if Confirmation Email functionality still required
   const handleResendConfirmationEmail = async () => {
     await currentUser.resendConfirmation()
   }
 
-  const events = [
-    {
-      event: t("user.notifications.essential"),
-      inAppChecked: false,
-      emailChecked: true,
-      emailDisabled: true,
-    },
-    {
-      event: t("user.notifications.templateChanged"),
-      inAppControl: "preferenceAttributes.enableInAppNewTemplateVersionPublishNotification",
-      emailChecked: false,
-    },
-    {
-      event: t("user.notifications.templateCustomized"),
-      inAppControl: "preferenceAttributes.enableInAppCustomizationUpdateNotification",
-      emailChecked: false,
-    },
-    {
-      event: t("user.notifications.applicationSubmitted"),
-      inAppControl: "preferenceAttributes.enableInAppApplicationSubmissionNotification",
-      emailControl: "preferenceAttributes.enableEmailApplicationSubmissionNotification",
-    },
-    {
-      event: t("user.notifications.applicationViewed"),
-      inAppControl: "preferenceAttributes.enableInAppApplicationViewNotification",
-      emailControl: "preferenceAttributes.enableEmailApplicationViewNotification",
-    },
-    {
-      event: t("user.notifications.applicationRevisionsRequested"),
-      inAppControl: "preferenceAttributes.enableInAppApplicationRevisionsRequestNotification",
-      emailControl: "preferenceAttributes.enableEmailApplicationRevisionsRequestNotification",
-    },
-    {
-      event: t("user.notifications.collaboration"),
-      inAppControl: "preferenceAttributes.enableInAppCollaborationNotification",
-      emailControl: "preferenceAttributes.enableEmailCollaborationNotification",
-    },
-    {
-      event: t("user.notifications.integrationMapping"),
-      inAppControl: "preferenceAttributes.enableInAppIntegrationMappingNotification",
-      emailControl: "preferenceAttributes.enableEmailIntegrationMappingNotification",
-    },
-  ]
+  // Check if email is required but empty
+  const isEmailRequiredError = errors?.email && errors.email.type === required
 
   return (
     <Container maxW="container.sm" p={8} as="main">
       <FormProvider {...formMethods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Flex as="section" direction="column" w="full" gap={6}>
-            <Heading as="h1" m={0}>
-              {t("user.myProfile")}
+            <Heading as="h1" m={0} color="theme.blueAlt">
+              {t("user.accountCreation")}
             </Heading>
+            {/*Remember: Need to confirm if it is still required */}
             {!currentUser.isSubmitter && (
               <InputGroup>
                 <Flex direction="column" w="full">
@@ -144,203 +84,32 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
             )}
 
             <Section>
-              <Avatar
-                size="xl"
-                name={currentUser.name}
-                bg={currentUser.name ? "semantic.warningLight" : "greys.grey02"}
-                color="text.primary"
-              />
               <Flex gap={{ base: 4, md: 6 }} direction={{ base: "column", md: "row" }}>
                 <TextFormControl label={t("user.firstName")} fieldName="firstName" required />
                 <TextFormControl label={t("user.lastName")} fieldName="lastName" required />
               </Flex>
-              {currentUser.isSubmitter && (
-                <>
-                  <TextFormControl label={t("auth.organizationLabel")} fieldName="organization" />
-                  <FormControl>
-                    <Controller
-                      name="certified"
-                      control={control}
-                      render={({ field: { onChange, value } }) => {
-                        return (
-                          <Checkbox isChecked={value} onChange={onChange}>
-                            {t("auth.certifiedProfessional")}
-                          </Checkbox>
-                        )
-                      }}
-                    />
-                  </FormControl>
-                </>
-              )}
-              <Divider my={1} />
-              <TextFormControl
-                // @ts-ignore
-                label={t(`user.omniauthProviders.${currentUser.omniauthProvider as EOmniauthProvider}`)}
-                hint={currentUser.omniauthEmail}
-                inputProps={{ value: currentUser.omniauthUsername }}
-                isDisabled
-              />
-              {!currentUser.isSuperAdmin && (
-                <Alert
-                  status="info"
-                  borderRadius="sm"
-                  gap={1.5}
-                  borderWidth={1}
-                  borderColor="semantic.info"
-                  px={2}
-                  py={1.5}
-                  fontSize="sm"
-                >
-                  <Info color="var(--chakra-colors-semantic-info)" />
-                  <Text>
-                    {t("user.changeBceid")}
-                    <Link href={import.meta.env.VITE_BCEID_URL} isExternal>
-                      {t("user.changeBceidLinkText")}
-                    </Link>
-                  </Text>
-                </Alert>
-              )}
+              <TextFormControl label={t("user.address")} fieldName="address" required />
+              <EmailFormControl fieldName="email" label={t("user.emailAddress")} showIcon required />
             </Section>
-
             <Section>
-              <Heading as="h3" m={0}>
-                {t("user.receiveNotifications")}
-              </Heading>
-              {currentUser.isUnconfirmed && !currentUser.confirmationSentAt ? (
-                <EmailFormControl fieldName="email" label={t("user.notificationsEmail")} showIcon required />
-              ) : (
-                <>
-                  {currentUser.unconfirmedEmail ? (
-                    <EmailFormControl
-                      label={t("user.notificationsEmail")}
-                      showIcon
-                      inputProps={{
-                        isDisabled: true,
-                        value: currentUser.unconfirmedEmail,
-                        paddingRight: "98.23px",
-                        _disabled: {
-                          color: "text.primary",
-                          bg: "greys.grey04",
-                          borderColor: "border.light",
-                        },
-                      }}
-                      inputRightElement={
-                        <InputRightElement pointerEvents="none" width="auto" px={2}>
-                          <Flex
-                            color="text.primary"
-                            borderColor="semantic.warning"
-                            borderWidth={1}
-                            bg="semantic.warningLight"
-                            rounded="xs"
-                            px={1.5}
-                            py={0.5}
-                            fontSize="sm"
-                          >
-                            {t("ui.unverified")}
-                          </Flex>
-                        </InputRightElement>
-                      }
-                    />
-                  ) : (
-                    <EmailFormControl
-                      label={t("user.notificationsEmail")}
-                      showIcon
-                      inputProps={{
-                        isDisabled: true,
-                        value: currentUser.email,
-                        paddingRight: "82.35px",
-                        _disabled: {
-                          color: "text.primary",
-                          bg: "greys.grey04",
-                          borderColor: "border.light",
-                        },
-                      }}
-                      inputRightElement={
-                        <InputRightElement pointerEvents="none" width="auto" px={2}>
-                          <Tag
-                            variant="outline"
-                            color="text.primary"
-                            borderColor="semantic.success"
-                            bg="theme.green.100"
-                            rounded="xs"
-                          >
-                            <TagLabel>{t("ui.verified")}</TagLabel>
-                          </Tag>
-                        </InputRightElement>
-                      }
-                    />
-                  )}
-
-                  {confirmationRequired && (
-                    <Alert
-                      status="warning"
-                      borderRadius="sm"
-                      gap={1.5}
-                      borderWidth={1}
-                      borderColor="semantic.warning"
-                      px={2}
-                      py={1.5}
-                      fontSize="sm"
-                    >
-                      <Warning color="var(--chakra-colors-semantic-warning)" />
-                      <Text>
-                        {currentUser.unconfirmedEmail && !currentUser.isUnconfirmed ? (
-                          <Trans
-                            i18nKey="user.confirmationRequiredWithEmail"
-                            values={{ email: currentUser.email }}
-                            components={{
-                              1: <Button variant="link" onClick={handleResendConfirmationEmail} />,
-                            }}
-                          />
-                        ) : (
-                          <Trans
-                            i18nKey="user.confirmationRequired"
-                            components={{
-                              1: <Button variant="link" onClick={handleResendConfirmationEmail} />,
-                            }}
-                          />
-                        )}
-                      </Text>
-                    </Alert>
-                  )}
-                  {isEditingEmail ? (
-                    <>
-                      <Divider my={4} />
-                      <EmailFormControl showIcon label={t("user.newEmail")} fieldName="email" />
-                    </>
-                  ) : (
-                    <Button
-                      variant="link"
-                      onClick={() => {
-                        setIsEditingEmail(true)
-                      }}
-                    >
-                      {t("user.changeEmail")}
-                    </Button>
-                  )}
-                </>
-              )}
-
-              <Table variant="simple">
-                <Thead>
-                  <Tr>
-                    <Th>{t("user.notifications.event")}</Th>
-                    <Th>{t("user.notifications.enableNotification")}</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {events.map((event, index) => (
-                    <EventRow key={index} {...event} />
-                  ))}
-                </Tbody>
-              </Table>
+              <Flex alignItems="center" alignSelf="stretch">
+                <Flex direction="column" flex={1}>
+                  <Text fontWeight={"bold"}>{t("user.termsandConditions")}</Text>
+                  <Text color="text.secondary" pr={4}>
+                    {/* Remember: To append date on which terms and conditions accepted */}
+                    {t("user.acceptedConditions")}
+                  </Text>
+                </Flex>
+                <Flex>
+                  <Button variant="secondary">View</Button>
+                </Flex>
+              </Flex>
             </Section>
-
-            {!currentUser.isSuperAdmin && <UserEulas />}
-
+            {/* Conditional rendering of ErrorAlert when email is required but empty */}
+            {isEmailRequiredError && <ErrorAlert description={t("user.emailValidationError")} />}
             <Flex as="section" gap={4} mt={4}>
               <Button variant="primary" type="submit" isLoading={isSubmitting} loadingText={t("ui.loading")}>
-                {t("ui.save")}
+                {t("ui.createAccount")}
               </Button>
               {!currentUser.isUnconfirmed && (
                 <Button variant="secondary" isDisabled={isSubmitting} onClick={() => navigate(-1)}>
@@ -348,14 +117,6 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                 </Button>
               )}
             </Flex>
-            <Text fontSize="xs">
-              <Trans
-                i18nKey={"user.deleteAccount"}
-                components={{
-                  1: <Link href={`mailto:digital.codes.permits@gov.bc.ca`}></Link>,
-                }}
-              />
-            </Text>
           </Flex>
         </form>
       </FormProvider>
@@ -368,65 +129,5 @@ function Section({ children }) {
     <Flex as="section" direction="column" gap={4} w="full" p={6} borderWidth={1} borderColor="border.light">
       {children}
     </Flex>
-  )
-}
-
-interface IEventRowProps {
-  event: string
-  inAppControl?: string
-  emailControl?: string
-  inAppChecked?: boolean
-  emailChecked?: boolean
-  emailDisabled?: boolean
-}
-
-const EventRow: React.FC<IEventRowProps> = ({
-  event,
-  inAppControl,
-  emailControl,
-  inAppChecked,
-  emailChecked,
-  emailDisabled,
-}) => {
-  const { control } = useFormContext()
-  const { t } = useTranslation()
-
-  return (
-    <Tr>
-      <Td w="45%">{event}</Td>
-      <Td w="55%">
-        <Flex gap={6} alignItems="center">
-          {inAppControl ? (
-            <Controller
-              name={inAppControl}
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Switch isChecked={value} onChange={onChange}>
-                  {t("user.inApp")}
-                </Switch>
-              )}
-            />
-          ) : (
-            <Switch isChecked={inAppChecked}>{t("user.inApp")}</Switch>
-          )}
-
-          {emailControl ? (
-            <Controller
-              name={emailControl}
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Switch isChecked={value} onChange={onChange}>
-                  {t("user.email")}
-                </Switch>
-              )}
-            />
-          ) : (
-            <Switch isChecked={emailChecked} disabled={emailDisabled}>
-              {t("user.email")}
-            </Switch>
-          )}
-        </Flex>
-      </Td>
-    </Tr>
   )
 }

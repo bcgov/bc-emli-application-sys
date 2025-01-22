@@ -33,6 +33,9 @@ class OmniauthUserResolver
     accept_invitation_with_omniauth if invited_user.present?
 
     self.user = invited_user || existing_user || create_user
+
+    Rails.logger.info "what is self user: #{self.user}"
+
     self.error_key = error_message_key unless user&.valid? && user&.persisted?
   end
 
@@ -54,8 +57,13 @@ class OmniauthUserResolver
         omniauth_provider:,
         omniauth_uid:,
         omniauth_email:,
-        omniauth_username:
+        omniauth_username:,
+        first_name: omniauth_givenname,
+        last_name: omniauth_familyname,
+        email: omniauth_email,
+        address: omniauth_address
       )
+
     # skip confirmation until user has a chance to add/verify their notification email
     u.skip_confirmation_notification!
     u.save
@@ -122,5 +130,23 @@ class OmniauthUserResolver
       else
         raw_info.bceid_username || raw_info.idir_username
       end
+  end
+
+  def omniauth_givenname
+    @first_name ||= raw_info.given_name
+  end
+
+  def omniauth_familyname
+    @last_name ||= raw_info.family_name
+  end
+
+  def omniauth_address
+    @street_address ||= begin
+      if raw_info.identity_provider == ENV["KEYCLOAK_CLIENT"]
+        street = raw_info.address.street_address
+        locality = raw_info.address.locality
+        "#{street}, #{locality}"
+      end
+    end
   end
 end
