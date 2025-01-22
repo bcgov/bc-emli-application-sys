@@ -15,7 +15,8 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
   const eligibleHomes: string[] = t("auth.checkEligibility.kindOfHomes", { returnObjects: true })
   const eligibleHomeTypes: string[] = t("auth.checkEligibility.alert.typesOfhome", { returnObjects: true })
   const assesedValues: string[] = t("auth.checkEligibility.assesedValues", { returnObjects: true })
-  const paymentValue: string[] = t("auth.checkEligibility.paymentOption", { returnObjects: true })
+  const paymentValues: string[] = t("auth.checkEligibility.paymentOption", { returnObjects: true })
+  const annualHouseholdValues: string[] = t("auth.checkEligibility.annualHouseholdOptions", { returnObjects: true })
 
   const breadCrumb = [
     {
@@ -26,13 +27,13 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
 
   const [isEligible, setIsEligible] = useState<null | boolean>(null)
   const [isHomeTypeEligible, setIsHomeTypeEligible] = useState<boolean | null>(null)
-  const [isAssessedValueEligible, setIsAssessedValueEligible] = useState<boolean | null>(null)
-
+  const [incomeNotToDisclose, setIncomeNotToDisclose] = useState<boolean | null>(null)
   const [formData, setFormData] = useState({
     homeType: "",
     assessedValue: "",
     paysBills: "",
     totalPeople: "",
+    annualHouseHold: "",
   })
 
   // Handle form input changes
@@ -42,29 +43,35 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
 
   // Validate dynamically as formData changes
   useEffect(() => {
-    const { homeType, assessedValue, paysBills, totalPeople } = formData
+    const { homeType, assessedValue, paysBills, totalPeople, annualHouseHold } = formData
 
-    if (!homeType && !assessedValue && !paysBills && !totalPeople) {
+    if (!homeType && !assessedValue && !paysBills && !totalPeople && !annualHouseHold) {
       setIsHomeTypeEligible(null)
-      setIsAssessedValueEligible(null)
+      setIncomeNotToDisclose(null)
       setIsEligible(null)
       return
     }
 
     // Calculate home type eligibility based on conditions
     const homeTypeEligible = homeType === eligibleHomes[4] ? false : true
-    const ineligibleHomes = [eligibleHomes[4], eligibleHomes[5], eligibleHomes[6]]
+    const ineligibleHomes = [eligibleHomes[4], eligibleHomes[5]]
 
     const areEligibleHomes = !ineligibleHomes.includes(homeType)
     setIsHomeTypeEligible(homeTypeEligible)
 
-    // Calculate assesed value eligibility based on conditions
-    const assessedValueEligible = assessedValue === assesedValues[2] ? false : true
-    setIsAssessedValueEligible(assessedValueEligible)
+    // household income eligibility conditions
+    const incomeNotToDiscloseSelected = annualHouseHold === annualHouseholdValues[4] ? true : false
+    setIncomeNotToDisclose(incomeNotToDiscloseSelected)
 
     // Calculate overall eligibility
     const eligibility =
-      areEligibleHomes && assessedValue === assesedValues[1] && paysBills === paymentValue[0] && totalPeople !== ""
+      areEligibleHomes &&
+      assessedValue !== assesedValues[0] &&
+      paysBills !== paymentValues[1] &&
+      totalPeople !== "" &&
+      annualHouseHold !== "" &&
+      annualHouseHold !== annualHouseholdValues[3]
+
     setIsEligible(eligibility)
   }, [formData])
 
@@ -76,7 +83,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
         <Container maxW="container.lg" px={8} h="100%">
           <Flex align="center" h="100%" w="100%" position="relative">
             <Heading as="h1" color="white">
-              {t("auth.checkEligibility.seeEligible")}
+              {t("auth.checkEligibility.heading")}
             </Heading>
           </Flex>
         </Container>
@@ -86,8 +93,14 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
       <Container maxW="container.lg" pt={{ md: 12 }} px={{ lg: 8 }} pb={{ md: 12 }}>
         <VStack spacing={{ base: 4, md: 12 }} align="flex-start">
           <Flex direction={{ base: "column", md: "row" }} gap={{ base: 6, md: 12 }}>
-            <Box flex={1}>
-              <Image src="/images/place-holder.png" alt="Place holder" />
+            <Box position="relative">
+              <Image
+                src="/images/eligibility-place-holder.png"
+                alt="Place holder"
+                objectFit="cover"
+                width="100%"
+                height="100%"
+              />
             </Box>
             <VStack align="flex-start" flex={1} spacing={4} p={{ base: 6, md: 0 }}>
               <Heading as="h2" color="theme.blueAlt">
@@ -113,7 +126,6 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
                   onAnswerSelect={handleChange("homeType")}
                 />
               </FormControl>
-
               {/* Show Error Alert if home type is not eligible */}
               {isHomeTypeEligible === false && (
                 <Box mt={4}>
@@ -128,18 +140,51 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
                   </Text>
                 </Box>
               )}
-
-              {/* Assessed Value Question */}
+              {formData.homeType === eligibleHomes[5] && (
+                <ErrorAlert
+                  title={t("auth.checkEligibility.alert.otherHomes")}
+                  description={t("auth.checkEligibility.alert.currentlyEligibleHome")}
+                  items={eligibleHomeTypes}
+                  linkText={t("auth.checkEligibility.alert.seeDetails")}
+                  linkHref={t("landing.iNeedLink")}
+                />
+              )}
+              {formData.homeType === eligibleHomes[6] && (
+                <ErrorAlert
+                  title={t("auth.checkEligibility.alert.certainHomes")}
+                  description={t("auth.checkEligibility.alert.currentlyEligibleHome")}
+                  items={eligibleHomeTypes}
+                  linkText={t("auth.checkEligibility.alert.seeDetails")}
+                  linkHref={t("landing.iNeedLink")}
+                  icon={<Warning />}
+                  iconColor="semantic.warning"
+                  borderColor="semantic.warning"
+                  backgroundColor="semantic.warningLight"
+                />
+              )}
+              {/*Property Assessed Value Question */}
               <FormControl as="fieldset" mb={4}>
                 <QuestionCard
                   question={t("auth.checkEligibility.propertyAssesmentQuestion")}
-                  answers={t("auth.checkEligibility.assesedValues", { returnObjects: true })}
+                  answers={assesedValues}
                   onAnswerSelect={handleChange("assessedValue")}
+                  type={t("auth.checkEligibility.assesmentText")}
                 />
               </FormControl>
-
               {/* Show Error Alert if assesed value is not eligible */}
-              {isAssessedValueEligible === false && (
+              {formData.assessedValue === assesedValues[0] && (
+                <Box mt={4}>
+                  <Text fontSize="lg" fontWeight="bold">
+                    <ErrorAlert
+                      title={t("auth.checkEligibility.alert.propertyValueHigh")}
+                      description={t("auth.checkEligibility.alert.propertyValueHighDesc")}
+                      linkText={t("auth.checkEligibility.alert.seeDetails")}
+                      linkHref={t("landing.iNeedLink")}
+                    />
+                  </Text>
+                </Box>
+              )}
+              {formData.assessedValue === assesedValues[2] && (
                 <Box mt={4}>
                   <Text fontSize="lg" fontWeight="bold">
                     <ErrorAlert
@@ -155,30 +200,85 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
                   </Text>
                 </Box>
               )}
-
               {/* Payment Bills Question */}
               <FormControl as="fieldset" mb={4}>
                 <QuestionCard
                   question={t("auth.checkEligibility.paymentQuestion")}
-                  answers={t("auth.checkEligibility.paymentOption", { returnObjects: true })}
+                  answers={paymentValues}
                   onAnswerSelect={handleChange("paysBills")}
+                  type={t("auth.checkEligibility.paymentTextPrefix")}
                 />
               </FormControl>
-
+              {formData.paysBills === paymentValues[2] && (
+                <Box mt={4}>
+                  <Text fontSize="lg" fontWeight="bold">
+                    <ErrorAlert
+                      title={t("auth.checkEligibility.alert.mustPay")}
+                      description={t("auth.checkEligibility.alert.mustPayDesc")}
+                      linkText={t("auth.checkEligibility.alert.seeDetails")}
+                      linkHref={t("landing.iNeedLink")}
+                      icon={<Warning />}
+                      iconColor="semantic.warning"
+                      borderColor="semantic.warning"
+                      backgroundColor="semantic.warningLight"
+                    />
+                  </Text>
+                </Box>
+              )}
               {/* Total People Question */}
               <FormControl as="fieldset" mb={4}>
                 <QuestionCard
                   question={t("auth.checkEligibility.totalPeople")}
                   answers={t("auth.checkEligibility.peopleNumber", { returnObjects: true })}
                   onAnswerSelect={handleChange("totalPeople")}
+                  type={t("auth.checkEligibility.peopleTextPrefix")}
                 />
               </FormControl>
-
+              {/* Annual Household Question */}
+              <FormControl as="fieldset" mb={4}>
+                <QuestionCard
+                  question={t("auth.checkEligibility.annualHouseholdQuestion")}
+                  answers={annualHouseholdValues}
+                  onAnswerSelect={handleChange("annualHouseHold")}
+                />
+              </FormControl>
+              {incomeNotToDisclose && (
+                <Box mt={4}>
+                  <Text fontSize="lg" fontWeight="bold">
+                    <ErrorAlert
+                      title={t("auth.checkEligibility.alert.provideInformation")}
+                      description={t("auth.checkEligibility.alert.proofOfIncomeDesc")}
+                      linkText={t("auth.checkEligibility.alert.seeDetails")}
+                      linkHref={t("landing.iNeedLink")}
+                      icon={<Warning />}
+                      iconColor="semantic.warning"
+                      borderColor="semantic.warning"
+                      backgroundColor="semantic.warningLight"
+                    />
+                  </Text>
+                </Box>
+              )}
+              {formData.annualHouseHold === annualHouseholdValues[3] && (
+                <Box mt={4}>
+                  <Text fontSize="lg" fontWeight="bold">
+                    <ErrorAlert
+                      title={t("auth.checkEligibility.alert.rangeNotEligible")}
+                      description={t("auth.checkEligibility.alert.annualHouseholdDesc")}
+                      linkText={t("auth.checkEligibility.alert.seeDetails")}
+                      linkHref={t("landing.iNeedLink")}
+                    />
+                  </Text>
+                </Box>
+              )}
               {/* Eligibility Result */}
               {isEligible !== null && (
                 <Box mt={4}>
                   <Text fontSize="lg" fontWeight="bold">
-                    {isEligible ? <SuccessAlert /> : <ErrorAlert title="You're not eligible to apply" />}
+                    {isEligible ? (
+                      <SuccessAlert />
+                    ) : (
+                      <ErrorAlert title={t("auth.checkEligibility.alert.notEligible")} />
+                    )}
                   </Text>
                 </Box>
               )}
