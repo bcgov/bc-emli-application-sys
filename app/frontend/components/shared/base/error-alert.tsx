@@ -49,7 +49,7 @@ const ErrorAlert: FC<ErrorAlertProps> = ({
       align="stretch"
     >
       <Alert status="error" variant="subtle" bg="transparent" alignItems="start" p={0}>
-        <IconButton variant="ghost" icon={icon} zIndex={1} color={iconColor} aria-label="Error Icon" />
+        <IconButton variant="ghost" icon={icon} zIndex={1} color={iconColor} aria-label="Error Icon" fontSize={20} />
         <Stack mt={2}>
           {title && (
             <AlertTitle fontSize="md" fontWeight="bold">
@@ -69,10 +69,10 @@ const ErrorAlert: FC<ErrorAlertProps> = ({
             </Box>
           </AlertDescription>
           {linkText && (
-            <Link href={linkHref} isExternal>
-              <Text fontSize="sm" color="text.secondary">
-                {linkText} <ArrowSquareOut />
-              </Text>
+            <Link href={linkHref} isExternal fontSize="md" fontWeight="normal">
+              {/* <Text fontSize="sm" color="text.secondary"> */}
+              {linkText} <ArrowSquareOut />
+              {/* </Text> */}
             </Link>
           )}
         </Stack>

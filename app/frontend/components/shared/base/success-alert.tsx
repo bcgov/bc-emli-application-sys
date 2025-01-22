@@ -7,7 +7,7 @@ function SuccessAlert() {
   const { t } = useTranslation()
 
   const handleReload = () => {
-    window.location.href = "/login"
+    window.location.href = "/login?showContractor=false"
   }
   return (
     <Stack
@@ -29,9 +29,6 @@ function SuccessAlert() {
           <Button size="sm" variant="secondary" onClick={handleReload}>
             {t("auth.checkEligibility.alert.loginWithAccount")}
           </Button>
-          {/* <RouterLinkButton mt="2" to={"/login"} variant="secondary">
-            {t("auth.checkEligibility.alert.loginWithAccount")}
-          </RouterLinkButton> */}
         </Stack>
       </Alert>
     </Stack>
