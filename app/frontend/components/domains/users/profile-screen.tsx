@@ -25,11 +25,7 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
     currentUser.unconfirmedEmail || (currentUser.isUnconfirmed && currentUser.confirmationSentAt)
 
   const getDefaults = () => {
-<<<<<<< HEAD
-    const { firstName, lastName, nickname, certified, organization, preference, email } = currentUser
-=======
     const { firstName, lastName, nickname, certified, organization, preference, email, address } = currentUser
->>>>>>> 9f18f986a6934d91445fc77a8810268d7935b58a
     return {
       firstName,
       lastName,
@@ -37,10 +33,7 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
       organization,
       preferenceAttributes: preference,
       email,
-<<<<<<< HEAD
-=======
       address,
->>>>>>> 9f18f986a6934d91445fc77a8810268d7935b58a
     }
   }
   const formMethods = useForm({
