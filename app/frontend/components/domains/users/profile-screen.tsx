@@ -25,7 +25,7 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
     currentUser.unconfirmedEmail || (currentUser.isUnconfirmed && currentUser.confirmationSentAt)
 
   const getDefaults = () => {
-    const { firstName, lastName, nickname, certified, organization, preference, email } = currentUser
+    const { firstName, lastName, nickname, certified, organization, preference, email, address } = currentUser
     return {
       firstName,
       lastName,
@@ -33,6 +33,7 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
       organization,
       preferenceAttributes: preference,
       email,
+      address,
     }
   }
   const formMethods = useForm({
@@ -54,9 +55,11 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
   const handleResendConfirmationEmail = async () => {
     await currentUser.resendConfirmation()
   }
-
+  
   // Check if email is required but empty
   const isEmailRequiredError = errors?.email && errors.email.type === required
+  
+  console.log("currentUser:", currentUser);
 
   return (
     <Container maxW="container.sm" p={8} as="main">
