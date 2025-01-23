@@ -66,7 +66,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
     // Calculate overall eligibility
     const eligibility =
       areEligibleHomes &&
-      assessedValue !== assesedValues[0] &&
+      assessedValue !== assesedValues[1] &&
       paysBills !== paymentValues[1] &&
       totalPeople !== "" &&
       annualHouseHold !== "" &&
@@ -172,7 +172,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
                 />
               </FormControl>
               {/* Show Error Alert if assesed value is not eligible */}
-              {formData.assessedValue === assesedValues[0] && (
+              {formData.assessedValue === assesedValues[1] && (
                 <Box mt={4}>
                   <Text fontSize="lg" fontWeight="bold">
                     <ErrorAlert

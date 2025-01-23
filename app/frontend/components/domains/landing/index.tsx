@@ -176,16 +176,26 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
             <BareBox n={"1"}>
               {t("landing.additionalContent.left")}
               <br />
-              <RouterLinkButton mt="2" to={currentUser ? "/" : "/"} variant="primaryInverse">
-                {t("landing.additionalContent.viewTemplate")}
+              <RouterLinkButton
+                mt="2"
+                to={t("landing.additionalContent.energyPlannerLink")}
+                variant="primaryInverse"
+                rightIcon={<ArrowSquareOut />}
+              >
+                {t("landing.additionalContent.getStarted")}
               </RouterLinkButton>
             </BareBox>
 
             <BareBox n={"2"}>
               {t("landing.additionalContent.mid")}
               <br />
-              <RouterLinkButton mt="2" to={"/"} variant="primaryInverse">
-                {t("landing.additionalContent.midButton")}
+              <RouterLinkButton
+                mt="2"
+                to={t("landing.additionalContent.energyCoachBookCallLink")}
+                variant="primaryInverse"
+                rightIcon={<ArrowSquareOut />}
+              >
+                {t("landing.additionalContent.bookACall")}
               </RouterLinkButton>
             </BareBox>
           </Flex>
@@ -350,12 +360,12 @@ interface IBareBoxProps {
 
 const BareBox: React.FC<IBareBoxProps> = ({ n, children }) => {
   return (
-    <Box p={4} borderRadius="lg" bg="theme.blueLight" color="theme.blueAlt" flex={1}>
-      <Flex gap={6} align="center" h="full">
+    <Box p={4} borderRadius="lg" bg="theme.blueLight" color="theme.blueText" flex={1}>
+      <Flex gap={6} h="full">
         <Flex
           alignItems="center"
           justifyContent="center"
-          bg="theme.blue"
+          bg="theme.blueText"
           color="white"
           borderRadius="50%"
           minWidth="35px"
