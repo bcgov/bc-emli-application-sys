@@ -14,7 +14,7 @@ export function EnergyCoachInfoBlock() {
         t("auth.bcServiceCardInfo.energyCoach.homeUpgrades"),
       ]}
       ctaText={t("auth.bcServiceCardInfo.energyCoach.requestACall")}
-      ctaLink=""
+      ctaLink={t("auth.bcServiceCardInfo.energyCoach.ctaLink")}
     />
   )
 }

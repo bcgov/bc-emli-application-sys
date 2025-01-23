@@ -49,7 +49,11 @@ export const SupportScreen = () => {
               <strong>{t("site.support.speakWithEnergyCoach")}</strong>
             </Text>
             <Text>{t("site.support.anyQuestions")}</Text>
-            <RouterLinkButton to="/" variant="secondary" rightIcon={<ArrowSquareOut size={16} />}>
+            <RouterLinkButton
+              to={t("site.support.supportLink")}
+              variant="secondary"
+              rightIcon={<ArrowSquareOut size={16} />}
+            >
               {t("site.support.bookACall")}
             </RouterLinkButton>
           </Flex>

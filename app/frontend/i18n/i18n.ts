@@ -38,7 +38,8 @@ const options = {
               rebateQuestions: "questions about rebate programs",
               virtualWalkThrough: "doing a virtual walk-through of your home or",
               homeUpgrades: "home upgrade opportunities in general",
-              requestACall: "Request a call",
+              requestACall: "Book a call",
+              ctaLink: "https://www.betterbuildingsbc.ca/connect/",
             },
           },
           bceidInfo: {
@@ -103,7 +104,7 @@ const options = {
             programIntro:
               "The Energy Savings Program (ESP) offers home energy efficiency rebates based on your household income. It is an initiative of CleanBC Better Homes. It is funded by the Province of B.C., the Government of Canada and BC Hydro.",
             programAffordability:
-              "ESP makes energy-saving home upgrades more affordable to low- and middle-income households. Energy efficiency upgrades can help you lower your monthly energy cost.They can also help you improve year-round comfort in your home, enjoy healthier indoor air quality and reduce your greenhouse gas emissions.",
+              "ESP makes energy-saving home upgrades more affordable to low- and middle-income households. Energy efficiency upgrades can help you lower your monthly energy cost. They can also help you improve year-round comfort in your home, enjoy healthier indoor air quality and reduce your greenhouse gas emissions.",
             questionInstruction:
               "You might be eligible for the Energy Savings Program. Answer these questions to find out. All questions are required (*)",
             BCAssessmentLink: "https://www.bcassessment.ca/",
@@ -120,7 +121,7 @@ const options = {
             propertyAssesmentQuestion: "What is your property’s total assessed value? *",
             assesmentText: "You can find the assessed value of your property on",
             BCAssessment: "BC Assessment.",
-            assesedValues: ["Over $1,230,000", "$1,230,000 or lower", "Unsure"],
+            assesedValues: ["$1,230,000 or lower", "Over $1,230,000", "Unsure"],
 
             paymentQuestion: "Do you or a family member pay your own electricity and heating bills? *",
             paymentTextPrefix:
@@ -250,7 +251,10 @@ const options = {
             left: "Use the BC Home Energy Planner to find recommended upgrades for your home",
             mid: "Speak with an Energy Coach to get help with your application and learn more about rebate programs",
             midButton: "Schedule a call",
-            viewTemplate: "Get started",
+            getStarted: "Get started",
+            energyPlannerLink: "https://www.bchomeenergyplanner.ca/",
+            energyCoachBookCallLink: "https://www.betterbuildingsbc.ca/connect/",
+            bookACall: "Book a call",
           },
         },
         ui: {
@@ -2128,7 +2132,7 @@ const options = {
           pageNotFoundWeSuggest: "We suggest:",
           pageNotFoundChecking: "Checking that the web URL has been entered correctly",
           pageNotFoundGoing: "Going to the ",
-          pageNotFoundGoHome: "Enegry Savings Program application home page",
+          pageNotFoundGoHome: "Energy Savings Program application home page",
           pageNotFoundReaching: "Reaching out to ",
           pageNotFoundGetSupport: "Get support",
           pageNotFoundCTA: "Go back to home",
