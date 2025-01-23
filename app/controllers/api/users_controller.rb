@@ -156,7 +156,7 @@ class Api::UsersController < Api::ApplicationController
       agreement: EndUserLicenseAgreement.active_agreement(@user.eula_variant)
     )
     render_success @user,
-                   "user.eula_accepted",
+                   "user.terms_accepted",
                    { blueprint_opts: { view: :current_user } }
   end
 
