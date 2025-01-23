@@ -96,6 +96,7 @@ const options = {
             "Check your email inbox for a confirmation email to finish activating your new Building Permit Hub account.",
           tokenExpired: "Your session is no longer valid, please login again",
           checkEligibility: {
+            heading: "Eligibility check",
             home: "Home",
             seeEligible: "See if you’re eligible",
             aboutProgram: "About the Energy Savings Program",
@@ -104,7 +105,8 @@ const options = {
             programAffordability:
               "ESP makes energy-saving home upgrades more affordable to low- and middle-income households. Energy efficiency upgrades can help you lower your monthly energy cost.They can also help you improve year-round comfort in your home, enjoy healthier indoor air quality and reduce your greenhouse gas emissions.",
             questionInstruction:
-              "Answer a few quick questions to find out if you qualify for the program. All questions are required (*).",
+              "You might be eligible for the Energy Savings Program. Answer these questions to find out. All questions are required (*)",
+            BCAssessmentLink: "https://www.bcassessment.ca/",
             homeQuestion: "What kind of home do you live in? *",
             kindOfHomes: [
               "Single family home (detached dwelling)",
@@ -119,6 +121,7 @@ const options = {
             assesmentText: "You can find the assessed value of your property on",
             BCAssessment: "BC Assessment.",
             assesedValues: ["Over $1,230,000", "$1,230,000 or lower", "Unsure"],
+
             paymentQuestion: "Do you or a family member pay your own electricity and heating bills? *",
             paymentTextPrefix:
               "Common utility providers include BC Hydro, FortisBC, Pacific Northern Gas, City of New Westminster, City of Penticton, City of Grand Forks, Nelson Hydro, and District of Summerland.",
@@ -129,8 +132,17 @@ const options = {
               "Include all adults and children. Include all roommates and tenants who live in the same individually metered suite or home.",
             peopleTextSuffix: "Do not include people who live in a separate secondary suite.",
             peopleNumber: ["1", "2", "3", "4", "5", "6", "7+"],
+            annualHouseholdQuestion: "What is the combined annual household income before taxes? *",
+            annualHouseholdOptions: [
+              "Less than $##,###",
+              "Between $##,### and $###,###",
+              "Between $###, ### and $###, ###",
+              "Greater than $###,###",
+              "Prefer not to disclose",
+            ],
             alert: {
               eligible: "You may be eligible to apply for the Energy Savings Program",
+              notEligible: "You're not eligible to apply",
               loginWithAccount: "Log in to apply now",
               condoEligible: "Condominiums or apartments are currently not eligible.",
               currentlyEligibleHome: "Home types currently eligible for the Energy Savings Program are:",
@@ -139,8 +151,21 @@ const options = {
                 "Duplex, triplex, row, and townhomes",
                 "Mobile homes that are fixed on a foundation and structurally complete with plumbing, electrical, sewer, and water hooked up permanently",
               ],
+              otherHomes: "Other home types are currently not eligible.",
+              certainHomes: "Only certain home types are eligible.",
               seeDetails: "See the full eligibility requirements on Better Homes",
               provideInformation: "You must provide this information when you apply for rebates.",
+              propertyValueHigh: "Your property’s assessed value is too high.",
+              propertyValueHighDesc:
+                "Your property’s assessed value must be $1,230,000 or lower to be eligible for the Energy Savings Program.",
+              mustPay: "You or a family member must pay your home’s electricity and energy bills.",
+              mustPayDesc:
+                "The person who pays the electricity and heating bills for this address must be the one to apply for the Energy Savings Program. If a tenant pays, their name must be listed in the tenancy agreement.",
+              rangeNotEligible: "This annual household income range is not eligible.",
+              proofOfIncomeDesc:
+                "When you apply to the Energy Savings Program, you must provide proof of income for all adults in the home. Eligibility is based on how many people live in the home and your combined annual income.",
+              annualHouseholdDesc:
+                "Energy Savings Program eligibility is based on how many people live in the home and your combined annual income.",
               assessedValDescription:
                 "Your property’s assessed value must be $1,230,000 or lower to be eligible for the Energy Savings Program.",
             },
@@ -270,6 +295,7 @@ const options = {
           resume: "Resume",
           cancel: "Cancel",
           remove: "Remove",
+          createAccount: "Create account",
           save: "Save changes",
           onlySave: "Save",
           done: "Done",
@@ -1541,7 +1567,16 @@ const options = {
           notificationsEmail: "Notification email address",
           firstName: "First name",
           lastName: "Last name",
+          address: "Address",
+          required: "required",
+          emailAddress: "Email address",
           myProfile: "My profile",
+          myAccount: "My account",
+          accountCreation: "Create account",
+          termsandConditions: "Terms and conditions",
+          acceptedConditions: "You accepted the terms and conditions on",
+          emailValidationError: "You need to have at least one email address to receive notifications.",
+          enterValidEmail: "Please enter a valid email address",
           inviteTitle: "Invite users",
           adminInviteTitle: "Invite super admins",
           inviteSuccess: "Invite sent!",

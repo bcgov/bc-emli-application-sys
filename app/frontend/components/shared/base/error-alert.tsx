@@ -15,7 +15,7 @@ import React, { ReactElement } from "react"
 import { FC, ReactNode } from "react"
 
 type ErrorAlertProps = {
-  title: string
+  title?: string
   description?: string
   items?: string[] // Optional list of error details
   linkText?: string // Optional link text
@@ -49,18 +49,18 @@ const ErrorAlert: FC<ErrorAlertProps> = ({
       align="stretch"
     >
       <Alert status="error" variant="subtle" bg="transparent" alignItems="start" p={0}>
-        <IconButton variant="ghost" icon={icon} zIndex={1} color={iconColor} aria-label="Error Icon" />
+        <IconButton variant="ghost" icon={icon} zIndex={1} color={iconColor} aria-label="Error Icon" fontSize={20} />
         <Stack mt={2}>
-          <AlertTitle fontSize="md" fontWeight="bold">
-            {title}
-          </AlertTitle>
-          <AlertDescription fontSize="sm" fontWeight="normal">
+          {title && (
+            <AlertTitle fontSize="md" fontWeight="bold">
+              {title}
+            </AlertTitle>
+          )}
+          <AlertDescription fontSize="md" fontWeight="normal" lineHeight="normal">
             <Box>
-              <Text fontSize="sm" mb={2}>
-                {description}
-              </Text>
+              <Text mb={2}>{description}</Text>
               {items.length > 0 && (
-                <UnorderedList fontSize="sm" spacing={1}>
+                <UnorderedList spacing={1}>
                   {items.map((item, index) => (
                     <ListItem key={index}>{item}</ListItem>
                   ))}
@@ -69,10 +69,10 @@ const ErrorAlert: FC<ErrorAlertProps> = ({
             </Box>
           </AlertDescription>
           {linkText && (
-            <Link href={linkHref} isExternal>
-              <Text fontSize="sm" color="text.secondary">
-                {linkText} <ArrowSquareOut />
-              </Text>
+            <Link href={linkHref} isExternal fontSize="md" fontWeight="normal">
+              {/* <Text fontSize="sm" color="text.secondary"> */}
+              {linkText} <ArrowSquareOut />
+              {/* </Text> */}
             </Link>
           )}
         </Stack>

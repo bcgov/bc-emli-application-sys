@@ -19,7 +19,7 @@ export const NotFoundScreen = observer(({ ...rest }: INotFoundScreenProps) => {
           </Heading>
           <Text>{t("site.pageNotFoundInstructions")}</Text>
           <Text>{t("site.pageNotFoundWeSuggest")}</Text>
-          <UnorderedList>
+          <UnorderedList paddingLeft={0}>
             <ListItem>
               <Text>{t("site.pageNotFoundChecking")}</Text>
             </ListItem>

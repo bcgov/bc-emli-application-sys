@@ -79,7 +79,7 @@ export const EmailFormControl = ({
           <Input
             {...(fieldName &&
               register(fieldName, {
-                required: required && t("ui.isRequired", { field: t("auth.emailLabel") }),
+                required: required && t("user.enterValidEmail", { field: t("auth.emailLabel") }),
                 validate: {
                   matchesEmailRegex: (str) =>
                     !validate || (!required && !str) || EMAIL_REGEX.test(str) || t("ui.invalidEmail"),
@@ -87,7 +87,7 @@ export const EmailFormControl = ({
               }))}
             bg="greys.white"
             type={"text"}
-            placeholder={t("ui.emailPlaceholder")}
+            // placeholder={t("ui.emailPlaceholder")}
             {...inputProps}
           />
           {inputRightElement}
