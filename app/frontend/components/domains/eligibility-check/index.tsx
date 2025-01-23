@@ -16,7 +16,9 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
   const eligibleHomeTypes: string[] = t("auth.checkEligibility.alert.typesOfhome", { returnObjects: true })
   const assesedValues: string[] = t("auth.checkEligibility.assesedValues", { returnObjects: true })
   const paymentValues: string[] = t("auth.checkEligibility.paymentOption", { returnObjects: true })
-  const annualHouseholdValues: string[] = t("auth.checkEligibility.annualHouseholdOptions", { returnObjects: true })
+
+  const annualHouseholdOptions = t("auth.checkEligibility.annualHouseholdValues", { returnObjects: true })
+  const [selectedHouseholdValues, setSelectedHouseholdValues] = useState<string[] | null>(null)
 
   const breadCrumb = [
     {
@@ -27,7 +29,6 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
 
   const [isEligible, setIsEligible] = useState<null | boolean>(null)
   const [isHomeTypeEligible, setIsHomeTypeEligible] = useState<boolean | null>(null)
-  const [incomeNotToDisclose, setIncomeNotToDisclose] = useState<boolean | null>(null)
   const [formData, setFormData] = useState({
     homeType: "",
     assessedValue: "",
@@ -38,18 +39,34 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
 
   // Handle form input changes
   const handleChange = (field: string) => (value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData((prev) => {
+      // Check if the field being updated is totalPeople
+      if (field === "totalPeople") {
+        // If totalPeople changes, reset annualHouseHold
+        return { ...prev, [field]: value, annualHouseHold: "" }
+      }
+      // Otherwise, just update the field normally
+      return { ...prev, [field]: value }
+    })
   }
 
   // Validate dynamically as formData changes
   useEffect(() => {
     const { homeType, assessedValue, paysBills, totalPeople, annualHouseHold } = formData
+    // Utility function to check for empty values
+    const isNullOrEmpty = (value: string | null | undefined): boolean => !value
 
     if (!homeType && !assessedValue && !paysBills && !totalPeople && !annualHouseHold) {
       setIsHomeTypeEligible(null)
-      setIncomeNotToDisclose(null)
       setIsEligible(null)
       return
+    }
+
+    // Select the corresponding annual household values when totalPeople selected changes
+    const selectedHouseholdValues = annualHouseholdOptions[0][totalPeople]
+
+    if (selectedHouseholdValues) {
+      setSelectedHouseholdValues(selectedHouseholdValues)
     }
 
     // Calculate home type eligibility based on conditions
@@ -59,18 +76,16 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
     const areEligibleHomes = !ineligibleHomes.includes(homeType)
     setIsHomeTypeEligible(homeTypeEligible)
 
-    // household income eligibility conditions
-    const incomeNotToDiscloseSelected = annualHouseHold === annualHouseholdValues[4] ? true : false
-    setIncomeNotToDisclose(incomeNotToDiscloseSelected)
-
     // Calculate overall eligibility
     const eligibility =
+      !isNullOrEmpty(homeType) &&
       areEligibleHomes &&
       assessedValue !== assesedValues[1] &&
+      !isNullOrEmpty(paysBills) &&
       paysBills !== paymentValues[1] &&
-      totalPeople !== "" &&
-      annualHouseHold !== "" &&
-      annualHouseHold !== annualHouseholdValues[3]
+      !isNullOrEmpty(totalPeople) &&
+      !isNullOrEmpty(annualHouseHold) &&
+      annualHouseHold !== selectedHouseholdValues[3]
 
     setIsEligible(eligibility)
   }, [formData])
@@ -234,51 +249,59 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
                   type={t("auth.checkEligibility.peopleTextPrefix")}
                 />
               </FormControl>
-              {/* Annual Household Question */}
-              <FormControl as="fieldset" mb={4}>
-                <QuestionCard
-                  question={t("auth.checkEligibility.annualHouseholdQuestion")}
-                  answers={annualHouseholdValues}
-                  onAnswerSelect={handleChange("annualHouseHold")}
-                />
-              </FormControl>
-              {incomeNotToDisclose && (
-                <Box mt={4}>
-                  <Text fontSize="lg" fontWeight="bold">
-                    <ErrorAlert
-                      title={t("auth.checkEligibility.alert.provideInformation")}
-                      description={t("auth.checkEligibility.alert.proofOfIncomeDesc")}
-                      linkText={t("auth.checkEligibility.alert.seeDetails")}
-                      linkHref={t("landing.iNeedLink")}
-                      icon={<Warning />}
-                      iconColor="semantic.warning"
-                      borderColor="semantic.warning"
-                      backgroundColor="semantic.warningLight"
+              {selectedHouseholdValues !== null && (
+                <>
+                  {/* Annual Household Question */}
+                  <FormControl as="fieldset" mb={4}>
+                    <QuestionCard
+                      question={t("auth.checkEligibility.annualHouseholdQuestion")}
+                      answers={selectedHouseholdValues}
+                      onAnswerSelect={handleChange("annualHouseHold")}
                     />
-                  </Text>
-                </Box>
-              )}
-              {formData.annualHouseHold === annualHouseholdValues[3] && (
-                <Box mt={4}>
-                  <Text fontSize="lg" fontWeight="bold">
-                    <ErrorAlert
-                      title={t("auth.checkEligibility.alert.rangeNotEligible")}
-                      description={t("auth.checkEligibility.alert.annualHouseholdDesc")}
-                      linkText={t("auth.checkEligibility.alert.seeDetails")}
-                      linkHref={t("landing.iNeedLink")}
-                    />
-                  </Text>
-                </Box>
+                  </FormControl>
+                  {selectedHouseholdValues !== null && (
+                    <>
+                      {formData.annualHouseHold === selectedHouseholdValues[4] && (
+                        <Box mt={4}>
+                          <Text fontSize="lg" fontWeight="bold">
+                            <ErrorAlert
+                              title={t("auth.checkEligibility.alert.provideInformation")}
+                              description={t("auth.checkEligibility.alert.proofOfIncomeDesc")}
+                              linkText={t("auth.checkEligibility.alert.seeDetails")}
+                              linkHref={t("landing.iNeedLink")}
+                              icon={<Warning />}
+                              iconColor="semantic.warning"
+                              borderColor="semantic.warning"
+                              backgroundColor="semantic.warningLight"
+                            />
+                          </Text>
+                        </Box>
+                      )}
+                    </>
+                  )}
+
+                  {formData.annualHouseHold === selectedHouseholdValues[3] && (
+                    <Box mt={4}>
+                      <Text fontSize="lg" fontWeight="bold">
+                        <ErrorAlert
+                          title={t("auth.checkEligibility.alert.rangeNotEligible")}
+                          description={t("auth.checkEligibility.alert.annualHouseholdDesc")}
+                          linkText={t("auth.checkEligibility.alert.seeDetails")}
+                          linkHref={t("landing.iNeedLink")}
+                        />
+                      </Text>
+                    </Box>
+                  )}
+                </>
               )}
               {/* Eligibility Result */}
               {isEligible !== null && (
                 <Box mt={4}>
                   <Text fontSize="lg" fontWeight="bold">
-                    {isEligible ? (
-                      <SuccessAlert />
-                    ) : (
-                      <ErrorAlert title={t("auth.checkEligibility.alert.notEligible")} />
-                    )}
+                    {isEligible && <SuccessAlert />}
+                    {/* // ) : (
+                    //   <ErrorAlert title={t("auth.checkEligibility.alert.notEligible")} />
+                    // )} */}
                   </Text>
                 </Box>
               )}
