@@ -2064,7 +2064,7 @@ const options = {
             speakWithEnergyCoach: "Speak with an Energy Coach",
             anyQuestions:
               "Do you have questions about the program or home upgrade opportunities? Energy Coaches can help you understand home energy upgrades and rebates. Request a call from an Energy Coach for help or to register for the Savings Program by phone. Calls take about 20 minutes.",
-            bookACall: "Book an Energy Coach call",
+            bookACall: "Book a call",
             learnMore: "Learn more about the Energy Savings Program",
             offers:
               "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It’s part the Province of B.C.’s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
