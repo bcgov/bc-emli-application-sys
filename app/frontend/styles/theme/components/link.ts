@@ -12,6 +12,10 @@ export const Link = {
     _hover: {
       color: "text.link",
     },
+
+    _visited: {
+      color: "text.link",
+    },
   },
   variants: {
     primaryInverse: {
