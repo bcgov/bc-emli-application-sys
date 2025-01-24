@@ -20,6 +20,10 @@ export const Link = {
   variants: {
     primaryInverse: {
       color: "white",
+      textDecoration: "underline",
+      _visited: {
+        color: "white",
+      },
       _hover: {
         color: "theme.white",
         opacity: 0.8,

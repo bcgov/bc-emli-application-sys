@@ -50,7 +50,7 @@ export const SupportScreen = () => {
             </Text>
             <Text>{t("site.support.anyQuestions")}</Text>
             <RouterLinkButton
-              to={t("site.support.supportLink")}
+              to={t("landing.additionalContent.energyCoachBookCallLink")}
               variant="secondary"
               rightIcon={<ArrowSquareOut size={16} />}
             >
