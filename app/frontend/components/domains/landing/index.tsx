@@ -109,11 +109,10 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
               <Text>{t("landing.checkEligiblityUsingCard")}</Text>
               <Flex gap={6} direction={{ base: "column", md: "row" }}>
                 <RouterLinkButton
-                  to={currentUser ? "/" : "/check-eligible"}
+                  to={currentUser ? "/profile" : "/check-eligible"}
                   variant="primaryInverse"
                   icon={<CaretRight size={16} />}
                   iconPosition="right"
-                  fontWeight="bold"
                 >
                   {t("landing.goTo", {
                     location:
