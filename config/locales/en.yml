@@ -280,7 +280,7 @@ en:
         message: The users you specified weren't able to be invited. Please contact support.
       update_success:
         title: ""
-        message: The user was updated successfully
+        message: Change saved.
       update_error:
         title: There was an error updating the user
         message: "%{error_message}"

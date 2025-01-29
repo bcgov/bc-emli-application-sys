@@ -1,9 +1,23 @@
-import { Button, Container, Flex, Heading, InputGroup, Select, Switch, Td, Text, Tr } from "@chakra-ui/react"
+import {
+  Alert,
+  Button,
+  Container,
+  Divider,
+  Flex,
+  Heading,
+  InputGroup,
+  InputRightElement,
+  Select,
+  Tag,
+  TagLabel,
+  Text,
+} from "@chakra-ui/react"
+import { Warning } from "@phosphor-icons/react"
 import { observer } from "mobx-react-lite"
 import React, { useState } from "react"
-import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form"
-import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
+import { FormProvider, useForm } from "react-hook-form"
+import { Trans, useTranslation } from "react-i18next"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useMst } from "../../../setup/root"
 import { EUserRoles } from "../../../types/enums"
 import ErrorAlert from "../../shared/base/error-alert"
@@ -15,6 +29,8 @@ interface IProfileScreenProps {}
 export const ProfileScreen = observer(({}: IProfileScreenProps) => {
   const { t } = useTranslation()
   const required: string = t("user.required")
+  const location = useLocation()
+  const currentPath = location.pathname
 
   const [isEditingEmail, setIsEditingEmail] = useState(false)
 
@@ -51,21 +67,18 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
     reset(getDefaults())
   }
 
-  // Remember: Need to check if Confirmation Email functionality still required
   const handleResendConfirmationEmail = async () => {
     await currentUser.resendConfirmation()
   }
 
-  // Check if email is required but empty
-  const isEmailRequiredError = errors?.email && errors.email.type === required
-
   return (
     <Container maxW="container.sm" p={8} as="main">
+      <Flex mb={6}> {Object.keys(errors).length > 0 && <ErrorAlert description={t("ui.correctFields")} />} </Flex>
       <FormProvider {...formMethods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Flex as="section" direction="column" w="full" gap={6}>
             <Heading as="h1" m={0} color="theme.blueAlt">
-              {t("user.accountCreation")}
+              {currentPath === "/profile" ? "My account" : <>{t("user.accountCreation")}</>}
             </Heading>
             {/*Remember: Need to confirm if it is still required */}
             {!currentUser.isSubmitter && (
@@ -89,7 +102,121 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                 <TextFormControl label={t("user.lastName")} fieldName="lastName" required />
               </Flex>
               <TextFormControl label={t("user.address")} fieldName="address" required />
-              <EmailFormControl fieldName="email" label={t("user.emailAddress")} showIcon required />
+              {currentUser.isUnconfirmed && !currentUser.confirmationSentAt ? (
+                <EmailFormControl fieldName="email" label={t("user.emailAddress")} showIcon required />
+              ) : (
+                <>
+                  {currentUser.unconfirmedEmail ? (
+                    <EmailFormControl
+                      label={t("user.emailAddress")}
+                      required
+                      showIcon
+                      inputProps={{
+                        isDisabled: true,
+                        value: currentUser.unconfirmedEmail,
+                        paddingRight: "98.23px",
+                        _disabled: {
+                          color: "text.primary",
+                          bg: "greys.grey04",
+                          borderColor: "border.light",
+                        },
+                      }}
+                      inputRightElement={
+                        <InputRightElement pointerEvents="none" width="auto" px={2}>
+                          <Flex
+                            color="text.primary"
+                            borderColor="semantic.warning"
+                            borderWidth={1}
+                            bg="semantic.warningLight"
+                            rounded="xs"
+                            px={1.5}
+                            py={0.5}
+                            fontSize="sm"
+                          >
+                            {t("ui.unverified")}
+                          </Flex>
+                        </InputRightElement>
+                      }
+                    />
+                  ) : (
+                    <EmailFormControl
+                      label={t("user.emailAddress")}
+                      showIcon
+                      inputProps={{
+                        isDisabled: true,
+                        value: currentUser.email,
+                        paddingRight: "82.35px",
+                        _disabled: {
+                          color: "text.primary",
+                          bg: "greys.grey04",
+                          borderColor: "border.light",
+                        },
+                      }}
+                      inputRightElement={
+                        <InputRightElement pointerEvents="none" width="auto" px={2}>
+                          <Tag
+                            variant="outline"
+                            color="text.primary"
+                            borderColor="semantic.success"
+                            bg="theme.green.100"
+                            rounded="xs"
+                          >
+                            <TagLabel>{t("ui.verified")}</TagLabel>
+                          </Tag>
+                        </InputRightElement>
+                      }
+                    />
+                  )}
+
+                  {confirmationRequired && (
+                    <Alert
+                      status="warning"
+                      borderRadius="sm"
+                      gap={1.5}
+                      borderWidth={1}
+                      borderColor="semantic.warning"
+                      px={2}
+                      py={1.5}
+                      fontSize="sm"
+                    >
+                      <Warning color="var(--chakra-colors-semantic-warning)" />
+                      <Text>
+                        {currentUser.unconfirmedEmail && !currentUser.isUnconfirmed ? (
+                          <Trans
+                            i18nKey="user.confirmationRequiredWithEmail"
+                            values={{ email: currentUser.email }}
+                            components={{
+                              1: <Button variant="link" onClick={handleResendConfirmationEmail} />,
+                            }}
+                          />
+                        ) : (
+                          <Trans
+                            i18nKey="user.confirmationRequired"
+                            components={{
+                              1: <Button variant="link" onClick={handleResendConfirmationEmail} />,
+                            }}
+                          />
+                        )}
+                      </Text>
+                    </Alert>
+                  )}
+                  {isEditingEmail ? (
+                    <>
+                      <Divider my={4} />
+                      <EmailFormControl showIcon label={t("user.newEmail")} fieldName="email" />
+                    </>
+                  ) : (
+                    <Button
+                      variant="link"
+                      onClick={() => {
+                        setIsEditingEmail(true)
+                      }}
+                    >
+                      {t("user.changeEmail")}
+                    </Button>
+                  )}
+                </>
+              )}
             </Section>
             <Section>
               <Flex alignItems="center" alignSelf="stretch">
@@ -101,17 +228,15 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                   </Text>
                 </Flex>
                 <Flex>
-                  <Button variant="secondary">View</Button>
+                  <Button variant="secondary"> {t("ui.view")}</Button>
                 </Flex>
               </Flex>
             </Section>
-            {/* Conditional rendering of ErrorAlert when email is required but empty */}
-            {isEmailRequiredError && <ErrorAlert description={t("user.emailValidationError")} />}
             <Flex as="section" gap={4} mt={4}>
               <Button variant="primary" type="submit" isLoading={isSubmitting} loadingText={t("ui.loading")}>
-                {t("ui.createAccount")}
+                {currentPath === "/profile" ? <>{t("ui.save")}</> : <>{t("ui.createAccount")}</>}
               </Button>
-              {!currentUser.isUnconfirmed && (
+              {currentUser.isUnconfirmed && (
                 <Button variant="secondary" isDisabled={isSubmitting} onClick={() => navigate(-1)}>
                   {t("ui.cancel")}
                 </Button>
