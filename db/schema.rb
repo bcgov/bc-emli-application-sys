@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_01_22_192440) do
+ActiveRecord::Schema[7.1].define(version: 2025_01_31_011556) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -582,6 +582,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_22_192440) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
+  create_table "target_user_id", id: false, force: :cascade do |t|
+    t.uuid "id"
+  end
+
   create_table "template_section_blocks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "requirement_template_section_id", null: false
     t.uuid "requirement_block_id", null: false
@@ -623,6 +627,19 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_22_192440) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["hdd", "step"], name: "tedi_composite_index", unique: true
+  end
+
+  create_table "user_addresses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "street_address"
+    t.string "locality"
+    t.string "region"
+    t.string "postal_code"
+    t.string "country"
+    t.string "address_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_addresses_on_user_id"
   end
 
   create_table "user_license_agreements", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -732,6 +749,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_22_192440) do
   add_foreign_key "template_section_blocks", "requirement_template_sections"
   add_foreign_key "template_versions", "requirement_templates"
   add_foreign_key "template_versions", "users", column: "deprecated_by_id"
+  add_foreign_key "user_addresses", "users"
   add_foreign_key "user_license_agreements", "end_user_license_agreements", column: "agreement_id"
   add_foreign_key "user_license_agreements", "users"
 end

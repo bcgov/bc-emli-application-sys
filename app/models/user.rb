@@ -31,6 +31,9 @@ class User < ApplicationRecord
   self.skip_session_storage = %i[http_auth params_auth]
 
   # Associations
+  has_one :physical_address, -> { where(address_type: 'physical') }, class_name: 'UserAddress', dependent: :destroy
+  has_one :mailing_address, -> { where(address_type: 'mailing') }, class_name: 'UserAddress', dependent: :destroy
+
   has_many :jurisdiction_memberships, dependent: :destroy
   has_many :jurisdictions, through: :jurisdiction_memberships
   has_many :integration_mapping_notifications,
@@ -60,7 +63,8 @@ class User < ApplicationRecord
 
   has_one :preference, dependent: :destroy
   accepts_nested_attributes_for :preference
-
+  accepts_nested_attributes_for :physical_address, :mailing_address
+  
   # Validations
   validate :valid_role_change, if: :role_changed?, on: :update
   validate :jurisdiction_must_belong_to_correct_roles
@@ -166,6 +170,38 @@ class User < ApplicationRecord
     end
   end
 
+  def save_user_address(address_data)
+    Rails.logger.info "Address Data: #{address_data.inspect}"  # Debugging log
+
+    return unless address_data.present?
+
+    # Find or initialize the physical address
+    physical_address = physical_address || build_physical_address
+    physical_address.assign_attributes(
+      user_id: self.id,  # Ensure it's linked to the user
+      street_address: address_data[:street_address],
+      locality: address_data[:locality],
+      region: address_data[:region],
+      postal_code: address_data[:postal_code],
+      country: address_data[:country],
+      address_type: :physical
+    )
+    physical_address.save!
+
+    # Find or initialize the mailing address
+    mailing_address = mailing_address || build_mailing_address
+    mailing_address.assign_attributes(
+      user_id: self.id,  # Ensure it's linked to the user
+      street_address: address_data[:street_address],
+      locality: address_data[:locality],
+      region: address_data[:region],
+      postal_code: address_data[:postal_code],
+      country: address_data[:country],
+      address_type: :mailing
+    )
+    mailing_address.save!
+  end
+
   private
 
   def destroy_jurisdiction_collaborator
@@ -246,4 +282,25 @@ class User < ApplicationRecord
   def valid_role_change
     errors.add(:base, :admin_role_change) if role_was.to_sym == :super_admin
   end
+
+  # def only_one_address_per_type
+  #   if physical_address && UserAddress.where(user_id: id, address_type: :physical).count > 1
+  #     errors.add(:base, 'A user can only have one physical address')
+  #   end
+
+  #   if mailing_address && UserAddress.where(user_id: id, address_type: :mailing).count > 1
+  #     errors.add(:base, 'A user can only have one mailing address')
+  #   end
+  # end
+
+
+  # def mailing_address_constraint
+  #   return unless mailing_address.present?
+
+  #   if mailing_address.attributes.except('id', 'created_at', 'updated_at') == physical_address.attributes.except('id', 'created_at', 'updated_at')
+  #     mailing_address.unique = false
+  #   else
+  #     mailing_address.unique = true
+  #   end
+  # end
 end
