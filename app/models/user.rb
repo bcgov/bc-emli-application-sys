@@ -282,25 +282,4 @@ class User < ApplicationRecord
   def valid_role_change
     errors.add(:base, :admin_role_change) if role_was.to_sym == :super_admin
   end
-
-  # def only_one_address_per_type
-  #   if physical_address && UserAddress.where(user_id: id, address_type: :physical).count > 1
-  #     errors.add(:base, 'A user can only have one physical address')
-  #   end
-
-  #   if mailing_address && UserAddress.where(user_id: id, address_type: :mailing).count > 1
-  #     errors.add(:base, 'A user can only have one mailing address')
-  #   end
-  # end
-
-
-  # def mailing_address_constraint
-  #   return unless mailing_address.present?
-
-  #   if mailing_address.attributes.except('id', 'created_at', 'updated_at') == physical_address.attributes.except('id', 'created_at', 'updated_at')
-  #     mailing_address.unique = false
-  #   else
-  #     mailing_address.unique = true
-  #   end
-  # end
 end

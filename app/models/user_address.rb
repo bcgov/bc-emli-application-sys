@@ -22,7 +22,6 @@ class UserAddress < ApplicationRecord
     end
   end
 
-
   # After save, remove any duplicate addresses of the same type
   def enforce_unique_address_type
     if address_type_physical?

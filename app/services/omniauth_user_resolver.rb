@@ -62,15 +62,11 @@ class OmniauthUserResolver
         address: nil
       )
 
-    Rails.logger.info "omniauth_address: #{omniauth_address.inspect}"
     # skip confirmation until user has a chance to add/verify their notification email
     user.skip_confirmation_notification!
     
-    Rails.logger.info "🚀 Attempting to save user..."
-
     # Skip validation initially, so we can add addresses first
     if user.save(validate: false)
-      Rails.logger.info "✅ User saved successfully! Calling save_user_address..."
       user.save_user_address(omniauth_address)
 
       # Now run full validations
