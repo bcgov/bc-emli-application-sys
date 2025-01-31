@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_01_31_011556) do
+ActiveRecord::Schema[7.1].define(version: 2025_01_31_015246) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -685,7 +685,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_31_011556) do
     t.string "unconfirmed_email"
     t.string "omniauth_email"
     t.string "omniauth_username"
-    t.text "address"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
     t.index ["email"], name: "index_users_on_email"
