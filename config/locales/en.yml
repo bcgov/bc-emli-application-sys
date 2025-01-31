@@ -102,6 +102,9 @@ en:
               reviewers_only: can only be added to review staff
             password:
               password_format: "Password does no meet the required format"
+            address:
+              one_physical: "A user can only have one physical address"
+              one_mailing: "A user can only have one mailing address"
         revision_request:
           attributes:
             user:
