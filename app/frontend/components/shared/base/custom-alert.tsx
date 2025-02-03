@@ -11,12 +11,13 @@ import {
   UnorderedList,
 } from "@chakra-ui/react"
 import { ArrowSquareOut, WarningCircle } from "@phosphor-icons/react"
-import React, { ReactElement } from "react"
-import { FC, ReactNode } from "react"
+import React, { FC, ReactElement } from "react"
 
-type ErrorAlertProps = {
+type CustomAlertProps = {
   title?: string
   description?: string
+  descLinkText?: string // Optional description link text
+  descLinkHref?: string // Optional description link URL
   items?: string[] // Optional list of error details
   linkText?: string // Optional link text
   linkHref?: string // Optional link URL
@@ -26,13 +27,15 @@ type ErrorAlertProps = {
   iconColor?: string // Optional icon color
 }
 
-const ErrorAlert: FC<ErrorAlertProps> = ({
+const CustomAlert: FC<CustomAlertProps> = ({
   title,
   description,
+  descLinkText,
+  descLinkHref,
   items = [],
   linkText,
   linkHref,
-  icon = <WarningCircle size={20} />, // Default icon
+  icon = <WarningCircle size={27} />, // Default icon
   borderColor = "semantic.error", // Default border color
   backgroundColor = "semantic.errorLight", // Default background color
   iconColor = "semantic.error", // Default icon color
@@ -49,7 +52,7 @@ const ErrorAlert: FC<ErrorAlertProps> = ({
       align="stretch"
     >
       <Alert status="error" variant="subtle" bg="transparent" alignItems="start" p={0}>
-        <IconButton variant="ghost" icon={icon} zIndex={1} color={iconColor} aria-label="Error Icon" fontSize={20} />
+        <IconButton variant="ghost" icon={icon} zIndex={1} color={iconColor} aria-label="Error Icon" fontSize={27} />
         <Stack mt={2}>
           {title && (
             <AlertTitle fontSize="md" fontWeight="bold">
@@ -66,13 +69,16 @@ const ErrorAlert: FC<ErrorAlertProps> = ({
                   ))}
                 </UnorderedList>
               )}
+              {descLinkText && (
+                <Link href={descLinkHref} isExternal fontSize="md" fontWeight="normal">
+                  {descLinkText}
+                </Link>
+              )}
             </Box>
           </AlertDescription>
           {linkText && (
             <Link href={linkHref} isExternal fontSize="md" fontWeight="normal">
-              {/* <Text fontSize="sm" color="text.secondary"> */}
               {linkText} <ArrowSquareOut />
-              {/* </Text> */}
             </Link>
           )}
         </Stack>
@@ -81,4 +87,4 @@ const ErrorAlert: FC<ErrorAlertProps> = ({
   )
 }
 
-export default ErrorAlert
+export default CustomAlert

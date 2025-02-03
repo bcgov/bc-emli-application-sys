@@ -3,7 +3,7 @@ import { Warning } from "@phosphor-icons/react/dist/ssr"
 import { observer } from "mobx-react-lite"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import ErrorAlert from "../../shared/base/error-alert"
+import CustomAlert from "../../shared/base/custom-alert"
 import QuestionCard from "../../shared/base/question-card"
 import SuccessAlert from "../../shared/base/success-alert"
 import { SubNavBar } from "../navigation/sub-nav-bar"
@@ -145,7 +145,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
               {isHomeTypeEligible === false && (
                 <Box mt={4}>
                   <Text fontSize="lg" fontWeight="bold">
-                    <ErrorAlert
+                    <CustomAlert
                       title={t("auth.checkEligibility.alert.condoEligible")}
                       description={t("auth.checkEligibility.alert.currentlyEligibleHome")}
                       items={eligibleHomeTypes}
@@ -156,7 +156,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
                 </Box>
               )}
               {formData.homeType === eligibleHomes[5] && (
-                <ErrorAlert
+                <CustomAlert
                   title={t("auth.checkEligibility.alert.otherHomes")}
                   description={t("auth.checkEligibility.alert.currentlyEligibleHome")}
                   items={eligibleHomeTypes}
@@ -165,7 +165,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
                 />
               )}
               {formData.homeType === eligibleHomes[6] && (
-                <ErrorAlert
+                <CustomAlert
                   title={t("auth.checkEligibility.alert.certainHomes")}
                   description={t("auth.checkEligibility.alert.currentlyEligibleHome")}
                   items={eligibleHomeTypes}
@@ -190,7 +190,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
               {formData.assessedValue === assesedValues[1] && (
                 <Box mt={4}>
                   <Text fontSize="lg" fontWeight="bold">
-                    <ErrorAlert
+                    <CustomAlert
                       title={t("auth.checkEligibility.alert.propertyValueHigh")}
                       description={t("auth.checkEligibility.alert.propertyValueHighDesc")}
                       linkText={t("auth.checkEligibility.alert.seeDetails")}
@@ -202,7 +202,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
               {formData.assessedValue === assesedValues[2] && (
                 <Box mt={4}>
                   <Text fontSize="lg" fontWeight="bold">
-                    <ErrorAlert
+                    <CustomAlert
                       title={t("auth.checkEligibility.alert.provideInformation")}
                       description={t("auth.checkEligibility.alert.assessedValDescription")}
                       linkText={t("auth.checkEligibility.alert.seeDetails")}
@@ -227,7 +227,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
               {formData.paysBills === paymentValues[2] && (
                 <Box mt={4}>
                   <Text fontSize="lg" fontWeight="bold">
-                    <ErrorAlert
+                    <CustomAlert
                       title={t("auth.checkEligibility.alert.mustPay")}
                       description={t("auth.checkEligibility.alert.mustPayDesc")}
                       linkText={t("auth.checkEligibility.alert.seeDetails")}
@@ -264,7 +264,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
                       {formData.annualHouseHold === selectedHouseholdValues[4] && (
                         <Box mt={4}>
                           <Text fontSize="lg" fontWeight="bold">
-                            <ErrorAlert
+                            <CustomAlert
                               title={t("auth.checkEligibility.alert.provideInformation")}
                               description={t("auth.checkEligibility.alert.proofOfIncomeDesc")}
                               linkText={t("auth.checkEligibility.alert.seeDetails")}
@@ -283,7 +283,7 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
                   {formData.annualHouseHold === selectedHouseholdValues[3] && (
                     <Box mt={4}>
                       <Text fontSize="lg" fontWeight="bold">
-                        <ErrorAlert
+                        <CustomAlert
                           title={t("auth.checkEligibility.alert.rangeNotEligible")}
                           description={t("auth.checkEligibility.alert.annualHouseholdDesc")}
                           linkText={t("auth.checkEligibility.alert.seeDetails")}
@@ -299,9 +299,6 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
                 <Box mt={4}>
                   <Text fontSize="lg" fontWeight="bold">
                     {isEligible && <SuccessAlert />}
-                    {/* // ) : (
-                    //   <ErrorAlert title={t("auth.checkEligibility.alert.notEligible")} />
-                    // )} */}
                   </Text>
                 </Box>
               )}
