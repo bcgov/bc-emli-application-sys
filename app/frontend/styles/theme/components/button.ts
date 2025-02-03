@@ -130,7 +130,7 @@ export const Button = {
       _hover: { bg: "lighten.100", _disabled: { ...disabledStyles }, _active: { ...activeStyles } },
     },
     link: {
-      color: "text.link",
+      color: "text.primary",
       fontWeight: "normal",
       textDecoration: "underline",
       fontSize: "inherit",

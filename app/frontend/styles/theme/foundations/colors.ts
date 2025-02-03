@@ -36,6 +36,7 @@ export const colors = {
   greys: {
     overlay: "rgba(150, 150, 150, 0.35)",
     white: "#FFFFFF",
+    offWhite: "#F7F9FC",
     grey01: "#A19F9D",
     grey02: "#E1DFDD",
     grey03: "#F2F2F2",
@@ -76,7 +77,7 @@ export const colors = {
     // warning: "#FCBA19",
     warning: "#E86825",
     // warningLight: "#FEF2D6",
-    warningLight: "#FFE1BE",
+    warningLight: "#FEF8E8",
     special: "#8000FF",
     specialLight: "#F0DCFF",
   },

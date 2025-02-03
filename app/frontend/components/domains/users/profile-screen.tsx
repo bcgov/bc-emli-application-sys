@@ -1,6 +1,7 @@
 import {
   Alert,
   Button,
+  Checkbox,
   Container,
   Divider,
   Flex,
@@ -12,7 +13,7 @@ import {
   TagLabel,
   Text,
 } from "@chakra-ui/react"
-import { Warning } from "@phosphor-icons/react"
+import { Info, Warning } from "@phosphor-icons/react"
 import { observer } from "mobx-react-lite"
 import React, { useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
@@ -20,15 +21,14 @@ import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useMst } from "../../../setup/root"
 import { EUserRoles } from "../../../types/enums"
-import ErrorAlert from "../../shared/base/error-alert"
 import { EmailFormControl } from "../../shared/form/email-form-control"
 import { TextFormControl } from "../../shared/form/input-form-control"
+import CustomAlert from "../../shared/base/custom-alert"
 
 interface IProfileScreenProps {}
 
 export const ProfileScreen = observer(({}: IProfileScreenProps) => {
   const { t } = useTranslation()
-  const required: string = t("user.required")
   const location = useLocation()
   const currentPath = location.pathname
 
@@ -40,8 +40,21 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
   const confirmationRequired =
     currentUser.unconfirmedEmail || (currentUser.isUnconfirmed && currentUser.confirmationSentAt)
 
+  // Function to get defaults
   const getDefaults = () => {
-    const { firstName, lastName, nickname, certified, organization, preference, email, address } = currentUser
+    const {
+      firstName,
+      lastName,
+      certified,
+      organization,
+      preference,
+      email,
+      address,
+      city,
+      province,
+      postalCode,
+      country,
+    } = currentUser
     return {
       firstName,
       lastName,
@@ -50,17 +63,28 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
       preferenceAttributes: preference,
       email,
       address,
+      city,
+      province,
+      postalCode,
+      country,
+      postalAddress: "",
+      postalAddressCity: "",
+      postalAddressProvince: "",
+      postalAddressPostalcode: "",
+      postalAddressCountry: "",
+      isSameAddress: false,
     }
   }
   const formMethods = useForm({
     mode: "onSubmit",
     defaultValues: getDefaults(),
   })
-  const { handleSubmit, formState, control, reset, setValue } = formMethods
+  const [formValues, setFormValues] = useState(getDefaults())
+  const [isSameAddress, setIsSameAddress] = useState(false)
+  const { handleSubmit, register, reset, formState } = formMethods
   const { isSubmitting, errors } = formState
 
   const navigate = useNavigate()
-
   const onSubmit = async (formData) => {
     await updateProfile(formData)
     setIsEditingEmail(false)
@@ -71,9 +95,33 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
     await currentUser.resendConfirmation()
   }
 
+  // Handle checkbox change to sync physical address with postal address
+  const handleCheckboxChange = (event) => {
+    const checked = event.target.checked
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      isSameAddress: checked,
+      ...(checked && {
+        postalAddress: prevValues.address,
+        postalAddressCity: prevValues.city,
+        postalAddressProvince: prevValues.province,
+        postalAddressPostalcode: prevValues.postalCode,
+        postalAddressCountry: prevValues.country,
+      }),
+      // If unchecked, reset postal address fields
+      ...(!checked && {
+        postalAddress: "",
+        postalAddressCity: "",
+        postalAddressProvince: "",
+        postalAddressPostalcode: "",
+        postalAddressCountry: "",
+      }),
+    }))
+  }
+
   return (
     <Container maxW="container.sm" p={8} as="main">
-      <Flex mb={6}> {Object.keys(errors).length > 0 && <ErrorAlert description={t("ui.correctFields")} />} </Flex>
+      <Flex mb={6}> {Object.keys(errors).length > 0 && <CustomAlert description={t("ui.correctFields")} />} </Flex>
       <FormProvider {...formMethods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Flex as="section" direction="column" w="full" gap={6}>
@@ -98,10 +146,106 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
 
             <Section>
               <Flex gap={{ base: 4, md: 6 }} direction={{ base: "column", md: "row" }}>
-                <TextFormControl label={t("user.firstName")} fieldName="firstName" required />
-                <TextFormControl label={t("user.lastName")} fieldName="lastName" required />
+                <TextFormControl
+                  label={t("user.firstName")}
+                  fieldName="firstName"
+                  required
+                  value={formValues.firstName}
+                  onChange={(e) => setFormValues({ ...formValues, firstName: e.target.value })}
+                />
+                <TextFormControl
+                  label={t("user.lastName")}
+                  fieldName="lastName"
+                  required
+                  value={formValues.lastName}
+                  onChange={(e) => setFormValues({ ...formValues, lastName: e.target.value })}
+                />
               </Flex>
-              <TextFormControl label={t("user.address")} fieldName="address" required />
+              <TextFormControl
+                label={t("user.address")}
+                fieldName="address"
+                required
+                value={formValues.address}
+                onChange={(e) => setFormValues({ ...formValues, address: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.city")}
+                fieldName="city"
+                required
+                value={formValues.city}
+                onChange={(e) => setFormValues({ ...formValues, city: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.province")}
+                fieldName="province"
+                required
+                value={formValues.province}
+                onChange={(e) => setFormValues({ ...formValues, province: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.postalCode")}
+                fieldName="postalCode"
+                required
+                value={formValues.postalCode}
+                onChange={(e) => setFormValues({ ...formValues, postalCode: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.country")}
+                fieldName="country"
+                required
+                value={formValues.country}
+                onChange={(e) => setFormValues({ ...formValues, country: e.target.value })}
+              />
+              <Checkbox checked={isSameAddress} onChange={handleCheckboxChange}>
+                {t("user.sameAddress")}
+              </Checkbox>
+              <CustomAlert
+                description={t("user.changeInfo")}
+                descLinkHref={t("user.changeInfoLink")}
+                descLinkText={t("user.bceid")}
+                icon={<Info />}
+                iconColor="theme.darkBlue"
+                borderColor="theme.darkBlue"
+                backgroundColor="greys.offWhite"
+              />
+              <Text fontSize="md" fontWeight="bold">
+                {t("user.postalAddress")}
+              </Text>
+              <TextFormControl
+                label={t("user.address")}
+                fieldName="postalAddress"
+                required
+                value={formValues.isSameAddress ? formValues.address : formValues.postalAddress}
+                onChange={(e) => setFormValues({ ...formValues, postalAddress: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.city")}
+                fieldName="postalAddressCity"
+                required
+                value={formValues.isSameAddress ? formValues.city : formValues.postalAddressCity}
+                onChange={(e) => setFormValues({ ...formValues, postalAddressCity: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.province")}
+                fieldName="postalAddressProvince"
+                required
+                value={formValues.isSameAddress ? formValues.province : formValues.postalAddressProvince}
+                onChange={(e) => setFormValues({ ...formValues, postalAddressProvince: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.postalCode")}
+                fieldName="postalAddressPostalcode"
+                required
+                value={formValues.isSameAddress ? formValues.postalCode : formValues.postalAddressPostalcode}
+                onChange={(e) => setFormValues({ ...formValues, postalAddressPostalcode: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.country")}
+                fieldName="postalAddressCountry"
+                required
+                value={formValues.isSameAddress ? formValues.country : formValues.postalAddressCountry}
+                onChange={(e) => setFormValues({ ...formValues, postalAddressCountry: e.target.value })}
+              />
               {currentUser.isUnconfirmed && !currentUser.confirmationSentAt ? (
                 <EmailFormControl fieldName="email" label={t("user.emailAddress")} showIcon required />
               ) : (
@@ -109,6 +253,7 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                   {currentUser.unconfirmedEmail ? (
                     <EmailFormControl
                       label={t("user.emailAddress")}
+                      showOptional={false}
                       required
                       showIcon
                       inputProps={{
@@ -142,6 +287,7 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                     <EmailFormControl
                       label={t("user.emailAddress")}
                       showIcon
+                      showOptional={false}
                       inputProps={{
                         isDisabled: true,
                         value: currentUser.email,
@@ -179,31 +325,33 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                       py={1.5}
                       fontSize="sm"
                     >
-                      <Warning color="var(--chakra-colors-semantic-warning)" />
-                      <Text>
-                        {currentUser.unconfirmedEmail && !currentUser.isUnconfirmed ? (
-                          <Trans
-                            i18nKey="user.confirmationRequiredWithEmail"
-                            values={{ email: currentUser.email }}
-                            components={{
-                              1: <Button variant="link" onClick={handleResendConfirmationEmail} />,
-                            }}
-                          />
-                        ) : (
-                          <Trans
-                            i18nKey="user.confirmationRequired"
-                            components={{
-                              1: <Button variant="link" onClick={handleResendConfirmationEmail} />,
-                            }}
-                          />
-                        )}
-                      </Text>
+                      <Flex>
+                        <Warning color="var(--chakra-colors-semantic-warning)" fontSize={27} />
+                        <Text fontSize="md" ml={2}>
+                          {currentUser.unconfirmedEmail && !currentUser.isUnconfirmed ? (
+                            <Trans
+                              i18nKey="user.confirmationRequiredWithEmail"
+                              values={{ email: currentUser.email }}
+                              components={{
+                                1: <Button variant="link" onClick={handleResendConfirmationEmail} />,
+                              }}
+                            />
+                          ) : (
+                            <Trans
+                              i18nKey="user.confirmationRequired"
+                              components={{
+                                1: <Button variant="link" onClick={handleResendConfirmationEmail} />,
+                              }}
+                            />
+                          )}
+                        </Text>
+                      </Flex>
                     </Alert>
                   )}
                   {isEditingEmail ? (
                     <>
                       <Divider my={4} />
-                      <EmailFormControl showIcon label={t("user.newEmail")} fieldName="email" />
+                      <EmailFormControl showIcon label={t("user.newEmail")} fieldName="email" showOptional={false} />
                     </>
                   ) : (
                     <Button
