@@ -58,8 +58,7 @@ class OmniauthUserResolver
         omniauth_username:,
         first_name: omniauth_givenname,
         last_name: omniauth_familyname,
-        email: omniauth_email,
-        address: nil
+        email: omniauth_email
       )
 
     # skip confirmation until user has a chance to add/verify their notification email
