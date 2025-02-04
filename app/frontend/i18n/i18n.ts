@@ -17,11 +17,11 @@ const options = {
     en: {
       translation: {
         auth: {
-          login: "Login",
+          login: "Log in",
           adminLogin: "Admin login",
           adminAccountAccess: "If you cannot login with your IDIR, please contact your administrator to gain access.",
           bcServiceCardInfo: {
-            bcservice_login: "Login with BC Services Card Account",
+            bcservice_login: "Log in with BC Services Card Account",
             prompt:
               "The easiest way to log in is with your BC Services Card. It’s a secure way to prove who you are online. ",
             learnMore: "Learn more about BC Services Card Login",
@@ -33,11 +33,11 @@ const options = {
             learnMoreTokensLink: "https://id.gov.bc.ca/account/token-setup-instruction",
             energyCoach: {
               title: "Contact an Energy coach",
-              description: "Request a call with an Energy coach for assistance with",
-              fillingRebate: "filling in your application",
-              rebateQuestions: "questions about rebate programs",
-              virtualWalkThrough: "doing a virtual walk-through of your home or",
-              homeUpgrades: "home upgrade opportunities in general",
+              description: "Request a call with an Energy coach for assistance with:",
+              fillingRebate: "Filling in your application",
+              rebateQuestions: "Questions about rebate programs",
+              virtualWalkThrough: "Doing a virtual walk-through of your home or",
+              homeUpgrades: "Home upgrade opportunities in general",
               requestACall: "Book a call",
               ctaLink: "https://www.betterbuildingsbc.ca/connect/",
             },
@@ -64,7 +64,7 @@ const options = {
             //   register: "Register for Business BCeID",
             // },
             contractor: {
-              title: "Contractor login",
+              title: "Contractor log in",
               description:
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent aliquet pretium ipsum quis interdum. Mauris in dapibus ligula. ",
               ctaText: "Log in with Business BCeID",
@@ -76,9 +76,9 @@ const options = {
           logout: "Logout",
           submit: "Submit",
           or: "or",
-          bceid_login: "Login with BCeID",
-          bcsc_login: "Login with BC Services Card Account",
-          idir_login: "Login with IDIR",
+          bceid_login: "Log in with BCeID",
+          bcsc_login: "Log in with BC Services Card Account",
+          idir_login: "Log in with IDIR",
           troubleLogging: "Trouble logging in? The Service BC Help Desk is here to help.",
           phoneNumber: "1-888-356-2741",
           role: "Role",
@@ -97,7 +97,7 @@ const options = {
             "Check your email inbox for a confirmation email to finish activating your new Building Permit Hub account.",
           tokenExpired: "Your session is no longer valid, please login again",
           checkEligibility: {
-            heading: "Eligibility check",
+            heading: "Eligibility",
             home: "Home",
             seeEligible: "See if you’re eligible",
             aboutProgram: "About the Energy Savings Program",
@@ -198,12 +198,12 @@ const options = {
               eligible: "You may be eligible to apply for the Energy Savings Program",
               notEligible: "You're not eligible to apply",
               loginWithAccount: "Log in to apply now",
-              condoEligible: "Condominiums or apartments are currently not eligible.",
+              condoEligible: "Condominiums and apartments are currently not eligible.",
               currentlyEligibleHome: "Home types currently eligible for the Energy Savings Program are:",
               typesOfhome: [
                 "Single-family homes or secondary suites in a single-family home",
-                "Duplex, triplex, row, and townhomes",
                 "Mobile homes that are fixed on a foundation and structurally complete with plumbing, electrical, sewer, and water hooked up permanently",
+                "Duplex, triplex, row, and townhomes",
               ],
               otherHomes: "Other home types are currently not eligible.",
               certainHomes: "Only certain home types are eligible.",
@@ -251,10 +251,10 @@ const options = {
           iNeedLong: "What do I need for a housing building permit?",
           whatToApply: "What do I need to apply?",
           applyNeeds: [
-            "information about your home",
-            "the account numbers on your energy utility bills",
-            "the number of adults living in your home",
-            "proof of income for all adults in your home",
+            "Information about your home",
+            "The account numbers on your energy utility bills",
+            "The number of adults living in your home",
+            "Proof of income for all adults in your home",
           ],
           duringApplication: "During the application, we will ask for:",
           informationReady: "To make things easier, collect this information before you begin your application.",
@@ -303,7 +303,7 @@ const options = {
           additionalContent: {
             left: "Use the BC Home Energy Planner to find recommended upgrades for your home",
             mid: "Speak with an Energy Coach to get help with your application and learn more about rebate programs",
-            midButton: "Schedule a call",
+            midButton: "Book a call",
             getStarted: "Get started",
             energyPlannerLink: "https://www.bchomeenergyplanner.ca/",
             energyCoachBookCallLink: "https://www.betterbuildingsbc.ca/connect/",
@@ -2150,7 +2150,7 @@ const options = {
           contact: "Contact us",
           betterHomes: "Better Homes",
           disclaimer: "Disclaimer",
-          dataAndPrivacy: "Data and privacy",
+          dataAndPrivacy: "Privacy",
           footerLinks: {
             betterHomes: "https://www.betterhomesbc.ca/",
             disclaimer: "https://www2.gov.bc.ca/gov/content/home/disclaimer",
