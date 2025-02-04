@@ -2,11 +2,11 @@ redis:
   sentinel:
     resources:
       requests:
-        memory: "64Mi"
-        cpu: "100m"
+        memory: "48Mi"
+        cpu: "50m"
       limits:
-        memory: "128Mi"
-        cpu: "150m"
+        memory: "96Mi"
+        cpu: "100m"
   replica:
     replicaCount: 1
     persistence:
@@ -14,8 +14,8 @@ redis:
       size: 500Mi
     resources:
       requests:
-        memory: "128Mi"
-        cpu: "250m"
+        memory: "96Mi"
+        cpu: "150m"
       limits:
-        memory: "256Mi"
-        cpu: "250m"
+        memory: "192Mi"
+        cpu: "200m"
