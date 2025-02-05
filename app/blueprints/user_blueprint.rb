@@ -26,9 +26,11 @@ class UserBlueprint < Blueprinter::Base
            :confirmation_sent_at,
            :discarded_at,
            :last_sign_in_at
+    association :physical_address, blueprint: UserAddressBlueprint
+    association :mailing_address, blueprint: UserAddressBlueprint
     association :preference, blueprint: PreferenceBlueprint
   end
-
+  
   view :external_api do
     fields :email, :first_name, :last_name
   end

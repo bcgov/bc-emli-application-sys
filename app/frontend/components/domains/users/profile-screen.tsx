@@ -49,7 +49,8 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
       organization,
       preference,
       email,
-      address,
+      physicalAddress,
+      mailingAddress,
       city,
       province,
       postalCode,
@@ -62,16 +63,16 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
       organization,
       preferenceAttributes: preference,
       email,
-      address,
-      city,
-      province,
-      postalCode,
-      country,
-      postalAddress: "",
-      postalAddressCity: "",
-      postalAddressProvince: "",
-      postalAddressPostalcode: "",
-      postalAddressCountry: "",
+      address: physicalAddress.streetAddress,
+      city: physicalAddress.locality,
+      province: physicalAddress.region,
+      postalCode: physicalAddress.postalCode,
+      country: physicalAddress.country,
+      postalAddress: mailingAddress.streetAddress,
+      postalAddressCity: mailingAddress.locality,
+      postalAddressProvince: mailingAddress.region,
+      postalAddressPostalcode: mailingAddress.postalCode,
+      postalAddressCountry: mailingAddress.country,
       isSameAddress: false,
     }
   }
@@ -118,7 +119,7 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
       }),
     }))
   }
-
+  
   return (
     <Container maxW="container.sm" p={8} as="main">
       <Flex mb={6}> {Object.keys(errors).length > 0 && <CustomAlert description={t("ui.correctFields")} />} </Flex>
