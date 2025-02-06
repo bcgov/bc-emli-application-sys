@@ -224,6 +224,18 @@ export const EligibilityCheck = observer(({}: IEligibilityCheckProps) => {
                   type={t("auth.checkEligibility.paymentTextPrefix")}
                 />
               </FormControl>
+              {formData.paysBills === paymentValues[1] && (
+                <Box mt={4}>
+                  <Text fontSize="lg" fontWeight="bold">
+                    <CustomAlert
+                      title={t("auth.checkEligibility.alert.mustPay")}
+                      description={t("auth.checkEligibility.alert.mustPayDesc")}
+                      linkText={t("auth.checkEligibility.alert.seeDetails")}
+                      linkHref={t("landing.iNeedLink")}
+                    />
+                  </Text>
+                </Box>
+              )}
               {formData.paysBills === paymentValues[2] && (
                 <Box mt={4}>
                   <Text fontSize="lg" fontWeight="bold">

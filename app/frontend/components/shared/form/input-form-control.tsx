@@ -37,6 +37,7 @@ interface IInputFormControlProps<TInputProps = Partial<InputProps>> extends Form
   showOptional?: boolean
   value?: string
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+  disabled?: boolean
 }
 
 export const TextFormControl = (props: IInputFormControlProps) => {
@@ -49,6 +50,7 @@ export const TextFormControl = (props: IInputFormControlProps) => {
             placeholder: props._placeholder,
             value: props.value,
             onChange: props.onChange,
+            disabled: props.disabled,
           },
           validate: {
             satisfiesLength: (str) =>

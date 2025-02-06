@@ -2,7 +2,7 @@ import { Text, View } from "@react-pdf/renderer"
 import { format } from "date-fns"
 import { t } from "i18next"
 import React from "react"
-import { IPermitApplication } from "../../../../../../models/permit-application"
+import { IPermitApplication } from "../../../../../../models/energy-savings-application"
 import { theme } from "../../../../../../styles/theme"
 
 export const Footer = ({ permitApplication }: { permitApplication: IPermitApplication }) => {

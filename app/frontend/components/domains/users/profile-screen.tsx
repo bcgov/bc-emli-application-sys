@@ -151,6 +151,7 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                   label={t("user.firstName")}
                   fieldName="firstName"
                   required
+                  disabled={true}
                   value={formValues.firstName}
                   onChange={(e) => setFormValues({ ...formValues, firstName: e.target.value })}
                 />
@@ -158,6 +159,7 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                   label={t("user.lastName")}
                   fieldName="lastName"
                   required
+                  disabled={true}
                   value={formValues.lastName}
                   onChange={(e) => setFormValues({ ...formValues, lastName: e.target.value })}
                 />

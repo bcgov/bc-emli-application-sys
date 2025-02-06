@@ -6,7 +6,7 @@ import { useFormContext } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { IRequirementTemplate } from "../../../../../models/requirement-template"
-import { BrowserSearchPrompt } from "../../../../shared/permit-applications/browser-search-prompt"
+import { BrowserSearchPrompt } from "../../../../shared/energy-savings-applications/browser-search-prompt"
 import { IEditRequirementActionsProps, IEditRequirementOptionsProps, IRequirementTemplateForm } from "./index"
 
 interface IProps {

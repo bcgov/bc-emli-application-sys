@@ -59,7 +59,7 @@ export const SortSelect: React.FC<ISearchSortProps> = ({ searchModel, i18nPrefix
   }
 
   return (
-    <Flex direction="column" minW={250}>
+    <Flex direction="column" minW={{ md: 250, base: "100%" }}>
       <FormLabel htmlFor={uniqueId}>{t("ui.sortBy")}</FormLabel>
 
       <Select
