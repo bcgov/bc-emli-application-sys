@@ -9,7 +9,7 @@ import { LoadingScreen } from "../../../../shared/base/loading-screen"
 import { BackButton } from "../../../../shared/buttons/back-button"
 import { FloatingHelpDrawer } from "../../../../shared/floating-help-drawer"
 import { BrowserSearchPrompt } from "../../../../shared/energy-savings-applications/browser-search-prompt"
-import { PermitApplicationStatusTag } from "../../../../shared/energy-savings-applications/energy-savings-application-status-tag"
+import { EnergySavingsApplicationStatusTag } from "../../../../shared/energy-savings-applications/energy-savings-application-status-tag"
 import { RequirementForm } from "../../../../shared/energy-savings-applications/requirement-form"
 import { ChecklistSideBar } from "../../../energy-savings-application/checklist-sidebar"
 
@@ -52,7 +52,7 @@ export const EarlyAccessRequirementTemplateScreen = observer(({}: IEarlyAccessRe
           flexDirection={{ base: "column", md: "row" }}
         >
           <HStack gap={4} flex={1}>
-            <PermitApplicationStatusTag permitApplication={ephemeralPermitApplication} />
+            <EnergySavingsApplicationStatusTag energySavingsApplication={ephemeralPermitApplication} />
 
             <Flex direction="column" w="full">
               <Heading fontSize="xl">{requirementTemplate.nickname}</Heading>
