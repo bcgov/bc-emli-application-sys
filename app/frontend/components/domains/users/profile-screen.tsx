@@ -87,6 +87,7 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
 
   const navigate = useNavigate()
   const onSubmit = async (formData) => {
+    console.log(formData);
     await updateProfile(formData)
     setIsEditingEmail(false)
     reset(getDefaults())
@@ -166,35 +167,35 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
               </Flex>
               <TextFormControl
                 label={t("user.address")}
-                fieldName="address"
+                fieldName="streetAddressAttributes.streetAddress"
                 required
                 value={formValues.address}
                 onChange={(e) => setFormValues({ ...formValues, address: e.target.value })}
               />
               <TextFormControl
                 label={t("user.city")}
-                fieldName="city"
+                fieldName="streetAddressAttributes.locality"
                 required
                 value={formValues.city}
                 onChange={(e) => setFormValues({ ...formValues, city: e.target.value })}
               />
               <TextFormControl
                 label={t("user.province")}
-                fieldName="province"
+                fieldName="streetAddressAttributes.region"
                 required
                 value={formValues.province}
                 onChange={(e) => setFormValues({ ...formValues, province: e.target.value })}
               />
               <TextFormControl
                 label={t("user.postalCode")}
-                fieldName="postalCode"
+                fieldName="streetAddressAttributes.postalCode"
                 required
                 value={formValues.postalCode}
                 onChange={(e) => setFormValues({ ...formValues, postalCode: e.target.value })}
               />
               <TextFormControl
                 label={t("user.country")}
-                fieldName="country"
+                fieldName="streetAddressAttributes.country"
                 required
                 value={formValues.country}
                 onChange={(e) => setFormValues({ ...formValues, country: e.target.value })}
@@ -216,35 +217,35 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
               </Text>
               <TextFormControl
                 label={t("user.address")}
-                fieldName="postalAddress"
+                fieldName="mailingAddressAttributes.streetAddress"
                 required
                 value={formValues.isSameAddress ? formValues.address : formValues.postalAddress}
                 onChange={(e) => setFormValues({ ...formValues, postalAddress: e.target.value })}
               />
               <TextFormControl
                 label={t("user.city")}
-                fieldName="postalAddressCity"
+                fieldName="mailingAddressAttributes.locality"
                 required
                 value={formValues.isSameAddress ? formValues.city : formValues.postalAddressCity}
                 onChange={(e) => setFormValues({ ...formValues, postalAddressCity: e.target.value })}
               />
               <TextFormControl
                 label={t("user.province")}
-                fieldName="postalAddressProvince"
+                fieldName="mailingAddressAttributes.region"
                 required
                 value={formValues.isSameAddress ? formValues.province : formValues.postalAddressProvince}
                 onChange={(e) => setFormValues({ ...formValues, postalAddressProvince: e.target.value })}
               />
               <TextFormControl
                 label={t("user.postalCode")}
-                fieldName="postalAddressPostalcode"
+                fieldName="mailingAddressAttributes.postalCode"
                 required
                 value={formValues.isSameAddress ? formValues.postalCode : formValues.postalAddressPostalcode}
                 onChange={(e) => setFormValues({ ...formValues, postalAddressPostalcode: e.target.value })}
               />
               <TextFormControl
                 label={t("user.country")}
-                fieldName="postalAddressCountry"
+                fieldName="mailingAddressAttributes.country"
                 required
                 value={formValues.isSameAddress ? formValues.country : formValues.postalAddressCountry}
                 onChange={(e) => setFormValues({ ...formValues, postalAddressCountry: e.target.value })}

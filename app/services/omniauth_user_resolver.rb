@@ -32,7 +32,13 @@ class OmniauthUserResolver
 
     accept_invitation_with_omniauth if invited_user.present?
 
-    self.user = invited_user || existing_user || create_user
+    Rails.logger.info("found existing user: #{existing_user}");
+
+    if existing_user
+      self.user = update_user
+    else
+      self.user = invited_user || create_user
+    end
 
     self.error_key = error_message_key unless user&.valid? && user&.persisted?
   end
@@ -45,6 +51,22 @@ class OmniauthUserResolver
   def promotable_user?
     return unless existing_user.present? && invited_user.present?
     existing_user.submitter? || invited_user.regional_review_manager?
+  end
+
+  def update_user
+    existing_user.update(
+      first_name: omniauth_givenname,
+      last_name: omniauth_familyname,
+    )
+
+    if existing_user.valid?
+      existing_user.update_user_physical_address(omniauth_address)
+      existing_user.save
+    else
+        Rails.logger.error "User validation failed: #{existing_user.errors.full_messages}"  
+    end
+    
+    return existing_user
   end
 
   def create_user

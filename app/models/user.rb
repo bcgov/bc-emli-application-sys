@@ -170,9 +170,7 @@ class User < ApplicationRecord
     end
   end
 
-  def save_user_address(address_data)
-    Rails.logger.info "Address Data: #{address_data.inspect}"  # Debugging log
-
+  def update_user_physical_address(address_data)
     return unless address_data.present?
 
     # Find or initialize the physical address
@@ -187,6 +185,14 @@ class User < ApplicationRecord
       address_type: :physical
     )
     physical_address.save!
+  end
+
+  def save_user_address(address_data)
+    Rails.logger.info "Address Data: #{address_data.inspect}"  # Debugging log
+
+    return unless address_data.present?
+
+    update_user_physical_address(address_data)
 
     # Find or initialize the mailing address
     mailing_address = mailing_address || build_mailing_address
