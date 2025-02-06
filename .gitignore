@@ -65,3 +65,4 @@ deleteme.*
 /cypress/screenshots/
 
 .npm/
+.vscode/
