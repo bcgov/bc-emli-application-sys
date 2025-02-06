@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite"
 import React from "react"
 import { useMst } from "../../../setup/root"
 import { EUserRoles } from "../../../types/enums"
-import { PermitApplicationIndexScreen } from "../permit-application"
+import { EnergySavingsApplicationIndexScreen } from "../energy-savings-application"
 import { ReviewManagerHomeScreen } from "./review-manager"
 import { ReviewerHomeScreen } from "./reviewer-home-screen"
 import { SuperAdminHomeScreen } from "./super-admin-home-screen"
@@ -13,7 +13,7 @@ const roleSpecificScreens = (role: EUserRoles, props: IHomeScreenProps) => {
     [EUserRoles.reviewer]: <ReviewerHomeScreen {...props} />,
     [EUserRoles.reviewManager]: <ReviewManagerHomeScreen {...props} />,
     [EUserRoles.regionalReviewManager]: <ReviewManagerHomeScreen {...props} />,
-    [EUserRoles.submitter]: <PermitApplicationIndexScreen {...props} />,
+    [EUserRoles.submitter]: <EnergySavingsApplicationIndexScreen {...props} />,
   }[role]
 }
 

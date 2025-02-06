@@ -1,7 +1,7 @@
 import { Tag, TagProps } from "@chakra-ui/react"
 import React from "react"
 import { useTranslation } from "react-i18next"
-import { IPermitApplication } from "../../../models/permit-application"
+import { IPermitApplication } from "../../../models/energy-savings-application"
 import { EPermitApplicationStatus } from "../../../types/enums"
 
 interface IPermitApplicationViewedAtTagProps extends TagProps {

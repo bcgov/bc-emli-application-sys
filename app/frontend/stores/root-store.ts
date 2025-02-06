@@ -16,7 +16,7 @@ import {
 import { GeocoderStoreModel, IGeocoderStore } from "./geocoder-store"
 import { IJurisdictionStore, JurisdictionStoreModel } from "./jurisdiction-store"
 import { INotificationStore, NotificationStoreModel } from "./notification-store"
-import { IPermitApplicationStore, PermitApplicationStoreModel } from "./permit-application-store"
+import { IEnergySavingsApplicationStore, PermitApplicationStoreModel } from "./energy-savings-application-store"
 import { IPermitClassificationStore, PermitClassificationStoreModel } from "./permit-classification-store"
 import { IRequirementBlockStoreModel, RequirementBlockStoreModel } from "./requirement-block-store"
 import { IRequirementTemplateStoreModel, RequirementTemplateStoreModel } from "./requirement-template-store"
@@ -101,7 +101,7 @@ export const RootStoreModel = types
 export interface IRootStore extends IStateTreeNode {
   uiStore: IUIStore
   sessionStore: ISessionStore
-  permitApplicationStore: IPermitApplicationStore
+  permitApplicationStore: IEnergySavingsApplicationStore
   permitClassificationStore: IPermitClassificationStore
   jurisdictionStore: IJurisdictionStore
   userStore: IUserStore

@@ -9,12 +9,12 @@ import { SubNavBar } from "../navigation/sub-nav-bar"
 export const SupportScreen = () => {
   const { t } = useTranslation()
   const mailto = `mailto:${t("site.contactEmail")}`
-  const breadCrumb = [
-    {
-      href: "/get-support",
-      title: t("site.support.getSupport"),
-    },
-  ]
+  // const breadCrumb = [
+  //   {
+  //     href: "/get-support",
+  //     title: t("site.support.getSupport"),
+  //   },
+  // ]
 
   const contactTeamInstructions = i18next.t("site.contactTeamInstructions", {
     returnObjects: true,
@@ -22,7 +22,7 @@ export const SupportScreen = () => {
 
   return (
     <>
-      <SubNavBar staticBreadCrumbs={breadCrumb} borderBottom={"none"} />
+      {/* <SubNavBar staticBreadCrumbs={breadCrumb} borderBottom={"none"} /> */}
       <Container maxW="container.lg" p={8} gap={4}>
         {/* Heading */}
         <Heading as="h1" color="theme.blueAlt">

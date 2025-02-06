@@ -11,7 +11,7 @@ import {
 import * as R from "ramda"
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { IPermitApplication } from "../../../models/permit-application"
+import { IPermitApplication } from "../../../models/energy-savings-application"
 import { INPUT_CONTACT_KEYS } from "../../../stores/contact-store"
 import { IContact, IOption } from "../../../types/types"
 import { convertPhoneNumberToFormioFormat, isSafari } from "../../../utils/utility-functions"
