@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next"
 import { useJurisdiction } from "../../../../hooks/resources/use-jurisdiction"
 import { usePermitClassificationsLoad } from "../../../../hooks/resources/use-permit-classifications-load"
 import { useSearch } from "../../../../hooks/use-search"
-import { IPermitApplication } from "../../../../models/energy-savings-application"
+import { IEnergySavingsApplication } from "../../../../models/energy-savings-application"
 import { useMst } from "../../../../setup/root"
 import { ECollaborationType } from "../../../../types/enums"
 import { CalloutBanner } from "../../../shared/base/callout-banner"
@@ -20,7 +20,7 @@ import { SearchGrid } from "../../../shared/grid/search-grid"
 import { SearchGridItem } from "../../../shared/grid/search-grid-item"
 import { RouterLink } from "../../../shared/navigation/router-link"
 import { RouterLinkButton } from "../../../shared/navigation/router-link-button"
-import { PermitApplicationStatusTag } from "../../../shared/energy-savings-applications/energy-savings-application-status-tag"
+import { EnergySavingsApplicationStatusTag } from "../../../shared/energy-savings-applications/energy-savings-application-status-tag"
 import { PermitApplicationViewedAtTag } from "../../../shared/energy-savings-applications/permit-application-viewed-at-tag"
 import { Can } from "../../../shared/user/can"
 import { DesignatedCollaboratorAssignmentPopover } from "../../energy-savings-application/collaborator-management/designated-collaborator-assignment-popover"
@@ -74,7 +74,7 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
               <SharedSpinner />
             </Flex>
           ) : (
-            currentJurisdiction.tablePermitApplications.map((pa: IPermitApplication) => {
+            currentJurisdiction.tablePermitApplications.map((pa: IEnergySavingsApplication) => {
               if (!pa.submitter) return <></>
 
               return (
@@ -85,7 +85,7 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
                   display={"contents"}
                 >
                   <SearchGridItem>
-                    <PermitApplicationStatusTag permitApplication={pa} />
+                    <EnergySavingsApplicationStatusTag energySavingsApplication={pa} />
                   </SearchGridItem>
                   <SearchGridItem>{pa.number}</SearchGridItem>
                   <SearchGridItem wordBreak={"break-word"}>{pa.referenceNumber}</SearchGridItem>
