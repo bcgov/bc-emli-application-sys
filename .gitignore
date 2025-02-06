@@ -65,4 +65,7 @@ deleteme.*
 /cypress/screenshots/
 
 .npm/
-.vscode/
+
+# ignore vscode files except the settings.json
+.vscode/*
+!.vscode/settings.json
