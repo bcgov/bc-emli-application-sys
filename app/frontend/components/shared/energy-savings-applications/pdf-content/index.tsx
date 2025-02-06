@@ -1,7 +1,7 @@
 import React from "react"
 
 import { t } from "i18next"
-import { IPermitApplication } from "../../../../models/permit-application"
+import { IPermitApplication } from "../../../../models/energy-savings-application"
 import { PDFDocument } from "../../pdf"
 import { ApplicationFields } from "./application"
 import { CoverPage } from "./cover"

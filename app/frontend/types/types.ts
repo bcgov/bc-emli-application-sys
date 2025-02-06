@@ -1,5 +1,5 @@
 import { Theme } from "@chakra-ui/react"
-import { IPermitApplication } from "../models/permit-application"
+import { IEnergySavingsApplication } from "../models/energy-savings-application"
 import { IPermitBlockStatus } from "../models/permit-block-status"
 import { IActivity, IPermitType } from "../models/permit-classification"
 import { IRequirement } from "../models/requirement"
@@ -236,7 +236,7 @@ export interface IStepCodeSelectOptions {
   compliancePaths: EStepCodeCompliancePath[]
   airtightnessValues: EStepCodeAirtightnessValue[]
   epcTestingTargetTypes: EStepCodeEPCTestingTargetType[]
-  permitApplications: Partial<IPermitApplication>[]
+  permitApplications: Partial<IEnergySavingsApplication>[]
   buildingTypes: EStepCodeBuildingType[]
   buildingCharacteristicsSummary: IStepCodeBuildingCharacteristicSummarySelectOptions
   energySteps: EEnergyStep[]
@@ -271,7 +271,7 @@ export interface ILicenseAgreement {
   acceptedAt: Date
 }
 
-export interface IPermitApplicationComplianceUpdate {
+export interface IEnergySavingsApplicationComplianceUpdate {
   id: string
   frontEndFormUpdate: Object
   formattedComplianceData: Object
@@ -327,15 +327,15 @@ export interface ITemplateVersionUpdate {
 }
 
 export type TSocketEventData =
-  | IPermitApplicationComplianceUpdate
-  | IPermitApplicationSupportingDocumentsUpdate
+  | IEnergySavingsApplicationComplianceUpdate
+  | IEnergySavingsApplicationSupportingDocumentsUpdate
   | IPermitBlockStatus
   | INotification
   | ITemplateVersionUpdate
 
-export interface IPermitApplicationSupportingDocumentsUpdate {
+export interface IEnergySavingsApplicationSupportingDocumentsUpdate {
   id: string
-  supportingDocuments: IPermitApplication["supportingDocuments"]
+  supportingDocuments: IEnergySavingsApplication["supportingDocuments"]
   missingPdfs: string[]
   zipfileSize: null | number
   zipfileName: null | string
@@ -424,14 +424,14 @@ export interface IParcelInfoExtractorModuleConfiguration
   type: EAutoComplianceType.externalValueExtractor
 }
 
-export interface IPermitApplicationModuleConfiguration
+export interface IEnergySavingsApplicationModuleConfiguration
   extends TAutoComplianceValueExtractorTypeConfiguration<EAutoComplianceModule.PermitApplication> {
   type: EAutoComplianceType.internalValueExtractor
 }
 
 export type TValueExtractorAutoComplianceModuleConfiguration =
   | IParcelInfoExtractorModuleConfiguration
-  | IPermitApplicationModuleConfiguration
+  | IEnergySavingsApplicationModuleConfiguration
 
 export interface IHistoricSiteModuleConfiguration
   extends TAutoComplianceOptionsMapperTypeConfiguration<EAutoComplianceModule.HistoricSite> {}
@@ -441,7 +441,7 @@ export type TOptionsMapperAutoComplianceModuleConfiguration = IHistoricSiteModul
 export type TAutoComplianceModuleConfigurations = {
   [EAutoComplianceModule.DigitalSealValidator]: IDigitalSealValidatorModuleConfiguration
   [EAutoComplianceModule.ParcelInfoExtractor]: IParcelInfoExtractorModuleConfiguration
-  [EAutoComplianceModule.PermitApplication]: IPermitApplicationModuleConfiguration
+  [EAutoComplianceModule.PermitApplication]: IEnergySavingsApplicationModuleConfiguration
   [EAutoComplianceModule.HistoricSite]: IHistoricSiteModuleConfiguration
 }
 
@@ -458,7 +458,7 @@ export interface IJurisdictionSearchFilters {
   submissionInboxSetUp?: boolean
 }
 
-export interface IPermitApplicationSearchFilters {
+export interface IEnergySavingsApplicationSearchFilters {
   requirementTemplateId?: string
   templateVersionId?: string
   status?: EPermitApplicationStatus[]

@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite"
 import React, { Suspense } from "react"
 import { PDFContent } from "."
 import { usePermitApplication } from "../../../../hooks/resources/use-permit-application"
-import { IPermitApplication } from "../../../../models/permit-application"
+import { IPermitApplication } from "../../../../models/energy-savings-application"
 import { LoadingScreen } from "../../base/loading-screen"
 
 interface IProps {

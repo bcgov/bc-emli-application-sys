@@ -8,10 +8,10 @@ import { ErrorScreen } from "../../../../shared/base/error-screen"
 import { LoadingScreen } from "../../../../shared/base/loading-screen"
 import { BackButton } from "../../../../shared/buttons/back-button"
 import { FloatingHelpDrawer } from "../../../../shared/floating-help-drawer"
-import { BrowserSearchPrompt } from "../../../../shared/permit-applications/browser-search-prompt"
-import { PermitApplicationStatusTag } from "../../../../shared/permit-applications/permit-application-status-tag"
-import { RequirementForm } from "../../../../shared/permit-applications/requirement-form"
-import { ChecklistSideBar } from "../../../permit-application/checklist-sidebar"
+import { BrowserSearchPrompt } from "../../../../shared/energy-savings-applications/browser-search-prompt"
+import { PermitApplicationStatusTag } from "../../../../shared/energy-savings-applications/energy-savings-application-status-tag"
+import { RequirementForm } from "../../../../shared/energy-savings-applications/requirement-form"
+import { ChecklistSideBar } from "../../../energy-savings-application/checklist-sidebar"
 
 interface IEarlyAccessRequirementTemplateScreenProps {}
 

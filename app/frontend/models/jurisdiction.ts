@@ -8,7 +8,7 @@ import { IExternalApiKeyParams } from "../types/api-request"
 import { EEnergyStep, EJurisdictionExternalApiState, EZeroCarbonStep } from "../types/enums"
 import { IContact, IOption, IPermitTypeRequiredStep, IPermitTypeSubmissionContact, TLatLngTuple } from "../types/types"
 import { ExternalApiKeyModel } from "./external-api-key"
-import { PermitApplicationModel } from "./permit-application"
+import { EnergySavingsApplicationModel } from "./energy-savings-application"
 import { SandboxModel } from "./sandbox"
 
 export const JurisdictionModel = types
@@ -34,7 +34,7 @@ export const JurisdictionModel = types
     externalApiKeysMap: types.map(ExternalApiKeyModel),
     createdAt: types.maybeNull(types.Date),
     updatedAt: types.maybeNull(types.Date),
-    tablePermitApplications: types.array(types.reference(PermitApplicationModel)),
+    tablePermitApplications: types.array(types.reference(EnergySavingsApplicationModel)),
     boundryPoints: types.optional(types.array(types.frozen<TLatLngTuple>()), []),
     mapPosition: types.frozen<TLatLngTuple>(),
     mapZoom: types.maybeNull(types.number),

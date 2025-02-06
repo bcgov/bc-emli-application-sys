@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ISearch } from "../../../lib/create-search-model"
 import { useMst } from "../../../setup/root"
-import { TFilterableStatus } from "../../../stores/permit-application-store"
+import { TFilterableStatus } from "../../../stores/energy-savings-application-store"
 import { EPermitApplicationStatus, EPermitApplicationStatusGroup } from "../../../types/enums"
 import { arrayEqualsAsSet } from "../../../utils/utility-functions"
 

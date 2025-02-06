@@ -17,7 +17,7 @@ import {
 import { observer } from "mobx-react-lite"
 import React from "react"
 import { useTranslation } from "react-i18next"
-import { IPermitApplication } from "../../../models/permit-application"
+import { IPermitApplication } from "../../../models/energy-savings-application"
 import { useMst } from "../../../setup/root"
 import SandboxHeader from "../sandbox/sandbox-header"
 

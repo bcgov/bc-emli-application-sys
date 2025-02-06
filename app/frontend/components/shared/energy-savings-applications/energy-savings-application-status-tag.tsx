@@ -1,14 +1,17 @@
 import { Tag, TagProps } from "@chakra-ui/react"
 import React from "react"
 import { useTranslation } from "react-i18next"
-import { IPermitApplication } from "../../../models/permit-application"
+import { IEnergySavingsApplication } from "../../../models/energy-savings-application"
 import { EPermitApplicationStatus } from "../../../types/enums"
 
-interface IPermitApplicationStatusTagProps extends TagProps {
-  permitApplication: IPermitApplication
+interface IEnergySavingsApplicationStatusTagProps extends TagProps {
+  energySavingsApplication: IEnergySavingsApplication
 }
 
-export const PermitApplicationStatusTag = ({ permitApplication, ...rest }: IPermitApplicationStatusTagProps) => {
+export const EnergySavingsApplicationStatusTag = ({
+  energySavingsApplication,
+  ...rest
+}: IEnergySavingsApplicationStatusTagProps) => {
   const { t } = useTranslation()
 
   const bgMap = {
@@ -30,8 +33,8 @@ export const PermitApplicationStatusTag = ({ permitApplication, ...rest }: IPerm
   return (
     <Tag
       p={1}
-      bg={bgMap[permitApplication.status]}
-      color={colorMap[permitApplication.status]}
+      bg={bgMap[energySavingsApplication.status]}
+      color={colorMap[energySavingsApplication.status]}
       fontWeight="bold"
       border="1px solid"
       borderColor="border.light"
@@ -41,7 +44,7 @@ export const PermitApplicationStatusTag = ({ permitApplication, ...rest }: IPerm
       {...rest}
     >
       {/* @ts-ignore */}
-      {t(`permitApplication.status.${permitApplication.status}`)}
+      {t(`energySavingsApplication.status.${energySavingsApplication.status}`)}
     </Tag>
   )
 }

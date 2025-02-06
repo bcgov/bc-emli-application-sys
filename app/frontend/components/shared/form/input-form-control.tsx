@@ -35,6 +35,9 @@ interface IInputFormControlProps<TInputProps = Partial<InputProps>> extends Form
   key?: string
   LabelInfo?: () => JSX.Element
   showOptional?: boolean
+  value?: string
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+  disabled?: boolean
 }
 
 export const TextFormControl = (props: IInputFormControlProps) => {
@@ -42,7 +45,13 @@ export const TextFormControl = (props: IInputFormControlProps) => {
     <InputFormControl
       {...(R.mergeDeepRight(
         {
-          inputProps: { type: "text" },
+          inputProps: {
+            type: "text",
+            placeholder: props._placeholder,
+            value: props.value,
+            onChange: props.onChange,
+            disabled: props.disabled,
+          },
           validate: {
             satisfiesLength: (str) =>
               (!props.required && !str) || (str?.length >= 1 && str?.length < 128) || t("ui.invalidInput"),

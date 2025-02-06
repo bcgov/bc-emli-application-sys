@@ -9,13 +9,20 @@ interface IBlueTitleBarProps extends BoxProps {
 export const BlueTitleBar = ({ title, imageSrc, ...rest }: IBlueTitleBarProps) => {
   return (
     <Box h="fit-content" bg="theme.blueGradient" {...rest}>
-      <Container as={Flex} direction="column" justify="center" maxW="container.lg" h="full">
-        <Box position="relative" minHeight="180px" display="flex" alignItems="center">
-          <Heading as="h1" color="greys.white" my="12">
-            {title}
-          </Heading>
+      <Container
+        as={Flex}
+        direction="column"
+        justifyContent="center"
+        alignContent="center"
+        maxW="container.lg"
+        minHeight="180px"
+      >
+        {/* <Box position="relative" minHeight="180px" alignItems="center"> */}
+        <Heading as="h1" color="greys.white" my="12">
+          {title}
+        </Heading>
 
-          <Image
+        {/* <Image
             position="absolute"
             right="0"
             zIndex="0"
@@ -24,8 +31,8 @@ export const BlueTitleBar = ({ title, imageSrc, ...rest }: IBlueTitleBarProps) =
             alt="title decoration"
             h="full"
             objectFit="cover"
-          />
-        </Box>
+          /> */}
+        {/* </Box> */}
       </Container>
     </Box>
   )

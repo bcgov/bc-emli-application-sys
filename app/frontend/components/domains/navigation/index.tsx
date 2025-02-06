@@ -31,7 +31,7 @@ const NotFoundScreen = lazy(() =>
 )
 
 const PermitApplicationPDFViewer = lazy(() =>
-  import("../../shared/permit-applications/pdf-content/viewer").then((module) => ({
+  import("../../shared/energy-savings-applications/pdf-content/viewer").then((module) => ({
     default: module.PermitApplicationPDFViewer,
   }))
 )
@@ -87,27 +87,27 @@ const JurisdictionUserIndexScreen = lazy(() =>
 )
 const LandingScreen = lazy(() => import("../landing").then((module) => ({ default: module.LandingScreen })))
 const ContactScreen = lazy(() => import("../misc/contact-screen").then((module) => ({ default: module.ContactScreen })))
-const PermitApplicationIndexScreen = lazy(() =>
-  import("../permit-application").then((module) => ({ default: module.PermitApplicationIndexScreen }))
+const EnergySavingsApplicationIndexScreen = lazy(() =>
+  import("../energy-savings-application").then((module) => ({ default: module.EnergySavingsApplicationIndexScreen }))
 )
 const EditPermitApplicationScreen = lazy(() =>
-  import("../permit-application/edit-permit-application-screen").then((module) => ({
+  import("../energy-savings-application/edit-energy-savings-application-screen").then((module) => ({
     default: module.EditPermitApplicationScreen,
   }))
 )
 
 const NewPermitApplicationScreen = lazy(() =>
-  import("../permit-application/new-permit-application-screen").then((module) => ({
+  import("../energy-savings-application/new-energy-savings-application-screen").then((module) => ({
     default: module.NewPermitApplicationScreen,
   }))
 )
 const ReviewPermitApplicationScreen = lazy(() =>
-  import("../permit-application/review-permit-application-screen").then((module) => ({
+  import("../energy-savings-application/review-permit-application-screen").then((module) => ({
     default: module.ReviewPermitApplicationScreen,
   }))
 )
 const SuccessfulSubmissionScreen = lazy(() =>
-  import("../permit-application/successful-submission").then((module) => ({
+  import("../energy-savings-application/successful-submission").then((module) => ({
     default: module.SuccessfulSubmissionScreen,
   }))
 )
@@ -454,7 +454,7 @@ const AppRoutes = observer(() => {
         <Route
           element={<ProtectedRoute isAllowed={loggedIn && !mustAcceptEula} redirectPath={mustAcceptEula && "/"} />}
         >
-          <Route path="/permit-applications" element={<PermitApplicationIndexScreen />} />
+          <Route path="/permit-applications" element={<EnergySavingsApplicationIndexScreen />} />
           <Route path="/permit-applications/new" element={<NewPermitApplicationScreen />} />
           <Route path="/permit-applications/:permitApplicationId/edit" element={<EditPermitApplicationScreen />}>
             <Route path="step-code" element={<StepCodeForm />} />
