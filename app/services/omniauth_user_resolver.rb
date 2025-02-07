@@ -32,8 +32,6 @@ class OmniauthUserResolver
 
     accept_invitation_with_omniauth if invited_user.present?
 
-    Rails.logger.info("found existing user: #{existing_user}");
-
     if existing_user
       self.user = update_user
     else
@@ -174,7 +172,7 @@ class OmniauthUserResolver
   end
 
   def omniauth_familyname
-    @last_name ||= raw_info.family_name
+    @last_name ||= raw_info.family_name || " "
   end
 
   def omniauth_address

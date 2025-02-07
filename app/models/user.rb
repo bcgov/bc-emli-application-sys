@@ -252,9 +252,9 @@ class User < ApplicationRecord
     unless !confirmed? || first_name.present?
       errors.add(:user, "Confirmed user must have first_name")
     end
-    unless !confirmed? || last_name.present?
-      errors.add(:user, "Confirmed user must have last_name")
-    end
+    #unless !confirmed? || last_name.present?
+    #  errors.add(:user, "Confirmed user must have last_name")
+    #end
     unless !confirmed? || email.present?
       errors.add(:user, "Confirmed user must have email")
     end
