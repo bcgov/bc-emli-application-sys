@@ -60,7 +60,12 @@ class OmniauthUserResolver
     )
 
     if existing_user.valid?
-      existing_user.update_user_physical_address(omniauth_address)
+      if existing_user.user_has_mailing_address
+        existing_user.update_user_physical_address(omniauth_address)
+      else
+        existing_user.save_user_address(omniauth_address)
+      end
+      
       existing_user.save
     else
         Rails.logger.error "User validation failed: #{existing_user.errors.full_messages}"  
