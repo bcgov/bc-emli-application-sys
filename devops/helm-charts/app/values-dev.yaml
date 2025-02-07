@@ -1,5 +1,5 @@
 STAGE: dev
-artifactoryRepo: bbfc-local
+artifactoryRepo: bbfc-dev
 
 route:
   spec:

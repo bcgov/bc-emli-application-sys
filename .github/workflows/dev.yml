@@ -44,11 +44,11 @@ jobs:
 
       # Step 4: Tag the Image
       - name: Tag Docker Image
-        run: docker tag energy-app artifacts.developer.gov.bc.ca/bbfc-local/energy-app:latest
+        run: docker tag energy-app artifacts.developer.gov.bc.ca/bbfc-dev/energy-app:latest
       
       # Step 5: Push the Docker image to Artifactory
       - name: Push Image to Artifactory
-        run: docker push artifacts.developer.gov.bc.ca/bbfc-local/energy-app:latest
+        run: docker push artifacts.developer.gov.bc.ca/bbfc-dev/energy-app:latest
 
       # Step 6: Logout
       - name: Log out from Docker

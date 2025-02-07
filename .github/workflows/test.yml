@@ -1,51 +1,55 @@
-name: Deploy a branch to TEST
+name: Build and Push Docker Image to Artifactory
 
 on:
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: "Branch Name"
-        required: true
-        default: "main"
+  push:
+    branches:
+    - test
+    paths:
+      - app/**
+      - config/**
+      - db/**
+      - eulas/**
+      - lib/**
+      - public/**
+      - spec/**
+      - swagger/**
+      - config.ru
+      - Gemfile
+      - Gemfile.lock
+      - package-lock.json
+      - package.json
+      - Rakefile
 
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
-    name: Build & Deploy Docker Rails / React application
+    name: Build & Push Docker Image to Artifactory
     environment: test
 
     steps:
-      - name: Install Git LFS
-        run: |
-          sudo apt-get update
-          sudo apt-get install git-lfs
-          git lfs install
+      # Step 1: Checkout the code
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.branch }}
           lfs: true
+
+      # Step 2: Login to Artifactory
+      - name: Login to Artifactory
+        run: docker login artifacts.developer.gov.bc.ca -u ${{ secrets.ARTIFACTORY_USERNAME }} -p ${{ secrets.ARTIFACTORY_PASSWORD }}
+      
+      # Step 3: Build Image
       - name: Build Docker Image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: test-hous-permit-portal
-          tags: latest ${{ github.sha }}
-          labels: |
-            app=test-hous-permit-portal
-            git-sha=${{ github.sha }}
-          containerfiles: ./devops/docker/app/Dockerfile
-          build-args: |
-            VITE_ENABLE_TEMPLATE_FORCE_PUBLISH=${{ vars.VITE_ENABLE_TEMPLATE_FORCE_PUBLISH }}
-            VITE_BASIC_BCEID_REGISTRATION_URL=${{ vars.VITE_BASIC_BCEID_REGISTRATION_URL }}
-            VITE_BUSINESS_BCEID_REGISTRATION_URL=${{ vars.VITE_BUSINESS_BCEID_REGISTRATION_URL }}
-            VITE_BCEID_URL=${{ vars.VITE_BCEID_URL }}
-            VITE_SITEMINDER_LOGOUT_URL=${{ vars.VITE_SITEMINDER_LOGOUT_URL }}
-            VITE_KEYCLOAK_LOGOUT_URL=${{ vars.VITE_KEYCLOAK_LOGOUT_URL }}
-            VITE_POST_LOGOUT_REDIRECT_URL=${{ vars.VITE_POST_LOGOUT_REDIRECT_URL }}
-      - name: Push to Openshift Registry using Service Account
-        uses: redhat-actions/push-to-registry@v2.7
-        with:
-          image: test-hous-permit-portal
-          registry: ${{ secrets.REGISTRY_URL }}
-          username: ${{ secrets.BUILDER_USERNAME }}
-          password: ${{ secrets.BUILDER_TOKEN }}
+        run: docker build -t energy-app -f ./devops/docker/app/Dockerfile .
+
+      # Step 4: Tag the Image
+      - name: Tag Docker Image
+        run: docker tag energy-app artifacts.developer.gov.bc.ca/bbfc-test/energy-app:latest
+      
+      # Step 5: Push the Docker image to Artifactory
+      - name: Push Image to Artifactory
+        run: docker push artifacts.developer.gov.bc.ca/bbfc-test/energy-app:latest
+
+      # Step 6: Logout
+      - name: Log out from Docker
+        run: docker logout artifacts.developer.gov.bc.ca
