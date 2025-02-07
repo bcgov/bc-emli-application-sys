@@ -187,6 +187,10 @@ class User < ApplicationRecord
     physical_address.save!
   end
 
+  def user_has_mailing_address
+    mailing_address.present?
+  end
+  
   def save_user_address(address_data)
     Rails.logger.info "Address Data: #{address_data.inspect}"  # Debugging log
 
