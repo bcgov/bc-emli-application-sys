@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_01_31_015246) do
+ActiveRecord::Schema[7.1].define(version: 2025_02_07_225839) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -27,6 +27,15 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_31_015246) do
   end
 
   create_table "assets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "audit_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "table_name"
+    t.string "action"
+    t.jsonb "data_before"
+    t.jsonb "data_after"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -580,6 +589,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_31_015246) do
     t.datetime "updated_at", null: false
     t.integer "taggings_count", default: 0
     t.index ["name"], name: "index_tags_on_name", unique: true
+  end
+
+  create_table "target_user_id", id: false, force: :cascade do |t|
+    t.uuid "id"
   end
 
   create_table "template_section_blocks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

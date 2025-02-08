@@ -5,6 +5,7 @@ class User < ApplicationRecord
 
   include Devise::JWT::RevocationStrategies::Allowlist
   include Discard::Model
+  include Auditable
 
   devise :invitable,
          :database_authenticatable,
