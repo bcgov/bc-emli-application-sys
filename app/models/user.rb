@@ -174,18 +174,13 @@ class User < ApplicationRecord
   def update_user_physical_address(address_data)
     return unless address_data.present?
 
-    # Find or initialize the physical address
-    physical_address = physical_address || build_physical_address
-    physical_address.assign_attributes(
-      user_id: self.id,  # Ensure it's linked to the user
-      street_address: address_data[:street_address],
-      locality: address_data[:locality],
-      region: address_data[:region],
-      postal_code: address_data[:postal_code],
-      country: address_data[:country],
-      address_type: :physical
-    )
-    physical_address.save!
+    physical_address = self.physical_address || build_physical_address
+    physical_address.assign_attributes(address_data)
+    
+    # trigger an update only if changes are detected
+    if physical_address.changed?
+      physical_address.save!
+    end
   end
 
   def user_has_mailing_address
@@ -200,7 +195,7 @@ class User < ApplicationRecord
     update_user_physical_address(address_data)
 
     # Find or initialize the mailing address
-    mailing_address = mailing_address || build_mailing_address
+    mailing_address = self.mailing_address || build_mailing_address
     mailing_address.assign_attributes(
       user_id: self.id,  # Ensure it's linked to the user
       street_address: address_data[:street_address],
