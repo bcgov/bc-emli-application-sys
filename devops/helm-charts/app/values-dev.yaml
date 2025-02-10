@@ -1,5 +1,4 @@
 STAGE: dev
-artifactoryRepo: bbfc-dev
 
 route:
   spec:
@@ -10,6 +9,10 @@ pvc:
     resources:
       requests:
         storage: 250Mi
+
+image:
+  repository: "artifacts.developer.gov.bc.ca/bbfc-dev"
+  tag: latest
 
 deployments:
   - process: web

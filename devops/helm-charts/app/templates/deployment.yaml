@@ -45,7 +45,7 @@ spec:
       imagePullSecrets:
         - name: bfc7dd-artifactory-credentials
       containers:
-        - image: "artifacts.developer.gov.bc.ca/{{ $.Values.artifactoryRepo }}/energy-app:latest"
+        - image: {{ $.Values.appName }}:latest
           imagePullPolicy: Always
           name: "{{ $.Values.appName }}-{{ .process }}"
           {{- if eq .process "web" }}
