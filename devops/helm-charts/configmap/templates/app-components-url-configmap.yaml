@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-components-url
+data:
+  ANYCABLE_DEV_REDIS_URL: "redis://redis-ha:6379/"
+  ANYCABLE_URL: "ws://anycable-go:8080/cable"
+  CACHE_DEV_REDIS_URL: "redis://redis-ha:6379/4"
+  ELASTICSEARCH_URL: "http://elasticsearch-ha:9200"
+  RATE_LIMIT_DEV_REDIS_URL: "redis://redis-ha:6379/2"
+  REDIS_URL: "redis://redis-ha:6379/0"
+  SIMPLE_FEED_DEV_REDIS_URL: "redis://redis-ha:6379/3"

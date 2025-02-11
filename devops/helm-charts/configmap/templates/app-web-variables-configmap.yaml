@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-web-variables
+data:
+  APP_DOMAIN: {{ $.Values.web.BUNDLE_PATH }}
+  GEM_HOME: {{ $.Values.web.BUNDLE_PATH }}
+  {{- range $key, $value := .Values.web }}
+  {{ $key }}: "{{ $value | default "" }}"
+  {{- end }}
