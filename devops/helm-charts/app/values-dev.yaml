@@ -11,8 +11,10 @@ pvc:
         storage: 250Mi
 
 image:
-  repository: "artifacts.developer.gov.bc.ca/bbfc-dev"
+  artifactRepo: "artifacts.developer.gov.bc.ca/bbfc-local"
+  name: energy-app
   tag: latest
+  serviceAccountName: bfc7dd-vault-dockercfg-vp5qh
 
 deployments:
   - process: web
