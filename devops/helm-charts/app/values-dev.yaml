@@ -1,5 +1,4 @@
 STAGE: dev
-artifactoryRepo: bbfc-local
 
 route:
   spec:
@@ -10,6 +9,12 @@ pvc:
     resources:
       requests:
         storage: 250Mi
+
+image:
+  artifactRepo: "artifacts.developer.gov.bc.ca/bbfc-local"
+  name: energy-app
+  tag: latest
+  serviceAccountName: bfc7dd-vault-dockercfg-vp5qh
 
 deployments:
   - process: web
