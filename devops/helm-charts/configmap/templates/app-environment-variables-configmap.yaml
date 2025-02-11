@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-environment-variables
+data:
+  REDIS_SENTINEL_HEADLESS: "redis-ha.{{ $.Values.OPENSHIFT_NAMESPACE }}-{{ $.Values.STAGE }}.svc.cluster.local"
+  REDIS_SENTINEL_MASTER_SET_NAME: "redisMasterSet"
+  REDIS_SENTINEL_PORT: "26379"
+  SECRET_KEY_BASE: "1"
+  SIDEKIQ_CONCURRENCY: "20"
+  SIDEKIQ_REDIS_DB: "0"

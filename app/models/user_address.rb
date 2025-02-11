@@ -1,4 +1,6 @@
 class UserAddress < ApplicationRecord
+  include Auditable
+  
   belongs_to :user
 
   enum address_type: { physical: 'physical', mailing: 'mailing' }, _prefix: true

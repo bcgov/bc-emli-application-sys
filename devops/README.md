@@ -1,22 +1,39 @@
-# DevOps
+# DevOps Guide
 
-The application relies on various deployments and services in order to run. These are all deployed into the government's Openshift environment.
+This repository contains Helm charts for deploying various services required to run the application within the government's OpenShift environment.
 
-## Helm Charts
+## Helm Charts Overview
 
-There are helm charts available for each major service / application. Right now they are:
+The following Helm charts are available for deployment:
 
-- permit-portal-routing (includes base network policies and nginx for reverse proxying to websocket / http servers)
-- app (includes web, workers, RPC service for hous-permit-portal)
-- anycable-go (websocket service)
-- ha-postgres-crunchydb (HA Postgres, makes use of https://github.com/bcgov/crunchy-postgres)
-- ha-elasticsearch (HA Elasticsearch based off bitnami/elasticsearch)
-- ha-redis (HA Redis with Sentinels based off bitnami/redis)
+- **app** – Deploys the web application, workers, and RPC service for `energy-portal`.  
+- **anycable-go** – WebSocket service.  
+- **ha-postgres-crunchydb** – High-Availability PostgreSQL using [bcgov/crunchy-postgres](https://github.com/bcgov/crunchy-postgres).  
+- **ha-elasticsearch** – High-Availability Elasticsearch based on `bitnami/elasticsearch`.  
+- **ha-redis** – High-Availability Redis with Sentinels based on `bitnami/redis`.  
+- **configmap** – Stores configuration variables required by the application.  
 
-Run each helm chart by going into the respective folder and issuing helm commands, here are some examples:
+## Deployment Instructions
 
-Install Helm Chart (dry run)
-`helm install hous-permit-portal . -f values.yaml -f values-dev.yaml -n bb18ab-dev --debug --dry-run`
+Each Helm chart should be deployed in a specific order to ensure proper functionality. Additionally, **ConfigMap values must be set beforehand**, or they will need to be updated later.
 
-Make updates to the Helm release
-`helm upgrade hous-permit-portal -f values.yaml -f values-dev.yaml -n bb18ab-dev`
+### Prerequisites
+
+Ensure you are connected to the OpenShift cluster before proceeding.
+
+### Installation Steps
+
+Navigate to the `helm-charts` directory and run the following command:
+
+```sh
+helm install <chart_name> <chart_directory> -f values.yaml -f values-<env>.yaml -n <namespace>
+```
+
+Install the charts in the following order:
+
+1. **ha-postgres-crunchydb**  
+2. **configmap**  
+3. **anycable-go**  
+4. **ha-elasticsearch**  
+5. **ha-redis**  
+6. **app**  
