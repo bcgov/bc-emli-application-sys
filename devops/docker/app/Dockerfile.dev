@@ -39,5 +39,5 @@ RUN bundle exec bootsnap precompile app/ lib/
 
 EXPOSE 3000
 ENTRYPOINT ["./devops/docker/app/entrypoint-dev.sh"]
-CMD ["./bin/rails", "server"]
+# CMD ["./bin/rails", "server"]
 

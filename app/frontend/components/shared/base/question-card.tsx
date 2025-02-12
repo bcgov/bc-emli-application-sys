@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardBody, CardHeader, Radio, RadioGroup, Text, Wrap } from "@chakra-ui/react"
+import { Box, Card, CardBody, CardHeader, Link, Radio, RadioGroup, Text, Wrap } from "@chakra-ui/react"
 import { ArrowSquareOut } from "@phosphor-icons/react"
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -45,13 +45,14 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, answers, onAnswer
           <Text fontSize="md" fontWeight="bold">
             {question}
           </Text>
+
           <Text fontSize="md" mt="2">
             {content}{" "}
             {type === t("auth.checkEligibility.assesmentText") && (
-              <Button as="span" variant="link">
+              <Link href={t("auth.checkEligibility.BCAssessmentLink")} target="_blank">
                 {t("auth.checkEligibility.BCAssessment")}
                 <ArrowSquareOut />
-              </Button>
+              </Link>
             )}
           </Text>
           {additionalContent && (

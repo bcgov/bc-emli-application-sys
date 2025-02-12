@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   labels:
-    app: "permit-portal-routing"
+    app: "energy-portal-routing"
   name: allow-from-openshift-ingress
 spec:
   ingress:
@@ -13,13 +13,12 @@ spec:
   podSelector: {}
   policyTypes:
     - Ingress
-status: {}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   labels:
-    app: "permit-portal-routing"
+    app: "energy-portal-routing"
   name: allow-same-namespace
 spec:
   ingress:
@@ -28,4 +27,3 @@ spec:
   podSelector: {}
   policyTypes:
     - Ingress
-status: {}

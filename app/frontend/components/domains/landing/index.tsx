@@ -109,11 +109,10 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
               <Text>{t("landing.checkEligiblityUsingCard")}</Text>
               <Flex gap={6} direction={{ base: "column", md: "row" }}>
                 <RouterLinkButton
-                  to={currentUser ? "/" : "/check-eligible"}
+                  to={currentUser ? "/profile" : "/check-eligible"}
                   variant="primaryInverse"
                   icon={<CaretRight size={16} />}
                   iconPosition="right"
-                  fontWeight="bold"
                 >
                   {t("landing.goTo", {
                     location:
@@ -124,8 +123,8 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
 
               <Flex mt="auto" direction="column">
                 <Text>{t("landing.continuePrefix")} </Text>
-                <Text>
-                  <Link color="greys.white" _hover={{ opacity: 0.4 }} href="/login">
+                <Text fontWeight="bold">
+                  <Link variant="primaryInverse" href="/login">
                     {t("landing.continueLogin")}
                   </Link>
                 </Text>
@@ -176,16 +175,26 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
             <BareBox n={"1"}>
               {t("landing.additionalContent.left")}
               <br />
-              <RouterLinkButton mt="2" to={currentUser ? "/" : "/"} variant="primaryInverse" fontWeight="bold">
-                {t("landing.additionalContent.viewTemplate")}
+              <RouterLinkButton
+                mt="2"
+                to={t("landing.additionalContent.energyPlannerLink")}
+                variant="primaryInverse"
+                rightIcon={<ArrowSquareOut />}
+              >
+                {t("landing.additionalContent.getStarted")}
               </RouterLinkButton>
             </BareBox>
 
             <BareBox n={"2"}>
               {t("landing.additionalContent.mid")}
               <br />
-              <RouterLinkButton mt="2" to={"/"} variant="primaryInverse" fontWeight="bold">
-                {t("landing.additionalContent.midButton")}
+              <RouterLinkButton
+                mt="2"
+                to={t("landing.additionalContent.energyCoachBookCallLink")}
+                variant="primaryInverse"
+                rightIcon={<ArrowSquareOut />}
+              >
+                {t("landing.additionalContent.bookACall")}
               </RouterLinkButton>
             </BareBox>
           </Flex>
@@ -350,12 +359,12 @@ interface IBareBoxProps {
 
 const BareBox: React.FC<IBareBoxProps> = ({ n, children }) => {
   return (
-    <Box p={4} borderRadius="lg" bg="theme.blueLight" color="theme.blueAlt" flex={1}>
-      <Flex gap={6} align="center" h="full">
+    <Box p={4} borderRadius="lg" bg="theme.blueLight" color="theme.blueText" flex={1}>
+      <Flex gap={6} h="full">
         <Flex
           alignItems="center"
           justifyContent="center"
-          bg="theme.blue"
+          bg="theme.blueText"
           color="white"
           borderRadius="50%"
           minWidth="35px"

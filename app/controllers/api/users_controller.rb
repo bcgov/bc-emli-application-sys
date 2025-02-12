@@ -59,6 +59,8 @@ class Api::UsersController < Api::ApplicationController
       return render_error "misc.user_not_authorized_error"
     end
 
+    Rails.logger.info("Updating user: #{user_params}")
+
     if @user.update(user_params)
       render_success @user,
                      "user.update_success",
@@ -79,6 +81,7 @@ class Api::UsersController < Api::ApplicationController
     # https://github.com/heartcombo/devise/issues/5470
     current_user.unconfirmed_email = nil if current_user.email &&
       profile_params[:email] == current_user.email
+    
     if current_user.update(profile_params)
       should_send_confirmation =
         @user.confirmed_at.blank? && @user.confirmation_sent_at.blank?
@@ -156,7 +159,7 @@ class Api::UsersController < Api::ApplicationController
       agreement: EndUserLicenseAgreement.active_agreement(@user.eula_variant)
     )
     render_success @user,
-                   "user.eula_accepted",
+                   "user.terms_accepted",
                    { blueprint_opts: { view: :current_user } }
   end
 
@@ -222,7 +225,10 @@ class Api::UsersController < Api::ApplicationController
   end
 
   def profile_params
-    params.require(:user).permit(
+    # Transform all keys to snake_case first
+    transformed_params = params.require(:user).deep_transform_keys { |key| key.to_s.underscore }
+    
+    transformed_params.permit(
       :email,
       :nickname,
       :first_name,
@@ -242,7 +248,8 @@ class Api::UsersController < Api::ApplicationController
         enable_email_collaboration_notification
         enable_in_app_integration_mapping_notification
         enable_email_integration_mapping_notification
-      ]
+      ],
+      mailing_address_attributes: %i[street_address locality region postal_code country]
     )
   end
 end

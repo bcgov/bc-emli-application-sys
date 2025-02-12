@@ -1,44 +1,37 @@
 import {
   Alert,
-  Avatar,
   Button,
   Checkbox,
   Container,
   Divider,
   Flex,
-  FormControl,
   Heading,
   InputGroup,
   InputRightElement,
-  Link,
   Select,
-  Switch,
-  Table,
   Tag,
   TagLabel,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tr,
 } from "@chakra-ui/react"
 import { Info, Warning } from "@phosphor-icons/react"
 import { observer } from "mobx-react-lite"
 import React, { useState } from "react"
-import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form"
+import { FormProvider, useForm } from "react-hook-form"
 import { Trans, useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useMst } from "../../../setup/root"
 import { EUserRoles } from "../../../types/enums"
 import { EmailFormControl } from "../../shared/form/email-form-control"
 import { TextFormControl } from "../../shared/form/input-form-control"
-import { UserEulas } from "../../shared/user-eulas"
+import CustomAlert from "../../shared/base/custom-alert"
 
 interface IProfileScreenProps {}
 
 export const ProfileScreen = observer(({}: IProfileScreenProps) => {
   const { t } = useTranslation()
+  const location = useLocation()
+  const currentPath = location.pathname
+
   const [isEditingEmail, setIsEditingEmail] = useState(false)
 
   const { userStore } = useMst()
@@ -47,26 +40,54 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
   const confirmationRequired =
     currentUser.unconfirmedEmail || (currentUser.isUnconfirmed && currentUser.confirmationSentAt)
 
+  // Function to get defaults
   const getDefaults = () => {
-    const { firstName, lastName, nickname, certified, organization, preference } = currentUser
+    const {
+      firstName,
+      lastName,
+      certified,
+      organization,
+      preference,
+      email,
+      physicalAddress,
+      mailingAddress,
+      city,
+      province,
+      postalCode,
+      country,
+    } = currentUser
     return {
       firstName,
       lastName,
       certified,
       organization,
       preferenceAttributes: preference,
+      email,
+      address: physicalAddress?.streetAddress,
+      city: physicalAddress?.locality,
+      province: physicalAddress?.region,
+      postalCode: physicalAddress?.postalCode,
+      country: physicalAddress?.country,
+      postalAddress: mailingAddress?.streetAddress,
+      postalAddressCity: mailingAddress?.locality,
+      postalAddressProvince: mailingAddress?.region,
+      postalAddressPostalcode: mailingAddress?.postalCode,
+      postalAddressCountry: mailingAddress?.country,
+      isSameAddress: false,
     }
   }
   const formMethods = useForm({
     mode: "onSubmit",
     defaultValues: getDefaults(),
   })
-  const { handleSubmit, formState, control, reset, setValue } = formMethods
-  const { isSubmitting } = formState
+  const [formValues, setFormValues] = useState(getDefaults())
+  const [isSameAddress, setIsSameAddress] = useState(false)
+  const { handleSubmit, register, reset, formState } = formMethods
+  const { isSubmitting, errors } = formState
 
   const navigate = useNavigate()
-
   const onSubmit = async (formData) => {
+    console.log(formData);
     await updateProfile(formData)
     setIsEditingEmail(false)
     reset(getDefaults())
@@ -76,58 +97,40 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
     await currentUser.resendConfirmation()
   }
 
-  const events = [
-    {
-      event: t("user.notifications.essential"),
-      inAppChecked: false,
-      emailChecked: true,
-      emailDisabled: true,
-    },
-    {
-      event: t("user.notifications.templateChanged"),
-      inAppControl: "preferenceAttributes.enableInAppNewTemplateVersionPublishNotification",
-      emailChecked: false,
-    },
-    {
-      event: t("user.notifications.templateCustomized"),
-      inAppControl: "preferenceAttributes.enableInAppCustomizationUpdateNotification",
-      emailChecked: false,
-    },
-    {
-      event: t("user.notifications.applicationSubmitted"),
-      inAppControl: "preferenceAttributes.enableInAppApplicationSubmissionNotification",
-      emailControl: "preferenceAttributes.enableEmailApplicationSubmissionNotification",
-    },
-    {
-      event: t("user.notifications.applicationViewed"),
-      inAppControl: "preferenceAttributes.enableInAppApplicationViewNotification",
-      emailControl: "preferenceAttributes.enableEmailApplicationViewNotification",
-    },
-    {
-      event: t("user.notifications.applicationRevisionsRequested"),
-      inAppControl: "preferenceAttributes.enableInAppApplicationRevisionsRequestNotification",
-      emailControl: "preferenceAttributes.enableEmailApplicationRevisionsRequestNotification",
-    },
-    {
-      event: t("user.notifications.collaboration"),
-      inAppControl: "preferenceAttributes.enableInAppCollaborationNotification",
-      emailControl: "preferenceAttributes.enableEmailCollaborationNotification",
-    },
-    {
-      event: t("user.notifications.integrationMapping"),
-      inAppControl: "preferenceAttributes.enableInAppIntegrationMappingNotification",
-      emailControl: "preferenceAttributes.enableEmailIntegrationMappingNotification",
-    },
-  ]
-
+  // Handle checkbox change to sync physical address with postal address
+  const handleCheckboxChange = (event) => {
+    const checked = event.target.checked
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      isSameAddress: checked,
+      ...(checked && {
+        postalAddress: prevValues.address,
+        postalAddressCity: prevValues.city,
+        postalAddressProvince: prevValues.province,
+        postalAddressPostalcode: prevValues.postalCode,
+        postalAddressCountry: prevValues.country,
+      }),
+      // If unchecked, reset postal address fields
+      ...(!checked && {
+        postalAddress: "",
+        postalAddressCity: "",
+        postalAddressProvince: "",
+        postalAddressPostalcode: "",
+        postalAddressCountry: "",
+      }),
+    }))
+  }
+  
   return (
     <Container maxW="container.sm" p={8} as="main">
+      <Flex mb={6}> {Object.keys(errors).length > 0 && <CustomAlert description={t("ui.correctFields")} />} </Flex>
       <FormProvider {...formMethods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Flex as="section" direction="column" w="full" gap={6}>
-            <Heading as="h1" m={0}>
-              {t("user.myProfile")}
+            <Heading as="h1" m={0} color="theme.blueAlt">
+              {currentPath === "/profile" ? "My account" : <>{t("user.accountCreation")}</>}
             </Heading>
+            {/*Remember: Need to confirm if it is still required */}
             {!currentUser.isSubmitter && (
               <InputGroup>
                 <Flex direction="column" w="full">
@@ -144,75 +147,118 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
             )}
 
             <Section>
-              <Avatar
-                size="xl"
-                name={currentUser.name}
-                bg={currentUser.name ? "semantic.warningLight" : "greys.grey02"}
-                color="text.primary"
-              />
               <Flex gap={{ base: 4, md: 6 }} direction={{ base: "column", md: "row" }}>
-                <TextFormControl label={t("user.firstName")} fieldName="firstName" required />
-                <TextFormControl label={t("user.lastName")} fieldName="lastName" required />
+                <TextFormControl
+                  label={t("user.firstName")}
+                  fieldName="firstName"
+                  required
+                  disabled={true}
+                  value={formValues.firstName}
+                  onChange={(e) => setFormValues({ ...formValues, firstName: e.target.value })}
+                />
+                <TextFormControl
+                  label={t("user.lastName")}
+                  fieldName="lastName"
+                  required
+                  disabled={true}
+                  value={formValues.lastName}
+                  onChange={(e) => setFormValues({ ...formValues, lastName: e.target.value })}
+                />
               </Flex>
-              {currentUser.isSubmitter && (
-                <>
-                  <TextFormControl label={t("auth.organizationLabel")} fieldName="organization" />
-                  <FormControl>
-                    <Controller
-                      name="certified"
-                      control={control}
-                      render={({ field: { onChange, value } }) => {
-                        return (
-                          <Checkbox isChecked={value} onChange={onChange}>
-                            {t("auth.certifiedProfessional")}
-                          </Checkbox>
-                        )
-                      }}
-                    />
-                  </FormControl>
-                </>
-              )}
-              <Divider my={1} />
               <TextFormControl
-                // @ts-ignore
-                label={t(`user.omniauthProviders.${currentUser.omniauthProvider as EOmniauthProvider}`)}
-                hint={currentUser.omniauthEmail}
-                inputProps={{ value: currentUser.omniauthUsername }}
-                isDisabled
+                label={t("user.address")}
+                fieldName="streetAddressAttributes.streetAddress"
+                required
+                value={formValues.address}
+                onChange={(e) => setFormValues({ ...formValues, address: e.target.value })}
               />
-              {!currentUser.isSuperAdmin && (
-                <Alert
-                  status="info"
-                  borderRadius="sm"
-                  gap={1.5}
-                  borderWidth={1}
-                  borderColor="semantic.info"
-                  px={2}
-                  py={1.5}
-                  fontSize="sm"
-                >
-                  <Info color="var(--chakra-colors-semantic-info)" />
-                  <Text>
-                    {t("user.changeBceid")}
-                    <Link href={import.meta.env.VITE_BCEID_URL} isExternal>
-                      {t("user.changeBceidLinkText")}
-                    </Link>
-                  </Text>
-                </Alert>
-              )}
-            </Section>
-
-            <Section>
-              <Heading as="h3" m={0}>
-                {t("user.receiveNotifications")}
-              </Heading>
+              <TextFormControl
+                label={t("user.city")}
+                fieldName="streetAddressAttributes.locality"
+                required
+                value={formValues.city}
+                onChange={(e) => setFormValues({ ...formValues, city: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.province")}
+                fieldName="streetAddressAttributes.region"
+                required
+                value={formValues.province}
+                onChange={(e) => setFormValues({ ...formValues, province: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.postalCode")}
+                fieldName="streetAddressAttributes.postalCode"
+                required
+                value={formValues.postalCode}
+                onChange={(e) => setFormValues({ ...formValues, postalCode: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.country")}
+                fieldName="streetAddressAttributes.country"
+                required
+                value={formValues.country}
+                onChange={(e) => setFormValues({ ...formValues, country: e.target.value })}
+              />
+              <Checkbox checked={isSameAddress} onChange={handleCheckboxChange}>
+                {t("user.sameAddress")}
+              </Checkbox>
+              <CustomAlert
+                description={t("user.changeInfo")}
+                descLinkHref={t("user.changeInfoLink")}
+                descLinkText={t("user.bceid")}
+                icon={<Info />}
+                iconColor="theme.darkBlue"
+                borderColor="theme.darkBlue"
+                backgroundColor="greys.offWhite"
+              />
+              <Text fontSize="md" fontWeight="bold">
+                {t("user.postalAddress")}
+              </Text>
+              <TextFormControl
+                label={t("user.address")}
+                fieldName="mailingAddressAttributes.streetAddress"
+                required
+                value={formValues.isSameAddress ? formValues.address : formValues.postalAddress}
+                onChange={(e) => setFormValues({ ...formValues, postalAddress: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.city")}
+                fieldName="mailingAddressAttributes.locality"
+                required
+                value={formValues.isSameAddress ? formValues.city : formValues.postalAddressCity}
+                onChange={(e) => setFormValues({ ...formValues, postalAddressCity: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.province")}
+                fieldName="mailingAddressAttributes.region"
+                required
+                value={formValues.isSameAddress ? formValues.province : formValues.postalAddressProvince}
+                onChange={(e) => setFormValues({ ...formValues, postalAddressProvince: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.postalCode")}
+                fieldName="mailingAddressAttributes.postalCode"
+                required
+                value={formValues.isSameAddress ? formValues.postalCode : formValues.postalAddressPostalcode}
+                onChange={(e) => setFormValues({ ...formValues, postalAddressPostalcode: e.target.value })}
+              />
+              <TextFormControl
+                label={t("user.country")}
+                fieldName="mailingAddressAttributes.country"
+                required
+                value={formValues.isSameAddress ? formValues.country : formValues.postalAddressCountry}
+                onChange={(e) => setFormValues({ ...formValues, postalAddressCountry: e.target.value })}
+              />
               {currentUser.isUnconfirmed && !currentUser.confirmationSentAt ? (
-                <EmailFormControl fieldName="email" label={t("user.notificationsEmail")} showIcon required />
+                <EmailFormControl fieldName="email" label={t("user.emailAddress")} showIcon required />
               ) : (
                 <>
                   {currentUser.unconfirmedEmail ? (
                     <EmailFormControl
-                      label={t("user.notificationsEmail")}
+                      label={t("user.emailAddress")}
+                      showOptional={false}
+                      required
                       showIcon
                       inputProps={{
                         isDisabled: true,
@@ -243,8 +289,9 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                     />
                   ) : (
                     <EmailFormControl
-                      label={t("user.notificationsEmail")}
+                      label={t("user.emailAddress")}
                       showIcon
+                      showOptional={false}
                       inputProps={{
                         isDisabled: true,
                         value: currentUser.email,
@@ -282,31 +329,33 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                       py={1.5}
                       fontSize="sm"
                     >
-                      <Warning color="var(--chakra-colors-semantic-warning)" />
-                      <Text>
-                        {currentUser.unconfirmedEmail && !currentUser.isUnconfirmed ? (
-                          <Trans
-                            i18nKey="user.confirmationRequiredWithEmail"
-                            values={{ email: currentUser.email }}
-                            components={{
-                              1: <Button variant="link" onClick={handleResendConfirmationEmail} />,
-                            }}
-                          />
-                        ) : (
-                          <Trans
-                            i18nKey="user.confirmationRequired"
-                            components={{
-                              1: <Button variant="link" onClick={handleResendConfirmationEmail} />,
-                            }}
-                          />
-                        )}
-                      </Text>
+                      <Flex>
+                        <Warning color="var(--chakra-colors-semantic-warning)" fontSize={27} />
+                        <Text fontSize="md" ml={2}>
+                          {currentUser.unconfirmedEmail && !currentUser.isUnconfirmed ? (
+                            <Trans
+                              i18nKey="user.confirmationRequiredWithEmail"
+                              values={{ email: currentUser.email }}
+                              components={{
+                                1: <Button variant="link" onClick={handleResendConfirmationEmail} />,
+                              }}
+                            />
+                          ) : (
+                            <Trans
+                              i18nKey="user.confirmationRequired"
+                              components={{
+                                1: <Button variant="link" onClick={handleResendConfirmationEmail} />,
+                              }}
+                            />
+                          )}
+                        </Text>
+                      </Flex>
                     </Alert>
                   )}
                   {isEditingEmail ? (
                     <>
                       <Divider my={4} />
-                      <EmailFormControl showIcon label={t("user.newEmail")} fieldName="email" />
+                      <EmailFormControl showIcon label={t("user.newEmail")} fieldName="email" showOptional={false} />
                     </>
                   ) : (
                     <Button
@@ -320,42 +369,31 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                   )}
                 </>
               )}
-
-              <Table variant="simple">
-                <Thead>
-                  <Tr>
-                    <Th>{t("user.notifications.event")}</Th>
-                    <Th>{t("user.notifications.enableNotification")}</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {events.map((event, index) => (
-                    <EventRow key={index} {...event} />
-                  ))}
-                </Tbody>
-              </Table>
             </Section>
-
-            {!currentUser.isSuperAdmin && <UserEulas />}
-
+            <Section>
+              <Flex alignItems="center" alignSelf="stretch">
+                <Flex direction="column" flex={1}>
+                  <Text fontWeight={"bold"}>{t("user.termsandConditions")}</Text>
+                  <Text color="text.secondary" pr={4}>
+                    {/* Remember: To append date on which terms and conditions accepted */}
+                    {t("user.acceptedConditions")}
+                  </Text>
+                </Flex>
+                <Flex>
+                  <Button variant="secondary"> {t("ui.view")}</Button>
+                </Flex>
+              </Flex>
+            </Section>
             <Flex as="section" gap={4} mt={4}>
               <Button variant="primary" type="submit" isLoading={isSubmitting} loadingText={t("ui.loading")}>
-                {t("ui.save")}
+                {currentPath === "/profile" ? <>{t("ui.save")}</> : <>{t("ui.createAccount")}</>}
               </Button>
-              {!currentUser.isUnconfirmed && (
+              {currentUser.isUnconfirmed && (
                 <Button variant="secondary" isDisabled={isSubmitting} onClick={() => navigate(-1)}>
                   {t("ui.cancel")}
                 </Button>
               )}
             </Flex>
-            <Text fontSize="xs">
-              <Trans
-                i18nKey={"user.deleteAccount"}
-                components={{
-                  1: <Link href={`mailto:digital.codes.permits@gov.bc.ca`}></Link>,
-                }}
-              />
-            </Text>
           </Flex>
         </form>
       </FormProvider>
@@ -368,65 +406,5 @@ function Section({ children }) {
     <Flex as="section" direction="column" gap={4} w="full" p={6} borderWidth={1} borderColor="border.light">
       {children}
     </Flex>
-  )
-}
-
-interface IEventRowProps {
-  event: string
-  inAppControl?: string
-  emailControl?: string
-  inAppChecked?: boolean
-  emailChecked?: boolean
-  emailDisabled?: boolean
-}
-
-const EventRow: React.FC<IEventRowProps> = ({
-  event,
-  inAppControl,
-  emailControl,
-  inAppChecked,
-  emailChecked,
-  emailDisabled,
-}) => {
-  const { control } = useFormContext()
-  const { t } = useTranslation()
-
-  return (
-    <Tr>
-      <Td w="45%">{event}</Td>
-      <Td w="55%">
-        <Flex gap={6} alignItems="center">
-          {inAppControl ? (
-            <Controller
-              name={inAppControl}
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Switch isChecked={value} onChange={onChange}>
-                  {t("user.inApp")}
-                </Switch>
-              )}
-            />
-          ) : (
-            <Switch isChecked={inAppChecked}>{t("user.inApp")}</Switch>
-          )}
-
-          {emailControl ? (
-            <Controller
-              name={emailControl}
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Switch isChecked={value} onChange={onChange}>
-                  {t("user.email")}
-                </Switch>
-              )}
-            />
-          ) : (
-            <Switch isChecked={emailChecked} disabled={emailDisabled}>
-              {t("user.email")}
-            </Switch>
-          )}
-        </Flex>
-      </Td>
-    </Tr>
   )
 }

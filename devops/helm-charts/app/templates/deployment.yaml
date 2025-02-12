@@ -2,8 +2,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    image.openshift.io/triggers: '{{ printf "[{\"from\":{\"kind\":\"ImageStreamTag\",\"name\":\"%s-%s:latest\"},\"fieldPath\":\"spec.template.spec.containers[?(@.name==\\\"%s-%s\\\")].image\"}]" $.Values.STAGE $.Values.appName $.Values.appName .process }}'
   labels:
     app: "{{ $.Values.appName }}-{{ .process }}"
   name: "{{ $.Values.appName }}-{{ .process }}"
@@ -42,15 +40,39 @@ spec:
         app: "{{ $.Values.appName }}-{{ .process }}"
         deployment: "{{ $.Values.appName }}-{{ .process }}"
     spec:
+      imagePullSecrets:
+        - name: {{ $.Values.image.serviceAccountName }}
       containers:
-        - image: "image-registry.openshift-image-registry.svc:5000/{{ $.Values.OPENSHIFT_NAMESPACE }}-{{ $.Values.STAGE }}/permit-app:latest"
+        - name: "{{ $.Values.appName }}-{{ .process }}"
           imagePullPolicy: Always
-          name: "{{ $.Values.appName }}-{{ .process }}"
+          image: energy-app:latest
           {{- if eq .process "web" }}
           volumeMounts:
             - name: log-volume
               mountPath: /app/log
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ha-postgres-crunchydb-pguser-postgres
+                  key: uri
+            - name: DATABASE_OPENSHIFT_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: ha-postgres-crunchydb-pguser-postgres
+                  key: host
           {{- end }}
+          envFrom:
+            - configMapRef:
+                name: app-environment-variables
+            {{- if eq .process "web" }}
+            - configMapRef:
+                name: app-components-url
+            - configMapRef:
+                name: app-keycloak
+            - configMapRef:
+                name: app-web-variables
+            {{- end }}
           ports:
             - containerPort: 3000
               protocol: TCP

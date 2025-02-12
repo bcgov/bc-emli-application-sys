@@ -5,6 +5,7 @@ class User < ApplicationRecord
 
   include Devise::JWT::RevocationStrategies::Allowlist
   include Discard::Model
+  include Auditable
 
   devise :invitable,
          :database_authenticatable,
@@ -31,6 +32,9 @@ class User < ApplicationRecord
   self.skip_session_storage = %i[http_auth params_auth]
 
   # Associations
+  has_one :physical_address, -> { where(address_type: 'physical') }, class_name: 'UserAddress', dependent: :destroy
+  has_one :mailing_address, -> { where(address_type: 'mailing') }, class_name: 'UserAddress', dependent: :destroy
+
   has_many :jurisdiction_memberships, dependent: :destroy
   has_many :jurisdictions, through: :jurisdiction_memberships
   has_many :integration_mapping_notifications,
@@ -60,7 +64,8 @@ class User < ApplicationRecord
 
   has_one :preference, dependent: :destroy
   accepts_nested_attributes_for :preference
-
+  accepts_nested_attributes_for :physical_address, :mailing_address
+  
   # Validations
   validate :valid_role_change, if: :role_changed?, on: :update
   validate :jurisdiction_must_belong_to_correct_roles
@@ -166,6 +171,43 @@ class User < ApplicationRecord
     end
   end
 
+  def update_user_physical_address(address_data)
+    return unless address_data.present?
+
+    physical_address = self.physical_address || build_physical_address
+    physical_address.assign_attributes(address_data)
+    
+    # trigger an update only if changes are detected
+    if physical_address.changed?
+      physical_address.save!
+    end
+  end
+
+  def user_has_mailing_address
+    mailing_address.present?
+  end
+  
+  def save_user_address(address_data)
+    Rails.logger.info "Address Data: #{address_data.inspect}"  # Debugging log
+
+    return unless address_data.present?
+
+    update_user_physical_address(address_data)
+
+    # Find or initialize the mailing address
+    mailing_address = self.mailing_address || build_mailing_address
+    mailing_address.assign_attributes(
+      user_id: self.id,  # Ensure it's linked to the user
+      street_address: address_data[:street_address],
+      locality: address_data[:locality],
+      region: address_data[:region],
+      postal_code: address_data[:postal_code],
+      country: address_data[:country],
+      address_type: :mailing
+    )
+    mailing_address.save!
+  end
+
   private
 
   def destroy_jurisdiction_collaborator
@@ -206,9 +248,9 @@ class User < ApplicationRecord
     unless !confirmed? || first_name.present?
       errors.add(:user, "Confirmed user must have first_name")
     end
-    unless !confirmed? || last_name.present?
-      errors.add(:user, "Confirmed user must have last_name")
-    end
+    #unless !confirmed? || last_name.present?
+    #  errors.add(:user, "Confirmed user must have last_name")
+    #end
     unless !confirmed? || email.present?
       errors.add(:user, "Confirmed user must have email")
     end

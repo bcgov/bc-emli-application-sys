@@ -5,6 +5,7 @@ import { EOmniauthProvider, EUserRoles } from "../types/enums"
 import { ILicenseAgreement } from "../types/types"
 import { convertToDate } from "../utils/utility-functions"
 import { IJurisdiction, JurisdictionModel } from "./jurisdiction"
+import { IAddress, AddressModel } from "./address"
 
 export const UserModel = types
   .model("UserModel")
@@ -31,6 +32,8 @@ export const UserModel = types
     preference: types.frozen<IPreference>(),
     invitedToJurisdiction: types.maybeNull(types.frozen<IJurisdiction>()),
     licenseAgreements: types.maybeNull(types.frozen<ILicenseAgreement[]>()),
+    physicalAddress: types.maybeNull(AddressModel),
+    mailingAddress: types.maybeNull(AddressModel),
   })
   .extend(withRootStore())
   .extend(withEnvironment())
@@ -77,6 +80,10 @@ export const UserModel = types
     },
   }))
   .actions((self) => ({
+    setAddresses(physical: IAddress | null, mailing: IAddress | null) {
+      self.physicalAddress = physical ? AddressModel.create(physical) : null;
+      self.mailingAddress = mailing ? AddressModel.create(mailing) : null;
+    },
     setLicenseAgreements(licenseAgreements: ILicenseAgreement[]) {
       self.licenseAgreements = licenseAgreements?.map((licenseAgreement) => ({
         ...licenseAgreement,

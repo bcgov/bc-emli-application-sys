@@ -2,16 +2,15 @@ import { Box, Center } from "@chakra-ui/react"
 import { observer } from "mobx-react-lite"
 import React, { Suspense, lazy, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom"
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { useMst } from "../../../setup/root"
 import { EFlashMessageStatus } from "../../../types/enums"
 import { FlashMessage } from "../../shared/base/flash-message"
 import { LoadingScreen } from "../../shared/base/loading-screen"
+import { SupportScreen } from "../misc/support-screen"
 import { EULAScreen } from "../onboarding/eula"
 import { NavBar } from "./nav-bar"
 import { ProtectedRoute } from "./protected-route"
-import { SupportScreen } from "../misc/support-screen"
-
 
 const ExternalApiKeysIndexScreen = lazy(() =>
   import("../external-api-key").then((module) => ({ default: module.ExternalApiKeysIndexScreen }))
@@ -32,7 +31,7 @@ const NotFoundScreen = lazy(() =>
 )
 
 const PermitApplicationPDFViewer = lazy(() =>
-  import("../../shared/permit-applications/pdf-content/viewer").then((module) => ({
+  import("../../shared/energy-savings-applications/pdf-content/viewer").then((module) => ({
     default: module.PermitApplicationPDFViewer,
   }))
 )
@@ -88,27 +87,27 @@ const JurisdictionUserIndexScreen = lazy(() =>
 )
 const LandingScreen = lazy(() => import("../landing").then((module) => ({ default: module.LandingScreen })))
 const ContactScreen = lazy(() => import("../misc/contact-screen").then((module) => ({ default: module.ContactScreen })))
-const PermitApplicationIndexScreen = lazy(() =>
-  import("../permit-application").then((module) => ({ default: module.PermitApplicationIndexScreen }))
+const EnergySavingsApplicationIndexScreen = lazy(() =>
+  import("../energy-savings-application").then((module) => ({ default: module.EnergySavingsApplicationIndexScreen }))
 )
 const EditPermitApplicationScreen = lazy(() =>
-  import("../permit-application/edit-permit-application-screen").then((module) => ({
+  import("../energy-savings-application/edit-energy-savings-application-screen").then((module) => ({
     default: module.EditPermitApplicationScreen,
   }))
 )
 
 const NewPermitApplicationScreen = lazy(() =>
-  import("../permit-application/new-permit-application-screen").then((module) => ({
+  import("../energy-savings-application/new-energy-savings-application-screen").then((module) => ({
     default: module.NewPermitApplicationScreen,
   }))
 )
 const ReviewPermitApplicationScreen = lazy(() =>
-  import("../permit-application/review-permit-application-screen").then((module) => ({
+  import("../energy-savings-application/review-permit-application-screen").then((module) => ({
     default: module.ReviewPermitApplicationScreen,
   }))
 )
 const SuccessfulSubmissionScreen = lazy(() =>
-  import("../permit-application/successful-submission").then((module) => ({
+  import("../energy-savings-application/successful-submission").then((module) => ({
     default: module.SuccessfulSubmissionScreen,
   }))
 )
@@ -455,7 +454,7 @@ const AppRoutes = observer(() => {
         <Route
           element={<ProtectedRoute isAllowed={loggedIn && !mustAcceptEula} redirectPath={mustAcceptEula && "/"} />}
         >
-          <Route path="/permit-applications" element={<PermitApplicationIndexScreen />} />
+          <Route path="/permit-applications" element={<EnergySavingsApplicationIndexScreen />} />
           <Route path="/permit-applications/new" element={<NewPermitApplicationScreen />} />
           <Route path="/permit-applications/:permitApplicationId/edit" element={<EditPermitApplicationScreen />}>
             <Route path="step-code" element={<StepCodeForm />} />
@@ -539,7 +538,8 @@ const AppRoutes = observer(() => {
           element={currentUser?.isSuperAdmin ? <JurisdictionIndexScreen /> : <LimitedJurisdictionIndexScreen />}
         />
         <Route path="/jurisdictions/:jurisdictionId" element={<JurisdictionScreen />} />
-        <Route path="*" element={<NotFoundScreen />} />
+        <Route path="/not-found" element={<NotFoundScreen />} />
+        <Route path="*" element={<Navigate replace to="/not-found" />} />
       </Routes>
       {enableStepCodeRoute && (
         <Routes>

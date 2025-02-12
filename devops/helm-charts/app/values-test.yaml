@@ -1,8 +1,9 @@
 STAGE: test
+artifactoryRepo: bbfc-test
 
 route:
   spec:
-    host: "test.buildingpermit.gov.bc.ca"
+    host: ""
 
 pvc:
   spec:
@@ -38,6 +39,7 @@ deployments:
           limits:
             cpu: 250m
             memory: 512Mi
+          configMapName: app-environment
   - process: anycable-rpc
     replicaCount: 1
     spec:

@@ -102,6 +102,9 @@ en:
               reviewers_only: can only be added to review staff
             password:
               password_format: "Password does no meet the required format"
+            address:
+              one_physical: "A user can only have one physical address"
+              one_mailing: "A user can only have one mailing address"
         revision_request:
           attributes:
             user:
@@ -280,7 +283,7 @@ en:
         message: The users you specified weren't able to be invited. Please contact support.
       update_success:
         title: ""
-        message: The user was updated successfully
+        message: Change saved.
       update_error:
         title: There was an error updating the user
         message: "%{error_message}"
@@ -302,6 +305,9 @@ en:
       eula_accepted:
         title: ""
         message: "End-User License Agreement accepted"
+      terms_accepted:
+        title: ""
+        message: "Terms and Conditions accepted"
       get_super_admins_error:
         title: "Error"
         message: "Could not fetch super users"

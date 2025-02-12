@@ -1,6 +1,6 @@
 import { ICollaborator } from "../models/collaborator"
 import { IJurisdiction } from "../models/jurisdiction"
-import { IPermitApplication } from "../models/permit-application"
+import { IPermitApplication } from "../models/energy-savings-application"
 import { IRequirementBlock } from "../models/requirement-block"
 import { IRequirementTemplate } from "../models/requirement-template"
 import { IUser } from "../models/user"

@@ -14,7 +14,7 @@ import {
 import React from "react"
 import { useTranslation } from "react-i18next"
 import { ISingleRequirementFormJson } from "../../../types/types"
-import { SingleRequirementForm } from "../permit-applications/single-requirement-form"
+import { SingleRequirementForm } from "../energy-savings-applications/single-requirement-form"
 
 export interface IPreviousSubmissionModalProps extends Partial<ReturnType<typeof useDisclosure>> {
   requirementJson: ISingleRequirementFormJson

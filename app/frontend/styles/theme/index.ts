@@ -14,6 +14,7 @@ import { fonts } from "./foundations/fonts"
 import { shadows } from "./foundations/shadows"
 import { sizes } from "./foundations/sizes"
 import { space } from "./foundations/space"
+import { Radio } from "./components/radio"
 
 const styles = {
   global: {
@@ -84,7 +85,7 @@ const styles = {
     },
   },
 }
-const components = { Button, FormLabel, Heading, Input, Link, Select, Text, Table }
+const components = { Button, FormLabel, Heading, Input, Link, Select, Text, Table, Radio }
 const overrides = { styles, colors, fonts, fontSizes, sizes, radii, space, shadows, components }
 
 export const theme = extendTheme(overrides)

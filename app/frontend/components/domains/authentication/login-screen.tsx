@@ -1,11 +1,12 @@
 import { Box, Divider, Flex, Heading, HStack, Link, Text, VStack, Button } from "@chakra-ui/react"
 import { ArrowSquareOut, Phone } from "@phosphor-icons/react"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ContractorInfoBlock } from "../../shared/bcservicecard/contractor"
 import { EnergyCoachInfoBlock } from "../../shared/bcservicecard/energy-coach"
 import { CenterContainer } from "../../shared/containers/center-container"
 import { RouterLinkButton } from "../../shared/navigation/router-link-button"
+import { useLocation } from "react-router-dom"
 
 interface ILoginScreenProps {
   isAdmin?: boolean
@@ -13,10 +14,14 @@ interface ILoginScreenProps {
 
 export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
   const { t } = useTranslation()
+  const location = useLocation()
+  const currentPath = location.pathname
+  const searchParams = new URLSearchParams(location.search)
+  const showContractor = searchParams.get("showContractor") === "false"
 
   return (
     <CenterContainer h="full">
-      <Flex direction={{ base: "column", md: "row" }} gap={4}>
+      <Flex direction={{ base: "column", md: "row" }} gap={10}>
         <Flex
           direction="column"
           gap={6}
@@ -42,12 +47,9 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
               name="authenticity_token"
               value={document.querySelector("[name=csrf-token]").content}
             />
-            <Button variant="primary" w="full" type="submit">
-          {t("auth.bcsc_login")}
-          </Button>
-            {/* <RouterLinkButton to="/" bg="theme.blue" color="white" rightIcon={<ArrowSquareOut size={16} />}>
-              {t("auth.bcServiceCardInfo.bcservice_login")}
-            </RouterLinkButton> */}
+            <Button variant="primary" w="full" type="submit" rightIcon={<ArrowSquareOut size={16} />}>
+              {t("auth.bcsc_login")}
+            </Button>
           </form>
           {isAdmin ? (
             <Text>{t("auth.adminAccountAccess")}</Text>
@@ -88,9 +90,11 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
             </>
           )}
         </Flex>
-        <Box height="auto">
-          <ContractorInfoBlock />
-        </Box>
+        {currentPath === "/login" && !showContractor && (
+          <Box height="auto">
+            <ContractorInfoBlock />
+          </Box>
+        )}
       </Flex>
     </CenterContainer>
   )

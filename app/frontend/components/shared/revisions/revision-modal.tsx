@@ -25,8 +25,8 @@ import { useTranslation } from "react-i18next"
 import { useMst } from "../../../setup/root"
 import { IFormIORequirement, IRevisionRequest } from "../../../types/types"
 import { singleRequirementFormJson } from "../../../utils/formio-helpers"
-import { IRevisionRequestForm } from "../../domains/permit-application/revision-sidebar"
-import { SingleRequirementForm } from "../permit-applications/single-requirement-form"
+import { IRevisionRequestForm } from "../../domains/energy-savings-application/revision-sidebar"
+import { SingleRequirementForm } from "../energy-savings-applications/single-requirement-form"
 
 export interface IRevisionModalProps extends Partial<ReturnType<typeof useDisclosure>> {
   requirementJson: IFormIORequirement

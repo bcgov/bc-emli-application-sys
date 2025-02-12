@@ -32,7 +32,12 @@ class OmniauthUserResolver
 
     accept_invitation_with_omniauth if invited_user.present?
 
-    self.user = invited_user || existing_user || create_user
+    if existing_user
+      self.user = update_user
+    else
+      self.user = invited_user || create_user
+    end
+
     self.error_key = error_message_key unless user&.valid? && user&.persisted?
   end
 
@@ -46,20 +51,58 @@ class OmniauthUserResolver
     existing_user.submitter? || invited_user.regional_review_manager?
   end
 
+  def update_user
+    existing_user.update(
+      first_name: omniauth_givenname,
+      last_name: omniauth_familyname,
+    )
+
+    if existing_user.valid?
+      if existing_user.user_has_mailing_address
+        existing_user.update_user_physical_address(omniauth_address)
+      else
+        existing_user.save_user_address(omniauth_address)
+      end
+      
+      existing_user.save
+    else
+        Rails.logger.error "User validation failed: #{existing_user.errors.full_messages}"  
+    end
+    
+    return existing_user
+  end
+
   def create_user
     return if omniauth_provider == OMNIAUTH_PROVIDERS[:idir]
-    u =
+    user =
       User.new(
         password: Devise.friendly_token[0, 20],
         omniauth_provider:,
         omniauth_uid:,
         omniauth_email:,
-        omniauth_username:
+        omniauth_username:,
+        first_name: omniauth_givenname,
+        last_name: omniauth_familyname,
+        email: omniauth_email
       )
+
     # skip confirmation until user has a chance to add/verify their notification email
-    u.skip_confirmation_notification!
-    u.save
-    u
+    user.skip_confirmation_notification!
+    
+    # Skip validation initially, so we can add addresses first
+    if user.save(validate: false)
+      user.save_user_address(omniauth_address)
+
+      # Now run full validations
+      if user.valid?
+        user.save
+        return user
+      else
+        Rails.logger.error "User validation failed: #{user.errors.full_messages}"
+      end
+    end
+
+    nil
   end
 
   def accept_invitation_with_omniauth
@@ -122,5 +165,26 @@ class OmniauthUserResolver
       else
         raw_info.bceid_username || raw_info.idir_username
       end
+  end
+
+  def omniauth_givenname
+    @first_name ||= raw_info.given_name
+  end
+
+  def omniauth_familyname
+    @last_name ||= raw_info.family_name || " "
+  end
+
+  def omniauth_address
+    return unless raw_info.identity_provider == ENV["KEYCLOAK_CLIENT"]
+
+    address_info = raw_info.address
+    {
+      street_address: address_info.street_address,
+      locality: address_info.locality,
+      region: address_info.region,
+      postal_code: address_info.postal_code,
+      country: address_info.country
+    }
   end
 end

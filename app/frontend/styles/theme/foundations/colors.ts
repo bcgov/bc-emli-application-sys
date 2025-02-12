@@ -13,6 +13,8 @@ export const colors = {
     blueButtonHover: "#1E5189",
     blueText: "#2464A4",
     primary100: "#234075",
+    darkBlue: "#053662",
+    radioOutline: "#0D6EFD",
     buttonHover: "linear-gradient(0deg, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0.32) 100%), #234075;",
     blueAltGradient: "linear-gradient(124.8deg, #142B43 -52.7%, #142B43 -52.68%, #054277 47.38%, #142B43 137.55%)",
     blueGradient:
@@ -34,6 +36,7 @@ export const colors = {
   greys: {
     overlay: "rgba(150, 150, 150, 0.35)",
     white: "#FFFFFF",
+    offWhite: "#F7F9FC",
     grey01: "#A19F9D",
     grey02: "#E1DFDD",
     grey03: "#F2F2F2",
@@ -74,7 +77,7 @@ export const colors = {
     // warning: "#FCBA19",
     warning: "#E86825",
     // warningLight: "#FEF2D6",
-    warningLight: "#FFE1BE",
+    warningLight: "#FEF8E8",
     special: "#8000FF",
     specialLight: "#F0DCFF",
   },

@@ -1,8 +1,9 @@
 OPENSHIFT_NAMESPACE: bfc7dd
 STAGE: dev
-appName: "permit-app"
+appName: energy-app
 
-vaultNamespace: "bfc7dd-nonprod"
+vaultNamespace: bfc7dd-nonprod
+imageRepository: image-registry.apps.silver.devops.gov.bc.ca
 
 route:
   spec:

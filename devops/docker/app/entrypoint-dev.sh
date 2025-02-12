@@ -2,7 +2,9 @@
 
 # Rails Entrypoint
 # If running the rails server then create or migrate existing database
-if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
+# if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
+# if IS_APP_SERVER == true; then
+if [ -n "$IS_APP_SERVER" ]; then
   until nc -z -v -w30 postgres 5432; do
     echo "Waiting for PostgreSQL database (postgres) to start..."
     sleep 1
@@ -10,7 +12,8 @@ if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
 
   echo "*** Preparing Database..."
   
-  IS_DOCKER_BUILD=true ./bin/rails db:migrate
+  ./bin/rails db:migrate
 fi
 
-bundle exec rails s -b '0.0.0.0' -p 3000
+# bundle exec rails s -b '0.0.0.0' -p 3000
+exec "$@"

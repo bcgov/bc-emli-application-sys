@@ -4,9 +4,12 @@ metadata:
   name: purge-old-compliance-logfiles
 spec:
   schedule: "0 0 * * *"
+  successfulJobsHistoryLimit: 1  # Keep only 1 successful Job
+  failedJobsHistoryLimit: 1  # Keep only 1 failed Job
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
+      ttlSecondsAfterFinished: 300  # Deletes Jobs and their pods 5 minutes after completion
       template:
         spec:
           containers:
