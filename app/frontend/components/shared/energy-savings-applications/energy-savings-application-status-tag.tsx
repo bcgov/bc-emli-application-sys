@@ -20,6 +20,9 @@ export const EnergySavingsApplicationStatusTag = ({
     [EPermitApplicationStatus.newDraft]: "theme.blueLight",
     [EPermitApplicationStatus.revisionsRequested]: "semantic.errorLight",
     [EPermitApplicationStatus.ephemeral]: "theme.blueLight",
+    [EPermitApplicationStatus.viewed]: "theme.blueLight",
+    [EPermitApplicationStatus.updateNeeded]: "semantic.errorLight",
+    [EPermitApplicationStatus.accepted]: "theme.lightGreen",
   }
 
   const colorMap = {
@@ -28,6 +31,9 @@ export const EnergySavingsApplicationStatusTag = ({
     [EPermitApplicationStatus.newDraft]: "text.primary",
     [EPermitApplicationStatus.revisionsRequested]: "semantic.error",
     [EPermitApplicationStatus.ephemeral]: "text.primary",
+    [EPermitApplicationStatus.viewed]: "text.primary",
+    [EPermitApplicationStatus.updateNeeded]: "semantic.error",
+    [EPermitApplicationStatus.accepted]: "theme.primary",
   }
 
   return (

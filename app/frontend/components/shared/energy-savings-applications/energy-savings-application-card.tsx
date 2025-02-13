@@ -9,6 +9,7 @@ import { GreenLineSmall } from "../base/decorative/green-line-small"
 import { RouterLinkButton } from "../navigation/router-link-button"
 import SandboxHeader from "../sandbox/sandbox-header"
 import { EnergySavingsApplicationStatusTag } from "./energy-savings-application-status-tag"
+import { EPermitApplicationStatus, EPermitApplicationStatusGroup } from "../../../types/enums"
 
 interface IEnergySavingsApplicationCardProps {
   energySavingsApplication: IEnergySavingsApplication
@@ -49,16 +50,20 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
 
   return (
     <Flex
-      bg={showNewVersionWarning ? "semantic.warningLight" : "greys.white"}
       direction="column"
       borderRadius="lg"
       border="1px solid"
-      borderColor={showNewVersionWarning ? "semantic.warning" : "border.light"}
+      borderColor={
+        energySavingsApplication.status === EPermitApplicationStatus.updateNeeded ? "theme.yellow" : "border.light"
+      }
       p={8}
       align="center"
       gap={4}
       position="relative"
       cursor="pointer"
+      bg={
+        energySavingsApplication.status === EPermitApplicationStatus.updateNeeded ? "theme.orangeLight" : "greys.white"
+      }
     >
       {energySavingsApplication.sandbox && <SandboxHeader override sandbox={energySavingsApplication.sandbox} />}
       <Flex flexDirection={{ base: "column", md: "row" }} gap={6} w="full">
@@ -141,6 +146,17 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
                 <b>Action required:</b> Please review the changes an agent made to your application.  
               </Text>
             </Flex> */}
+            {energySavingsApplication.status === EPermitApplicationStatus.updateNeeded && (
+              <Flex bg="theme.orange" p={2} borderRadius={4} alignItems={"center"}>
+                <Box>
+                  <Warning size={16} aria-label={"warning icon"} />
+                </Box>
+                <Text fontSize="sm" ml={2}>
+                  <b>{t(`energySavingsApplication.card.actionRequired`)}</b>{" "}
+                  {t(`energySavingsApplication.card.reviewApplication`)}
+                </Text>
+              </Flex>
+            )}
             <Text color="text.link" fontSize="lg" fontWeight="bold">
               {nicknameSplitText?.[0]}
             </Text>

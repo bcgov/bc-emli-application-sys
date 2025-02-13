@@ -8,7 +8,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { useMountStatus } from "../../../hooks/use-mount-status"
-import { IPermitApplication } from "../../../models/energy-savings-application"
+import { IEnergySavingsApplication } from "../../../models/energy-savings-application"
 import { IErrorsBoxData } from "../../../types/types"
 import { getCompletedBlocksFromForm, getRequirementByKey } from "../../../utils/formio-component-traversal"
 import { singleRequirementFormJson, singleRequirementSubmissionData } from "../../../utils/formio-helpers"
@@ -23,7 +23,7 @@ import { PreviousSubmissionModal } from "../revisions/previous-submission-modal"
 import { PermitApplicationSubmitModal } from "./permit-application-submit-modal"
 
 interface IRequirementFormProps {
-  permitApplication?: IPermitApplication
+  permitApplication?: IEnergySavingsApplication
   onCompletedBlocksChange?: (sections: any) => void
   formRef: any
   triggerSave?: (params?: { autosave?: boolean; skipPristineCheck?: boolean }) => void
@@ -362,7 +362,7 @@ export const RequirementForm = observer(
           {permitApplication?.isSubmitted ? (
             <CustomMessageBox
               description={t("permitApplication.show.wasSubmitted", {
-                date: format(permitApplication.submittedAt, "MMM d, yyyy h:mm a"),
+                // date: format(permitApplication.submittedAt, "MMM d, yyyy h:mm a"),
                 jurisdictionName: jurisdiction.qualifiedName,
               })}
               status="info"

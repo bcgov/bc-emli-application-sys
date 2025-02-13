@@ -30,6 +30,7 @@ import { convertResourceArrayToRecord, setQueryParam } from "../utils/utility-fu
 const filterableStatus = Object.values(EPermitApplicationStatus)
 export type TFilterableStatus = (typeof filterableStatus)[number]
 
+
 export const PermitApplicationStoreModel = types
   .compose(
     types.model("PermitApplicationStore", {
@@ -37,8 +38,11 @@ export const PermitApplicationStoreModel = types
       tablePermitApplications: types.array(types.reference(EnergySavingsApplicationModel)),
       currentPermitApplication: types.maybeNull(types.reference(EnergySavingsApplicationModel)),
       statusFilter: types.optional(types.array(types.enumeration(filterableStatus)), [
-        EPermitApplicationStatus.newDraft,
-        EPermitApplicationStatus.revisionsRequested,
+        EPermitApplicationStatus.draft,
+        EPermitApplicationStatus.submitted,
+        EPermitApplicationStatus.viewed,
+        EPermitApplicationStatus.updateNeeded,
+        EPermitApplicationStatus.accepted,
       ]),
       templateVersionIdFilter: types.maybeNull(types.string),
       requirementTemplateIdFilter: types.maybeNull(types.string),
@@ -50,10 +54,10 @@ export const PermitApplicationStoreModel = types
   .extend(withMerge())
   .views((self) => ({
     get draftStatuses() {
-      return [EPermitApplicationStatus.newDraft, EPermitApplicationStatus.revisionsRequested]
+      return [EPermitApplicationStatus.draft]
     },
     get submittedStatuses() {
-      return [EPermitApplicationStatus.newlySubmitted, EPermitApplicationStatus.resubmitted]
+      return [EPermitApplicationStatus.submitted]
     },
   }))
   .views((self) => ({
@@ -77,6 +81,9 @@ export const PermitApplicationStoreModel = types
       const map = {
         [self.draftStatuses.join(",")]: EPermitApplicationStatusGroup.draft,
         [self.submittedStatuses.join(",")]: EPermitApplicationStatusGroup.submitted,
+        [self.submittedStatuses.join(",")]: EPermitApplicationStatusGroup.viewed,
+        [self.submittedStatuses.join(",")]: EPermitApplicationStatusGroup.updateNeeded,
+        [self.submittedStatuses.join(",")]: EPermitApplicationStatusGroup.accepted,
       }
       return map[self.statusFilter.join(",")]
     },
@@ -291,13 +298,10 @@ export const PermitApplicationStoreModel = types
         },
       } as TSearchParams<EPermitApplicationSortFields, IEnergySavingsApplicationSearchFilters>
 
-      console.log("searchParams", searchParams)
       const currentJurisdictionId = self.rootStore?.jurisdictionStore?.currentJurisdiction?.id
-      console.log("currentJurisdictionId", currentJurisdictionId)
       const response = currentJurisdictionId
         ? yield self.environment.api.fetchJurisdictionPermitApplications(currentJurisdictionId, searchParams)
         : yield self.environment.api.fetchPermitApplications(searchParams)
-      console.log("response", response)
       if (response.ok) {
         self.mergeUpdateAll(response.data.data, "permitApplicationMap")
         ;(self?.rootStore?.jurisdictionStore?.currentJurisdiction ?? self).setTablePermitApplications(
@@ -314,7 +318,6 @@ export const PermitApplicationStoreModel = types
     fetchPermitApplication: flow(function* (id: string, review?: boolean) {
       // If the user is review staff, we still need to hit the show endpoint to update viewedAt
       const { ok, data: response } = yield self.environment.api.fetchPermitApplication(id, review)
-      console.log("data......>", response)
       if (ok && response.data) {
         const permitApplication = response.data
 
@@ -329,7 +332,7 @@ export const PermitApplicationStoreModel = types
       const statusFilter = queryParams.get("status")?.split(",") as TFilterableStatus[]
       const templateVersionIdFilter = queryParams.get("templateVersionId")
       const requirementTemplateIdFilter = queryParams.get("requirementTemplateId")
-
+      //show all the applications
       self.setStatusFilter(statusFilter)
       self.requirementTemplateIdFilter = requirementTemplateIdFilter
       self.templateVersionIdFilter = templateVersionIdFilter
