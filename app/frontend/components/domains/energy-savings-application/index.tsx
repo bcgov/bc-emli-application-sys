@@ -18,12 +18,14 @@ import { SharedSpinner } from "../../shared/base/shared-spinner"
 import { EnergySavingsApplicationCard } from "../../shared/energy-savings-applications/energy-savings-application-card"
 import { RouterLinkButton } from "../../shared/navigation/router-link-button"
 import { SortSelect } from "../../shared/select/selectors/sort-select"
+import { PermitApplicationStatusTabs } from "../../shared/energy-savings-applications/permit-application-status-tabs"
+import { EnergySavingsApplicationFilter } from "../../shared/energy-savings-applications/energy-savings-application-filter"
 
 interface IEnergySavingsApplicationIndexScreenProps {}
 
 export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsApplicationIndexScreenProps) => {
   const { t } = useTranslation()
-  const [selectedFilter, setSelectedFilter] = useState("Filter")
+  const [selectedFilter, setSelectedFilter] = useState("filter")
   const { permitApplicationStore, sandboxStore } = useMst()
   const {
     tablePermitApplications,
@@ -84,18 +86,7 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
               w={{ base: "full", md: "fit-content" }}
             >
               <Flex direction={{ base: "row" }} alignItems={{ md: "end", base: "end" }} gap={4}>
-                <Menu>
-                  <MenuButton as={Button} leftIcon={<Funnel />} rightIcon={<CaretDown />} bg="transparent">
-                    {selectedFilter}
-                  </MenuButton>
-                  <MenuList>
-                    {Object.entries(filters).map(([key, value]) => (
-                      <MenuItem key={key} onClick={() => handleFilterSelect(value)}>
-                        {value}
-                      </MenuItem>
-                    ))}
-                  </MenuList>
-                </Menu>
+                <EnergySavingsApplicationFilter />
                 {hasResetableFilters && (
                   <Button variant="link" mb={2} onClick={resetQueryParams}>
                     {t("ui.resetFilters")}

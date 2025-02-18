@@ -869,6 +869,9 @@ const options = {
             collaborationCalloutDraft:
               "<1>{{authorName}} has assigned you to this permit.</1> Collaborate on this permit application.",
             collaborationCalloutSubmitted: "<1>{{authorName}} assigned you to this permit.</1>",
+            actionRequired: "Action required:",
+            reviewApplication:
+              "An agent has reviewed your application and needs more information. Please review and update your application.",
           },
           referenceNumber: "Reference #",
           pdf: {
@@ -901,6 +904,7 @@ const options = {
           viewed: "Viewed",
           notViewed: "New",
           newlyRevised: "Newly revised",
+          reset: "Reset",
           status: {
             new_draft: "Draft",
             newly_submitted: "Submitted",
@@ -919,8 +923,13 @@ const options = {
             accepted: "Accepted",
           },
           statusGroup: {
-            draft: "Draft permits",
-            submitted: "Submitted permits",
+            filter: "Filter",
+            all: "All",
+            draft: "Draft",
+            submitted: "Submitted",
+            viewed: "Viewed",
+            updateNeeded: "Update needed",
+            accepted: "Accepted",
           },
           columns: {
             number: "Application #",

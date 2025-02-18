@@ -6,7 +6,10 @@ module PermitApplicationStatus
            new_draft: 0,
            newly_submitted: 1,
            revisions_requested: 3,
-           resubmitted: 4
+           resubmitted: 4,
+           viewed: 5,
+           update_needed: 6,
+           accepted: 7
          },
          _default: 0
 
