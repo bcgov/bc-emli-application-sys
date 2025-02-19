@@ -29,7 +29,6 @@ services:
       - /app/node_modules
     ports:
       - "3000:3000"
-      - "12345:12345"
     depends_on:
       - postgres
       - redis
