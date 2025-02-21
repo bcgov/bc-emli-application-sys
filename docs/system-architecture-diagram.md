@@ -31,6 +31,7 @@ graph TD;
             Postgres[Postgres DB]
             Redis[Redis Cache]
             Elastic[Elasticsearch]
+            Sidekiq[Sidekiq: Task Scheduler]
         end
     end
 
