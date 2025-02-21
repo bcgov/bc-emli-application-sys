@@ -1,6 +1,10 @@
 # System Architecture Diagram
 
 ```mermaid
+---
+title: Home Energy - System Architecture Diagram
+---
+
 graph TD;
     %% Authentication Flow (Confidential OIDC via Keycloak)
     User[User] -->|Accesses| Browser[Browser]
