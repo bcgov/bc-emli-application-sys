@@ -20,11 +20,13 @@ class User < ApplicationRecord
          jwt_revocation_strategy: self
 
   enum role: {
-         submitter: 0,
-         review_manager: 1,
-         reviewer: 2,
-         super_admin: 3,
-         regional_review_manager: 4
+         participant: 0,
+         admin_manager: 1,
+         admin: 2,
+         system_admin: 3,
+         #regional_review_manager: 4
+         participant_support_rep: 5,
+         contractor: 6,
        },
        _default: 0
 
@@ -71,7 +73,7 @@ class User < ApplicationRecord
   validate :jurisdiction_must_belong_to_correct_roles
   validate :confirmed_user_has_fields
   validate :unique_omniauth_uid
-  validate :single_jurisdiction, unless: :regional_review_manager?
+  #validate :single_jurisdiction, unless: :regional_review_manager?
 
   after_commit :refresh_search_index, if: :saved_change_to_discarded_at
   after_commit :reindex_jurisdiction_user_size
@@ -93,11 +95,10 @@ class User < ApplicationRecord
 
   def eula_variant
     {
-      submitter: "terms",
-      reviewer: "employee",
-      review_manager: "employee",
-      regional_review_manager: "employee",
-      super_admin: nil
+      participant: "terms",
+      admin: "terms",
+      admin_manager: "terms",
+      system_admin: nil
     }[
       role.to_sym
     ]
@@ -124,25 +125,25 @@ class User < ApplicationRecord
 
   def invitable_roles
     case role
-    when "super_admin"
-      %w[reviewer review_manager super_admin regional_review_manager]
-    when "review_manager", "regional_review_manager"
-      %w[reviewer review_manager]
+    when "system_admin"
+      %w[admin admin_manager participant_support_rep]
+    when "admin_manager"
+      %w[admin participant_support_rep]
     else
       []
     end
   end
 
   def staff?
-    review_staff? || super_admin?
+    review_staff? || system_admin?
   end
 
   def manager?
-    review_manager? || regional_review_manager?
+    admin_manager?
   end
 
   def review_staff?
-    reviewer? || review_manager? || regional_review_manager?
+    admin? || admin_manager?
   end
 
   def role_name
@@ -188,7 +189,7 @@ class User < ApplicationRecord
   end
   
   def save_user_address(address_data)
-    Rails.logger.info "Address Data: #{address_data.inspect}"  # Debugging log
+    #Rails.logger.info "Address Data: #{address_data.inspect}"  # Debugging log
 
     return unless address_data.present?
 
@@ -269,13 +270,13 @@ class User < ApplicationRecord
         .where.not(omniauth_uid: nil)
         .find_by(omniauth_uid:, omniauth_provider:)
     return unless existing_user && existing_user != self
-    if !super_admin?
+    if !system_admin?
       errors.add(
         :base,
         :bceid_taken,
         jurisdiction: existing_user.jurisdictions.first&.name
       )
-    elsif super_admin?
+    elsif system_admin?
       errors.add(:base, :idir_taken)
     end
   end
@@ -286,6 +287,6 @@ class User < ApplicationRecord
   end
 
   def valid_role_change
-    errors.add(:base, :admin_role_change) if role_was.to_sym == :super_admin
+    errors.add(:base, :admin_role_change) if role_was.to_sym == :system_admin
   end
 end

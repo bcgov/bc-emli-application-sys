@@ -43,15 +43,16 @@ export const UserInput = observer(({ index, remove, adminOnly }: IUserInputProps
               return (
                 <>
                   <Select bg="greys.white" placeholder={t("ui.pleaseSelect")} {...field}>
+                    {/* TOOD: This needs to be adjusted as per our rules */}
                     {adminOnly ? (
-                      <option value={EUserRoles.superAdmin}>{t(`user.roles.${EUserRoles.superAdmin}`)}</option>
+                      <option value={EUserRoles.systemAdmin}>{t(`user.roles.${EUserRoles.systemAdmin}`)}</option>
                     ) : (
                       <>
-                        <option value={EUserRoles.reviewer}>{t(`user.roles.${EUserRoles.reviewer}`)}</option>
-                        <option value={EUserRoles.reviewManager}>{t(`user.roles.${EUserRoles.reviewManager}`)}</option>
-                        <option value={EUserRoles.regionalReviewManager}>
+                        <option value={EUserRoles.admin}>{t(`user.roles.${EUserRoles.admin}`)}</option>
+                        <option value={EUserRoles.adminManager}>{t(`user.roles.${EUserRoles.adminManager}`)}</option>
+                        {/* <option value={EUserRoles.regionalReviewManager}>
                           {t(`user.roles.${EUserRoles.regionalReviewManager}`)}
-                        </option>
+                        </option> */}
                       </>
                     )}
                   </Select>

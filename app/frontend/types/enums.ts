@@ -64,11 +64,13 @@ export enum ExternalApiKeyStatus {
 }
 
 export enum EUserRoles {
-  submitter = "submitter",
-  regionalReviewManager = "regional_review_manager",
-  reviewManager = "review_manager",
-  reviewer = "reviewer",
-  superAdmin = "super_admin",
+  participant = "participant",
+  //regionalReviewManager = "regional_review_manager",
+  participantSupportRep = "participant_support_rep",
+  adminManager = "admin_manager",
+  admin = "admin",
+  systemAdmin = "system_admin",
+  contractor = "contractor",
 }
 
 export enum ERequirementLibrarySortFields {
@@ -372,7 +374,7 @@ export enum EEnergyStepCodeDependencyRequirementCode {
 }
 
 export enum EOmniauthProvider {
-  idir = "idir",
+  idir = "azureidir",
   basicBceid = "bceidbasic",
   businessBceid = "bceidbusiness",
   bcsc = "bcsc",

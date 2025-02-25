@@ -17,9 +17,9 @@ class OmniauthUserResolver
   private
 
   OMNIAUTH_PROVIDERS = {
-    idir: "idir",
+    idir: "azureidir",
     bcsc: "bcsc",
-    bceid: "bceidboth",
+    #bceid: "bceidboth",
     bceid_business: "bceidbusiness",
     bceid_basic: "bceidbasic"
   }
@@ -73,7 +73,8 @@ class OmniauthUserResolver
   end
 
   def create_user
-    return if omniauth_provider == OMNIAUTH_PROVIDERS[:idir]
+    #return if omniauth_provider == OMNIAUTH_PROVIDERS[:idir]
+    
     user =
       User.new(
         password: Devise.friendly_token[0, 20],
@@ -84,6 +85,7 @@ class OmniauthUserResolver
         first_name: omniauth_givenname,
         last_name: omniauth_familyname,
         email: omniauth_email
+        
       )
 
     # skip confirmation until user has a chance to add/verify their notification email
@@ -91,8 +93,10 @@ class OmniauthUserResolver
     
     # Skip validation initially, so we can add addresses first
     if user.save(validate: false)
-      user.save_user_address(omniauth_address)
-
+      if omniauth_provider ==ENV["KEYCLOAK_CLIENT"]
+        user.save_user_address(omniauth_address)
+      end
+      
       # Now run full validations
       if user.valid?
         user.save
@@ -129,6 +133,7 @@ class OmniauthUserResolver
   end
 
   def omniauth_provider
+    #Rails.logger.info("RawInfo: #{raw_info}")
     @provider ||=
       case raw_info.identity_provider
       when OMNIAUTH_PROVIDERS[:bceid]
@@ -147,10 +152,11 @@ class OmniauthUserResolver
 
   def omniauth_uid
     @uid ||= 
-      if raw_info.identity_provider == ENV["KEYCLOAK_CLIENT"]
+      case raw_info.identity_provider
+      when ENV["KEYCLOAK_CLIENT"] || OMNIAUTH_PROVIDERS[:idir]
         raw_info.sub.split("@").first
       else
-        raw_info.bceid_user_guid || raw_info.idir_user_guid
+        raw_info.bceid_user_guid
       end
   end
 
@@ -160,10 +166,13 @@ class OmniauthUserResolver
 
   def omniauth_username
     @username ||= 
-      if raw_info.identity_provider == ENV["KEYCLOAK_CLIENT"]
+      case raw_info.identity_provider
+      when ENV["KEYCLOAK_CLIENT"]
         raw_info.sub.split("@").first
+      when OMNIAUTH_PROVIDERS[:idir]
+        raw_info.idir_username
       else
-        raw_info.bceid_username || raw_info.idir_username
+        raw_info.bceid_username
       end
   end
 

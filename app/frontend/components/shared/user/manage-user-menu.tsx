@@ -46,7 +46,7 @@ export const ManageUserMenu = observer(function ManageUserMenu<TSearchModel exte
           {t("ui.manage")}
         </MenuButton>
         <MenuList>
-          {user.role != EUserRoles.superAdmin && (
+          {user.role != EUserRoles.systemAdmin && (
             <Can action="user:updateRole">
               <ManageMenuItemButton
                 color={isCurrentUser ? "greys.grey01" : "text.primary"}

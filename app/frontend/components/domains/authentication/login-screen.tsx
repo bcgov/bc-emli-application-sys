@@ -35,12 +35,12 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
         >
           <VStack spacing={2} align="start">
             <Heading as="h1" mb={0} color="theme.blueAlt">
-              {isAdmin ? t("auth.adminLogin") : t("auth.login")}
+              {isAdmin ? t("auth.adminLogin") : t("auth.participantLogin")}
             </Heading>
             {!isAdmin && <Text fontSize="md">{t("auth.bcServiceCardInfo.prompt")}</Text>}
           </VStack>
           <form action="/api/auth/keycloak" method="post">
-            <input type="hidden" name="kc_idp_hint" value={isAdmin ? "idir" : "bcsc"} />
+            <input type="hidden" name="kc_idp_hint" value="bcsc" />
             {/* @ts-ignore */}
             <input
               type="hidden"
@@ -81,20 +81,31 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
                 <Phone size={16} />
                 <Text flex={1}>{t("auth.phoneNumber")}</Text>
               </Flex>
+              <Box>
+                <Text fontWeight="bold">{t("auth.bcServiceCardInfo.noBCServicesCard")}</Text>
+                <form id="authForm" action="/api/auth/keycloak" method="post">
+                  <input type="hidden" name="kc_idp_hint" value="bceidbasic" />
+                  {/* @ts-ignore */}
+                  <input
+                    type="hidden"
+                    name="authenticity_token"
+                    value={document.querySelector("[name=csrf-token]").content}
+                  />
+                </form>
+
+                <Link href="#" onClick={() => document.getElementById('authForm').submit()}>
+                  {t("auth.bcServiceCardInfo.bceidLogin")}
+                </Link>
+                  
+              </Box>
               <Divider my={4} />
               <Heading as="h2" m={0} color="theme.blueAlt">
                 {t("auth.bceidInfo.needHelp")}
               </Heading>
-
               <EnergyCoachInfoBlock />
             </>
           )}
         </Flex>
-        {currentPath === "/login" && !showContractor && (
-          <Box height="auto">
-            <ContractorInfoBlock />
-          </Box>
-        )}
       </Flex>
     </CenterContainer>
   )

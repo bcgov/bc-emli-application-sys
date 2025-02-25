@@ -4,6 +4,7 @@ import { IJurisdiction } from "../models/jurisdiction"
 import { IUser } from "../models/user"
 import { EUserRoles } from "../types/enums"
 
+//TODO: This is find grained role based access control, need to be adjusted for new roles.
 const sharedStaticRules = ["jurisdiction:view"]
 
 const sharedDynamicRules = {
@@ -20,7 +21,7 @@ const reviewManagerRules = {
 }
 
 export const rules = {
-  [EUserRoles.superAdmin]: {
+  [EUserRoles.systemAdmin]: {
     static: [
       ...sharedStaticRules,
       "jurisdiction:create",
@@ -30,13 +31,14 @@ export const rules = {
     ],
     dynamic: { ...sharedDynamicRules },
   },
-  [EUserRoles.reviewManager]: reviewManagerRules,
-  [EUserRoles.regionalReviewManager]: reviewManagerRules,
-  [EUserRoles.reviewer]: {
+  [EUserRoles.adminManager]: reviewManagerRules,
+  //[EUserRoles.regionalReviewManager]: reviewManagerRules,
+  
+  [EUserRoles.admin]: {
     static: [...sharedStaticRules, "user:view", "application:download"],
     dynamic: { ...sharedDynamicRules },
   },
-  [EUserRoles.submitter]: {
+  [EUserRoles.participant]: {
     static: [...sharedStaticRules],
     dynamic: { ...sharedDynamicRules },
   },

@@ -11,6 +11,7 @@ import { SupportScreen } from "../misc/support-screen"
 import { EULAScreen } from "../onboarding/eula"
 import { NavBar } from "./nav-bar"
 import { ProtectedRoute } from "./protected-route"
+import { AdminPortalLogin } from "../admin/login"
 
 const ExternalApiKeysIndexScreen = lazy(() =>
   import("../external-api-key").then((module) => ({ default: module.ExternalApiKeysIndexScreen }))
@@ -520,7 +521,10 @@ const AppRoutes = observer(() => {
 
         <Route element={<ProtectedRoute isAllowed={!loggedIn} redirectPath="/" />}>
           <Route path="/login" element={<LoginScreen />} />
-          <Route path="/admin" element={<LoginScreen isAdmin />} />
+          <Route path="/admin" element={<AdminPortalLogin isAdmin />} />
+          <Route path="/psr" element={<AdminPortalLogin isPSR />} />
+          <Route path="/admin-mgr" element={<AdminPortalLogin isAdminMgr />} />
+          <Route path="/sys-admin" element={<AdminPortalLogin isSysAdmin />} />
         </Route>
         {/* Public Routes */}
         <Route path="/accept-invitation" element={<AcceptInvitationScreen />} />
