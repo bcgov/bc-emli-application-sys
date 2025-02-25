@@ -10,6 +10,7 @@ export const Footer = observer(() => {
   const location = useLocation()
   const {
     sessionStore: { loggedIn },
+    userStore: { currentUser },
   } = useMst()
   const { t } = useTranslation()
   const onlyShowFooterOnRoutes = [
@@ -24,7 +25,9 @@ export const Footer = observer(() => {
     "/get-support",
   ]
 
-  const shouldShowFooter = onlyShowFooterOnRoutes.some((route) => location.pathname.startsWith(route))
+  const shouldShowFooter = onlyShowFooterOnRoutes.some(
+    (route) => location.pathname.startsWith(route) || (location.pathname === "/" && !currentUser?.isSubmitter)
+  )
 
   return (
     <>
