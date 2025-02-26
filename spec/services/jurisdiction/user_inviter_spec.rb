@@ -4,8 +4,8 @@ RSpec.describe Jurisdiction::UserInviter, type: :service do
   let(:email) { "user@test.com" }
   let(:inviter) { build_stubbed(:user, :super_admin) }
   let(:jurisdiction) { create(:sub_district) }
-  let(:existing_user_role) { :review_manager }
-  let(:invited_role) { :review_manager }
+  let(:existing_user_role) { :admin_manager }
+  let(:invited_role) { :admin_manager }
   let(:users_params) do
     [
       {
