@@ -12,12 +12,12 @@ FactoryBot.define do
     end
 
     trait :review_manager do
-      role { :admin }
+      role { :admin_manager }
       association :jurisdiction, factory: :sub_district
     end
 
     trait :reviewer do
-      role { :admin_manager }
+      role { :admin }
       association :jurisdiction, factory: :sub_district
     end
 

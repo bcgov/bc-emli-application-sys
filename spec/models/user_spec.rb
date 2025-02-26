@@ -47,20 +47,20 @@ RSpec.describe User, type: :model do
   # end
 
   describe "invitable roles" do
-    it "a system admin can invite admins, admin managers, system admins" do
+    it "a system admin can invite admin, admin_manager, participant_support_rep" do
       inviter = build(:user, :super_admin)
       expect(inviter.invitable_roles).to match_array(
-        %w[admin admin_manager regional_review_manager system_admin]
+        %w[admin admin_manager participant_support_rep]
       )
     end
     it "a admin manager can invite admin and admin managers" do
-      inviter = build(:user, :review_manager)
+      inviter = build(:user, :reviewer)
       expect(inviter.invitable_roles).to match_array(
-        %w[admin admin_manager]
+        %w[admin participant_support_rep]
       )
     end
     it "a admin cannot invite anyone" do
-      inviter = build(:user, :reviewer)
+      inviter = build(:user, :reviewer_manager)
       expect(inviter.invitable_roles).to match_array([])
     end
   end

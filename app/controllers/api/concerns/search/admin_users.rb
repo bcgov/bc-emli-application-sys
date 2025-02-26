@@ -7,14 +7,7 @@ module Api::Concerns::Search::AdminUsers
         user_query,
         where: {
           discarded: discarded,
-          role:
-            (
-              if current_user.system_admin
-                ["system_admin"]
-              else
-                nil
-              end
-            )
+          role: (current_user&.system_admin? ? ["system_admin"] : [])
         },
         order: user_order,
         match: :word_start,
