@@ -9,8 +9,8 @@ module Api::Concerns::Search::AdminUsers
           discarded: discarded,
           role:
             (
-              if current_user.super_admin?
-                ["super_admin"]
+              if current_user.system_admin
+                ["system_admin"]
               else
                 nil
               end
