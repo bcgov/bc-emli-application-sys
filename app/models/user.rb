@@ -27,8 +27,9 @@ class User < ApplicationRecord
          #regional_review_manager: 4
          participant_support_rep: 5,
          contractor: 6,
+         unassigned: 7,
        },
-       _default: 0
+       _default: :participant
 
   # https://github.com/waiting-for-dev/devise-jwt
   self.skip_session_storage = %i[http_auth params_auth]
@@ -98,6 +99,9 @@ class User < ApplicationRecord
       participant: "terms",
       admin: "terms",
       admin_manager: "terms",
+      participant_support_rep: "terms",
+      contractor: "terms",
+      unassigned: "terms",
       system_admin: nil
     }[
       role.to_sym

@@ -71,6 +71,7 @@ export enum EUserRoles {
   admin = "admin",
   systemAdmin = "system_admin",
   contractor = "contractor",
+  unassigned = "unassigned"
 }
 
 export enum ERequirementLibrarySortFields {

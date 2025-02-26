@@ -1,14 +1,11 @@
 import { Box, Divider, Flex, Heading, HStack, Link, Text, VStack, Button } from "@chakra-ui/react"
-import { ArrowSquareOut, Phone } from "@phosphor-icons/react"
-import React, { useEffect, useState } from "react"
+import { ArrowSquareOut } from "@phosphor-icons/react"
+import React from "react"
 import { useTranslation } from "react-i18next"
-import { ContractorInfoBlock } from "../../shared/bcservicecard/contractor"
-import { EnergyCoachInfoBlock } from "../../shared/bcservicecard/energy-coach"
 import { CenterContainer } from "../../shared/containers/center-container"
-import { RouterLinkButton } from "../../shared/navigation/router-link-button"
-import { useLocation } from "react-router-dom"
+import { storeEntryPoint } from "../../shared/store-entry-point"
 
-interface ILoginScreenProps {
+export interface ILoginScreenProps {
   isAdmin?: boolean
   isPSR?: boolean
   isAdminMgr?: boolean
@@ -17,7 +14,8 @@ interface ILoginScreenProps {
 
 export const AdminPortalLogin = ({ isAdmin, isPSR, isAdminMgr, isSysAdmin }: ILoginScreenProps) => {
   const { t } = useTranslation()
-  const location = useLocation()
+  const loginScreenProps = { isAdmin, isPSR, isAdminMgr, isSysAdmin };
+  const loginKey = Object.keys(loginScreenProps).filter(key => loginScreenProps[key as keyof ILoginScreenProps] !== undefined)[0];
 
   const loginType = () => {
     if (isAdmin) {
@@ -36,7 +34,18 @@ export const AdminPortalLogin = ({ isAdmin, isPSR, isAdminMgr, isSysAdmin }: ILo
   // Usage
   const loginMessage = loginType();
   
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault(); // Prevent the default form submission
+
+    // Store the entry point in the session
+    await storeEntryPoint(loginKey);
+
+    // Submit the form after storing the entry point
+    (event.target as HTMLFormElement).submit();
+  };
+
   return (
+    // @ts-ignore
     <CenterContainer h="full">
       <Flex direction={{ base: "column", md: "row" }} gap={10}>
         <Flex
@@ -56,13 +65,12 @@ export const AdminPortalLogin = ({ isAdmin, isPSR, isAdminMgr, isSysAdmin }: ILo
             </Heading>
             <Text fontSize="md">{t("auth.adminPortalLoginInfo.login")}</Text>
           </VStack>
-          <form action="/api/auth/keycloak" method="post">
+          <form action="/api/auth/keycloak" method="post" onSubmit={handleSubmit}>
             <input type="hidden" name="kc_idp_hint" value="azureidir" />
-            {/* @ts-ignore */}
             <input
               type="hidden"
               name="authenticity_token"
-              value={document.querySelector("[name=csrf-token]").content}
+              value={(document.querySelector("[name=csrf-token]") as HTMLMetaElement).content}
             />
             <Button variant="primary" w="full" type="submit" rightIcon={<ArrowSquareOut size={16} />}>
               {t("auth.adminPortalLoginInfo.button")}
@@ -83,15 +91,14 @@ export const AdminPortalLogin = ({ isAdmin, isPSR, isAdminMgr, isSysAdmin }: ILo
             <Text fontWeight="bold">{t("auth.adminPortalLoginInfo.noAccount.text")}</Text>
             <form id="authForm" action="/api/auth/keycloak" method="post">
               <input type="hidden" name="kc_idp_hint" value="bceidbusiness" />
-              {/* @ts-ignore */}
               <input
                 type="hidden"
                 name="authenticity_token"
-                value={document.querySelector("[name=csrf-token]").content}
+                value={(document.querySelector("[name=csrf-token]") as HTMLMetaElement).content}
               />
             </form>
 
-            <Link href="#" onClick={() => document.getElementById('authForm').submit()}>
+            <Link href="#" onClick={() => (document.getElementById('authForm') as HTMLFormElement).submit()}>
               {t("auth.adminPortalLoginInfo.noAccount.altLoginText")}
             </Link>
 
