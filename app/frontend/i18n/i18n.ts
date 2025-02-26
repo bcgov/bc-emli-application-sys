@@ -428,6 +428,7 @@ const options = {
           seeLiveButton: "See Live",
           invite: "Invite",
           public: "Public",
+          comingSoon: "Coming soon",
         },
         notification: {
           title: "Notifications",
@@ -1687,11 +1688,13 @@ const options = {
           },
         },
         home: {
-          jurisdictionsTitle: "Jurisdictions",
+          auditLog: "Audit Log",
+          jurisdictionsTitle: "Programs",
           siteConfigurationTitle: "Configuration management",
           jurisdictionsDescription:
             "Administer Review Managers and their roles within local jurisdictions through the Building Permit Hub. This includes inviting or removing managers, managing overall jurisdictions, customizing community pages, and handling jurisdiction-specific settings.",
-          permitTemplateCatalogueTitle: "Permit templates catalogue",
+          permitTemplateCatalogueTitle: "Applications templates catalogue",
+          permitTemplateCatalogueTitleShort: "Applications catalogue",
           reportingTitle: "Reporting",
           reportingDescription:
             "Explore reports and analytics to gain insights and make informed decisions about your permit applications",
@@ -1784,7 +1787,8 @@ const options = {
               description: "Manage API keys for the Building Permit Hub.",
             },
           },
-          superAdminTitle: "Admin home",
+          superAdminTitle: "System admin portal",
+          systemAdminTitle: "System admin portal",
           submissionsInboxTitle: "Submissions inbox",
           submissionsInboxDescription: "View all submitted building permit applications.",
           permitsTitle: "Digital building permits",
@@ -1921,6 +1925,7 @@ const options = {
             review_manager: "review manager",
             reviewer: "reviewer",
             super_admin: "super admin",
+            system_admin: "system admin",
           },
           rolesExplanation: {
             submitter:
@@ -2343,7 +2348,7 @@ const options = {
         site: {
           title: "Better Homes Energy Savings Program application",
           titleLong: "Better Homes Energy Savings Program",
-          adminNavBarTitle: "Building Permit Hub - Admin Panel",
+          adminNavBarTitle: "Better Homes Energy Savings Program application",
           adminPanel: "Admin Panel",
           beta: "Beta",
           linkHome: "Navigate home",

@@ -73,10 +73,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, answers, onAnswer
                   borderColor="border.light"
                   justifyContent="center"
                   width={{ base: "100%", md: "calc(22% - 14px)" }}
-                  height={{
-                    base: "calc(70px + 1vw)",
-                    md: "calc(28px + 2vw)",
-                  }}
                 >
                   <Radio value={answer}>
                     <Text>{answer}</Text>
