@@ -24,7 +24,7 @@ class User < ApplicationRecord
          admin_manager: 1,
          admin: 2,
          system_admin: 3,
-         #regional_review_manager: 4
+         regional_review_manager: 4,  # unused, only still relevant for old tests until they are cleaned up
          participant_support_rep: 5,
          contractor: 6,
          unassigned: 7,

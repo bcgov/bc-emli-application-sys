@@ -71,11 +71,11 @@ class Jurisdiction < ApplicationRecord
   end
 
   def review_managers
-    users&.kept&.review_manager
+    users&.kept&.admin_manager
   end
 
   def reviewers
-    users&.kept&.reviewer
+    users&.kept&.admin
   end
 
   def assign_unique_prefix
