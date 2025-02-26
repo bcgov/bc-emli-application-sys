@@ -194,7 +194,7 @@ export const NavBar = observer(function NavBar() {
               )}
               {currentUser?.isSuperAdmin && (
                 <Text color="text.primary" textTransform="capitalize">
-                  {t(`user.roles.${currentUser.role as EUserRoles}`)}
+                  {t("user.roles.system_admin")}
                 </Text>
               )}
               {/* {(!loggedIn || currentUser?.isSubmitter) && (

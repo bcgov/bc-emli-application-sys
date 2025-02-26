@@ -1788,6 +1788,7 @@ const options = {
             },
           },
           superAdminTitle: "System admin portal",
+          systemAdminTitle: "System admin portal",
           submissionsInboxTitle: "Submissions inbox",
           submissionsInboxDescription: "View all submitted building permit applications.",
           permitsTitle: "Digital building permits",
@@ -1923,7 +1924,8 @@ const options = {
             regional_review_manager: "regional review manager",
             review_manager: "review manager",
             reviewer: "reviewer",
-            super_admin: "system admin",
+            super_admin: "super admin",
+            system_admin: "system admin",
           },
           rolesExplanation: {
             submitter:

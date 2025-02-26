@@ -11,7 +11,7 @@ export const SuperAdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
 
   return (
     <Flex as="main" direction="column" w="full" bg="greys.white" pb="24">
-      <BlueTitleBar title={t("home.superAdminTitle")} />
+      <BlueTitleBar title={t("home.systemAdminTitle")} />
       <Container maxW="container.md" py={16}>
         <Flex direction="column" align="center" w="full">
           <Flex direction="column" align="center" w="full" gap={6}>
