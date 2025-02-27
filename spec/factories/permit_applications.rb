@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :permit_application do
-    association :submitter, factory: :user, role: "submitter"
+    association :submitter, factory: :user, role: "participant"
     association :jurisdiction, factory: :sub_district
     permit_type do
       PermitType.first || association(:permit_type, code: :low_residential)

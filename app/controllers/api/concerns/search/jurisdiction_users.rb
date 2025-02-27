@@ -11,11 +11,11 @@ module Api::Concerns::Search::JurisdictionUsers
           # Only show the review managers if current user is a super admin, but also show reviewers if a review manager
           role:
             (
-              if current_user.super_admin?
-                %w[review_manager regional_review_manager]
-              elsif current_user.review_manager? ||
+              if current_user.system_admin?
+                %w[admin admin_manager]
+              elsif current_user.admin_manager? ||
                     current_user.regional_review_manager?
-                %w[regional_review_manager review_manager reviewer]
+                %w[admin admin_manager]
               else
                 nil
               end

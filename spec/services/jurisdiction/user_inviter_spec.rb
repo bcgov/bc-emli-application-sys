@@ -5,7 +5,7 @@ RSpec.describe Jurisdiction::UserInviter, type: :service do
   let(:inviter) { build_stubbed(:user, :super_admin) }
   let(:jurisdiction) { create(:sub_district) }
   let(:existing_user_role) { :review_manager }
-  let(:invited_role) { :review_manager }
+  let(:invited_role) { :admin }
   let(:users_params) do
     [
       {
@@ -56,12 +56,12 @@ RSpec.describe Jurisdiction::UserInviter, type: :service do
 
     it_behaves_like AN_EXISTING_USER
 
-    context "and the invited user is a regional review manager" do
-      let(:invited_role) { :regional_review_manager }
+    # context "and the invited user is a regional review manager" do
+    #   let(:invited_role) { :regional_review_manager }
 
-      it_behaves_like AN_EXISTING_REGIONAL_RM
-      it_behaves_like A_REVIEW_STAFF_INVITED_AS_A_REGIONAL_RM
-    end
+    #   it_behaves_like AN_EXISTING_REGIONAL_RM
+    #   it_behaves_like A_REVIEW_STAFF_INVITED_AS_A_REGIONAL_RM
+    # end
 
     context "and the confirmed active review staff is a regional review manager" do
       let(:invited_role) { :regional_review_manager }

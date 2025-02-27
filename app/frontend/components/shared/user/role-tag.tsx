@@ -8,19 +8,21 @@ interface IRoleTagProps {
 }
 
 const roleColors: { [key in EUserRoles]: string } = {
-  [EUserRoles.submitter]: "transparent",
-  [EUserRoles.regionalReviewManager]: "hover.blue",
-  [EUserRoles.reviewManager]: "hover.blue",
-  [EUserRoles.reviewer]: "greys.grey20",
-  [EUserRoles.superAdmin]: "transparent",
+  [EUserRoles.participant]: "transparent",
+  [EUserRoles.contractor]: "transpaerent",
+  [EUserRoles.participantSupportRep]: "hover.blue",
+  [EUserRoles.adminManager]: "hover.blue",
+  [EUserRoles.admin]: "greys.grey20",
+  [EUserRoles.systemAdmin]: "transparent",
 }
 
 const roleBorderColors: { [key in EUserRoles]: string } = {
-  [EUserRoles.submitter]: "transparent",
-  [EUserRoles.regionalReviewManager]: "focus",
-  [EUserRoles.reviewManager]: "focus",
-  [EUserRoles.reviewer]: "greys.grey90",
-  [EUserRoles.superAdmin]: "transparent",
+  [EUserRoles.participant]: "transparent",
+  [EUserRoles.contractor]: "transpaerent",
+  [EUserRoles.participantSupportRep]: "focus",
+  [EUserRoles.adminManager]: "focus",
+  [EUserRoles.admin]: "greys.grey90",
+  [EUserRoles.systemAdmin]: "transparent",
 }
 
 export const RoleTag = ({ role }: IRoleTagProps) => {

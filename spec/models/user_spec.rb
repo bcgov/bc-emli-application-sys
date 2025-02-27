@@ -17,18 +17,21 @@ RSpec.describe User, type: :model do
     # Testing enum for role
     it do
       should define_enum_for(:role).with_values(
-               submitter: 0,
-               review_manager: 1,
-               reviewer: 2,
-               super_admin: 3,
-               regional_review_manager: 4
+               participant: 0,
+               admin_manager: 1,
+               admin: 2,
+               system_admin: 3,
+               regional_review_manager: 4,
+               participant_support_rep: 5,
+               contractor: 6,
+               unassigned: 7
              )
     end
 
     # Testing default value for role
     it "has submitter as a default role" do
       user = User.new
-      expect(user.role).to eq("submitter")
+      expect(user.role).to eq("participant")
     end
   end
 
@@ -44,16 +47,16 @@ RSpec.describe User, type: :model do
   # end
 
   describe "invitable roles" do
-    it "a super admin can invite reviewers, review managers, super admins" do
+    it "a system admin can invite admins, admin managers and participant support reps" do
       inviter = build(:user, :super_admin)
       expect(inviter.invitable_roles).to match_array(
-        %w[reviewer review_manager regional_review_manager super_admin]
+        %w[admin admin_manager participant_support_rep]
       )
     end
-    it "a review manager can invite reviewers and review managers" do
+    it "an admin manager can invite admins and participant support reps" do
       inviter = build(:user, :review_manager)
       expect(inviter.invitable_roles).to match_array(
-        %w[reviewer review_manager]
+        %w[admin participant_support_rep]
       )
     end
     it "a reviewer cannot invite anyone" do

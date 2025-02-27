@@ -16,15 +16,15 @@ class JurisdictionPolicy < ApplicationPolicy
   end
 
   def create?
-    user.super_admin?
+    user.system_admin?
   end
 
   def update?
-    user.super_admin? || (user.staff? && user.jurisdictions.find(record.id))
+    user.system_admin? || (user.staff? && user.jurisdictions.find(record.id))
   end
 
   def update_external_api_enabled?
-    user.super_admin? ||
+    user.system_admin? ||
       (user.manager? && user.jurisdictions.find(record.id) && !record.g_off?)
   end
 

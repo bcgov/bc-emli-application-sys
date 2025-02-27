@@ -1,5 +1,6 @@
 FactoryBot.define do
   factory :user do
+    
     transient { confirmed { true } }
 
     first_name { Faker::Name.first_name }
@@ -8,16 +9,16 @@ FactoryBot.define do
     password { ENV["TESTING_DEFAULT_PASSWORD"] || "P@ssword1" }
 
     trait :submitter do
-      role { :submitter }
+      role { :participant }
     end
 
     trait :review_manager do
-      role { :review_manager }
+      role { :admin_manager }
       association :jurisdiction, factory: :sub_district
     end
 
     trait :reviewer do
-      role { :reviewer }
+      role { :admin }
       association :jurisdiction, factory: :sub_district
     end
 
@@ -27,7 +28,7 @@ FactoryBot.define do
     end
 
     trait :super_admin do
-      role { :super_admin }
+      role { :system_admin }
       password { "P@ssword1" }
     end
 

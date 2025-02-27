@@ -18,17 +18,37 @@ const options = {
       translation: {
         auth: {
           login: "Log in",
-          adminLogin: "Admin login",
+          participantLogin: "Participant Log in",
+          adminLogin: "Admin Log in",
+          psrLogin: "PSR Log in",
+          adminMgrLogin: "Admin Manager Log in",
+          sysAdminLogin: "System Admin Log in",
           adminAccountAccess: "If you cannot login with your IDIR, please contact your administrator to gain access.",
+          adminPortalLoginInfo: {
+            prompt: "",
+            login: "You must authenticate with an IDIR account to use this system.",
+            button: "Log in with IDIR account",
+            trouble: {
+              link: "https://www.bceid.ca/clp/account_recovery.aspx",
+              linkText: "Click here",
+              text: " if you are having trouble logging in using IDIR.",
+            },
+            noAccount: {
+              text: "Don’t have an IDIR account?",
+              altLoginText: "Log in with Business BCeID",
+            }
+          },
           bcServiceCardInfo: {
             bcservice_login: "Log in with BC Services Card Account",
             prompt:
               "The easiest way to log in is with your BC Services Card. It’s a secure way to prove who you are online. ",
-            learnMore: "Learn more about BC Services Card Login",
+            learnMore: "Learn more about BC Services Card",
             learnMoreLink: "https://id.gov.bc.ca/account/",
             loginHelp: "and how to set up an account.",
             noSmartPhone: "Don’t have a smart phone or can’t use the mobile app?",
+            noBCServicesCard: "Don’t have a BC Services card?",
             phoneService: "You can use a token. They are free and you can pick one up at any Service BC office.",
+            bceidLogin: "Log in with Basic BCeID",
             serviceCardTokens: "Learn more about BC Services Card tokens.",
             learnMoreTokensLink: "https://id.gov.bc.ca/account/token-setup-instruction",
             energyCoach: {

@@ -39,29 +39,35 @@ export const UserModel = types
   .extend(withEnvironment())
   .views((self) => ({
     get isSuperAdmin() {
-      return self.role == EUserRoles.superAdmin
+      return self.role == EUserRoles.systemAdmin
+    },
+    get isPSR() {
+      return self.role == EUserRoles.participantSupportRep
+    },
+    get isContractor() {
+      return self.role == EUserRoles.contractor
     },
     get isRegionalReviewManager() {
-      return self.role == EUserRoles.regionalReviewManager
+      return self.role == EUserRoles.adminManager
     },
     get isReviewManager() {
-      return self.role == EUserRoles.reviewManager
+      return self.role == EUserRoles.adminManager
     },
     get isManager() {
-      return self.role == EUserRoles.regionalReviewManager || self.role == EUserRoles.reviewManager
+      return self.role == EUserRoles.adminManager
     },
     get isReviewer() {
-      return self.role == EUserRoles.reviewer
+      return self.role == EUserRoles.admin
     },
     get isReviewStaff() {
       return (
-        self.role == EUserRoles.reviewer ||
-        self.role == EUserRoles.reviewManager ||
-        self.role == EUserRoles.regionalReviewManager
+        self.role == EUserRoles.admin ||
+        self.role == EUserRoles.adminManager
+        //self.role == EUserRoles.regionalReviewManager
       )
     },
     get isSubmitter() {
-      return self.role == EUserRoles.submitter
+      return self.role == EUserRoles.participant
     },
     get isDiscarded() {
       return self.discardedAt !== null
@@ -104,10 +110,10 @@ export const UserModel = types
     }),
     changeRole: flow(function* () {
       let newRole = null
-      if (self.role === EUserRoles.reviewManager) {
-        newRole = EUserRoles.reviewer
-      } else if (self.role === EUserRoles.reviewer) {
-        newRole = EUserRoles.reviewManager
+      if (self.role === EUserRoles.adminManager) {
+        newRole = EUserRoles.admin
+      } else if (self.role === EUserRoles.admin) {
+        newRole = EUserRoles.adminManager
       } else {
         return
       }

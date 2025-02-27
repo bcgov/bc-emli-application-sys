@@ -4,7 +4,7 @@ class RequirementTemplatePolicy < ApplicationPolicy
 
     return false unless user.present?
 
-    user.super_admin? ||
+    user.system_admin? ||
       (
         record.early_access? &&
           user
@@ -19,7 +19,7 @@ class RequirementTemplatePolicy < ApplicationPolicy
   end
 
   def create?
-    user.super_admin?
+    user.system_admin?
   end
 
   def index?

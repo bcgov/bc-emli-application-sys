@@ -17,7 +17,8 @@ import { EUserRoles } from "../../types/enums"
 export function UserRolesExplanationModal() {
   const { t } = useTranslation()
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const rolesToExplain = [EUserRoles.submitter, EUserRoles.reviewManager, EUserRoles.reviewer]
+  //TODO: add new roles to explain; PSR & Contractor
+  const rolesToExplain = [EUserRoles.participant, EUserRoles.adminManager, EUserRoles.admin]
   return (
     <>
       <Button onClick={onOpen} variant={"link"} textDecoration={"underline"}>

@@ -14,7 +14,7 @@ module Auditable
 
   def store_previous_values
     @previous_values = changes.except(*EXCLUDED_COLUMNS).transform_values(&:first) # 🔥 Capture before-update values
-    puts "DEBUG: Stored previous values: #{@previous_values.inspect}"  # Debugging
+    # puts "DEBUG: Stored previous values: #{@previous_values.inspect}"  # Debugging
   end
 
   def audit_create
@@ -32,13 +32,13 @@ module Auditable
     data_before = @previous_values || {}  # 🔹 Use captured values
     data_after = data_before.keys.index_with { |key| self[key] }  # 🔹 Capture new values
 
-    puts "DEBUG: audit_update is running for #{self.class.name} (ID: #{self.id})"
-    puts "DEBUG: previous_values = #{data_before.inspect}"
-    puts "DEBUG: data_after = #{data_after.inspect}"
+    # puts "DEBUG: audit_update is running for #{self.class.name} (ID: #{self.id})"
+    # puts "DEBUG: previous_values = #{data_before.inspect}"
+    # puts "DEBUG: data_after = #{data_after.inspect}"
 
     return if data_before.blank? || data_before == data_after  # Avoid logging if no meaningful changes
 
-    puts "DEBUG: Creating audit log for #{self.class.name}"
+    # puts "DEBUG: Creating audit log for #{self.class.name}"
 
     AuditLog.create!(
       table_name: self.class.table_name,
