@@ -12,10 +12,10 @@ module Api::Concerns::Search::JurisdictionUsers
           role:
             (
               if current_user.system_admin?
-                %w[admin admin_manager participant_support_rep]
+                %w[admin admin_manager]
               elsif current_user.admin_manager? ||
                     current_user.regional_review_manager?
-                %w[admin_manager participant_support_rep]
+                %w[admin admin_manager]
               else
                 nil
               end

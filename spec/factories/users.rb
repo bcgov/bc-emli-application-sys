@@ -1,5 +1,6 @@
 FactoryBot.define do
   factory :user do
+    
     transient { confirmed { true } }
 
     first_name { Faker::Name.first_name }

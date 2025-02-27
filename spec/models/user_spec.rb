@@ -29,7 +29,7 @@ RSpec.describe User, type: :model do
     end
 
     # Testing default value for role
-    it "has participant as a default role" do
+    it "has submitter as a default role" do
       user = User.new
       expect(user.role).to eq("participant")
     end
@@ -47,20 +47,20 @@ RSpec.describe User, type: :model do
   # end
 
   describe "invitable roles" do
-    it "a system admin can invite admin, admin_manager, participant_support_rep" do
+    it "a system admin can invite admins, admin managers and participant support reps" do
       inviter = build(:user, :super_admin)
       expect(inviter.invitable_roles).to match_array(
         %w[admin admin_manager participant_support_rep]
       )
     end
-    it "a admin manager can invite admin and admin managers" do
-      inviter = build(:user, :reviewer)
+    it "an admin manager can invite admins and participant support reps" do
+      inviter = build(:user, :review_manager)
       expect(inviter.invitable_roles).to match_array(
         %w[admin participant_support_rep]
       )
     end
-    it "a admin cannot invite anyone" do
-      inviter = build(:user, :reviewer_manager)
+    it "a reviewer cannot invite anyone" do
+      inviter = build(:user, :reviewer)
       expect(inviter.invitable_roles).to match_array([])
     end
   end
