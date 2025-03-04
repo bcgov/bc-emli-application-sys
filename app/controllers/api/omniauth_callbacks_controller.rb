@@ -2,12 +2,17 @@ class Api::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   include BaseControllerMethods
 
   def keycloak
+    # Retrieve the entry point from the session
+    entry_point = session[:entry_point] || ''
+    session.delete(:entry_point)
+    
     origin_query =
       Rack::Utils.parse_nested_query(URI(request.env["omniauth.origin"]).query)
     result =
       OmniauthUserResolver.new(
         auth: request.env["omniauth.auth"],
-        invitation_token: origin_query["invitation_token"]
+        invitation_token: origin_query["invitation_token"],
+        entry_point: entry_point
       ).call
     @user = result.user
 

@@ -30,7 +30,7 @@ export const AdminInviteScreen = observer(({}: IAdminInviteScreenProps) => {
   const prepopulatedLastName = query.get("lastName")
 
   const defaultUserValues = {
-    role: EUserRoles.superAdmin,
+    role: EUserRoles.systemAdmin,
     email: prepopulatedEmail,
     firstName: prepopulatedFirstName,
     lastName: prepopulatedLastName,

@@ -3,7 +3,7 @@ STAGE: dev
 appName: energy-app
 
 vaultNamespace: bfc7dd-nonprod
-imageRepository: image-registry.apps.silver.devops.gov.bc.ca
+imageRepository: image-registry.openshift-image-registry.svc:5000
 
 route:
   spec:

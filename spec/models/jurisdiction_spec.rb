@@ -83,7 +83,7 @@ RSpec.describe Jurisdiction, type: :model do
 
         jurisdiction.update_external_api_state!(
           enable_external_api: true,
-          allow_reset: user.super_admin?
+          allow_reset: user.system_admin?
         )
 
         expect(jurisdiction.integration_mappings.count).to eq(2)
@@ -150,7 +150,7 @@ RSpec.describe Jurisdiction, type: :model do
           )
           jurisdiction.update_external_api_state!(
             enable_external_api: true,
-            allow_reset: super_admin.super_admin?
+            allow_reset: super_admin.system_admin?
           )
         end
 
@@ -166,7 +166,7 @@ RSpec.describe Jurisdiction, type: :model do
 
           jurisdiction.update_external_api_state!(
             enable_external_api: true,
-            allow_reset: super_admin.super_admin?
+            allow_reset: super_admin.system_admin?
           )
         end
       end
@@ -178,7 +178,7 @@ RSpec.describe Jurisdiction, type: :model do
 
           jurisdiction.update_external_api_state!(
             enable_external_api: false,
-            allow_reset: manager.super_admin?
+            allow_reset: manager.system_admin?
           )
         end
       end

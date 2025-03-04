@@ -10,6 +10,6 @@ class InvitationPolicy < ApplicationPolicy
   def update?
     user.review_staff?
   end
-
+  
   # Add more methods as needed for other actions
 end

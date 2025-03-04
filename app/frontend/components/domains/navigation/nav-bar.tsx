@@ -5,6 +5,7 @@ import {
   Flex,
   HStack,
   Heading,
+  Hide,
   IconButton,
   Image,
   Link,
@@ -17,12 +18,11 @@ import {
   MenuList,
   Portal,
   Show,
-  Hide,
   Spacer,
   Text,
   VStack,
 } from "@chakra-ui/react"
-import { Envelope, Folders, List, Warning } from "@phosphor-icons/react"
+import { Folders, List, Warning } from "@phosphor-icons/react"
 import { observer } from "mobx-react-lite"
 import * as R from "ramda"
 import React, { useState } from "react"
@@ -106,7 +106,7 @@ export const NavBar = observer(function NavBar() {
   const { sessionStore, userStore, notificationStore, uiStore, sandboxStore } = useMst()
 
   const { currentUser } = userStore
-  const { loggedIn,logout } = sessionStore
+  const { loggedIn, logout } = sessionStore
   const { criticalNotifications } = notificationStore
   const { rmJurisdictionSelectKey } = uiStore
 
@@ -123,8 +123,8 @@ export const NavBar = observer(function NavBar() {
         as="nav"
         id="mainNav"
         w="full"
-        bg={currentUser?.isSubmitter || !loggedIn ? "greys.white" : "theme.blue"}
-        color={currentUser?.isSubmitter || !loggedIn ? "theme.blue" : "greys.white"}
+        bg={"greys.white"}
+        color={"text.primary"}
         zIndex={10}
         borderBottomWidth={2}
         borderColor="border.light"
@@ -139,7 +139,7 @@ export const NavBar = observer(function NavBar() {
                   htmlHeight="30.853px"
                   htmlWidth="145.386px"
                   alt={t("site.linkHome")}
-                  src={currentUser?.isSubmitter || !loggedIn ? "/images/logo.png" : "/images/logo-light.svg"}
+                  src={"/images/logo.png"}
                 />
               </Box>
             </RouterLink>
@@ -148,10 +148,6 @@ export const NavBar = observer(function NavBar() {
                 <HStack>
                   <Text fontSize="xl" fontWeight="normal" mb="0" whiteSpace="nowrap">
                     {currentUser?.isSuperAdmin ? t("site.adminNavBarTitle") : t("site.title")}
-                  </Text>
-
-                  <Text fontSize="sm" textTransform="uppercase" color="theme.yellow" fontWeight="bold">
-                    {t("site.beta")}
                   </Text>
                 </HStack>
                 {currentUser?.isReviewStaff && (
@@ -197,8 +193,8 @@ export const NavBar = observer(function NavBar() {
                 </VStack>
               )}
               {currentUser?.isSuperAdmin && (
-                <Text color="greys.white" textTransform="capitalize">
-                  {t(`user.roles.${currentUser.role as EUserRoles}`)}
+                <Text color="text.primary" textTransform="capitalize">
+                  {t("user.roles.system_admin")}
                 </Text>
               )}
               {/* {(!loggedIn || currentUser?.isSubmitter) && (
@@ -208,30 +204,26 @@ export const NavBar = observer(function NavBar() {
                   </RouterLinkButton>
                 </Show>
               )} */}
-              {loggedIn && (
-                <NotificationsPopover
-                  aria-label="notifications popover"
-                  color={currentUser?.isSubmitter || !loggedIn ? "theme.blue" : "greys.white"}
-                />
+              {loggedIn && <NotificationsPopover aria-label="notifications popover" color="text.primary" />}
+
+              <NavBarMenu />
+              {!currentUser?.isSuperAdmin && (
+                <Show above="lg">
+                  <RouterLinkButton variant="tertiary" color="text.primary" to={"/get-support"}>
+                    {t("site.support.getSupport")}
+                  </RouterLinkButton>
+                </Show>
               )}
-              <Hide above="md">
-                <NavBarMenu />
-              </Hide>
-              <Show above="md">
-                <RouterLinkButton variant="tertiary" color="greys.grey100" to={"/get-support"}>
-                  {t("site.support.getSupport")}
-                </RouterLinkButton>
-              </Show>
               {!loggedIn && (
-                <Show above="md">
-                  <RouterLinkButton variant="tertiary" color="greys.grey100" to="/login">
+                <Show above="lg">
+                  <RouterLinkButton variant="tertiary" color="text.primary" to="/login">
                     {t("auth.login")}
                   </RouterLinkButton>
                 </Show>
               )}
-              {loggedIn && (
+              {loggedIn && !currentUser?.isSuperAdmin && (
                 <Show above="md">
-                  <RouterLinkButton variant="tertiary" color="greys.grey100" onClick={handleClickLogout}>
+                  <RouterLinkButton variant="tertiary" color="text.primary" onClick={handleClickLogout}>
                     {t("auth.logout")}
                   </RouterLinkButton>
                 </Show>
@@ -310,10 +302,10 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
 
   const superAdminOnlyItems = (
     <MenuGroup>
-      <NavMenuItem label={t("home.permitTemplateCatalogueTitle")} to={"/requirement-templates"} />
+      <NavMenuItem label={t("home.permitTemplateCatalogueTitleShort")} to={"/requirement-templates"} />
       <NavMenuItem label={t("home.requirementsLibraryTitle")} to={"/requirements-library"} />
       <NavMenuItem label={t("home.configurationManagement.title")} to={"/configuration-management"} />
-      <NavMenuItem label={t("home.earlyAccess.title")} to={"/early-access"} />
+      <NavMenuItem label={t("home.auditLog")} to={"/audit-log"} />
       <MenuDivider my={0} borderColor="border.light" />
     </MenuGroup>
   )
@@ -378,10 +370,10 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
         <MenuButton
           as={Button}
           borderRadius="lg"
-          border={currentUser?.isSubmitter || !loggedIn ? "solid black" : "solid white"}
+          border="solid black"
           borderWidth="1px"
           p={3}
-          variant={currentUser?.isSubmitter || !loggedIn ? "primaryInverse" : "primary"}
+          variant="primaryInverse"
           aria-label="menu dropdown button"
           leftIcon={<List size={16} weight="bold" />}
         >
@@ -394,42 +386,33 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
           <MenuList zIndex={99} boxShadow="2xl">
             {loggedIn && !currentUser.isUnconfirmed ? (
               <>
-                <Text fontSize="xs" fontStyle="italic" px={3} mb={-1} color="greys.grey01">
-                  {t("site.loggedInWelcome")}
-                </Text>
-                <MenuGroup title={currentUser.name} noOfLines={1}>
-                  <MenuDivider my={0} borderColor="border.light" />
-                  <NavMenuItem label={t("site.home")} to={"/"} />
-                  <MenuDivider my={0} borderColor="border.light" />
-                  {!currentUser.isReviewStaff && (
-                    <NavMenuItem label={t("home.jurisdictionsTitle")} to={"/jurisdictions"} />
-                  )}
-                  {currentUser?.isSuperAdmin && superAdminOnlyItems}
-                  {(currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) && reviewManagerOnlyItems}
-                  {(currentUser?.isSuperAdmin ||
-                    currentUser?.isReviewManager ||
-                    currentUser?.isRegionalReviewManager) &&
-                    adminOrManagerItems}
-                  {currentUser?.isReviewer && reviwerOnlyItems}
-                  {currentUser?.isSubmitter && submitterOnlyItems}
-                  {currentUser?.isReviewStaff && reviewStaffOnlyItems}
-                  {!currentUser?.isSubmitter && (
-                    <>
-                      <MenuItem bg="greys.grey03" onClick={(e) => navigate("/permit-applications/new")}>
-                        <Button as={Box} variant="primary">
-                          {t("site.newApplication")}
-                        </Button>
-                      </MenuItem>
-                      <NavMenuItem label={t("site.myPermits")} to="/permit-applications" bg="greys.grey03" />
-                      <MenuDivider my={0} borderColor="border.light" />
-                    </>
-                  )}
-                  <HelpDrawer
-                    renderTriggerButton={({ onClick }) => <NavMenuItem label={t("ui.help")} onClick={onClick} />}
-                  />
-                  <NavMenuItem label={t("user.myProfile")} to={"/profile"} />
-                  <NavMenuItem label={t("auth.logout")} onClick={handleClickLogout} />
-                </MenuGroup>
+                <MenuDivider my={0} borderColor="border.light" />
+                <NavMenuItem label={t("site.home")} to={"/"} />
+                {!currentUser.isReviewStaff && (
+                  <NavMenuItem label={t("home.jurisdictionsTitle")} to={"/jurisdictions"} />
+                )}
+                {currentUser?.isSuperAdmin && superAdminOnlyItems}
+                {(currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) && reviewManagerOnlyItems}
+                {(currentUser?.isSuperAdmin || currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) &&
+                  adminOrManagerItems}
+                {currentUser?.isReviewer && reviwerOnlyItems}
+                {currentUser?.isSubmitter && submitterOnlyItems}
+                {currentUser?.isReviewStaff && reviewStaffOnlyItems}
+
+                {currentUser?.isSubmitter && (
+                  <>
+                    <MenuItem bg="greys.grey03" onClick={(e) => navigate("/permit-applications/new")}>
+                      <Button as={Box} variant="primary">
+                        {t("site.newApplication")}
+                      </Button>
+                    </MenuItem>
+                    <NavMenuItem label={t("site.myPermits")} to="/permit-applications" bg="greys.grey03" />
+                    <MenuDivider my={0} borderColor="border.light" />
+                  </>
+                )}
+                <MenuDivider my={0} borderColor="border.light" />
+                <NavMenuItem label={t("user.myAccount")} to={"/profile"} />
+                <NavMenuItem label={t("auth.logout")} onClick={handleClickLogout} />
               </>
             ) : (
               <>
@@ -453,13 +436,6 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
                 {loggedIn && <NavMenuItem label={t("auth.logout")} onClick={handleClickLogout} />}
               </>
             )}
-
-            <MenuDivider my={0} borderColor="border.light" />
-            <MenuItem>
-              <Link textDecoration="none" w="full" href={"mailto:" + t("site.contactEmail")} isExternal>
-                {t("site.giveFeedback")} <Envelope size={16} style={{ display: "inline", color: "inherit" }} />
-              </Link>
-            </MenuItem>
           </MenuList>
         </Box>
       </Portal>

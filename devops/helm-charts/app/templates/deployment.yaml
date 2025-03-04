@@ -43,9 +43,9 @@ spec:
       imagePullSecrets:
         - name: {{ $.Values.image.serviceAccountName }}
       containers:
-        - name: "{{ $.Values.appName }}-{{ .process }}"
+        - name: {{ $.Values.appName }}-{{ .process }}
           imagePullPolicy: Always
-          image: energy-app:latest
+          image: {{ $.Values.imageRepository }}/{{ $.Values.OPENSHIFT_NAMESPACE }}-{{ $.Values.STAGE }}/{{ $.Values.image.name }}:{{ $.Values.image.tag }}
           {{- if eq .process "web" }}
           volumeMounts:
             - name: log-volume

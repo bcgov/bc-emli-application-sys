@@ -33,16 +33,22 @@ export enum EPermitClassificationCode {
 }
 
 export enum EPermitApplicationStatus {
-  newDraft = "new_draft",
-  newlySubmitted = "newly_submitted",
-  revisionsRequested = "revisions_requested",
-  resubmitted = "resubmitted",
-  ephemeral = "ephemeral",
+  draft = "new_draft",
+  submitted = "newly_submitted",
+  // revisionsRequested = "revisions_requested",
+  // resubmitted = "resubmitted",
+  // ephemeral = "ephemeral",
+  viewed = "viewed",
+  updateNeeded = "update_needed",
+  accepted = "accepted",
 }
 
 export enum EPermitApplicationStatusGroup {
   draft = "draft",
   submitted = "submitted",
+  viewed = "viewed",
+  updateNeeded = "updateNeeded",
+  accepted = "accepted",
 }
 
 export enum ETemplateVersionStatus {
@@ -58,11 +64,14 @@ export enum ExternalApiKeyStatus {
 }
 
 export enum EUserRoles {
-  submitter = "submitter",
-  regionalReviewManager = "regional_review_manager",
-  reviewManager = "review_manager",
-  reviewer = "reviewer",
-  superAdmin = "super_admin",
+  participant = "participant",
+  //regionalReviewManager = "regional_review_manager",
+  participantSupportRep = "participant_support_rep",
+  adminManager = "admin_manager",
+  admin = "admin",
+  systemAdmin = "system_admin",
+  contractor = "contractor",
+  unassigned = "unassigned"
 }
 
 export enum ERequirementLibrarySortFields {
@@ -366,7 +375,7 @@ export enum EEnergyStepCodeDependencyRequirementCode {
 }
 
 export enum EOmniauthProvider {
-  idir = "idir",
+  idir = "azureidir",
   basicBceid = "bceidbasic",
   businessBceid = "bceidbusiness",
   bcsc = "bcsc",

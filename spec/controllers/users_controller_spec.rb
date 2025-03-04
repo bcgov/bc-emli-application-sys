@@ -31,7 +31,7 @@ RSpec.describe Api::UsersController, type: :controller do
 
     context "when an error occurs in the service" do
       before do
-        allow(User).to receive(:super_admin).and_raise(
+        allow(User).to receive(:system_admin).and_raise(
           StandardError.new("Service Error")
         )
       end

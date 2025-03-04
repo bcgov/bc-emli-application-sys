@@ -45,7 +45,7 @@ RSpec.describe Api::Concerns::Search::JurisdictionUsers, type: :controller do
         controller.perform_user_search
         expect(
           controller.instance_variable_get(:@user_search).results
-        ).to match_array(review_managers)
+        ).to match_array((review_managers + reviewers))
       end
     end
 

@@ -5,7 +5,7 @@ x-env-vars: &default-env-vars
   BROWSER: true # so that launchy does not error out - @TODO: figure out local emails in docker compose environment
   RAILS_ENV: development
   REDIS_URL: redis://redis:6379/0
-  ANYCABLE_DEV_REDIS_URL: redis://localhost:6379/1
+  ANYCABLE_DEV_REDIS_URL: redis://redis:6379/1
   ANYCABLE_URL: ws://localhost:8080/cable
   RATE_LIMIT_DEV_REDIS_URL: redis://redis:6379/2
   SIMPLE_FEED_DEV_REDIS_URL: redis://redis:6379/3
@@ -13,7 +13,6 @@ x-env-vars: &default-env-vars
   DEVISE_JWT_SECRET_KEY: supersecret
   DATABASE_URL: postgres://postgres:password@postgres:5432/app_development
   ELASTICSEARCH_URL: http://elasticsearch:9200
-  
 
 services:
   app:
@@ -39,7 +38,11 @@ services:
       VITE_RUBY_HOST: vite
       IS_APP_SERVER: true
       <<: *default-env-vars
-    command: bash -c "bundle exec rails s -b '0.0.0.0' -p 3000"
+    command: >
+      bash -c "
+      until bundle exec rails db:prepare; do sleep 5; done;
+      bundle exec rails db:seed;
+      bundle exec rails s -b '0.0.0.0' -p 3000"
 
   vite:
     image: hous-permit-portal-dev:latest

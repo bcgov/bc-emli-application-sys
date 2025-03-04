@@ -273,4 +273,5 @@ Rails.application.routes.draw do
       constraints: ->(req) do
         !req.path.include?("/rails") && !req.path.start_with?("/public")
       end
+  post '/store_entry_point', to: 'sessions#store_entry_point'
 end

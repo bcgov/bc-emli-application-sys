@@ -1,7 +1,7 @@
 class RequirementBlockPolicy < ApplicationPolicy
   # TODO: expand roles that can access requirements when defined
   def show?
-    user.super_admin?
+    user.system_admin?
   end
 
   def index?
