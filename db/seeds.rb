@@ -21,30 +21,30 @@ north_van = Jurisdiction.find_by(name: "North Vancouver")
 van = Jurisdiction.find_by(name: "Vancouver")
 
 puts "Seeding users..."
-User.find_or_create_by(omniauth_username: "super_admin") do |user|
-  user.role = :super_admin
-  user.first_name = "SuperAdmin"
+User.find_or_create_by(omniauth_username: "system_admin") do |user|
+  user.role = :system_admin
+  user.first_name = "SystemAdmin"
   user.last_name = "McUser"
-  user.email = "super_admin@example.com"
+  user.email = "system_admin@example.com"
   user.password = "P@ssword1"
   user.confirmed_at = Time.now
   user.omniauth_uid = "A41927C69D6549B8A396FCA748F53502"
   user.omniauth_provider = "bceidbasic"
-  user.omniauth_email = "super_admin@example.com"
-  user.omniauth_username = "super_admin"
+  user.omniauth_email = "system_admin@example.com"
+  user.omniauth_username = "system_admin"
 end
 
-User.find_or_create_by(omniauth_username: "review_manager") do |user|
-  user.role = :review_manager
-  user.first_name = "ReviewManager"
+User.find_or_create_by(omniauth_username: "admin_manager") do |user|
+  user.role = :admin_manager
+  user.first_name = "AdminManager"
   user.last_name = "McUser"
-  user.email = "review_manager@example.com"
+  user.email = "admin_manager@example.com"
   user.password = "P@ssword1"
   user.jurisdictions = [north_van]
   user.confirmed_at = Time.now
   user.omniauth_uid = "85EEC5B6F05A4DB7BB5BB97FBC6985B1"
   user.omniauth_provider = "bceidbasic"
-  user.omniauth_email = "review_manager@example.com"
+  user.omniauth_email = "admin_manager@example.com"
 end
 
 User.find_or_create_by(omniauth_username: "regional_review_manager") do |user|
@@ -61,29 +61,29 @@ User.find_or_create_by(omniauth_username: "regional_review_manager") do |user|
   user.omniauth_username = "regional_rm"
 end
 
-User.find_or_create_by(omniauth_username: "reviewer") do |user|
-  user.role = :reviewer
-  user.first_name = "Reviewer"
+User.find_or_create_by(omniauth_username: "admin") do |user|
+  user.role = :admin
+  user.first_name = "Admin"
   user.last_name = "McUser"
-  user.email = "reviewer@example.com"
+  user.email = "admin@example.com"
   user.password = "P@ssword1"
   user.jurisdictions = [north_van]
   user.confirmed_at = Time.now
   user.omniauth_uid = "8505910FBD594495AC899BC6653F3544"
   user.omniauth_provider = "bceidbasic"
-  user.omniauth_email = "reviewer@example.com"
+  user.omniauth_email = "admin@example.com"
 end
 
-User.find_or_create_by(omniauth_username: "submitter") do |user|
-  user.role = :submitter
-  user.first_name = "Submitter"
+User.find_or_create_by(omniauth_username: "participant") do |user|
+  user.role = :participant
+  user.first_name = "Participant"
   user.last_name = "McUser"
-  user.email = "submitter@example.com"
+  user.email = "participant@example.com"
   user.password = "P@ssword1"
   user.confirmed_at = Time.now
   user.omniauth_uid = "C2E3AA0067514FFEB587C11038E437E2"
   user.omniauth_provider = "bceidbasic"
-  user.omniauth_email = "submitter@example.com"
+  user.omniauth_email = "participant@example.com"
 end
 
 User.reindex
@@ -310,11 +310,11 @@ end
 # invite a usable super admin
 # safeguard for development only
 if Rails.env.development?
-  email = "usable+super_admin@example.com"
+  email = "usable+system_admin@example.com"
   User.invite!(email: email) do |u|
     u.skip_confirmation_notification!
-    u.role = :super_admin
-    u.first_name = "Super"
+    u.role = :system_admin
+    u.first_name = "System"
     u.last_name = "Admin"
     u.save
   end

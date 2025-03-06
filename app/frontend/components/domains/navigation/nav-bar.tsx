@@ -21,73 +21,73 @@ import {
   Spacer,
   Text,
   VStack,
-} from "@chakra-ui/react"
-import { Folders, List, Warning } from "@phosphor-icons/react"
-import { observer } from "mobx-react-lite"
-import * as R from "ramda"
-import React, { useState } from "react"
-import { Trans, useTranslation } from "react-i18next"
-import { useLocation, useNavigate } from "react-router-dom"
-import { PopoverProvider, useNotificationPopover } from "../../../hooks/use-notification-popover"
-import { useMst } from "../../../setup/root"
-import { EUserRoles } from "../../../types/enums"
-import { INotification, IPermitNotificationObjectData } from "../../../types/types"
-import { HelpDrawer } from "../../shared/help-drawer"
-import { RouterLink } from "../../shared/navigation/router-link"
-import { RouterLinkButton } from "../../shared/navigation/router-link-button"
-import SandboxHeader from "../../shared/sandbox/sandbox-header"
-import { NotificationsPopover } from "../home/notifications/notifications-popover"
-import { RegionalRMJurisdictionSelect } from "./regional-rm-jurisdiction-select"
-import { SandboxMenuItem } from "./sandbox-menu-item"
-import { SubNavBar } from "./sub-nav-bar"
+} from '@chakra-ui/react';
+import { Folders, List, Warning } from '@phosphor-icons/react';
+import { observer } from 'mobx-react-lite';
+import * as R from 'ramda';
+import React, { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { PopoverProvider, useNotificationPopover } from '../../../hooks/use-notification-popover';
+import { useMst } from '../../../setup/root';
+import { EUserRoles } from '../../../types/enums';
+import { INotification, IPermitNotificationObjectData } from '../../../types/types';
+import { HelpDrawer } from '../../shared/help-drawer';
+import { RouterLink } from '../../shared/navigation/router-link';
+import { RouterLinkButton } from '../../shared/navigation/router-link-button';
+import SandboxHeader from '../../shared/sandbox/sandbox-header';
+import { NotificationsPopover } from '../home/notifications/notifications-popover';
+import { RegionalRMJurisdictionSelect } from './regional-rm-jurisdiction-select';
+
+import { SubNavBar } from './sub-nav-bar';
 
 function isTemplateEditPath(path: string): boolean {
-  const regex = /^\/requirement-templates\/([a-f\d-]+)\/edit$/
+  const regex = /^\/requirement-templates\/([a-f\d-]+)\/edit$/;
 
-  return regex.test(path)
+  return regex.test(path);
 }
 
 function isEarlyAccessTemplateEditPath(path: string): boolean {
-  const regex = /^\/early-access?\/requirement-templates\/([a-f\d-]+)\/edit$/
+  const regex = /^\/early-access?\/requirement-templates\/([a-f\d-]+)\/edit$/;
 
-  return regex.test(path)
+  return regex.test(path);
 }
 
 function isEarlyAccessTemplateViewPath(path: string): boolean {
-  const regex = /^\/early-access\/requirement-templates\/([a-f\d-]+)$/
+  const regex = /^\/early-access\/requirement-templates\/([a-f\d-]+)$/;
 
-  return regex.test(path)
+  return regex.test(path);
 }
 
 function isDigitalPermitEditPath(path: string): boolean {
-  const regex = /^\/digital-building-permits\/([a-f\d-]+)\/edit$/
+  const regex = /^\/digital-building-permits\/([a-f\d-]+)\/edit$/;
 
-  return regex.test(path)
+  return regex.test(path);
 }
 
 function isTemplateVersionPath(path: string): boolean {
-  const regex = /^\/template-versions\/([a-f\d-]+)$/
-  return regex.test(path)
+  const regex = /^\/template-versions\/([a-f\d-]+)$/;
+  return regex.test(path);
 }
 
 function isPermitApplicationPath(path: string): boolean {
-  const regex = /^\/permit-applications\/([a-f\d-]+)/
-  return regex.test(path)
+  const regex = /^\/permit-applications\/([a-f\d-]+)/;
+  return regex.test(path);
 }
 
 function isPermitApplicationEditPath(path: string): boolean {
-  const regex = /^\/permit-applications\/([a-f\d-]+)\/edit.*$/
-  return regex.test(path)
+  const regex = /^\/permit-applications\/([a-f\d-]+)\/edit.*$/;
+  return regex.test(path);
 }
 
 function isApiMappingPath(path: string): boolean {
-  const regex = /^(\/jurisdictions\/[a-z\d-]+)?\/api-settings\/api-mappings.*$/
-  return regex.test(path)
+  const regex = /^(\/jurisdictions\/[a-z\d-]+)?\/api-settings\/api-mappings.*$/;
+  return regex.test(path);
 }
 
 function shouldHideSubNavbarForPath(path: string): boolean {
   const matchers: Array<(path: string) => boolean> = [
-    (path) => path === "/",
+    (path) => path === '/',
     isTemplateEditPath,
     isEarlyAccessTemplateEditPath,
     isEarlyAccessTemplateViewPath,
@@ -96,26 +96,26 @@ function shouldHideSubNavbarForPath(path: string): boolean {
     isPermitApplicationPath,
     isDigitalPermitEditPath,
     isApiMappingPath,
-  ]
+  ];
 
-  return matchers.some((matcher) => matcher(path))
+  return matchers.some((matcher) => matcher(path));
 }
 
 export const NavBar = observer(function NavBar() {
-  const { t } = useTranslation()
-  const { sessionStore, userStore, notificationStore, uiStore, sandboxStore } = useMst()
+  const { t } = useTranslation();
+  const { sessionStore, userStore, notificationStore, uiStore, sandboxStore } = useMst();
 
-  const { currentUser } = userStore
-  const { loggedIn, logout } = sessionStore
-  const { criticalNotifications } = notificationStore
-  const { rmJurisdictionSelectKey } = uiStore
+  const { currentUser } = userStore;
+  const { loggedIn, logout } = sessionStore;
+  const { criticalNotifications } = notificationStore;
+  const { rmJurisdictionSelectKey } = uiStore;
 
-  const location = useLocation()
-  const path = location.pathname
+  const location = useLocation();
+  const path = location.pathname;
 
   const handleClickLogout = async () => {
-    await logout()
-  }
+    await logout();
+  };
 
   return (
     <PopoverProvider>
@@ -123,8 +123,8 @@ export const NavBar = observer(function NavBar() {
         as="nav"
         id="mainNav"
         w="full"
-        bg={"greys.white"}
-        color={"text.primary"}
+        bg={'greys.white'}
+        color={'text.primary'}
         zIndex={10}
         borderBottomWidth={2}
         borderColor="border.light"
@@ -138,8 +138,8 @@ export const NavBar = observer(function NavBar() {
                   fit="contain"
                   htmlHeight="30.853px"
                   htmlWidth="145.386px"
-                  alt={t("site.linkHome")}
-                  src={"/images/logo.png"}
+                  alt={t('site.linkHome')}
+                  src={'/images/logo.png'}
                 />
               </Box>
             </RouterLink>
@@ -147,7 +147,7 @@ export const NavBar = observer(function NavBar() {
               <Flex direction="column" w="full">
                 <HStack>
                   <Text fontSize="xl" fontWeight="normal" mb="0" whiteSpace="nowrap">
-                    {currentUser?.isSuperAdmin ? t("site.adminNavBarTitle") : t("site.title")}
+                    {currentUser?.isSuperAdmin ? t('site.adminNavBarTitle') : t('site.title')}
                   </Text>
                 </HStack>
                 {currentUser?.isReviewStaff && (
@@ -172,14 +172,14 @@ export const NavBar = observer(function NavBar() {
               )}
               {currentUser?.isSubmitter && !currentUser.isUnconfirmed && (
                 <RouterLinkButton to="/" variant="tertiary" leftIcon={<Folders size={16} />}>
-                  {t("site.myApplications")}
+                  {t('site.myApplications')}
                 </RouterLinkButton>
               )}
               {currentUser?.isReviewStaff && !currentUser.isRegionalReviewManager && (
                 <Flex direction="column">
-                  <Text color="greys.white">{currentUser.jurisdiction.name}</Text>
+                  {/* <Text color="greys.white">{currentUser.jurisdiction.name}</Text> */}
                   <Text color="whiteAlpha.700" textAlign="right" variant="tiny_uppercase">
-                    {t(`user.roles.${currentUser.role as EUserRoles}`)}
+                    {t(`user.roles.${currentUser.role}`, { defaultValue: currentUser.role })}
                   </Text>
                 </Flex>
               )}
@@ -187,14 +187,14 @@ export const NavBar = observer(function NavBar() {
               {currentUser?.isRegionalReviewManager && (
                 <VStack align="flex-end" gap={1}>
                   <Text color="whiteAlpha.700" textAlign="right" variant="tiny_uppercase">
-                    {t(`user.roles.${currentUser.role as EUserRoles}`)}
+                    {t(`user.roles.${currentUser.role}`, { defaultValue: currentUser.role })}
                   </Text>
                   <RegionalRMJurisdictionSelect key={rmJurisdictionSelectKey} />
                 </VStack>
               )}
               {currentUser?.isSuperAdmin && (
                 <Text color="text.primary" textTransform="capitalize">
-                  {t("user.roles.system_admin")}
+                  {t('user.roles.system_admin')}
                 </Text>
               )}
               {/* {(!loggedIn || currentUser?.isSubmitter) && (
@@ -209,22 +209,22 @@ export const NavBar = observer(function NavBar() {
               <NavBarMenu />
               {!currentUser?.isSuperAdmin && (
                 <Show above="lg">
-                  <RouterLinkButton variant="tertiary" color="text.primary" to={"/get-support"}>
-                    {t("site.support.getSupport")}
+                  <RouterLinkButton variant="tertiary" color="text.primary" to={'/get-support'}>
+                    {t('site.support.getSupport')}
                   </RouterLinkButton>
                 </Show>
               )}
               {!loggedIn && (
                 <Show above="lg">
                   <RouterLinkButton variant="tertiary" color="text.primary" to="/login">
-                    {t("auth.login")}
+                    {t('auth.login')}
                   </RouterLinkButton>
                 </Show>
               )}
               {loggedIn && !currentUser?.isSuperAdmin && (
                 <Show above="md">
                   <RouterLinkButton variant="tertiary" color="text.primary" onClick={handleClickLogout}>
-                    {t("auth.logout")}
+                    {t('auth.logout')}
                   </RouterLinkButton>
                 </Show>
               )}
@@ -236,19 +236,19 @@ export const NavBar = observer(function NavBar() {
 
       {!shouldHideSubNavbarForPath(path) && loggedIn && <SubNavBar />}
     </PopoverProvider>
-  )
-})
+  );
+});
 
 interface IActionRequiredBoxProps {
-  notification: INotification
+  notification: INotification;
 }
 
 const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notification }) => {
-  const { notificationStore } = useMst()
-  const { generateSpecificLinkData } = notificationStore
-  const { t } = useTranslation()
-  const linkData = generateSpecificLinkData(notification)
-  const { handleOpen } = useNotificationPopover()
+  const { notificationStore } = useMst();
+  const { generateSpecificLinkData } = notificationStore;
+  const { t } = useTranslation();
+  const linkData = generateSpecificLinkData(notification);
+  const { handleOpen } = useNotificationPopover();
 
   return (
     <Flex
@@ -259,15 +259,14 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
       borderColor={`semantic.warning`}
       p={4}
     >
-      <Flex align="flex-start" gap={2} whiteSpace={"normal"}>
-        <Box color={`semantic.warning`}>{<Warning size={24} aria-label={"warning icon"} />}</Box>
+      <Flex align="flex-start" gap={2} whiteSpace={'normal'}>
+        <Box color={`semantic.warning`}>{<Warning size={24} aria-label={'warning icon'} />}</Box>
         <Flex direction="column" gap={2}>
           <Heading as="h3" fontSize="md">
-            {t("ui.actionRequired")}
+            {t('ui.actionRequired')}
           </Heading>
           <Text>
             <Trans
-              // @ts-ignore
               i18nKey={`site.actionRequired.${notification.actionType}`}
               number={(notification.objectData as IPermitNotificationObjectData).permitApplicationNumber}
               components={{
@@ -279,77 +278,76 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
               }}
             />
           </Text>
-          <Link onClick={handleOpen}>{t("site.reviewNotifications")}</Link>
+          <Link onClick={handleOpen}>{t('site.reviewNotifications')}</Link>
         </Flex>
       </Flex>
     </Flex>
-  )
-})
+  );
+});
 
 interface INavBarMenuProps {}
 
 const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
-  const { t } = useTranslation()
-  const navigate = useNavigate()
-  const { sessionStore, userStore } = useMst()
-  const { currentUser } = userStore
-  const { logout, loggedIn } = sessionStore
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { sessionStore, userStore } = useMst();
+  const { currentUser } = userStore;
+  const { logout, loggedIn } = sessionStore;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleClickLogout = async () => {
-    await logout()
-  }
+    await logout();
+  };
 
   const superAdminOnlyItems = (
     <MenuGroup>
-      <NavMenuItem label={t("home.permitTemplateCatalogueTitleShort")} to={"/requirement-templates"} />
-      <NavMenuItem label={t("home.requirementsLibraryTitle")} to={"/requirements-library"} />
-      <NavMenuItem label={t("home.configurationManagement.title")} to={"/configuration-management"} />
-      <NavMenuItem label={t("home.auditLog")} to={"/audit-log"} />
+      <NavMenuItem label={t('home.permitTemplateCatalogueTitleShort')} to={'/requirement-templates'} />
+      <NavMenuItem label={t('home.requirementsLibraryTitle')} to={'/requirements-library'} />
+      <NavMenuItem label={t('home.configurationManagement.title')} to={'/configuration-management'} />
+      <NavMenuItem label={t('home.auditLog')} to={'/audit-log'} />
       <MenuDivider my={0} borderColor="border.light" />
     </MenuGroup>
-  )
+  );
 
   const reviewStaffOnlyItems = (
     <MenuGroup>
-      <SandboxMenuItem />
       <MenuDivider my={0} borderColor="border.light" />
     </MenuGroup>
-  )
+  );
 
   const reviewManagerOnlyItems = (
     <MenuGroup>
       <NavMenuItem
-        label={t("site.breadcrumb.submissionInbox")}
+        label={t('site.breadcrumb.submissionInbox')}
         to={`/jurisdictions/${currentUser?.jurisdiction?.slug}/submission-inbox`}
       />
-      <NavMenuItem label={t("site.breadcrumb.digitalBuildingPermits")} to={"/digital-building-permits"} />
+      <NavMenuItem label={t('site.breadcrumb.digitalBuildingPermits')} to={'/digital-building-permits'} />
       <NavMenuItem
-        label={t("site.breadcrumb.configurationManagement")}
+        label={t('site.breadcrumb.configurationManagement')}
         to={`/jurisdictions/${currentUser?.jurisdiction?.slug}/configuration-management`}
       />
-      <NavMenuItem label={t("site.breadcrumb.users")} to={`/jurisdictions/${currentUser?.jurisdiction?.slug}/users`} />
+      <NavMenuItem label={t('site.breadcrumb.users')} to={`/jurisdictions/${currentUser?.jurisdiction?.slug}/users`} />
       <NavMenuItem
-        label={t("site.breadcrumb.apiSettings")}
+        label={t('site.breadcrumb.apiSettings')}
         to={`/jurisdictions/${currentUser?.jurisdiction?.slug}/api-settings`}
       />
       <MenuDivider my={0} borderColor="border.light" />
     </MenuGroup>
-  )
+  );
 
-  const adminOrManagerItems = <></>
+  const adminOrManagerItems = <></>;
 
   const reviwerOnlyItems = (
     <MenuGroup>
       <NavMenuItem
-        label={t("site.breadcrumb.submissionInbox")}
+        label={t('site.breadcrumb.submissionInbox')}
         to={`/jurisdictions/${currentUser?.jurisdiction?.slug}/submission-inbox`}
       />
       <MenuDivider my={0} borderColor="border.light" />
     </MenuGroup>
-  )
+  );
 
-  const submitterOnlyItems = <></>
+  const submitterOnlyItems = <></>;
 
   return (
     <Menu onClose={() => setIsMenuOpen(false)} onOpen={() => setIsMenuOpen(true)} computePositionOnMount>
@@ -357,10 +355,10 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
         <MenuButton
           as={IconButton}
           borderRadius="lg"
-          border={currentUser?.isSubmitter || !loggedIn ? "solid black" : "solid white"}
+          border={currentUser?.isSubmitter || !loggedIn ? 'solid black' : 'solid white'}
           borderWidth="1px"
           p={3}
-          variant={currentUser?.isSubmitter || !loggedIn ? "primaryInverse" : "primary"}
+          variant={currentUser?.isSubmitter || !loggedIn ? 'primaryInverse' : 'primary'}
           aria-label="menu dropdown button"
           icon={<List size={16} weight="bold" />}
         />
@@ -377,19 +375,19 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
           aria-label="menu dropdown button"
           leftIcon={<List size={16} weight="bold" />}
         >
-          {t("site.menu")}
+          {t('site.menu')}
         </MenuButton>
       </Show>
 
       <Portal>
-        <Box color="text.primary" className={isMenuOpen && "show-menu-overlay-background"}>
+        <Box color="text.primary" className={isMenuOpen && 'show-menu-overlay-background'}>
           <MenuList zIndex={99} boxShadow="2xl">
             {loggedIn && !currentUser.isUnconfirmed ? (
               <>
                 <MenuDivider my={0} borderColor="border.light" />
-                <NavMenuItem label={t("site.home")} to={"/"} />
+                <NavMenuItem label={t('site.home')} to={'/'} />
                 {!currentUser.isReviewStaff && (
-                  <NavMenuItem label={t("home.jurisdictionsTitle")} to={"/jurisdictions"} />
+                  <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/jurisdictions'} />
                 )}
                 {currentUser?.isSuperAdmin && superAdminOnlyItems}
                 {(currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) && reviewManagerOnlyItems}
@@ -401,18 +399,18 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
 
                 {currentUser?.isSubmitter && (
                   <>
-                    <MenuItem bg="greys.grey03" onClick={(e) => navigate("/permit-applications/new")}>
+                    <MenuItem bg="greys.grey03" onClick={(e) => navigate('/permit-applications/new')}>
                       <Button as={Box} variant="primary">
-                        {t("site.newApplication")}
+                        {t('site.newApplication')}
                       </Button>
                     </MenuItem>
-                    <NavMenuItem label={t("site.myPermits")} to="/permit-applications" bg="greys.grey03" />
+                    <NavMenuItem label={t('site.myPermits')} to="/permit-applications" bg="greys.grey03" />
                     <MenuDivider my={0} borderColor="border.light" />
                   </>
                 )}
                 <MenuDivider my={0} borderColor="border.light" />
-                <NavMenuItem label={t("user.myAccount")} to={"/profile"} />
-                <NavMenuItem label={t("auth.logout")} onClick={handleClickLogout} />
+                <NavMenuItem label={t('user.myAccount')} to={'/profile'} />
+                <NavMenuItem label={t('auth.logout')} onClick={handleClickLogout} />
               </>
             ) : (
               <>
@@ -427,80 +425,80 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
                     boxShadow="none"
                     maxW="300px"
                   >
-                    <NavMenuItemCTA label={t("auth.login")} to="/login" />
+                    <NavMenuItemCTA label={t('auth.login')} to="/login" />
                   </MenuList>
                 )}
                 <MenuDivider my={0} borderColor="border.light" />
-                <NavMenuItem label={t("site.home")} to="/" />
-                <NavMenuItem label={t("home.jurisdictionsTitle")} to={"/jurisdictions"} />
-                {loggedIn && <NavMenuItem label={t("auth.logout")} onClick={handleClickLogout} />}
+                <NavMenuItem label={t('site.home')} to="/" />
+                <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/jurisdictions'} />
+                {loggedIn && <NavMenuItem label={t('auth.logout')} onClick={handleClickLogout} />}
               </>
             )}
           </MenuList>
         </Box>
       </Portal>
     </Menu>
-  )
-})
+  );
+});
 
 // Looks complicated but this is jsut how you make it so that either to or onClick must be given, but not necessarily both
 interface INavMenuItemProps extends MenuItemProps {
-  label: string
-  to?: string
-  onClick?: (any) => void
+  label: string;
+  to?: string;
+  onClick?: (any) => void;
 }
 
 const NavMenuItem = ({ label, to, onClick, ...rest }: INavMenuItemProps) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleClick = (e) => {
-    navigate(to)
-    onClick && onClick(e)
-  }
+    navigate(to);
+    onClick && onClick(e);
+  };
 
   return (
-    <MenuItem as={"a"} py={2} px={3} onClick={handleClick} _hover={{ cursor: "pointer", bg: "hover.blue" }} {...rest}>
+    <MenuItem as={'a'} py={2} px={3} onClick={handleClick} _hover={{ cursor: 'pointer', bg: 'hover.blue' }} {...rest}>
       <Text textAlign="left" w="full">
         {label}
       </Text>
     </MenuItem>
-  )
-}
+  );
+};
 
 // THIS IS CTA BUTTON VERSION FOR THE NAV MENU
 interface INavMenuItemCTAProps {
-  label: string
-  to?: string
-  onClick?: (any) => void
+  label: string;
+  to?: string;
+  onClick?: (any) => void;
 }
 
 const NavMenuItemCTA = ({ label, to, onClick }: INavMenuItemCTAProps) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleClick = (e) => {
-    navigate(to)
-    onClick && onClick(e)
-  }
+    navigate(to);
+    onClick && onClick(e);
+  };
 
   return (
     <MenuItem
-      as={"a"}
+      as={'a'}
       flex={1}
       onClick={handleClick}
       style={{
-        color: "var(--chakra-colors-greys-white)",
-        background: "var(--chakra-colors-theme-blue)",
-        borderRadius: "var(--chakra-radii-sm)",
-        width: "auto",
+        color: 'var(--chakra-colors-greys-white)',
+        background: 'var(--chakra-colors-theme-blue)',
+        borderRadius: 'var(--chakra-radii-sm)',
+        width: 'auto',
       }}
-      display={"flex"}
-      justifyContent={"center"}
+      display={'flex'}
+      justifyContent={'center'}
       _hover={{
-        bg: "var(--chakra-colors-theme-blueAlt) !important",
-        boxShadow: "none",
+        bg: 'var(--chakra-colors-theme-blueAlt) !important',
+        boxShadow: 'none',
       }}
     >
       {label}
     </MenuItem>
-  )
-}
+  );
+};

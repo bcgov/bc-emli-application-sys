@@ -24,10 +24,10 @@ class User < ApplicationRecord
          admin_manager: 1,
          admin: 2,
          system_admin: 3,
-         regional_review_manager: 4,  # unused, only still relevant for old tests until they are cleaned up
+         regional_review_manager: 4, # unused, only still relevant for old tests until they are cleaned up
          participant_support_rep: 5,
          contractor: 6,
-         unassigned: 7,
+         unassigned: 7
        },
        _default: :participant
 
@@ -35,8 +35,14 @@ class User < ApplicationRecord
   self.skip_session_storage = %i[http_auth params_auth]
 
   # Associations
-  has_one :physical_address, -> { where(address_type: 'physical') }, class_name: 'UserAddress', dependent: :destroy
-  has_one :mailing_address, -> { where(address_type: 'mailing') }, class_name: 'UserAddress', dependent: :destroy
+  has_one :physical_address,
+          -> { where(address_type: "physical") },
+          class_name: "UserAddress",
+          dependent: :destroy
+  has_one :mailing_address,
+          -> { where(address_type: "mailing") },
+          class_name: "UserAddress",
+          dependent: :destroy
 
   has_many :jurisdiction_memberships, dependent: :destroy
   has_many :jurisdictions, through: :jurisdiction_memberships
@@ -68,7 +74,7 @@ class User < ApplicationRecord
   has_one :preference, dependent: :destroy
   accepts_nested_attributes_for :preference
   accepts_nested_attributes_for :physical_address, :mailing_address
-  
+
   # Validations
   validate :valid_role_change, if: :role_changed?, on: :update
   validate :jurisdiction_must_belong_to_correct_roles
@@ -90,6 +96,9 @@ class User < ApplicationRecord
 
   delegate :sandboxes, to: :jurisdiction
 
+  # Ensure the reviewed field has a default value of false
+  attribute :reviewed, :boolean, default: false
+
   def confirmation_required?
     false
   end
@@ -102,7 +111,7 @@ class User < ApplicationRecord
       participant_support_rep: "terms",
       contractor: "terms",
       unassigned: "terms",
-      system_admin: nil
+      system_admin: "terms"
     }[
       role.to_sym
     ]
@@ -181,17 +190,15 @@ class User < ApplicationRecord
 
     physical_address = self.physical_address || build_physical_address
     physical_address.assign_attributes(address_data)
-    
+
     # trigger an update only if changes are detected
-    if physical_address.changed?
-      physical_address.save!
-    end
+    physical_address.save! if physical_address.changed?
   end
 
   def user_has_mailing_address
     mailing_address.present?
   end
-  
+
   def save_user_address(address_data)
     #Rails.logger.info "Address Data: #{address_data.inspect}"  # Debugging log
 
@@ -202,7 +209,7 @@ class User < ApplicationRecord
     # Find or initialize the mailing address
     mailing_address = self.mailing_address || build_mailing_address
     mailing_address.assign_attributes(
-      user_id: self.id,  # Ensure it's linked to the user
+      user_id: self.id, # Ensure it's linked to the user
       street_address: address_data[:street_address],
       locality: address_data[:locality],
       region: address_data[:region],
@@ -253,9 +260,9 @@ class User < ApplicationRecord
     unless !confirmed? || first_name.present?
       errors.add(:user, "Confirmed user must have first_name")
     end
-    #unless !confirmed? || last_name.present?
-    #  errors.add(:user, "Confirmed user must have last_name")
-    #end
+    unless !confirmed? || last_name.present?
+      errors.add(:user, "Confirmed user must have last_name")
+    end
     unless !confirmed? || email.present?
       errors.add(:user, "Confirmed user must have email")
     end

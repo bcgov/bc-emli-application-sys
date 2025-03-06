@@ -1878,8 +1878,28 @@ const options = {
             bceidbusiness: 'Business BCeID',
             bcsc: 'BCSC',
           },
-          changeBceid: 'If you want to change your BCeID information, please go to ',
-          changeBceidLinkText: 'bceid.ca',
+          changeBceid: {
+            info: '',
+            link: '',
+            linkText: '',
+          },
+          changeIdir: {
+            info: '',
+            link: '',
+            linkText: '',
+          },
+          changeBasic: {
+            info: '',
+            link: '',
+            linkText: '',
+          },
+          changeBcsc: {
+            info: '',
+            link: '',
+            linkText: '',
+          },
+          //changeBceid: 'If you want to change your BCeID information, please go to ',
+          //changeBceidLinkText: 'bceid.ca',
           confirmationRequiredWithEmail:
             'Action required: please click the link in the verification email that was sent to you. You will continue to receive emails at <strong>{{email}}</strong> until your new email is confirmed. <br/><br/>(Didn’t receive it? <1>Resend email</1>)',
           confirmationRequired:
@@ -1894,10 +1914,10 @@ const options = {
           postalCode: 'Postal code',
           country: 'Country',
           sameAddress: 'My residential address is the same as my postal address',
-          changeInfo: 'If you want to change your BCeID information, please go to',
-          bceid: 'bceid.ca',
-          changeInfoLink:
-            'https://www2.gov.bc.ca/gov/content/governments/government-id/bc-services-card/your-card/change-personal-information',
+          //changeInfo: 'If you want to change your BCeID information, please go to',
+          //bceid: 'bceid.ca',
+          //changeInfoLink:
+          //  'https://www2.gov.bc.ca/gov/content/governments/government-id/bc-services-card/your-card/change-personal-information',
           postalAddress: 'Postal address',
           required: 'required',
           emailAddress: 'Email address',
@@ -1948,6 +1968,11 @@ const options = {
             review_manager: 'review manager',
             reviewer: 'reviewer',
             super_admin: 'super admin',
+            participant: 'participant',
+            participantSupportRep: 'participant support representative',
+            admin: 'admin',
+            contractor: 'contractor',
+            adminManager: 'admin manager',
             system_admin: 'system admin',
           },
           rolesExplanation: {
