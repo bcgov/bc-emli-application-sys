@@ -32,7 +32,7 @@ jobs:
         registry-url: ${{ env.GITHUB_REGISTRY }}
         registry-username: ${{ github.actor }}
         registry-password: ${{ secrets.GITHUB_TOKEN }}
-        image-name: bcgov/hpp
+        image-name: bcgov/hesp
         docker-context: .
         docker-file: devops/docker/app/Dockerfile
         docker-args: |
