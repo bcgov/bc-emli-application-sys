@@ -1,0 +1,42 @@
+name: Deploy Dev Environment
+
+on:
+  push
+
+env:
+  GITHUB_REGISTRY: ghcr.io
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  packages: write
+  contents: write
+  security-events: write
+
+jobs:
+  build-push-frontend:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+    - uses: hmarr/debug-action@f7318c783045ac39ed9bb497e22ce835fdafbfe6
+    - uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
+
+    - name: Setup Tools
+      uses: ./.github/actions/setup-tools
+
+    - name: Build and Push
+      uses: egose/actions/docker-build-push@46d589997e49cae4a8a3d06644ae8b04351a30f2
+      with:
+        registry-url: ${{ env.GITHUB_REGISTRY }}
+        registry-username: ${{ github.actor }}
+        registry-password: ${{ secrets.GITHUB_TOKEN }}
+        image-name: bcgov/hpp
+        docker-context: .
+        docker-file: bc-emli-application-sys/devops/docker/app/Dockerfile
+        docker-args: |
+          deployment_tag=${{ github.sha }}
+        metadata-tags: |
+          type=ref,event=branch
+          type=sha,format=long,prefix=,suffix=
