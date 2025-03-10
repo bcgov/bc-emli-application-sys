@@ -16,7 +16,7 @@ permissions:
   security-events: write
 
 jobs:
-  build-push-frontend:
+  build-push-app:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
@@ -34,7 +34,7 @@ jobs:
         registry-password: ${{ secrets.GITHUB_TOKEN }}
         image-name: bcgov/hpp
         docker-context: .
-        docker-file: bc-emli-application-sys/devops/docker/app/Dockerfile
+        docker-file: devops/docker/app/Dockerfile
         docker-args: |
           deployment_tag=${{ github.sha }}
         metadata-tags: |
