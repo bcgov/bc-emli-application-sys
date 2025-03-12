@@ -9,11 +9,12 @@ import { SuperAdminHomeScreen } from "./super-admin-home-screen"
 
 const roleSpecificScreens = (role: EUserRoles, props: IHomeScreenProps) => {
   return {
-    [EUserRoles.superAdmin]: <SuperAdminHomeScreen {...props} />,
-    [EUserRoles.reviewer]: <ReviewerHomeScreen {...props} />,
-    [EUserRoles.reviewManager]: <ReviewManagerHomeScreen {...props} />,
-    [EUserRoles.regionalReviewManager]: <ReviewManagerHomeScreen {...props} />,
-    [EUserRoles.submitter]: <EnergySavingsApplicationIndexScreen {...props} />,
+    [EUserRoles.systemAdmin]: <SuperAdminHomeScreen {...props} />,
+    [EUserRoles.admin]: <ReviewerHomeScreen {...props} />,
+    [EUserRoles.adminManager]: <ReviewManagerHomeScreen {...props} />,
+    //TODO: [EUserRoles.participantSupportRep]: <ParticipantSupportRep {...props} />,
+    //TODO: 
+    [EUserRoles.participant]: <EnergySavingsApplicationIndexScreen {...props} />,
   }[role]
 }
 

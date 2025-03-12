@@ -56,7 +56,7 @@ module Api::Concerns::Search::PermitApplications
   def permit_application_order
     if (sort = permit_application_search_params[:sort])
       { sort[:field] => { order: sort[:direction], unmapped_type: "long" } }
-    elsif current_user.submitter?
+    elsif current_user.participant?
       { created_at: { order: :desc, unmapped_type: "long" } }
     else
       { number: { order: :desc, unmapped_type: "long" } }
@@ -78,7 +78,7 @@ module Api::Concerns::Search::PermitApplications
       else
         { user_ids_with_submission_edit_permissions: current_user.id }
       end
-    where[:sandbox_id] = current_sandbox&.id if !current_user.super_admin?
+    where[:sandbox_id] = current_sandbox&.id if !current_user.system_admin?
 
     (filters&.to_h || {}).deep_symbolize_keys.compact.merge!(where)
   end

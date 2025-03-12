@@ -19,14 +19,14 @@ class Jurisdiction::UserInviter
     users_params.each do |user_params|
       user =
         User
-          .where.not(role: :submitter)
+          .where.not(role: :participant)
           .find_by(email: user_params[:email].strip)
       is_regional_rm =
         user&.regional_review_manager? ||
           (user && user_params[:role].to_sym == :regional_review_manager)
 
       if user.present? && !user.discarded? && user.confirmed? &&
-           (!is_regional_rm || user.super_admin?)
+           (!is_regional_rm || user.system_admin?)
         self.results[:email_taken] << user
       elsif user && is_regional_rm &&
             jurisdiction_id = user_params[:jurisdiction_id]

@@ -1,20 +1,28 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint",
-    "jsx-a11y"
-  ],
+  "plugins": ["@typescript-eslint", "jsx-a11y"],
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:jsx-a11y/recommended"
+    "plugin:jsx-a11y/recommended",
   ],
+  "rules": {
+    "semi": [2, "always"],
+    "no-unused-vars": 1,
+    "react/prop-types": 0,
+    "no-mixed-spaces-and-tabs": 1,
+    "no-extra-semi": 1,
+    "valid-typeof": 0,
+    "react-hooks/exhaustive-deps": 0,
+    "react/jsx-uses-react": "error", // Ensure React is in scope
+    "react/jsx-uses-vars": "error", // Ensure JSX variables are used
+  },
   "settings": {
     "react": {
-      "version": "detect"
-    }
-  }
+      "version": "detect",
+    },
+  },
 }

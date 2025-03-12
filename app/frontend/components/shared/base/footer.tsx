@@ -1,30 +1,32 @@
-import { Box, Container, Divider, Flex, Show, Text } from "@chakra-ui/react"
-import { observer } from "mobx-react-lite"
-import React from "react"
-import { useTranslation } from "react-i18next"
-import { useLocation } from "react-router-dom"
-import { useMst } from "../../../setup/root"
-import { RouterLink } from "../navigation/router-link"
+import { Box, Container, Divider, Flex, Show, Text } from '@chakra-ui/react';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
+import { useMst } from '../../../setup/root';
+import { RouterLink } from '../navigation/router-link';
 
 export const Footer = observer(() => {
-  const location = useLocation()
+  const location = useLocation();
   const {
     sessionStore: { loggedIn },
-  } = useMst()
-  const { t } = useTranslation()
+    userStore: { currentUser },
+  } = useMst();
+  const { t } = useTranslation();
   const onlyShowFooterOnRoutes = [
-    "/reset-password",
-    "/accept-invitation",
-    "/login",
-    "/forgot-password",
-    "/welcome",
-    "/contact",
-    "/check-eligible",
-    "/not-found",
-    "/get-support",
-  ]
+    '/reset-password',
+    '/accept-invitation',
+    '/forgot-password',
+    '/welcome',
+    '/contact',
+    '/check-eligible',
+    '/not-found',
+    '/get-support',
+  ];
 
-  const shouldShowFooter = onlyShowFooterOnRoutes.some((route) => location.pathname.startsWith(route))
+  const shouldShowFooter = onlyShowFooterOnRoutes.some(
+    (route) => location.pathname.startsWith(route) || (location.pathname === '/' && !currentUser?.isSubmitter),
+  );
 
   return (
     <>
@@ -40,32 +42,32 @@ export const Footer = observer(() => {
         >
           <Flex py={8} borderY="4px solid" borderColor="theme.yellow" bg="text.primary" color="greys.white">
             <Container maxW="container.lg">
-              <Text>{t("site.territorialAcknowledgement")}</Text>
+              <Text>{t('site.territorialAcknowledgement')}</Text>
             </Container>
           </Flex>
           <Show above="md">
             <Box py={14} bg="greys.grey03" w="full">
               <Container maxW="container.lg">
-                <Flex direction={{ base: "column", md: "row" }} gap={12}>
-                  <Flex direction={"row"} align="center" justify="center" wrap="wrap" gap={8}>
-                    <RouterLink to={t("site.footerLinks.betterHomes")} color="text.secondary">
-                      {t("site.betterHomes")}
+                <Flex direction={{ base: 'column', md: 'row' }} gap={12}>
+                  <Flex direction={'row'} align="center" justify="center" wrap="wrap" gap={8}>
+                    <RouterLink to={t('site.footerLinks.betterHomes')} color="text.secondary">
+                      {t('site.betterHomes')}
                     </RouterLink>
                     <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                    <RouterLink to={t("site.footerLinks.disclaimer")} color="text.secondary">
-                      {t("site.disclaimer")}
+                    <RouterLink to={t('site.footerLinks.disclaimer')} color="text.secondary">
+                      {t('site.disclaimer')}
                     </RouterLink>
                     <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                    <RouterLink to={t("site.footerLinks.accessibility")} color="text.secondary">
-                      {t("site.accessibility")}
+                    <RouterLink to={t('site.footerLinks.accessibility')} color="text.secondary">
+                      {t('site.accessibility')}
                     </RouterLink>
                     <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                    <RouterLink to={t("site.footerLinks.copyright")} color="text.secondary">
-                      {t("site.copyright")}
+                    <RouterLink to={t('site.footerLinks.copyright')} color="text.secondary">
+                      {t('site.copyright')}
                     </RouterLink>
                     <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                    <RouterLink to={t("site.footerLinks.dataAndPrivacy")} color="text.secondary">
-                      {t("site.dataAndPrivacy")}
+                    <RouterLink to={t('site.footerLinks.dataAndPrivacy')} color="text.secondary">
+                      {t('site.dataAndPrivacy')}
                     </RouterLink>
                   </Flex>
                 </Flex>
@@ -75,5 +77,5 @@ export const Footer = observer(() => {
         </Flex>
       )}
     </>
-  )
-})
+  );
+});

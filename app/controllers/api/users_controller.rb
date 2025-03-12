@@ -39,7 +39,7 @@ class Api::UsersController < Api::ApplicationController
   def super_admins
     authorize :user, :super_admins?
     begin
-      super_admins = User.super_admin
+      super_admins = User.system_admin
       render_success super_admins,
                      nil,
                      {

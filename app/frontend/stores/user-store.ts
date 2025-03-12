@@ -52,7 +52,7 @@ export const UserStoreModel = types
   }))
   .views((self) => ({
     get adminUsers(): IUser[] {
-      return self.users.filter((u) => u.role === EUserRoles.superAdmin)
+      return self.users.filter((u) => u.role === EUserRoles.systemAdmin)
     },
   }))
   .actions((self) => ({
