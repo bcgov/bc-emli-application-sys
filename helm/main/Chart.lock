@@ -1,0 +1,24 @@
+dependencies:
+- name: app
+  repository: file://../_app
+  version: 0.1.0
+- name: anycable-rpc
+  repository: file://../_anycable-rpc
+  version: 0.1.0
+- name: sidekiq
+  repository: file://../_sidekiq
+  version: 0.1.0
+- name: crunchy-postgres
+  repository: https://bcgov.github.io/crunchy-postgres/
+  version: 0.6.1
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 18.16.1
+- name: elasticsearch
+  repository: https://charts.bitnami.com/bitnami
+  version: 19.19.3
+- name: anycable-go
+  repository: https://helm.anycable.io/
+  version: 0.5.11
+digest: sha256:8588a66e40967b78365f5fa4af1e5d8189940b16a8f3afe7c8a5dd5b153074fc
+generated: "2025-03-10T20:58:34.397590493-07:00"

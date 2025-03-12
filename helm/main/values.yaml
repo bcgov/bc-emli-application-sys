@@ -1,0 +1,334 @@
+# See https://helm.sh/docs/chart_template_guide/subcharts_and_globals/#global-chart-values
+global:
+  licencePlate: bfc7dd
+  vault:
+    # licencePlate-nonprod or licencePlate-prod
+    role:
+    # sub-path of the vault secret
+    subPath:
+    podAnnotations: {}
+      # See https://developer.hashicorp.com/vault/docs/platform/k8s/injector/annotations#agent-annotations
+      # vault.hashicorp.com/auth-path: auth/k8s-silver
+      # vault.hashicorp.com/namespace: platform-services
+      # vault.hashicorp.com/agent-inject: "true"
+      # vault.hashicorp.com/agent-inject-token: "false"
+      # vault.hashicorp.com/agent-pre-populate: "true"
+      # vault.hashicorp.com/agent-pre-populate-only: "true"
+      # vault.hashicorp.com/agent-requests-cpu: 50m
+      # vault.hashicorp.com/agent-limits-cpu: 100m
+      # vault.hashicorp.com/agent-requests-mem: 32Mi
+      # vault.hashicorp.com/agent-limits-mem: 64Mi
+  imagePullSecrets:
+    - name: bfc7dd-artifactory-credentials
+  env:
+    "REDIS_SENTINEL_HEADLESS": "hesp-redis-headless"
+    "REDIS_SENTINEL_MASTER_SET_NAME": "redisMasterSet"
+    "REDIS_SENTINEL_PORT": "26379"
+    "SECRET_KEY_BASE": "1"
+    "SIDEKIQ_CONCURRENCY": "20"
+    "SIDEKIQ_REDIS_DB": "0"
+
+  envSecretName: hesp # pragma: allowlist secret
+  serviceAccountName: bfc7dd-vault
+
+nameOverride: hesp
+fullnameOverride: hesp
+
+app:
+  enabled: false
+  image:
+    pullPolicy: IfNotPresent
+
+  nameOverride: hesp-app
+  fullnameOverride: hesp-app
+
+  logVolume:
+    enabled: true
+
+  resources:
+    requests:
+      cpu: 300m
+      memory: 768Mi
+
+  env:
+    "ANYCABLE_REDIS_URL": "redis://hesp-redis:6379/"
+    "ANYCABLE_URL": "ws://anycable-go:8080/cable"
+    "BUNDLE_PATH": "/usr/local/bundle"
+    "CACHE_DEV_REDIS_URL": "redis://hesp-redis:6379/4"
+    "ELASTICSEARCH_URL": "http://elasticsearch-ha:9200"
+    "FROM_EMAIL": "no-reply@gov.bc.ca"
+    "GEM_HOME": "/usr/local/bundle"
+    "RAILS_ENV": "production"
+    "RAILS_MAX_THREADS": "3"
+    "RATE_LIMIT_DEV_REDIS_URL": "redis://hesp-redis:6379/2"
+    "REDIS_URL": "redis://hesp-redis:6379/0"
+    "RUBY_VERSION": "3.2.5"
+    "SESSION_TIMEOUT_MINUTES": "60"
+    "SIMPLE_FEED_DEV_REDIS_URL": "redis://hesp-redis:6379/3"
+    "VITE_RUBY_HOST": "vite"
+    "WEB_CONCURRENCY": "2"
+    "APP_DOMAIN": ""
+    "KEYCLOAK_AUTH_URL": ""
+    "VITE_SITEMINDER_LOGOUT_URL": ""
+    "VITE_BCEID_URL": ""
+    "VITE_BUSINESS_BCEID_REGISTRATION_URL": ""
+    "VITE_KEYCLOAK_LOGOUT_URL": ""
+    "VITE_POST_LOGOUT_REDIRECT_URL": ""
+
+sidekiq:
+  enabled: false
+  image:
+    pullPolicy: IfNotPresent
+
+  nameOverride: hesp-sidekiq
+  fullnameOverride: hesp-sidekiq
+
+  resources:
+    requests:
+      cpu: 300m
+      memory: 256Mi
+
+  env: {}
+
+anycable-rpc:
+  enabled: false
+  image:
+    pullPolicy: IfNotPresent
+
+  nameOverride: hesp-anycable-rpc
+  fullnameOverride: hesp-anycable-rpc
+
+  resources:
+    requests:
+      cpu: 300m
+      memory: 256Mi
+
+  env: {}
+
+# See https://github.com/bcgov/crunchy-postgres/blob/main/charts/crunchy-postgres/values.yaml
+crunchy-postgres:
+  enabled: true
+  fullnameOverride: hesp-crunchydb
+
+  crunchyImage: # it's not necessary to specify an image as the images specified in the Crunchy Postgres Operator will be pulled by default
+  # crunchyImage: artifacts.developer.gov.bc.ca/bcgov-docker-local/crunchy-postgres-gis:ubi8-15.2-3.3-0 # use this image for POSTGIS
+  postgresVersion: 15
+  # postGISVersion: '3.3' # use this version of POSTGIS. both crunchyImage and this property needs to have valid values for POSTGIS to be enabled.
+  imagePullPolicy: IfNotPresent
+
+  instances:
+    name: ha # high availability
+    replicas: 1
+    dataVolumeClaimSpec:
+      storage: 1Gi
+      storageClassName: netapp-block-standard
+    requests:
+      cpu: 10m
+      memory: 256Mi
+    replicaCertCopy:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+
+  pgBackRest:
+    image: # it's not necessary to specify an image as the images specified in the Crunchy Postgres Operator will be pulled by default
+    retention: "1" # Ideally a larger number such as 30 backups/days
+    # If retention-full-type set to 'count' then the oldest backups will expire when the number of backups reach the number defined in retention
+    # If retention-full-type set to 'time' then the number defined in retention will take that many days worth of full backups before expiration
+    retentionFullType: count
+    repos:
+      schedules:
+        full: 0 4 * * *
+        incremental: 0 0,4,12,16,20 * * *
+      volume:
+        accessModes: "ReadWriteOnce"
+        storage: 1Gi
+        storageClassName: netapp-file-backup
+    repoHost:
+      requests:
+        cpu: 1m
+        memory: 64Mi
+    sidecars:
+      requests:
+        cpu: 1m
+        memory: 64Mi
+    s3:
+      enabled: false
+      createS3Secret: true
+      # the s3 secret name
+      s3Secret: s3-pgbackrest
+      # the path start with /, it will be created under bucket if it doesn't exist
+      s3Path: "/habackup"
+      # s3UriStyle is host or path
+      s3UriStyle: path
+      # bucket specifies the S3 bucket to use,
+      bucket: "backetName"
+      # endpoint specifies the S3 endpoint to use.
+      endpoint: "endpointName"
+      # region specifies the S3 region to use. If your S3 storage system does not
+      # use "region", fill this in with a random value.
+      region: "ca-central-1"
+      # key is the S3 key. This is stored in a Secret.
+      # Please DO NOT push this value to GitHub
+      key: "s3keyValue"
+      # keySecret is the S3 key secret. This is stored in a Secret.
+      # Please DO NOT push this value to GitHub
+      keySecret: "s3SecretValue"
+
+  patroni:
+    postgresql:
+      pg_hba: "host all all 0.0.0.0/0 md5"
+      parameters:
+        shared_buffers: 16MB # default is 128MB; a good tuned default for shared_buffers is 25% of the memory allocated to the pod
+        wal_buffers: "64kB" # this can be set to -1 to automatically set as 1/32 of shared_buffers or 64kB, whichever is larger
+        min_wal_size: 32MB
+        max_wal_size: 64MB # default is 1GB
+        max_slot_wal_keep_size: 128MB # default is -1, allowing unlimited wal growth when replicas fall behind
+
+  proxy:
+    pgBouncer:
+      image: # it's not necessary to specify an image as the images specified in the Crunchy Postgres Operator will be pulled by default
+      replicas: 2
+      requests:
+        cpu: 50m
+        memory: 64Mi
+
+  # Postgres Cluster resource values:
+  pgmonitor:
+    enabled: false
+    exporter:
+      image: # it's not necessary to specify an image as the images specified in the Crunchy Postgres Operator will be pulled by default
+      requests:
+        cpu: 1m
+        memory: 64Mi
+
+# See https://github.com/bitnami/charts/blob/main/bitnami/redis/values.yaml
+redis:
+  enabled: true
+  nameOverride: hesp-redis
+  fullnameOverride: hesp-redis
+  auth:
+    enabled: false
+    sentinel: false
+    usePasswordFiles: false # if this is enabeld it will use /opt/bitnami/redis/secrets/redis-password ---> we will instead use /vault/secrets/secrets.env which we have configured to have the password
+  sentinel:
+    enabled: true
+    masterSet: redisMasterSet
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 20m
+  replica:
+    replicaCount: 1
+    shareProcessNamespace: true
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+    persistence:
+      enabled: true
+      size: 500Mi
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 20m
+
+# See https://github.com/bitnami/charts/blob/main/bitnami/elasticsearch/values.yaml
+elasticsearch:
+  enabled: true
+  fullnameOverride: hesp-elasticsearch
+  clusterName: hesp-elasticsearch
+  sysctlImage:
+    enabled: false
+  master:
+    replicaCount: 1
+    heapSize: 128m
+    networkPolicy:
+      enabled: false
+      allowExternal: false
+    resources:
+      requests:
+        cpu: 20m
+        memory: 256Mi
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 256Mi
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 1200
+      periodSeconds: 15
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
+  data:
+    replicaCount: 1
+    networkPolicy:
+      enabled: false
+      allowExternal: false
+    heapSize: 128m
+    resources:
+      requests:
+        cpu: 20m
+        memory: 512Mi
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 1200
+      periodSeconds: 15
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
+  coordinating:
+    replicaCount: 0
+  ingest:
+    replicaCount: 0
+
+  # This will be running internal to the Openshift cluster only, never exposed
+  security:
+    enabled: false
+    fipsMode: false
+    tls:
+      restEncryption: false
+      autoGenerated: false
+
+  metrics:
+    enabled: false
+
+# See https://github.com/anycable/anycable-helm/blob/master/anycable-go/values.yaml
+anycableGo:
+  enabled: false
+  nameOverride: hesp-anycable-go
+  fullNameOverride: hesp-anycable-go
+  replicas: 1
+  env:
+    # Assuming that Ruby RPC is available in K8s in the same namespace as anycable-rpc service (see next chapter)
+    anycableRpcHost: hesp-anycable-rpc:50051
+    anycableRedisUrl: redis://redisMasterSet:6379/1
+    anycableRedisSentinels: hesp-redis-headless:26379
+  route:
+    enabled: true
+  ingress:
+    enable: true
+    path: /cable
+  resources:
+    requests:
+      cpu: 20m
+      memory: 128Mi
