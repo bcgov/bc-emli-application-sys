@@ -1,6 +1,6 @@
 import { Box, Divider, Flex, Heading, HStack, Link, Text, VStack, Button } from '@chakra-ui/react';
 import { ArrowSquareOut } from '@phosphor-icons/react';
-import React from 'react';
+import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CenterContainer } from '../../shared/containers/center-container';
 import { storeEntryPoint } from '../../shared/store-entry-point';
@@ -14,6 +14,8 @@ export interface ILoginScreenProps {
 
 export const AdminPortalLogin = ({ isAdmin, isPSR, isAdminMgr, isSysAdmin }: ILoginScreenProps) => {
   const { t } = useTranslation();
+  const authFormRef = useRef<HTMLFormElement>(null);
+
   const loginScreenProps = { isAdmin, isPSR, isAdminMgr, isSysAdmin };
   const loginKey = Object.keys(loginScreenProps).filter(
     (key) => loginScreenProps[key as keyof ILoginScreenProps] !== undefined,
@@ -90,18 +92,23 @@ export const AdminPortalLogin = ({ isAdmin, isPSR, isAdminMgr, isSysAdmin }: ILo
 
           <Box>
             <Text fontWeight="bold">{t('auth.adminPortalLoginInfo.noAccount.text')}</Text>
-            <form id="authForm" action="/api/auth/keycloak" method="post">
+            <form ref={authFormRef} id="authForm" action="/api/auth/keycloak" method="post" onSubmit={handleSubmit}>
               <input type="hidden" name="kc_idp_hint" value="bceidbusiness" />
               <input
                 type="hidden"
                 name="authenticity_token"
                 value={(document.querySelector('[name=csrf-token]') as HTMLMetaElement).content}
               />
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  authFormRef.current?.requestSubmit();
+                }}
+              >
+                {t('auth.adminPortalLoginInfo.noAccount.altLoginText')}
+              </Link>
             </form>
-
-            <Link href="#" onClick={() => (document.getElementById('authForm') as HTMLFormElement).submit()}>
-              {t('auth.adminPortalLoginInfo.noAccount.altLoginText')}
-            </Link>
           </Box>
           <Divider my={4} />
         </Flex>

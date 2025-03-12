@@ -2,10 +2,14 @@ class Api::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   include BaseControllerMethods
 
   def keycloak
+    Rails.logger.info(
+      "[Omniauth Callback] session_id=#{session.id} session=#{session.to_hash.inspect}"
+    )
     # Retrieve the entry point from the session
-    entry_point = session[:entry_point] || ''
+    entry_point = session[:entry_point] || ""
+    Rails.logger.info("[Omniauth Callback] Entry Point KC: #{entry_point}")
     session.delete(:entry_point)
-    
+
     origin_query =
       Rack::Utils.parse_nested_query(URI(request.env["omniauth.origin"]).query)
     result =

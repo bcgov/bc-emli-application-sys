@@ -81,7 +81,7 @@ class Api::UsersController < Api::ApplicationController
     # https://github.com/heartcombo/devise/issues/5470
     current_user.unconfirmed_email = nil if current_user.email &&
       profile_params[:email] == current_user.email
-    
+
     if current_user.update(profile_params)
       should_send_confirmation =
         @user.confirmed_at.blank? && @user.confirmation_sent_at.blank?
@@ -226,8 +226,9 @@ class Api::UsersController < Api::ApplicationController
 
   def profile_params
     # Transform all keys to snake_case first
-    transformed_params = params.require(:user).deep_transform_keys { |key| key.to_s.underscore }
-    
+    transformed_params =
+      params.require(:user).deep_transform_keys { |key| key.to_s.underscore }
+
     transformed_params.permit(
       :email,
       :nickname,
@@ -235,6 +236,7 @@ class Api::UsersController < Api::ApplicationController
       :last_name,
       :organization,
       :certified,
+      :reviewed,
       preference_attributes: %i[
         enable_in_app_new_template_version_publish_notification
         enable_in_app_customization_update_notification
@@ -249,7 +251,13 @@ class Api::UsersController < Api::ApplicationController
         enable_in_app_integration_mapping_notification
         enable_email_integration_mapping_notification
       ],
-      mailing_address_attributes: %i[street_address locality region postal_code country]
+      mailing_address_attributes: %i[
+        street_address
+        locality
+        region
+        postal_code
+        country
+      ]
     )
   end
 end

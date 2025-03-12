@@ -189,7 +189,7 @@ export const NavBar = observer(function NavBar() {
                   <Text color="whiteAlpha.700" textAlign="right" variant="tiny_uppercase">
                     {t(`user.roles.${currentUser.role}`, { defaultValue: currentUser.role })}
                   </Text>
-                  <RegionalRMJurisdictionSelect key={rmJurisdictionSelectKey} />
+                  {/* <RegionalRMJurisdictionSelect key={rmJurisdictionSelectKey} /> */}
                 </VStack>
               )}
               {currentUser?.isSuperAdmin && (

@@ -113,6 +113,21 @@ export const UserModel = types
         self.jurisdictions[0]
       );
     },
+    get isSameAddress() {
+      if (!self.mailingAddress || !self.physicalAddress) {
+        return false; // If either is null, they can't be the same
+      }
+
+      const isSame =
+        self.mailingAddress.streetAddress === self.physicalAddress.streetAddress &&
+        self.mailingAddress.locality === self.physicalAddress.locality &&
+        self.mailingAddress.region === self.physicalAddress.region &&
+        self.mailingAddress.postalCode === self.physicalAddress.postalCode &&
+        self.mailingAddress.country === self.physicalAddress.country;
+
+      console.log('isSameAddress result:', isSame);
+      return isSame;
+    },
   }))
   .actions((self) => ({
     setAddresses(physical: IAddress | null, mailing: IAddress | null) {

@@ -15,14 +15,16 @@ import {
 } from '@chakra-ui/react';
 import { Info, Warning } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
 import { EmailFormControl } from '../../shared/form/email-form-control';
 import { TextFormControl } from '../../shared/form/input-form-control';
-import CustomAlert from '../../shared/base/custom-alert';
+import CustomAlert, { InformationAlert } from '../../shared/base/custom-alert';
+import { useCurrentUserLicenseAgreements } from '../../../hooks/resources/user-license-agreements';
+import { reaction } from 'mobx';
 
 interface IProfileScreenProps {}
 
@@ -37,17 +39,18 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
   const { userStore } = useMst();
   const { currentUser, updateProfile } = userStore;
 
+  const [sameAddressChecked, setSameAddressChecked] = useState(currentUser.isSameAddress);
+
   const confirmationRequired =
     currentUser.unconfirmedEmail || (currentUser.isUnconfirmed && currentUser.confirmationSentAt);
 
   // Function to get defaults
   const getDefaults = () => {
-    const { firstName, lastName, certified, organization, preference, email, physicalAddress, mailingAddress } =
-      currentUser;
+    const { firstName, lastName, organization, preference, email, physicalAddress, mailingAddress } = currentUser;
     return {
       firstName,
       lastName,
-      certified,
+      certified: true,
       organization,
       preferenceAttributes: preference,
       email,
@@ -61,7 +64,7 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
       postalAddressProvince: mailingAddress?.region,
       postalAddressPostalcode: mailingAddress?.postalCode,
       postalAddressCountry: mailingAddress?.country,
-      isSameAddress: false,
+      reviewed: true,
     };
   };
   const formMethods = useForm({
@@ -78,6 +81,7 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
     await updateProfile(formData);
     setIsEditingEmail(false);
     reset(getDefaults());
+    navigate('/');
   };
 
   const handleResendConfirmationEmail = async () => {
@@ -87,9 +91,9 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
   // Handle checkbox change to sync physical address with postal address
   const handleCheckboxChange = (event) => {
     const checked = event.target.checked;
+    setSameAddressChecked(checked);
     setFormValues((prevValues) => ({
       ...prevValues,
-      isSameAddress: checked,
       ...(checked && {
         postalAddress: prevValues.address,
         postalAddressCity: prevValues.city,
@@ -136,27 +140,33 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                   onChange={(e) => setFormValues({ ...formValues, lastName: e.target.value })}
                 />
               </Flex>
-              {currentUser.isParticipant && (
+              {currentUser.isParticipant && !currentUser.isBasicBCEID ? (
                 <>
-                  <PhysicalAddressBlock
-                    formValues={formValues}
-                    setFormValues={setFormValues}
-                    checkBoxChangeEvent={handleCheckboxChange}
-                  />
-                  <CustomAlert
-                    description={t('user.changeInfo')}
-                    descLinkHref={t('user.changeInfoLink')}
-                    descLinkText={t('user.bceid')}
-                    icon={<Info />}
-                    iconColor="theme.darkBlue"
-                    borderColor="theme.darkBlue"
-                    backgroundColor="greys.offWhite"
+                  <PhysicalAddressBlock formValues={formValues} />
+                  <Checkbox isChecked={sameAddressChecked} onChange={handleCheckboxChange}>
+                    {t('user.sameAddress')}
+                  </Checkbox>
+                  <InformationAlert
+                    description={t('user.changeBcsc.info')}
+                    descLinkHref={t('user.changeBcsc.link')}
+                    descLinkText={t('user.changeBcsc.linkText')}
                   />
                 </>
-              )}
-              {currentUser.isParticipant && (
-                <MailingAddressBlock formValues={formValues} setFormValues={setFormValues} />
-              )}
+              ) : null}
+              {currentUser.isParticipant && !currentUser.isBasicBCEID && !sameAddressChecked ? (
+                <MailingAddressBlock
+                  sameAddressChecked={sameAddressChecked}
+                  formValues={formValues}
+                  setFormValues={setFormValues}
+                />
+              ) : null}
+              {currentUser.isParticipant && currentUser.isBasicBCEID ? (
+                <InformationAlert
+                  description={t('user.changeBasic.info')}
+                  descLinkHref={t('user.changeBasic.link')}
+                  descLinkText={t('user.changeBasic.linkText')}
+                />
+              ) : null}
               {currentUser.isUnconfirmed && !currentUser.confirmationSentAt ? (
                 <EmailFormControl fieldName="email" label={t('user.emailAddress')} showIcon required />
               ) : (
@@ -280,16 +290,20 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                     ))}
                 </>
               )}
-              {/* TODO: Text changes based on provider login type */}
-              <CustomAlert
-                description={t('user.changeInfo')}
-                descLinkHref={t('user.changeInfoLink')}
-                descLinkText={t('user.bceid')}
-                icon={<Info />}
-                iconColor="theme.darkBlue"
-                borderColor="theme.darkBlue"
-                backgroundColor="greys.offWhite"
-              />
+              {currentUser.isBusBCEID ? (
+                <InformationAlert
+                  description={t('user.changeBceid.info')}
+                  descLinkHref={t('user.changeBceid.link')}
+                  descLinkText={t('user.changeBceid.linkText')}
+                />
+              ) : null}
+              {currentUser.isIDIR ? (
+                <InformationAlert
+                  description={t('user.changeIdir.info')}
+                  descLinkHref={t('user.changeIdir.link')}
+                  descLinkText={t('user.changeIdir.linkText')}
+                />
+              ) : null}
             </Section>
             <Section>
               <Flex alignItems="center" alignSelf="stretch">
@@ -330,54 +344,46 @@ function Section({ children }) {
   );
 }
 
-const PhysicalAddressBlock = ({ formValues, setFormValues, checkBoxChangeEvent }) => {
+const PhysicalAddressBlock = ({ formValues }) => {
   const { t } = useTranslation();
 
   return (
     <>
       <TextFormControl
+        disabled={true}
         label={t('user.address')}
         fieldName="streetAddressAttributes.streetAddress"
-        required
         value={formValues.address}
-        onChange={(e) => setFormValues({ ...formValues, address: e.target.value })}
       />
       <TextFormControl
+        disabled={true}
         label={t('user.city')}
         fieldName="streetAddressAttributes.locality"
-        required
         value={formValues.city}
-        onChange={(e) => setFormValues({ ...formValues, city: e.target.value })}
       />
       <TextFormControl
+        disabled={true}
         label={t('user.province')}
         fieldName="streetAddressAttributes.region"
-        required
         value={formValues.province}
-        onChange={(e) => setFormValues({ ...formValues, province: e.target.value })}
       />
       <TextFormControl
+        disabled={true}
         label={t('user.postalCode')}
         fieldName="streetAddressAttributes.postalCode"
-        required
         value={formValues.postalCode}
-        onChange={(e) => setFormValues({ ...formValues, postalCode: e.target.value })}
       />
       <TextFormControl
+        disabled={true}
         label={t('user.country')}
         fieldName="streetAddressAttributes.country"
-        required
         value={formValues.country}
-        onChange={(e) => setFormValues({ ...formValues, country: e.target.value })}
       />
-      <Checkbox checked={formValues.isSameAddress} onChange={checkBoxChangeEvent}>
-        {t('user.sameAddress')}
-      </Checkbox>
     </>
   );
 };
 
-const MailingAddressBlock = ({ formValues, setFormValues }) => {
+const MailingAddressBlock = ({ formValues, setFormValues, sameAddressChecked }) => {
   const { t } = useTranslation();
 
   return (
@@ -388,36 +394,31 @@ const MailingAddressBlock = ({ formValues, setFormValues }) => {
       <TextFormControl
         label={t('user.address')}
         fieldName="mailingAddressAttributes.streetAddress"
-        required
-        value={formValues.isSameAddress ? formValues.address : formValues.postalAddress}
+        value={sameAddressChecked ? formValues.address : formValues.postalAddress}
         onChange={(e) => setFormValues({ ...formValues, postalAddress: e.target.value })}
       />
       <TextFormControl
         label={t('user.city')}
         fieldName="mailingAddressAttributes.locality"
-        required
-        value={formValues.isSameAddress ? formValues.city : formValues.postalAddressCity}
+        value={sameAddressChecked ? formValues.city : formValues.postalAddressCity}
         onChange={(e) => setFormValues({ ...formValues, postalAddressCity: e.target.value })}
       />
       <TextFormControl
         label={t('user.province')}
         fieldName="mailingAddressAttributes.region"
-        required
-        value={formValues.isSameAddress ? formValues.province : formValues.postalAddressProvince}
+        value={sameAddressChecked ? formValues.province : formValues.postalAddressProvince}
         onChange={(e) => setFormValues({ ...formValues, postalAddressProvince: e.target.value })}
       />
       <TextFormControl
         label={t('user.postalCode')}
         fieldName="mailingAddressAttributes.postalCode"
-        required
-        value={formValues.isSameAddress ? formValues.postalCode : formValues.postalAddressPostalcode}
+        value={sameAddressChecked ? formValues.postalCode : formValues.postalAddressPostalcode}
         onChange={(e) => setFormValues({ ...formValues, postalAddressPostalcode: e.target.value })}
       />
       <TextFormControl
         label={t('user.country')}
         fieldName="mailingAddressAttributes.country"
-        required
-        value={formValues.isSameAddress ? formValues.country : formValues.postalAddressCountry}
+        value={sameAddressChecked ? formValues.country : formValues.postalAddressCountry}
         onChange={(e) => setFormValues({ ...formValues, postalAddressCountry: e.target.value })}
       />
     </>
