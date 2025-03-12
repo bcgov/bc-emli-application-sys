@@ -1,13 +1,13 @@
-name: Deploy Dev Environment
+name: Deploy Test Environment
 
 on:
   push:
-    branches:
-    - main
+    tags:
+    - v*.*.*
 
 env:
   GITHUB_REGISTRY: ghcr.io
-  ARTIFACTORY_REGISTRY: artifacts.developer.gov.bc.ca
+  IMAGE_TAG: ${{ github.ref_name}}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,7 +19,16 @@ permissions:
   security-events: write
 
 jobs:
-  build-push-app-ghcr:
+  set-tag:
+    runs-on: ubuntu-22.04
+    outputs:
+      image_tag: ${{ steps.set-image-tag.outputs.image_tag }}
+    steps:
+    - name: Set IMAGE_TAG
+      id: set-image-tag
+      run: echo "::set-output name=image_tag::${GITHUB_REF_NAME#v}"
+
+  build-push-app:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
@@ -35,49 +44,25 @@ jobs:
         registry-url: ${{ env.GITHUB_REGISTRY }}
         registry-username: ${{ github.actor }}
         registry-password: ${{ secrets.GITHUB_TOKEN }}
-        image-name: bcgov/hesp-app
+        image-name: bcgov/hesp
         docker-context: .
         docker-file: devops/docker/app/Dockerfile
         docker-args: |
-          deployment_tag=${{ github.sha }}
+          deployment_tag=${{ github.ref_name }}
         metadata-tags: |
-          type=ref,event=branch
-          type=sha,format=long,prefix=,suffix=
-
-  build-push-app-artifacts:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 10
-    steps:
-    - uses: hmarr/debug-action@f7318c783045ac39ed9bb497e22ce835fdafbfe6
-    - uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
-
-    - name: Setup Tools
-      uses: ./.github/actions/setup-tools
-
-    - name: Build and Push
-      uses: egose/actions/docker-build-push@46d589997e49cae4a8a3d06644ae8b04351a30f2
-      with:
-        registry-url: ${{ env.ARTIFACTORY_REGISTRY }}
-        registry-username: ${{ secrets.ARTIFACTORY_USERNAME }}
-        registry-password: ${{ secrets.ARTIFACTORY_PASSWORD }}
-        image-name: hesp/app
-        docker-context: .
-        docker-file: devops/docker/app/Dockerfile
-        docker-args: |
-          deployment_tag=${{ github.sha }}
-        metadata-tags: |
-          type=ref,event=branch
-          type=sha,format=long,prefix=,suffix=
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
 
   deploy:
-    needs: [build-push-app-ghcr]
+    needs: [set-tag, build-push-app]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:
       contents: read
     environment:
-      name: dev
-      url: https://dev-hesp.apps.silver.devops.gov.bc.ca
+      name: test
+      url: https://test-hesp.apps.silver.devops.gov.bc.ca
 
     steps:
     - uses: hmarr/debug-action@f7318c783045ac39ed9bb497e22ce835fdafbfe6
@@ -93,6 +78,7 @@ jobs:
 
     - name: Deploy apps with Helm chart
       run: |
-        make upgrade NAMESPACE=${{ vars.OPENSHIFT_NAMESPACE }} IMAGE_TAG=${{ github.sha }}
+        vtag=${{ env.IMAGE_TAG }}
+        make upgrade NAMESPACE=${{ vars.OPENSHIFT_NAMESPACE }} IMAGE_TAG=${{ needs.set-tag.outputs.image_tag }}
         kubectl rollout status deployment/hesp-app
       working-directory: ./helm/main

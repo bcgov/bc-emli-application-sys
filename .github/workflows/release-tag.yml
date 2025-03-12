@@ -1,0 +1,93 @@
+name: Create Release Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        description: Tag Version (excl. prefix; e.g. 1.2.3)
+        required: true
+
+jobs:
+  newtag:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+    - name: Fail on tags
+      run: exit 1
+      if: ${{ !startsWith(github.ref, 'refs/heads/') }}
+
+    - name: Validate Tag Input
+      id: input
+      run: |
+        vtag=${{ github.event.inputs.tag }}
+        echo "tag=${vtag//v}" >> $GITHUB_OUTPUT
+
+    - uses: hmarr/debug-action@f7318c783045ac39ed9bb497e22ce835fdafbfe6
+    - uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
+      with:
+        ssh-key: ${{ secrets.SSH_KEY }}
+        fetch-depth: 0
+
+    - name: Setup Tools
+      uses: ./.github/actions/setup-tools
+
+    - name: Setup NPM Packages
+      uses: ./.github/actions/setup-npm
+
+    - name: Create a tag
+      run: |
+        git config user.name "$GITHUB_ACTOR"
+        git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+        git config commit.gpgsign false
+
+        branch=newtags/${{ steps.input.outputs.tag }}
+        git checkout -b "$branch"
+        git push --set-upstream origin "$branch"
+
+        git status
+        git reset --hard
+        ./node_modules/.bin/release-it ${{ steps.input.outputs.tag }} --ci
+
+    - name: Set output variables
+      id: vars
+      run: |
+        pr_title="chore(release): release candidate v${{ steps.input.outputs.tag }}"
+        pr_body=$(git tag -l --format='%(contents)' v${{ steps.input.outputs.tag }})
+        echo "pr_title=$pr_title" >> $GITHUB_OUTPUT
+        echo "base=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
+
+        # See https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        echo "pr_body<<$EOF" >> "$GITHUB_OUTPUT"
+        echo "$pr_body" >> $GITHUB_OUTPUT
+        echo "$EOF" >> "$GITHUB_OUTPUT"
+
+    - name: Create Pull Request
+      uses: actions/github-script@62c3794a3eb6788d9a2a72b219504732c0c9a298
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const { repo, owner } = context.repo;
+          const result = await github.rest.pulls.create({
+            owner,
+            repo,
+            head: 'tags/${{ steps.input.outputs.tag }}',
+            base: '${{ steps.vars.outputs.base }}',
+            title: '${{ steps.vars.outputs.pr_title }}',
+            body: `### Commits
+          ${{ steps.vars.outputs.pr_body }}
+          `,
+          });
+
+          github.rest.issues.addLabels({
+            owner,
+            repo,
+            issue_number: result.data.number,
+            labels: ['tag', 'v${{ steps.input.outputs.tag }}']
+          });
