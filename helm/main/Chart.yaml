@@ -1,0 +1,36 @@
+apiVersion: v2
+name: main
+description: A Helm chart for bc-emli-application-sys
+type: application
+version: 0.1.0
+appVersion: '0.1.0'
+dependencies:
+  - name: app
+    version: '0.1.0'
+    repository: 'file://../_app'
+    condition: app.enabled
+  - name: anycable-rpc
+    version: '0.1.0'
+    repository: 'file://../_anycable-rpc'
+    condition: anycable-rpc.enabled
+  - name: sidekiq
+    version: '0.1.0'
+    repository: 'file://../_sidekiq'
+    condition: sidekiq.enabled
+  - name: crunchy-postgres
+    version: '0.6.1'
+    repository: https://bcgov.github.io/crunchy-postgres/
+    condition: crunchy-postgres.enabled
+  - name: redis
+    version: '18.16.1'
+    repository: 'https://charts.bitnami.com/bitnami'
+    condition: redis.enabled
+  - name: elasticsearch
+    version: '19.19.3'
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: elasticsearch.enabled
+  - name: anycable-go
+    alias: anycableGo
+    version: '0.5.11'
+    repository: https://helm.anycable.io/
+    condition: anycableGo.enabled

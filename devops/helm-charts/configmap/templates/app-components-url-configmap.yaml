@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: app-components-url
 data:
-  ANYCABLE_DEV_REDIS_URL: "redis://redis-ha:6379/"
+  ANYCABLE_REDIS_URL: "redis://redis-ha:6379/"
   ANYCABLE_URL: "ws://anycable-go:8080/cable"
   CACHE_DEV_REDIS_URL: "redis://redis-ha:6379/4"
   ELASTICSEARCH_URL: "http://elasticsearch-ha:9200"

@@ -1,0 +1,121 @@
+{{- $deploymentTag := .Values.image.tag | default .Chart.AppVersion -}}
+{{- $root := . }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "_.fullname" . }}
+  labels:
+    {{- include "_.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "_.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+      {{- $podAnnotations := merge (.Values.podAnnotations | default dict) (.Values.global.vault.podAnnotations | default dict) -}}
+      {{- with $podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        # vault.hashicorp.com/role: {{ .Values.global.vault.role }}
+        # vault.hashicorp.com/agent-inject-secret-secrets.env: {{ .Values.global.vault.role }}/{{ .Values.global.vault.subPath }}
+        # vault.hashicorp.com/agent-inject-template-secrets.env: |
+        #   {{`{{- with secret "`}}{{ .Values.global.vault.role }}/{{ .Values.global.vault.subPath }}{{ `" -}}`}}
+        #   {{`{{- range $k, $v := .Data.data }}`}}
+        #   {{ `{{ $k }}={{ $v }}{{ end -}}` }}
+        #   {{`{{- end }}`}}
+      labels:
+        {{- include "_.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- $imagePullSecrets := concat (.Values.imagePullSecrets | default list) (.Values.global.imagePullSecrets | default list) -}}
+      {{- with $imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ default .Values.global.serviceAccountName .Values.serviceAccountName }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ $deploymentTag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            ['./bin/rails server']
+          env:
+            - name: DEPLOYMENT_TAG
+              value: {{ $deploymentTag | quote }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.crunchydbSecret }}
+                  key: uri
+            - name: DATABASE_OPENSHIFT_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.crunchydbSecret }}
+                  key: host
+          {{- $env := merge (.Values.global.env | default dict) (.Values.env | default dict) -}}
+            {{- range $k, $v := $env }}
+            - name: {{ $k | quote }}
+              value: {{ $v | quote }}
+            {{- end }}
+          {{- $envSecrets := list }}
+          {{- if .Values.global.envSecretName }}
+            {{- $envSecrets = append $envSecrets .Values.global.envSecretName }}
+          {{- end }}
+          {{- if .Values.envSecretName }}
+            {{- $envSecrets = append $envSecrets .Values.envSecretName }}
+          {{- end }}
+          {{- if $envSecrets }}
+          envFrom:
+            {{- range $envSecrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.logVolume.enabled }}
+          volumeMounts:
+            - name: log-volume
+              mountPath: /app/log
+          {{- end }}
+      {{- with .Values.logVolume.enabled }}
+      volumes:
+        - name: log-volume
+          persistentVolumeClaim:
+            claimName: {{ include "_.fullname" $root }}-log
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
