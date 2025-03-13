@@ -55,7 +55,7 @@ app:
     "ANYCABLE_URL": "ws://anycable-go:8080/cable"
     "BUNDLE_PATH": "/usr/local/bundle"
     "CACHE_DEV_REDIS_URL": "redis://hesp-redis:6379/4"
-    "ELASTICSEARCH_URL": "http://elasticsearch-ha:9200"
+    "ELASTICSEARCH_URL": "http://hesp-elasticsearch:9200"
     "FROM_EMAIL": "no-reply@gov.bc.ca"
     "GEM_HOME": "/usr/local/bundle"
     "RAILS_ENV": "production"
@@ -321,7 +321,7 @@ anycableGo:
   env:
     # Assuming that Ruby RPC is available in K8s in the same namespace as anycable-rpc service (see next chapter)
     anycableRpcHost: hesp-anycable-rpc:50051
-    anycableRedisUrl: redis://redisMasterSet:6379/1
+    anycableRedisUrl: redis://hesp-redis:6379/1
     anycableRedisSentinels: hesp-redis-headless:26379
   route:
     enabled: true
