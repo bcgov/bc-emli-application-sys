@@ -1,0 +1,27 @@
+{
+  "git": {
+    "commitMessage": "chore: release candidate v${version}",
+    "tagName": "v${version}",
+    "tagAnnotation": "${name}\n${changelog}"
+  },
+  "npm": {
+    "publish": false
+  },
+  "hooks": {},
+  "plugins": {
+    "@release-it/bumper": {
+      "out": [
+        {
+          "file": "package.json",
+          "path": "version",
+          "prefix": ""
+        },
+        {
+          "file": "VERSION",
+          "type": "text/plain",
+          "consumeWholeFile": true
+        }
+      ]
+    }
+  }
+}
