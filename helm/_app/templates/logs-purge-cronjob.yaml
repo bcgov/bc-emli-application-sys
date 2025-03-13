@@ -1,0 +1,38 @@
+{{- if .Values.logVolume.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "_.fullname" . }}-purge-logs
+spec:
+  schedule: "0 0 * * *"
+  successfulJobsHistoryLimit: 1  # Keep only 1 successful Job
+  failedJobsHistoryLimit: 1  # Keep only 1 failed Job
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 600  # Deletes Jobs and their pods 10 minutes after completion
+      template:
+        spec:
+          containers:
+            - name: 90-day-log-purger
+              image: alpine:3.21.3
+              command: ["/bin/sh"]
+              args:
+                - "-c"
+                - >
+                  echo "Starting log purge: $(date)";
+                  find /app/log -type f -mtime +90 -exec rm -v {} + && 
+                  echo "Log purge completed: $(date)";
+              volumeMounts:
+                - name: log-volume
+                  mountPath: /app/log
+              resources:
+                requests:
+                  memory: 64Mi
+                  cpu: 50m
+          restartPolicy: OnFailure
+          volumes:
+            - name: log-volume
+              persistentVolumeClaim:
+                claimName: {{ include "_.fullname" . }}-log
+{{- end }}
