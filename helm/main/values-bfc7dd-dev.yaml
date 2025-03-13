@@ -83,7 +83,7 @@ crunchy-postgres:
     postgresql:
       parameters:
         shared_buffers: 16MB # default is 128MB; a good tuned default for shared_buffers is 25% of the memory allocated to the pod
-        wal_buffers: "64kB" # this can be set to -1 to automatically set as 1/32 of shared_buffers or 64kB, whichever is larger
+        wal_buffers: 64kB # this can be set to -1 to automatically set as 1/32 of shared_buffers or 64kB, whichever is larger
         min_wal_size: 32MB
         max_wal_size: 64MB # default is 1GB
         max_slot_wal_keep_size: 128MB # default is -1, allowing unlimited wal growth when replicas fall behind
@@ -119,8 +119,8 @@ redis:
   sentinel:
     resources:
       requests:
-        memory: "128Mi"
-        cpu: "20m"
+        memory: 128Mi
+        cpu: 20m
   replica:
     replicaCount: 1
     persistence:
@@ -128,8 +128,8 @@ redis:
       size: 500Mi
     resources:
       requests:
-        memory: "128Mi"
-        cpu: "20m"
+        memory: 128Mi
+        cpu: 20m
 
 # See https://github.com/bitnami/charts/blob/main/bitnami/elasticsearch/values.yaml
 elasticsearch:
@@ -137,28 +137,28 @@ elasticsearch:
 
   master:
     replicaCount: 1
-    heapSize: "512m"
+    heapSize: 128m
     resources:
       requests:
-        cpu: "50m"
-        memory: "512Mi"
+        cpu: 50m
+        memory: 256Mi
     persistence:
       enabled: true
       accessModes:
         - ReadWriteOnce
-      size: "500Mi"
+      size: 500Mi
   data:
     replicaCount: 1
-    heapSize: "1024m"
+    heapSize: 1024m
     resources:
       requests:
-        cpu: "200m"
-        memory: "1024Mi"
+        cpu: 200m
+        memory: 512Mi
     persistence:
       enabled: true
       accessModes:
         - ReadWriteOnce
-      size: "1Gi"
+      size: 1Gi
 
 # See https://github.com/anycable/anycable-helm/blob/master/anycable-go/values.yaml
 anycableGo:
