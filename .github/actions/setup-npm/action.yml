@@ -4,25 +4,18 @@ description: Setup required NPM packages
 runs:
   using: composite
   steps:
-  # See https://nextjs.org/docs/pages/building-your-application/deploying/ci-build-caching#github-actions
+  # See https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows#example-using-the-cache-action
   - uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf
+    env:
+      cache-name: cache-node-modules
     with:
-      # pnpm store path
-      path: |
-        ~/.cache/Cypress
-        ~/.local/share/pnpm/store/v3
-        ${{ github.workspace }}/app/.next/cache
-      key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+      path: ~/.npm
+      key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
       restore-keys: |
-        ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+        ${{ runner.os }}-build-${{ env.cache-name }}-
+        ${{ runner.os }}-build-
+        ${{ runner.os }}-
 
   - name: Install Root NPM packages
-    run: |
-      pnpm install --no-frozen-lockfile
-      pnpm cypress install
+    run: npm install
     shell: bash
-
-  - name: Install App NPM packages
-    run: pnpm install --no-frozen-lockfile
-    shell: bash
-    working-directory: app
