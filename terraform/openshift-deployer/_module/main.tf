@@ -233,6 +233,11 @@ resource "kubernetes_role" "this" {
     resources  = ["processedtemplates"]
     verbs      = ["create"]
   }
+  rule {
+    api_groups = ["postgres-operator.crunchydata.com"]
+    resources  = ["postgresclusters"]
+    verbs      = ["get", "patch"]
+  }
 }
 
 resource "kubernetes_service_account" "this" {
