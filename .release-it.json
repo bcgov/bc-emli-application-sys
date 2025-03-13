@@ -10,13 +10,7 @@
   "hooks": {},
   "plugins": {
     "@release-it/bumper": {
-      "allowSameVersion": true,
       "out": [
-        {
-          "file": "package.json",
-          "path": "version",
-          "prefix": ""
-        },
         {
           "file": "VERSION",
           "type": "text/plain",
