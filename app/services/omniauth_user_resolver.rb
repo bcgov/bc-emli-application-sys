@@ -105,9 +105,11 @@ class OmniauthUserResolver
     # skip confirmation until user has a chance to add/verify their notification email
     user.skip_confirmation_notification!
 
+    Rails.logger.info("Auth Provider: #{omniauth_provider}")
     # Skip validation initially, so we can add addresses first
     if user.save(validate: false)
-      if omniauth_provider == ENV["KEYCLOAK_CLIENT"]
+      #if omniauth_provider == ENV["KEYCLOAK_CLIENT"]
+      if omniauth_provider == OMNIAUTH_PROVIDERS[:bcsc]
         user.save_user_address(omniauth_address)
       end
 
