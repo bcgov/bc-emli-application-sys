@@ -55,7 +55,7 @@ class OmniauthUserResolver
   def update_user
     existing_user.update(
       first_name: omniauth_givenname,
-      last_name: omniauth_familyname,
+      last_name: omniauth_familyname
     )
 
     if existing_user.valid?
@@ -64,12 +64,12 @@ class OmniauthUserResolver
       else
         existing_user.save_user_address(omniauth_address)
       end
-      
+
       existing_user.save
     else
-        Rails.logger.error "User validation failed: #{existing_user.errors.full_messages}"  
+      Rails.logger.error "User validation failed: #{existing_user.errors.full_messages}"
     end
-    
+
     return existing_user
   end
 
@@ -81,9 +81,9 @@ class OmniauthUserResolver
       "isAdminMgr" => :admin_manager,
       "isSysAdmin" => :system_admin,
       "isParticipant" => :participant,
-      "isContractor" => :contractor,
+      "isContractor" => :contractor
     }
-    
+
     selected_role = entry_points[@entry_point] || :unassigned
 
     Rails.logger.info("Role: #{selected_role}")
@@ -99,17 +99,20 @@ class OmniauthUserResolver
         last_name: omniauth_familyname,
         email: omniauth_email,
         role: selected_role,
+        confirmed_at: Time.current
       )
 
     # skip confirmation until user has a chance to add/verify their notification email
     user.skip_confirmation_notification!
-    
+
+    Rails.logger.info("Auth Provider: #{omniauth_provider}")
     # Skip validation initially, so we can add addresses first
     if user.save(validate: false)
-      if omniauth_provider == ENV["KEYCLOAK_CLIENT"]
+      #if omniauth_provider == ENV["KEYCLOAK_CLIENT"]
+      if omniauth_provider == OMNIAUTH_PROVIDERS[:bcsc]
         user.save_user_address(omniauth_address)
       end
-      
+
       # Now run full validations
       if user.valid?
         user.save
@@ -165,7 +168,7 @@ class OmniauthUserResolver
   end
 
   def omniauth_uid
-    @uid ||= 
+    @uid ||=
       case raw_info.identity_provider
       when ENV["KEYCLOAK_CLIENT"] || OMNIAUTH_PROVIDERS[:idir]
         raw_info.sub.split("@").first
@@ -175,11 +178,14 @@ class OmniauthUserResolver
   end
 
   def omniauth_email
-    @email ||= auth.info.email 
+    @email ||= auth.info.email
+  end
+
+  def certified
   end
 
   def omniauth_username
-    @username ||= 
+    @username ||=
       case raw_info.identity_provider
       when ENV["KEYCLOAK_CLIENT"]
         raw_info.sub.split("@").first
@@ -191,11 +197,26 @@ class OmniauthUserResolver
   end
 
   def omniauth_givenname
-    @first_name ||= raw_info.given_name
+    #bceid only has a single name field, we need to break it apart
+    @first_name ||=
+      case raw_info.identity_provider
+      when OMNIAUTH_PROVIDERS[:bceid_business], OMNIAUTH_PROVIDERS[:bceid_basic]
+        raw_info.given_name.rpartition(" ").first.presence ||
+          raw_info.given_name
+      else
+        raw_info.given_name || " "
+      end
   end
 
   def omniauth_familyname
-    @last_name ||= raw_info.family_name || " "
+    #bceid only has a single name field, we need to break it apart
+    @last_name ||=
+      case raw_info.identity_provider
+      when OMNIAUTH_PROVIDERS[:bceid_business], OMNIAUTH_PROVIDERS[:bceid_basic]
+        raw_info.given_name.rpartition(" ").last.presence || raw_info.given_name
+      else
+        raw_info.family_name || " "
+      end
   end
 
   def omniauth_address

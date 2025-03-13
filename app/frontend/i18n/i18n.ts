@@ -23,6 +23,10 @@ const options = {
           psrLogin: 'PSR Log in',
           adminMgrLogin: 'Admin Manager Log in',
           sysAdminLogin: 'System Admin Log in',
+          sysAdmin: {
+            createTitle: 'Create system admin account',
+            loginTitle: 'System admin log in',
+          },
           adminAccountAccess: 'If you cannot login with your IDIR, please contact your administrator to gain access.',
           adminPortalLoginInfo: {
             prompt: '',
@@ -1878,8 +1882,28 @@ const options = {
             bceidbusiness: 'Business BCeID',
             bcsc: 'BCSC',
           },
-          changeBceid: 'If you want to change your BCeID information, please go to ',
-          changeBceidLinkText: 'bceid.ca',
+          changeBceid: {
+            info: 'The information above is from your Business BCeID account. To change your Business BCeID account information, click ',
+            link: 'https://www.bceid.ca/aboutbceid/faqs.aspx',
+            linkText: 'here',
+          },
+          changeIdir: {
+            info: 'If your IDIR details are incorrect, please contact your business area or program administrator to request an update.',
+            link: '',
+            linkText: '',
+          },
+          changeBasic: {
+            info: 'The information above is from your Basic BCeID account. To change your Basic BCeID account information, click ',
+            link: 'https://www.bceid.ca/aboutbceid/faqs.aspx',
+            linkText: 'here',
+          },
+          changeBcsc: {
+            info: 'The information above is from your BC Services account. To change your BC Services Card information, click ',
+            link: 'https://www2.gov.bc.ca/gov/content/governments/government-id/bc-services-card/your-card/change-personal-information',
+            linkText: 'here',
+          },
+          //changeBceid: 'If you want to change your BCeID information, please go to ',
+          //changeBceidLinkText: 'bceid.ca',
           confirmationRequiredWithEmail:
             'Action required: please click the link in the verification email that was sent to you. You will continue to receive emails at <strong>{{email}}</strong> until your new email is confirmed. <br/><br/>(Didn’t receive it? <1>Resend email</1>)',
           confirmationRequired:
@@ -1894,10 +1918,10 @@ const options = {
           postalCode: 'Postal code',
           country: 'Country',
           sameAddress: 'My residential address is the same as my postal address',
-          changeInfo: 'If you want to change your BCeID information, please go to',
-          bceid: 'bceid.ca',
-          changeInfoLink:
-            'https://www2.gov.bc.ca/gov/content/governments/government-id/bc-services-card/your-card/change-personal-information',
+          //changeInfo: 'If you want to change your BCeID information, please go to',
+          //bceid: 'bceid.ca',
+          //changeInfoLink:
+          //  'https://www2.gov.bc.ca/gov/content/governments/government-id/bc-services-card/your-card/change-personal-information',
           postalAddress: 'Postal address',
           required: 'required',
           emailAddress: 'Email address',
@@ -1948,6 +1972,11 @@ const options = {
             review_manager: 'review manager',
             reviewer: 'reviewer',
             super_admin: 'super admin',
+            participant: 'participant',
+            participantSupportRep: 'participant support representative',
+            admin: 'admin',
+            contractor: 'contractor',
+            adminManager: 'admin manager',
             system_admin: 'system admin',
           },
           rolesExplanation: {

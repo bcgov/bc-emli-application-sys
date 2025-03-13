@@ -1,17 +1,14 @@
 import { Box, Button, Divider, Container, Flex, HStack, Heading, Link, Text, VStack } from '@chakra-ui/react';
 import { ArrowSquareOut, Phone } from '@phosphor-icons/react';
-import React from 'react';
+import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EnergyCoachInfoBlock } from '../../shared/bcservicecard/energy-coach';
 import { CenterContainer } from '../../shared/containers/center-container';
 import { storeEntryPoint } from '../../shared/store-entry-point';
 
-interface ILoginScreenProps {
-  isAdmin?: boolean;
-}
-
-export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
+export const LoginScreen = () => {
   const { t } = useTranslation();
+  const authFormRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent the default form submission
@@ -24,7 +21,6 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
   };
 
   return (
-    // @ts-ignore
     <>
       <CenterContainer h="full">
         <Flex direction={{ base: 'column', md: 'row' }} gap={10}>
@@ -85,9 +81,8 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
             <Text>{t('auth.phoneNumberHours')}</Text>
             <Box>
               <Text fontWeight="bold">{t('auth.bcServiceCardInfo.noBCServicesCard')}</Text>
-              <form id="authForm" action="/api/auth/keycloak" method="post" onSubmit={handleSubmit}>
+              <form ref={authFormRef} id="authForm" action="/api/auth/keycloak" method="post" onSubmit={handleSubmit}>
                 <input type="hidden" name="kc_idp_hint" value="bceidbasic" />
-                {/* @ts-ignore */}
                 <input
                   type="hidden"
                   name="authenticity_token"
@@ -95,7 +90,13 @@ export const LoginScreen = ({ isAdmin }: ILoginScreenProps) => {
                 />
               </form>
 
-              <Link href="#" onClick={() => (document.getElementById('authForm') as HTMLFormElement).submit()}>
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  authFormRef.current?.requestSubmit();
+                }}
+              >
                 {t('auth.bcServiceCardInfo.bceidLogin')}
               </Link>
             </Box>
