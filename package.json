@@ -106,5 +106,6 @@
     "*.rb": [
       "stree write"
     ]
-  }
+  },
+  "version": "0.1.1"
 }

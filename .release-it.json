@@ -12,11 +12,6 @@
     "@release-it/bumper": {
       "out": [
         {
-          "file": "package.json",
-          "path": "version",
-          "prefix": ""
-        },
-        {
           "file": "VERSION",
           "type": "text/plain",
           "consumeWholeFile": true
