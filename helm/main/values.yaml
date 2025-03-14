@@ -321,7 +321,7 @@ anycableGo:
   env:
     # Assuming that Ruby RPC is available in K8s in the same namespace as anycable-rpc service (see next chapter)
     anycableRpcHost: hesp-anycable-rpc:50051
-    anycableRedisUrl: redis://hesp-redis:6379/1
+    anycableRedisUrl: redis://redisMasterSet:6379/1
     anycableRedisSentinels: hesp-redis-headless:26379
   route:
     enabled: true

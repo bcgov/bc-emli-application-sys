@@ -60,7 +60,7 @@ jobs:
         registry-url: ${{ env.ARTIFACTORY_REGISTRY }}
         registry-username: ${{ secrets.ARTIFACTORY_USERNAME }}
         registry-password: ${{ secrets.ARTIFACTORY_PASSWORD }}
-        image-name: hesp/app
+        image-name: bbfc-dev/hesp-app
         docker-context: .
         docker-file: devops/docker/app/Dockerfile
         docker-args: |
@@ -70,7 +70,7 @@ jobs:
           type=sha,format=long,prefix=,suffix=
 
   deploy:
-    needs: [build-push-app-ghcr]
+    needs: [build-push-app-artifacts]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:

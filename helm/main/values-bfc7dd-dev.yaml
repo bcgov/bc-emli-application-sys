@@ -7,6 +7,9 @@ global:
 app:
   enabled: true
 
+  image:
+    repository: artifacts.developer.gov.bc.ca/bbfc-dev/hesp-app
+
   resources:
     requests:
       cpu: 300m
