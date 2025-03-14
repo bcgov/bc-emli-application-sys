@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_03_05_215444) do
+ActiveRecord::Schema[7.1].define(version: 2025_03_13_234010) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -409,6 +409,18 @@ ActiveRecord::Schema[7.1].define(version: 2025_03_05_215444) do
     t.boolean "enable_in_app_integration_mapping_notification", default: true
     t.boolean "enable_email_integration_mapping_notification", default: true
     t.index ["user_id"], name: "index_preferences_on_user_id"
+  end
+
+  create_table "programs",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.string "program_name"
+    t.string "funded_by"
+    t.string "description_html"
+    t.string "external_api_state", default: "g_off", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "requirement_blocks",
@@ -814,10 +826,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_03_05_215444) do
     t.datetime "updated_at", null: false
     t.integer "taggings_count", default: 0
     t.index ["name"], name: "index_tags_on_name", unique: true
-  end
-
-  create_table "target_user_id", id: false, force: :cascade do |t|
-    t.uuid "id"
   end
 
   create_table "template_section_blocks",
