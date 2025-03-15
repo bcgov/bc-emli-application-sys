@@ -16,6 +16,9 @@ class Api::ProgramsController < Api::ApplicationController
   skip_before_action :authenticate_user!,
                      only: %i[create show index jurisdiction_options]
 
+  # skip_before_action :verify_authenticity_token, only: [:create]
+  # skip_after_action :verify_authorized, only: :create
+
   def index
     perform_search
     authorized_results = apply_search_authorization(@search.results)
@@ -112,15 +115,15 @@ class Api::ProgramsController < Api::ApplicationController
   def create
     # class_to_use = Jurisdiction.class_for_locality_type(program_params[:locality_type])
 
-    @program = Jurisdiction.build(program_params)
+    @program = Program.build(program_params)
 
-    authorize @program
+    # authorize @program
 
     if @program.save
       render_success @program,
                      "jurisdiction.create_success",
                      {
-                       blueprint: JurisdictionBlueprint,
+                       blueprint: ProgramBlueprint,
                        blueprint_opts: {
                          view: :base
                        }
@@ -128,19 +131,9 @@ class Api::ProgramsController < Api::ApplicationController
     else
       render_error "jurisdiction.create_error",
                    message_opts: {
-                     error_message:
-                       @jurisdiction.errors.full_messages.join(", ")
+                     error_message: @program.errors.full_messages.join(", ")
                    }
     end
-  end
-
-  def locality_type_options
-    authorize :jurisdiction, :locality_type_options?
-    options =
-      Jurisdiction.locality_types.sort.map do |lt|
-        { label: Jurisdiction.custom_titleize_locality_type(lt), value: lt }
-      end
-    render_success options, nil, { blueprint: OptionBlueprint }
   end
 
   # POST /api/jurisdictions/:id/users/search
@@ -210,45 +203,10 @@ class Api::ProgramsController < Api::ApplicationController
   private
 
   def program_params
-    params.require(:progam).permit(
+    params.require(:program).permit(
       :program_name,
       :funded_by,
-      :type,
-      :user_id,
-      :locality_type,
-      :address,
-      :regional_district_id,
-      :description_html,
-      :checklist_html,
-      :look_out_html,
-      :contact_summary_html,
-      :map_zoom,
-      map_position: [],
-      users_attributes: %i[first_name last_name role email],
-      contacts_attributes: %i[
-        id
-        first_name
-        last_name
-        department
-        title
-        phone
-        cell
-        email
-      ],
-      permit_type_submission_contacts_attributes: %i[
-        id
-        email
-        permit_type_id
-        _destroy
-      ],
-      permit_type_required_steps_attributes: %i[
-        id
-        permit_type_id
-        default
-        energy_step_required
-        zero_carbon_step_required
-        _destroy
-      ]
+      :description_html
     )
   end
 
