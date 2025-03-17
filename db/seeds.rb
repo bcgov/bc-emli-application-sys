@@ -148,7 +148,7 @@ if PermitApplication.first.blank?
     end
 
   User
-    .submitter
+    .participant
     .first(10)
     .each do |user|
       if user.contacts.blank?
@@ -192,14 +192,14 @@ if PermitApplication.first.blank?
 
   # Requrements from seeder are idempotent
   # Requirments block will get created from requiremetms templates
-  puts "Seeding requirements..."
-  RequirementsFromXlsxSeeder.seed
-  if Rails.env.development?
-    PermitClassification.find_by_code("medium_residential").update(
-      enabled: true
-    )
-    RequirementsFromXlsxSeeder.seed_medium
-  end
+  # puts "Seeding requirements..."
+  # RequirementsFromXlsxSeeder.seed
+  # if Rails.env.development?
+  #   PermitClassification.find_by_code("medium_residential").update(
+  #     enabled: true
+  #   )
+  #   RequirementsFromXlsxSeeder.seed_medium
+  # end
 
   # Remove any invalid records that prevent saving of the template
   RequirementBlock.find_each { |block| block.destroy unless block.valid? }
@@ -210,48 +210,48 @@ if PermitApplication.first.blank?
 
   # Creating Permit Applications
   puts "Seeding permit applications..."
-  submitters = User.submitter
-  template_version = TemplateVersion.published.first
-  20.times do |index|
-    PermitApplication.create!(
-      submitter_id: submitters.sample.id,
-      full_address: "123 Address st",
-      pid: "999999999",
-      jurisdiction_id:
-        index.even? ? jurisdictions.first(10).sample.id : north_van.id,
-      activity_id: template_version.activity.id,
-      permit_type_id: template_version.permit_type.id,
-      template_version: template_version
-    )
-  end
+  participants = User.participant
+  # template_version = TemplateVersion.published.first
+  # 20.times do |index|
+  #   PermitApplication.create!(
+  #     participant_id: participants.sample.id,
+  #     full_address: "123 Address st",
+  #     pid: "999999999",
+  #     jurisdiction_id:
+  #       index.even? ? jurisdictions.first(10).sample.id : north_van.id,
+  #     activity_id: template_version.activity.id,
+  #     permit_type_id: template_version.permit_type.id,
+  #     template_version: template_version
+  #   )
+  # end
   # Seed a North Vancouver Example
-  4.times do
-    pid =
-      (
-        if (north_van.locality_type == "corporation of the city")
-          "013228544"
-        else
-          "008535981"
-        end
-      )
-    full_address =
-      (
-        if (north_van.locality_type == "corporation of the city")
-          "323 18TH ST E, NORTH VANCOUVER, BC, V7L 2X8"
-        else
-          "5419 ESPERANZA DR, NORTH VANCOUVER, BC, V7R 3W3"
-        end
-      )
-    PermitApplication.create!(
-      submitter: submitters.sample,
-      jurisdiction: north_van,
-      activity_id: template_version.activity.id,
-      permit_type_id: template_version.permit_type.id,
-      full_address: full_address,
-      template_version: template_version,
-      pid: pid
-    )
-  end
+  # 4.times do
+  #   pid =
+  #     (
+  #       if (north_van.locality_type == "corporation of the city")
+  #         "013228544"
+  #       else
+  #         "008535981"
+  #       end
+  #     )
+  #   full_address =
+  #     (
+  #       if (north_van.locality_type == "corporation of the city")
+  #         "323 18TH ST E, NORTH VANCOUVER, BC, V7L 2X8"
+  #       else
+  #         "5419 ESPERANZA DR, NORTH VANCOUVER, BC, V7R 3W3"
+  #       end
+  #     )
+  #   PermitApplication.create!(
+  #     participant: participants.sample,
+  #     jurisdiction: north_van,
+  #     activity_id: template_version.activity.id,
+  #     permit_type_id: template_version.permit_type.id,
+  #     full_address: full_address,
+  #     template_version: template_version,
+  #     pid: pid
+  #   )
+  # end
 end
 PermitApplication.reindex
 
