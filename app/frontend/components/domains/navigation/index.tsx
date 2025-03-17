@@ -64,6 +64,10 @@ const SubmissionsInboxSetupScreen = lazy(() =>
   })),
 );
 
+const NewProgramScreen = lazy(() =>
+  import('../programs/new-program-screen').then((module) => ({ default: module.NewProgramScreen })),
+);
+
 const JurisdictionIndexScreen = lazy(() =>
   import('../jurisdictions/index').then((module) => ({ default: module.JurisdictionIndexScreen })),
 );
@@ -343,6 +347,8 @@ const AppRoutes = observer(() => {
 
   const superAdminOnlyRoutes = (
     <>
+      {/*<Route path="/programs/new" element={<NewProgramsScreen />} />*/}
+      <Route path="/programs/new" element={<NewProgramScreen />} />
       <Route path="/jurisdictions/new" element={<NewJurisdictionScreen />} />
       <Route path="/requirements-library" element={<RequirementsLibraryScreen />} />
       <Route path="/early-access/requirements-library" element={<EarlyAccessRequirementsLibraryScreen />} />
