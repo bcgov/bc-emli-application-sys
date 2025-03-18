@@ -62,6 +62,7 @@ export const NewProgramScreen = observer(() => {
 
   const onSubmit = async (formData) => {
     const submissionData = { ...formData, regionalDistrictId: formData.regionalDistrict?.id };
+    console.log('SubmissionData----', submissionData);
     const createdJurisdiction = (await createJurisdiction(submissionData)) as IJurisdiction;
     if (createdJurisdiction) {
       setJurisdiction(createdJurisdiction);
@@ -75,7 +76,7 @@ export const NewProgramScreen = observer(() => {
       <FormProvider {...formMethods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <VStack alignItems={'flex-start'} spacing={5} w={'full'} h={'full'}>
-            <Heading as="h1" alignSelf="center">
+            <Heading as="h1" alignSelf="center" color="theme.blueAlt">
               {t('program.new.title')}
             </Heading>
             {jurisdiction ? (
@@ -113,7 +114,7 @@ export const NewProgramScreen = observer(() => {
                   <Flex gap={8}>
                     <Box w="full">
                       <TextFormControl label={t('program.new.nameOfProgram')} fieldName={'programName'} required />
-                      <TextFormControl label={t('program.new.fundedBy')} fieldName={'fundedBy'} required />
+                      <TextFormControl mt={4} label={t('program.new.fundedBy')} fieldName={'fundedBy'} required />
                     </Box>
                   </Flex>
                 </Flex>

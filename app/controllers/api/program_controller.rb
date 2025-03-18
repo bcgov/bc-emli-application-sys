@@ -1,4 +1,4 @@
-class Api::JurisdictionsController < Api::ApplicationController
+class Api::ProgramsController < Api::ApplicationController
   include Api::Concerns::Search::Jurisdictions
   include Api::Concerns::Search::JurisdictionUsers
   include Api::Concerns::Search::PermitApplications
@@ -14,7 +14,7 @@ class Api::JurisdictionsController < Api::ApplicationController
   skip_after_action :verify_policy_scoped,
                     only: %i[index search_users search_permit_applications]
   skip_before_action :authenticate_user!,
-                     only: %i[show index jurisdiction_options]
+                     only: %i[create show index jurisdiction_options]
 
   def index
     perform_search
@@ -36,10 +36,10 @@ class Api::JurisdictionsController < Api::ApplicationController
 
   def update
     authorize @jurisdiction
-    if jurisdiction_params[:contacts_attributes]
+    if program_params[:contacts_attributes]
       # Get current contact ids from the params
       payload_record_ids =
-        jurisdiction_params[:contacts_attributes].map { |c| c[:id] }
+        program_params[:contacts_attributes].map { |c| c[:id] }
       # Mark contacts not included in the current payload for destruction
       @jurisdiction.contacts.each do |contact|
         unless payload_record_ids.include?(contact.id.to_s)
@@ -47,7 +47,7 @@ class Api::JurisdictionsController < Api::ApplicationController
         end
       end
     end
-    if @jurisdiction.update(jurisdiction_params)
+    if @jurisdiction.update(program_params)
       render_success @jurisdiction,
                      "jurisdiction.update_success",
                      {
@@ -108,17 +108,16 @@ class Api::JurisdictionsController < Api::ApplicationController
     render_success(@jurisdiction, nil, blueprint_opts: { view: :base })
   end
 
-  # POST /api/jurisdiction
+  # POST /api/program
   def create
-    class_to_use =
-      Jurisdiction.class_for_locality_type(jurisdiction_params[:locality_type])
+    # class_to_use = Jurisdiction.class_for_locality_type(program_params[:locality_type])
 
-    @jurisdiction = class_to_use.build(jurisdiction_params)
+    @program = Jurisdiction.build(program_params)
 
-    authorize @jurisdiction
+    authorize @program
 
-    if @jurisdiction.save
-      render_success @jurisdiction,
+    if @program.save
+      render_success @program,
                      "jurisdiction.create_success",
                      {
                        blueprint: JurisdictionBlueprint,
@@ -194,9 +193,9 @@ class Api::JurisdictionsController < Api::ApplicationController
 
     # TODO: refactor jurisdictions search to accomodate filters,
     # then use that here instead of having the search logic in the controller
-    name = jurisdiction_params["name"]
-    type = jurisdiction_params["type"]
-    user_id = jurisdiction_params["user_id"]
+    name = program_params["name"]
+    type = program_params["type"]
+    user_id = program_params["user_id"]
 
     filters = {}
     filters = { type: type } if type.present?
@@ -210,12 +209,13 @@ class Api::JurisdictionsController < Api::ApplicationController
 
   private
 
-  def jurisdiction_params
-    params.require(:jurisdiction).permit(
-      :name,
+  def program_params
+    params.require(:progam).permit(
+      :program_name,
+      :funded_by,
       :type,
       :user_id,
-      # :locality_type,
+      :locality_type,
       :address,
       :regional_district_id,
       :description_html,

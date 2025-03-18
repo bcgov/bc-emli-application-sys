@@ -2520,6 +2520,7 @@ const options = {
             profile: 'Edit My account',
             jurisdictions: 'Jurisdictions',
             new: 'Create new',
+            programs: 'Programs',
             invite: 'Invite',
             templateVersions: 'Template versions',
             requirementsLibrary: 'Requirements library',
