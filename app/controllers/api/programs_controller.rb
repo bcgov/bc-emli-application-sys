@@ -117,7 +117,7 @@ class Api::ProgramsController < Api::ApplicationController
 
     @program = Program.build(program_params)
 
-    # authorize @program
+    authorize @program
 
     if @program.save
       render_success @program,
