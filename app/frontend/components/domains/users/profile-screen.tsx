@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { Info, Warning } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -24,7 +24,7 @@ import { EmailFormControl } from '../../shared/form/email-form-control';
 import { TextFormControl } from '../../shared/form/input-form-control';
 import CustomAlert, { InformationAlert } from '../../shared/base/custom-alert';
 import { useCurrentUserLicenseAgreements } from '../../../hooks/resources/user-license-agreements';
-import { reaction } from 'mobx';
+import { format } from 'date-fns';
 
 interface IProfileScreenProps {}
 
@@ -38,6 +38,12 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
 
   const { userStore } = useMst();
   const { currentUser, updateProfile } = userStore;
+
+  const { error, licenseAgreements, isLoading, currentEula } = useCurrentUserLicenseAgreements();
+  let acceptedLicenseAgreement = null;
+  useMemo(() => {
+    acceptedLicenseAgreement = licenseAgreements?.find((la) => la.agreement?.id === currentEula?.id);
+  }, [isLoading]);
 
   const [sameAddressChecked, setSameAddressChecked] = useState(currentUser.isSameAddress);
 
@@ -310,8 +316,12 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                 <Flex direction="column" flex={1}>
                   <Text fontWeight={'bold'}>{t('user.termsandConditions')}</Text>
                   <Text color="text.secondary" pr={4}>
-                    {/* Remember: To append date on which terms and conditions accepted */}
-                    {t('user.acceptedConditions')}
+                    {acceptedLicenseAgreement
+                      ? t('user.acceptedConditions', {
+                          date: format(acceptedLicenseAgreement.acceptedAt, 'MMM dd, yyy'),
+                          time: format(acceptedLicenseAgreement.acceptedAt, 'hh:mm'),
+                        })
+                      : null}
                   </Text>
                 </Flex>
                 <Flex>
@@ -354,30 +364,36 @@ const PhysicalAddressBlock = ({ formValues }) => {
         label={t('user.address')}
         fieldName="streetAddressAttributes.streetAddress"
         value={formValues.address}
+        showOptional={false}
       />
       <TextFormControl
         disabled={true}
         label={t('user.city')}
         fieldName="streetAddressAttributes.locality"
         value={formValues.city}
+        required={false}
+        showOptional={false}
       />
       <TextFormControl
         disabled={true}
         label={t('user.province')}
         fieldName="streetAddressAttributes.region"
         value={formValues.province}
+        showOptional={false}
       />
       <TextFormControl
         disabled={true}
         label={t('user.postalCode')}
         fieldName="streetAddressAttributes.postalCode"
         value={formValues.postalCode}
+        showOptional={false}
       />
       <TextFormControl
         disabled={true}
         label={t('user.country')}
         fieldName="streetAddressAttributes.country"
         value={formValues.country}
+        showOptional={false}
       />
     </>
   );
@@ -392,34 +408,39 @@ const MailingAddressBlock = ({ formValues, setFormValues, sameAddressChecked }) 
         {t('user.postalAddress')}
       </Text>
       <TextFormControl
-        label={t('user.address')}
+        label={t('user.mailingAdress')}
         fieldName="mailingAddressAttributes.streetAddress"
         value={sameAddressChecked ? formValues.address : formValues.postalAddress}
         onChange={(e) => setFormValues({ ...formValues, postalAddress: e.target.value })}
+        showOptional={false}
       />
       <TextFormControl
         label={t('user.city')}
         fieldName="mailingAddressAttributes.locality"
         value={sameAddressChecked ? formValues.city : formValues.postalAddressCity}
         onChange={(e) => setFormValues({ ...formValues, postalAddressCity: e.target.value })}
+        showOptional={false}
       />
       <TextFormControl
         label={t('user.province')}
         fieldName="mailingAddressAttributes.region"
         value={sameAddressChecked ? formValues.province : formValues.postalAddressProvince}
         onChange={(e) => setFormValues({ ...formValues, postalAddressProvince: e.target.value })}
+        showOptional={false}
       />
       <TextFormControl
         label={t('user.postalCode')}
         fieldName="mailingAddressAttributes.postalCode"
         value={sameAddressChecked ? formValues.postalCode : formValues.postalAddressPostalcode}
         onChange={(e) => setFormValues({ ...formValues, postalAddressPostalcode: e.target.value })}
+        showOptional={false}
       />
       <TextFormControl
         label={t('user.country')}
         fieldName="mailingAddressAttributes.country"
         value={sameAddressChecked ? formValues.country : formValues.postalAddressCountry}
         onChange={(e) => setFormValues({ ...formValues, postalAddressCountry: e.target.value })}
+        showOptional={false}
       />
     </>
   );
