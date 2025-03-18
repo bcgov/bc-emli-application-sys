@@ -1926,7 +1926,7 @@ const options = {
           myAccount: 'My account',
           accountCreation: 'Create account',
           termsandConditions: 'Terms and conditions',
-          acceptedConditions: 'You accepted the terms and conditions on',
+          acceptedConditions: 'You accepted the terms and conditions on {{date}} at {{time}}',
           emailValidationError: 'You need to have at least one email address to receive notifications.',
           enterValidEmail: 'Please enter a valid email address',
           inviteTitle: 'Invite users',
