@@ -354,30 +354,36 @@ const PhysicalAddressBlock = ({ formValues }) => {
         label={t('user.address')}
         fieldName="streetAddressAttributes.streetAddress"
         value={formValues.address}
+        showOptional={false}
       />
       <TextFormControl
         disabled={true}
         label={t('user.city')}
         fieldName="streetAddressAttributes.locality"
         value={formValues.city}
+        required={false}
+        showOptional={false}
       />
       <TextFormControl
         disabled={true}
         label={t('user.province')}
         fieldName="streetAddressAttributes.region"
         value={formValues.province}
+        showOptional={false}
       />
       <TextFormControl
         disabled={true}
         label={t('user.postalCode')}
         fieldName="streetAddressAttributes.postalCode"
         value={formValues.postalCode}
+        showOptional={false}
       />
       <TextFormControl
         disabled={true}
         label={t('user.country')}
         fieldName="streetAddressAttributes.country"
         value={formValues.country}
+        showOptional={false}
       />
     </>
   );
@@ -392,34 +398,39 @@ const MailingAddressBlock = ({ formValues, setFormValues, sameAddressChecked }) 
         {t('user.postalAddress')}
       </Text>
       <TextFormControl
-        label={t('user.address')}
+        label={t('user.mailingAdress')}
         fieldName="mailingAddressAttributes.streetAddress"
         value={sameAddressChecked ? formValues.address : formValues.postalAddress}
         onChange={(e) => setFormValues({ ...formValues, postalAddress: e.target.value })}
+        showOptional={false}
       />
       <TextFormControl
         label={t('user.city')}
         fieldName="mailingAddressAttributes.locality"
         value={sameAddressChecked ? formValues.city : formValues.postalAddressCity}
         onChange={(e) => setFormValues({ ...formValues, postalAddressCity: e.target.value })}
+        showOptional={false}
       />
       <TextFormControl
         label={t('user.province')}
         fieldName="mailingAddressAttributes.region"
         value={sameAddressChecked ? formValues.province : formValues.postalAddressProvince}
         onChange={(e) => setFormValues({ ...formValues, postalAddressProvince: e.target.value })}
+        showOptional={false}
       />
       <TextFormControl
         label={t('user.postalCode')}
         fieldName="mailingAddressAttributes.postalCode"
         value={sameAddressChecked ? formValues.postalCode : formValues.postalAddressPostalcode}
         onChange={(e) => setFormValues({ ...formValues, postalAddressPostalcode: e.target.value })}
+        showOptional={false}
       />
       <TextFormControl
         label={t('user.country')}
         fieldName="mailingAddressAttributes.country"
         value={sameAddressChecked ? formValues.country : formValues.postalAddressCountry}
         onChange={(e) => setFormValues({ ...formValues, postalAddressCountry: e.target.value })}
+        showOptional={false}
       />
     </>
   );
