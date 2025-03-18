@@ -168,10 +168,13 @@ class OmniauthUserResolver
   end
 
   def omniauth_uid
+    Rails.logger.info("RawInfo: #{raw_info}")
     @uid ||=
       case raw_info.identity_provider
-      when ENV["KEYCLOAK_CLIENT"] || OMNIAUTH_PROVIDERS[:idir]
+      when ENV["KEYCLOAK_CLIENT"]
         raw_info.sub.split("@").first
+      when OMNIAUTH_PROVIDERS[:idir]
+        raw_info.idir_user_guid
       else
         raw_info.bceid_user_guid
       end
