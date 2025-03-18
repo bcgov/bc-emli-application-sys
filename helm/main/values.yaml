@@ -52,7 +52,7 @@ app:
 
   env:
     "ANYCABLE_REDIS_URL": "redis://hesp-redis:6379/"
-    "ANYCABLE_URL": "ws://anycable-go:8080/cable"
+    "ANYCABLE_URL": "ws://hesp-anycable-go:8080/cable"
     "BUNDLE_PATH": "/usr/local/bundle"
     "CACHE_DEV_REDIS_URL": "redis://hesp-redis:6379/4"
     "ELASTICSEARCH_URL": "http://hesp-elasticsearch:9200"
