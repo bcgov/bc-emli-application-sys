@@ -16,7 +16,7 @@ import { RouterLink } from '../../shared/navigation/router-link';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { GridHeaders } from './grid-header';
 
-export const JurisdictionIndexScreen = observer(function JurisdictionIndex() {
+export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
   const { jurisdictionStore } = useMst();
   const {
     tableJurisdictions,
@@ -37,11 +37,13 @@ export const JurisdictionIndexScreen = observer(function JurisdictionIndex() {
       <VStack alignItems={'flex-start'} spacing={5} w={'full'} h={'full'}>
         <Flex justifyContent={'space-between'} w={'full'} alignItems={'flex-end'}>
           <Box>
-            <Heading as="h1">{t('jurisdiction.index.title')}</Heading>
-            <Text color={'text.secondary'}>{t('jurisdiction.index.description')}</Text>
+            <Heading as="h1" color={'theme.blueAlt'}>
+              {t('program.index.title')}
+            </Heading>
+            <Text color={'text.secondary'}>{t('program.index.description')}</Text>
           </Box>
-          <RouterLinkButton variant={'primary'} to={'/jurisdictions/new'}>
-            {t('jurisdiction.index.createButton')}
+          <RouterLinkButton variant={'primary'} to={'/programs/new'}>
+            {t('program.index.createButton')}
           </RouterLinkButton>
         </Flex>
 

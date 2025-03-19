@@ -502,9 +502,19 @@ const options = {
           },
         },
         program: {
+          index: {
+            title: 'Manage programs',
+            description: 'Below is a list of all programs in the system',
+            createButton: 'Create a new program',
+            tableHeading: 'Programs',
+            users: 'Users',
+            externalApiKeys: 'API settings',
+            exportTemplates: 'Export templates',
+            about: 'About',
+          },
           new: {
             title: 'Create new program',
-            description: 'Below is a list of all jurisdictions in the system',
+            description: 'Below is a list of all programs in the system',
             createButton: 'Create program',
             tableHeading: 'Local governments',
             users: 'Users',
@@ -515,6 +525,7 @@ const options = {
             fundedBy: 'Funded by',
           },
         },
+        /* To be removed later */
         jurisdiction: {
           edit: {
             displayDescriptionLabel: 'Jurisdiction description (public)',

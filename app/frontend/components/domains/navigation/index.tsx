@@ -12,6 +12,7 @@ import { EULAScreen } from '../onboarding/eula';
 import { NavBar } from './nav-bar';
 import { ProtectedRoute } from './protected-route';
 import { AdminPortalLogin } from '../admin/login';
+import { ProgramsIndexScreen } from '../programs';
 
 const ExternalApiKeysIndexScreen = lazy(() =>
   import('../external-api-key').then((module) => ({ default: module.ExternalApiKeysIndexScreen })),
@@ -548,9 +549,14 @@ const AppRoutes = observer(() => {
           path="/early-access/requirement-templates/:requirementTemplateId"
           element={<EarlyAccessRequirementTemplateScreen />}
         />
+        {/* To be removed later  */}
         <Route
           path="/jurisdictions"
           element={currentUser?.isSuperAdmin ? <JurisdictionIndexScreen /> : <LimitedJurisdictionIndexScreen />}
+        />
+        <Route
+          path="/programs"
+          element={currentUser?.isSuperAdmin ? <ProgramsIndexScreen /> : <LimitedJurisdictionIndexScreen />}
         />
         <Route path="/jurisdictions/:jurisdictionId" element={<JurisdictionScreen />} />
         <Route path="/not-found" element={<NotFoundScreen />} />
