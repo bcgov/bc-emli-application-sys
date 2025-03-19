@@ -17,6 +17,7 @@ app:
 
   env:
     "APP_DOMAIN": "test-hesp.apps.silver.devops.gov.bc.ca"
+    "ANYCABLE_URL": "wss://test-hesp-anycable.apps.silver.devops.gov.bc.ca/cable"
     "KEYCLOAK_AUTH_URL": "https://test.loginproxy.gov.bc.ca/"
     "VITE_SITEMINDER_LOGOUT_URL": "https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi"
     "VITE_BCEID_URL": "https://www.development.bceid.ca"
@@ -61,7 +62,7 @@ crunchy-postgres:
     dataVolumeClaimSpec:
       storage: 1Gi
     requests:
-      cpu: 200m
+      cpu: 10m
       memory: 256Mi
     replicaCertCopy:
       requests:
@@ -166,6 +167,10 @@ elasticsearch:
 # See https://github.com/anycable/anycable-helm/blob/master/anycable-go/values.yaml
 anycableGo:
   enabled: true
+
+  route:
+    enabled: true
+    host: test-hesp-anycable.apps.silver.devops.gov.bc.ca
 
   resources:
     requests:
