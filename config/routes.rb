@@ -142,6 +142,9 @@ Rails.application.routes.draw do
       get "jurisdiction_options", on: :collection
     end
 
+    resources :programs, only: %i[index update show create] do
+    end
+
     resources :contacts, only: %i[create update destroy] do
       get "contact_options", on: :collection
     end
@@ -273,5 +276,5 @@ Rails.application.routes.draw do
       constraints: ->(req) do
         !req.path.include?("/rails") && !req.path.start_with?("/public")
       end
-  post '/store_entry_point', to: 'sessions#store_entry_point'
+  post "/store_entry_point", to: "sessions#store_entry_point"
 end

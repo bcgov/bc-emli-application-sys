@@ -331,7 +331,7 @@ const options = {
             left: 'Use the BC Home Energy Planner to find recommended upgrades for your home',
             mid: 'Speak with an Energy Coach to get help with your application and learn more about rebate programs',
             midButton: 'Book a call',
-            getStarted: 'Get started',
+            getStarted: 'Go to Planner',
             energyPlannerLink: 'https://www.bchomeenergyplanner.ca/',
             energyCoachBookCallLink: 'https://www.betterbuildingsbc.ca/connect/',
             bookACall: 'Book a call',
@@ -501,6 +501,31 @@ const options = {
             professionalNumber: 'Professional number',
           },
         },
+        program: {
+          index: {
+            title: 'Manage programs',
+            description: 'Below is a list of all programs in the system',
+            createButton: 'Create a new program',
+            tableHeading: 'Programs',
+            users: 'Users',
+            externalApiKeys: 'API settings',
+            exportTemplates: 'Export templates',
+            about: 'About',
+          },
+          new: {
+            title: 'Create new program',
+            description: 'Below is a list of all programs in the system',
+            createButton: 'Create program',
+            tableHeading: 'Local governments',
+            users: 'Users',
+            externalApiKeys: 'API settings',
+            exportTemplates: 'Export templates',
+            about: 'About',
+            nameOfProgram: 'Name of program',
+            fundedBy: 'Funded by',
+          },
+        },
+        /* To be removed later */
         jurisdiction: {
           edit: {
             displayDescriptionLabel: 'Jurisdiction description (public)',
@@ -2506,6 +2531,7 @@ const options = {
             profile: 'Edit My account',
             jurisdictions: 'Jurisdictions',
             new: 'Create new',
+            programs: 'Programs',
             invite: 'Invite',
             templateVersions: 'Template versions',
             requirementsLibrary: 'Requirements library',

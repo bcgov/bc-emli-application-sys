@@ -12,6 +12,7 @@ import { EULAScreen } from '../onboarding/eula';
 import { NavBar } from './nav-bar';
 import { ProtectedRoute } from './protected-route';
 import { AdminPortalLogin } from '../admin/login';
+import { ProgramsIndexScreen } from '../programs';
 
 const ExternalApiKeysIndexScreen = lazy(() =>
   import('../external-api-key').then((module) => ({ default: module.ExternalApiKeysIndexScreen })),
@@ -62,6 +63,10 @@ const SubmissionsInboxSetupScreen = lazy(() =>
   import('../home/review-manager/configuration-management-screen/submissions-inbox-setup-screen').then((module) => ({
     default: module.SubmissionsInboxSetupScreen,
   })),
+);
+
+const NewProgramScreen = lazy(() =>
+  import('../programs/new-program-screen').then((module) => ({ default: module.NewProgramScreen })),
 );
 
 const JurisdictionIndexScreen = lazy(() =>
@@ -343,6 +348,8 @@ const AppRoutes = observer(() => {
 
   const superAdminOnlyRoutes = (
     <>
+      {/*<Route path="/programs/new" element={<NewProgramsScreen />} />*/}
+      <Route path="/programs/new" element={<NewProgramScreen />} />
       <Route path="/jurisdictions/new" element={<NewJurisdictionScreen />} />
       <Route path="/requirements-library" element={<RequirementsLibraryScreen />} />
       <Route path="/early-access/requirements-library" element={<EarlyAccessRequirementsLibraryScreen />} />
@@ -542,9 +549,14 @@ const AppRoutes = observer(() => {
           path="/early-access/requirement-templates/:requirementTemplateId"
           element={<EarlyAccessRequirementTemplateScreen />}
         />
+        {/* To be removed later  */}
         <Route
           path="/jurisdictions"
           element={currentUser?.isSuperAdmin ? <JurisdictionIndexScreen /> : <LimitedJurisdictionIndexScreen />}
+        />
+        <Route
+          path="/programs"
+          element={currentUser?.isSuperAdmin ? <ProgramsIndexScreen /> : <LimitedJurisdictionIndexScreen />}
         />
         <Route path="/jurisdictions/:jurisdictionId" element={<JurisdictionScreen />} />
         <Route path="/not-found" element={<NotFoundScreen />} />

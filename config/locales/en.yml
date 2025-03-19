@@ -453,7 +453,7 @@ en:
         message: "%{error_message}"
       create_success:
         title: ""
-        message: "New jurisdiction created successfully!"
+        message: "New Program created successfully!"
       update_error:
         title: Error
         message: "%{error_message}"

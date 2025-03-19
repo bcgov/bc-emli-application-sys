@@ -95,7 +95,8 @@ export enum EJurisdictionSortFields {
   reviewersSize = 'reviewers_size',
   permitApplicationsSize = 'permit_applications_size',
   regionalDistrict = 'regional_district_name',
-  submissionInboxSetUp = 'submission_inbox_set_up',
+  // submissionInboxSetUp = 'submission_inbox_set_up',
+  templatesUsed = 'templates_used',
 }
 
 export enum EUserSortFields {
