@@ -77,7 +77,7 @@ jobs:
           const result = await github.rest.pulls.create({
             owner,
             repo,
-            head: 'tags/${{ steps.input.outputs.tag }}',
+            head: 'newtags/${{ steps.input.outputs.tag }}',
             base: '${{ steps.vars.outputs.base }}',
             title: '${{ steps.vars.outputs.pr_title }}',
             body: `### Commits
