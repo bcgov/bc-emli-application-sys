@@ -8,7 +8,7 @@ app:
   enabled: true
 
   image:
-    repository: artifacts.developer.gov.bc.ca/bbfc-test/hesp-app
+    repository: artifacts.developer.gov.bc.ca/bbfc-test/hesp-test
 
   resources:
     requests:
