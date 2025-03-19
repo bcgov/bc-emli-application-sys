@@ -71,7 +71,7 @@ jobs:
         registry-url: ${{ env.ARTIFACTORY_REGISTRY }}
         registry-username: ${{ secrets.ARTIFACTORY_USERNAME }}
         registry-password: ${{ secrets.ARTIFACTORY_PASSWORD }}
-        image-name: bbfc-dev/hesp-app
+        image-name: bbfc-test/hesp-app
         docker-context: .
         docker-file: devops/docker/app/Dockerfile
         docker-args: |
