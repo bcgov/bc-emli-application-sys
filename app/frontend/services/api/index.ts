@@ -128,7 +128,7 @@ export class Api {
   }
 
   async searchJurisdictions(params?: TSearchParams<EJurisdictionSortFields, IJurisdictionSearchFilters>) {
-    return this.client.post<IJurisdictionResponse>('/jurisdictions/search', params);
+    return this.client.post<IJurisdictionResponse>('/programs/search', params);
   }
 
   async fetchJurisdiction(id) {
