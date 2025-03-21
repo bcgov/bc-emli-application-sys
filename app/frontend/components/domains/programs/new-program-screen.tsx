@@ -42,7 +42,7 @@ export const NewProgramScreen = observer(() => {
   const [jurisdiction, setJurisdiction] = useState<IJurisdiction>();
   const [useCustom, setUseCustom] = useState<boolean>(false);
   const {
-    jurisdictionStore: { createJurisdiction, fetchLocalityTypeOptions, regionalDistrictLocalityType },
+    jurisdictionStore: { createProgram, fetchLocalityTypeOptions, regionalDistrictLocalityType },
   } = useMst();
 
   const formMethods = useForm<TCreateJurisdictionFormData>({

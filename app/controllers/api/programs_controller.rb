@@ -1,5 +1,5 @@
 class Api::ProgramsController < Api::ApplicationController
-  include Api::Concerns::Search::Jurisdictions
+  include Api::Concerns::Search::Programs
   include Api::Concerns::Search::JurisdictionUsers
   include Api::Concerns::Search::PermitApplications
 
@@ -20,7 +20,8 @@ class Api::ProgramsController < Api::ApplicationController
   # skip_after_action :verify_authorized, only: :create
 
   def index
-    perform_search
+    perform_search_programs
+
     authorized_results = apply_search_authorization(@search.results)
     render_success authorized_results,
                    nil,
@@ -30,7 +31,7 @@ class Api::ProgramsController < Api::ApplicationController
                        total_count: @search.total_count,
                        current_page: @search.current_page
                      },
-                     blueprint: JurisdictionBlueprint,
+                     blueprint: ProgramBlueprint,
                      blueprint_opts: {
                        view: :base
                      }
