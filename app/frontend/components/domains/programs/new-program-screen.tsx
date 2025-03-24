@@ -17,20 +17,11 @@ import React, { useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { IJurisdiction } from '../../../models/jurisdiction';
+import { IProgram } from '../../../models/program';
 import { useMst } from '../../../setup/root';
-import { EJurisdictionTypes } from '../../../types/enums';
 import { AsyncRadioGroup } from '../../shared/base/inputs/async-radio-group';
 import { TextFormControl } from '../../shared/form/input-form-control';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
-import { JurisdictionSelect } from '../../shared/select/selectors/jurisdiction-select';
-
-export type TCreateJurisdictionFormData = {
-  name: string;
-  localityType: string;
-  postalAddress: string;
-  regionalDistrict: IJurisdiction;
-};
 
 export type TCreateProgramFormData = {
   programName: string;
@@ -39,19 +30,18 @@ export type TCreateProgramFormData = {
 
 export const NewProgramScreen = observer(() => {
   const { t } = useTranslation();
-  const [jurisdiction, setJurisdiction] = useState<IJurisdiction>();
+  const [program, setProgram] = useState<IProgram>();
   const [useCustom, setUseCustom] = useState<boolean>(false);
+
   const {
-    jurisdictionStore: { createJurisdiction, fetchLocalityTypeOptions, regionalDistrictLocalityType },
+    programStore: { createProgram },
   } = useMst();
 
-  const formMethods = useForm<TCreateJurisdictionFormData>({
+  const formMethods = useForm<TCreateProgramFormData>({
     mode: 'onChange',
     defaultValues: {
-      name: '',
-      localityType: '',
-      postalAddress: '',
-      regionalDistrict: null,
+      programName: '',
+      fundedBy: '',
     },
   });
 
@@ -61,11 +51,10 @@ export const NewProgramScreen = observer(() => {
   const { isSubmitting, isValid } = formState;
 
   const onSubmit = async (formData) => {
-    const submissionData = { ...formData, regionalDistrictId: formData.regionalDistrict?.id };
-    console.log('SubmissionData----', submissionData);
-    const createdJurisdiction = (await createJurisdiction(submissionData)) as IJurisdiction;
-    if (createdJurisdiction) {
-      setJurisdiction(createdJurisdiction);
+    const submissionData = { ...formData, programID: formData.programID?.id };
+    const createdProgram = (await createProgram(submissionData)) as IProgram;
+    if (createdProgram) {
+      setProgram(createdProgram);
     }
   };
 
@@ -79,22 +68,25 @@ export const NewProgramScreen = observer(() => {
             <Heading as="h1" alignSelf="center" color="theme.blueAlt">
               {t('program.new.title')}
             </Heading>
-            {jurisdiction ? (
+            {program ? (
               <Flex direction="column" w="full" align="center" gap={6}>
                 <Box background="greys.grey03" p={6} w="full">
                   <VStack>
-                    <Text>{jurisdiction.qualifier}</Text>
-                    <Heading as="h3">{jurisdiction.name}</Heading>
+                    <Text>{program.qualifier}</Text>
+                    <Heading as="h3">{program.programName}</Heading>
+                    <Text as={'span'} fontSize={'lg'}>
+                      {t('program.new.fundedBy').toLowerCase() + ' ' + program.fundedBy}
+                    </Text>
                   </VStack>
                 </Box>
                 <Text fontWeight="bold" fontSize="lg">
-                  {t('jurisdiction.new.nextStep')}
+                  {t('program.new.nextStep')}
                 </Text>
                 <HStack>
-                  <RouterLinkButton to={`/jurisdictions/${jurisdiction?.slug}/users/invite`} variant="primary">
+                  <RouterLinkButton to={`/programs/${program?.slug}/users/invite`} variant="primary">
                     {t('user.index.inviteButton')}
                   </RouterLinkButton>
-                  <RouterLinkButton to={`/jurisdictions`} variant="secondary">
+                  <RouterLinkButton to={`/programs`} variant="secondary">
                     {t('ui.doLater')}
                   </RouterLinkButton>
                 </HStack>
