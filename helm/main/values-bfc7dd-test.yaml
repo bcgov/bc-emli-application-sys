@@ -32,6 +32,9 @@ app:
 sidekiq:
   enabled: true
 
+  image:
+    repository: artifacts.developer.gov.bc.ca/bbfc-test/hesp-test
+
   resources:
     requests:
       cpu: 100m
@@ -41,8 +44,9 @@ sidekiq:
 
 anycable-rpc:
   enabled: true
+
   image:
-    pullPolicy: IfNotPresent
+    repository: artifacts.developer.gov.bc.ca/bbfc-test/hesp-test
 
   nameOverride: hesp-anycable-rpc
   fullnameOverride: hesp-anycable-rpc
