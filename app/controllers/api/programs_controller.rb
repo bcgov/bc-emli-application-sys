@@ -115,7 +115,6 @@ class Api::ProgramsController < Api::ApplicationController
   # POST /api/program
   def create
     # class_to_use = Jurisdiction.class_for_locality_type(program_params[:locality_type])
-
     @program = Program.build(program_params)
 
     authorize @program

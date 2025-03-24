@@ -65,8 +65,8 @@ export const JurisdictionStoreModel = types
     removeJurisdiction(id: string) {
       self.jurisdictionMap.delete(id);
     },
-    createProgram: flow(function* (formData: TcreateProgramFormData) {
-      const { ok, data: response } = yield* toGenerator(self.environment.api.createProgram(formData));
+    createJurisdiction: flow(function* (formData: TcreateProgramFormData) {
+      const { ok, data: response } = yield* toGenerator(self.environment.api.createJurisdiction(formData));
 
       if (ok) {
         self.jurisdictionMap.put(response.data);

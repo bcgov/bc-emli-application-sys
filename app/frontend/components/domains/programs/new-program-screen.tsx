@@ -22,6 +22,8 @@ import { useMst } from '../../../setup/root';
 import { AsyncRadioGroup } from '../../shared/base/inputs/async-radio-group';
 import { TextFormControl } from '../../shared/form/input-form-control';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
+import { JurisdictionSelect } from '../../shared/select/selectors/jurisdiction-select';
+import { EProgramUserGroupType } from '../../../types/enums';
 
 export type TCreateProgramFormData = {
   programName: string;
@@ -34,9 +36,14 @@ export const NewProgramScreen = observer(() => {
   const [useCustom, setUseCustom] = useState<boolean>(false);
 
   const {
-    programStore: { createProgram },
+    programStore: { createProgram, fetchLocalityTypeOptions, regionalDistrictLocalityType },
+    permitClassificationStore: { fetchActivityOptions },
   } = useMst();
 
+  interface IOption<T> {
+    value: T;
+    label: string;
+  }
   const formMethods = useForm<TCreateProgramFormData>({
     mode: 'onChange',
     defaultValues: {
@@ -56,6 +63,13 @@ export const NewProgramScreen = observer(() => {
     if (createdProgram) {
       setProgram(createdProgram);
     }
+  };
+
+  const fetchUserGroupTypeOptions = async (): Promise<IOption<string>[]> => {
+    return Object.keys(EProgramUserGroupType).map((key) => {
+      const value = EProgramUserGroupType[key as keyof typeof EProgramUserGroupType];
+      return { value: key, label: value };
+    });
   };
 
   const handleToggleCustom = () => setUseCustom((pastState) => !pastState);
@@ -93,20 +107,37 @@ export const NewProgramScreen = observer(() => {
               </Flex>
             ) : (
               <>
-                <Flex
-                  direction="column"
-                  as="section"
-                  gap={6}
-                  w="75%"
-                  p={6}
-                  border="solid 1px"
-                  borderColor="border.light"
-                  alignSelf="center"
-                >
+                <Flex direction="column" as="section" gap={6} w="75%" p={6} alignSelf="center">
                   <Flex gap={8}>
                     <Box w="full">
-                      <TextFormControl label={t('program.new.nameOfProgram')} fieldName={'programName'} required />
-                      <TextFormControl mt={4} label={t('program.new.fundedBy')} fieldName={'fundedBy'} required />
+                      <AsyncRadioGroup
+                        valueField="id"
+                        fetchOptions={fetchUserGroupTypeOptions}
+                        fieldName={'targetGroupType'}
+                        question={t('program.new.targetGroup')}
+                      />
+                      <Flex
+                        bg="greys.grey03"
+                        p={8}
+                        mt={4}
+                        border="1px solid"
+                        borderColor="greys.grey02"
+                        borderRadius="sm"
+                        width="100%"
+                      >
+                        <TextFormControl label={t('program.new.nameOfProgram')} fieldName={'programName'} required />
+                      </Flex>
+                      <Flex
+                        bg="greys.grey03"
+                        p={8}
+                        border="1px solid"
+                        borderColor="greys.grey02"
+                        borderRadius="sm"
+                        width="100%"
+                        mt={4}
+                      >
+                        <TextFormControl label={t('program.new.fundedBy')} fieldName={'fundedBy'} required />
+                      </Flex>
                     </Box>
                   </Flex>
                 </Flex>

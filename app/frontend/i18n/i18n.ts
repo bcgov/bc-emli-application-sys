@@ -521,9 +521,17 @@ const options = {
             externalApiKeys: 'API settings',
             exportTemplates: 'Export templates',
             about: 'About',
+            targetGroup: 'Select target user group:',
             nameOfProgram: 'Name of program',
             fundedBy: 'Funded by',
             nextStep: 'Next step is to invite users',
+          },
+          fields: {
+            reverseQualifiedName: 'Name',
+            reviewManagersSize: 'Managers',
+            reviewersSize: 'Reviewers',
+            permitApplicationsSize: 'Applications received',
+            templatesUsed: 'Templates used',
           },
         },
         /* To be removed later */
@@ -2166,11 +2174,11 @@ const options = {
             title: 'Applications template catalog',
             description:
               'List of all application in the system that’s been created by the Admin manager or a System admin. Only Published application will be visible to programs.',
-            createButton: 'Create new application',
+            createButton: 'Create a new template',
             seeArchivedButton: 'See archived',
           },
           new: {
-            title: 'Create a new application',
+            title: 'Create a new template',
             typePrompt: 'What kind of building permit is this?',
             descriptionHelpText:
               'Provide some context for managers and admin on what this application is for (MAX 250 CHARACTERS).',

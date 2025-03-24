@@ -1,6 +1,6 @@
 class Program < ApplicationRecord
   extend FriendlyId
-  friendly_id :qualified_name, use: :slugged
+  friendly_id :program_name, use: :slugged
   include JurisdictionExternalApiState
 
   # BASE_INCLUDES = %i[
@@ -36,10 +36,10 @@ class Program < ApplicationRecord
   # validates :locality_type, presence: true
 
   # Validation to ensure at least one sandbox exists
-  validate :must_have_one_sandbox
+  # validate :must_have_one_sandbox
 
   # Callback to ensure default sandboxes exist
-  before_validation :ensure_default_sandboxes
+  # before_validation :ensure_default_sandboxes
 
   # before_validation :normalize_locality_type
   before_validation :normalize_name
@@ -47,7 +47,7 @@ class Program < ApplicationRecord
 
   before_save :sanitize_html_fields
 
-  after_create :create_permit_type_required_steps
+  # after_create :create_permit_type_required_steps
 
   accepts_nested_attributes_for :contacts
   accepts_nested_attributes_for :permit_type_submission_contacts,
@@ -59,7 +59,7 @@ class Program < ApplicationRecord
 
   accepts_nested_attributes_for :permit_type_required_steps, allow_destroy: true
 
-  before_create :assign_unique_prefix
+  # before_create :assign_unique_prefix
 
   def customizations
     # Convenience method to prevent carpal tunnel syndrome
@@ -78,22 +78,22 @@ class Program < ApplicationRecord
     users&.kept&.admin
   end
 
-  def assign_unique_prefix
-    # Initial prefix from the first letter of the qualifier and the name
-    prefix_base = "#{qualifier.first}#{name.first.capitalize}"
-    prefix = prefix_base
-    counter = 1
+  # def assign_unique_prefix
+  #   # Initial prefix from the first letter of the qualifier and the name
+  #   prefix_base = "#{qualifier.first}#{name.first.capitalize}"
+  #   prefix = prefix_base
+  #   counter = 1
 
-    # Loop until a unique prefix is found
-    while Jurisdiction.exists?(prefix: prefix)
-      next_letter = name[counter] || ""
-      prefix = "#{prefix_base}#{next_letter.capitalize}"
-      counter += 1
-    end
+  #   # Loop until a unique prefix is found
+  #   while Jurisdiction.exists?(prefix: prefix)
+  #     next_letter = name[counter] || ""
+  #     prefix = "#{prefix_base}#{next_letter.capitalize}"
+  #     counter += 1
+  #   end
 
-    # Update the jurisdiction with the unique prefix
-    self.prefix = prefix
-  end
+  #   # Update the jurisdiction with the unique prefix
+  #   self.prefix = prefix
+  # end
 
   # def self.locality_types
   #   find_by_sql("SELECT DISTINCT locality_type FROM jurisdictions").pluck(
@@ -275,7 +275,7 @@ class Program < ApplicationRecord
 
   def normalize_name
     # Replace underscores with spaces
-    normalized = name.gsub("_", " ")
+    normalized = program_name.gsub("_", " ")
 
     # Remove commas and periods
     normalized.gsub(/[,.]/, "")
@@ -283,7 +283,7 @@ class Program < ApplicationRecord
     # Remove leading and trailing whitespaces
     normalized.strip!
 
-    self.name = normalized
+    self.program_name = normalized
   end
 
   # def normalize_locality_type
@@ -291,19 +291,19 @@ class Program < ApplicationRecord
   #   normalized = locality_type.downcase
 
   #   # Replace underscores with spaces
-  #   normalized.gsub("_", " ")
+  # normalized.gsub("_", " ")
 
-  #   # Remove commas and periods
-  #   normalized.gsub(/[,.]/, "")
+  # # Remove commas and periods
+  # normalized.gsub(/[,.]/, "")
 
-  #   # Remove leading and trailing whitespaces
-  #   normalized.strip!
+  # # Remove leading and trailing whitespaces
+  # normalized.strip!
 
-  #   # Remove leading "the" or "of", case insensitive
-  #   normalized.sub!(/\A(the|of)\s+/, "")
+  # # Remove leading "the" or "of", case insensitive
+  # normalized.sub!(/\A(the|of)\s+/, "")
 
-  #   # Remove trailing "the" or "of", case insensitive
-  #   normalized.sub!(/\s+(the|of)\z/, "")
+  # # Remove trailing "the" or "of", case insensitive
+  # normalized.sub!(/\s+(the|of)\z/, "")
 
   #   self.locality_type = normalized
   # end
