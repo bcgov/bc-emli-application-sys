@@ -48,7 +48,7 @@ app:
   resources:
     requests:
       cpu: 300m
-      memory: 768Mi
+      memory: 512Mi
 
   env:
     "ANYCABLE_REDIS_URL": "redis://hesp-redis:6379/"

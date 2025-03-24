@@ -13,7 +13,7 @@ app:
   resources:
     requests:
       cpu: 300m
-      memory: 768Mi
+      memory: 512Mi
 
   env:
     "APP_DOMAIN": "test-hesp.apps.silver.devops.gov.bc.ca"
