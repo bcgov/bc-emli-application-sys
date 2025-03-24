@@ -52,10 +52,9 @@ export const Footer = observer(() => {
   const deploymentTagElem = document.querySelector('meta[name="deployment-tag"]');
   const deploymentTimestampElem = document.querySelector('meta[name="deployment-timestamp"]');
 
-  const deploymentTag = deploymentTagElem ? (deploymentTagElem as HTMLMetaElement).content : 'localdev';
-  const deploymentTimestamp = deploymentTimestampElem
-    ? (deploymentTimestampElem as HTMLMetaElement).content
-    : new Date().toISOString();
+  const deploymentTag = (deploymentTagElem && (deploymentTagElem as HTMLMetaElement).content) || 'localdev';
+  const deploymentTimestamp =
+    (deploymentTimestampElem && (deploymentTimestampElem as HTMLMetaElement).content) || new Date().toISOString();
 
   const isCommitSHA = deploymentTag.length === 40;
   const isTag = isValidSemVer(deploymentTag);
