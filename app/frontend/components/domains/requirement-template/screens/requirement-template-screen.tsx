@@ -15,18 +15,18 @@ export const RequirementTemplatesScreen = observer(function RequirementTemplate(
 
   return (
     <Container maxW="container.lg" p={8} as="main">
-      <VStack alignItems={"flex-start"} spacing={5} w={"full"} h={"full"}>
-        <Flex justifyContent={"space-between"} w={"full"} alignItems={"flex-end"} gap={6}>
+      <VStack alignItems={'flex-start'} spacing={5} w={'full'} h={'full'}>
+        <Flex justifyContent={'space-between'} w={'full'} alignItems={'flex-end'} gap={6}>
           <Box>
-            <Heading as="h1" color={"text.primary"}>
-              {t("requirementTemplate.index.title")}
+            <Heading as="h1" color={'theme.blueAlt'}>
+              {t('requirementTemplate.index.title')}
             </Heading>
-            <Text color={"text.secondary"} mt={1}>
-              {t("requirementTemplate.index.description")}
+            <Text color={'text.secondary'} mt={1}>
+              {t('requirementTemplate.index.description')}
             </Text>
           </Box>
-          <RouterLinkButton to="new" variant={"primary"} minWidth="fit-content">
-            {t("requirementTemplate.index.createButton")}
+          <RouterLinkButton to="new" variant={'primary'} minWidth="fit-content">
+            {t('requirementTemplate.index.createButton')}
           </RouterLinkButton>
         </Flex>
 
@@ -35,5 +35,5 @@ export const RequirementTemplatesScreen = observer(function RequirementTemplate(
         <ToggleArchivedButton searchModel={requirementTemplateStore} mt={3} />
       </VStack>
     </Container>
-  )
+  );
 })

@@ -70,27 +70,27 @@ export const NewJurisdictionScreen = observer(() => {
     <Container maxW="container.lg" p={8} as="main">
       <FormProvider {...formMethods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <VStack alignItems={"flex-start"} spacing={5} w={"full"} h={"full"}>
+          <VStack alignItems={'flex-start'} spacing={5} w={'full'} h={'full'}>
             <Heading as="h1" alignSelf="center">
-              {t("jurisdiction.new.title")}
+              {t('jurisdiction.new.title')}
             </Heading>
             {jurisdiction ? (
               <Flex direction="column" w="full" align="center" gap={6}>
                 <Box background="greys.grey03" p={6} w="full">
                   <VStack>
-                    <Text>{jurisdiction.qualifier}</Text>
-                    <Heading as="h3">{jurisdiction.name}</Heading>
+                    <Text>{jurisdiction?.qualifier}</Text>
+                    <Heading as="h3">{jurisdiction?.name}</Heading>
                   </VStack>
                 </Box>
                 <Text fontWeight="bold" fontSize="lg">
-                  {t("jurisdiction.new.nextStep")}
+                  {t('jurisdiction.new.nextStep')}
                 </Text>
                 <HStack>
                   <RouterLinkButton to={`/jurisdictions/${jurisdiction?.slug}/users/invite`} variant="primary">
-                    {t("user.index.inviteButton")}
+                    {t('user.index.inviteButton')}
                   </RouterLinkButton>
                   <RouterLinkButton to={`/jurisdictions`} variant="secondary">
-                    {t("ui.doLater")}
+                    {t('ui.doLater')}
                   </RouterLinkButton>
                 </HStack>
               </Flex>
@@ -112,15 +112,15 @@ export const NewJurisdictionScreen = observer(() => {
                       </Text>
                       {useCustom ? (
                         <TextFormControl
-                          label={t("jurisdiction.fields.localityType")}
-                          fieldName={"localityType"}
+                          label={t('jurisdiction.fields.localityType')}
+                          fieldName={'localityType'}
                           required
                         />
                       ) : (
                         <AsyncRadioGroup
-                          label={t("jurisdiction.fields.localityType")}
+                          label={t('jurisdiction.fields.localityType')}
                           fetchOptions={fetchLocalityTypeOptions}
-                          fieldName={"localityType"}
+                          fieldName={'localityType'}
                         />
                       )}
 
@@ -129,21 +129,21 @@ export const NewJurisdictionScreen = observer(() => {
                       </Text>
                     </Flex>
                     <Box w="50%">
-                      <TextFormControl label={t("jurisdiction.new.nameLabel")} fieldName={"name"} required />
+                      <TextFormControl label={t('jurisdiction.new.nameLabel')} fieldName={'name'} required />
                     </Box>
                   </Flex>
 
                   <FormControl display="flex" alignItems="center">
                     <FormLabel htmlFor="use-custom" mb="0">
-                      {t("jurisdiction.new.useCustom")}
+                      {t('jurisdiction.new.useCustom')}
                     </FormLabel>
                     <Switch id="use-custom" isChecked={useCustom} onChange={handleToggleCustom} />
                   </FormControl>
                   <Flex gap={8}>
                     <Box w="50%">
                       <TextFormControl
-                        label={t("jurisdiction.new.postalAddressLabel")}
-                        fieldName={"postalAddress"}
+                        label={t('jurisdiction.new.postalAddressLabel')}
+                        fieldName={'postalAddress'}
                         required
                       />
                     </Box>
@@ -155,7 +155,7 @@ export const NewJurisdictionScreen = observer(() => {
                         render={({ field: { onChange, value } }) => {
                           return (
                             <FormControl w="full" zIndex={1}>
-                              <FormLabel>{`${t("jurisdiction.fields.regionalDistrictName")} ${t("ui.optional")}`}</FormLabel>
+                              <FormLabel>{`${t('jurisdiction.fields.regionalDistrictName')} ${t('ui.optional')}`}</FormLabel>
                               <InputGroup w="full">
                                 <JurisdictionSelect
                                   onChange={onChange}
@@ -169,7 +169,7 @@ export const NewJurisdictionScreen = observer(() => {
                                 />
                               </InputGroup>
                             </FormControl>
-                          )
+                          );
                         }}
                       />
                     </Box>
@@ -181,12 +181,12 @@ export const NewJurisdictionScreen = observer(() => {
                     type="submit"
                     isDisabled={!isValid || isSubmitting}
                     isLoading={isSubmitting}
-                    loadingText={t("ui.loading")}
+                    loadingText={t('ui.loading')}
                   >
-                    {t("jurisdiction.new.createButton")}
+                    {t('jurisdiction.new.createButton')}
                   </Button>
                   <Button variant="secondary" isDisabled={isSubmitting} onClick={() => navigate(-1)}>
-                    {t("ui.cancel")}
+                    {t('ui.cancel')}
                   </Button>
                 </Flex>
               </>
@@ -195,5 +195,5 @@ export const NewJurisdictionScreen = observer(() => {
         </form>
       </FormProvider>
     </Container>
-  )
+  );
 })

@@ -10,74 +10,81 @@ import { ERequirementTemplateType } from "../../../types/enums"
 import { TCreateRequirementTemplateFormData } from "../../../types/types"
 import { AsyncRadioGroup } from "../base/inputs/async-radio-group"
 import { TextFormControl } from "../form/input-form-control"
+import { HStack } from '../../domains/step-code/checklist/pdf-content/shared/h-stack';
 
 interface IRequirementTemplateFormProps {
-  type: ERequirementTemplateType
-  onSuccess: (createdRequirementTemplate: IRequirementTemplate) => void
+  type: ERequirementTemplateType;
+  onSuccess: (createdRequirementTemplate: IRequirementTemplate) => void;
 }
 
 export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequirementTemplateFormProps) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const {
     requirementTemplateStore: { createRequirementTemplate, copyRequirementTemplate },
     permitClassificationStore: { fetchPermitTypeOptions, fetchActivityOptions },
-  } = useMst()
+  } = useMst();
 
-  const [copyExisting, setCopyExisting] = useState(false)
+  const [copyExisting, setCopyExisting] = useState(false);
 
   const formMethods = useForm<TCreateRequirementTemplateFormData>({
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      description: "",
+      description: '',
       firstNations: false,
       permitTypeId: null,
       activityId: null,
     },
-  })
+  });
 
-  const navigate = useNavigate()
-  const { handleSubmit, formState, control } = formMethods
+  const navigate = useNavigate();
+  const { handleSubmit, formState, control } = formMethods;
 
   const firstNationsChecked = useWatch({
     control,
-    name: "firstNations",
+    name: 'firstNations',
     defaultValue: false,
-  })
+  });
 
-  const { isSubmitting } = formState
+  const { isSubmitting } = formState;
 
   const onSubmit = async (formData) => {
-    formData.type = type
+    formData.type = type;
 
     const createdRequirementTemplate = copyExisting
       ? await copyRequirementTemplate(formData)
-      : await createRequirementTemplate(formData)
+      : await createRequirementTemplate(formData);
 
     if (createdRequirementTemplate) {
-      onSuccess(createdRequirementTemplate)
+      onSuccess(createdRequirementTemplate);
     }
-  }
+  };
 
   return (
     <FormProvider {...formMethods}>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <VStack alignItems={"flex-start"} spacing={5} gap={8} w={"full"} h={"full"}>
-          <Text>{t("requirementTemplate.new.typePrompt")}</Text>
+        <VStack alignItems={'flex-start'} spacing={5} gap={8} w={'full'} h={'full'}>
+          {/* <Text>{t('requirementTemplate.new.typePrompt')}</Text> */}
 
-          <Flex gap={8} w="full" as="section">
+          <VStack display={'contents'}>
             <AsyncRadioGroup
               valueField="id"
-              label={t("requirementTemplate.fields.permitType")}
               fetchOptions={fetchPermitTypeOptions}
-              fieldName={"permitTypeId"}
+              fieldName={'permitTypeId'}
+              question={t('requirementTemplate.new.programQuestion')}
             />
-            <AsyncRadioGroup
-              valueField="id"
-              label={t("requirementTemplate.fields.activity")}
-              fetchOptions={fetchActivityOptions}
-              fieldName={"activityId"}
-            />
-          </Flex>
+            <Flex
+              bg="greys.grey03"
+              p={4}
+              border="1px solid"
+              borderColor="greys.grey02"
+              borderRadius="sm"
+              width="100%"
+              direction="column"
+            >
+              <Text>{t('requirementTemplate.new.applicationName')}</Text>
+              <TextFormControl mt={2} fieldName={'description'} required maxWidth="224px" />
+            </Flex>
+          </VStack>
           <Controller
             name="firstNations"
             control={control}
@@ -85,7 +92,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
             render={({ field: { onChange, value } }) => (
               <Checkbox isChecked={value} onChange={onChange}>
                 <Trans
-                  i18nKey={"requirementTemplate.new.firstNationsLand"}
+                  i18nKey={'requirementTemplate.new.firstNationsLand'}
                   components={{
                     1: (
                       <Link
@@ -100,14 +107,14 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
           />
           {firstNationsChecked && (
             <Checkbox isChecked={copyExisting} onChange={(e) => setCopyExisting(e.target.checked)}>
-              {t("requirementTemplate.new.copyExistingByClassifications")}
+              {t('requirementTemplate.new.copyExistingByClassifications')}
             </Checkbox>
           )}
 
           <Flex direction="column" as="section" w="full">
-            <TextFormControl label={t("requirementTemplate.fields.description")} fieldName={"description"} required />
+            <TextFormControl label={t('requirementTemplate.fields.description')} fieldName={'description'} required />
             <Text fontSize="sm" color="border.base">
-              {t("requirementTemplate.new.descriptionHelpText")}
+              {t('requirementTemplate.new.descriptionHelpText')}
             </Text>
           </Flex>
 
@@ -117,16 +124,16 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
               type="submit"
               isDisabled={!formState.isValid || isSubmitting}
               isLoading={isSubmitting}
-              loadingText={t("ui.loading")}
+              loadingText={t('ui.loading')}
             >
-              {t("requirementTemplate.new.createButton")}
+              {t('requirementTemplate.new.createButton')}
             </Button>
-            <Button variant="secondary" isDisabled={isSubmitting} onClick={() => navigate(-1)}>
-              {t("ui.cancel")}
+            <Button variant="secondary" ml={8} isDisabled={isSubmitting} onClick={() => navigate(-1)}>
+              {t('ui.cancel')}
             </Button>
           </Flex>
         </VStack>
       </form>
     </FormProvider>
-  )
-})
+  );
+});
