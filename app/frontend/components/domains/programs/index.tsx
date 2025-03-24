@@ -17,9 +17,9 @@ import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { GridHeaders } from './grid-header';
 
 export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
-  const { jurisdictionStore } = useMst();
+  const { programStore } = useMst();
   const {
-    tableJurisdictions,
+    tablePrograms,
     currentPage,
     totalPages,
     totalCount,
@@ -27,10 +27,10 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
     handleCountPerPageChange,
     handlePageChange,
     isSearching,
-  } = jurisdictionStore;
+  } = programStore;
   const { t } = useTranslation();
 
-  useSearch(jurisdictionStore);
+  useSearch(programStore);
 
   return (
     <Container maxW="container.lg" p={8} as={'main'} flexGrow={1}>
@@ -61,25 +61,28 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
               <SharedSpinner />
             </Flex>
           ) : (
-            tableJurisdictions.map((j) => {
+            tablePrograms.map((j) => {
               return (
                 <Box key={j.id} className={'jurisdiction-index-grid-row'} role={'row'} display={'contents'}>
-                  <SearchGridItem fontWeight={700}>{j.reverseQualifiedName}</SearchGridItem>
+                  <SearchGridItem fontWeight={700}>{j.programName}</SearchGridItem>
                   <SearchGridItem>{j.reviewManagersSize}</SearchGridItem>
                   <SearchGridItem>{j.reviewersSize}</SearchGridItem>
-                  <SearchGridItem>{j.permitApplicationsSize}</SearchGridItem>
                   <SearchGridItem>
-                    {j.submissionInboxSetUp && (
+                    <></>
+                  </SearchGridItem>
+                  <SearchGridItem>
+                    {/* {j.submissionInboxSetUp && (
                       <Flex gap={1}>
                         <CheckCircle color="var(--chakra-colors-semantic-success)" size={18} />
                         {t('ui.yes')}
                       </Flex>
-                    )}
+                    )} */}
+                    <></>
                   </SearchGridItem>
                   <SearchGridItem>
                     <Flex justify="center" w="full" gap={3}>
                       <RouterLink to={`${j.slug}/users/invite`}>{t('user.invite')}</RouterLink>
-                      <ManageJurisdictionMenu jurisdiction={j} searchModel={jurisdictionStore} />
+                      <ManageJurisdictionMenu jurisdiction={j} searchModel={programStore} />
                     </Flex>
                   </SearchGridItem>
                 </Box>

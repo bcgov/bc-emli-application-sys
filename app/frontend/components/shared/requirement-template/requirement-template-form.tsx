@@ -72,6 +72,12 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
               fieldName={'permitTypeId'}
               question={t('requirementTemplate.new.programQuestion')}
             />
+            <AsyncRadioGroup
+              valueField="id"
+              label={t('requirementTemplate.fields.activity')}
+              fetchOptions={fetchActivityOptions}
+              fieldName={'activityId'}
+            />
             <Flex
               bg="greys.grey03"
               p={4}
