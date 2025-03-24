@@ -2147,7 +2147,7 @@ const options = {
           },
           fields: {
             status: 'Status',
-            permitType: 'Permit type',
+            applicationName: 'Application Name',
             activity: 'Work type',
             firstNations: 'First Nations',
             description: 'Description',
@@ -2162,21 +2162,23 @@ const options = {
           },
 
           index: {
-            tableHeading: 'Templates',
-            title: 'Permit templates catalogue',
+            tableHeading: 'Applications',
+            title: 'Applications template catalog',
             description:
-              "List of all permit templates in the system that's been created by the Super Admin. Only published templates will be visible to jurisdictions and submitters.",
-            createButton: 'Create new template',
+              'List of all application in the system that’s been created by the Admin manager or a System admin. Only Published application will be visible to programs.',
+            createButton: 'Create new application',
             seeArchivedButton: 'See archived',
           },
           new: {
-            title: 'Create new template',
+            title: 'Create a new application',
             typePrompt: 'What kind of building permit is this?',
             descriptionHelpText:
-              'Provide some context for review managers and administrators on what kinds of buildings this permit is meant for.',
-            createButton: 'Create template',
+              'Provide some context for managers and admin on what this application is for (MAX 250 CHARACTERS).',
+            createButton: 'Create application',
             firstNationsLand: 'This permit is intended only for <1>First Nation Registered Land</1>',
             copyExistingByClassifications: 'Copy from existing template of this permit and work type if available',
+            programQuestion: 'What program does this application belong to ? ',
+            applicationName: 'What is the name of this application ? ',
           },
           versionSidebar: {
             triggerButton: 'Versions',
@@ -2535,7 +2537,7 @@ const options = {
             invite: 'Invite',
             templateVersions: 'Template versions',
             requirementsLibrary: 'Requirements library',
-            requirementTemplates: 'Permit templates catalogue',
+            requirementTemplates: 'Applications template catalog',
             edit: 'Edit',
             users: 'Users',
             editTemplate: 'Edit template',

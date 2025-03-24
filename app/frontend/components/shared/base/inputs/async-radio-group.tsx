@@ -7,31 +7,32 @@ import { IOption } from "../../../../types/types"
 import { SharedSpinner } from "../shared-spinner"
 
 interface IAsyncRadioGroupProps<T> extends FlexProps {
-  label: string
-  valueField?: string
-  fetchOptions: () => Promise<IOption<T>[]>
-  fieldName: string
+  label?: string;
+  question?: string;
+  valueField?: string;
+  fetchOptions: () => Promise<IOption<T>[]>;
+  fieldName: string;
 }
 
 export const AsyncRadioGroup = observer(
-  <T,>({ label, fetchOptions, fieldName, valueField, ...rest }: IAsyncRadioGroupProps<T>) => {
-    const { control } = useFormContext()
-    const [options, setOptions] = useState<IOption<T>[]>([])
+  <T,>({ label, question, fetchOptions, fieldName, valueField, ...rest }: IAsyncRadioGroupProps<T>) => {
+    const { control } = useFormContext();
+    const [options, setOptions] = useState<IOption<T>[]>([]);
 
-    const [error, setError] = useState<Error | undefined>(undefined)
+    const [error, setError] = useState<Error | undefined>(undefined);
 
-    const { t } = useTranslation()
+    const { t } = useTranslation();
 
     useEffect(() => {
-      ;(async () => {
+      (async () => {
         try {
-          const opts = await fetchOptions()
-          setOptions(opts)
+          const opts = await fetchOptions();
+          setOptions(opts);
         } catch (e) {
-          setError(e instanceof Error ? e : new Error(t("errors.fetchOptions")))
+          setError(e instanceof Error ? e : new Error(t('errors.fetchOptions')));
         }
-      })()
-    }, [])
+      })();
+    }, []);
 
     return options?.length > 0 ? (
       <Flex direction="column" w="full" {...rest}>
@@ -55,24 +56,27 @@ export const AsyncRadioGroup = observer(
                   borderColor="greys.grey02"
                   borderRadius="sm"
                 >
+                  <Text mb={1} pb={4}>
+                    {question}
+                  </Text>
                   <Stack direction="column">
                     {options.map((option) => {
-                      const optionValue = valueField ? option.value[valueField] : option.value
+                      const optionValue = valueField ? option.value[valueField] : option.value;
                       return (
                         <Radio key={optionValue} value={optionValue} bg="white">
                           {option.label}
                         </Radio>
-                      )
+                      );
                     })}
                   </Stack>
                 </RadioGroup>
-              )
+              );
             }}
           />
         )}
       </Flex>
     ) : (
       <SharedSpinner />
-    )
-  }
-)
+    );
+  },
+);

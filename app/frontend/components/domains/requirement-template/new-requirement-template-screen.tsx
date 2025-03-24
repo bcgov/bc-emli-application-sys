@@ -17,10 +17,10 @@ export const NewRequirementTemplateScreen = observer(() => {
 
   return (
     <Container maxW="container.lg" p={8} as="main">
-      <Heading as="h1" alignSelf="center">
-        {t("requirementTemplate.new.title")}
+      <Heading as="h1" alignSelf="center" color="theme.blueAlt">
+        {t('requirementTemplate.new.title')}
       </Heading>
       <RequirementTemplateForm type={ERequirementTemplateType.LiveRequirementTemplate} onSuccess={handleSuccess} />
     </Container>
-  )
+  );
 })

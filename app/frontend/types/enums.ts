@@ -108,17 +108,17 @@ export enum EUserSortFields {
 }
 
 export enum ERequirementTemplateSortFields {
-  permitType = 'permit_type',
-  activity = 'activity',
-  firstNations = 'first_nations',
+  applicationName = 'application_name',
+  // activity = 'activity',
+  // firstNations = 'first_nations',
   description = 'description',
-  currentVersion = 'current_version',
   jurisdictionsSize = 'jurisdictions_size',
+  currentVersion = 'current_version',
 }
 
 export enum EEarlyAccessRequirementTemplateSortFields {
   nickname = 'nickname',
-  permitType = 'permit_type',
+  applicationName = 'application_name',
   activity = 'activity',
   firstNations = 'first_nations',
   sharedWith = 'shared_with',
