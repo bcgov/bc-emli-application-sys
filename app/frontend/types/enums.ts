@@ -99,6 +99,14 @@ export enum EJurisdictionSortFields {
   templatesUsed = 'templates_used',
 }
 
+export enum EProgramSortFields {
+  name = 'name',
+  reviewManagersSize = 'review_managers_size',
+  reviewersSize = 'reviewers_size',
+  applicationsReceived = 'applications_received',
+  templatesUsed = 'templates_used',
+}
+
 export enum EUserSortFields {
   role = 'role',
   email = 'email',
@@ -449,6 +457,12 @@ export enum EVisibility {
 }
 
 export enum EJurisdictionExternalApiState {
+  jOn = 'j_on',
+  jOff = 'j_off',
+  gOff = 'g_off',
+}
+
+export enum EProgramExternalApiState {
   jOn = 'j_on',
   jOff = 'j_off',
   gOff = 'g_off',

@@ -62,6 +62,7 @@ import {
 } from '../../types/types';
 import { camelizeResponse, decamelizeRequest } from '../../utils';
 import { getCsrfToken } from '../../utils/utility-functions';
+import { IProgram } from '../../models/program';
 
 export class Api {
   client: ApisauceInstance;
@@ -183,7 +184,12 @@ export class Api {
   }
 
   async createJurisdiction(params) {
-    return this.client.post<ApiResponse<IJurisdiction>>('/programs', { program: params });
+    return this.client.post<ApiResponse<IJurisdiction>>('/juridictions', { jurisdiction: params });
+  }
+
+  async createProgram(params) {
+    const response = await this.client.post<ApiResponse<IProgram>>('/programs', { program: params });
+    return response;
   }
 
   async updateJurisdiction(id, params) {

@@ -523,6 +523,7 @@ const options = {
             about: 'About',
             nameOfProgram: 'Name of program',
             fundedBy: 'Funded by',
+            nextStep: 'Next step is to invite users',
           },
         },
         /* To be removed later */
@@ -567,7 +568,7 @@ const options = {
             createButton: 'Create jurisdiction',
             nameLabel: 'Name of local jurisdiction',
             postalAddressLabel: 'Postal address',
-            nextStep: 'The next step is to invite users',
+            nextStep: 'Next step is to invite users',
             useCustom: 'Use a custom locality type',
           },
           index: {
@@ -2532,7 +2533,7 @@ const options = {
             latest: 'Latest',
             profile: 'Edit My account',
             jurisdictions: 'Jurisdictions',
-            new: 'Create new',
+            new: 'Create new program',
             programs: 'Programs',
             invite: 'Invite',
             templateVersions: 'Template versions',
