@@ -187,10 +187,6 @@ export class Api {
     return this.client.post<ApiResponse<IJurisdiction>>('/juridictions', { jurisdiction: params });
   }
 
-  // async createProgram(params) {
-  //  return this.client.post<ApiResponse<IProgram>>('/programs', { program: params });
-  //}
-
   async createProgram(params) {
     const response = await this.client.post<ApiResponse<IProgram>>('/programs', { program: params });
     return response;
