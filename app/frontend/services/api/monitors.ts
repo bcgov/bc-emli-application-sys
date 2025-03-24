@@ -3,7 +3,7 @@ import { ISessionStore } from "../../stores/session-store"
 import { IUIStore } from "../../stores/ui-store"
 import { isNilOrEmpty } from "../../utils"
 import { API_ERROR_TYPES } from "../../utils/api-errors"
-import { Api } from "./"
+import { Api } from "."
 
 /**
   Watches for "flash" messages from the server and reports them.
