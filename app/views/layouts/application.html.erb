@@ -3,6 +3,8 @@
 <head>
   <title>Home Energy Application</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" charset="UTF-8">
+  <meta name="deployment-tag" content="<%= ENV.fetch('DEPLOYMENT_TAG', 'localdev') %>">
+  <meta name="deployment-timestamp" content="<%= ENV.fetch('DEPLOYMENT_TIMESTAMP', Time.now.utc.iso8601) %>">
 
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>

@@ -39,6 +39,9 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
 
+    - name: Set Deployment Timestamp
+      run: echo "DEPLOYMENT_TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+
     - name: Build and Push
       uses: egose/actions/docker-build-push@46d589997e49cae4a8a3d06644ae8b04351a30f2
       with:
@@ -49,7 +52,7 @@ jobs:
         docker-context: .
         docker-file: devops/docker/app/Dockerfile
         docker-args: |
-          deployment_tag=${{ github.ref_name }}
+          DEPLOYMENT_TIMESTAMP=${{ env.DEPLOYMENT_TIMESTAMP }}
         metadata-tags: |
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
@@ -65,6 +68,9 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
 
+    - name: Set Deployment Timestamp
+      run: echo "DEPLOYMENT_TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+
     - name: Build and Push
       uses: egose/actions/docker-build-push@46d589997e49cae4a8a3d06644ae8b04351a30f2
       with:
@@ -75,7 +81,7 @@ jobs:
         docker-context: .
         docker-file: devops/docker/app/Dockerfile
         docker-args: |
-          deployment_tag=${{ github.ref_name }}
+          DEPLOYMENT_TIMESTAMP=${{ env.DEPLOYMENT_TIMESTAMP }}
         metadata-tags: |
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}

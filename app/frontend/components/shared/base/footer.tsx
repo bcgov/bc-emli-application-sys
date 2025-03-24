@@ -6,6 +6,27 @@ import { useLocation } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
 import { RouterLink } from '../navigation/router-link';
 
+function isValidSemVer(version) {
+  return /^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-.]+)?(\+[0-9A-Za-z-.]+)?$/.test(version);
+}
+
+function formatUTCDate(isoString) {
+  const date = new Date(isoString);
+  return (
+    date
+      .toLocaleString('en-CA', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: 'UTC',
+      })
+      .replace(',', '') + ' UTC'
+  );
+}
+
 export const Footer = observer(() => {
   const location = useLocation();
   const {
@@ -27,6 +48,24 @@ export const Footer = observer(() => {
   const shouldShowFooter = onlyShowFooterOnRoutes.some(
     (route) => location.pathname.startsWith(route) || (location.pathname === '/' && !currentUser?.isSubmitter),
   );
+
+  const deploymentTagElem = document.querySelector('meta[name="deployment-tag"]');
+  const deploymentTimestampElem = document.querySelector('meta[name="deployment-timestamp"]');
+
+  const deploymentTag = deploymentTagElem ? (deploymentTagElem as HTMLMetaElement).content : 'localdev';
+  const deploymentTimestamp = deploymentTimestampElem
+    ? (deploymentTimestampElem as HTMLMetaElement).content
+    : new Date().toISOString();
+
+  const isCommitSHA = deploymentTag.length === 40;
+  const isTag = isValidSemVer(deploymentTag);
+
+  let version = deploymentTag;
+  if (isCommitSHA) {
+    version = deploymentTag.substring(0, 7);
+  } else if (isTag) {
+    version = `v${deploymentTag}`;
+  }
 
   return (
     <>
@@ -69,6 +108,8 @@ export const Footer = observer(() => {
                     <RouterLink to={t('site.footerLinks.dataAndPrivacy')} color="text.secondary">
                       {t('site.dataAndPrivacy')}
                     </RouterLink>
+                    <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
+                    <div>{`${version} (${formatUTCDate(deploymentTimestamp)})`}</div>
                   </Flex>
                 </Flex>
               </Container>
