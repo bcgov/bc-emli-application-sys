@@ -8,7 +8,8 @@ app:
   enabled: true
 
   image:
-    repository: artifacts.developer.gov.bc.ca/bbfc-test/hesp-test
+    # repository: artifacts.developer.gov.bc.ca/bbfc-test/hesp-test
+    repository: ghcr.io/bcgov/hesp-app
 
   resources:
     requests:
@@ -33,7 +34,8 @@ sidekiq:
   enabled: true
 
   image:
-    repository: artifacts.developer.gov.bc.ca/bbfc-test/hesp-test
+    # repository: artifacts.developer.gov.bc.ca/bbfc-test/hesp-test
+    repository: ghcr.io/bcgov/hesp-app
 
   resources:
     requests:
@@ -46,7 +48,8 @@ anycable-rpc:
   enabled: true
 
   image:
-    repository: artifacts.developer.gov.bc.ca/bbfc-test/hesp-test
+    # repository: artifacts.developer.gov.bc.ca/bbfc-test/hesp-test
+    repository: ghcr.io/bcgov/hesp-app
 
   nameOverride: hesp-anycable-rpc
   fullnameOverride: hesp-anycable-rpc

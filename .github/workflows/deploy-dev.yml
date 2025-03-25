@@ -50,6 +50,7 @@ jobs:
   build-push-app-artifacts:
     runs-on: ubuntu-22.04
     timeout-minutes: 20
+    continue-on-error: true
     steps:
     - uses: hmarr/debug-action@f7318c783045ac39ed9bb497e22ce835fdafbfe6
     - uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
@@ -72,11 +73,10 @@ jobs:
         docker-args: |
           DEPLOYMENT_TIMESTAMP=${{ env.DEPLOYMENT_TIMESTAMP }}
         metadata-tags: |
-          type=ref,event=branch
           type=sha,format=long,prefix=,suffix=
 
   deploy:
-    needs: [build-push-app-artifacts]
+    needs: [build-push-app-ghcr]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:

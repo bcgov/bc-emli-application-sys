@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  # repository: ghcr.io/bcgov/hesp-app
-  repository: artifacts.developer.gov.bc.ca/bbfc-dev/hesp-dev
+  repository: ghcr.io/bcgov/hesp-app
+  # repository: artifacts.developer.gov.bc.ca/bbfc-dev/hesp-dev
   tag: main
   pullPolicy: Always
 
