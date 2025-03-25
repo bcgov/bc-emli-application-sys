@@ -67,9 +67,7 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
                   <SearchGridItem fontWeight={700}>{j.programName}</SearchGridItem>
                   <SearchGridItem>{j.reviewManagersSize}</SearchGridItem>
                   <SearchGridItem>{j.reviewersSize}</SearchGridItem>
-                  <SearchGridItem>
-                    <></>
-                  </SearchGridItem>
+                  <SearchGridItem>{j.permitApplicationsSize}</SearchGridItem>
                   <SearchGridItem>
                     {/* {j.submissionInboxSetUp && (
                       <Flex gap={1}>
@@ -94,7 +92,7 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
           <PerPageSelect
             handleCountPerPageChange={handleCountPerPageChange}
             countPerPage={countPerPage}
-            totalCount={totalCount}
+            totalCount={0}
           />
           <Paginator
             current={currentPage}

@@ -206,6 +206,7 @@ class Api::ProgramsController < Api::ApplicationController
     params.require(:program).permit(
       :program_name,
       :funded_by,
+      :user_group_type,
       :description_html
     )
   end

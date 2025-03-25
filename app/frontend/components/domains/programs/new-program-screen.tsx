@@ -28,6 +28,7 @@ import { EProgramUserGroupType } from '../../../types/enums';
 export type TCreateProgramFormData = {
   programName: string;
   fundedBy: string;
+  userGroupType: EProgramUserGroupType;
 };
 
 export const NewProgramScreen = observer(() => {
@@ -36,7 +37,7 @@ export const NewProgramScreen = observer(() => {
   const [useCustom, setUseCustom] = useState<boolean>(false);
 
   const {
-    programStore: { createProgram, fetchLocalityTypeOptions, regionalDistrictLocalityType },
+    programStore: { createProgram },
     permitClassificationStore: { fetchActivityOptions },
   } = useMst();
 
@@ -49,15 +50,17 @@ export const NewProgramScreen = observer(() => {
     defaultValues: {
       programName: '',
       fundedBy: '',
+      userGroupType: EProgramUserGroupType.participants,
     },
   });
 
   const navigate = useNavigate();
   const { handleSubmit, formState, control, watch } = formMethods;
-
+  const userGroupTypeWatch = watch('userGroupType');
   const { isSubmitting, isValid } = formState;
 
   const onSubmit = async (formData) => {
+    console.log('formData', formData);
     const submissionData = { ...formData, programID: formData.programID?.id };
     const createdProgram = (await createProgram(submissionData)) as IProgram;
     if (createdProgram) {
@@ -111,9 +114,8 @@ export const NewProgramScreen = observer(() => {
                   <Flex gap={8}>
                     <Box w="full">
                       <AsyncRadioGroup
-                        valueField="id"
                         fetchOptions={fetchUserGroupTypeOptions}
-                        fieldName={'targetGroupType'}
+                        fieldName="userGroupType"
                         question={t('program.new.targetGroup')}
                       />
                       <Flex
