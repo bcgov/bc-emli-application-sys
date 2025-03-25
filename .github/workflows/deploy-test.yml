@@ -85,7 +85,6 @@ jobs:
         metadata-tags: |
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{major}}
 
   deploy:
     needs: [set-tag, build-push-app-artifacts]
