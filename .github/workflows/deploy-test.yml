@@ -84,7 +84,6 @@ jobs:
           DEPLOYMENT_TIMESTAMP=${{ env.DEPLOYMENT_TIMESTAMP }}
         metadata-tags: |
           type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
 
   deploy:
     needs: [set-tag, build-push-app-artifacts]
