@@ -104,9 +104,9 @@ const EditPermitApplicationScreen = lazy(() =>
   })),
 );
 
-const NewPermitApplicationScreen = lazy(() =>
-  import('../energy-savings-application/new-energy-savings-application-screen').then((module) => ({
-    default: module.NewPermitApplicationScreen,
+const NewApplicationScreen = lazy(() =>
+  import('../energy-savings-application/new-application').then((module) => ({
+    default: module.NewApplicationScreen,
   })),
 );
 const ReviewPermitApplicationScreen = lazy(() =>
@@ -467,13 +467,13 @@ const AppRoutes = observer(() => {
         <Route
           element={<ProtectedRoute isAllowed={loggedIn && !mustAcceptEula} redirectPath={mustAcceptEula && '/'} />}
         >
-          <Route path="/permit-applications" element={<EnergySavingsApplicationIndexScreen />} />
-          <Route path="/permit-applications/new" element={<NewPermitApplicationScreen />} />
-          <Route path="/permit-applications/:permitApplicationId/edit" element={<EditPermitApplicationScreen />}>
+          <Route path="/applications" element={<EnergySavingsApplicationIndexScreen />} />
+          <Route path="/applications/new" element={<NewApplicationScreen />} />
+          <Route path="/applications/:permitApplicationId/edit" element={<EditPermitApplicationScreen />}>
             <Route path="step-code" element={<StepCodeForm />} />
           </Route>
           <Route
-            path="/permit-applications/:permitApplicationId/sucessful-submission"
+            path="/applications/:permitApplicationId/successful-submission"
             element={<SuccessfulSubmissionScreen />}
           />
         </Route>

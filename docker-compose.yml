@@ -17,7 +17,7 @@ x-env-vars: &default-env-vars
 services:
   app:
     image: hous-permit-portal-dev:latest
-    pull_policy: "never"
+    pull_policy: 'never'
     tty: true
     stdin_open: true
     build:
@@ -28,7 +28,7 @@ services:
       - .:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - postgres
       - redis
@@ -40,13 +40,11 @@ services:
       <<: *default-env-vars
     command: >
       bash -c "
-      until bundle exec rails db:prepare; do sleep 5; done;
-      rm /app/tmp/pids/server.pid || true;
       bundle exec rails s -b '0.0.0.0' -p 3000"
 
   vite:
     image: hous-permit-portal-dev:latest
-    pull_policy: "never"
+    pull_policy: 'never'
     working_dir: /app
     env_file: .env.docker_compose
     volumes:
@@ -54,14 +52,14 @@ services:
       - /app/node_modules
     environment:
       <<: *default-env-vars
-      VITE_RUBY_HOST: "0.0.0.0"
-    command: "./bin/vite dev"
+      VITE_RUBY_HOST: '0.0.0.0'
+    command: './bin/vite dev'
     ports:
-      - "3036:3036"
+      - '3036:3036'
 
   sidekiq:
     image: hous-permit-portal-dev:latest
-    pull_policy: "never"
+    pull_policy: 'never'
     tty: true
     stdin_open: true
     working_dir: /app
@@ -70,23 +68,23 @@ services:
       - .:/app
     environment:
       <<: *default-env-vars
-    command: "bundle exec sidekiq"
+    command: 'bundle exec sidekiq'
     depends_on:
       - app
 
   anycable-rpc:
     image: hous-permit-portal-dev:latest
-    pull_policy: "never"
+    pull_policy: 'never'
     command: bundle exec anycable
     volumes:
       - .:/app
     environment:
       <<: *default-env-vars # need to inject DEVISE_JWT_SECRET_KEY and DATABASE_URL here might as well just reference the block
       ANYCABLE_REDIS_URL: redis://redis:6379/1
-      ANYCABLE_RPC_HOST: "0.0.0.0:50051"
+      ANYCABLE_RPC_HOST: '0.0.0.0:50051'
       ANYCABLE_LOG_LEVEL: debug
     ports:
-      - "50051:50051"
+      - '50051:50051'
     depends_on:
       - redis
       - app
@@ -94,13 +92,13 @@ services:
   anycable-go:
     image: anycable/anycable-go:1.4.8
     environment:
-      ANYCABLE_HOST: "0.0.0.0"
-      ANYCABLE_PORT: "8080"
+      ANYCABLE_HOST: '0.0.0.0'
+      ANYCABLE_PORT: '8080'
       ANYCABLE_RPC_HOST: anycable-rpc:50051
       ANYCABLE_REDIS_URL: redis://redis:6379/1
       ANYCABLE_LOG_LEVEL: debug
     ports:
-      - "8080:8080"
+      - '8080:8080'
     depends_on:
       - redis
       - app
@@ -111,7 +109,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -129,7 +127,7 @@ services:
       - xpack.security.http.ssl.enabled=false
       - cluster.routing.allocation.disk.threshold_enabled=false
     ports:
-      - "9200:9200"
+      - '9200:9200'
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
 

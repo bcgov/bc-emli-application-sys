@@ -71,12 +71,12 @@ function isTemplateVersionPath(path: string): boolean {
 }
 
 function isPermitApplicationPath(path: string): boolean {
-  const regex = /^\/permit-applications\/([a-f\d-]+)/;
+  const regex = /^\/applications\/([a-f\d-]+)/;
   return regex.test(path);
 }
 
 function isPermitApplicationEditPath(path: string): boolean {
-  const regex = /^\/permit-applications\/([a-f\d-]+)\/edit.*$/;
+  const regex = /^\/applications\/([a-f\d-]+)\/edit.*$/;
   return regex.test(path);
 }
 
@@ -399,12 +399,12 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
 
                 {currentUser?.isSubmitter && (
                   <>
-                    <MenuItem bg="greys.grey03" onClick={(e) => navigate('/permit-applications/new')}>
+                    <MenuItem bg="greys.grey03" onClick={(e) => navigate('/applications/new')}>
                       <Button as={Box} variant="primary">
                         {t('site.newApplication')}
                       </Button>
                     </MenuItem>
-                    <NavMenuItem label={t('site.myPermits')} to="/permit-applications" bg="greys.grey03" />
+                    <NavMenuItem label={t('site.myPermits')} to="/applications" bg="greys.grey03" />
                     <MenuDivider my={0} borderColor="border.light" />
                   </>
                 )}
