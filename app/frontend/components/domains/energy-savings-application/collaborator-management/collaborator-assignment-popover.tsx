@@ -12,108 +12,110 @@ import {
   Stack,
   Text,
   useDisclosure,
-} from "@chakra-ui/react"
-import { Plus, Users } from "@phosphor-icons/react"
-import { observer } from "mobx-react-lite"
-import React, { useEffect } from "react"
-import { useTranslation } from "react-i18next"
-import { IPermitApplication } from "../../../../models/energy-savings-application"
-import { IPermitCollaboration } from "../../../../models/permit-collaboration"
-import { useMst } from "../../../../setup/root"
-import { ECollaborationType, ECollaboratorType } from "../../../../types/enums"
-import { RequestLoadingButton } from "../../../shared/request-loading-button"
-import { CollaborationAssignmentPopoverContent } from "./collaboration-assignment-popover-content"
-import { CollaboratorInvite } from "./collaborator-invite-popover-content"
-import { Reinvite } from "./reinvite"
-import { EAssignmentPopoverScreen } from "./types"
+} from '@chakra-ui/react';
+import { Plus, Users } from '@phosphor-icons/react';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { IPermitApplication } from '../../../../models/energy-savings-application';
+import { IPermitCollaboration } from '../../../../models/permit-collaboration';
+import { useMst } from '../../../../setup/root';
+import { ECollaborationType, ECollaboratorType } from '../../../../types/enums';
+import { RequestLoadingButton } from '../../../shared/request-loading-button';
+import { CollaborationAssignmentPopoverContent } from './collaboration-assignment-popover-content';
+import { CollaboratorInvite } from './collaborator-invite-popover-content';
+import { Reinvite } from './reinvite';
+import { EAssignmentPopoverScreen } from './types';
 
 interface IProps {
-  permitApplication: IPermitApplication
-  collaborationType: ECollaborationType
-  requirementBlockId: string
+  permitApplication: IPermitApplication;
+  collaborationType: ECollaborationType;
+  requirementBlockId: string;
 }
 
-const INITIAL_SCREEN = EAssignmentPopoverScreen.collaborations
+const INITIAL_SCREEN = EAssignmentPopoverScreen.collaborations;
 
 export const CollaboratorAssignmentPopover = observer(function AssignmentPopover({
   permitApplication,
   collaborationType,
   requirementBlockId,
 }: IProps) {
-  const { userStore, collaboratorStore } = useMst()
-  const { currentUser } = userStore
-  const { t } = useTranslation()
+  const { userStore, collaboratorStore } = useMst();
+  const { currentUser } = userStore;
+  const { t } = useTranslation();
   const existingAssignments = permitApplication.getCollaborationAssigneesByBlockId(
     collaborationType,
-    requirementBlockId
-  )
-  const existingCollaboratorIds = new Set<string>(existingAssignments.map((a) => a.collaborator.id))
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const createConfirmationModalDisclosureProps = useDisclosure()
-  const [currentScreen, setCurrentScreen] = React.useState<EAssignmentPopoverScreen>(INITIAL_SCREEN)
-  const [openAssignmentConfirmationModals, setOpenAssignmentConfirmationModals] = React.useState<Set<string>>(new Set())
-  const contentRef = React.useRef<HTMLDivElement>(null)
+    requirementBlockId,
+  );
+  const existingCollaboratorIds = new Set<string>(existingAssignments.map((a) => a.collaborator.id));
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const createConfirmationModalDisclosureProps = useDisclosure();
+  const [currentScreen, setCurrentScreen] = React.useState<EAssignmentPopoverScreen>(INITIAL_SCREEN);
+  const [openAssignmentConfirmationModals, setOpenAssignmentConfirmationModals] = React.useState<Set<string>>(
+    new Set(),
+  );
+  const contentRef = React.useRef<HTMLDivElement>(null);
 
-  const canManage = permitApplication.canUserManageCollaborators(currentUser, collaborationType)
+  const canManage = permitApplication.canUserManageCollaborators(currentUser, collaborationType);
 
   const changeScreen = (screen: EAssignmentPopoverScreen) => {
     // review does have the ability to invite new collaborators. They should already be present for a jurisdiction
     if (screen === EAssignmentPopoverScreen.collaboratorInvite && collaborationType === ECollaborationType.review) {
-      return
+      return;
     }
 
-    setCurrentScreen(canManage ? screen : INITIAL_SCREEN)
+    setCurrentScreen(canManage ? screen : INITIAL_SCREEN);
 
     // This needs to be done as their is a focus loss issue when dynamically
     // changing the screen in the popover, causing close on blur to not work
-    contentRef.current?.focus()
-  }
+    contentRef.current?.focus();
+  };
 
   useEffect(() => {
     if (isOpen) {
-      changeScreen(INITIAL_SCREEN)
-      setOpenAssignmentConfirmationModals(new Set())
+      changeScreen(INITIAL_SCREEN);
+      setOpenAssignmentConfirmationModals(new Set());
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   useEffect(() => {
-    contentRef?.current?.focus()
-  }, [currentScreen])
+    contentRef?.current?.focus();
+  }, [currentScreen]);
 
   const onPopoverClose = () => {
     if (openAssignmentConfirmationModals.size > 0 || createConfirmationModalDisclosureProps.isOpen) {
-      return
+      return;
     }
 
-    onClose()
-  }
+    onClose();
+  };
 
   const openAssignmentPopover = (collaboratorId: string) => {
-    setOpenAssignmentConfirmationModals((prev) => new Set([...prev, collaboratorId]))
-  }
+    setOpenAssignmentConfirmationModals((prev) => new Set([...prev, collaboratorId]));
+  };
   const closeAssignmentPopover = (collaboratorId: string) => {
     setOpenAssignmentConfirmationModals((prev) => {
-      const newSet = new Set([...prev])
-      newSet.delete(collaboratorId)
+      const newSet = new Set([...prev]);
+      newSet.delete(collaboratorId);
 
-      contentRef.current?.focus()
+      contentRef.current?.focus();
 
-      return newSet
-    })
-  }
+      return newSet;
+    });
+  };
 
   const createAssignmentConfirmationModalDisclosureProps = (collaboratorId: string) => ({
     isOpen: openAssignmentConfirmationModals.has(collaboratorId),
     onOpen: () => openAssignmentPopover(collaboratorId),
     onClose: () => closeAssignmentPopover(collaboratorId),
-  })
+  });
 
   const onInviteCollaborator = (user: { email: string; firstName: string; lastName: string }) =>
-    permitApplication.inviteNewCollaborator(ECollaboratorType.assignee, user, requirementBlockId)
+    permitApplication.inviteNewCollaborator(ECollaboratorType.assignee, user, requirementBlockId);
 
   return (
-    <Popover placement={"bottom-start"} isOpen={isOpen} onClose={onPopoverClose} onOpen={onOpen} isLazy>
-      <PopoverTrigger>
+    <Popover placement={'bottom-start'} isOpen={isOpen} onClose={onPopoverClose} onOpen={onOpen} isLazy>
+      {/* <PopoverTrigger>
         <Button
           onClick={(e) => {
             e.stopPropagation()
@@ -128,9 +130,9 @@ export const CollaboratorAssignmentPopover = observer(function AssignmentPopover
             {t("permitCollaboration.popover.triggerButton", { count: existingAssignments.length })}
           </Text>
         </Button>
-      </PopoverTrigger>
+      </PopoverTrigger> */}
       <Portal>
-        <PopoverContent w={"370px"} maxW={"370px"} ref={contentRef}>
+        <PopoverContent w={'370px'} maxW={'370px'} ref={contentRef}>
           {currentScreen === EAssignmentPopoverScreen.collaborations && (
             <Collaborations
               permitCollaborations={existingAssignments}
@@ -141,9 +143,9 @@ export const CollaboratorAssignmentPopover = observer(function AssignmentPopover
                 canManage
                   ? async (permitCollaborationId) => {
                       try {
-                        await permitApplication.unassignPermitCollaboration(permitCollaborationId)
+                        await permitApplication.unassignPermitCollaboration(permitCollaborationId);
                       } finally {
-                        contentRef.current?.focus()
+                        contentRef.current?.focus();
                       }
                     }
                   : undefined
@@ -180,8 +182,8 @@ export const CollaboratorAssignmentPopover = observer(function AssignmentPopover
         </PopoverContent>
       </Portal>
     </Popover>
-  )
-})
+  );
+});
 
 const Collaborations = observer(function PermitCollaborations({
   transitionToAssign,
@@ -189,79 +191,79 @@ const Collaborations = observer(function PermitCollaborations({
   onUnassign,
   onReinvite,
 }: {
-  transitionToAssign?: () => void
-  onUnassign?: (permitCollaborationId: string) => Promise<void>
-  onReinvite?: (permitCollaborationId: string) => Promise<void>
-  permitCollaborations: IPermitCollaboration[]
+  transitionToAssign?: () => void;
+  onUnassign?: (permitCollaborationId: string) => Promise<void>;
+  onReinvite?: (permitCollaborationId: string) => Promise<void>;
+  permitCollaborations: IPermitCollaboration[];
 }) {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <>
       <PopoverHeader
-        fontSize={"lg"}
-        fontFamily={"heading"}
-        fontWeight={"bold"}
+        fontSize={'lg'}
+        fontFamily={'heading'}
+        fontWeight={'bold'}
         p={4}
         display="flex"
-        justifyContent={"space-between"}
-        alignItems={"center"}
+        justifyContent={'space-between'}
+        alignItems={'center'}
       >
-        {t("permitCollaboration.popover.collaborations.title")}
+        {t('permitCollaboration.popover.collaborations.title')}
         {transitionToAssign && (
-          <Button leftIcon={<Plus />} onClick={transitionToAssign} variant={"primary"} size={"sm"} fontSize={"sm"}>
-            {t("permitCollaboration.popover.collaborations.assignButton")}
+          <Button leftIcon={<Plus />} onClick={transitionToAssign} variant={'primary'} size={'sm'} fontSize={'sm'}>
+            {t('permitCollaboration.popover.collaborations.assignButton')}
           </Button>
         )}
       </PopoverHeader>
       <PopoverBody px={5} py={4}>
-        <Stack as={"ul"} w={"full"} listStyleType={"none"} pl={0} spacing={4}>
+        <Stack as={'ul'} w={'full'} listStyleType={'none'} pl={0} spacing={4}>
           {permitCollaborations.length === 0 && (
-            <Text textAlign={"center"} fontSize={"sm"} color={"text.secondary"} fontStyle={"italic"}>
-              {t("permitCollaboration.popover.assignment.noneAssigned")}
+            <Text textAlign={'center'} fontSize={'sm'} color={'text.secondary'} fontStyle={'italic'}>
+              {t('permitCollaboration.popover.assignment.noneAssigned')}
             </Text>
           )}
           {permitCollaborations.map((permitCollaboration) => {
-            const name = permitCollaboration.collaborator.user.name
-            const organization = permitCollaboration.collaborator.user.organization
+            const name = permitCollaboration.collaborator.user.name;
+            const organization = permitCollaboration.collaborator.user.organization;
             const isConfirmedUser =
               !permitCollaboration.collaborator.user?.isDiscarded &&
-              !permitCollaboration.collaborator.user?.isUnconfirmed
-            const isEligibleForReinvite = permitCollaboration.collaborator.user?.isSubmitter
+              !permitCollaboration.collaborator.user?.isUnconfirmed;
+            const isEligibleForReinvite = permitCollaboration.collaborator.user?.isSubmitter;
             return (
               <Stack
                 key={permitCollaboration.id}
                 px={4}
-                py={"0.625rem"}
-                border={"1px solid"}
-                borderColor={"border.light"}
-                borderRadius={"sm"}
-                bg={!isEligibleForReinvite && !isConfirmedUser ? "greys.grey03" : undefined}
+                py={'0.625rem'}
+                border={'1px solid'}
+                borderColor={'border.light'}
+                borderRadius={'sm'}
+                bg={!isEligibleForReinvite && !isConfirmedUser ? 'greys.grey03' : undefined}
               >
                 <HStack spacing={2}>
-                  <Avatar name={name} size={"sm"} />
-                  <Box flex={1} h={"full"} ml={2}>
+                  <Avatar name={name} size={'sm'} />
+                  <Box flex={1} h={'full'} ml={2}>
                     <Text fontWeight={700}>{name}</Text>
-                    {organization && <Text fontSize={"sm"}>{organization}</Text>}
+                    {organization && <Text fontSize={'sm'}>{organization}</Text>}
                   </Box>
 
                   {onUnassign && (
                     <RequestLoadingButton
                       onClick={() => onUnassign(permitCollaboration.id)}
-                      size={"sm"}
-                      fontSize={"sm"}
-                      variant={"link"}
+                      size={'sm'}
+                      fontSize={'sm'}
+                      variant={'link'}
                     >
-                      {t("permitCollaboration.popover.collaborations.unassignButton")}
+                      {t('permitCollaboration.popover.collaborations.unassignButton')}
                     </RequestLoadingButton>
                   )}
                 </HStack>
                 <Reinvite permitCollaboration={permitCollaboration} onReinvite={onReinvite} />
               </Stack>
-            )
+            );
           })}
         </Stack>
       </PopoverBody>
     </>
-  )
-})
+  );
+});
