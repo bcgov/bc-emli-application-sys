@@ -324,10 +324,10 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 <Button variant="ghost" leftIcon={<Info size={20} />} color="white" onClick={onContactsOpen}>
                   {t('permitApplication.show.contactsSummary')}
                 </Button>{' '}
-                <CollaboratorsSidebar
+                {/* <CollaboratorsSidebar
                   permitApplication={currentPermitApplication}
                   collaborationType={ECollaborationType.submission}
-                />
+                /> */}
                 {doesUserHaveSubmissionPermission && (
                   <SubmissionDownloadModal permitApplication={currentPermitApplication} />
                 )}
@@ -344,10 +344,10 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 gap={4}
               >
                 <BrowserSearchPrompt />
-                <CollaboratorsSidebar
+                {/* <CollaboratorsSidebar
                   permitApplication={currentPermitApplication}
                   collaborationType={ECollaborationType.submission}
-                />
+                /> */}
                 <Button variant="primary" onClick={handleClickFinishLater}>
                   {t('permitApplication.edit.saveDraft')}
                 </Button>

@@ -820,13 +820,12 @@ const options = {
             bySubmitting: 'By submitting this application',
             confirmation:
               'You confirm that the information you provided was completed to the best of your knowledge and ability',
-            yourReference: 'For reference, your BC Building Permit Hub Application # is {{ number }}',
+            yourReference: 'Your application ID is {{ number }}',
             noContactsAvailable:
               'This jurisdiction is not ready to accept applications through this tool yet. Please check with your local jurisdiction.',
             whatsNext:
-              "Upon receipt by the local jurisdiction, you will be notified via email or phone of any updates to your application's status or if additional documentation is required.",
-            emailed:
-              'A confirmation email has also been sent to the applicant and the {{ jurisdictionName }} building permit office',
+              'We will review your application. If we need more information or change the status of your application, we will send you an email. Please check your inbox regularly for updates to your application.',
+            emailed: 'You will receive a confirmation email.',
             pinRequired: 'PID not found or unavailable. Please select a PIN and jurisdiction below:',
             pinVerified: 'PIN is verified.',
             pinUnableToVerify: 'Unable to verify PIN, please confirm and proceed as applicable.',
@@ -1048,7 +1047,7 @@ const options = {
             submitted: 'Your application has been submitted!',
             hearBack: 'Need Help?',
             contactInstruction:
-              'You can log into the Building Permit Hub at any time to view a history of the applications you have submitted. Please contact the {{ jurisdictionName }} for questions related to your application.',
+              'See the status of your application or your application history any time by logging in to the Better Homes Energy Savings Program. Contact <email /> if you have any questions about your application.',
             whatsNextTitle: "What's next?",
             ready: 'Ready to submit this application?',
             bySubmitting: 'By submitting this application',
@@ -2526,7 +2525,8 @@ const options = {
           foippaWarning:
             'We are collecting your personal information under section 26(c) & (e) of the Freedom of Information and Protection of Privacy Act. We are collecting this information to process your application to the CleanBC Better Homes Energy Savings Program, and for program planning and evaluation. The Ministry of Energy and Climate Solutions administers this program. If you have questions about the collection of your information, please contact us at ',
           needMoreHelp: 'Need more help?',
-          pleaseContact: 'Please contact your local government for questions related to your permit application.',
+          pleaseContact:
+            'Please contact your local government for questions related to your energy savings application.',
           forHelp: 'For help with the Building Permit Hub please contact:',
           reviewNotifications: 'Review notifications',
           breadcrumb: {
