@@ -63,6 +63,7 @@ import {
 import { camelizeResponse, decamelizeRequest } from '../../utils';
 import { getCsrfToken } from '../../utils/utility-functions';
 import { IProgram } from '../../models/program';
+import { TCreateEnergyApplicationFormData } from '../../components/domains/energy-savings-application/new-application';
 
 export class Api {
   client: ApisauceInstance;
@@ -237,6 +238,15 @@ export class Api {
 
   async createPermitApplication(params: TCreatePermitApplicationFormData) {
     return this.client.post<ApiResponse<IPermitApplication>>('/permit_applications', { permitApplication: params });
+  }
+
+  async createEnergyApplication(params: TCreateEnergyApplicationFormData) {
+    console.log(params);
+    return this.client.post<ApiResponse<IPermitApplication>>('/esp_application', params, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 
   async createRequirementBlock(params: IRequirementBlockParams) {

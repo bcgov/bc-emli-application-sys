@@ -248,6 +248,8 @@ Rails.application.routes.draw do
         end
       end
     end
+
+    resources :esp_application, only: [:create]
   end
 
   scope module: :external_api, path: :external_api do

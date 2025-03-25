@@ -1,37 +1,37 @@
-import { Box, Button, Center, Flex, Link, Text, useDisclosure } from "@chakra-ui/react"
-import { observer } from "mobx-react-lite"
+import { Box, Button, Center, Flex, Link, Text, useDisclosure } from '@chakra-ui/react';
+import { observer } from 'mobx-react-lite';
 
-import { ArrowSquareOut } from "@phosphor-icons/react"
-import { format } from "date-fns"
-import * as R from "ramda"
-import React, { useEffect, useRef, useState } from "react"
-import { Trans, useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
-import { useMountStatus } from "../../../hooks/use-mount-status"
-import { IEnergySavingsApplication } from "../../../models/energy-savings-application"
-import { IErrorsBoxData } from "../../../types/types"
-import { getCompletedBlocksFromForm, getRequirementByKey } from "../../../utils/formio-component-traversal"
-import { singleRequirementFormJson, singleRequirementSubmissionData } from "../../../utils/formio-helpers"
-import { CompareRequirementsBox } from "../../domains/energy-savings-application/compare-requirements-box"
-import { ErrorsBox } from "../../domains/energy-savings-application/errors-box"
-import { BuilderBottomFloatingButtons } from "../../domains/requirement-template/builder-bottom-floating-buttons"
-import { CustomMessageBox } from "../base/custom-message-box"
-import { SharedSpinner } from "../base/shared-spinner"
-import { Form, defaultOptions } from "../chefs"
-import { ContactModal } from "../contact/contact-modal"
-import { PreviousSubmissionModal } from "../revisions/previous-submission-modal"
-import { PermitApplicationSubmitModal } from "./permit-application-submit-modal"
+import { ArrowSquareOut } from '@phosphor-icons/react';
+import { format } from 'date-fns';
+import * as R from 'ramda';
+import React, { useEffect, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useMountStatus } from '../../../hooks/use-mount-status';
+import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
+import { IErrorsBoxData } from '../../../types/types';
+import { getCompletedBlocksFromForm, getRequirementByKey } from '../../../utils/formio-component-traversal';
+import { singleRequirementFormJson, singleRequirementSubmissionData } from '../../../utils/formio-helpers';
+import { CompareRequirementsBox } from '../../domains/energy-savings-application/compare-requirements-box';
+import { ErrorsBox } from '../../domains/energy-savings-application/errors-box';
+import { BuilderBottomFloatingButtons } from '../../domains/requirement-template/builder-bottom-floating-buttons';
+import { CustomMessageBox } from '../base/custom-message-box';
+import { SharedSpinner } from '../base/shared-spinner';
+import { Form, defaultOptions } from '../chefs';
+import { ContactModal } from '../contact/contact-modal';
+import { PreviousSubmissionModal } from '../revisions/previous-submission-modal';
+import { PermitApplicationSubmitModal } from './permit-application-submit-modal';
 
 interface IRequirementFormProps {
-  permitApplication?: IEnergySavingsApplication
-  onCompletedBlocksChange?: (sections: any) => void
-  formRef: any
-  triggerSave?: (params?: { autosave?: boolean; skipPristineCheck?: boolean }) => void
-  showHelpButton?: boolean
-  renderSaveButton?: () => JSX.Element
-  isEditing?: boolean
-  renderTopButtons?: () => React.ReactNode
-  updateCollaborationAssignmentNodes?: () => void
+  permitApplication?: IEnergySavingsApplication;
+  onCompletedBlocksChange?: (sections: any) => void;
+  formRef: any;
+  triggerSave?: (params?: { autosave?: boolean; skipPristineCheck?: boolean }) => void;
+  showHelpButton?: boolean;
+  renderSaveButton?: () => JSX.Element;
+  isEditing?: boolean;
+  renderTopButtons?: () => React.ReactNode;
+  updateCollaborationAssignmentNodes?: () => void;
 }
 
 export const RequirementForm = observer(
@@ -57,75 +57,75 @@ export const RequirementForm = observer(
       previousSubmissionVersion,
       selectedPastSubmissionVersion,
       isViewingPastRequests,
-    } = permitApplication
+    } = permitApplication;
 
-    const shouldShowDiff = permitApplication?.shouldShowApplicationDiff(isEditing)
-    const userShouldSeeDiff = permitApplication?.currentUserShouldSeeApplicationDiff
+    const shouldShowDiff = permitApplication?.shouldShowApplicationDiff(isEditing);
+    const userShouldSeeDiff = permitApplication?.currentUserShouldSeeApplicationDiff;
 
-    const pastVersion = isViewingPastRequests ? selectedPastSubmissionVersion : previousSubmissionVersion
-    const isMounted = useMountStatus()
-    const { t } = useTranslation()
-    const navigate = useNavigate()
-    const { isOpen, onOpen, onClose } = useDisclosure()
-    const boxRef = useRef<HTMLDivElement>(null)
+    const pastVersion = isViewingPastRequests ? selectedPastSubmissionVersion : previousSubmissionVersion;
+    const isMounted = useMountStatus();
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const boxRef = useRef<HTMLDivElement>(null);
 
-    const [wrapperClickCount, setWrapperClickCount] = useState(0)
-    const [errorBoxData, setErrorBoxData] = useState<IErrorsBoxData[]>([]) // an array of Labels and links to the component
-    const [imminentSubmission, setImminentSubmission] = useState(null)
-    const [floatErrorBox, setFloatErrorBox] = useState(false)
-    const [hasErrors, setHasErrors] = useState(false)
-    const [autofillContactKey, setAutofillContactKey] = useState(null)
-    const [previousSubmissionKey, setPreviousSubmissionKey] = useState(null)
-    const [firstComponentKey, setFirstComponentKey] = useState(null)
-    const [isCollapsedAll, setIsCollapsedAllState] = useState(false)
+    const [wrapperClickCount, setWrapperClickCount] = useState(0);
+    const [errorBoxData, setErrorBoxData] = useState<IErrorsBoxData[]>([]); // an array of Labels and links to the component
+    const [imminentSubmission, setImminentSubmission] = useState(null);
+    const [floatErrorBox, setFloatErrorBox] = useState(false);
+    const [hasErrors, setHasErrors] = useState(false);
+    const [autofillContactKey, setAutofillContactKey] = useState(null);
+    const [previousSubmissionKey, setPreviousSubmissionKey] = useState(null);
+    const [firstComponentKey, setFirstComponentKey] = useState(null);
+    const [isCollapsedAll, setIsCollapsedAllState] = useState(false);
 
-    const [unsavedSubmissionData, setUnsavedSubmissionData] = useState(() => R.clone(submissionData))
+    const [unsavedSubmissionData, setUnsavedSubmissionData] = useState(() => R.clone(submissionData));
 
     const handleSetUnsavedSubmissionData = (data) => {
-      permitApplication.setIsDirty(true)
-      setUnsavedSubmissionData(data)
-    }
+      permitApplication.setIsDirty(true);
+      setUnsavedSubmissionData(data);
+    };
 
-    const { isOpen: isContactsOpen, onOpen: onContactsOpen, onClose: onContactsClose } = useDisclosure()
+    const { isOpen: isContactsOpen, onOpen: onContactsOpen, onClose: onContactsClose } = useDisclosure();
     const {
       isOpen: isPreviousSubmissionOpen,
       onOpen: onPreviousSubmissionOpen,
       onClose: onPreviousSubmissionClose,
-    } = useDisclosure()
+    } = useDisclosure();
 
-    const infoBoxData = permitApplication.diffToInfoBoxData
+    const infoBoxData = permitApplication.diffToInfoBoxData;
 
     useEffect(() => {
       if (shouldShowDiff && userShouldSeeDiff) {
-        permitApplication.fetchDiff()
+        permitApplication.fetchDiff();
       }
-    }, [])
+    }, []);
 
     useEffect(() => {
       // The box observers need to be re-registered whenever a panel is collapsed
       // This triggers a re-registration whenever the body of the box is clicked
       // Click listener must be registered this way because formIO prevents bubbling
 
-      const box = boxRef.current
+      const box = boxRef.current;
       const handleClick = () => {
-        setWrapperClickCount((n) => n + 1)
-      }
-      box?.addEventListener("click", handleClick)
+        setWrapperClickCount((n) => n + 1);
+      };
+      box?.addEventListener('click', handleClick);
       return () => {
-        box?.removeEventListener("click", handleClick)
-      }
-    }, [])
+        box?.removeEventListener('click', handleClick);
+      };
+    }, []);
 
     useEffect(() => {
       if (hasErrors) {
-        window.addEventListener("scroll", onScroll)
+        window.addEventListener('scroll', onScroll);
       } else {
-        window.removeEventListener("scroll", onScroll)
+        window.removeEventListener('scroll', onScroll);
       }
       return () => {
-        window.removeEventListener("scroll", onScroll)
-      }
-    }, [hasErrors])
+        window.removeEventListener('scroll', onScroll);
+      };
+    }, [hasErrors]);
 
     useEffect(() => {
       // This useEffect registers the intersection observers for the panels
@@ -133,188 +133,190 @@ export const RequirementForm = observer(
       // and detects when this line covers at least a small percentage of the panel
 
       // Problems with render timing necessitates the use of this isMounted state
-      if (!isMounted) return
+      if (!isMounted) return;
 
-      const formComponentNodes = document.querySelectorAll(".formio-component")
+      const formComponentNodes = document.querySelectorAll('.formio-component');
 
       const blockNodes = Array.from(formComponentNodes).filter((node) =>
-        Array.from(node.classList).some((className) => blockClasses.includes(className))
-      )
-      const viewportHeight = window.innerHeight // Get the viewport height
-      const topValue = -viewportHeight / 2 + 5
-      const bottomValue = -viewportHeight / 2 + 5
-      const rootMarginValue = `${topValue}px 0px ${bottomValue}px 0px`
+        Array.from(node.classList).some((className) => blockClasses.includes(className)),
+      );
+      const viewportHeight = window.innerHeight; // Get the viewport height
+      const topValue = -viewportHeight / 2 + 5;
+      const bottomValue = -viewportHeight / 2 + 5;
+      const rootMarginValue = `${topValue}px 0px ${bottomValue}px 0px`;
       const blockOptions = {
         rootMargin: rootMarginValue,
         threshold: 0.0001, // Adjust threshold based on needs
-      }
+      };
 
-      const blockObserver = new IntersectionObserver(handleBlockIntersection, blockOptions)
+      const blockObserver = new IntersectionObserver(handleBlockIntersection, blockOptions);
 
       Object.values(blockNodes).forEach((ref) => {
         if (ref) {
-          blockObserver.observe(ref)
+          blockObserver.observe(ref);
         }
-      })
+      });
 
       return () => {
-        blockObserver.disconnect()
-      }
-    }, [formJson, isMounted, window.innerHeight, wrapperClickCount])
+        blockObserver.disconnect();
+      };
+    }, [formJson, isMounted, window.innerHeight, wrapperClickCount]);
 
     const handleOpenStepCode = async (_event) => {
-      await triggerSave?.()
-      navigate("step-code", { state: { enableStepCodeRoute: true } })
-    }
+      await triggerSave?.();
+      navigate('step-code', { state: { enableStepCodeRoute: true } });
+    };
 
     const handleOpenContactAutofill = async (event) => {
-      setAutofillContactKey(event.detail.key)
-      onContactsOpen()
-    }
+      setAutofillContactKey(event.detail.key);
+      onContactsOpen();
+    };
 
     const handleOpenPreviousSubmission = async (event) => {
-      setPreviousSubmissionKey(event.detail.key)
-      onPreviousSubmissionOpen()
-    }
+      setPreviousSubmissionKey(event.detail.key);
+      onPreviousSubmissionOpen();
+    };
 
     useEffect(() => {
-      document.addEventListener("openStepCode", handleOpenStepCode)
-      document.addEventListener("openAutofillContact", handleOpenContactAutofill)
-      document.addEventListener("openPreviousSubmission", handleOpenPreviousSubmission)
+      document.addEventListener('openStepCode', handleOpenStepCode);
+      document.addEventListener('openAutofillContact', handleOpenContactAutofill);
+      document.addEventListener('openPreviousSubmission', handleOpenPreviousSubmission);
       return () => {
-        document.removeEventListener("openStepCode", handleOpenStepCode)
-        document.removeEventListener("openAutofillContact", handleOpenContactAutofill)
-        document.removeEventListener("openPreviousSubmission", handleOpenPreviousSubmission)
-      }
-    }, [])
+        document.removeEventListener('openStepCode', handleOpenStepCode);
+        document.removeEventListener('openAutofillContact', handleOpenContactAutofill);
+        document.removeEventListener('openPreviousSubmission', handleOpenPreviousSubmission);
+      };
+    }, []);
 
     const setIsCollapsedAll = (isCollapsedAll: boolean) => {
       if (isCollapsedAll) {
-        document.querySelectorAll(".formio-collapse-icon.fa-minus-square-o").forEach((el: HTMLDivElement) => el.click())
+        document
+          .querySelectorAll('.formio-collapse-icon.fa-minus-square-o')
+          .forEach((el: HTMLDivElement) => el.click());
       } else {
-        document.querySelectorAll(".formio-collapse-icon.fa-plus-square-o").forEach((el: HTMLDivElement) => el.click())
+        document.querySelectorAll('.formio-collapse-icon.fa-plus-square-o').forEach((el: HTMLDivElement) => el.click());
       }
-      setIsCollapsedAllState(isCollapsedAll)
-    }
+      setIsCollapsedAllState(isCollapsedAll);
+    };
 
     const mapErrorBoxData = (errors) =>
       errors.map((error) => {
-        return { label: error.component.label, id: error.component.id, class: error.component.class }
-      })
+        return { label: error.component.label, id: error.component.id, class: error.component.class };
+      });
 
     function handleBlockIntersection(entries: IntersectionObserverEntry[]) {
-      const entry = entries.filter((en) => en.isIntersecting)[0]
-      if (!entry) return
+      const entry = entries.filter((en) => en.isIntersecting)[0];
+      if (!entry) return;
 
       const itemWithSectionClassName = Array.from(entry.target.classList).find(
         (className) =>
-          className.includes("formio-component-formSubmissionDataRSTsection") ||
-          className.includes("formio-component-section-signoff-key")
-      )
+          className.includes('formio-component-formSubmissionDataRSTsection') ||
+          className.includes('formio-component-section-signoff-key'),
+      );
 
       if (itemWithSectionClassName) {
-        const classNameParts = itemWithSectionClassName.split("|")
-        const blockId = classNameParts[classNameParts.length - 1].slice(-36)
-        setSelectedTabIndex(indexOfBlockId(blockId))
+        const classNameParts = itemWithSectionClassName.split('|');
+        const blockId = classNameParts[classNameParts.length - 1].slice(-36);
+        setSelectedTabIndex(indexOfBlockId(blockId));
       }
     }
 
     const onFormSubmit = async (submission: any) => {
-      setHasErrors(null)
-      setImminentSubmission(submission)
-      onOpen()
-    }
+      setHasErrors(null);
+      setImminentSubmission(submission);
+      onOpen();
+    };
 
     const onModalSubmit = async () => {
       if (await permitApplication.submit({ submissionData: imminentSubmission })) {
-        navigate(`/permit-applications/${permitApplication.id}/sucessful-submission`)
+        navigate(`/applications/${permitApplication.id}/successful-submission`);
       }
-    }
+    };
 
     const onBlur = (containerComponent) => {
       if (onCompletedBlocksChange) {
-        onCompletedBlocksChange(getCompletedBlocksFromForm(containerComponent.root))
+        onCompletedBlocksChange(getCompletedBlocksFromForm(containerComponent.root));
       }
-    }
+    };
     const onScroll = (event) => {
-      setFloatErrorBox(hasErrors && isFirstComponentNearTopOfView(firstComponentKey))
-    }
+      setFloatErrorBox(hasErrors && isFirstComponentNearTopOfView(firstComponentKey));
+    };
 
     const onChange = (changedEvent) => {
       //in the case of a multi select box, there is a change but no onblur bubbled up
-      if (changedEvent?.changed?.component?.type == "selectboxes") {
+      if (changedEvent?.changed?.component?.type == 'selectboxes') {
         if (onCompletedBlocksChange) {
-          onCompletedBlocksChange(getCompletedBlocksFromForm(changedEvent?.changed?.instance?.root))
+          onCompletedBlocksChange(getCompletedBlocksFromForm(changedEvent?.changed?.instance?.root));
         }
-        setErrorBoxData(mapErrorBoxData(changedEvent?.changed?.instance?.root?.errors))
+        setErrorBoxData(mapErrorBoxData(changedEvent?.changed?.instance?.root?.errors));
       }
-      if (changedEvent?.changed?.component?.type == "simplefile") {
+      if (changedEvent?.changed?.component?.type == 'simplefile') {
         //https://github.com/formio/formio.js/blob/4.19.x/src/components/file/File.unit.js
         // formio `pristine` is not set for file upldates
         // using `setPristine(false)` causes the entire form to validate so instead, we use a separate dirty state
         // trigger save to rerun compliance and save file
-        triggerSave?.({ autosave: true, skipPristineCheck: true })
+        triggerSave?.({ autosave: true, skipPristineCheck: true });
       }
-    }
+    };
 
     const onInitialized = (event) => {
-      if (!formRef.current) return
+      if (!formRef.current) return;
 
-      updateCollaborationAssignmentNodes?.()
+      updateCollaborationAssignmentNodes?.();
 
       if (onCompletedBlocksChange) {
-        onCompletedBlocksChange(getCompletedBlocksFromForm(formRef.current))
+        onCompletedBlocksChange(getCompletedBlocksFromForm(formRef.current));
       }
-      setErrorBoxData(mapErrorBoxData(formRef.current.errors))
-    }
+      setErrorBoxData(mapErrorBoxData(formRef.current.errors));
+    };
 
     const formReady = (rootComponent) => {
-      formRef.current = rootComponent
+      formRef.current = rootComponent;
 
-      rootComponent.on("change", (_) => {
+      rootComponent.on('change', (_) => {
         // whenever a form data changes, we update the state of ErrorBox with the new error information
-        setErrorBoxData(mapErrorBoxData(formRef.current.errors))
-      })
+        setErrorBoxData(mapErrorBoxData(formRef.current.errors));
+      });
 
-      rootComponent.on("submitError", (error) => {
+      rootComponent.on('submitError', (error) => {
         // when the form attempts to submit but has validation errors, we set a flag to show ErrorBox
-        setHasErrors(true)
-        setErrorBoxData(mapErrorBoxData(formRef.current.errors))
-      })
+        setHasErrors(true);
+        setErrorBoxData(mapErrorBoxData(formRef.current.errors));
+      });
 
-      const firstComponent = rootComponent.form.components[0]
-      setFirstComponentKey(firstComponent.key)
-    }
+      const firstComponent = rootComponent.form.components[0];
+      setFirstComponentKey(firstComponent.key);
+    };
 
     let permitAppOptions = {
       ...defaultOptions,
       ...(isDraft ? { readOnly: shouldShowDiff } : { readOnly: false }),
       // readonly loggic depends on formattedJson for submitted applications
-    }
-    permitAppOptions.componentOptions.simplefile.config["formCustomOptions"] = {
-      persistFileUploadAction: "PATCH",
+    };
+    permitAppOptions.componentOptions.simplefile.config['formCustomOptions'] = {
+      persistFileUploadAction: 'PATCH',
       persistFileUploadUrl: `/api/permit_applications/${permitApplication.id}/upload_supporting_document`,
-    }
+    };
 
     const handleUpdatePermitApplicationVersion = () => {
       if (permitApplication.showingCompareAfter) {
-        permitApplication.resetCompareAfter()
+        permitApplication.resetCompareAfter();
       } else {
-        permitApplication.updateVersion()
+        permitApplication.updateVersion();
       }
-    }
-    const showVersionDiffContactWarning = shouldShowDiff && !userShouldSeeDiff
+    };
+    const showVersionDiffContactWarning = shouldShowDiff && !userShouldSeeDiff;
     return (
       <>
         <Flex
           direction="column"
-          as={"section"}
+          as={'section'}
           flex={1}
-          className={`form-wrapper ${floatErrorBox ? "float-on" : "float-off"}`}
+          className={`form-wrapper ${floatErrorBox ? 'float-on' : 'float-off'}`}
           mb="40vh"
           mx="auto"
-          pl={{ base: "10" }}
-          pr={{ base: "10", xl: "var(--app-permit-form-right-white-space)" }}
+          pl={{ base: '10' }}
+          pr={{ base: '10', xl: 'var(--app-permit-form-right-white-space)' }}
           width="full"
           maxWidth="container.lg"
           gap={8}
@@ -322,7 +324,7 @@ export const RequirementForm = observer(
           id="requirement-form-wrapper"
           sx={{
             "[id^='error-list-'].alert.alert-danger > p::before": {
-              content: `"${t("requirementTemplate.edit.errorsBox.title", { count: errorBoxData.length })}"`,
+              content: `"${t('requirementTemplate.edit.errorsBox.title', { count: errorBoxData.length })}"`,
             },
           }}
         >
@@ -341,7 +343,7 @@ export const RequirementForm = observer(
                 handleUpdatePermitApplicationVersion={handleUpdatePermitApplicationVersion}
                 showingCompareAfter={permitApplication.showingCompareAfter}
                 handleClickDismiss={() => {
-                  permitApplication.resetDiff()
+                  permitApplication.resetDiff();
                 }}
                 isUpdatable={permitApplication.isDraft}
               />
@@ -350,68 +352,21 @@ export const RequirementForm = observer(
             ))}
           {permitApplication?.isRevisionsRequested && (
             <CustomMessageBox
-              description={t("permitApplication.show.revisionsWereRequested", {
-                date: format(permitApplication.revisionsRequestedAt, "MMM d, yyyy h:mm a"),
+              description={t('permitApplication.show.revisionsWereRequested', {
+                date: format(permitApplication.revisionsRequestedAt, 'MMM d, yyyy h:mm a'),
               })}
               status="warning"
             />
           )}
           {showVersionDiffContactWarning && (
-            <CustomMessageBox description={t("permitApplication.show.versionDiffContactWarning")} status="warning" />
+            <CustomMessageBox description={t('permitApplication.show.versionDiffContactWarning')} status="warning" />
           )}
-          {permitApplication?.isSubmitted ? (
-            <CustomMessageBox
-              description={t("permitApplication.show.wasSubmitted", {
-                // date: format(permitApplication.submittedAt, "MMM d, yyyy h:mm a"),
-                jurisdictionName: jurisdiction.qualifiedName,
-              })}
-              status="info"
-            />
-          ) : (
-            <CustomMessageBox
-              title={
-                jurisdiction &&
-                t("permitApplication.show.submittingTo.title", { jurisdictionName: jurisdiction?.qualifiedName })
-              }
-              description={
-                <Trans
-                  t={t}
-                  i18nKey={"permitApplication.show.submittingTo.description"}
-                  components={{
-                    1: (
-                      <Button
-                        sx={{
-                          span: {
-                            ml: 0,
-                          },
-                        }}
-                        as={Link}
-                        rightIcon={<ArrowSquareOut />}
-                        href={
-                          "https://www2.gov.bc.ca/gov/content/governments/local-governments/planning-land-use/land-use-regulation/zoning-bylaws"
-                        }
-                        variant={"link"}
-                        target="_blank"
-                        color={"text.primary !important"}
-                        rel="noopener noreferrer"
-                      />
-                    ),
-                  }}
-                />
-              }
-              status="info"
-              headingProps={{
-                fontSize: "md !important",
-                mb: 0,
-              }}
-              fontSize={"sm"}
-            />
-          )}
+
           <Box bg="greys.grey03" p={3} borderRadius="sm">
             <Text fontStyle="italic">
-              {t("site.foippaWarning")}
-              <Link href={"mailto:" + t("site.contactEmail")} isExternal>
-                {t("site.contactEmail")}
+              {t('site.foippaWarning')}
+              <Link href={'mailto:' + t('site.contactEmail')} isExternal>
+                {t('site.contactEmail')}
               </Link>
             </Text>
           </Box>
@@ -460,23 +415,23 @@ export const RequirementForm = observer(
             onOpen={onPreviousSubmissionOpen}
             onClose={onPreviousSubmissionClose}
             requirementJson={singleRequirementFormJson(
-              getRequirementByKey(pastVersion.formJson, previousSubmissionKey)
+              getRequirementByKey(pastVersion.formJson, previousSubmissionKey),
             )}
             submissionJson={singleRequirementSubmissionData(pastVersion.submissionData, previousSubmissionKey)}
           />
         )}
       </>
-    )
-  }
-)
+    );
+  },
+);
 
 function isFirstComponentNearTopOfView(firstComponentKey) {
-  const firstComponentElement = document.querySelector(`.formio-component-${firstComponentKey}`)
+  const firstComponentElement = document.querySelector(`.formio-component-${firstComponentKey}`);
   if (firstComponentElement) {
-    const firstComponentElTopY = firstComponentElement.getBoundingClientRect().y
-    const buffer = 400 // this buffer is to account for the transition-delay of displaying ErrorBox
-    return firstComponentElTopY < buffer
+    const firstComponentElTopY = firstComponentElement.getBoundingClientRect().y;
+    const buffer = 400; // this buffer is to account for the transition-delay of displaying ErrorBox
+    return firstComponentElTopY < buffer;
   } else {
-    return false
+    return false;
   }
 }

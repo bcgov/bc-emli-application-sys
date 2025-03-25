@@ -255,6 +255,8 @@ class PermitApplication < ApplicationRecord
   end
 
   def current_published_template_version
+    Rails.logger.info("activity: #{activity.inspect}")
+    Rails.logger.info("permit_type: #{permit_type.inspect}")
     # this will eventually be different, if there is a new version it should notify the user
     RequirementTemplate.published_requirement_template_version(
       activity,
@@ -596,6 +598,7 @@ class PermitApplication < ApplicationRecord
   end
 
   def assign_unique_number
+    Rails.logger.info("jurisdiction #{jurisdiction.inspect}")
     last_number =
       jurisdiction
         .permit_applications

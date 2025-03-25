@@ -209,7 +209,7 @@ class RequirementTemplate < ApplicationRecord
       first_nations: first_nations
     ).published_template_version
   rescue NoMethodError => e
-    rails.logger.error e.message
+    Rails.logger.error e.message
   end
 
   def search_data

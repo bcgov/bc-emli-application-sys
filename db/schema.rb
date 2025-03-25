@@ -415,8 +415,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_03_13_234010) do
                id: :uuid,
                default: -> { "gen_random_uuid()" },
                force: :cascade do |t|
-    t.string "program_name"
-    t.string "funded_by"
+    t.string "program_name", null: false
+    t.string "funded_by", null: false
     t.string "description_html"
     t.string "external_api_state", default: "g_off", null: false
     t.datetime "created_at", null: false
