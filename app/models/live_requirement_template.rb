@@ -1,5 +1,5 @@
 class LiveRequirementTemplate < RequirementTemplate
-  validate :unique_classification_for_undiscarded
+  # validate :unique_classification_for_undiscarded
 
   def visibility
     "live"

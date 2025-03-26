@@ -18,8 +18,8 @@ class Program < ApplicationRecord
   has_one :preference
   has_many :permit_applications
   has_many :contacts, as: :contactable, dependent: :destroy
-  has_many :jurisdiction_memberships, dependent: :destroy
-  has_many :users, through: :jurisdiction_memberships
+  # has_many :jurisdiction_memberships, dependent: :destroy
+  # has_many :users, through: :jurisdiction_memberships
   has_many :submitters, through: :permit_applications, source: :submitter
   has_many :jurisdiction_template_version_customizations
   has_many :template_versions,
@@ -66,17 +66,17 @@ class Program < ApplicationRecord
     jurisdiction_template_version_customizations
   end
 
-  def regional_review_managers
-    users&.kept&.regional_review_manager
-  end
+  # def regional_review_managers
+  #   users&.kept&.regional_review_manager
+  # end
 
-  def review_managers
-    users&.kept&.admin_manager
-  end
+  # def review_managers
+  #   users&.kept&.admin_manager
+  # end
 
-  def reviewers
-    users&.kept&.admin
-  end
+  # def reviewers
+  #   users&.kept&.admin
+  # end
 
   # def assign_unique_prefix
   #   # Initial prefix from the first letter of the qualifier and the name
@@ -158,13 +158,13 @@ class Program < ApplicationRecord
     "#{name}, #{qualifier}"
   end
 
-  def review_managers_size
-    (review_managers&.size || 0) + (regional_review_managers&.size || 0)
-  end
+  # def review_managers_size
+  #   (review_managers&.size || 0) + (regional_review_managers&.size || 0)
+  # end
 
-  def reviewers_size
-    reviewers&.size || 0
-  end
+  # def reviewers_size
+  #   reviewers&.size || 0
+  # end
 
   def permit_applications_size
     permit_applications&.size || 0
@@ -174,19 +174,19 @@ class Program < ApplicationRecord
     permit_applications.unviewed
   end
 
-  def submission_inbox_set_up
-    # preload all of the permit_types and contacts for efficiency
-    permit_types = PermitType.enabled.to_a
-    contacts =
-      permit_type_submission_contacts
-        .where.not(email: nil)
-        .where.not(confirmed_at: nil)
-        .to_a
+  # def submission_inbox_set_up
+  #   # preload all of the permit_types and contacts for efficiency
+  #   permit_types = PermitType.enabled.to_a
+  #   contacts =
+  #     permit_type_submission_contacts
+  #       .where.not(email: nil)
+  #       .where.not(confirmed_at: nil)
+  #       .to_a
 
-    permit_types.all? do |permit_type|
-      contacts.any? { |contact| contact.permit_type_id == permit_type.id }
-    end
-  end
+  #   permit_types.all? do |permit_type|
+  #     contacts.any? { |contact| contact.permit_type_id == permit_type.id }
+  #   end
+  # end
 
   # def self.class_for_locality_type(locality_type)
   #   if locality_type == RegionalDistrict.locality_type
@@ -234,7 +234,7 @@ class Program < ApplicationRecord
   end
 
   def blueprint
-    JurisdictionBlueprint
+    ProgramBlueprint
   end
 
   def template_version_customization(template_version, sandbox = nil)

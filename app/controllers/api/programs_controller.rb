@@ -3,7 +3,7 @@ class Api::ProgramsController < Api::ApplicationController
   include Api::Concerns::Search::JurisdictionUsers
   include Api::Concerns::Search::PermitApplications
 
-  before_action :set_jurisdiction,
+  before_action :set_program,
                 only: %i[
                   show
                   update
@@ -215,12 +215,9 @@ class Api::ProgramsController < Api::ApplicationController
     params.require(:external_api_enabled)
   end
 
-  def set_jurisdiction
+  def set_program
     @jurisdiction =
-      Jurisdiction
-        .includes(Jurisdiction::BASE_INCLUDES)
-        .friendly
-        .find(params[:id])
+      Program.includes(Program::BASE_INCLUDES).friendly.find(params[:id])
   rescue ActiveRecord::RecordNotFound => e
     render_error("misc.not_found_error", { status: :not_found }, e)
   end

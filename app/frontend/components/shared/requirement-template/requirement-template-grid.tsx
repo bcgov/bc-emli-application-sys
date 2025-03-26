@@ -1,23 +1,23 @@
-import { Box, Flex, GridItem, Text, VStack } from "@chakra-ui/react"
-import { observer } from "mobx-react-lite"
-import React from "react"
-import { useTranslation } from "react-i18next"
-import { useSearch } from "../../../hooks/use-search"
-import { useMst } from "../../../setup/root"
-import { ERequirementTemplateSortFields } from "../../../types/enums"
-import { Paginator } from "../base/inputs/paginator"
-import { PerPageSelect } from "../base/inputs/per-page-select"
-import { ModelSearchInput } from "../base/model-search-input"
-import { SharedSpinner } from "../base/shared-spinner"
-import { GridHeader } from "../grid/grid-header"
-import { SearchGrid } from "../grid/search-grid"
-import { SearchGridItem } from "../grid/search-grid-item"
-import { SortIcon } from "../sort-icon"
-import { VersionTag } from "../version-tag"
-import { YesNoTag } from "../yes-no-tag"
+import { Box, Flex, GridItem, Text, VStack } from '@chakra-ui/react';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useSearch } from '../../../hooks/use-search';
+import { useMst } from '../../../setup/root';
+import { ERequirementTemplateSortFields } from '../../../types/enums';
+import { Paginator } from '../base/inputs/paginator';
+import { PerPageSelect } from '../base/inputs/per-page-select';
+import { ModelSearchInput } from '../base/model-search-input';
+import { SharedSpinner } from '../base/shared-spinner';
+import { GridHeader } from '../grid/grid-header';
+import { SearchGrid } from '../grid/search-grid';
+import { SearchGridItem } from '../grid/search-grid-item';
+import { SortIcon } from '../sort-icon';
+import { VersionTag } from '../version-tag';
+import { YesNoTag } from '../yes-no-tag';
 
 interface RequirementTemplateGridProps {
-  renderActions: (rt: any) => React.ReactNode // Replace 'any' with your actual type
+  renderActions: (rt: any) => React.ReactNode; // Replace 'any' with your actual type
 }
 
 export const RequirementTemplateGrid: React.FC<RequirementTemplateGridProps> = observer(({ renderActions }) => {
@@ -47,10 +47,11 @@ export const RequirementTemplateGrid: React.FC<RequirementTemplateGridProps> = o
         ) : (
           tableRequirementTemplates.map((rt) => (
             <Box key={rt.id} className={'requirements-template-grid-row'} role={'row'} display={'contents'}>
-              <SearchGridItem fontWeight="bold">{rt.permitType.name}</SearchGridItem>
+              <SearchGridItem fontWeight="bold">{rt.nickname ?? 'N/A'}</SearchGridItem>
               <SearchGridItem>{rt.description}</SearchGridItem>
               <SearchGridItem>
-                <YesNoTag boolean={rt.firstNations} />
+                {/* <YesNoTag boolean={rt.firstNations} /> */}
+                {rt.program?.programName}
               </SearchGridItem>
               <SearchGridItem>
                 {' '}

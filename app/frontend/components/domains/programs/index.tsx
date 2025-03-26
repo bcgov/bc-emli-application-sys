@@ -65,9 +65,9 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
               return (
                 <Box key={j.id} className={'jurisdiction-index-grid-row'} role={'row'} display={'contents'}>
                   <SearchGridItem fontWeight={700}>{j.programName}</SearchGridItem>
-                  <SearchGridItem>{j.reviewManagersSize}</SearchGridItem>
-                  <SearchGridItem>{j.reviewersSize}</SearchGridItem>
-                  <SearchGridItem>{j.permitApplicationsSize}</SearchGridItem>
+                  <SearchGridItem>{j.reviewManagersSize ?? 0}</SearchGridItem>
+                  <SearchGridItem>{j.reviewersSize ?? 0}</SearchGridItem>
+                  <SearchGridItem>{j.permitApplicationsSize ?? 0}</SearchGridItem>
                   <SearchGridItem>
                     {/* {j.submissionInboxSetUp && (
                       <Flex gap={1}>
@@ -92,7 +92,7 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
           <PerPageSelect
             handleCountPerPageChange={handleCountPerPageChange}
             countPerPage={countPerPage}
-            totalCount={0}
+            totalCount={totalCount}
           />
           <Paginator
             current={currentPage}

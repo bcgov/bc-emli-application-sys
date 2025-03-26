@@ -2155,11 +2155,11 @@ const options = {
           },
           fields: {
             status: 'Status',
-            applicationName: 'Application Name',
+            templateName: 'Name',
             activity: 'Work type',
             userGroupType: 'Select the user type for this program',
             firstNations: 'First Nations',
-            description: 'Provide a description for administrative staff on what the template is for',
+            description: 'Description',
             currentVersion: 'Current version',
             jurisdictionsSize: 'Used by',
           },
@@ -2171,7 +2171,7 @@ const options = {
           },
 
           index: {
-            tableHeading: 'Applications',
+            tableHeading: 'Templates',
             title: 'Applications template catalog',
             description:
               'List of all application in the system that’s been created by the Admin manager or a System admin. Only Published application will be visible to programs.',
@@ -2181,8 +2181,7 @@ const options = {
           new: {
             title: 'Create a new template',
             typePrompt: 'What kind of building permit is this?',
-            descriptionHelpText:
-              'Provide some context for managers and admin on what this application is for (MAX 250 CHARACTERS).',
+            descriptionHelpText: '(MAX 250 CHARACTERS)',
             createButton: 'Create application',
             firstNationsLand: 'This permit is intended only for <1>First Nation Registered Land</1>',
             copyExistingByClassifications: 'Copy from existing template of this permit and work type if available',
