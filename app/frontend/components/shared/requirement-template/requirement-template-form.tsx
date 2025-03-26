@@ -1,16 +1,15 @@
-import { Button, Checkbox, Flex, Link, Text, VStack } from "@chakra-ui/react"
-import { observer } from "mobx-react-lite"
-import React, { useState } from "react"
-import { Controller, FormProvider, useForm, useWatch } from "react-hook-form"
-import { Trans, useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
-import { IRequirementTemplate } from "../../../models/requirement-template"
-import { useMst } from "../../../setup/root"
-import { ERequirementTemplateType } from "../../../types/enums"
-import { TCreateRequirementTemplateFormData } from "../../../types/types"
-import { AsyncRadioGroup } from "../base/inputs/async-radio-group"
-import { TextFormControl } from "../form/input-form-control"
-import { HStack } from '../../domains/step-code/checklist/pdf-content/shared/h-stack';
+import { Button, Checkbox, Flex, Link, Text, VStack } from '@chakra-ui/react';
+import { observer } from 'mobx-react-lite';
+import React, { useState } from 'react';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
+import { Trans, useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { IRequirementTemplate } from '../../../models/requirement-template';
+import { useMst } from '../../../setup/root';
+import { ERequirementTemplateType } from '../../../types/enums';
+import { TCreateRequirementTemplateFormData } from '../../../types/types';
+import { AsyncRadioGroup } from '../base/inputs/async-radio-group';
+import { TextFormControl } from '../form/input-form-control';
 
 interface IRequirementTemplateFormProps {
   type: ERequirementTemplateType;
@@ -63,28 +62,22 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
     <FormProvider {...formMethods}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <VStack alignItems={'flex-start'} spacing={5} gap={8} w={'full'} h={'full'}>
-          {/* <Text>{t('requirementTemplate.new.typePrompt')}</Text> */}
+          <Text>{t('requirementTemplate.new.typePrompt')}</Text>
 
-          <VStack display={'contents'}>
+          <Flex gap={8} w="full" as="section">
             <AsyncRadioGroup
               valueField="id"
+              label={t('requirementTemplate.fields.permitType')}
               fetchOptions={fetchPermitTypeOptions}
               fieldName={'permitTypeId'}
-              question={t('requirementTemplate.new.programQuestion')}
             />
-            <Flex
-              bg="greys.grey03"
-              p={4}
-              border="1px solid"
-              borderColor="greys.grey02"
-              borderRadius="sm"
-              width="100%"
-              direction="column"
-            >
-              <Text>{t('requirementTemplate.new.applicationName')}</Text>
-              <TextFormControl mt={2} fieldName={'description'} required maxWidth="224px" />
-            </Flex>
-          </VStack>
+            <AsyncRadioGroup
+              valueField="id"
+              label={t('requirementTemplate.fields.activity')}
+              fetchOptions={fetchActivityOptions}
+              fieldName={'activityId'}
+            />
+          </Flex>
           <Controller
             name="firstNations"
             control={control}
@@ -128,7 +121,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
             >
               {t('requirementTemplate.new.createButton')}
             </Button>
-            <Button variant="secondary" ml={8} isDisabled={isSubmitting} onClick={() => navigate(-1)}>
+            <Button variant="secondary" isDisabled={isSubmitting} onClick={() => navigate(-1)}>
               {t('ui.cancel')}
             </Button>
           </Flex>
