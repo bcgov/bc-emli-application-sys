@@ -475,13 +475,13 @@ en:
         message: '%{error_message}'
       create_success:
         title: ''
-        message: 'New permit application started!'
+        message: 'New Application started!'
       update_error:
         title: Error
         message: '%{error_message}'
       save_success:
         title: ''
-        message: 'Permit application successfully updated!'
+        message: 'Application successfully updated!'
       assign_collaborator_success:
         title: ''
         message: 'Collaborator successfully assigned!'
@@ -490,10 +490,10 @@ en:
         message: '%{error_message}'
       update_version_succes:
         title: ''
-        message: 'Permit application successfully updated to new version!'
+        message: 'Application successfully updated to new version!'
       save_draft_success:
         title: ''
-        message: 'Permit application successfully saved as draft!'
+        message: 'Application successfully saved as draft!'
       submit_error:
         title: Error
         message: '%{error_message}'
