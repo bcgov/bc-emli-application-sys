@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_03_24_221729) do
+ActiveRecord::Schema[7.1].define(version: 2025_03_25_234457) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -343,7 +343,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_03_24_221729) do
   end
 
   create_table "requirement_templates", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "activity_id", null: false
+    t.uuid "activity_id"
     t.uuid "permit_type_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -356,11 +356,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_03_24_221729) do
     t.uuid "copied_from_id"
     t.uuid "assignee_id"
     t.boolean "public", default: false
+    t.uuid "program_id"
     t.index ["activity_id"], name: "index_requirement_templates_on_activity_id"
     t.index ["assignee_id"], name: "index_requirement_templates_on_assignee_id"
     t.index ["copied_from_id"], name: "index_requirement_templates_on_copied_from_id"
     t.index ["discarded_at"], name: "index_requirement_templates_on_discarded_at"
     t.index ["permit_type_id"], name: "index_requirement_templates_on_permit_type_id"
+    t.index ["program_id"], name: "index_requirement_templates_on_program_id"
     t.index ["type"], name: "index_requirement_templates_on_type"
   end
 
@@ -744,6 +746,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_03_24_221729) do
   add_foreign_key "requirement_template_sections", "requirement_templates"
   add_foreign_key "requirement_templates", "permit_classifications", column: "activity_id"
   add_foreign_key "requirement_templates", "permit_classifications", column: "permit_type_id"
+  add_foreign_key "requirement_templates", "programs"
   add_foreign_key "requirement_templates", "requirement_templates", column: "copied_from_id"
   add_foreign_key "requirement_templates", "users", column: "assignee_id"
   add_foreign_key "requirements", "requirement_blocks"

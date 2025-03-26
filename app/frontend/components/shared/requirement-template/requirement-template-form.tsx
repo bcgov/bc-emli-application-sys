@@ -1,20 +1,25 @@
-import { Button, Checkbox, Flex, Link, Text, VStack } from "@chakra-ui/react"
-import { observer } from "mobx-react-lite"
-import React, { useState } from "react"
-import { Controller, FormProvider, useForm, useWatch } from "react-hook-form"
-import { Trans, useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
-import { IRequirementTemplate } from "../../../models/requirement-template"
-import { useMst } from "../../../setup/root"
-import { ERequirementTemplateType } from "../../../types/enums"
-import { TCreateRequirementTemplateFormData } from "../../../types/types"
-import { AsyncRadioGroup } from "../base/inputs/async-radio-group"
-import { TextFormControl } from "../form/input-form-control"
+import { Button, Checkbox, Flex, Link, Text, VStack } from '@chakra-ui/react';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
+import { Trans, useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { IRequirementTemplate } from '../../../models/requirement-template';
+import { useMst } from '../../../setup/root';
+import { EProgramUserGroupType, ERequirementTemplateType } from '../../../types/enums';
+import { TCreateRequirementTemplateFormData } from '../../../types/types';
+import { AsyncRadioGroup } from '../base/inputs/async-radio-group';
+import { TextFormControl } from '../form/input-form-control';
 import { HStack } from '../../domains/step-code/checklist/pdf-content/shared/h-stack';
-
+import { useSearch } from '../../../hooks/use-search';
 interface IRequirementTemplateFormProps {
   type: ERequirementTemplateType;
   onSuccess: (createdRequirementTemplate: IRequirementTemplate) => void;
+}
+
+interface IOption<T> {
+  value: T;
+  label: string;
 }
 
 export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequirementTemplateFormProps) => {
@@ -23,8 +28,36 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
     requirementTemplateStore: { createRequirementTemplate, copyRequirementTemplate },
     permitClassificationStore: { fetchPermitTypeOptions, fetchActivityOptions },
   } = useMst();
+  const { programStore } = useMst();
+  const {
+    tablePrograms,
+    currentPage,
+    totalPages,
+    totalCount,
+    countPerPage,
+    handleCountPerPageChange,
+    handlePageChange,
+    isSearching,
+  } = programStore;
 
+  useSearch(programStore);
   const [copyExisting, setCopyExisting] = useState(false);
+
+  const fetchUserGroupTypeOptions = async (): Promise<IOption<string>[]> => {
+    return Object.keys(EProgramUserGroupType).map((key) => {
+      const value = EProgramUserGroupType[key as keyof typeof EProgramUserGroupType];
+      return { value: key, label: value };
+    });
+  };
+
+  const fetchPrograms = async (): Promise<IOption<string>[]> => {
+    return tablePrograms.map((program) => {
+      return {
+        value: program.id,
+        label: program.programName || 'No Program Name',
+      };
+    });
+  };
 
   const formMethods = useForm<TCreateRequirementTemplateFormData>({
     mode: 'onChange',
@@ -32,7 +65,9 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
       description: '',
       firstNations: false,
       permitTypeId: null,
-      activityId: null,
+      // activityId: null,
+      programId: null,
+      nickname: '',
     },
   });
 
@@ -63,20 +98,20 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
     <FormProvider {...formMethods}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <VStack alignItems={'flex-start'} spacing={5} gap={8} w={'full'} h={'full'}>
-          {/* <Text>{t('requirementTemplate.new.typePrompt')}</Text> */}
-
           <VStack display={'contents'}>
+            {tablePrograms.length > 0 && (
+              <AsyncRadioGroup
+                fetchOptions={fetchPrograms}
+                fieldName={'programId'}
+                question={t('requirementTemplate.new.programQuestion')}
+              />
+            )}
+
             <AsyncRadioGroup
               valueField="id"
+              question={t('requirementTemplate.fields.userGroupType')}
               fetchOptions={fetchPermitTypeOptions}
               fieldName={'permitTypeId'}
-              question={t('requirementTemplate.new.programQuestion')}
-            />
-            <AsyncRadioGroup
-              valueField="id"
-              label={t('requirementTemplate.fields.activity')}
-              fetchOptions={fetchActivityOptions}
-              fieldName={'activityId'}
             />
             <Flex
               bg="greys.grey03"
@@ -88,10 +123,11 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
               direction="column"
             >
               <Text>{t('requirementTemplate.new.applicationName')}</Text>
-              <TextFormControl mt={2} fieldName={'description'} required maxWidth="224px" />
+              <TextFormControl mt={2} fieldName={'nickname'} required maxWidth="224px" />
             </Flex>
           </VStack>
-          <Controller
+
+          {/* <Controller
             name="firstNations"
             control={control}
             defaultValue={false}
@@ -104,26 +140,35 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
                       <Link
                         isExternal
                         href="https://services.aadnc-aandc.gc.ca/ILRS_Public/Home/Home.aspx?ReturnUrl=%2filrs_public%2f"
-                      ></Link>
+                      />
                     ),
                   }}
                 />
               </Checkbox>
             )}
-          />
-          {firstNationsChecked && (
+          /> */}
+          {/* {firstNationsChecked && (
             <Checkbox isChecked={copyExisting} onChange={(e) => setCopyExisting(e.target.checked)}>
               {t('requirementTemplate.new.copyExistingByClassifications')}
             </Checkbox>
-          )}
+          )} */}
 
-          <Flex direction="column" as="section" w="full">
+          <Flex
+            bg="greys.grey03"
+            p={4}
+            border="1px solid"
+            borderColor="greys.grey02"
+            borderRadius="sm"
+            width="100%"
+            direction="column"
+          >
             <TextFormControl label={t('requirementTemplate.fields.description')} fieldName={'description'} required />
-            <Text fontSize="sm" color="border.base">
+            <Text fontSize="sm" color="border.base" mt={4}>
               {t('requirementTemplate.new.descriptionHelpText')}
             </Text>
           </Flex>
 
+          {/* Buttons */}
           <Flex gap={4}>
             <Button
               variant="primary"

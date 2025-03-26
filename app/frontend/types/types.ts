@@ -195,135 +195,136 @@ export interface IDenormalizedRequirementTemplateSection {
 }
 
 export interface IDenormalizedTemplate {
-  id: string
-  label: string
-  description?: string
-  permitType: IPermitType
-  activity: IActivity
-  requirementTemplateSections: IDenormalizedRequirementTemplateSection[]
+  id: string;
+  label: string;
+  description?: string;
+  nickname: string;
+  permitType: IPermitType;
+  activity: IActivity;
+  requirementTemplateSections: IDenormalizedRequirementTemplateSection[];
 }
 
 export interface ICompareRequirementsBoxData {
-  id?: string
-  class?: string
-  label: string
-  diffSectionLabel: string
+  id?: string;
+  class?: string;
+  label: string;
+  diffSectionLabel: string;
 }
 
 export interface ICompareRequirementsBoxDiff {
-  added: ICompareRequirementsBoxData[]
-  removed: ICompareRequirementsBoxData[]
-  changed: ICompareRequirementsBoxData[]
+  added: ICompareRequirementsBoxData[];
+  removed: ICompareRequirementsBoxData[];
+  changed: ICompareRequirementsBoxData[];
 }
 
 export interface IErrorsBoxData {
-  id: string
-  label: string
-  class: string
+  id: string;
+  label: string;
+  class: string;
 }
 
 interface IStepCodeBuildingCharacteristicSummarySelectOptions {
   performanceTypes: {
-    windowsGlazedDoors: EWindowsGlazedDoorsPerformanceType[]
-    doors: EDoorsPerformanceType[]
-    spaceHeatingCooling: ESpaceHeatingCoolingPerformanceType[]
-    hotWater: EHotWaterPerformanceType[]
-  }
-  fossilFuelsPresence: EFossilFuelsPresence[]
+    windowsGlazedDoors: EWindowsGlazedDoorsPerformanceType[];
+    doors: EDoorsPerformanceType[];
+    spaceHeatingCooling: ESpaceHeatingCoolingPerformanceType[];
+    hotWater: EHotWaterPerformanceType[];
+  };
+  fossilFuelsPresence: EFossilFuelsPresence[];
 }
 
 export interface IStepCodeSelectOptions {
-  compliancePaths: EStepCodeCompliancePath[]
-  airtightnessValues: EStepCodeAirtightnessValue[]
-  epcTestingTargetTypes: EStepCodeEPCTestingTargetType[]
-  permitApplications: Partial<IEnergySavingsApplication>[]
-  buildingTypes: EStepCodeBuildingType[]
-  buildingCharacteristicsSummary: IStepCodeBuildingCharacteristicSummarySelectOptions
-  energySteps: EEnergyStep[]
-  zeroCarbonSteps: EZeroCarbonStep[]
+  compliancePaths: EStepCodeCompliancePath[];
+  airtightnessValues: EStepCodeAirtightnessValue[];
+  epcTestingTargetTypes: EStepCodeEPCTestingTargetType[];
+  permitApplications: Partial<IEnergySavingsApplication>[];
+  buildingTypes: EStepCodeBuildingType[];
+  buildingCharacteristicsSummary: IStepCodeBuildingCharacteristicSummarySelectOptions;
+  energySteps: EEnergyStep[];
+  zeroCarbonSteps: EZeroCarbonStep[];
 }
 
 export interface IRequirementBlockCustomization {
-  tip?: string
-  enabledElectiveFieldIds?: Array<string>
-  enabledElectiveFieldReasons?: Record<string, EEnabledElectiveFieldReason>
+  tip?: string;
+  enabledElectiveFieldIds?: Array<string>;
+  enabledElectiveFieldReasons?: Record<string, EEnabledElectiveFieldReason>;
 }
 
 export interface ITemplateCustomization {
-  requirementBlockChanges?: Record<string, IRequirementBlockCustomization>
+  requirementBlockChanges?: Record<string, IRequirementBlockCustomization>;
 }
 
 export interface IDownloadableFile {
-  fileUrl: string
-  fileName: string
-  fileSize: number
+  fileUrl: string;
+  fileName: string;
+  fileSize: number;
 }
 
 export interface IEULA {
-  id: string
-  content: string
-  createdAt: Date
+  id: string;
+  content: string;
+  createdAt: Date;
 }
 
 export interface ILicenseAgreement {
-  id: string
-  agreement: IEULA
-  acceptedAt: Date
+  id: string;
+  agreement: IEULA;
+  acceptedAt: Date;
 }
 
 export interface IEnergySavingsApplicationComplianceUpdate {
-  id: string
-  frontEndFormUpdate: Object
-  formattedComplianceData: Object
+  id: string;
+  frontEndFormUpdate: Object;
+  formattedComplianceData: Object;
 }
 
 export interface IPermitNotificationObjectData {
-  templateVersionId?: string
-  previousTemplateVersionId?: string
-  requirementTemplateId?: string
-  permitApplicationId?: string
-  permitApplicationNumber?: string
+  templateVersionId?: string;
+  previousTemplateVersionId?: string;
+  requirementTemplateId?: string;
+  permitApplicationId?: string;
+  permitApplicationNumber?: string;
   // Add future notification data here
 }
 
 export interface IRequirementTemplateNotificationObjectData {
-  requirementTemplateId?: string
+  requirementTemplateId?: string;
 }
 
 export interface ITemplateVersionNotificationObjectData {
-  templateVersionId?: string
+  templateVersionId?: string;
 }
 
 export interface IPermitCollaborationNotificationObjectData {
-  permitApplicationId?: string
-  collaboratorType?: ECollaboratorType
-  assignedRequirementBlockName?: string
+  permitApplicationId?: string;
+  collaboratorType?: ECollaboratorType;
+  assignedRequirementBlockName?: string;
 }
 
 export interface IPermitBlockStatusReadyNotificationObjectData {
-  permitApplicationId?: string
-  collaborationType: ECollaborationType
-  requirementBlockName?: string
+  permitApplicationId?: string;
+  collaborationType: ECollaborationType;
+  requirementBlockName?: string;
 }
 
 export interface IMissingRequirementsMappingNotificationObjectData {
-  templateVersionId: string
+  templateVersionId: string;
 }
 
 export interface INotification {
-  id: string
-  actionType: ENotificationActionType
-  actionText: string
+  id: string;
+  actionType: ENotificationActionType;
+  actionText: string;
   objectData?:
     | IPermitNotificationObjectData
     | IMissingRequirementsMappingNotificationObjectData
     | IPermitCollaborationNotificationObjectData
     | ITemplateVersionNotificationObjectData
-    | IRequirementTemplateNotificationObjectData
+    | IRequirementTemplateNotificationObjectData;
 }
 
 export interface ITemplateVersionUpdate {
-  status: ETemplateVersionStatus
+  status: ETemplateVersionStatus;
 }
 
 export type TSocketEventData =
@@ -331,212 +332,214 @@ export type TSocketEventData =
   | IEnergySavingsApplicationSupportingDocumentsUpdate
   | IPermitBlockStatus
   | INotification
-  | ITemplateVersionUpdate
+  | ITemplateVersionUpdate;
 
 export interface IEnergySavingsApplicationSupportingDocumentsUpdate {
-  id: string
-  supportingDocuments: IEnergySavingsApplication["supportingDocuments"]
-  missingPdfs: string[]
-  zipfileSize: null | number
-  zipfileName: null | string
-  zipfileUrl: null | string
+  id: string;
+  supportingDocuments: IEnergySavingsApplication['supportingDocuments'];
+  missingPdfs: string[];
+  zipfileSize: null | number;
+  zipfileName: null | string;
+  zipfileUrl: null | string;
 }
 
 export interface IUserPushPayload {
-  data: TSocketEventData
-  domain: ESocketDomainTypes
-  eventType: ESocketEventTypes | EPermitApplicationSocketEventTypes
+  data: TSocketEventData;
+  domain: ESocketDomainTypes;
+  eventType: ESocketEventTypes | EPermitApplicationSocketEventTypes;
   meta: {
-    lastReadAt: number
-    totalPages: number
-    unreadCount: number
-  }
+    lastReadAt: number;
+    totalPages: number;
+    unreadCount: number;
+  };
 }
 
 export type TSiteWideMessageConfiguration = {
-  displaySitewideMessage: boolean
-  sitewideMessage: string | null
-}
+  displaySitewideMessage: boolean;
+  sitewideMessage: string | null;
+};
 
 export interface IContact {
-  firstName: string
-  lastName: string
-  email?: string
-  phone?: string
-  cell?: string
-  address?: string
-  organization?: string
-  businessName?: string
-  businessLicense?: string
-  professionalAssociation?: string
-  professionalNumber?: string
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  cell?: string;
+  address?: string;
+  organization?: string;
+  businessName?: string;
+  businessLicense?: string;
+  professionalAssociation?: string;
+  professionalNumber?: string;
 }
 
 export type TConditional = {
-  show: boolean
-  when: string
-  eq: string
-}
+  show: boolean;
+  when: string;
+  eq: string;
+};
 
 export interface ILinkItem {
-  href: string
-  title: string
-  descrption: string
-  show: boolean
+  href: string;
+  title: string;
+  descrption: string;
+  show: boolean;
 }
 
 export interface IHelpLinkItems {
-  getStartedLinkItem: ILinkItem
-  bestPracticesLinkItem: ILinkItem
-  dictionaryLinkItem: ILinkItem
-  userGuideLinkItem: ILinkItem
+  getStartedLinkItem: ILinkItem;
+  bestPracticesLinkItem: ILinkItem;
+  dictionaryLinkItem: ILinkItem;
+  userGuideLinkItem: ILinkItem;
 }
 
 interface ICommonAutoComplianceModuleConfiguration<EModule extends EAutoComplianceModule> {
-  module: EModule
-  type: EAutoComplianceType
-  label: string
-  availableOnInputTypes: ERequirementType[]
-  defaultSettings?: Object
+  module: EModule;
+  type: EAutoComplianceType;
+  label: string;
+  availableOnInputTypes: ERequirementType[];
+  defaultSettings?: Object;
 }
 
 type TAutoComplianceValueExtractorTypeConfiguration<EModule extends EAutoComplianceModule> =
   ICommonAutoComplianceModuleConfiguration<EModule> & {
-    type: EAutoComplianceType.externalValueExtractor | EAutoComplianceType.internalValueExtractor
+    type: EAutoComplianceType.externalValueExtractor | EAutoComplianceType.internalValueExtractor;
     availableFields: Array<
       IOption<string> & {
-        availableOnInputTypes: ERequirementType[]
+        availableOnInputTypes: ERequirementType[];
       }
-    >
-  }
+    >;
+  };
 
 type TAutoComplianceOptionsMapperTypeConfiguration<EModule extends EAutoComplianceModule> =
   ICommonAutoComplianceModuleConfiguration<EModule> & {
-    type: EAutoComplianceType.externalOptionsMapper
-    mappableExternalOptions: Array<IOption<string>>
-  }
+    type: EAutoComplianceType.externalOptionsMapper;
+    mappableExternalOptions: Array<IOption<string>>;
+  };
 
 export interface IDigitalSealValidatorModuleConfiguration
   extends ICommonAutoComplianceModuleConfiguration<EAutoComplianceModule.DigitalSealValidator> {}
 
 export interface IParcelInfoExtractorModuleConfiguration
   extends TAutoComplianceValueExtractorTypeConfiguration<EAutoComplianceModule.ParcelInfoExtractor> {
-  type: EAutoComplianceType.externalValueExtractor
+  type: EAutoComplianceType.externalValueExtractor;
 }
 
 export interface IEnergySavingsApplicationModuleConfiguration
   extends TAutoComplianceValueExtractorTypeConfiguration<EAutoComplianceModule.PermitApplication> {
-  type: EAutoComplianceType.internalValueExtractor
+  type: EAutoComplianceType.internalValueExtractor;
 }
 
 export type TValueExtractorAutoComplianceModuleConfiguration =
   | IParcelInfoExtractorModuleConfiguration
-  | IEnergySavingsApplicationModuleConfiguration
+  | IEnergySavingsApplicationModuleConfiguration;
 
 export interface IHistoricSiteModuleConfiguration
   extends TAutoComplianceOptionsMapperTypeConfiguration<EAutoComplianceModule.HistoricSite> {}
 
-export type TOptionsMapperAutoComplianceModuleConfiguration = IHistoricSiteModuleConfiguration
+export type TOptionsMapperAutoComplianceModuleConfiguration = IHistoricSiteModuleConfiguration;
 
 export type TAutoComplianceModuleConfigurations = {
-  [EAutoComplianceModule.DigitalSealValidator]: IDigitalSealValidatorModuleConfiguration
-  [EAutoComplianceModule.ParcelInfoExtractor]: IParcelInfoExtractorModuleConfiguration
-  [EAutoComplianceModule.PermitApplication]: IEnergySavingsApplicationModuleConfiguration
-  [EAutoComplianceModule.HistoricSite]: IHistoricSiteModuleConfiguration
-}
+  [EAutoComplianceModule.DigitalSealValidator]: IDigitalSealValidatorModuleConfiguration;
+  [EAutoComplianceModule.ParcelInfoExtractor]: IParcelInfoExtractorModuleConfiguration;
+  [EAutoComplianceModule.PermitApplication]: IEnergySavingsApplicationModuleConfiguration;
+  [EAutoComplianceModule.HistoricSite]: IHistoricSiteModuleConfiguration;
+};
 
 export type TAutoComplianceModuleConfiguration =
-  TAutoComplianceModuleConfigurations[keyof TAutoComplianceModuleConfigurations]
+  TAutoComplianceModuleConfigurations[keyof TAutoComplianceModuleConfigurations];
 
 export interface IJurisdictionFilters {
-  name?: string
-  type?: EJurisdictionTypes
-  userId?: string
+  name?: string;
+  type?: EJurisdictionTypes;
+  userId?: string;
 }
 
 export interface IJurisdictionSearchFilters {
-  submissionInboxSetUp?: boolean
+  submissionInboxSetUp?: boolean;
 }
 
 export interface IEnergySavingsApplicationSearchFilters {
-  requirementTemplateId?: string
-  templateVersionId?: string
-  status?: EPermitApplicationStatus[]
+  requirementTemplateId?: string;
+  templateVersionId?: string;
+  status?: EPermitApplicationStatus[];
 }
 
 export interface ITemplateVersionDiff {
-  added: IRequirement[]
-  removed: IRequirement[]
-  changed: IRequirement[]
+  added: IRequirement[];
+  removed: IRequirement[];
+  changed: IRequirement[];
 }
 
-export type TLocalSystemMapping = string
+export type TLocalSystemMapping = string;
 
 export interface ISimplifiedRequirementsMap {
   [requirementBlockSku: string]: {
-    [requirementCode: string]: TLocalSystemMapping
-  }
+    [requirementCode: string]: TLocalSystemMapping;
+  };
 }
 
 export interface IRequirementMap {
-  id: string
-  requirementCode: string
-  local_system_mapping?: TLocalSystemMapping
+  id: string;
+  requirementCode: string;
+  local_system_mapping?: TLocalSystemMapping;
 }
 
-export type TChakraColor = keyof Theme["colors"]
+export type TChakraColor = keyof Theme['colors'];
 
 export interface ILinkData {
-  text: string
-  href: string
+  text: string;
+  href: string;
 }
 
 export interface IRevisionRequest {
-  id: string
-  reasonCode: string
-  requirementJson: IFormIORequirement
-  submissionJson: any
-  comment: string
-  user?: IMinimalFrozenUser
-  createdAt: number
+  id: string;
+  reasonCode: string;
+  requirementJson: IFormIORequirement;
+  submissionJson: any;
+  comment: string;
+  user?: IMinimalFrozenUser;
+  createdAt: number;
 }
 
 export interface IMinimalFrozenUser {
-  id: string
-  email: string
-  role: EUserRoles
-  firstName: string
-  lastName: string
-  organization?: string
-  certified: boolean
-  discardedAt?: Date
+  id: string;
+  email: string;
+  role: EUserRoles;
+  firstName: string;
+  lastName: string;
+  organization?: string;
+  certified: boolean;
+  discardedAt?: Date;
 }
 
 export interface ISubmissionVersion {
-  id: string
-  formJson: IFormJson
-  submissionData: ISubmissionData
-  revisionRequests: IRevisionRequest[]
-  viewedAt?: Date
-  createdAt: number
+  id: string;
+  formJson: IFormJson;
+  submissionData: ISubmissionData;
+  revisionRequests: IRevisionRequest[];
+  viewedAt?: Date;
+  createdAt: number;
 }
 
 export interface IPermitTypeRequiredStep {
-  id?: string
-  default: boolean
-  permitTypeId: string
-  permitTypeLabel?: string
-  energyStepRequired: EEnergyStep
-  zeroCarbonStepRequired: EZeroCarbonStep
+  id?: string;
+  default: boolean;
+  permitTypeId: string;
+  permitTypeLabel?: string;
+  energyStepRequired: EEnergyStep;
+  zeroCarbonStepRequired: EZeroCarbonStep;
 }
 
 export type TCreateRequirementTemplateFormData = {
-  description: string
-  firstNations?: boolean
-  permitTypeId: string
-  activityId: string
-  type: string
-}
+  description: string;
+  firstNations?: boolean;
+  permitTypeId: string;
+  // activityId: string;
+  programId: string;
+  nickname: string;
+  type: string;
+};
 
 export interface ICopyRequirementTemplateFormData extends Partial<TCreateRequirementTemplateFormData> {
   id?: string

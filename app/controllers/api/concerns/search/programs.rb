@@ -22,13 +22,15 @@ module Api::Concerns::Search::Programs
     # Conditionally add the `where` clause
     search_params[
       :where
-    ] = program_where_clause unless program_where_clause.nil?
+    ] = program_where_clause if program_where_clause.present?
+
     @search =
       Program.search(
         program_query,
         **search_params,
         includes: Program::BASE_INCLUDES
       )
+
   end
 
   private
@@ -44,16 +46,15 @@ module Api::Concerns::Search::Programs
   end
 
   def program_query
-    if program_search_params[:query].present?
-      program_search_params[:query]
-    else
-      "*"
-    end
+    program_search_params[:query].present? ? program_search_params[:query] : "*"
   end
 
   def program_order
     if (sort = program_search_params[:sort])
-      { sort[:field] => { order: sort[:direction] } }
+      field = sort[:field].to_sym if sort[:field].present?
+      direction = sort[:direction].to_sym if sort[:direction].present?
+      # Only use unmapped_type if the field is truly numeric
+      { field => { order: direction || :asc, unmapped_type: "long" } }
     else
       { program_name: { order: :asc } }
     end

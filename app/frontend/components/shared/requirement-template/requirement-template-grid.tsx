@@ -47,10 +47,11 @@ export const RequirementTemplateGrid: React.FC<RequirementTemplateGridProps> = o
         ) : (
           tableRequirementTemplates.map((rt) => (
             <Box key={rt.id} className={'requirements-template-grid-row'} role={'row'} display={'contents'}>
-              <SearchGridItem fontWeight="bold">{rt.permitType.name}</SearchGridItem>
+              <SearchGridItem fontWeight="bold">{rt.nickname ?? 'N/A'}</SearchGridItem>
               <SearchGridItem>{rt.description}</SearchGridItem>
               <SearchGridItem>
-                <YesNoTag boolean={rt.firstNations} />
+                {/* <YesNoTag boolean={rt.firstNations} /> */}
+                {rt.program?.programName}
               </SearchGridItem>
               <SearchGridItem>
                 {' '}

@@ -44,22 +44,21 @@ export const TemplateVersionsSidebar = observer(function TemplateVersionsSidebar
 
   return (
     <>
-      <Button size="sm" variant={"primary"} onClick={onOpen}>
-        {t("requirementTemplate.versionSidebar.triggerButton")}
+      <Button size="sm" variant={'primary'} onClick={onOpen}>
+        {t('requirementTemplate.versionSidebar.triggerButton')}
       </Button>
       <Drawer isOpen={isOpen} placement="right" onClose={onClose} finalFocusRef={btnRef}>
         <DrawerOverlay />
         <DrawerContent maxW="644px">
           <DrawerCloseButton />
-          <DrawerHeader mt={4} px={8} borderBottom="1px solid" borderColor={"border.light"}>
-            <Text as="h2" fontWeight={700} fontSize={"2xl"}>
-              {t("requirementTemplate.versionSidebar.title")}
+          <DrawerHeader mt={4} px={8} borderBottom="1px solid" borderColor={'border.light'}>
+            <Text as="h2" fontWeight={700} fontSize={'2xl'}>
+              {t('requirementTemplate.versionSidebar.title')}
             </Text>
-            <Text
-              fontSize={"md"}
-              fontWeight={700}
-              mt={2}
-            >{`${t("requirementTemplate.versionSidebar.subtitlePrefix")} ${requirementTemplate.label}`}</Text>
+            <Text fontSize={'md'} fontWeight={700} mt={2}>
+              {' '}
+              {requirementTemplate.nickname}
+            </Text>
           </DrawerHeader>
 
           <DrawerBody py={10} px={8}>
@@ -74,8 +73,8 @@ export const TemplateVersionsSidebar = observer(function TemplateVersionsSidebar
               </Box>
               {!requirementTemplate.isDiscarded && (
                 <Box>
-                  <Text as="h3" fontSize={"xl"} fontWeight={700} mb={2}>
-                    {t("requirementTemplate.versionSidebar.listTitles.draft")}
+                  <Text as="h3" fontSize={'xl'} fontWeight={700} mb={2}>
+                    {t('requirementTemplate.versionSidebar.listTitles.draft')}
                   </Text>
 
                   <VersionCard
@@ -99,14 +98,14 @@ export const TemplateVersionsSidebar = observer(function TemplateVersionsSidebar
               {requirementTemplate.publishedTemplateVersion && (
                 <Menu>
                   <MenuButton as={Button} aria-label="Options" variant="secondary" rightIcon={<Export />} px={2}>
-                    {t("ui.export")}
+                    {t('ui.export')}
                   </MenuButton>
 
                   <MenuList>
                     <MenuItem onClick={requirementTemplate.publishedTemplateVersion.downloadRequirementSummary}>
-                      <HStack spacing={2} fontSize={"sm"}>
+                      <HStack spacing={2} fontSize={'sm'}>
                         <FileCsv size={24} />
-                        <Text as={"span"}>{t("requirementTemplate.export.downloadSummaryCsv")}</Text>
+                        <Text as={'span'}>{t('requirementTemplate.export.downloadSummaryCsv')}</Text>
                       </HStack>
                     </MenuItem>
                   </MenuList>
@@ -117,7 +116,7 @@ export const TemplateVersionsSidebar = observer(function TemplateVersionsSidebar
         </DrawerContent>
       </Drawer>
     </>
-  )
+  );
 })
 
 const VersionsList = observer(function VersionsList({

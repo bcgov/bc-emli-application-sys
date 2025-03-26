@@ -296,7 +296,7 @@ class Api::RequirementTemplatesController < Api::ApplicationController
     # eager loading of associations as most of the time we return the extended view
     @requirement_template =
       RequirementTemplate.includes(
-        :activity,
+        # :activity,
         :permit_type,
         :published_template_version,
         :last_three_deprecated_template_versions,
@@ -323,7 +323,8 @@ class Api::RequirementTemplatesController < Api::ApplicationController
         :nickname,
         :assignee_id,
         :first_nations,
-        :activity_id,
+        :program_id,
+        # :activity_id,
         :permit_type_id,
         :type,
         :public,

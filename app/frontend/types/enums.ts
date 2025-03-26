@@ -129,7 +129,7 @@ export enum EUserSortFields {
 }
 
 export enum ERequirementTemplateSortFields {
-  applicationName = 'application_name',
+  templateName = 'template_name',
   // activity = 'activity',
   // firstNations = 'first_nations',
   description = 'description',

@@ -89,6 +89,7 @@ export const ProgramStoreModel = types
           },
         }),
       );
+      console.log('response====', response);
       if (response.ok) {
         self.mergeUpdateAll(response.data.data, 'programMap');
         self.tablePrograms = cast(response.data.data.map((program) => program.id));
