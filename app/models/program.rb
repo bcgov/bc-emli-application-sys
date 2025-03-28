@@ -48,6 +48,7 @@ class Program < ApplicationRecord
   before_save :sanitize_html_fields
 
   # after_create :create_permit_type_required_steps
+  after_commit :reindex_program
 
   accepts_nested_attributes_for :contacts
   accepts_nested_attributes_for :permit_type_submission_contacts,
@@ -127,6 +128,10 @@ class Program < ApplicationRecord
     else
       all
     end
+  end
+
+  def reindex_program
+    Program.reindex
   end
 
   def search_data

@@ -123,7 +123,6 @@ export const RequirementTemplateStoreModel = types
     }),
 
     createRequirementTemplate: flow(function* (formData: TCreateRequirementTemplateFormData) {
-      console.log('formData-----', formData);
       const { ok, data: response } = yield* toGenerator(self.environment.api.createRequirementTemplate(formData));
 
       if (ok) {

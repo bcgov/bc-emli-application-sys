@@ -60,7 +60,6 @@ export const NewProgramScreen = observer(() => {
   const { isSubmitting, isValid } = formState;
 
   const onSubmit = async (formData) => {
-    console.log('formData', formData);
     const submissionData = { ...formData, programID: formData.programID?.id };
     const createdProgram = (await createProgram(submissionData)) as IProgram;
     if (createdProgram) {

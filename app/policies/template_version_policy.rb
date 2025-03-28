@@ -6,7 +6,7 @@ class TemplateVersionPolicy < ApplicationPolicy
 
   def show?
     if sandbox.nil? || sandbox.published?
-      !record.scheduled? || user.super_admin?
+      !record.scheduled? || user.system_admin?
     elsif sandbox.scheduled?
       record.scheduled?
     end
@@ -17,7 +17,7 @@ class TemplateVersionPolicy < ApplicationPolicy
   end
 
   def download_summary_csv?
-    user.super_admin?
+    user.system_admin?
   end
 
   def download_customization_csv?
@@ -58,7 +58,7 @@ class TemplateVersionPolicy < ApplicationPolicy
           .where.not(status: "deprecated")
       if sandbox.present?
         template_versions.for_sandbox(sandbox)
-      elsif user.super_admin? || user.review_manager? ||
+      elsif user.system_admin? || user.review_manager? ||
             user.regional_review_manager?
         template_versions
       else
