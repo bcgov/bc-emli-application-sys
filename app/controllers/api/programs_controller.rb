@@ -1,9 +1,9 @@
 class Api::ProgramsController < Api::ApplicationController
-  include Api::Concerns::Search::Jurisdictions
+  include Api::Concerns::Search::Programs
   include Api::Concerns::Search::JurisdictionUsers
   include Api::Concerns::Search::PermitApplications
 
-  before_action :set_jurisdiction,
+  before_action :set_program,
                 only: %i[
                   show
                   update
@@ -20,7 +20,8 @@ class Api::ProgramsController < Api::ApplicationController
   # skip_after_action :verify_authorized, only: :create
 
   def index
-    perform_search
+    perform_search_programs
+
     authorized_results = apply_search_authorization(@search.results)
     render_success authorized_results,
                    nil,
@@ -30,7 +31,7 @@ class Api::ProgramsController < Api::ApplicationController
                        total_count: @search.total_count,
                        current_page: @search.current_page
                      },
-                     blueprint: JurisdictionBlueprint,
+                     blueprint: ProgramBlueprint,
                      blueprint_opts: {
                        view: :base
                      }
@@ -114,7 +115,6 @@ class Api::ProgramsController < Api::ApplicationController
   # POST /api/program
   def create
     # class_to_use = Jurisdiction.class_for_locality_type(program_params[:locality_type])
-
     @program = Program.build(program_params)
 
     authorize @program
@@ -206,6 +206,7 @@ class Api::ProgramsController < Api::ApplicationController
     params.require(:program).permit(
       :program_name,
       :funded_by,
+      :user_group_type,
       :description_html
     )
   end
@@ -214,12 +215,9 @@ class Api::ProgramsController < Api::ApplicationController
     params.require(:external_api_enabled)
   end
 
-  def set_jurisdiction
+  def set_program
     @jurisdiction =
-      Jurisdiction
-        .includes(Jurisdiction::BASE_INCLUDES)
-        .friendly
-        .find(params[:id])
+      Program.includes(Program::BASE_INCLUDES).friendly.find(params[:id])
   rescue ActiveRecord::RecordNotFound => e
     render_error("misc.not_found_error", { status: :not_found }, e)
   end

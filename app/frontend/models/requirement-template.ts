@@ -1,68 +1,69 @@
-import { addDays, isAfter, isSameDay, max, startOfDay } from "date-fns"
-import { utcToZonedTime } from "date-fns-tz"
-import { t } from "i18next"
-import { Instance, flow, toGenerator, types } from "mobx-state-tree"
-import pluck from "ramda/src/pluck"
-import { vancouverTimeZone } from "../constants"
-import { withEnvironment } from "../lib/with-environment"
-import { withRootStore } from "../lib/with-root-store"
-import { EFlashMessageStatus, ERequirementTemplateType, EVisibility } from "../types/enums"
-import { EarlyAccessPreviewModel } from "./early-access-preview"
-import { IActivity, IPermitType } from "./permit-classification"
-import { RequirementTemplateSectionModel } from "./requirement-template-section"
-import { TemplateVersionModel } from "./template-version"
-import { UserModel } from "./user"
+import { addDays, isAfter, isSameDay, max, startOfDay } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
+import { t } from 'i18next';
+import { Instance, flow, toGenerator, types } from 'mobx-state-tree';
+import pluck from 'ramda/src/pluck';
+import { vancouverTimeZone } from '../constants';
+import { withEnvironment } from '../lib/with-environment';
+import { withRootStore } from '../lib/with-root-store';
+import { EFlashMessageStatus, ERequirementTemplateType, EVisibility } from '../types/enums';
+import { EarlyAccessPreviewModel } from './early-access-preview';
+import { IActivity, IPermitType } from './permit-classification';
+import { RequirementTemplateSectionModel } from './requirement-template-section';
+import { TemplateVersionModel } from './template-version';
+import { UserModel } from './user';
+import { IProgram } from './program';
 
 function preProcessor(snapshot) {
   const processedSnapShot = {
     ...snapshot,
     publishedTemplateVersion: snapshot.publishedTemplateVersion?.id,
-  }
+  };
 
   if (Array.isArray(snapshot.earlyAccessPreviews)) {
     processedSnapShot.earlyAccessPreviews = pluck(
-      "id",
+      'id',
       snapshot.earlyAccessPreviews as Array<{
-        id: "string"
-      }>
-    )
+        id: 'string';
+      }>,
+    );
   }
 
   if (Array.isArray(snapshot.scheduledTemplateVersions)) {
     processedSnapShot.scheduledTemplateVersions = pluck(
-      "id",
+      'id',
       snapshot.scheduledTemplateVersions as Array<{
-        id: "string"
-      }>
-    )
+        id: 'string';
+      }>,
+    );
   }
 
   if (Array.isArray(snapshot.deprecatedTemplateVersions)) {
     processedSnapShot.deprecatedTemplateVersions = pluck(
-      "id",
+      'id',
       snapshot.deprecatedTemplateVersions as Array<{
-        id: "string"
-      }>
-    )
+        id: 'string';
+      }>,
+    );
   }
 
   if (snapshot.requirementTemplateSections) {
     processedSnapShot.requirementTemplateSectionMap = snapshot.requirementTemplateSections.reduce((acc, section) => {
-      acc[section.id] = section
-      return acc
-    }, {})
+      acc[section.id] = section;
+      return acc;
+    }, {});
     processedSnapShot.sortedRequirementTemplateSections = snapshot.requirementTemplateSections.map(
-      (section) => section.id
-    )
-    processedSnapShot.isFullyLoaded = true
+      (section) => section.id,
+    );
+    processedSnapShot.isFullyLoaded = true;
   }
 
-  return processedSnapShot
+  return processedSnapShot;
 }
 
 export const RequirementTemplateModel = types.snapshotProcessor(
   types
-    .model("RequirementTemplateModel", {
+    .model('RequirementTemplateModel', {
       id: types.identifier,
       label: types.string,
       nickname: types.maybeNull(types.string),
@@ -76,6 +77,7 @@ export const RequirementTemplateModel = types.snapshotProcessor(
       assignee: types.maybeNull(types.safeReference(UserModel)),
       permitType: types.frozen<IPermitType>(),
       activity: types.frozen<IActivity>(),
+      program: types.frozen<IProgram>(),
       formJson: types.frozen<IRequirementTemplateFormJson>(),
       discardedAt: types.maybeNull(types.Date),
       firstNations: types.boolean,
@@ -92,140 +94,140 @@ export const RequirementTemplateModel = types.snapshotProcessor(
     .extend(withEnvironment())
     .views((self) => ({
       get isDiscarded() {
-        return self.discardedAt !== null
+        return self.discardedAt !== null;
       },
       get nextAvailableScheduleDate() {
         // Get tomorrow's date in Vancouver time zone, starting from midnight
-        const tomorrow = addDays(startOfDay(utcToZonedTime(new Date(), vancouverTimeZone)), 1)
+        const tomorrow = addDays(startOfDay(utcToZonedTime(new Date(), vancouverTimeZone)), 1);
 
         // If no scheduled versions are available, return tomorrow's date
         if (self.scheduledTemplateVersions.length === 0) {
-          return tomorrow
+          return tomorrow;
         }
 
         // Get the latest scheduled date in Vancouver time zone
         const latestDate = max(
           self.scheduledTemplateVersions.map((version) =>
-            startOfDay(utcToZonedTime(new Date(version.versionDate), vancouverTimeZone))
-          )
-        )
+            startOfDay(utcToZonedTime(new Date(version.versionDate), vancouverTimeZone)),
+          ),
+        );
 
         // Compare the latest date with tomorrow
         if (isAfter(latestDate, tomorrow) || isSameDay(latestDate, tomorrow)) {
           // If the latest date is after or the same day as tomorrow, return the date after the latest date
-          return addDays(latestDate, 1)
+          return addDays(latestDate, 1);
         } else {
           // Otherwise, return tomorrow's date
-          return tomorrow
+          return tomorrow;
         }
       },
       hasRequirementSection(id: string) {
-        return self.requirementTemplateSectionMap.has(id)
+        return self.requirementTemplateSectionMap.has(id);
       },
       getRequirementSectionById(id: string) {
-        return self.requirementTemplateSectionMap.get(id)
+        return self.requirementTemplateSectionMap.get(id);
       },
       getScheduledTemplateVersionById(id: string) {
-        return self.scheduledTemplateVersions.find((version) => version.id === id)
+        return self.scheduledTemplateVersions.find((version) => version.id === id);
       },
       get lastThreeDeprecatedTemplateVersions() {
-        return self.deprecatedTemplateVersions.slice(0, 3)
+        return self.deprecatedTemplateVersions.slice(0, 3);
       },
       get numberSharedWith() {
         // TODO
-        return 0
+        return 0;
       },
       get isEarlyAccess() {
-        return self.type === ERequirementTemplateType.EarlyAccessRequirementTemplate
+        return self.type === ERequirementTemplateType.EarlyAccessRequirementTemplate;
       },
     }))
     .views((self) => ({
       get numberOfPreviewers() {
-        return self.earlyAccessPreviews.length
+        return self.earlyAccessPreviews.length;
       },
     }))
     .actions((self) => ({
       setIsFullyLoaded(val: boolean) {
-        self.isFullyLoaded = val
+        self.isFullyLoaded = val;
       },
       addDeprecatedTemplateVersionReference(templateVersionId: string) {
-        self.deprecatedTemplateVersions.unshift(templateVersionId)
-        self.deprecatedTemplateVersions.sort((a, b) => b.versionDate.getTime() - a.versionDate.getTime())
+        self.deprecatedTemplateVersions.unshift(templateVersionId);
+        self.deprecatedTemplateVersions.sort((a, b) => b.versionDate.getTime() - a.versionDate.getTime());
       },
       removeScheduledTemplateVersion(templateVersionId: string) {
-        const templateVersion = self.getScheduledTemplateVersionById(templateVersionId)
+        const templateVersion = self.getScheduledTemplateVersionById(templateVersionId);
 
         if (!templateVersion) {
-          return
+          return;
         }
-        self.scheduledTemplateVersions.remove(templateVersion)
+        self.scheduledTemplateVersions.remove(templateVersion);
       },
     }))
     .actions((self) => ({
       unscheduleTemplateVersion: flow(function* (templateVersionId: string) {
-        const templateVersion = self.getScheduledTemplateVersionById(templateVersionId)
+        const templateVersion = self.getScheduledTemplateVersionById(templateVersionId);
 
         if (!templateVersion) {
-          return false
+          return false;
         }
 
-        const updateSuccessful = yield* toGenerator(templateVersion.unschedule())
+        const updateSuccessful = yield* toGenerator(templateVersion.unschedule());
 
         if (updateSuccessful) {
-          self.addDeprecatedTemplateVersionReference(templateVersionId)
-          self.removeScheduledTemplateVersion(templateVersionId)
+          self.addDeprecatedTemplateVersionReference(templateVersionId);
+          self.removeScheduledTemplateVersion(templateVersionId);
         }
 
-        return updateSuccessful
+        return updateSuccessful;
       }),
       destroy: flow(function* () {
-        const response = yield self.environment.api.destroyRequirementTemplate(self.id)
-        return response.ok
+        const response = yield self.environment.api.destroyRequirementTemplate(self.id);
+        return response.ok;
       }),
       restore: flow(function* () {
-        const response = yield self.environment.api.restoreRequirementTemplate(self.id)
-        return response.ok
+        const response = yield self.environment.api.restoreRequirementTemplate(self.id);
+        return response.ok;
       }),
       invitePreviewersByEmail: flow(function* (emails: string[]) {
-        if (!self.isEarlyAccess) return
+        if (!self.isEarlyAccess) return;
 
-        const response = yield self.environment.api.invitePreviewers(self.id, { emails })
+        const response = yield self.environment.api.invitePreviewers(self.id, { emails });
 
         if (response.data.meta.failedEmails.length > 0) {
-          const failedEmails = response.data.meta.failedEmails // Assuming this is an array of strings
-          const markdownList = failedEmails.map((email) => `- ${email.email} **(${email.error})**`).join("\n")
+          const failedEmails = response.data.meta.failedEmails; // Assuming this is an array of strings
+          const markdownList = failedEmails.map((email) => `- ${email.email} **(${email.error})**`).join('\n');
 
           self.rootStore.uiStore.flashMessage.show(
             EFlashMessageStatus.warning,
-            t("earlyAccessRequirementTemplate.index.inviteToPreviewPartialSuccess"),
+            t('earlyAccessRequirementTemplate.index.inviteToPreviewPartialSuccess'),
             markdownList, // Pass the markdown-formatted list as description
             30000,
-            true
-          )
+            true,
+          );
         }
         if (response.ok) {
-          const templateData = response.data.data
-          templateData.isFullyLoaded = true
+          const templateData = response.data.data;
+          templateData.isFullyLoaded = true;
 
-          self.rootStore.requirementTemplateStore.mergeUpdate(templateData, "requirementTemplateMap")
+          self.rootStore.requirementTemplateStore.mergeUpdate(templateData, 'requirementTemplateMap');
 
-          return self
+          return self;
         }
       }),
     })),
   {
     preProcessor,
-  }
-)
+  },
+);
 
 export interface IRequirementTemplate extends Instance<typeof RequirementTemplateModel> {}
 
 export interface IRequirementTemplateFormJson {
-  id: string
-  legend: string
-  key: string
-  label: string
-  input: boolean
-  tableView: boolean
-  components: any[] // Todo: define component type
+  id: string;
+  legend: string;
+  key: string;
+  label: string;
+  input: boolean;
+  tableView: boolean;
+  components: any[]; // Todo: define component type
 }

@@ -215,7 +215,7 @@ class Api::JurisdictionsController < Api::ApplicationController
       :name,
       :type,
       :user_id,
-      # :locality_type,
+      :locality_type,
       :address,
       :regional_district_id,
       :description_html,

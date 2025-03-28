@@ -127,6 +127,10 @@ export class Api {
     return this.client.get<ApiResponse<IUser>>(`/invitations/${token}`);
   }
 
+  async searchPrograms(params?: TSearchParams<EJurisdictionSortFields, IJurisdictionSearchFilters>) {
+    return this.client.post<IJurisdictionResponse>('/programs/search', params);
+  }
+
   async searchJurisdictions(params?: TSearchParams<EJurisdictionSortFields, IJurisdictionSearchFilters>) {
     return this.client.post<IJurisdictionResponse>('/jurisdictions/search', params);
   }
@@ -185,12 +189,11 @@ export class Api {
   }
 
   async createJurisdiction(params) {
-    return this.client.post<ApiResponse<IJurisdiction>>('/juridictions', { jurisdiction: params });
+    return this.client.post<ApiResponse<IJurisdiction>>('/jurisdictions', { jurisdiction: params });
   }
 
   async createProgram(params) {
-    const response = await this.client.post<ApiResponse<IProgram>>('/programs', { program: params });
-    return response;
+    return this.client.post<ApiResponse<IProgram>>('/programs', { program: params });
   }
 
   async updateJurisdiction(id, params) {

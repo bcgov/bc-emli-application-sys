@@ -323,6 +323,7 @@ class Api::RequirementTemplatesController < Api::ApplicationController
         :nickname,
         :assignee_id,
         :first_nations,
+        :program_id,
         :activity_id,
         :permit_type_id,
         :type,

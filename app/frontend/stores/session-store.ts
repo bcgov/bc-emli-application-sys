@@ -28,6 +28,7 @@ export const SessionStoreModel = types
   }))
   .actions((self) => ({
     handleLogin(response, opts = { redirectToRoot: false }) {
+      console.log('Login response', response.ok);
       if (response.ok) {
         const user = response.data.data
         self.loggedIn = true
