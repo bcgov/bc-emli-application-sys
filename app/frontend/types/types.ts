@@ -535,7 +535,7 @@ export type TCreateRequirementTemplateFormData = {
   description: string;
   firstNations?: boolean;
   permitTypeId: string;
-  // activityId: string;
+  activityId: string;
   programId: string;
   nickname: string;
   type: string;

@@ -3,6 +3,7 @@ class RequirementTemplate < ApplicationRecord
     published_template_version
     permit_type
     last_three_deprecated_template_versions
+    activity
     scheduled_template_versions
   ]
 
@@ -10,7 +11,7 @@ class RequirementTemplate < ApplicationRecord
              word_start: %i[description current_version permit_type],
              text_middle: %i[current_version description]
 
-  # belongs_to :activity, optional: false
+  belongs_to :activity, optional: true
   belongs_to :program, optional: true, foreign_key: "program_id"
   belongs_to :permit_type, optional: false
   belongs_to :copied_from, class_name: "RequirementTemplate", optional: true
@@ -220,7 +221,7 @@ class RequirementTemplate < ApplicationRecord
       first_nations: first_nations,
       current_version: published_template_version&.version_date,
       permit_type: permit_type.name,
-      # activity: activity.name,
+      activity: nil,
       discarded: discarded_at.present?,
       assignee: assignee&.name,
       visibility: visibility,

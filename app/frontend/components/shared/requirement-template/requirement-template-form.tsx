@@ -65,7 +65,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
       description: '',
       firstNations: false,
       permitTypeId: null,
-      // activityId: null,
+      activityId: null,
       programId: null,
       nickname: '',
     },
