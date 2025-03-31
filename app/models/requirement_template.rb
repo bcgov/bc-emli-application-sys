@@ -7,11 +7,12 @@ class RequirementTemplate < ApplicationRecord
     scheduled_template_versions
   ]
 
-  searchkick searchable: %i[description current_version permit_type activity],
-             word_start: %i[description current_version permit_type activity],
+  searchkick searchable: %i[description current_version permit_type],
+             word_start: %i[description current_version permit_type],
              text_middle: %i[current_version description]
 
-  belongs_to :activity, optional: false
+  belongs_to :activity, optional: true
+  belongs_to :program, optional: true, foreign_key: "program_id"
   belongs_to :permit_type, optional: false
   belongs_to :copied_from, class_name: "RequirementTemplate", optional: true
 
@@ -108,7 +109,7 @@ class RequirementTemplate < ApplicationRecord
   end
 
   def label
-    "#{permit_type.name} | #{activity.name}#{first_nations ? " (" + I18n.t("activerecord.attributes.requirement_template.first_nations") + ")" : ""}"
+    "#{permit_type.name} |#{first_nations ? " (" + I18n.t("activerecord.attributes.requirement_template.first_nations") + ")" : ""}"
   end
 
   def key
@@ -214,12 +215,13 @@ class RequirementTemplate < ApplicationRecord
 
   def search_data
     {
+      program_id: program_id,
       nickname: nickname,
       description: description,
       first_nations: first_nations,
       current_version: published_template_version&.version_date,
       permit_type: permit_type.name,
-      activity: activity.name,
+      activity: nil,
       discarded: discarded_at.present?,
       assignee: assignee&.name,
       visibility: visibility,

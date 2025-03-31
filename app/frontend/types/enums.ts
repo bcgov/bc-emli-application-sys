@@ -107,6 +107,17 @@ export enum EProgramSortFields {
   templatesUsed = 'templates_used',
 }
 
+export enum EProgramExternalApiState {
+  jOn = 'j_on',
+  jOff = 'j_off',
+  gOff = 'g_off',
+}
+
+export enum EProgramUserGroupType {
+  contractors = 'Contractors',
+  participants = 'Participants',
+}
+
 export enum EUserSortFields {
   role = 'role',
   email = 'email',
@@ -116,8 +127,8 @@ export enum EUserSortFields {
 }
 
 export enum ERequirementTemplateSortFields {
-  applicationName = 'application_name',
-  // activity = 'activity',
+  templateName = 'template_name',
+  activity = 'activity',
   // firstNations = 'first_nations',
   description = 'description',
   jurisdictionsSize = 'jurisdictions_size',

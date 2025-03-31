@@ -37,6 +37,7 @@ export const RootStoreModel = types
     userStore: types.optional(UserStoreModel, {}),
     permitApplicationStore: types.optional(PermitApplicationStoreModel, {}),
     permitClassificationStore: types.optional(PermitClassificationStoreModel, {}),
+    programStore: types.optional(ProgramStoreModel, {}),
     jurisdictionStore: types.optional(JurisdictionStoreModel, {}),
     programStore: types.optional(ProgramStoreModel, {}),
     requirementBlockStore: types.optional(RequirementBlockStoreModel, {}),

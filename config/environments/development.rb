@@ -90,7 +90,7 @@ Rails.application.configure do
   }
 
   # when running in a docker container locally we need to be able to view the logs from the containers IP
-  config.web_console.whitelisted_ips = ['0.0.0.0/0'] 
+  config.web_console.whitelisted_ips = ["0.0.0.0/0"]
 
   config.after_initialize do
     Rails.application.routes.default_url_options =

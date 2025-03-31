@@ -143,6 +143,7 @@ Rails.application.routes.draw do
     end
 
     resources :programs, only: %i[index update show create] do
+      post "search", on: :collection, to: "programs#index"
     end
 
     resources :contacts, only: %i[create update destroy] do
