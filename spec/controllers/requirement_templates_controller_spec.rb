@@ -399,7 +399,7 @@ RSpec.describe Api::RequirementTemplatesController, type: :controller do
       }
     end
 
-    let(:invalid_attributes) { { activity_id: nil, permit_type_id: nil } }
+    let(:invalid_attributes) { {  permit_type_id: nil } }
 
     context "when the user is authenticated as a super admin" do
       before { sign_in super_admin }
@@ -452,7 +452,7 @@ RSpec.describe Api::RequirementTemplatesController, type: :controller do
 
           expect(response).to have_http_status(:bad_request)
           expect(json_response["meta"]["message"]["message"]).to eq(
-            "Activity must exist, Permit type must exist"
+            "Permit type must exist"
           )
 
           # Ensure that the description was not updated
