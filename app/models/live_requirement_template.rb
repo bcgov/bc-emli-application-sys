@@ -13,7 +13,7 @@ class LiveRequirementTemplate < RequirementTemplate
         .where.not(id: id)
         .find_by(
           permit_type_id: permit_type_id,
-          activity_id: activity_id,
+          # activity_id: activity_id,
           first_nations: first_nations,
           discarded_at: nil
         )
