@@ -1,6 +1,6 @@
 # Overview
 
-Welcome to the codebase for BC's Housing Permit Portal
+This Energy Savings Program application project is a clone of the BC Housing Permit Portal.
 
 ## Getting Started
 
