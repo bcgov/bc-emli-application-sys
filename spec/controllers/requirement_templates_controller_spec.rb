@@ -2,17 +2,17 @@
 require "rails_helper"
 
 RSpec.describe Api::RequirementTemplatesController, type: :controller do
-  let!(:sytem_admin) { create(:user, :sytem_admin) }
+  let!(:super_admin) { create(:user, :super_admin) }
   let!(:activity) { create(:activity) }
   let!(:permit_type) { create(:permit_type, code: :high_residential) }
   let!(:other_activity) { create(:activity, code: :demolition) }
   let!(:other_permit_type) { create(:permit_type) }
 
   # Move the sign_in into specific contexts to avoid affecting all tests
-  # before { sign_in sytem_admin }
+  # before { sign_in super_admin }
 
   describe "POST #create" do
-    before { sign_in sytem_admin }
+    before { sign_in super_admin }
 
     context "It creates a live requirement template" do
       it "returns a successful response with the correct data structure" do
@@ -163,7 +163,7 @@ RSpec.describe Api::RequirementTemplatesController, type: :controller do
       allow(EarlyAccess::PreviewManagementService).to receive(:new).and_return(
         service_instance
       )
-      sign_in sytem_admin
+      sign_in super_admin
     end
 
     context "when inviting previewers successfully" do
@@ -297,10 +297,10 @@ RSpec.describe Api::RequirementTemplatesController, type: :controller do
         end
       end
 
-      context "when authenticated as a sytem admin" do
-        let(:sytem_admin_user) { create(:user, :sytem_admin) }
+      context "when authenticated as a super admin" do
+        let(:super_admin_user) { create(:user, :super_admin) }
 
-        before { sign_in sytem_admin_user }
+        before { sign_in super_admin_user }
 
         it "allows access" do
           get :show, params: { id: private_template.id }
@@ -401,8 +401,8 @@ RSpec.describe Api::RequirementTemplatesController, type: :controller do
 
     let(:invalid_attributes) { { activity_id: nil, permit_type_id: nil } }
 
-    context "when the user is authenticated as a sytem admin" do
-      before { sign_in sytem_admin }
+    context "when the user is authenticated as a super admin" do
+      before { sign_in super_admin }
 
       context "with valid parameters" do
         it "updates the requirement template and returns a success response" do
