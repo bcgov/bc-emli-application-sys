@@ -37,6 +37,8 @@ RSpec.describe LiveRequirementTemplate, type: :model do
 
         it "is invalid" do
           # Step 3: Trigger validations
+          # This test is passing but the template id, created_at and updated_at is null for the duplicate record.
+          # It should be the same as the existing template. Need to figure out why
           expect(duplicate_template).not_to be_valid
           expect(duplicate_template.errors[:base]).to include(
             I18n.t(
