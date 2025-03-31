@@ -18,7 +18,7 @@ RSpec.describe LiveRequirementTemplate, type: :model do
           create(
             :live_requirement_template,
             permit_type: subject.permit_type,
-            activity: subject.activity,
+            activity: nil,
             first_nations: subject.first_nations,
             discarded_at: nil
           )
@@ -51,7 +51,7 @@ RSpec.describe LiveRequirementTemplate, type: :model do
           create(
             :live_requirement_template,
             permit_type: subject.permit_type,
-            activity: subject.activity,
+            activity: nil,
             first_nations: subject.first_nations,
             discarded_at: Time.current
           )
