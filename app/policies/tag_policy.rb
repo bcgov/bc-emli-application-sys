@@ -1,11 +1,11 @@
 class TagPolicy < ApplicationPolicy
   def index?
-    user.super_admin?
+    user.system_admin?
   end
 
   class Scope < Scope
     def resolve
-      [] unless user.super_admin?
+      [] unless user.system_admin?
 
       scope.joins(:taggings).all
     end
