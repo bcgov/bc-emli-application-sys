@@ -526,6 +526,9 @@ const options = {
             fundedBy: 'Funded by',
             nextStep: 'Next step is to invite users',
           },
+          edit: {
+            editProgram: 'Edit Program',
+          },
           fields: {
             reverseQualifiedName: 'Name',
             reviewManagersSize: 'Managers',

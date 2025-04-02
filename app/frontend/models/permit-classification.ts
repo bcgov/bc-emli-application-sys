@@ -16,12 +16,23 @@ export const PermitTypeModel = PermitClassificationModel.named("PermitTypeModel"
   // Additional properties specific to PermitType
 })
 
+export const UserTypeModel = PermitClassificationModel.named('UserTypeModel').props({
+  type: types.literal('UserType'),
+  // Additional properties specific to UserType
+});
+export const ProgramTypeModel = PermitClassificationModel.named('ProgramTypeModel').props({
+  type: types.literal('ProgramType'),
+  // Additional properties specific to ProgramType
+});
+
 // Subclass Model for Activity
-export const ActivityModel = PermitClassificationModel.named("ActivityModel").props({
-  type: types.literal("Activity"),
+export const ActivityModel = PermitClassificationModel.named('ActivityModel').props({
+  type: types.literal('Activity'),
   // Additional properties specific to Activity
-})
+});
 
 export interface IPermitClassification extends Instance<typeof PermitClassificationModel> {}
 export interface IPermitType extends Instance<typeof PermitTypeModel> {}
+export interface IProgramType extends Instance<typeof ProgramTypeModel> {}
+export interface IUserType extends Instance<typeof UserTypeModel> {}
 export interface IActivity extends Instance<typeof ActivityModel> {}

@@ -1,29 +1,17 @@
-import { Instance, flow, toGenerator, types } from "mobx-state-tree"
-import { withEnvironment } from "../lib/with-environment"
-import { withMerge } from "../lib/with-merge"
-import { withRootStore } from "../lib/with-root-store"
-import {
-  ActivityModel,
-  IActivity,
-  IPermitType,
-  IProgramType,
-  PermitTypeModel,
-  ProgramTypeModel,
-  UserTypeModel,
-} from '../models/permit-classification';
+import { Instance, flow, toGenerator, types } from 'mobx-state-tree';
+import { withEnvironment } from '../lib/with-environment';
+import { withMerge } from '../lib/with-merge';
+import { withRootStore } from '../lib/with-root-store';
+import { ActivityModel, IActivity, IPermitType, PermitTypeModel } from '../models/permit-classification';
 import { EPermitClassificationType } from '../types/enums';
 import { IOption } from '../types/types';
 
-export const PermitClassificationStoreModel = types
-  .model('PermitClassificationStore', {
-    permitTypeMap: types.map(PermitTypeModel),
-    programTypeMap: types.map(ProgramTypeModel),
-    userTypeMap: types.map(UserTypeModel),
+export const ProgramClassificationModel = types
+  .model('ProgramClassificationStore', {
+    programTypeMap: types.map(PermitTypeModel),
     activityMap: types.map(ActivityModel),
     isLoaded: types.optional(types.boolean, false),
     isPermitTypeLoading: types.optional(types.boolean, false),
-    isProgramTypeLoading: types.optional(types.boolean, false),
-    isUserTypeLoading: types.optional(types.boolean, false),
     isActivityLoading: types.optional(types.boolean, false),
   })
   .extend(withEnvironment())
@@ -32,11 +20,11 @@ export const PermitClassificationStoreModel = types
   .views((self) => ({
     // View to get a PermitType by id
     getPermitTypeById(id: string) {
-      return self.permitTypeMap.get(id);
+      return self.programTypeMap.get(id);
     },
     // View to get all PermitTypes as an array
     get permitTypes() {
-      return Array.from(self.permitTypeMap.values());
+      return Array.from(self.programTypeMap.values());
     },
     // View to get an Activity by id
     getActivityById(id: string) {
@@ -50,11 +38,11 @@ export const PermitClassificationStoreModel = types
   .actions((self) => ({
     // Action to add a new PermitType
     addPermitType(permitType: Instance<typeof PermitTypeModel>) {
-      self.permitTypeMap.put(permitType);
+      self.programTypeMap.put(permitType);
     },
     // Action to remove a PermitType
     removePermitType(id: string) {
-      self.permitTypeMap.delete(id);
+      self.programTypeMap.delete(id);
     },
     // Action to add a new Activity
     addActivity(activity: Instance<typeof ActivityModel>) {
@@ -67,9 +55,9 @@ export const PermitClassificationStoreModel = types
     fetchPermitClassifications: flow(function* () {
       const response: any = yield self.environment.api.fetchPermitClassifications();
       if (response.ok) {
-        const permitTypeData = response.data.data.filter((pc) => pc.type == EPermitClassificationType.PermitType);
+        const programTypeMap = response.data.data.filter((pc) => pc.type == EPermitClassificationType.PermitType);
         const activityData = response.data.data.filter((pc) => pc.type == EPermitClassificationType.Activity);
-        self.mergeUpdateAll(permitTypeData, 'permitTypeMap');
+        self.mergeUpdateAll(programTypeMap, 'permitTypeMap');
         self.mergeUpdateAll(activityData, 'activityMap');
       }
       self.isLoaded = true;
@@ -86,7 +74,7 @@ export const PermitClassificationStoreModel = types
       self.isPermitTypeLoading = true;
       const response = yield* toGenerator(
         self.environment.api.fetchPermitClassificationOptions(
-          EPermitClassificationType.UserType,
+          EPermitClassificationType.PermitType,
           publishedOnly,
           firstNations,
           null,
@@ -97,27 +85,6 @@ export const PermitClassificationStoreModel = types
       );
       self.isPermitTypeLoading = false;
       return (response?.data?.data ?? []) as IOption<IPermitType>[];
-    }),
-    fetchProgramTypeOptions: flow(function* (
-      publishedOnly = false,
-      firstNations = null,
-      pid = null,
-      jurisdictionId = null,
-    ) {
-      self.isProgramTypeLoading = true;
-      const response = yield* toGenerator(
-        self.environment.api.fetchPermitClassificationOptions(
-          EPermitClassificationType.ProgramType,
-          publishedOnly,
-          firstNations,
-          null,
-          null,
-          pid,
-          jurisdictionId,
-        ),
-      );
-      self.isProgramTypeLoading = false;
-      return (response?.data?.data ?? []) as IOption<IProgramType>[];
     }),
     fetchActivityOptions: flow(function* (publishedOnly = false, firstNations = null, permitTypeId = null) {
       self.isActivityLoading = true;
@@ -134,4 +101,4 @@ export const PermitClassificationStoreModel = types
     }),
   }));
 
-export interface IPermitClassificationStore extends Instance<typeof PermitClassificationStoreModel> {}
+export interface IProgramClassificationStore extends Instance<typeof ProgramClassificationModel> {}

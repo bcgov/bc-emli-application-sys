@@ -9,7 +9,7 @@ import { IIntegrationMapping } from '../../models/integration-mapping';
 import { IJurisdiction } from '../../models/jurisdiction';
 import { IJurisdictionTemplateVersionCustomization } from '../../models/jurisdiction-template-version-customization';
 import { IPermitApplication } from '../../models/energy-savings-application';
-import { IActivity, IPermitType } from '../../models/permit-classification';
+import { IActivity, IPermitType, IProgramType, IUserType } from '../../models/permit-classification';
 import { IPermitCollaboration } from '../../models/permit-collaboration';
 import { IRequirementTemplate } from '../../models/requirement-template';
 import { IStepCode } from '../../models/step-code';
@@ -139,6 +139,10 @@ export class Api {
     return this.client.get<ApiResponse<IJurisdiction>>(`/jurisdictions/${id}`);
   }
 
+  async fetchProgram(id) {
+    return this.client.get<ApiResponse<IProgram>>(`/programs/${id}`);
+  }
+
   async fetchPermitApplication(id: string, review?: boolean) {
     return this.client.get<ApiResponse<IPermitApplication>>(`/permit_applications/${id}`, { review });
   }
@@ -161,6 +165,12 @@ export class Api {
     });
   }
 
+  async fetchProgramOptions(filters: IJurisdictionFilters) {
+    return this.client.get<IOptionResponse>(`/programs/program_options`, {
+      program: { ...filters },
+    });
+  }
+
   async fetchPermitClassifications() {
     return this.client.get<IOptionResponse<IContact>>(`/permit_classifications`);
   }
@@ -174,7 +184,7 @@ export class Api {
     pid: string = null,
     jurisdictionId: string = null,
   ) {
-    return this.client.post<IOptionResponse<IPermitType | IActivity>>(
+    return this.client.post<IOptionResponse<IPermitType | IActivity | IProgramType | IUserType>>(
       `/permit_classifications/permit_classification_options`,
       {
         type,
@@ -198,6 +208,10 @@ export class Api {
 
   async updateJurisdiction(id, params) {
     return this.client.patch<ApiResponse<IJurisdiction>>(`/jurisdictions/${id}`, { jurisdiction: params });
+  }
+
+  async updateProgram(id, params) {
+    return this.client.patch<ApiResponse<IJurisdiction>>(`/programs/${id}`, { program: params });
   }
 
   async updateJurisdictionExternalApiEnabled(id: string, externalApiEnabled: boolean) {

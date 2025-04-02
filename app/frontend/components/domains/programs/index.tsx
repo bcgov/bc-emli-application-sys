@@ -15,6 +15,7 @@ import { ManageJurisdictionMenu } from '../../shared/jurisdiction/manage-jurisdi
 import { RouterLink } from '../../shared/navigation/router-link';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { GridHeaders } from './grid-header';
+import { ManageProgramMenu } from '../../shared/program/manage-program-menu';
 
 export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
   const { programStore } = useMst();
@@ -80,7 +81,7 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
                   <SearchGridItem>
                     <Flex justify="center" w="full" gap={3}>
                       <RouterLink to={`${j.slug}/users/invite`}>{t('user.invite')}</RouterLink>
-                      <ManageJurisdictionMenu jurisdiction={j} searchModel={programStore} />
+                      <ManageProgramMenu program={j} searchModel={programStore} />
                     </Flex>
                   </SearchGridItem>
                 </Box>
