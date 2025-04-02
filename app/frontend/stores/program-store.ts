@@ -70,6 +70,15 @@ export const ProgramStoreModel = types
         return response.data;
       }
     }),
+
+    updateProgram: flow(function* (id:string, formData: TCreateProgramFormData) {
+      const { ok, data: response } = yield* toGenerator(self.environment.api.updateProgram(id,formData));
+
+      if (ok) {
+        self.programMap.put(response.data);
+        return response.data;
+      }
+    }),
     searchPrograms: flow(function* (
       opts?: { reset?: boolean; page?: number; countPerPage?: number },
       submissionInboxSetUp?: boolean,

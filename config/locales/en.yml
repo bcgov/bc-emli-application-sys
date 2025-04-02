@@ -459,7 +459,7 @@ en:
         message: '%{error_message}'
       update_success:
         title: ''
-        message: 'Jurisdiction successfully updated!'
+        message: 'Program successfully updated!'
       external_api_enabled_success:
         title: ''
         message: 'Jurisdiction external api successfully enabled!'

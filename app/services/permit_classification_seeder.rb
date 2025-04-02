@@ -55,6 +55,38 @@ class PermitClassificationSeeder
           "Involves the systematic tearing down of buildings and other structures, including clearing debris and preparing the site for future construction or restoration activities.",
         enabled: true,
         type: "Activity"
+      },
+      {
+        name: "Internal",
+        code: "internal",
+        description:
+          "",
+        enabled: true,
+        type: "ProgramType"
+      },
+      {
+        name: "External",
+        code: "external",
+        description:
+          "",
+        enabled: true,
+        type: "ProgramType"
+      },
+      {
+        name: "Contractor",
+        code: "contractor",
+        description:
+          "",
+        enabled: true,
+        type: "UserType"
+      },
+      {
+        name: "Participant",
+        code: "participant",
+        description:
+          "",
+        enabled: true,
+        type: "UserType"
       }
     ]
 

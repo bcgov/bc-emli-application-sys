@@ -326,6 +326,8 @@ class Api::RequirementTemplatesController < Api::ApplicationController
         :program_id,
         :activity_id,
         :permit_type_id,
+        :program_type_id,
+        :user_type_id,
         :type,
         :public,
         requirement_template_sections_attributes: [

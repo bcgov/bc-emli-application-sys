@@ -13,10 +13,10 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { IProgram } from '../../../models/program';
 import { useMst } from '../../../setup/root';
 import { AsyncRadioGroup } from '../../shared/base/inputs/async-radio-group';
@@ -33,11 +33,12 @@ export type TCreateProgramFormData = {
 
 export const NewProgramScreen = observer(() => {
   const { t } = useTranslation();
+  const { id } = useParams();
   const [program, setProgram] = useState<IProgram>();
   const [useCustom, setUseCustom] = useState<boolean>(false);
 
   const {
-    programStore: { createProgram },
+    programStore: { createProgram, fetchProgram, updateProgram },
     permitClassificationStore: { fetchActivityOptions },
   } = useMst();
 
@@ -55,15 +56,41 @@ export const NewProgramScreen = observer(() => {
   });
 
   const navigate = useNavigate();
-  const { handleSubmit, formState, control, watch } = formMethods;
+  const { handleSubmit, formState, control, watch, setValue } = formMethods;
   const userGroupTypeWatch = watch('userGroupType');
   const { isSubmitting, isValid } = formState;
 
+  useEffect(() => {
+    if (id) {
+      (async () => {
+        try {
+          const fetchedProgram = await fetchProgram(id);
+          if (fetchedProgram) {
+            // setProgram(fetchedProgram);
+            setValue('programName', fetchedProgram.programName);
+            setValue('fundedBy', fetchedProgram.fundedBy);
+            setValue('userGroupType', fetchedProgram.userGroupType);
+          }
+        } catch (e) {
+          console.error(e.message);
+        }
+      })();
+    }
+  }, [id, fetchProgram, setValue]);
+
   const onSubmit = async (formData) => {
-    const submissionData = { ...formData, programID: formData.programID?.id };
-    const createdProgram = (await createProgram(submissionData)) as IProgram;
-    if (createdProgram) {
-      setProgram(createdProgram);
+    try {
+      if (id) {
+        await updateProgram(id, formData);
+      } else {
+        const createdProgram = await createProgram(formData);
+        if (createdProgram) {
+          setProgram(createdProgram);
+        }
+      }
+      navigate('/programs');
+    } catch (error) {
+      console.error('Error saving program:', error.message);
     }
   };
 
@@ -150,7 +177,7 @@ export const NewProgramScreen = observer(() => {
                     isLoading={isSubmitting}
                     loadingText={t('ui.loading')}
                   >
-                    {t('program.new.createButton')}
+                    {id ? 'Save' : t('program.new.createButton')}
                   </Button>
                   <Button variant="secondary" isDisabled={isSubmitting} onClick={() => navigate(-1)}>
                     {t('ui.cancel')}

@@ -1,6 +1,7 @@
 // Reference: https://auth0.com/blog/role-based-access-control-rbac-and-react-apps/#Role-Based-Access-Control-Example-in-React-Apps
 
 import { IJurisdiction } from "../models/jurisdiction"
+import { IProgram } from '../models/program';
 import { IUser } from "../models/user"
 import { EUserRoles } from "../types/enums"
 
@@ -12,48 +13,55 @@ const sharedDynamicRules = {
 }
 
 const reviewManagerRules = {
-  static: [...sharedStaticRules, "user:invite", "application:download", "user:updateRole"],
+  static: [...sharedStaticRules, 'user:invite', 'application:download', 'user:updateRole'],
   dynamic: {
     ...sharedDynamicRules,
-    "jurisdiction:manage": (currentUser: IUser, data: { jurisdiction: IJurisdiction }) =>
-      jurisdictionRule(currentUser, data),
+    // "jurisdiction:manage": (currentUser: IUser, data: { jurisdiction: IJurisdiction }) =>
+    //   jurisdictionRule(currentUser, data),
+    'program:manage': (currentUser: IUser, data: { program: IProgram }) => programRule(currentUser, data),
   },
-}
+};
 
 export const rules = {
   [EUserRoles.systemAdmin]: {
     static: [
       ...sharedStaticRules,
-      "jurisdiction:create",
-      "jurisdiction:manage",
-      "user:invite",
-      "requirementTemplate:manage",
+      'jurisdiction:create',
+      'jurisdiction:manage',
+      'program:manage',
+      'user:invite',
+      'requirementTemplate:manage',
     ],
     dynamic: { ...sharedDynamicRules },
   },
   [EUserRoles.adminManager]: reviewManagerRules,
   //[EUserRoles.regionalReviewManager]: reviewManagerRules,
-  
+
   [EUserRoles.admin]: {
-    static: [...sharedStaticRules, "user:view", "application:download"],
+    static: [...sharedStaticRules, 'user:view', 'application:download'],
     dynamic: { ...sharedDynamicRules },
   },
   [EUserRoles.participant]: {
     static: [...sharedStaticRules],
     dynamic: { ...sharedDynamicRules },
   },
-  ["anonymous"]: {
+  ['anonymous']: {
     static: [],
     dynamic: {},
   },
-}
+};
 
 const userRule = (currentUser: IUser, data: { user: IUser }) => {
-  const { user } = data
-  return currentUser ? currentUser.id === user.id : false
-}
+  const { user } = data;
+  return currentUser ? currentUser.id === user.id : false;
+};
 
 const jurisdictionRule = (currentUser: IUser, data: { jurisdiction: IJurisdiction }) => {
-  const { jurisdiction } = data
-  return currentUser ? currentUser.jurisdiction.id === jurisdiction.id : false
-}
+  const { jurisdiction } = data;
+  return currentUser ? currentUser.jurisdiction.id === jurisdiction.id : false;
+};
+
+const programRule = (currentUser: IUser, data: { program: IProgram }) => {
+  const { program } = data;
+  return currentUser ? currentUser.program.id === program.id : false;
+};

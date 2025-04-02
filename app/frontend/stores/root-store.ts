@@ -28,6 +28,7 @@ import { IStepCodeStore, StepCodeStoreModel } from './step-code-store';
 import { ITemplateVersionStoreModel, TemplateVersionStoreModel } from './template-version-store';
 import { IUIStore, UIStoreModel } from './ui-store';
 import { IUserStore, UserStoreModel } from './user-store';
+import { IProgramClassificationStore } from './program-user-classification-store';
 
 export const RootStoreModel = types
   .model('RootStoreModel')
@@ -39,7 +40,6 @@ export const RootStoreModel = types
     permitClassificationStore: types.optional(PermitClassificationStoreModel, {}),
     programStore: types.optional(ProgramStoreModel, {}),
     jurisdictionStore: types.optional(JurisdictionStoreModel, {}),
-    programStore: types.optional(ProgramStoreModel, {}),
     requirementBlockStore: types.optional(RequirementBlockStoreModel, {}),
     earlyAccessRequirementBlockStore: types.optional(EarlyAccessRequirementBlockStoreModel, {}),
     requirementTemplateStore: types.optional(RequirementTemplateStoreModel, {}),
@@ -106,6 +106,7 @@ export interface IRootStore extends IStateTreeNode {
   sessionStore: ISessionStore;
   permitApplicationStore: IEnergySavingsApplicationStore;
   permitClassificationStore: IPermitClassificationStore;
+  programClassificationStore: IProgramClassificationStore;
   jurisdictionStore: IJurisdictionStore;
   programStore: IProgramStore;
   userStore: IUserStore;

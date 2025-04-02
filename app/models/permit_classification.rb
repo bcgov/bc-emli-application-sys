@@ -14,6 +14,10 @@ class PermitClassification < ApplicationRecord
          addition_alteration_renovation
          site_alteration
          demolition
+         internal
+         external
+         participant
+         contractor
        ]
 
   def image_url

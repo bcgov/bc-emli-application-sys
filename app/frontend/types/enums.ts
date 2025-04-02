@@ -14,6 +14,8 @@ export enum EPreviewStatus {
 }
 
 export enum EPermitClassificationType {
+  ProgramType = 'ProgramType',
+  UserType = 'UserType',
   PermitType = 'PermitType',
   Activity = 'Activity',
 }
@@ -31,6 +33,10 @@ export enum EPermitClassificationCode {
   additionAlterationRenovation = 'addition_alteration_renovation',
   siteAlteration = 'site_alteration',
   demolition = 'demolition',
+  internal = 'internal',
+  external = 'external',
+  participant = 'participant',
+  contractor = 'contractor',
 }
 
 export enum EPermitApplicationStatus {
@@ -114,8 +120,8 @@ export enum EProgramExternalApiState {
 }
 
 export enum EProgramUserGroupType {
-  contractors = 'Contractors',
-  participants = 'Participants',
+  contractors = 'contractors',
+  participants = 'participants',
 }
 
 export enum EUserSortFields {

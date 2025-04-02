@@ -13,7 +13,9 @@ class RequirementTemplate < ApplicationRecord
 
   belongs_to :activity, optional: true
   belongs_to :program, optional: true, foreign_key: "program_id"
-  belongs_to :permit_type, optional: false
+  belongs_to :permit_type, optional: true
+  belongs_to :program_type, optional: true
+  belongs_to :user_type, optional: true
   belongs_to :copied_from, class_name: "RequirementTemplate", optional: true
 
   has_many :requirement_template_sections,
@@ -109,7 +111,7 @@ class RequirementTemplate < ApplicationRecord
   end
 
   def label
-    "#{permit_type.name} |#{first_nations ? " (" + I18n.t("activerecord.attributes.requirement_template.first_nations") + ")" : ""}"
+    ""
   end
 
   def key
@@ -220,7 +222,9 @@ class RequirementTemplate < ApplicationRecord
       description: description,
       first_nations: first_nations,
       current_version: published_template_version&.version_date,
-      permit_type: permit_type.name,
+      permit_type: nil,
+      program_type: program_type&.name,
+      user_type: user_type&.name,
       activity: nil,
       discarded: discarded_at.present?,
       assignee: assignee&.name,

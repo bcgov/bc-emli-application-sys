@@ -22,24 +22,27 @@ export const ManageJurisdictionMenu = observer(function ManageJurisdictionMenu<T
     <Can action="jurisdiction:manage" data={{ jurisdiction }}>
       <Menu>
         <MenuButton as={Button} aria-label="manage" variant="link">
-          {t("ui.manage")}
+          {t('ui.manage')}
         </MenuButton>
         <MenuList boxShadow="elevations.elevation04">
           <ManageMenuItem icon={<Info size={16} />} to={`${jurisdiction.slug}`}>
-            {t("jurisdiction.index.about")}
+            {t('program.edit.editProgram')}
+          </ManageMenuItem>
+          <ManageMenuItem icon={<Info size={16} />} to={`${jurisdiction.slug}`}>
+            {t('jurisdiction.index.about')}
           </ManageMenuItem>
           <ManageMenuItem icon={<Users size={16} />} to={`${jurisdiction.slug}/users`}>
-            {t("jurisdiction.index.users")}
+            {t('jurisdiction.index.users')}
           </ManageMenuItem>
           <ManageMenuItem icon={<Key size={16} />} to={`${jurisdiction.slug}/api-settings`}>
-            {t("jurisdiction.index.externalApiKeys")}
+            {t('jurisdiction.index.externalApiKeys')}
           </ManageMenuItem>
 
           <ManageMenuItem icon={<Export size={16} />} to={`${jurisdiction.slug}/export-templates`}>
-            {t("jurisdiction.index.exportTemplates")}
+            {t('jurisdiction.index.exportTemplates')}
           </ManageMenuItem>
         </MenuList>
       </Menu>
     </Can>
-  )
+  );
 })

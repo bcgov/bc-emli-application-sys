@@ -26,7 +26,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
   const { t } = useTranslation();
   const {
     requirementTemplateStore: { createRequirementTemplate, copyRequirementTemplate },
-    permitClassificationStore: { fetchPermitTypeOptions, fetchActivityOptions },
+    permitClassificationStore: { fetchProgramTypeOptions, fetchActivityOptions },
   } = useMst();
   const { programStore } = useMst();
   const {
@@ -65,6 +65,8 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
       description: '',
       firstNations: false,
       permitTypeId: null,
+      programTypeId: null,
+      userTypeId: null,
       activityId: null,
       programId: null,
       nickname: '',
@@ -110,8 +112,8 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
             <AsyncRadioGroup
               valueField="id"
               question={t('requirementTemplate.fields.userGroupType')}
-              fetchOptions={fetchPermitTypeOptions}
-              fieldName={'permitTypeId'}
+              fetchOptions={fetchProgramTypeOptions}
+              fieldName={'programTypeId'}
             />
             <Flex
               bg="greys.grey03"

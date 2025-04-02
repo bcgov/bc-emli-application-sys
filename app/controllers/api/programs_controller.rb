@@ -39,23 +39,23 @@ class Api::ProgramsController < Api::ApplicationController
   end
 
   def update
-    authorize @jurisdiction
+    authorize @program
     if program_params[:contacts_attributes]
       # Get current contact ids from the params
       payload_record_ids =
         program_params[:contacts_attributes].map { |c| c[:id] }
       # Mark contacts not included in the current payload for destruction
-      @jurisdiction.contacts.each do |contact|
+      @program.contacts.each do |contact|
         unless payload_record_ids.include?(contact.id.to_s)
           contact.mark_for_destruction
         end
       end
     end
-    if @jurisdiction.update(program_params)
-      render_success @jurisdiction,
+    if @program.update(program_params)
+      render_success @program,
                      "jurisdiction.update_success",
                      {
-                       blueprint: JurisdictionBlueprint,
+                       blueprint: ProgramBlueprint,
                        blueprint_opts: {
                          view: :base
                        }
@@ -64,25 +64,25 @@ class Api::ProgramsController < Api::ApplicationController
       render_error "jurisdiction.update_error",
                    message_opts: {
                      error_message:
-                       @jurisdiction.errors.full_messages.join(", ")
+                       @program.errors.full_messages.join(", ")
                    }
     end
   end
 
   def update_external_api_enabled
-    authorize @jurisdiction, :update_external_api_enabled?
+    authorize @program, :update_external_api_enabled?
 
     desired_enabled = update_external_api_enabled_params
 
     begin
-      @jurisdiction.update_external_api_state!(
+      @program.update_external_api_state!(
         enable_external_api: desired_enabled,
         allow_reset: current_user.super_admin?
       )
 
       # Determine the appropriate success message based on the new state
       message =
-        case @jurisdiction.external_api_state
+        case @program.external_api_state
         when "j_on"
           "jurisdiction.external_api_enabled_success"
         when "j_off", "g_off"
@@ -91,7 +91,7 @@ class Api::ProgramsController < Api::ApplicationController
           "jurisdiction.update_success"
         end
 
-      render_success @jurisdiction,
+      render_success @program,
                      message,
                      {
                        blueprint: JurisdictionBlueprint,
@@ -108,8 +108,9 @@ class Api::ProgramsController < Api::ApplicationController
 
   # GET /api/jurisdictions/:id
   def show
-    authorize @jurisdiction
-    render_success(@jurisdiction, nil, blueprint_opts: { view: :base })
+    logger.debug("Show method---#{@program}")
+    authorize @program
+    render_success(@program, nil, blueprint_opts: { view: :base })
   end
 
   # POST /api/program
@@ -138,7 +139,7 @@ class Api::ProgramsController < Api::ApplicationController
 
   # POST /api/jurisdictions/:id/users/search
   def search_users
-    authorize @jurisdiction
+    authorize @program
     perform_user_search
     authorized_results =
       apply_search_authorization(
@@ -162,7 +163,7 @@ class Api::ProgramsController < Api::ApplicationController
 
   # POST /api/jurisdictions/:id/permit_applications/search
   def search_permit_applications
-    authorize @jurisdiction
+    authorize @program
     perform_permit_application_search
     authorized_results =
       apply_search_authorization(@permit_application_search.results, "index")
@@ -216,7 +217,7 @@ class Api::ProgramsController < Api::ApplicationController
   end
 
   def set_program
-    @jurisdiction =
+    @program =
       Program.includes(Program::BASE_INCLUDES).friendly.find(params[:id])
   rescue ActiveRecord::RecordNotFound => e
     render_error("misc.not_found_error", { status: :not_found }, e)

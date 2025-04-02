@@ -1,0 +1,2 @@
+class UserType < PermitClassification
+end

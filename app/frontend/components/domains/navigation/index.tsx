@@ -350,6 +350,7 @@ const AppRoutes = observer(() => {
     <>
       {/*<Route path="/programs/new" element={<NewProgramsScreen />} />*/}
       <Route path="/programs/new" element={<NewProgramScreen />} />
+      <Route path="/programs/:id/edit" element={<NewProgramScreen />} />
       <Route path="/jurisdictions/new" element={<NewJurisdictionScreen />} />
       <Route path="/requirements-library" element={<RequirementsLibraryScreen />} />
       <Route path="/early-access/requirements-library" element={<EarlyAccessRequirementsLibraryScreen />} />
