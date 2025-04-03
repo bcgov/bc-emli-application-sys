@@ -25,7 +25,7 @@ export const RequirementTemplatesScreen = observer(function RequirementTemplate(
               {t('requirementTemplate.index.description')}
             </Text>
           </Box>
-          <RouterLinkButton to="new" variant={'primary'} minWidth="fit-content">
+          <RouterLinkButton to="new-template" variant={'primary'} minWidth="fit-content">
             {t('requirementTemplate.index.createButton')}
           </RouterLinkButton>
         </Flex>

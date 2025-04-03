@@ -12,15 +12,18 @@ import { AsyncRadioGroup } from '../base/inputs/async-radio-group';
 import { TextFormControl } from '../form/input-form-control';
 import { HStack } from '../../domains/step-code/checklist/pdf-content/shared/h-stack';
 import { useSearch } from '../../../hooks/use-search';
+import { AsyncSelect } from '../select/async-select';
+import { IOption } from '../../../types/types';
+
 interface IRequirementTemplateFormProps {
   type: ERequirementTemplateType;
   onSuccess: (createdRequirementTemplate: IRequirementTemplate) => void;
 }
 
-interface IOption<T> {
-  value: T;
-  label: string;
-}
+// interface IOption<T> {
+//   value: T;
+//   label: string;
+// }
 
 export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequirementTemplateFormProps) => {
   const { t } = useTranslation();
@@ -42,6 +45,12 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
 
   useSearch(programStore);
   const [copyExisting, setCopyExisting] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
+
+  // Handle the change in selected value
+  const handleChange = (option: IOption) => {
+    setSelectedOption(option);
+  };
 
   const fetchUserGroupTypeOptions = async (): Promise<IOption<string>[]> => {
     return Object.keys(EProgramUserGroupType).map((key) => {
@@ -111,7 +120,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
 
             <AsyncRadioGroup
               valueField="id"
-              question={t('requirementTemplate.fields.userGroupType')}
+              question={t('requirementTemplate.fields.audienceType')}
               fetchOptions={fetchProgramTypeOptions}
               fieldName={'programTypeId'}
             />

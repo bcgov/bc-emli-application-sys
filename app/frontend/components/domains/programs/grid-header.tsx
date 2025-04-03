@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMst } from '../../../setup/root';
-import { EJurisdictionSortFields } from '../../../types/enums';
+import { EJurisdictionSortFields, EProgramSortFields } from '../../../types/enums';
 import { ModelSearchInput } from '../../shared/base/model-search-input';
 import { GridHeader } from '../../shared/grid/grid-header';
 import { SortIcon } from '../../shared/sort-icon';
@@ -15,8 +15,8 @@ interface IGridHeadersProps {
 }
 
 export const GridHeaders = observer(function GridHeaders({ columns, span, includeActionColumn }: IGridHeadersProps) {
-  const { jurisdictionStore } = useMst();
-  const { sort, toggleSort, getSortColumnHeader } = jurisdictionStore;
+  const { programStore } = useMst();
+  const { sort, toggleSort, getSortColumnHeader } = programStore;
   const { t } = useTranslation();
 
   return (
@@ -31,7 +31,7 @@ export const GridHeaders = observer(function GridHeaders({ columns, span, includ
           align="center"
         >
           <Text role={'heading'}>{t('program.index.tableHeading')}</Text>
-          <ModelSearchInput searchModel={jurisdictionStore} />
+          <ModelSearchInput searchModel={programStore} />
         </GridItem>
       </Box>
       <Box display={'contents'} role={'row'}>
@@ -43,13 +43,13 @@ export const GridHeaders = observer(function GridHeaders({ columns, span, includ
                 as={'button'}
                 justifyContent={'space-between'}
                 cursor="pointer"
-                onClick={() => toggleSort(field as any as EJurisdictionSortFields)}
+                onClick={() => toggleSort(field as any as EProgramSortFields)}
                 borderRight={'1px solid'}
                 borderColor={'border.light'}
                 px={4}
               >
-                <Text textAlign="left">{getSortColumnHeader(field as any as EJurisdictionSortFields)}</Text>
-                <SortIcon<EJurisdictionSortFields> field={field as any as EJurisdictionSortFields} currentSort={sort} />
+                <Text textAlign="left">{getSortColumnHeader(field as any as EProgramSortFields)}</Text>
+                <SortIcon<EProgramSortFields> field={field as any as EProgramSortFields} currentSort={sort} />
               </Flex>
             </GridHeader>
           );

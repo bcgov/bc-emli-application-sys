@@ -234,7 +234,7 @@ export const NavBar = observer(function NavBar() {
       </Box>
       {!R.isEmpty(criticalNotifications) && <ActionRequiredBox notification={criticalNotifications[0]} />}
 
-      {!shouldHideSubNavbarForPath(path) && loggedIn && <SubNavBar />}
+      {!shouldHideSubNavbarForPath(path) && loggedIn && <SubNavBar borderBottom={'none'} />}
     </PopoverProvider>
   );
 });

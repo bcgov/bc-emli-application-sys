@@ -26,7 +26,7 @@ export const ManageProgramMenu = observer(function ManageProgramMenu<TSearchMode
           {t('ui.manage')}
         </MenuButton>
         <MenuList boxShadow="elevations.elevation04">
-          <ManageMenuItem icon={<Pencil size={16} />} to={`/programs/${program.id}/edit`}>
+          <ManageMenuItem icon={<Pencil size={16} />} to={`/programs/${program.programName}/edit?id=${program.id}`}>
             {t('program.edit.editProgram')}
           </ManageMenuItem>
           <ManageMenuItem icon={<Info size={16} />} to={`${program.slug}`}>

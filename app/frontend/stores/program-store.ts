@@ -71,8 +71,8 @@ export const ProgramStoreModel = types
       }
     }),
 
-    updateProgram: flow(function* (id:string, formData: TCreateProgramFormData) {
-      const { ok, data: response } = yield* toGenerator(self.environment.api.updateProgram(id,formData));
+    updateProgram: flow(function* (id: string, formData: TCreateProgramFormData) {
+      const { ok, data: response } = yield* toGenerator(self.environment.api.updateProgram(id, formData));
 
       if (ok) {
         self.programMap.put(response.data);

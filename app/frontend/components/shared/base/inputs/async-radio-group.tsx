@@ -49,7 +49,7 @@ export const AsyncRadioGroup = observer(
                 <RadioGroup
                   onChange={onChange}
                   value={value}
-                  bg="greys.grey03"
+                  bg="greys.grey10"
                   flex={1}
                   p={4}
                   border="1px solid"

@@ -204,10 +204,10 @@ const InputFormControl = ({
     <FormControl isInvalid={!!errorMessage} {...rest}>
       {label && (
         <HStack gap={0}>
-          <FormLabel>{label} </FormLabel>
+          <FormLabel mb={4}>{label} </FormLabel>
           {!required && showOptional && (
             <Text ml={-2} mb={2}>
-              {t("ui.optional")}
+              {t('ui.optional')}
             </Text>
           )}
           {LabelInfo && <LabelInfo />}
@@ -226,5 +226,5 @@ const InputFormControl = ({
         {rightElement && <InputRightElement pointerEvents="none">{rightElement}</InputRightElement>}
       </InputGroup>
     </FormControl>
-  )
+  );
 }
