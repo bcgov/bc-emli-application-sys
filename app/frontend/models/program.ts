@@ -16,10 +16,10 @@ export const ProgramModel = types
     id: types.identifier,
     fundedBy: types.maybeNull(types.string),
     programName: types.maybeNull(types.string),
-    userGroupType: types.optional(
-      types.enumeration(Object.values(EProgramUserGroupType)),
-      EProgramUserGroupType.participants,
-    ),
+    // userGroupType: types.optional(
+    //   types.enumeration(Object.values(EProgramUserGroupType)),
+    //   EProgramUserGroupType.participants,
+    // ),
     slug: types.maybeNull(types.string),
     submissionEmail: types.maybeNull(types.string),
     qualifier: types.maybeNull(types.string),

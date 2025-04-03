@@ -50,33 +50,36 @@ const DynamicBreadcrumb = observer(({ path }: IDynamicBreadcrumbProps) => {
 
   const [breadcrumbs, setBreadcrumbs] = useState<TBreadcrumbSegment[]>([])
 
-  const FRIENDLY_SLUG_RESOURCES = ["jurisdictions"]
+  const FRIENDLY_SLUG_RESOURCES = ['jurisdictions', 'programs'];
 
   useEffect(() => {
     // Get the current path and split into segments
-    // Filter out empty segments
-    const pathSegments = path.split("/").filter(Boolean)
+    const pathSegments = path.split('/').filter(Boolean);
+
     // Create breadcrumb segments
     const breadcrumbSegments = pathSegments.map((segment, index) => {
-      const href = "/" + pathSegments.slice(0, index + 1).join("/")
-      const previousSegment = pathSegments[index - 1]
-      const resourceNeeded = isUUID(segment) || FRIENDLY_SLUG_RESOURCES.includes(previousSegment)
+      const href = '/' + pathSegments.slice(0, index + 1).join('/');
+      const previousSegment = pathSegments[index - 1];
+      const resourceNeeded = isUUID(segment) || FRIENDLY_SLUG_RESOURCES.includes(previousSegment);
 
       const currentResourceMap = {
         jurisdictions: rootStore.jurisdictionStore.currentJurisdiction?.name,
-        "permit-applications": rootStore.permitApplicationStore.currentPermitApplication?.number,
-      }
+        'permit-applications': rootStore.permitApplicationStore.currentPermitApplication?.number,
+      };
 
-      const title = resourceNeeded
-        ? currentResourceMap[previousSegment] || segment
-        : //@ts-ignore
-          t(`site.breadcrumb.${toCamelCase(segment)}`)
+      const titleGot =
+        resourceNeeded && segment !== 'new-program'
+          ? currentResourceMap[previousSegment] || segment
+          : //@ts-ignore
+            t(`site.breadcrumb.${toCamelCase(segment)}`);
 
-      return { href, title }
-    })
+      let title = decodeURIComponent(titleGot);
 
-    setBreadcrumbs(breadcrumbSegments)
-  }, [path, rootStore.jurisdictionStore.currentJurisdiction])
+      return { href, title };
+    });
+
+    setBreadcrumbs(breadcrumbSegments);
+  }, [path, rootStore.jurisdictionStore.currentJurisdiction]);
 
   return <SiteBreadcrumbs breadcrumbs={breadcrumbs} />
 })

@@ -349,8 +349,8 @@ const AppRoutes = observer(() => {
   const superAdminOnlyRoutes = (
     <>
       {/*<Route path="/programs/new" element={<NewProgramsScreen />} />*/}
-      <Route path="/programs/new" element={<NewProgramScreen />} />
-      <Route path="/programs/:id/edit" element={<NewProgramScreen />} />
+      <Route path="/programs/new-program" element={<NewProgramScreen />} />
+      <Route path="/programs/:programName/edit" element={<NewProgramScreen />} />
       <Route path="/jurisdictions/new" element={<NewJurisdictionScreen />} />
       <Route path="/requirements-library" element={<RequirementsLibraryScreen />} />
       <Route path="/early-access/requirements-library" element={<EarlyAccessRequirementsLibraryScreen />} />
@@ -361,7 +361,7 @@ const AppRoutes = observer(() => {
         path="/early-access/requirement-templates/:requirementTemplateId/edit"
         element={<EditEarlyAccessRequirementTemplateScreen />}
       />
-      <Route path="/requirement-templates/new" element={<NewRequirementTemplateScreen />} />
+      <Route path="/requirement-templates/new-template" element={<NewRequirementTemplateScreen />} />
       <Route path="/requirement-templates/:requirementTemplateId/edit" element={<EditRequirementTemplateScreen />} />
       <Route path="/template-versions/:templateVersionId" element={<TemplateVersionScreen />} />
       <Route path="/configuration-management" element={<SiteConfigurationManagementScreen />} />

@@ -16,7 +16,7 @@ import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { IProgram } from '../../../models/program';
 import { useMst } from '../../../setup/root';
 import { AsyncRadioGroup } from '../../shared/base/inputs/async-radio-group';
@@ -28,12 +28,14 @@ import { EProgramUserGroupType } from '../../../types/enums';
 export type TCreateProgramFormData = {
   programName: string;
   fundedBy: string;
-  userGroupType: EProgramUserGroupType;
+  // userGroupType: EProgramUserGroupType;
 };
 
 export const NewProgramScreen = observer(() => {
   const { t } = useTranslation();
-  const { id } = useParams();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const id = queryParams.get('id');
   const [program, setProgram] = useState<IProgram>();
   const [useCustom, setUseCustom] = useState<boolean>(false);
 
@@ -51,13 +53,13 @@ export const NewProgramScreen = observer(() => {
     defaultValues: {
       programName: '',
       fundedBy: '',
-      userGroupType: EProgramUserGroupType.participants,
+      // userGroupType: EProgramUserGroupType.participants,
     },
   });
 
   const navigate = useNavigate();
   const { handleSubmit, formState, control, watch, setValue } = formMethods;
-  const userGroupTypeWatch = watch('userGroupType');
+  // const userGroupTypeWatch = watch('userGroupType');
   const { isSubmitting, isValid } = formState;
 
   useEffect(() => {
@@ -66,10 +68,9 @@ export const NewProgramScreen = observer(() => {
         try {
           const fetchedProgram = await fetchProgram(id);
           if (fetchedProgram) {
-            // setProgram(fetchedProgram);
             setValue('programName', fetchedProgram.programName);
             setValue('fundedBy', fetchedProgram.fundedBy);
-            setValue('userGroupType', fetchedProgram.userGroupType);
+            // setValue('userGroupType', fetchedProgram.userGroupType);
           }
         } catch (e) {
           console.error(e.message);
@@ -88,7 +89,6 @@ export const NewProgramScreen = observer(() => {
           setProgram(createdProgram);
         }
       }
-      navigate('/programs');
     } catch (error) {
       console.error('Error saving program:', error.message);
     }
@@ -97,28 +97,35 @@ export const NewProgramScreen = observer(() => {
   const fetchUserGroupTypeOptions = async (): Promise<IOption<string>[]> => {
     return Object.keys(EProgramUserGroupType).map((key) => {
       const value = EProgramUserGroupType[key as keyof typeof EProgramUserGroupType];
-      return { value: key, label: value };
+      return { value: key, label: value.charAt(0).toUpperCase() + value.slice(1) };
     });
   };
 
   const handleToggleCustom = () => setUseCustom((pastState) => !pastState);
 
   return (
-    <Container maxW="container.lg" p={8} as="main">
+    <Container maxW="container.lg" pt={8} as="main">
       <FormProvider {...formMethods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <VStack alignItems={'flex-start'} spacing={5} w={'full'} h={'full'}>
-            <Heading as="h1" alignSelf="center" color="theme.blueAlt">
-              {t('program.new.title')}
-            </Heading>
+          <VStack alignItems={'flex-start'} pr={6} pl={6}>
             {program ? (
               <Flex direction="column" w="full" align="center" gap={6}>
-                <Box background="greys.grey03" p={6} w="full">
+                <Heading as="h1" color="theme.blueAlt">
+                  {t('program.new.title')}
+                </Heading>
+                <Box
+                  background="greys.grey10"
+                  border="1px solid"
+                  borderColor="greys.lightGrey"
+                  borderRadius="sm"
+                  p={6}
+                  w="full"
+                >
                   <VStack>
                     <Text>{program.qualifier}</Text>
                     <Heading as="h3">{program.programName}</Heading>
                     <Text as={'span'} fontSize={'lg'}>
-                      {t('program.new.fundedBy').toLowerCase() + ' ' + program.fundedBy}
+                      {t('program.new.fundedBy') + ' ' + program.fundedBy}
                     </Text>
                   </VStack>
                 </Box>
@@ -136,52 +143,70 @@ export const NewProgramScreen = observer(() => {
               </Flex>
             ) : (
               <>
-                <Flex direction="column" as="section" gap={6} w="75%" p={6} alignSelf="center">
-                  <Flex gap={8}>
-                    <Box w="full">
-                      <AsyncRadioGroup
+                <Flex direction="column" as="section" gap={6} w="full" alignSelf="center">
+                  <Heading as="h1" color="theme.blueAlt">
+                    {id ? t('program.edit.editProgram') : t('program.new.title')}
+                  </Heading>
+
+                  <Box w="full">
+                    <Flex direction="column" gap={8}>
+                      {/* <AsyncRadioGroup
                         fetchOptions={fetchUserGroupTypeOptions}
                         fieldName="userGroupType"
                         question={t('program.new.targetGroup')}
-                      />
+                      /> */}
                       <Flex
-                        bg="greys.grey03"
-                        p={8}
-                        mt={4}
+                        bg="greys.grey10"
+                        pt={6}
+                        pr={6}
+                        pb={10}
+                        pl={4}
                         border="1px solid"
-                        borderColor="greys.grey02"
+                        borderColor="greys.lightGrey"
                         borderRadius="sm"
-                        width="100%"
                       >
-                        <TextFormControl label={t('program.new.nameOfProgram')} fieldName={'programName'} required />
+                        <TextFormControl
+                          label={t('program.new.nameOfProgram')}
+                          fieldName={'programName'}
+                          required
+                          w={{ base: '100%', md: '30%' }}
+                        />
                       </Flex>
                       <Flex
-                        bg="greys.grey03"
-                        p={8}
+                        bg="greys.grey10"
+                        pt={6}
+                        pr={6}
+                        pb={10}
+                        pl={4}
                         border="1px solid"
-                        borderColor="greys.grey02"
+                        borderColor="greys.lightGrey"
                         borderRadius="sm"
-                        width="100%"
-                        mt={4}
                       >
-                        <TextFormControl label={t('program.new.fundedBy')} fieldName={'fundedBy'} required />
+                        <TextFormControl
+                          label={t('program.new.fundedBy')}
+                          fieldName={'fundedBy'}
+                          required
+                          w={{ base: '100%', md: '30%' }}
+                        />
                       </Flex>
-                    </Box>
+                    </Flex>
+                  </Box>
+
+                  <Flex gap={4}>
+                    <Button
+                      width={'140px'}
+                      variant="primary"
+                      type="submit"
+                      isDisabled={!isValid || isSubmitting}
+                      isLoading={isSubmitting}
+                      loadingText={t('ui.loading')}
+                    >
+                      {id ? 'Save' : t('program.new.createButton')}
+                    </Button>
+                    <Button variant="secondary" width={'140px'} isDisabled={isSubmitting} onClick={() => navigate(-1)}>
+                      {t('ui.cancel')}
+                    </Button>
                   </Flex>
-                </Flex>
-                <Flex gap={4} alignSelf="center">
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    isDisabled={!isValid || isSubmitting}
-                    isLoading={isSubmitting}
-                    loadingText={t('ui.loading')}
-                  >
-                    {id ? 'Save' : t('program.new.createButton')}
-                  </Button>
-                  <Button variant="secondary" isDisabled={isSubmitting} onClick={() => navigate(-1)}>
-                    {t('ui.cancel')}
-                  </Button>
                 </Flex>
               </>
             )}

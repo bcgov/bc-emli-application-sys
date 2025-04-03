@@ -5,7 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearch } from '../../../hooks/use-search';
 import { useMst } from '../../../setup/root';
-import { EJurisdictionSortFields } from '../../../types/enums';
+import { EJurisdictionSortFields, EProgramSortFields } from '../../../types/enums';
 import { Paginator } from '../../shared/base/inputs/paginator';
 import { PerPageSelect } from '../../shared/base/inputs/per-page-select';
 import { SharedSpinner } from '../../shared/base/shared-spinner';
@@ -43,7 +43,7 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
             </Heading>
             <Text color={'text.secondary'}>{t('program.index.description')}</Text>
           </Box>
-          <RouterLinkButton variant={'primary'} to={'/programs/new'}>
+          <RouterLinkButton variant={'primary'} to={'/programs/new-program'}>
             {t('program.index.createButton')}
           </RouterLinkButton>
         </Flex>
@@ -52,9 +52,7 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
           <GridHeaders
             span={6}
             includeActionColumn
-            columns={Object.values(EJurisdictionSortFields).filter(
-              (field) => field !== EJurisdictionSortFields.regionalDistrict,
-            )}
+            columns={Object.values(EProgramSortFields).filter((field) => field !== EProgramSortFields.regionalDistrict)}
           />
 
           {isSearching ? (

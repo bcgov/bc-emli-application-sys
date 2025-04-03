@@ -106,10 +106,11 @@ export enum EJurisdictionSortFields {
 }
 
 export enum EProgramSortFields {
-  name = 'name',
-  reviewManagersSize = 'review_managers_size',
-  reviewersSize = 'reviewers_size',
-  applicationsReceived = 'applications_received',
+  reverseQualifiedName = 'reverse_qualified_name',
+  adminManagersSize = 'admin_managers_size',
+  adminSize = 'admins_size',
+  permitApplicationsSize = 'permit_applications_size',
+  regionalDistrict = 'regional_district_name',
   templatesUsed = 'templates_used',
 }
 
@@ -134,7 +135,7 @@ export enum EUserSortFields {
 
 export enum ERequirementTemplateSortFields {
   templateName = 'template_name',
-  activity = 'activity',
+  // activity = 'activity',
   // firstNations = 'first_nations',
   description = 'description',
   jurisdictionsSize = 'jurisdictions_size',
