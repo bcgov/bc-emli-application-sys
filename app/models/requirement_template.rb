@@ -12,10 +12,11 @@ class RequirementTemplate < ApplicationRecord
              text_middle: %i[current_version description]
 
   belongs_to :activity, optional: true
-  belongs_to :program, optional: true, foreign_key: "program_id"
   belongs_to :permit_type, optional: true
-  belongs_to :program_type, optional: true
-  belongs_to :user_type, optional: true
+  belongs_to :program, optional: true, foreign_key: "program_id"
+  belongs_to :audience_type, optional: true
+  belongs_to :user_group_type, optional: true
+  belongs_to :submission_type, optional: true
   belongs_to :copied_from, class_name: "RequirementTemplate", optional: true
 
   has_many :requirement_template_sections,
@@ -223,9 +224,10 @@ class RequirementTemplate < ApplicationRecord
       first_nations: first_nations,
       current_version: published_template_version&.version_date,
       permit_type: nil,
-      program_type: program_type&.name,
-      user_type: user_type&.name,
       activity: nil,
+      audience_type: audience_type&.name,
+      user_group_type: user_group_type&.name,
+      submission_type: submission_type&.name,
       discarded: discarded_at.present?,
       assignee: assignee&.name,
       visibility: visibility,

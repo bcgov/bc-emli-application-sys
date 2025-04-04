@@ -1,20 +1,7 @@
-import {
-  Box,
-  Button,
-  Container,
-  Flex,
-  FormControl,
-  FormLabel,
-  HStack,
-  Heading,
-  InputGroup,
-  Switch,
-  Text,
-  VStack,
-} from '@chakra-ui/react';
+import { Box, Button, Container, Flex, HStack, Heading, Text, VStack } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { IProgram } from '../../../models/program';
@@ -22,7 +9,6 @@ import { useMst } from '../../../setup/root';
 import { AsyncRadioGroup } from '../../shared/base/inputs/async-radio-group';
 import { TextFormControl } from '../../shared/form/input-form-control';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
-import { JurisdictionSelect } from '../../shared/select/selectors/jurisdiction-select';
 import { EProgramUserGroupType } from '../../../types/enums';
 
 export type TCreateProgramFormData = {
@@ -41,7 +27,6 @@ export const NewProgramScreen = observer(() => {
 
   const {
     programStore: { createProgram, fetchProgram, updateProgram },
-    permitClassificationStore: { fetchActivityOptions },
   } = useMst();
 
   interface IOption<T> {

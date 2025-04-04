@@ -12,9 +12,7 @@ import { AsyncRadioGroup } from '../base/inputs/async-radio-group';
 import { TextFormControl } from '../form/input-form-control';
 import { HStack } from '../../domains/step-code/checklist/pdf-content/shared/h-stack';
 import { useSearch } from '../../../hooks/use-search';
-import { AsyncSelect } from '../select/async-select';
-import { IOption } from '../../../types/types';
-
+import { AsyncDropdown } from '../base/inputs/async-dropdown';
 interface IRequirementTemplateFormProps {
   type: ERequirementTemplateType;
   onSuccess: (createdRequirementTemplate: IRequirementTemplate) => void;
@@ -29,7 +27,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
   const { t } = useTranslation();
   const {
     requirementTemplateStore: { createRequirementTemplate, copyRequirementTemplate },
-    permitClassificationStore: { fetchProgramTypeOptions, fetchActivityOptions },
+    permitClassificationStore: { fetchAudienceTypeOptions, fetchUserGroupTypeOptions, fetchSubmissionTypeOptions },
   } = useMst();
   const { programStore } = useMst();
   const {
@@ -45,19 +43,13 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
 
   useSearch(programStore);
   const [copyExisting, setCopyExisting] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null);
 
-  // Handle the change in selected value
-  const handleChange = (option: IOption) => {
-    setSelectedOption(option);
-  };
-
-  const fetchUserGroupTypeOptions = async (): Promise<IOption<string>[]> => {
-    return Object.keys(EProgramUserGroupType).map((key) => {
-      const value = EProgramUserGroupType[key as keyof typeof EProgramUserGroupType];
-      return { value: key, label: value };
-    });
-  };
+  // const fetchUserGroupTypeOptions = async (): Promise<IOption<string>[]> => {
+  //   return Object.keys(EProgramUserGroupType).map((key) => {
+  //     const value = EProgramUserGroupType[key as keyof typeof EProgramUserGroupType];
+  //     return { value: key, label: value };
+  //   });
+  // };
 
   const fetchPrograms = async (): Promise<IOption<string>[]> => {
     return tablePrograms.map((program) => {
@@ -74,9 +66,10 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
       description: '',
       firstNations: false,
       permitTypeId: null,
-      programTypeId: null,
-      userTypeId: null,
       activityId: null,
+      audienceTypeId: null,
+      userGroupTypeId: null,
+      submissionTypeId: null,
       programId: null,
       nickname: '',
     },
@@ -111,18 +104,29 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
         <VStack alignItems={'flex-start'} spacing={5} gap={8} w={'full'} h={'full'}>
           <VStack display={'contents'}>
             {tablePrograms.length > 0 && (
-              <AsyncRadioGroup
+              <AsyncDropdown
                 fetchOptions={fetchPrograms}
                 fieldName={'programId'}
                 question={t('requirementTemplate.new.programQuestion')}
+                placeholderOptionLabel={t('ui.selectProgram')}
               />
             )}
-
+            <AsyncRadioGroup
+              valueField="id"
+              question={t('requirementTemplate.fields.userGroupType')}
+              fetchOptions={fetchUserGroupTypeOptions}
+              fieldName={'userGroupTypeId'}
+            />
             <AsyncRadioGroup
               valueField="id"
               question={t('requirementTemplate.fields.audienceType')}
-              fetchOptions={fetchProgramTypeOptions}
-              fieldName={'programTypeId'}
+              fetchOptions={fetchAudienceTypeOptions}
+              fieldName={'audienceTypeId'}
+            />
+            <AsyncDropdown
+              fetchOptions={fetchSubmissionTypeOptions}
+              fieldName={'submissionTypeId'}
+              question={t('requirementTemplate.fields.submissionType')}
             />
             <Flex
               bg="greys.grey03"

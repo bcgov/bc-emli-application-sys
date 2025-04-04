@@ -6,7 +6,7 @@ class ProgramBlueprint < Blueprinter::Base
            :program_name,
            :funded_by,
            :external_api_state,
-           :user_group_type,
+           # :user_group_type,
            #  :qualifier,
            #  :qualified_name,
            #  :reverse_qualified_name,

@@ -18,6 +18,10 @@ class PermitClassification < ApplicationRecord
          external
          participant
          contractor
+         application
+         onboarding
+         support_request
+         invoice
        ]
 
   def image_url

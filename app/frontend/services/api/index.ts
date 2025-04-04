@@ -9,7 +9,13 @@ import { IIntegrationMapping } from '../../models/integration-mapping';
 import { IJurisdiction } from '../../models/jurisdiction';
 import { IJurisdictionTemplateVersionCustomization } from '../../models/jurisdiction-template-version-customization';
 import { IPermitApplication } from '../../models/energy-savings-application';
-import { IActivity, IPermitType, IProgramType, IUserType } from '../../models/permit-classification';
+import {
+  IActivity,
+  IPermitType,
+  IAudienceType,
+  ISubmissionType,
+  IUserGroupType,
+} from '../../models/permit-classification';
 import { IPermitCollaboration } from '../../models/permit-collaboration';
 import { IRequirementTemplate } from '../../models/requirement-template';
 import { IStepCode } from '../../models/step-code';
@@ -184,18 +190,17 @@ export class Api {
     pid: string = null,
     jurisdictionId: string = null,
   ) {
-    return this.client.post<IOptionResponse<IPermitType | IActivity | IProgramType | IUserType>>(
-      `/permit_classifications/permit_classification_options`,
-      {
-        type,
-        published,
-        firstNations,
-        permitTypeId,
-        activityId,
-        pid,
-        jurisdictionId,
-      },
-    );
+    return this.client.post<
+      IOptionResponse<IPermitType | IActivity | IAudienceType | IUserGroupType | ISubmissionType>
+    >(`/permit_classifications/permit_classification_options`, {
+      type,
+      published,
+      firstNations,
+      permitTypeId,
+      activityId,
+      pid,
+      jurisdictionId,
+    });
   }
 
   async createJurisdiction(params) {
