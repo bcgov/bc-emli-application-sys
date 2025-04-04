@@ -59,34 +59,58 @@ class PermitClassificationSeeder
       {
         name: "Internal",
         code: "internal",
-        description:
-          "",
+        description: "",
         enabled: true,
-        type: "ProgramType"
+        type: "AudienceType"
       },
       {
         name: "External",
         code: "external",
-        description:
-          "",
+        description: "",
         enabled: true,
-        type: "ProgramType"
+        type: "AudienceType"
       },
       {
         name: "Contractor",
         code: "contractor",
-        description:
-          "",
+        description: "",
         enabled: true,
-        type: "UserType"
+        type: "UserGroupType"
       },
       {
         name: "Participant",
         code: "participant",
-        description:
-          "",
+        description: "",
         enabled: true,
-        type: "UserType"
+        type: "UserGroupType"
+      },
+      {
+        name: "Application",
+        code: "application",
+        description: "",
+        enabled: true,
+        type: "SubmissionType"
+      },
+      {
+        name: "Onboarding",
+        code: "onboarding",
+        description: "",
+        enabled: true,
+        type: "SubmissionType"
+      },
+      {
+        name: "Support Request",
+        code: "support_request",
+        description: "",
+        enabled: true,
+        type: "SubmissionType"
+      },
+      {
+        name: "Invoice",
+        code: "invoice",
+        description: "",
+        enabled: true,
+        type: "SubmissionType"
       }
     ]
 

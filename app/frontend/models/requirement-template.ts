@@ -8,7 +8,7 @@ import { withEnvironment } from '../lib/with-environment';
 import { withRootStore } from '../lib/with-root-store';
 import { EFlashMessageStatus, ERequirementTemplateType, EVisibility } from '../types/enums';
 import { EarlyAccessPreviewModel } from './early-access-preview';
-import { IActivity, IPermitType } from './permit-classification';
+import { IActivity, IAudienceType, IPermitType, ISubmissionType, IUserGroupType } from './permit-classification';
 import { RequirementTemplateSectionModel } from './requirement-template-section';
 import { TemplateVersionModel } from './template-version';
 import { UserModel } from './user';
@@ -77,6 +77,9 @@ export const RequirementTemplateModel = types.snapshotProcessor(
       assignee: types.maybeNull(types.safeReference(UserModel)),
       permitType: types.frozen<IPermitType>(),
       activity: types.frozen<IActivity>(),
+      audienceType: types.frozen<IAudienceType>(),
+      submissionType: types.frozen<ISubmissionType>(),
+      userGroupType: types.frozen<IUserGroupType>(),
       program: types.frozen<IProgram>(),
       formJson: types.frozen<IRequirementTemplateFormJson>(),
       discardedAt: types.maybeNull(types.Date),

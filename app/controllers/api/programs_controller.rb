@@ -63,8 +63,7 @@ class Api::ProgramsController < Api::ApplicationController
     else
       render_error "jurisdiction.update_error",
                    message_opts: {
-                     error_message:
-                       @program.errors.full_messages.join(", ")
+                     error_message: @program.errors.full_messages.join(", ")
                    }
     end
   end
@@ -207,7 +206,6 @@ class Api::ProgramsController < Api::ApplicationController
     params.require(:program).permit(
       :program_name,
       :funded_by,
-      :user_group_type,
       :description_html
     )
   end

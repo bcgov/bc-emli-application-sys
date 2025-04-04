@@ -534,10 +534,11 @@ export interface IPermitTypeRequiredStep {
 export type TCreateRequirementTemplateFormData = {
   description: string;
   firstNations?: boolean;
-  permitTypeId: string;
-  programTypeId: string;
-  userTypeId: string;
-  activityId: string;
+  permitTypeId?: string;
+  audienceTypeId: string;
+  userGroupTypeId: string;
+  submissionTypeId: string;
+  activityId?: string;
   programId: string;
   nickname: string;
   type: string;

@@ -14,8 +14,9 @@ export enum EPreviewStatus {
 }
 
 export enum EPermitClassificationType {
-  ProgramType = 'ProgramType',
-  UserType = 'UserType',
+  AudienceType = 'AudienceType',
+  UserGroupType = 'UserGroupType',
+  SubmissionType = 'SubmissionType',
   PermitType = 'PermitType',
   Activity = 'Activity',
 }
