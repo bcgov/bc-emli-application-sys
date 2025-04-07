@@ -111,8 +111,8 @@ class LiveRequirementTemplate < RequirementTemplate
   private
 
   def types_match?(aud:, group:, sub:)
-    audience_type&.code.to_sym == aud &&
-      user_group_type&.code.to_sym == group &&
-      submission_type&.code.to_sym == sub
+    audience_type&.code&.to_sym == aud &&
+      user_group_type&.code&.to_sym == group &&
+      submission_type&.code&.to_sym == sub
   end
 end

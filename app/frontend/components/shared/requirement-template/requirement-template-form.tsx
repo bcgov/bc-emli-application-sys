@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { IRequirementTemplate } from '../../../models/requirement-template';
 import { useMst } from '../../../setup/root';
 import { EProgramUserGroupType, ERequirementTemplateType } from '../../../types/enums';
-import { TCreateRequirementTemplateFormData } from '../../../types/types';
+import { IOption, TCreateRequirementTemplateFormData } from '../../../types/types';
 import { AsyncRadioGroup } from '../base/inputs/async-radio-group';
 import { TextFormControl } from '../form/input-form-control';
 import { HStack } from '../../domains/step-code/checklist/pdf-content/shared/h-stack';
@@ -78,11 +78,11 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
   const navigate = useNavigate();
   const { handleSubmit, formState, control } = formMethods;
 
-  const firstNationsChecked = useWatch({
-    control,
-    name: 'firstNations',
-    defaultValue: false,
-  });
+  // const firstNationsChecked = useWatch({
+  //   control,
+  //   name: 'firstNations',
+  //   defaultValue: false,
+  // });
 
   const { isSubmitting } = formState;
 
@@ -129,7 +129,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
               question={t('requirementTemplate.fields.submissionType')}
             />
             <Flex
-              bg="greys.grey03"
+              bg="greys.grey10"
               p={4}
               border="1px solid"
               borderColor="greys.grey02"
@@ -169,7 +169,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
           )} */}
 
           <Flex
-            bg="greys.grey03"
+            bg="greys.grey10"
             p={4}
             border="1px solid"
             borderColor="greys.grey02"

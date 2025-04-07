@@ -1,30 +1,22 @@
-import { Flex, FlexProps, Select, Text } from '@chakra-ui/react';
+import { Flex, FlexProps, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { IOption } from '../../../../types/types';
 import { SharedSpinner } from '../shared-spinner';
+import { Select as ChakraReactSelect } from 'chakra-react-select';
 
 interface IAsyncDropdownProps<T> extends FlexProps {
   label?: string;
   question?: string;
-  valueField?: string;
   fetchOptions: () => Promise<IOption<T>[]>;
   fieldName: string;
   placeholderOptionLabel?: string;
 }
 
 export const AsyncDropdown = observer(
-  <T,>({
-    label,
-    question,
-    fetchOptions,
-    fieldName,
-    valueField,
-    placeholderOptionLabel,
-    ...rest
-  }: IAsyncDropdownProps<T>) => {
+  <T,>({ label, question, fetchOptions, fieldName, placeholderOptionLabel, ...rest }: IAsyncDropdownProps<T>) => {
     const { control } = useFormContext();
     const [options, setOptions] = useState<IOption<T>[]>([]);
     const [error, setError] = useState<Error | undefined>(undefined);
@@ -43,44 +35,62 @@ export const AsyncDropdown = observer(
 
     return options?.length > 0 ? (
       <Flex direction="column" w="full" {...rest}>
-        {label && <Text mb={1}>{label}</Text>}
-        {error ? (
-          <Text>{error.message}</Text>
-        ) : (
+        <Flex
+          direction="column"
+          bg="greys.grey10"
+          p={4}
+          border="1px solid"
+          borderColor="greys.grey02"
+          borderRadius="sm"
+        >
+          {label && <Text mb={1}>{label}</Text>}
+          {question && <Text mb={2}>{question}</Text>}
+
           <Controller
             name={fieldName}
             control={control}
             rules={{ required: true }}
             render={({ field: { onChange, value } }) => (
-              <>
-                {question && (
-                  <Text mb={1} pb={2}>
-                    {question}
-                  </Text>
-                )}
-                <Select
-                  onChange={(e) => onChange(e.target.value)}
-                  value={value ?? ''}
-                  placeholder=""
-                  bg="white"
-                  borderColor="greys.grey02"
-                >
-                  <option value="" disabled hidden>
-                    {placeholderOptionLabel ?? t('ui.selectPlaceholder')}
-                  </option>
-                  {options.map((option) => {
-                    const optionValue = valueField ? option.value[valueField] : option.value;
-                    return (
-                      <option key={optionValue} value={optionValue}>
-                        {option.label}
-                      </option>
-                    );
-                  })}
-                </Select>
-              </>
+              <ChakraReactSelect
+                isClearable={false}
+                options={options}
+                getOptionLabel={(opt) => opt.label}
+                getOptionValue={(opt) => String(opt.value)}
+                placeholder={placeholderOptionLabel ?? t('ui.selectPlaceholder')}
+                value={options.find((opt) => opt.value === value) ?? null}
+                onChange={(selectedOption) => {
+                  onChange((selectedOption as IOption<T>)?.value ?? null);
+                }}
+                chakraStyles={{
+                  container: (base) => ({
+                    ...base,
+                    minWidth: '20rem', // adjust as needed
+                    width: 'fit-content',
+                  }),
+                  control: (base) => ({
+                    ...base,
+                    minWidth: '20rem',
+                    width: 'fit-content',
+                    backgroundColor: 'white',
+                  }),
+                  placeholder: (base) => ({
+                    ...base,
+                    color: 'gray.400',
+                    fontStyle: 'italic',
+                  }),
+                  dropdownIndicator: (base, state) => ({
+                    ...base,
+                    backgroundColor: 'white', // background of the icon button
+                    color: 'gray.600', // color of the arrow icon
+                  }),
+                  indicatorSeparator: () => ({
+                    display: 'none',
+                  }),
+                }}
+              />
             )}
           />
-        )}
+        </Flex>
       </Flex>
     ) : (
       <SharedSpinner />

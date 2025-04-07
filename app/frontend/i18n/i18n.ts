@@ -2105,7 +2105,7 @@ const options = {
             promoteElectivesMessage:
               'This will publish your sandboxed customizations and overwrite your non-sandboxed live electives!',
             clickToWriteDescription: 'Click to write description',
-            title: 'Permit Application Builder',
+            title: '',
             dndTitle: 'Drag to reorder',
             dndInstructions:
               "Change the order of requirements by using the menu on the left to drag items up or down. Click the 'Done' button to return to the form.",
@@ -2161,15 +2161,15 @@ const options = {
           },
           fields: {
             status: 'Status',
-            templateName: 'Name',
+            templateName: 'Application Name',
             activity: 'Work type',
             userGroupType: 'Select a user group for this template',
             audienceType: 'Select the audience for this program',
             submissionType: 'Select the submission type',
             firstNations: 'First Nations',
-            description: 'Provide a description for administrative staff on what the template is for',
+            description: 'Description',
             currentVersion: 'Current version',
-            jurisdictionsSize: 'Used by',
+            jurisdictionsSize: 'Program',
           },
           status: {
             published: 'Published',
@@ -2234,7 +2234,7 @@ const options = {
             seeButton: 'See {{status}}',
           },
           edit: {
-            permitTemplate: 'Permit template',
+            permitTemplate: 'Template',
             seeApiDoc: 'See API documentation',
             heading: '<1>Manage mapping for</1> <2>{{permitClassification}}</2>',
             table: {
