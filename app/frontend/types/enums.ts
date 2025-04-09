@@ -43,20 +43,22 @@ export enum EPermitClassificationCode {
 export enum EPermitApplicationStatus {
   draft = 'new_draft',
   submitted = 'newly_submitted',
-  // revisionsRequested = "revisions_requested",
-  // resubmitted = "resubmitted",
+  revisionsRequested = 'revisions_requested',
+  resubmitted = 'resubmitted',
   // ephemeral = "ephemeral",
-  viewed = 'viewed',
+  inReview = 'in_review',
   updateNeeded = 'update_needed',
-  accepted = 'accepted',
+  approved = 'approved',
+  rejected = 'rejected',
 }
 
 export enum EPermitApplicationStatusGroup {
   draft = 'draft',
   submitted = 'submitted',
-  viewed = 'viewed',
+  inReview = 'inReview',
   updateNeeded = 'updateNeeded',
-  accepted = 'accepted',
+  approved = 'approved',
+  rejected = 'rejected',
 }
 
 export enum ETemplateVersionStatus {

@@ -15,27 +15,40 @@ export const EnergySavingsApplicationStatusTag = ({
   const { t } = useTranslation()
 
   const bgMap = {
-    [EPermitApplicationStatus.newlySubmitted]: "theme.yellow",
-    [EPermitApplicationStatus.resubmitted]: "theme.yellow",
-    [EPermitApplicationStatus.newDraft]: "theme.blueLight",
-    [EPermitApplicationStatus.revisionsRequested]: "semantic.errorLight",
-    [EPermitApplicationStatus.ephemeral]: "theme.blueLight",
-    [EPermitApplicationStatus.viewed]: "theme.blueLight",
-    [EPermitApplicationStatus.updateNeeded]: "semantic.errorLight",
-    [EPermitApplicationStatus.accepted]: "theme.lightGreen",
-  }
+    [EPermitApplicationStatus.submitted]: 'theme.orangeLight02',
+    // [EPermitApplicationStatus.resubmitted]: 'theme.yellow',
+    [EPermitApplicationStatus.draft]: 'theme.blueLight',
+    // [EPermitApplicationStatus.revisionsRequested]: 'semantic.errorLight',
+    // [EPermitApplicationStatus.ephemeral]: 'theme.blueLight',
+    [EPermitApplicationStatus.inReview]: 'theme.offWhite',
+    [EPermitApplicationStatus.updateNeeded]: 'semantic.errorLight',
+    [EPermitApplicationStatus.approved]: 'theme.lightGreen',
+    [EPermitApplicationStatus.rejected]: 'theme.blueLight',
+  };
 
   const colorMap = {
-    [EPermitApplicationStatus.newlySubmitted]: "text.primary",
-    [EPermitApplicationStatus.resubmitted]: "text.primary",
-    [EPermitApplicationStatus.newDraft]: "text.primary",
-    [EPermitApplicationStatus.revisionsRequested]: "semantic.error",
-    [EPermitApplicationStatus.ephemeral]: "text.primary",
-    [EPermitApplicationStatus.viewed]: "text.primary",
-    [EPermitApplicationStatus.updateNeeded]: "semantic.error",
-    [EPermitApplicationStatus.accepted]: "theme.primary",
-  }
+    [EPermitApplicationStatus.submitted]: 'text.primary',
+    // [EPermitApplicationStatus.resubmitted]: 'text.primary',
+    [EPermitApplicationStatus.draft]: 'theme.blueButtonHover',
+    // [EPermitApplicationStatus.revisionsRequested]: 'semantic.error',
+    // [EPermitApplicationStatus.ephemeral]: 'text.primary',
+    [EPermitApplicationStatus.inReview]: 'text.primary',
+    [EPermitApplicationStatus.updateNeeded]: 'text.primary',
+    [EPermitApplicationStatus.approved]: 'theme.primary',
+    [EPermitApplicationStatus.rejected]: 'theme.primary',
+  };
 
+  const borderColorMap = {
+    [EPermitApplicationStatus.submitted]: 'theme.orange',
+    // [EPermitApplicationStatus.resubmitted]: 'theme.yellow',
+    [EPermitApplicationStatus.draft]: 'greys.lightGrey',
+    // [EPermitApplicationStatus.revisionsRequested]: 'semantic.errorLight',
+    // [EPermitApplicationStatus.ephemeral]: 'theme.blueLight',
+    [EPermitApplicationStatus.inReview]: 'theme.darkBlue',
+    [EPermitApplicationStatus.updateNeeded]: 'semantic.errorDark',
+    [EPermitApplicationStatus.approved]: 'theme.darkGreen',
+    [EPermitApplicationStatus.rejected]: 'theme.darkBlue',
+  };
   return (
     <Tag
       p={1}
@@ -43,7 +56,7 @@ export const EnergySavingsApplicationStatusTag = ({
       color={colorMap[energySavingsApplication.status]}
       fontWeight="bold"
       border="1px solid"
-      borderColor="border.light"
+      borderColor={borderColorMap[energySavingsApplication.status]}
       textTransform="uppercase"
       minW="fit-content"
       textAlign="center"
@@ -52,5 +65,5 @@ export const EnergySavingsApplicationStatusTag = ({
       {/* @ts-ignore */}
       {t(`energySavingsApplication.status.${energySavingsApplication.status}`)}
     </Tag>
-  )
+  );
 }

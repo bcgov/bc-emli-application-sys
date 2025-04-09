@@ -17,9 +17,10 @@ RSpec.describe PermitApplication, type: :model do
            newly_submitted: 1,
            revisions_requested: 3,
            resubmitted: 4,
-           viewed: 5,
+           in_review: 5,
            update_needed: 6,
-           accepted: 7
+           approved: 7,
+           rejected: 8
              )
     end
   end
