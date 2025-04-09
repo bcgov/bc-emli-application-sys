@@ -38,13 +38,15 @@ import { convertResourceArrayToRecord } from '../utils/utility-functions';
 import { ICollaborator } from './collaborator';
 import { JurisdictionModel } from './jurisdiction';
 import { IPermitBlockStatus, PermitBlockStatusModel } from './permit-block-status';
-import { IActivity, IPermitType } from './permit-classification';
+import { IActivity, IAudienceType, IPermitType, ISubmissionType, IUserGroupType } from './permit-classification';
 import { IPermitCollaboration, PermitCollaborationModel } from './permit-collaboration';
 import { IRequirement } from './requirement';
 import { SandboxModel } from './sandbox';
 import { StepCodeModel } from './step-code';
+import { ProgramModel } from './program';
 import { TemplateVersionModel } from './template-version';
 import { IUser, UserModel } from './user';
+import { IProgram } from './program';
 
 export const EnergySavingsApplicationModel = types.snapshotProcessor(
   types
@@ -57,6 +59,10 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       pid: types.maybeNull(types.string), // for now some seeds will not have this
       permitType: types.frozen<IPermitType>(),
       activity: types.frozen<IActivity>(),
+      userGroupType: types.frozen<IUserGroupType>(),
+      audienceType: types.frozen<IAudienceType>(),
+      submissionType: types.frozen<ISubmissionType>(),
+      program: types.frozen<IProgram>(),
       status: types.enumeration(Object.values(EPermitApplicationStatus)),
       submitter: types.maybeNull(types.maybe(types.reference(types.late(() => UserModel)))),
       jurisdiction: types.maybeNull(types.maybe(types.reference(types.late(() => JurisdictionModel)))),
@@ -193,6 +199,9 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       },
       get permitTypeAndActivity() {
         return `${self.activity?.name} - ${self.permitType?.name}`.trim();
+      },
+      get programNameAndTypes() {
+        return `${self.program?.programName || ''} ${self.userGroupType?.name?.toLowerCase() || ''} ${self.submissionType?.name?.toLowerCase() || ''}`;
       },
       get flattenedBlocks() {
         return self.formJson.components

@@ -47,4 +47,8 @@ class ProgramBlueprint < Blueprinter::Base
       program.external_api_enabled?
     end
   end
+
+  view :summary do
+    fields :program_name
+  end
 end

@@ -17,8 +17,8 @@ export const SuccessfulSubmissionScreen = observer(() => {
   if (error) return <ErrorScreen error={error} />;
   if (!currentPermitApplication?.isFullyLoaded) return <LoadingScreen />;
 
-  const { jurisdiction, number } = currentPermitApplication;
-  const { qualifiedName, primaryContact } = jurisdiction;
+  const { program, number } = currentPermitApplication;
+  const { qualifiedName, primaryContact } = program;
   return (
     <Container maxW="container.lg">
       <Flex direction="column" align="center" my={24} gap={8}>
@@ -57,7 +57,7 @@ export const SuccessfulSubmissionScreen = observer(() => {
                 }}
               />
             </Text>
-            {primaryContact && <ContactCard w="fit-content" contact={primaryContact} />}
+            {/* {primaryContact && <ContactCard w="fit-content" contact={primaryContact} />} */}
           </Flex>
         </Flex>
 

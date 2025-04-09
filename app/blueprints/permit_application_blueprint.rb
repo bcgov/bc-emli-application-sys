@@ -23,7 +23,7 @@ class PermitApplicationBlueprint < Blueprinter::Base
     association :user_group_type, blueprint: PermitClassificationBlueprint
     association :audience_type, blueprint: PermitClassificationBlueprint
     association :submission_type, blueprint: PermitClassificationBlueprint
-    association :program, blueprint: ProgramBlueprint
+    association :program, blueprint: ProgramBlueprint, view: :summary
     association :sandbox, blueprint: SandboxBlueprint
     association :submission_versions,
                 blueprint: SubmissionVersionBlueprint,
