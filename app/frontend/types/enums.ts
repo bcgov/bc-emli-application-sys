@@ -171,11 +171,12 @@ export enum EPermitApplicationSortFields {
 }
 
 export enum EPermitApplicationSubmitterSortFields {
-  number = 'number',
-  permitClassification = 'permit_classification',
-  submitter = 'submitter',
-  submittedAt = 'submitted_at',
-  viewedAt = 'viewed_at',
+  // number = 'number',
+  // permitClassification = 'permit_classification',
+  // submitter = 'submitter',
+  // submittedAt = 'submitted_at',
+  // viewedAt = 'viewed_at',
+  updatedAt = 'updated_at',
   status = 'status',
 }
 
@@ -192,6 +193,11 @@ export enum EPermitApplicationReviewerSortFields {
 export enum ESortDirection {
   ascending = 'asc',
   descending = 'desc',
+}
+
+export enum ELastUpdatedSortDirection {
+  oldestFirst = 'asc',
+  newestFirst = 'desc',
 }
 
 export enum ETagType {

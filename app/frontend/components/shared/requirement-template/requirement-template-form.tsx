@@ -138,7 +138,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
               direction="column"
             >
               <Text>{t('requirementTemplate.new.applicationName')}</Text>
-              <TextFormControl mt={2} fieldName={'nickname'} required maxWidth="224px" />
+              <TextFormControl mt={2} fieldName={'nickname'} required />
             </Flex>
           </VStack>
 
@@ -194,7 +194,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
             >
               {t('requirementTemplate.new.createButton')}
             </Button>
-            <Button variant="secondary" ml={8} isDisabled={isSubmitting} onClick={() => navigate(-1)}>
+            <Button variant="secondary" isDisabled={isSubmitting} onClick={() => navigate(-1)}>
               {t('ui.cancel')}
             </Button>
           </Flex>
