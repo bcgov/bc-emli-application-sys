@@ -25,11 +25,11 @@ export const SortSelect: React.FC<ISearchSortProps> = ({ searchModel, i18nPrefix
     sortFields.forEach((field: string) => {
       directions.forEach((direction) => {
         // @ts-ignore
-        const label = t(`${i18nPrefix}.columns.${field}`) + ` - ${t(`ui.${direction}`)}`
+        const label = t(`${i18nPrefix}.columns.${field}`) + ` - ${t(`ui.${field}${direction}`)} `;
         sortOptions.push({
           label,
           value: { field, direction },
-        })
+        });
       })
     })
     return sortOptions
