@@ -38,78 +38,83 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
   // Define the filters
   const draftFilters = [EPermitApplicationStatus.draft]
   const submittedFilters = [EPermitApplicationStatus.submitted]
-  const viewedFilters = [EPermitApplicationStatus.viewed]
-  const updateNeededFilters = [EPermitApplicationStatus.updateNeeded]
-  const acceptedFilters = [EPermitApplicationStatus.accepted]
+  const inReviewFilters = [EPermitApplicationStatus.inReview];
+  const updateNeededFilters = [EPermitApplicationStatus.updateNeeded];
+  const approvedFilters = [EPermitApplicationStatus.approved];
+  const rejectedFilters = [EPermitApplicationStatus.rejected];
 
   // Handle selected filters
-  const [selectedFilters, setSelectedFilters] = useState<string[]>(paramStatusFilter)
+  const [selectedFilters, setSelectedFilters] = useState<string[]>(paramStatusFilter);
 
   // Handle filters when checked/unchecked
   const handleFilterSelect = (filter: string, checked: boolean) => {
-    let newSelectedFilters = checked ? [...selectedFilters, filter] : selectedFilters.filter((item) => item !== filter)
+    let newSelectedFilters = checked ? [...selectedFilters, filter] : selectedFilters.filter((item) => item !== filter);
 
     // Remove "filter" if it exists in the selected filters
-    newSelectedFilters = newSelectedFilters.filter((item) => item !== "filter")
+    newSelectedFilters = newSelectedFilters.filter((item) => item !== 'filter');
 
     // If no filters are selected, set all filters
     if (newSelectedFilters.length === 0) {
-      setSelectedFilters(newSelectedFilters)
-      setStatusFilter(Object.values(EPermitApplicationStatus) as EPermitApplicationStatus[])
+      setSelectedFilters(newSelectedFilters);
+      setStatusFilter(Object.values(EPermitApplicationStatus) as EPermitApplicationStatus[]);
     } else {
-      setSelectedFilters(newSelectedFilters)
+      setSelectedFilters(newSelectedFilters);
       // Map the selected filters to their corresponding status array
-      const statusArray = newSelectedFilters.flatMap(mapFilterToStatusArray)
-      setStatusFilter(statusArray)
+      const statusArray = newSelectedFilters.flatMap(mapFilterToStatusArray);
+      setStatusFilter(statusArray);
     }
 
     // Trigger search with selected filters (even if it's for all statuses)
-    search()
+    search();
 
     // Update the URL based on selected filters
-    const newParams = new URLSearchParams(location.search)
+    const newParams = new URLSearchParams(location.search);
     if (newSelectedFilters.length > 0) {
-      newParams.set("status", newSelectedFilters.flatMap(mapFilterToStatusArray)?.join(","))
+      newParams.set('status', newSelectedFilters.flatMap(mapFilterToStatusArray)?.join(','));
     } else {
-      newParams.delete("status")
+      newParams.delete('status');
     }
-    window.history.replaceState(null, "", "?" + newParams.toString())
-  }
+    window.history.replaceState(null, '', '?' + newParams.toString());
+  };
 
   // Map filter to the status array
   const mapFilterToStatusArray = (filter: string): EPermitApplicationStatus[] => {
     switch (filter) {
-      case "draft":
-        return draftFilters
-      case "submitted":
-        return submittedFilters
-      case "viewed":
-        return viewedFilters
-      case "updateNeeded":
-        return updateNeededFilters
-      case "accepted":
-        return acceptedFilters
+      case 'draft':
+        return draftFilters;
+      case 'submitted':
+        return submittedFilters;
+      case 'inReview':
+        return inReviewFilters;
+      case 'updateNeeded':
+        return updateNeededFilters;
+      case 'approved':
+        return approvedFilters;
+      case 'rejected':
+        return rejectedFilters;
       default:
-        return []
+        return [];
     }
-  }
+  };
 
   const mapStatusToFilterArray = (filter: string) => {
     switch (filter) {
       case EPermitApplicationStatus.draft:
-        return "draft"
+        return 'draft';
       case EPermitApplicationStatus.submitted:
-        return "submitted"
-      case EPermitApplicationStatus.viewed:
-        return "viewed"
+        return 'submitted';
+      case EPermitApplicationStatus.inReview:
+        return 'inReview';
       case EPermitApplicationStatus.updateNeeded:
-        return "updateNeeded"
-      case EPermitApplicationStatus.accepted:
-        return "accepted"
+        return 'updateNeeded';
+      case EPermitApplicationStatus.approved:
+        return 'approved';
+      case EPermitApplicationStatus.rejected:
+        return 'rejected';
       default:
-        return []
+        return [];
     }
-  }
+  };
 
   // Handle reset functionality
   const handleResetFilters = () => {

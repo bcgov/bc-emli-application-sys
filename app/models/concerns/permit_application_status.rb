@@ -7,9 +7,10 @@ module PermitApplicationStatus
            newly_submitted: 1,
            revisions_requested: 3,
            resubmitted: 4,
-           viewed: 5,
+           in_review: 5,
            update_needed: 6,
-           accepted: 7
+           approved: 7,
+           rejected: 8
          },
          _default: 0
 
@@ -26,6 +27,9 @@ module PermitApplicationStatus
       state :newly_submitted
       state :revisions_requested
       state :resubmitted
+      state :in_review
+      state :approved
+      state :rejected
 
       event :submit do
         transitions from: :new_draft,

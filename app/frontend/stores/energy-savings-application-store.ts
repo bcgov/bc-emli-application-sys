@@ -40,9 +40,10 @@ export const PermitApplicationStoreModel = types
       statusFilter: types.optional(types.array(types.enumeration(filterableStatus)), [
         EPermitApplicationStatus.draft,
         EPermitApplicationStatus.submitted,
-        EPermitApplicationStatus.viewed,
+        EPermitApplicationStatus.inReview,
         EPermitApplicationStatus.updateNeeded,
-        EPermitApplicationStatus.accepted,
+        EPermitApplicationStatus.approved,
+        EPermitApplicationStatus.rejected,
       ]),
       templateVersionIdFilter: types.maybeNull(types.string),
       requirementTemplateIdFilter: types.maybeNull(types.string),
@@ -81,9 +82,10 @@ export const PermitApplicationStoreModel = types
       const map = {
         [self.draftStatuses.join(',')]: EPermitApplicationStatusGroup.draft,
         [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.submitted,
-        [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.viewed,
+        [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.inReview,
         [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.updateNeeded,
-        [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.accepted,
+        [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.approved,
+        [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.rejected,
       };
       return map[self.statusFilter.join(',')];
     },
