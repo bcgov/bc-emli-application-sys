@@ -263,7 +263,6 @@ export class Api {
   }
 
   async createEnergyApplication(params: TCreateEnergyApplicationFormData) {
-    console.log(params);
     return this.client.post<ApiResponse<IPermitApplication>>('/esp_application', params, {
       headers: {
         'Content-Type': 'application/json',

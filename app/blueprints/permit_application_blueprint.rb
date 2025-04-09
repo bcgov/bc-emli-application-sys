@@ -20,6 +20,10 @@ class PermitApplicationBlueprint < Blueprinter::Base
            :missing_pdfs
     association :permit_type, blueprint: PermitClassificationBlueprint
     association :activity, blueprint: PermitClassificationBlueprint
+    association :user_group_type, blueprint: PermitClassificationBlueprint
+    association :audience_type, blueprint: PermitClassificationBlueprint
+    association :submission_type, blueprint: PermitClassificationBlueprint
+    association :program, blueprint: ProgramBlueprint
     association :sandbox, blueprint: SandboxBlueprint
     association :submission_versions,
                 blueprint: SubmissionVersionBlueprint,
@@ -50,9 +54,8 @@ class PermitApplicationBlueprint < Blueprinter::Base
 
   view :extended do
     include_view :base
-    fields :formatted_compliance_data,
-           :front_end_form_update,
-           :form_customizations
+    fields :formatted_compliance_data, :front_end_form_update
+    #:form_customizations
 
     association :submitter, blueprint: UserBlueprint, view: :minimal
 

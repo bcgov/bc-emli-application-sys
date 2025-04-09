@@ -5,14 +5,26 @@ class PermitApplication < ApplicationRecord
   include ZipfileUploader.Attachment(:zipfile)
   include PermitApplicationStatus
 
+  # SEARCH_INCLUDES = %i[
+  #   permit_type
+  #   submission_versions
+  #   step_code
+  #   activity
+  #   jurisdiction
+  #   submitter
+  #   permit_collaborations
+  # ]
+
   SEARCH_INCLUDES = %i[
     permit_type
     submission_versions
-    step_code
     activity
-    jurisdiction
     submitter
-    permit_collaborations
+    user_group_type
+    submission_type
+    sandbox
+    program
+    audience_type
   ]
 
   searchkick word_middle: %i[
@@ -26,9 +38,13 @@ class PermitApplication < ApplicationRecord
              text_end: %i[number]
 
   belongs_to :submitter, class_name: "User"
-  belongs_to :jurisdiction
-  belongs_to :permit_type
-  belongs_to :activity
+  belongs_to :jurisdiction, optional: true
+  belongs_to :permit_type, optional: true
+  belongs_to :activity, optional: true
+  belongs_to :program
+  belongs_to :audience_type
+  belongs_to :submission_type
+  belongs_to :user_group_type
   belongs_to :template_version
   belongs_to :sandbox, optional: true
 
@@ -48,12 +64,12 @@ class PermitApplication < ApplicationRecord
 
   # Custom validation
 
-  validate :jurisdiction_has_matching_submission_contact
-  validate :pid_or_pin_presence
+  #validate :jurisdiction_has_matching_submission_contact
+  #validate :pid_or_pin_presence
   validates :nickname, presence: true
   validates :number, presence: true
   validates :reference_number, length: { maximum: 300 }, allow_nil: true
-  validate :sandbox_belongs_to_jurisdiction
+  #validate :sandbox_belongs_to_jurisdiction
 
   delegate :qualified_name, to: :jurisdiction, prefix: true
   delegate :name, to: :jurisdiction, prefix: true
@@ -65,7 +81,7 @@ class PermitApplication < ApplicationRecord
   before_validation :assign_unique_number, on: :create
   before_validation :set_template_version, on: :create
   before_validation :populate_base_form_data, on: :create
-  before_save :take_form_customizations_snapshot_if_submitted
+  #before_save :take_form_customizations_snapshot_if_submitted
 
   after_commit :reindex_jurisdiction_permit_application_size
   after_commit :send_submitted_webhook, if: :saved_change_to_status?
@@ -187,13 +203,15 @@ class PermitApplication < ApplicationRecord
     {
       number: number,
       nickname: nickname,
-      permit_classifications: "#{permit_type.name} #{activity.name}",
+      permit_classifications:
+        "#{permit_type&.name} #{activity&.name} #{user_group_type&.name} #{audience_type&.name} #{submission_type&.name}",
       submitter: "#{submitter.name} #{submitter.email}",
       submitted_at: submitted_at,
       resubmitted_at: resubmitted_at,
       viewed_at: viewed_at,
       status: status,
-      jurisdiction_id: jurisdiction.id,
+      jurisdiction_id: jurisdiction&.id,
+      program_id: program&.id,
       submitter_id: submitter.id,
       template_version_id: template_version.id,
       requirement_template_id: template_version.requirement_template.id,
@@ -596,17 +614,17 @@ class PermitApplication < ApplicationRecord
   end
 
   def assign_unique_number
-    Rails.logger.info("jurisdiction #{jurisdiction.inspect}")
+    #Rails.logger.info("program #{program.inspect}")
     last_number =
-      jurisdiction
-        .permit_applications
-        .where("number LIKE ?", "#{number_prefix}-%")
-        .order(Arel.sql("LENGTH(number) DESC"), number: :desc)
+      program
+        .permit_applications#.where("number LIKE ?", "#{number_prefix}-%")
+        .
+        order(Arel.sql("LENGTH(number) DESC"), number: :desc)
         .limit(1)
         .pluck(:number)
         .first
 
-    # Notice that the last number comes from the specific jurisdiction
+    # Notice that the last number comes from the specific program
 
     if last_number
       number_parts = last_number.split("-")
@@ -628,15 +646,14 @@ class PermitApplication < ApplicationRecord
       # %03d pads with 0s
       new_number =
         format(
-          "%s-%03d-%03d-%03d",
-          number_prefix,
+          "%03d-%03d-%03d",
           new_integer / 1_000_000 % 1000,
           new_integer / 1000 % 1000,
           new_integer % 1000
         )
     else
       # Start with the initial number if there are no previous numbers
-      new_number = format("%s-001-000-000", number_prefix)
+      new_number = format("001-000-000")
     end
 
     # Assign the new number to the permit application
