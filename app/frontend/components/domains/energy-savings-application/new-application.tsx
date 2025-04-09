@@ -25,11 +25,9 @@ export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) =>
       nickname: '',
     },
   });
-  const { handleSubmit, formState, control, watch, setValue } = formMethods;
-  const { isSubmitting } = formState;
+  const { formState } = formMethods;
   const { permitClassificationStore, permitApplicationStore, userStore } = useMst();
 
-  const { fetchPermitTypeOptions, fetchActivityOptions } = permitClassificationStore;
   const { currentUser } = userStore;
   const navigate = useNavigate();
 

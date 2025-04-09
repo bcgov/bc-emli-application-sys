@@ -38,7 +38,7 @@ import { FloatingHelpDrawer } from '../../shared/floating-help-drawer';
 import SandboxHeader from '../../shared/sandbox/sandbox-header';
 import { ChecklistSideBar } from './checklist-sidebar';
 import { BlockCollaboratorAssignmentManagement } from './collaborator-management/block-collaborator-assignment-management';
-import { CollaboratorsSidebar } from './collaborator-management/collaborators-sidebar';
+//import { CollaboratorsSidebar } from './collaborator-management/collaborators-sidebar';
 import { useCollaborationAssignmentNodes } from './collaborator-management/hooks/use-collaboration-assignment-nodes';
 import { ContactSummaryModal } from './contact-summary-modal';
 import { RevisionSideBar } from './revision-sidebar';
@@ -234,8 +234,16 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
   // @ts-ignore
   const permitHeaderHeight = permitHeaderRef?.current?.offsetHeight ?? 0;
 
-  const { permitTypeAndActivity, formJson, number, isSubmitted, isDirty, setIsDirty, isRevisionsRequested } =
-    currentPermitApplication;
+  const {
+    permitTypeAndActivity,
+    programNameAndTypes,
+    formJson,
+    number,
+    isSubmitted,
+    isDirty,
+    setIsDirty,
+    isRevisionsRequested,
+  } = currentPermitApplication;
 
   const doesUserHaveSubmissionPermission =
     currentUser?.id === currentPermitApplication.submitter?.id ||
@@ -305,7 +313,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                   </Tooltip>
                 </form>
 
-                <Text noOfLines={1}>{permitTypeAndActivity}</Text>
+                <Text noOfLines={1}>{programNameAndTypes}</Text>
                 <HStack>
                   <CopyableValue value={number} label={t('permitApplication.fields.number')} />
                   {currentPermitApplication.referenceNumber && (

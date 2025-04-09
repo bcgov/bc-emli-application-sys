@@ -159,6 +159,10 @@ class User < ApplicationRecord
     admin? || admin_manager?
   end
 
+  def participant?
+    role.include?("participant")
+  end
+
   def role_name
     role.gsub("_", " ")
   end

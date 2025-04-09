@@ -52,12 +52,15 @@ class PermitApplicationPolicy < ApplicationPolicy
   end
 
   def submit?
+    #TODO: this is where we handle who can submit what, this needs to be re-worked
+    # to allow admins/psr's the ability to submit in place of a Partiticipant
+    Rails.logger.info("#{user.inspect}")
     record.draft? ? record.submitter == user : user.review_staff?
     if record.draft?
       record.submission_requirement_block_edit_permissions(user_id: user.id) ==
         :all
     else
-      user.review_staff? && user.jurisdictions.find(record.jurisdiction_id)
+      user.review_staff? || user.participant? # user.jurisdictions.find(record.jurisdiction_id)
     end
   end
 

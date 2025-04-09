@@ -72,10 +72,15 @@ class PermitApplication < ApplicationRecord
   validates :reference_number, length: { maximum: 300 }, allow_nil: true
   #validate :sandbox_belongs_to_jurisdiction
 
-  delegate :qualified_name, to: :jurisdiction, prefix: true
-  delegate :name, to: :jurisdiction, prefix: true
+  delegate :qualified_name, to: :program, prefix: true
+  delegate :program_name, to: :program
   delegate :code, :name, to: :permit_type, prefix: true
   delegate :code, :name, to: :activity, prefix: true
+
+  delegate :code, :name, to: :user_group_type, prefix: true, allow_nil: true
+  delegate :code, :name, to: :audience_type, prefix: true, allow_nil: true
+  delegate :code, :name, to: :submission_type, prefix: true, allow_nil: true
+
   delegate :published_template_version, to: :template_version
 
   before_validation :assign_default_nickname, on: :create
@@ -381,14 +386,16 @@ class PermitApplication < ApplicationRecord
   end
 
   def send_submit_notifications
+    #TODO: this is where we need to adjust to send notifications to specific users when an app is submitted.
+
     # All submission related emails and in-app notifications are handled by this method
-    NotificationService.publish_application_submission_event(self)
-    confirmed_permit_type_submission_contacts.each do |permit_type_submission_contact|
-      PermitHubMailer.notify_reviewer_application_received(
-        permit_type_submission_contact,
-        self
-      ).deliver_later
-    end
+    # NotificationService.publish_application_submission_event(self)
+    # confirmed_permit_type_submission_contacts.each do |permit_type_submission_contact|
+    #   PermitHubMailer.notify_reviewer_application_received(
+    #     permit_type_submission_contact,
+    #     self
+    #   ).deliver_later
+    # end
   end
 
   def formatted_submission_data_for_external_use
@@ -404,24 +411,26 @@ class PermitApplication < ApplicationRecord
   def send_submitted_webhook
     return unless submitted?
 
-    jurisdiction
-      .active_external_api_keys
-      .where.not(
-        webhook_url: [nil, ""]
-      ) # Only send webhooks to keys with a webhook URL
-      .each do |external_api_key|
-        PermitWebhookJob.perform_async(
-          external_api_key.id,
-          (
-            if newly_submitted?
-              Constants::Webhooks::Events::PermitApplication::PERMIT_SUBMITTED
-            else
-              Constants::Webhooks::Events::PermitApplication::PERMIT_RESUBMITTED
-            end
-          ),
-          id
-        )
-      end
+    #TODO: if we want to implement webhooks were we call an external API when an application is submitted
+
+    # jurisdiction
+    #   .active_external_api_keys
+    #   .where.not(
+    #     webhook_url: [nil, ""]
+    #   ) # Only send webhooks to keys with a webhook URL
+    #   .each do |external_api_key|
+    #     PermitWebhookJob.perform_async(
+    #       external_api_key.id,
+    #       (
+    #         if newly_submitted?
+    #           Constants::Webhooks::Events::PermitApplication::PERMIT_SUBMITTED
+    #         else
+    #           Constants::Webhooks::Events::PermitApplication::PERMIT_RESUBMITTED
+    #         end
+    #       ),
+    #       id
+    #     )
+    #   end
   end
 
   def missing_pdfs
@@ -469,7 +478,7 @@ class PermitApplication < ApplicationRecord
       "action_type" =>
         Constants::NotificationActionTypes::APPLICATION_SUBMISSION,
       "action_text" =>
-        "#{I18n.t(i18n_key, number: number, jurisdiction_name: jurisdiction_name)}",
+        "#{I18n.t(i18n_key, number: number, jurisdiction_name: program_name)}",
       "object_data" => {
         "permit_application_id" => id
       }
@@ -619,9 +628,8 @@ class PermitApplication < ApplicationRecord
     #Rails.logger.info("program #{program.inspect}")
     last_number =
       program
-        .permit_applications#.where("number LIKE ?", "#{number_prefix}-%")
-        .
-        order(Arel.sql("LENGTH(number) DESC"), number: :desc)
+        .permit_applications #.where("number LIKE ?", "#{number_prefix}-%")
+        .order(Arel.sql("LENGTH(number) DESC"), number: :desc)
         .limit(1)
         .pluck(:number)
         .first
@@ -630,7 +638,7 @@ class PermitApplication < ApplicationRecord
 
     if last_number
       number_parts = last_number.split("-")
-      new_integer = number_parts[1..-1].join.to_i + 1 # Increment the sequence
+      new_integer = number_parts[0..-1].join.to_i + 1 # Increment the sequence
 
       # the remainder of dividing any number by 1000 always gives the last 3 digits
       # Removing the last 3 digits (integer division by 1000), then taking the remainder above gives the middle 3
@@ -655,7 +663,7 @@ class PermitApplication < ApplicationRecord
         )
     else
       # Start with the initial number if there are no previous numbers
-      new_number = format("001-000-000")
+      new_number = format("000-000-001")
     end
 
     # Assign the new number to the permit application
