@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_03_215538) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_09_002443) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -255,11 +255,11 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_03_215538) do
                force: :cascade do |t|
     t.integer "status", default: 0
     t.uuid "submitter_id", null: false
-    t.uuid "jurisdiction_id", null: false
+    t.uuid "jurisdiction_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "permit_type_id", null: false
-    t.uuid "activity_id", null: false
+    t.uuid "permit_type_id"
+    t.uuid "activity_id"
     t.string "full_address"
     t.string "pid"
     t.string "pin"
@@ -276,18 +276,29 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_03_215538) do
     t.datetime "revisions_requested_at", precision: nil
     t.boolean "first_nations", default: false
     t.uuid "sandbox_id"
+    t.uuid "program_id"
+    t.uuid "user_group_type_id"
+    t.uuid "audience_type_id"
+    t.uuid "submission_type_id"
     t.index ["activity_id"], name: "index_permit_applications_on_activity_id"
+    t.index ["audience_type_id"],
+            name: "index_permit_applications_on_audience_type_id"
     t.index ["jurisdiction_id"],
             name: "index_permit_applications_on_jurisdiction_id"
-    t.index ["number"],
-            name: "index_permit_applications_on_number",
-            unique: true
     t.index ["permit_type_id"],
             name: "index_permit_applications_on_permit_type_id"
+    t.index %w[program_id number],
+            name: "index_permit_applications_on_program_id_and_number",
+            unique: true
+    t.index ["program_id"], name: "index_permit_applications_on_program_id"
     t.index ["sandbox_id"], name: "index_permit_applications_on_sandbox_id"
+    t.index ["submission_type_id"],
+            name: "index_permit_applications_on_submission_type_id"
     t.index ["submitter_id"], name: "index_permit_applications_on_submitter_id"
     t.index ["template_version_id"],
             name: "index_permit_applications_on_template_version_id"
+    t.index ["user_group_type_id"],
+            name: "index_permit_applications_on_user_group_type_id"
   end
 
   create_table "permit_block_statuses",
@@ -1001,7 +1012,17 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_03_215538) do
                   column: "activity_id"
   add_foreign_key "permit_applications",
                   "permit_classifications",
+                  column: "audience_type_id"
+  add_foreign_key "permit_applications",
+                  "permit_classifications",
                   column: "permit_type_id"
+  add_foreign_key "permit_applications",
+                  "permit_classifications",
+                  column: "submission_type_id"
+  add_foreign_key "permit_applications",
+                  "permit_classifications",
+                  column: "user_group_type_id"
+  add_foreign_key "permit_applications", "programs"
   add_foreign_key "permit_applications", "sandboxes"
   add_foreign_key "permit_applications", "template_versions"
   add_foreign_key "permit_applications", "users", column: "submitter_id"

@@ -2,17 +2,17 @@ class Api::EspApplicationController < Api::ApplicationController
   before_action :set_resources, only: [:create]
 
   def create
-    Rails.logger.info("template: #{@template.inspect}")
+    #Rails.logger.info("template: #{@template.inspect}")
     permit_application =
       PermitApplication.create!(
         submitter: @user,
-        jurisdiction: @sub_district,
-        permit_type: @permit_type,
-        activity: @activity,
+        user_group_type: @user_group_type,
+        audience_type: @audience_type,
+        submission_type: @submission_type,
+        program: @program,
         status: :new_draft,
         nickname: @nickname,
-        template_version: @template,
-        pid: "999999999"
+        template_version: @template
       )
 
     authorize permit_application # Ensure Pundit authorization
@@ -28,8 +28,6 @@ class Api::EspApplicationController < Api::ApplicationController
     # Handles both nested and flat JSON params
     app_params = params[:esp_application]
 
-    Rails.logger.debug "Final Params: #{app_params}" # debug
-
     if app_params.blank?
       render json: {
                error: "Request body is missing or malformed"
@@ -38,22 +36,44 @@ class Api::EspApplicationController < Api::ApplicationController
       return
     end
 
-    #@activity = Activity.find_by(id: app_params[:activity_id])
-    #@permit_type = PermitType.find_by(id: app_params[:permit_type_id])
-    @permit_type = PermitType.find_by_code("low_residential")
-    @activity = Activity.find_by_code("addition_alteration_renovation")
-    @sub_district = SubDistrict.find_by(slug: "energy-savings-program")
-    @user = User.find_by(id: app_params[:user_id])
+    @user_group_type = UserGroupType.find_by(code: :participant)
+    @audience_type = AudienceType.find_by(code: :external)
+    @submission_type = SubmissionType.find_by(code: :application)
+
+    @program = Program.find_by!(slug: "energy-savings-program")
+    @user = User.find(app_params[:user_id])
+
     @nickname =
-      app_params[:nickname] ||
-        "Energy Savings Application #{SecureRandom.hex(4)}"
-    requirement =
-      RequirementTemplate.find_by(description: "ESP test application")
-    Rails.logger.info("RequirmentID: #{requirement.id}")
-    @template =
-      TemplateVersion.find_by(
-        requirement_template_id: requirement.id,
-        status: 1
-      )
+      app_params[:nickname] || "#{program&.program_name} #{SecureRandom.hex(4)}"
+
+    begin
+      requirement =
+        RequirementTemplate.find_by!(
+          program_id: @program&.id,
+          user_group_type_id: @user_group_type&.id,
+          audience_type_id: @audience_type&.id,
+          submission_type_id: @submission_type&.id
+        )
+    rescue ActiveRecord::RecordNotFound
+      render_error(
+        "application_controller.participant_application_not_found",
+        status: :not_found
+      ) and return
+      return
+    end
+
+    begin
+      @template =
+        TemplateVersion.find_by!(
+          requirement_template_id: requirement.id,
+          status: 1
+        )
+    rescue ActiveRecord::RecordNotFound
+      render_error(
+        "application_controller.participant_application_not_published",
+        status: :not_found
+      ) and return
+      return
+    end
   end
 end

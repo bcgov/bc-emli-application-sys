@@ -77,12 +77,12 @@ class PermitApplication::FormJsonService
 
           next unless has_only_elective_fields
 
-          enabled_elective_field_ids =
-            permit_application.form_customizations&.dig(
-              "requirement_block_changes",
-              rb_id,
-              "enabled_elective_field_ids"
-            ) || []
+          enabled_elective_field_ids = []
+          # permit_application.form_customizations&.dig(
+          #   "requirement_block_changes",
+          #   rb_id,
+          #   "enabled_elective_field_ids"
+          # ) || []
 
           # remove the block if no elective fields are enabled
           next rb_id if enabled_elective_field_ids.empty?
