@@ -5,7 +5,7 @@ runs:
   using: composite
   steps:
   # See https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows#example-using-the-cache-action
-  - uses: actions/cache@v3
+  - uses: actions/cache@v4
     env:
       cache-name: cache-node-modules
     with:
@@ -17,5 +17,5 @@ runs:
         ${{ runner.os }}-
 
   - name: Install Root NPM packages
-    run: npm install
+    run: npm install --no-optional --loglevel verbose
     shell: bash
