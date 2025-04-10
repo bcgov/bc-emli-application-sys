@@ -329,9 +329,9 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
             {isSubmitted ? (
               <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
                 <BrowserSearchPrompt />
-                <Button variant="ghost" leftIcon={<Info size={20} />} color="white" onClick={onContactsOpen}>
+                {/* <Button variant="ghost" leftIcon={<Info size={20} />} color="white" onClick={onContactsOpen}>
                   {t('permitApplication.show.contactsSummary')}
-                </Button>{' '}
+                </Button>{' '} */}
                 {/* <CollaboratorsSidebar
                   permitApplication={currentPermitApplication}
                   collaborationType={ECollaborationType.submission}

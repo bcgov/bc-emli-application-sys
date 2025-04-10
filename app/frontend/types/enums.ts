@@ -45,7 +45,7 @@ export enum EPermitApplicationStatus {
   submitted = 'newly_submitted',
   revisionsRequested = 'revisions_requested',
   resubmitted = 'resubmitted',
-  // ephemeral = "ephemeral",
+  ephemeral = 'ephemeral',
   inReview = 'in_review',
   updateNeeded = 'update_needed',
   approved = 'approved',

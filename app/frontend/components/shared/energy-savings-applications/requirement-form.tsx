@@ -61,6 +61,7 @@ export const RequirementForm = observer(
 
     const shouldShowDiff = permitApplication?.shouldShowApplicationDiff(isEditing);
     const userShouldSeeDiff = permitApplication?.currentUserShouldSeeApplicationDiff;
+    const isSubmitted = permitApplication?.isSubmitted;
 
     const pastVersion = isViewingPastRequests ? selectedPastSubmissionVersion : previousSubmissionVersion;
     const isMounted = useMountStatus();
@@ -387,7 +388,7 @@ export const RequirementForm = observer(
         <BuilderBottomFloatingButtons
           isCollapsedAll={isCollapsedAll}
           setIsCollapsedAll={setIsCollapsedAll}
-          renderSaveButton={renderSaveButton}
+          renderSaveButton={!isSubmitted ?? renderSaveButton}
         />
         {isOpen && (
           <PermitApplicationSubmitModal
