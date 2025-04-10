@@ -1,22 +1,22 @@
-import { Avatar, Box, HStack, Stack, Tooltip } from "@chakra-ui/react"
-import { observer } from "mobx-react-lite"
-import React, { useEffect, useState } from "react"
-import { createPortal } from "react-dom"
-import { IPermitApplication } from "../../../../models/energy-savings-application"
-import { ECollaborationType, EPermitBlockStatus } from "../../../../types/enums"
-import { BlockStatusSelect } from "../../../shared/select/selectors/block-status-select"
-import { CollaboratorAssignmentPopover } from "./collaborator-assignment-popover"
+import { Avatar, Box, HStack, Stack, Tooltip } from '@chakra-ui/react';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { IPermitApplication } from '../../../../models/energy-savings-application';
+import { ECollaborationType, EPermitBlockStatus } from '../../../../types/enums';
+import { BlockStatusSelect } from '../../../shared/select/selectors/block-status-select';
+import { CollaboratorAssignmentPopover } from './collaborator-assignment-popover';
 
 export interface IRequirementBlockAssignmentNode {
-  requirementBlockId: string
-  panelNode: HTMLElement
-  attachmentNode: HTMLElement
+  requirementBlockId: string;
+  panelNode: HTMLElement;
+  attachmentNode: HTMLElement;
 }
 
 interface IProps {
-  requirementBlockAssignmentNode: IRequirementBlockAssignmentNode
-  permitApplication: IPermitApplication
-  collaborationType: ECollaborationType
+  requirementBlockAssignmentNode: IRequirementBlockAssignmentNode;
+  permitApplication: IPermitApplication;
+  collaborationType: ECollaborationType;
 }
 
 export const BlockCollaboratorAssignmentManagement = observer(function BlockCollaboratorAssignmentManagement({
@@ -24,11 +24,11 @@ export const BlockCollaboratorAssignmentManagement = observer(function BlockColl
   permitApplication,
   collaborationType,
 }: IProps) {
-  const { requirementBlockId, attachmentNode } = requirementBlockAssignmentNode
+  const { requirementBlockId, attachmentNode } = requirementBlockAssignmentNode;
   const existingAssignments = permitApplication.getCollaborationAssigneesByBlockId(
     collaborationType,
-    requirementBlockId
-  )
+    requirementBlockId,
+  );
   return (
     <>
       {createPortal(
@@ -44,80 +44,81 @@ export const BlockCollaboratorAssignmentManagement = observer(function BlockColl
             requirementBlockId={requirementBlockId}
           />
         </HStack>,
-        attachmentNode
+        attachmentNode,
       )}
 
       {createPortal(
         <Stack
-          as={"ul"}
+          as={'ul'}
           top={0}
-          right={"-48px"}
-          position={"absolute"}
-          listStyleType={"none"}
+          right={'-48px'}
+          position={'absolute'}
+          listStyleType={'none'}
           pl={0}
           spacing={1}
           onClick={(e) => e.stopPropagation()}
-          cursor={"auto"}
+          cursor={'auto'}
         >
           {existingAssignments.map((assignment) => (
-            <Box as={"li"} key={assignment.id} pl={0}>
+            <Box as={'li'} key={assignment.id} pl={0}>
               <Tooltip label={assignment.collaborator?.user?.name}>
-                <Avatar name={assignment.collaborator?.user?.name} size={"sm"} />
+                <Avatar name={assignment.collaborator?.user?.name} size={'sm'} />
               </Tooltip>
             </Box>
           ))}
         </Stack>,
-        attachmentNode
+        attachmentNode,
       )}
     </>
-  )
-})
+  );
+});
 
 const StatusSelect = observer(function StatusSelect({
   permitApplication,
   collaborationType,
   requirementBlockId,
 }: {
-  permitApplication: IPermitApplication
-  collaborationType: ECollaborationType
-  requirementBlockId: string
+  permitApplication: IPermitApplication;
+  collaborationType: ECollaborationType;
+  requirementBlockId: string;
 }) {
-  const permitBlockStatus = permitApplication.getPermitBlockStatus(collaborationType, requirementBlockId)
+  const permitBlockStatus = permitApplication.getPermitBlockStatus(collaborationType, requirementBlockId);
 
-  const [status, setStatus] = useState<EPermitBlockStatus>(permitBlockStatus?.status || EPermitBlockStatus.draft)
+  const [status, setStatus] = useState<EPermitBlockStatus>(permitBlockStatus?.status || EPermitBlockStatus.draft);
 
   useEffect(() => {
-    setStatus(permitBlockStatus?.status || EPermitBlockStatus.draft)
-  }, [permitBlockStatus?.status])
+    setStatus(permitBlockStatus?.status || EPermitBlockStatus.draft);
+  }, [permitBlockStatus?.status]);
 
   const onChange = async (newStatus: EPermitBlockStatus) => {
-    const originalStatus = permitBlockStatus?.status || EPermitBlockStatus.draft
+    const originalStatus = permitBlockStatus?.status || EPermitBlockStatus.draft;
     try {
-      setStatus(newStatus)
+      setStatus(newStatus);
 
       const response = await permitApplication.createOrUpdatePermitBlockStatus(
         requirementBlockId,
         newStatus,
-        collaborationType
-      )
+        collaborationType,
+      );
 
       if (!response) {
-        setStatus(originalStatus)
+        setStatus(originalStatus);
       }
     } catch (e) {
-      setStatus(originalStatus)
+      setStatus(originalStatus);
     }
-  }
+  };
 
   const isDisabled =
-    collaborationType === ECollaborationType.review ? !permitApplication.isSubmitted : !permitApplication.isDraft
+    collaborationType === ECollaborationType.review ? !permitApplication.isSubmitted : !permitApplication.isDraft;
 
   return (
-    <BlockStatusSelect
-      value={status}
-      onChange={onChange}
-      isSelectionDisabled={isDisabled}
-      isTriggerDisabled={isDisabled}
-    />
-  )
-})
+    <></>
+    // <BlockStatusSelect
+    //   value={status}
+    //   onChange={onChange}
+    //   isSelectionDisabled={isDisabled}
+    //   isTriggerDisabled={isDisabled}
+    // />
+  );
+});

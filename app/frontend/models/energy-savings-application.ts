@@ -105,14 +105,12 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
     .views((self) => ({
       get isDraft() {
         return (
-          self.status === EPermitApplicationStatus.newDraft ||
-          self.status === EPermitApplicationStatus.revisionsRequested
+          self.status === EPermitApplicationStatus.draft || self.status === EPermitApplicationStatus.revisionsRequested
         );
       },
       get isSubmitted() {
         return (
-          self.status === EPermitApplicationStatus.newlySubmitted ||
-          self.status === EPermitApplicationStatus.resubmitted
+          self.status === EPermitApplicationStatus.submitted || self.status === EPermitApplicationStatus.resubmitted
         );
       },
       get isRevisionsRequested() {

@@ -55,22 +55,22 @@ class PermitApplicationPolicy < ApplicationPolicy
     #TODO: this is where we handle who can submit what, this needs to be re-worked
     # to allow admins/psr's the ability to submit in place of a Partiticipant
     Rails.logger.info("#{user.inspect}")
-    record.draft? ? record.submitter == user : user.review_staff?
+    record.draft? ? record.submitter == user : user.admin_manager?
     if record.draft?
       record.submission_requirement_block_edit_permissions(user_id: user.id) ==
         :all
     else
-      user.review_staff? || user.participant? # user.jurisdictions.find(record.jurisdiction_id)
+      user.admin_manager? || user.participant? # user.jurisdictions.find(record.jurisdiction_id)
     end
   end
 
   def generate_missing_pdfs?
-    user.super_admin? || (user.submitter? && record.submitter == user) ||
-      ((user.review_staff?) && user.jurisdictions.find(record.jurisdiction_id))
+    user.system_admin? || (user.participant? && record.submitter == user) ||
+      ((user.admin_manager?))
   end
 
   def finalize_revision_requests?
-    user.review_staff? && record.submitted?
+    user.admin_manager? && record.submitted?
   end
 
   def create_permit_collaboration?
