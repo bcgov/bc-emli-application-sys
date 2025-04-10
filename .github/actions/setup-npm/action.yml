@@ -17,5 +17,5 @@ runs:
         ${{ runner.os }}-
 
   - name: Install Root NPM packages
-    run: npm install --no-optional --loglevel verbose
+    run: npm install --omit=optional --legacy-peer-deps --loglevel verbose
     shell: bash
