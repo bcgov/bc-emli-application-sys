@@ -137,12 +137,17 @@ export enum EUserSortFields {
 }
 
 export enum ERequirementTemplateSortFields {
+  jurisdictionsSize = 'jurisdictions_size',
+  userGroupType = 'user_group_type_desc',
+  audienceType = 'audience_type_desc',
+  submissionType = 'submission_type_desc',
   templateName = 'template_name',
   // activity = 'activity',
   // firstNations = 'first_nations',
-  description = 'description',
-  jurisdictionsSize = 'jurisdictions_size',
+  // description = 'description',
+
   currentVersion = 'current_version',
+  actions = 'actions',
 }
 
 export enum EEarlyAccessRequirementTemplateSortFields {
@@ -179,7 +184,7 @@ export enum EPermitApplicationSubmitterSortFields {
   // submittedAt = 'submitted_at',
   // viewedAt = 'viewed_at',
   updatedAt = 'updated_at',
-  status = 'status',
+  // status = 'status',
 }
 
 export enum EPermitApplicationReviewerSortFields {

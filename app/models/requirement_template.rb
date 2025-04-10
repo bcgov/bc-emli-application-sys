@@ -7,9 +7,10 @@ class RequirementTemplate < ApplicationRecord
     scheduled_template_versions
   ]
 
-  searchkick searchable: %i[description current_version permit_type],
-             word_start: %i[description current_version permit_type],
-             text_middle: %i[current_version description]
+  searchkick searchable: %i[permit_type program nickname user_group_type audience_type submission_type],
+             word_start: %i[permit_type program nickname user_group_type audience_type submission_type]
+
+  #  text_middle: %i[description current_version permit_type program nickname]
 
   belongs_to :activity, optional: true
   belongs_to :permit_type, optional: true
@@ -220,6 +221,7 @@ class RequirementTemplate < ApplicationRecord
     {
       program_id: program_id,
       nickname: nickname,
+      program: program&.program_name,
       description: description,
       first_nations: first_nations,
       current_version: published_template_version&.version_date,
