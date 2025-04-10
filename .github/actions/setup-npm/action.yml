@@ -5,7 +5,7 @@ runs:
   using: composite
   steps:
   # See https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows#example-using-the-cache-action
-  - uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf
+  - uses: actions/cache@v3
     env:
       cache-name: cache-node-modules
     with:
