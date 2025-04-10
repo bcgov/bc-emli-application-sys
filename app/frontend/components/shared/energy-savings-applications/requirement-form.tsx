@@ -388,7 +388,7 @@ export const RequirementForm = observer(
         <BuilderBottomFloatingButtons
           isCollapsedAll={isCollapsedAll}
           setIsCollapsedAll={setIsCollapsedAll}
-          renderSaveButton={!isSubmitted ?? renderSaveButton}
+          renderSaveButton={!isSubmitted ? renderSaveButton : null}
         />
         {isOpen && (
           <PermitApplicationSubmitModal
