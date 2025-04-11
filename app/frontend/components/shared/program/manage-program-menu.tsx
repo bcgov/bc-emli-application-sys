@@ -26,13 +26,13 @@ export const ManageProgramMenu = observer(function ManageProgramMenu<TSearchMode
           {t('ui.manage')}
         </MenuButton>
         <MenuList boxShadow="elevations.elevation04">
-          <ManageMenuItem icon={<Pencil size={16} />} to={`/programs/${program.programName}/edit?id=${program.id}`}>
+          <ManageMenuItem icon={<Pencil size={16} />} to={`/programs/${program.id}/edit`}>
             {t('program.edit.editProgram')}
           </ManageMenuItem>
           <ManageMenuItem icon={<Info size={16} />} to={`${program.slug}`}>
             {t('jurisdiction.index.about')}
           </ManageMenuItem>
-          <ManageMenuItem icon={<Users size={16} />} to={`${program.slug}/users`}>
+          <ManageMenuItem icon={<Users size={16} />} to={`${program.id}/users`}>
             {t('jurisdiction.index.users')}
           </ManageMenuItem>
           <ManageMenuItem icon={<Key size={16} />} to={`${program.slug}/api-settings`}>

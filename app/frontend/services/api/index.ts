@@ -233,6 +233,10 @@ export class Api {
     return this.client.post<IUsersResponse>(`/jurisdictions/${jurisdictionId}/users/search`, params);
   }
 
+  async fetchProgramUserMembership(programId, params?: TSearchParams<EUserSortFields>) {
+    return this.client.post<IUsersResponse>(`/programs/${programId}/users/search`, params);
+  }
+
   async fetchAdminUsers(params?: TSearchParams<EUserSortFields>) {
     return this.client.post<IUsersResponse>(`/users/search`, params);
   }
