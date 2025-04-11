@@ -41,12 +41,12 @@ export const RequirementTemplateGrid: React.FC<RequirementTemplateGridProps> = o
         <GridHeaders />
 
         {isSearching ? (
-          <Flex py={50} gridColumn={'span 8'} width="100%" justifyContent="center">
+          <Flex py={50} gridColumn={'span 7'} justifyContent="center">
             <SharedSpinner />
           </Flex>
         ) : (
           tableRequirementTemplates.map((rt) => (
-            <Box key={rt.id} className={'requirements-template-grid-row'} role={'row'} display={'contents'}>
+            <Box key={rt.id} role={'row'} display={'contents'}>
               <SearchGridItem>
                 {/* <YesNoTag boolean={rt.firstNations} /> */}
                 {rt.program?.programName}
@@ -106,7 +106,7 @@ const GridHeaders = observer(function GridHeaders() {
           align="center"
         >
           <Text role={'heading'}>{t('requirementTemplate.index.tableHeading')}</Text>
-          <Box minW={250}>
+          <Box minW={250} maxW={300} w="100%">
             <ModelSearchInput searchModel={requirementTemplateStore} />
           </Box>
         </GridItem>
@@ -120,20 +120,18 @@ const GridHeaders = observer(function GridHeaders() {
               justifyContent={'space-between'}
               cursor="pointer"
               onClick={() => toggleSort(field)}
-              borderRight={
-                getSortColumnHeader(field) === t('requirementTemplate.fields.currentVersion') ? 'none' : '1px solid'
-              }
+              borderRight="1px solid"
               borderColor={'border.light'}
               px={4}
             >
               <Text>{getSortColumnHeader(field)}</Text>
-              {getSortColumnHeader(field) !== t('requirementTemplate.fields.currentVersion') && (
-                <SortIcon<ERequirementTemplateSortFields> field={field} currentSort={sort} />
-              )}
+              {getSortColumnHeader(field) !== t('requirementTemplate.fields.currentVersion') &&
+                field !== ERequirementTemplateSortFields.actions && (
+                  <SortIcon<ERequirementTemplateSortFields> field={field} currentSort={sort} />
+                )}
             </Flex>
           </GridHeader>
         ))}
-        {/* <GridHeader role={'columnheader'} /> */}
       </Box>
     </Box>
   );
