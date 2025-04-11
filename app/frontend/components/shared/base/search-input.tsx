@@ -18,7 +18,7 @@ export const SearchInput = observer(function SearchInput<TSearchModel extends IS
   inputProps,
 }: IProps) {
   return (
-    <InputGroup as={'section'} w={{ md: '20%', base: 'full' }} bg={'white'} {...inputGroupProps}>
+    <InputGroup as={'section'} bg={'white'} {...inputGroupProps}>
       <Input
         title={'search input'}
         type={'search'}

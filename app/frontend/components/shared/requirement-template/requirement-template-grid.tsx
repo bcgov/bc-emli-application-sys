@@ -106,7 +106,9 @@ const GridHeaders = observer(function GridHeaders() {
           align="center"
         >
           <Text role={'heading'}>{t('requirementTemplate.index.tableHeading')}</Text>
-          <ModelSearchInput searchModel={requirementTemplateStore} />
+          <Box minW={250}>
+            <ModelSearchInput searchModel={requirementTemplateStore} />
+          </Box>
         </GridItem>
       </Box>
       <Box display={'contents'} role={'row'}>
