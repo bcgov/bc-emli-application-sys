@@ -20,8 +20,9 @@ export type TCreateProgramFormData = {
 export const NewProgramScreen = observer(() => {
   const { t } = useTranslation();
   const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const id = queryParams.get('id');
+  //const queryParams = new URLSearchParams(location.search);
+  //const id = queryParams.get('id');
+  const { programId } = useParams();
   const [program, setProgram] = useState<IProgram>();
   const [useCustom, setUseCustom] = useState<boolean>(false);
 
@@ -48,10 +49,10 @@ export const NewProgramScreen = observer(() => {
   const { isSubmitting, isValid } = formState;
 
   useEffect(() => {
-    if (id) {
+    if (programId) {
       (async () => {
         try {
-          const fetchedProgram = await fetchProgram(id);
+          const fetchedProgram = await fetchProgram(programId);
           if (fetchedProgram) {
             setValue('programName', fetchedProgram.programName);
             setValue('fundedBy', fetchedProgram.fundedBy);
@@ -62,12 +63,12 @@ export const NewProgramScreen = observer(() => {
         }
       })();
     }
-  }, [id, fetchProgram, setValue]);
+  }, [programId, fetchProgram, setValue]);
 
   const onSubmit = async (formData) => {
     try {
-      if (id) {
-        await updateProgram(id, formData);
+      if (programId) {
+        await updateProgram(programId, formData);
       } else {
         const createdProgram = await createProgram(formData);
         if (createdProgram) {
@@ -130,7 +131,7 @@ export const NewProgramScreen = observer(() => {
               <>
                 <Flex direction="column" as="section" gap={6} w="full" alignSelf="center">
                   <Heading as="h1" color="theme.blueAlt">
-                    {id ? t('program.edit.editProgram') : t('program.new.title')}
+                    {programId ? t('program.edit.editProgram') : t('program.new.title')}
                   </Heading>
 
                   <Box w="full">
@@ -186,7 +187,7 @@ export const NewProgramScreen = observer(() => {
                       isLoading={isSubmitting}
                       loadingText={t('ui.loading')}
                     >
-                      {id ? 'Save' : t('program.new.createButton')}
+                      {programId ? t('ui.onlySave') : t('program.new.createButton')}
                     </Button>
                     <Button variant="secondary" width={'140px'} isDisabled={isSubmitting} onClick={() => navigate(-1)}>
                       {t('ui.cancel')}

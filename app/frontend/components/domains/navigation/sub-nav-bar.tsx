@@ -19,22 +19,9 @@ export const SubNavBar = observer(({ staticBreadCrumbs, breadCrumbContainerProps
   const path = location.pathname;
 
   return (
-    <Flex
-      w="full"
-      align="center"
-      position="sticky"
-      zIndex={9}
-      borderBottom="1px solid"
-      borderColor="border.light"
-      overflow="hidden"
-      {...containerProps}
-    >
+    <Flex w="full" align="center" position="sticky" zIndex={9} borderBottom="1px solid" borderColor="border.light" overflow="hidden" {...containerProps}>
       <Container minW="container.lg" px={8} {...breadCrumbContainerProps}>
-        {Array.isArray(staticBreadCrumbs) ? (
-          <SiteBreadcrumbs breadcrumbs={staticBreadCrumbs} />
-        ) : (
-          <DynamicBreadcrumb path={path} />
-        )}
+        {Array.isArray(staticBreadCrumbs) ? <SiteBreadcrumbs breadcrumbs={staticBreadCrumbs} /> : <DynamicBreadcrumb path={path} />}
       </Container>
     </Flex>
   );
@@ -79,7 +66,7 @@ const DynamicBreadcrumb = observer(({ path }: IDynamicBreadcrumbProps) => {
         : //@ts-ignore
           t(`site.breadcrumb.${toCamelCase(segment)}`);
 
-      let title = decodeURIComponent(titleGot);
+      const title = decodeURIComponent(titleGot);
 
       return { href, title };
     });
