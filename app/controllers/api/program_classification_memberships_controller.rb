@@ -1,4 +1,4 @@
-class ProgramClassificationMembershipsController < ApplicationController
+class Api::ProgramClassificationMembershipsController < ApplicationController
   before_action :set_program
 
   def participant_inbox_memberships
@@ -67,14 +67,7 @@ class ProgramClassificationMembershipsController < ApplicationController
   end
 
   def destroy
-    membership =
-      ProgramClassificationMembership.find_by!(
-        user_id: params[:user_id],
-        program_id: @program.id,
-        user_group_type_id: user_group_type_id(params[:user_group_type].to_sym),
-        submission_type_id: submission_type_id_or_nil(params[:submission_type])
-      )
-
+    membership = ProgramClassificationMembership.find(params[:id])
     membership.destroy
     head :no_content
   end
@@ -100,6 +93,10 @@ class ProgramClassificationMembershipsController < ApplicationController
   end
 
   def submission_type_id_or_nil(code)
-    code.present? ? submission_type_id(code.to_sym) : nil
+    return nil if code.blank?
+    PermitClassification.find_by!(
+      code: PermitClassification.codes[code],
+      type: "SubmissionType"
+    ).id
   end
 end
