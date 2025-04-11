@@ -144,6 +144,15 @@ Rails.application.routes.draw do
 
     resources :programs, only: %i[index update show create] do
       post "search", on: :collection, to: "programs#index"
+
+      resources :program_classification_memberships, only: %i[create destroy] do
+        collection do
+          get :participant_inbox_memberships
+          get :contractor_inbox_memberships
+          get :contractor_onboarding_memberships
+          get :inbox_membership_exists
+        end
+      end
     end
 
     resources :contacts, only: %i[create update destroy] do
