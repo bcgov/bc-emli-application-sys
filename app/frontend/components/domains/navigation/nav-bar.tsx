@@ -197,6 +197,11 @@ export const NavBar = observer(function NavBar() {
                   {t('user.roles.system_admin')}
                 </Text>
               )}
+              {currentUser?.isAdminManager && (
+                <Text color="text.primary" textTransform="capitalize">
+                  {t('user.roles.adminManager')}
+                </Text>
+              )}
               {/* {(!loggedIn || currentUser?.isSubmitter) && (
                 <Show above="md">
                   <RouterLinkButton variant="tertiary" to="/jurisdictions">
@@ -207,7 +212,7 @@ export const NavBar = observer(function NavBar() {
               {loggedIn && <NotificationsPopover aria-label="notifications popover" color="text.primary" />}
 
               <NavBarMenu />
-              {!currentUser?.isSuperAdmin && (
+              {!currentUser?.isSuperAdmin && !currentUser?.isAdminManager && (
                 <Show above="lg">
                   <RouterLinkButton variant="tertiary" color="text.primary" to={'/get-support'}>
                     {t('site.support.getSupport')}
@@ -221,7 +226,7 @@ export const NavBar = observer(function NavBar() {
                   </RouterLinkButton>
                 </Show>
               )}
-              {loggedIn && !currentUser?.isSuperAdmin && (
+              {loggedIn && !currentUser?.isSuperAdmin && !currentUser?.isAdminManager && (
                 <Show above="md">
                   <RouterLinkButton variant="tertiary" color="text.primary" onClick={handleClickLogout}>
                     {t('auth.logout')}
