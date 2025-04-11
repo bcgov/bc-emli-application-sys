@@ -18,21 +18,21 @@ export const SearchInput = observer(function SearchInput<TSearchModel extends IS
   inputProps,
 }: IProps) {
   return (
-    <InputGroup as={"section"} w={{ md: "250px", base: "full" }} bg={"white"} {...inputGroupProps}>
+    <InputGroup as={'section'} bg={'white'} {...inputGroupProps}>
       <Input
-        title={"search input"}
-        type={"search"}
-        placeholder={"Search"}
-        fontSize={"sm"}
+        title={'search input'}
+        type={'search'}
+        placeholder={'Search'}
+        fontSize={'sm'}
         onChange={(e) => onQueryChange(e.target.value)}
-        value={query ?? ""}
+        value={query ?? ''}
         h="38px"
         borderColor="border.input"
         {...inputProps}
       />
-      <InputLeftElement color={"greys.grey01"}>
+      <InputLeftElement color={'greys.grey01'}>
         <MagnifyingGlass size={16} />
       </InputLeftElement>
     </InputGroup>
-  )
+  );
 })

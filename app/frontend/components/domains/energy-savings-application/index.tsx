@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Container,
   Flex,
@@ -104,7 +105,9 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
                 )}
                 <FormControl flex={1}>
                   <FormLabel>{t('ui.search')}</FormLabel>
-                  <ModelSearchInput searchModel={permitApplicationStore} />
+                  <Box minW={{ md: 250, base: '100%' }}>
+                    <ModelSearchInput searchModel={permitApplicationStore} />
+                  </Box>
                 </FormControl>
               </Flex>
               <SortSelect

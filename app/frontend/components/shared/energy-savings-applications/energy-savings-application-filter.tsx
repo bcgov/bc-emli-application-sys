@@ -182,12 +182,13 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
           {Object.values(EPermitApplicationStatusGroup).map((filterValue) => (
             <MenuItem
               key={filterValue}
-              onClick={(e) => handleFilterSelect(filterValue, !selectedFilters.includes(filterValue))}
+              onClick={() => {
+                const isSelected = selectedFilters.includes(filterValue);
+                handleFilterSelect(filterValue, !isSelected);
+              }}
             >
-              <Checkbox isChecked={selectedFilters.includes(filterValue)}>
-                <span onClick={(e) => e.stopPropagation()}>
-                  {t(`energySavingsApplication.statusGroup.${filterValue}`)}
-                </span>
+              <Checkbox isChecked={selectedFilters.includes(filterValue)} pointerEvents="none">
+                {t(`energySavingsApplication.statusGroup.${filterValue}`)}
               </Checkbox>
             </MenuItem>
           ))}
@@ -199,5 +200,5 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
         </MenuList>
       </Menu>
     </Container>
-  )
+  );
 })

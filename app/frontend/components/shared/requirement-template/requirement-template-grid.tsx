@@ -37,22 +37,26 @@ export const RequirementTemplateGrid: React.FC<RequirementTemplateGridProps> = o
 
   return (
     <VStack alignItems={'flex-start'} spacing={5} w={'full'} h={'full'}>
-      <SearchGrid templateColumns="1fr 2fr repeat(2, 1fr)">
+      <SearchGrid templateColumns="repeat(5, 1fr)">
         <GridHeaders />
 
         {isSearching ? (
-          <Flex py={50} gridColumn={'span 6'} width="100%" justifyContent="center">
+          <Flex py={50} gridColumn={'span 8'} width="100%" justifyContent="center">
             <SharedSpinner />
           </Flex>
         ) : (
           tableRequirementTemplates.map((rt) => (
             <Box key={rt.id} className={'requirements-template-grid-row'} role={'row'} display={'contents'}>
-              <SearchGridItem fontWeight="bold">{rt.nickname ?? 'N/A'}</SearchGridItem>
-              <SearchGridItem>{rt.description}</SearchGridItem>
               <SearchGridItem>
                 {/* <YesNoTag boolean={rt.firstNations} /> */}
                 {rt.program?.programName}
               </SearchGridItem>
+              <SearchGridItem>{rt.program?.userGroupType}</SearchGridItem>
+              <SearchGridItem>{rt.program?.audienceType}</SearchGridItem>
+              <SearchGridItem>{rt.program?.submissionType}</SearchGridItem>
+              <SearchGridItem fontWeight="bold">{rt.nickname ?? 'N/A'}</SearchGridItem>
+              {/* <SearchGridItem>{rt.description}</SearchGridItem> */}
+
               <SearchGridItem>
                 {' '}
                 {rt.publishedTemplateVersion?.versionDate ? (
@@ -95,14 +99,16 @@ const GridHeaders = observer(function GridHeaders() {
       <Box display={'contents'} role={'row'}>
         <GridItem
           as={Flex}
-          gridColumn={'span 5'}
+          gridColumn={'span 7'}
           p={6}
           bg={'greys.grey10'}
           justifyContent={'space-between'}
           align="center"
         >
           <Text role={'heading'}>{t('requirementTemplate.index.tableHeading')}</Text>
-          <ModelSearchInput searchModel={requirementTemplateStore} />
+          <Box minW={250}>
+            <ModelSearchInput searchModel={requirementTemplateStore} />
+          </Box>
         </GridItem>
       </Box>
       <Box display={'contents'} role={'row'}>
@@ -127,7 +133,7 @@ const GridHeaders = observer(function GridHeaders() {
             </Flex>
           </GridHeader>
         ))}
-        <GridHeader role={'columnheader'} />
+        {/* <GridHeader role={'columnheader'} /> */}
       </Box>
     </Box>
   );

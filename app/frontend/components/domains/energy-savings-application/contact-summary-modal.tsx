@@ -37,37 +37,37 @@ export const ContactSummaryModal = ({ isOpen, onOpen, onClose, permitApplication
       <ModalContent>
         <ModalHeader>
           <Flex w="full" justify="space-between" my={3}>
-            <Heading as="h1" textTransform={"capitalize"}>
-              {t("permitApplication.show.contactsSummary")}
+            <Heading as="h1" textTransform={'capitalize'}>
+              {t('permitApplication.show.contactsSummary')}
             </Heading>
           </Flex>
           <ModalCloseButton fontSize="11px" />
         </ModalHeader>
         <ModalBody py={6}>
           <SearchGrid templateColumns="repeat(5, 1fr)">
-            <Box display={"contents"} role={"rowgroup"}>
-              <Box display={"contents"} role={"row"}>
+            <Box display={'contents'} role={'rowgroup'}>
+              <Box display={'contents'} role={'row'}>
                 <GridItem
                   as={Flex}
-                  gridColumn={"span 5"}
+                  gridColumn={'span 5'}
                   p={6}
-                  bg={"greys.grey10"}
-                  justifyContent={"space-between"}
+                  bg={'greys.grey04'}
+                  justifyContent={'space-between'}
                   align="center"
                 >
-                  <Text role={"heading"} as={"h3"} color={"black"} fontSize={"sm"} height="fit-content">
-                    {t("permitApplication.show.contactSummaryHeading")}
+                  <Text role={'heading'} as={'h3'} color={'black'} fontSize={'sm'} height="fit-content">
+                    {t('permitApplication.show.contactSummaryHeading')}
                   </Text>
                 </GridItem>
               </Box>
-              <Box display={"contents"} role={"row"}>
+              <Box display={'contents'} role={'row'}>
                 {Object.values(EContactSortFields).map((field, index) => (
-                  <GridHeader key={field} role={"columnheader"}>
+                  <GridHeader key={field} role={'columnheader'}>
                     <Flex
-                      w={"full"}
-                      justifyContent={"space-between"}
+                      w={'full'}
+                      justifyContent={'space-between'}
                       cursor="default"
-                      borderColor={"border.light"}
+                      borderColor={'border.light'}
                       borderLeftWidth={index == 0 ? 0 : 1}
                       px={4}
                     >
@@ -80,10 +80,10 @@ export const ContactSummaryModal = ({ isOpen, onOpen, onClose, permitApplication
               </Box>
             </Box>
             {contacts.map((contact) => {
-              const { title, name, email, phone, address } = contact
+              const { title, name, email, phone, address } = contact;
               return (
                 <Contact key={contact.id} title={title} name={name} email={email} phone={phone} address={address} />
-              )
+              );
             })}
             {permitApplication.stepCode && (
               <EnergyAdvisor checklist={permitApplication.stepCode.preConstructionChecklist} />
@@ -92,7 +92,7 @@ export const ContactSummaryModal = ({ isOpen, onOpen, onClose, permitApplication
         </ModalBody>
       </ModalContent>
     </Modal>
-  )
+  );
 }
 
 function EnergyAdvisor({ checklist }) {
