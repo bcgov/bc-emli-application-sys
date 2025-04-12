@@ -11,9 +11,3 @@ test:
 
 production:
   <<: *default
-
-postgres://postgres:password@postgres:5432/app_development
-postgres://postgres:password@postgres:5432/test_db
-POSTGRES_DB: 
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: password
