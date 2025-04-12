@@ -140,7 +140,7 @@ export const ProgramStoreModel = types
     },
     setCurrentProgramBySlug(slug) {
       const j = self.programs.find((j) => j.slug == slug);
-      self.currentProgram = j?.id;
+      self.currentProgram = j;
       return j?.id;
     },
   }))

@@ -8,7 +8,7 @@ class Program < ApplicationRecord
   #   contacts
   #   permit_type_required_steps
   # ]
-  BASE_INCLUDES = %i[contacts]
+  BASE_INCLUDES = %i[]
   include ActionView::Helpers::SanitizeHelper
   searchkick searchable: %i[program_name funded_by],
              word_start: %i[program_name funded_by],
@@ -18,6 +18,10 @@ class Program < ApplicationRecord
   has_one :preference
   has_many :permit_applications
   has_many :contacts, as: :contactable, dependent: :destroy
+
+  has_many :program_classification_memberships
+  has_many :users, through: :program_classification_memberships
+
   # has_many :jurisdiction_memberships, dependent: :destroy
   # has_many :users, through: :jurisdiction_memberships
   has_many :submitters, through: :permit_applications, source: :submitter
