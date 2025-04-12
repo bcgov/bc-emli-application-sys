@@ -23,7 +23,7 @@ class ProgramBlueprint < Blueprinter::Base
     field :external_api_enabled do |program, options|
       program.external_api_enabled?
     end
-    association :contacts, blueprint: ContactBlueprint
+    # association :contacts, blueprint: ContactBlueprint
     # association :permit_type_submission_contacts,
     #             blueprint: PermitTypeSubmissionContactBlueprint
     # association :sandboxes, blueprint: SandboxBlueprint

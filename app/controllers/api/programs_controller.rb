@@ -1,6 +1,6 @@
 class Api::ProgramsController < Api::ApplicationController
   include Api::Concerns::Search::Programs
-  include Api::Concerns::Search::JurisdictionUsers
+  include Api::Concerns::Search::ProgramUsers
   include Api::Concerns::Search::PermitApplications
 
   before_action :set_program,
@@ -136,14 +136,14 @@ class Api::ProgramsController < Api::ApplicationController
     end
   end
 
-  # POST /api/jurisdictions/:id/users/search
+  # POST /api/programs/:id/users/search
   def search_users
     authorize @program
     perform_user_search
     authorized_results =
       apply_search_authorization(
         @user_search.results,
-        "search_jurisdiction_users"
+        "search_program_membership_users"
       )
     render_success authorized_results,
                    nil,

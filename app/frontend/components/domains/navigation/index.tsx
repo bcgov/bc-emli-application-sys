@@ -91,6 +91,9 @@ const JurisdictionSubmissionInboxScreen = lazy(() =>
 const JurisdictionUserIndexScreen = lazy(() =>
   import('../jurisdictions/users').then((module) => ({ default: module.JurisdictionUserIndexScreen })),
 );
+const ProgramUserIndexScreen = lazy(() =>
+  import('../programs/users').then((module) => ({ default: module.ProgramUserIndexScreen })),
+);
 const LandingScreen = lazy(() => import('../landing').then((module) => ({ default: module.LandingScreen })));
 const ContactScreen = lazy(() =>
   import('../misc/contact-screen').then((module) => ({ default: module.ContactScreen })),
@@ -350,7 +353,8 @@ const AppRoutes = observer(() => {
     <>
       {/*<Route path="/programs/new" element={<NewProgramsScreen />} />*/}
       <Route path="/programs/new-program" element={<NewProgramScreen />} />
-      <Route path="/programs/:programName/edit" element={<NewProgramScreen />} />
+      <Route path="/programs/:programId/edit" element={<NewProgramScreen />} />
+      <Route path="/programs/:programId/users" element={<ProgramUserIndexScreen />} />
       <Route path="/jurisdictions/new" element={<NewJurisdictionScreen />} />
       <Route path="/requirements-library" element={<RequirementsLibraryScreen />} />
       <Route path="/early-access/requirements-library" element={<EarlyAccessRequirementsLibraryScreen />} />

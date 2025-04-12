@@ -144,6 +144,7 @@ Rails.application.routes.draw do
 
     resources :programs, only: %i[index update show create] do
       post "search", on: :collection, to: "programs#index"
+      post "users/search", on: :member, to: "programs#search_users"
 
       resources :program_classification_memberships, only: %i[create destroy] do
         collection do
