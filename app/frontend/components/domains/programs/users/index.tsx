@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useProgram } from '../../../../hooks/resources/use-jurisdiction';
+import { useProgram } from '../../../../hooks/resources/use-program';
 import { useSearch } from '../../../../hooks/use-search';
 import { IUser } from '../../../../models/user';
 import { useMst } from '../../../../setup/root';
@@ -46,7 +46,9 @@ export const ProgramUserIndexScreen = observer(function ProgramUserIndex() {
       <VStack alignItems={'flex-start'} spacing={5} w={'full'} h={'full'}>
         <Flex justifyContent={'space-between'} w={'full'} alignItems={'flex-end'}>
           <Box>
-            <Heading as="h1">{currentProgram?.qualifiedName}</Heading>
+            <Heading as="h1" color={'theme.blueAlt'}>
+              {`${currentProgram?.programName} users`}
+            </Heading>
           </Box>
           <RouterLinkButton alignSelf="flex-end" to={'invite'}>
             {t('user.index.inviteButton')}
