@@ -39,9 +39,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def search_program_membership_users?
-    if user.system_admin? && (record.manager? || record.system_admin?)
-      return true
-    end
+    return true if user.system_admin? && (!record.participant?)
     #user.manager? && record_in_users_jurisdictions?
   end
 
