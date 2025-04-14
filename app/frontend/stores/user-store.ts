@@ -167,29 +167,6 @@ export const UserStoreModel = types
 
       return self.adminUsers.map((u) => ({ label: u.name, value: u.id }));
     }),
-    // fetchUsersByProgram: flow(function* (programId: string, opts?: { page?: number; countPerPage?: number }) {
-    //   const searchParams = {
-    //     query: self.query,
-    //     sort: self.sort,
-    //     page: opts?.page ?? self.currentPage,
-    //     perPage: opts?.countPerPage ?? self.countPerPage,
-    //     showArchived: self.showArchived,
-    //     ...Object.fromEntries(self.filters),
-    //   };
-
-    //   const response = yield self.environment.api.fetchUsersByProgram(programId, searchParams);
-
-    //   if (response.ok) {
-    //     self.mergeUpdateAll(response.data.data, 'usersMap');
-    //     self.setTableUsers(response.data.data);
-    //     self.currentPage = opts?.page ?? self.currentPage;
-    //     self.totalPages = response.data.meta.totalPages;
-    //     self.totalCount = response.data.meta.totalCount;
-    //     self.countPerPage = opts?.countPerPage ?? self.countPerPage;
-    //   }
-
-    //   return response.ok;
-    // }),
   }));
 
 export interface IUserStore extends Instance<typeof UserStoreModel> {}
