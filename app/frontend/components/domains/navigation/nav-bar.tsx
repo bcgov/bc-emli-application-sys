@@ -202,6 +202,11 @@ export const NavBar = observer(function NavBar() {
                   {t('user.roles.adminManager')}
                 </Text>
               )}
+              {currentUser?.isAdmin && (
+                <Text color="text.primary" textTransform="capitalize">
+                  {t('user.roles.admin')}
+                </Text>
+              )}
               {/* {(!loggedIn || currentUser?.isSubmitter) && (
                 <Show above="md">
                   <RouterLinkButton variant="tertiary" to="/jurisdictions">
