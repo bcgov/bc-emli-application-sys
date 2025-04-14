@@ -32,11 +32,13 @@ Rails.application.routes.draw do
                path: "",
                path_names: {
                  sign_in: "login",
-                 sign_out: "logout"
+                 sign_out: "logout",
+                 invitation: "program_invitation"
                },
                controllers: {
                  sessions: "api/sessions",
-                 invitations: "api/invitations",
+                 # invitations: "api/invitations",
+                 invitations: "api/program_invitations",
                  omniauth_callbacks: "api/omniauth_callbacks"
                }
 
@@ -45,6 +47,7 @@ Rails.application.routes.draw do
       delete "/invitation/remove" => "invitations#remove"
       get "/invitations/:invitation_token" => "invitations#show"
       get "/logout" => "sessions#destroy"
+      get "/blah", to: "blahs#index"
     end
 
     get "/permit_type_submission_contacts/confirm",

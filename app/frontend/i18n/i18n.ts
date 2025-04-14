@@ -1873,6 +1873,7 @@ const options = {
         },
         admin: {},
         errors: {
+          fetchProgram: 'Something went wrong fetching the program',
           fetchJurisdiction: 'Something went wrong fetching the jurisdiction',
           fetchPermitApplication: 'Something went wrong fetching the permit application',
           fetchPermitTypeOptions: 'Something went wrong fetching the permit type options',
@@ -2018,10 +2019,14 @@ const options = {
             participantSupportRep: 'participant support representative',
             admin: 'admin',
             contractor: 'contractor',
-            adminManager: 'admin manager',
+            admin_manager: 'admin manager',
             system_admin: 'system admin',
+            participant_support_rep: 'PSR',
           },
           rolesExplanation: {
+            admin: 'The admin role is responsible for managing everything',
+            admin_manager: 'Odds and ends',
+            participant_support_rep: 'The PSR role is for lending support to participants',
             submitter:
               'The Submitter is typically an external user, such as a contractor, homeowner, or architect,' +
               ' who initiates the building permit application process. They are responsible for providing all necessary documentation and information required for the permit application. Submitters need to ensure their submissions are complete, accurate, and comply with local regulations.',
@@ -2563,7 +2568,7 @@ const options = {
             newTemplate: 'Create a new template',
             newProgram: 'Create a new program',
             programs: 'Programs',
-            invite: 'Invite',
+            invite: 'Invite users',
             templateVersions: 'Template versions',
             requirementsLibrary: 'Requirements library',
             requirementTemplates: 'Applications template catalog',

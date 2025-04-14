@@ -54,6 +54,7 @@ import {
   ERequirementTemplateSortFields,
   ETemplateVersionStatus,
   EUserSortFields,
+  EProgramSortFields,
 } from '../../types/enums';
 import {
   IContact,
@@ -123,6 +124,10 @@ export class Api {
 
   async invite(params) {
     return this.client.post('/invitation', params);
+  }
+
+  async inviteProgram(params) {
+    return this.client.post('/program_invitation', params);
   }
 
   async acceptInvitation(userId: string, params) {

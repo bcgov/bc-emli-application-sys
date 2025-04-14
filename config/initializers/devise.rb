@@ -15,6 +15,7 @@ Devise.setup do |config|
     jwt.dispatch_requests = [
       ["POST", %r{^/api/login$}],
       ["PUT", %r{^/api/invitation$}],
+      ["PUT", %r{^/api/program_invitation$}], # I don't know if this is used...
       ["PUT", %r{^/api/password$}],
       ["GET", %r{^/api/auth/keycloak/callback$}]
     ]

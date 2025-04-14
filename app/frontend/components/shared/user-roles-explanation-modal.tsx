@@ -9,33 +9,33 @@ import {
   Stack,
   Text,
   useDisclosure,
-} from "@chakra-ui/react"
-import React from "react"
-import { useTranslation } from "react-i18next"
-import { EUserRoles } from "../../types/enums"
+} from '@chakra-ui/react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { EUserRoles } from '../../types/enums';
 
 export function UserRolesExplanationModal() {
-  const { t } = useTranslation()
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { t } = useTranslation();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   //TODO: add new roles to explain; PSR & Contractor
-  const rolesToExplain = [EUserRoles.participant, EUserRoles.adminManager, EUserRoles.admin]
+  const rolesToExplain = [EUserRoles.admin, EUserRoles.adminManager];
   return (
     <>
-      <Button onClick={onOpen} variant={"link"} textDecoration={"underline"}>
-        {t("user.rolesAndPermissions")}
+      <Button onClick={onOpen} variant={'link'} textDecoration={'underline'}>
+        {t('user.rolesAndPermissions')}
       </Button>
       <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
         <ModalOverlay />
-        <ModalContent maxW={"container.md"}>
-          <ModalHeader>{t("user.rolesAndPermissions")}</ModalHeader>
+        <ModalContent maxW={'container.md'}>
+          <ModalHeader>{t('user.rolesAndPermissions')}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Stack as={"ul"} listStyleType={"none"} spacing={4} pl={0} pb={4}>
+            <Stack as={'ul'} listStyleType={'none'} spacing={4} pl={0} pb={4}>
               {rolesToExplain.map((role) => (
-                <Text as={"li"} key={role}>
-                  <Text as={"span"} fontWeight={700} textTransform={"capitalize"}>
+                <Text as={'li'} key={role}>
+                  <Text as={'span'} fontWeight={700} textTransform={'capitalize'}>
                     {t(`user.roles.${role}`)}:
-                  </Text>{" "}
+                  </Text>{' '}
                   {t(`user.rolesExplanation.${role}`)}
                 </Text>
               ))}
@@ -44,5 +44,5 @@ export function UserRolesExplanationModal() {
         </ModalContent>
       </Modal>
     </>
-  )
+  );
 }

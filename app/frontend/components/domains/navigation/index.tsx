@@ -267,9 +267,15 @@ const AcceptInvitationScreen = lazy(() =>
   import('../users/accept-invitation-screen').then((module) => ({ default: module.AcceptInvitationScreen })),
 );
 const InviteScreen = lazy(() => import('../users/invite-screen').then((module) => ({ default: module.InviteScreen })));
+
+const InviteScreenProgram = lazy(() =>
+  import('../users/invite-screen-program').then((module) => ({ default: module.InviteScreenProgram })),
+);
+
 const ProfileScreen = lazy(() =>
   import('../users/profile-screen').then((module) => ({ default: module.ProfileScreen })),
 );
+
 const RedirectScreen = lazy(() =>
   import('../../shared/base/redirect-screen').then((module) => ({ default: module.RedirectScreen })),
 );
@@ -381,6 +387,7 @@ const AppRoutes = observer(() => {
     <>
       <Route path="/jurisdictions/:jurisdictionId/users" element={<JurisdictionUserIndexScreen />} />
       <Route path="/jurisdictions/:jurisdictionId/users/invite" element={<InviteScreen />} />
+      <Route path="/programs/:programId/users/invite" element={<InviteScreenProgram />} />
       <Route path="/jurisdictions/:jurisdictionId/export-templates" element={<ExportTemplatesScreen />} />
       <Route path="/jurisdictions/:jurisdictionId/api-settings" element={<ExternalApiKeysIndexScreen />}>
         <Route path="create" element={<ExternalApiKeyModalSubRoute />} />
