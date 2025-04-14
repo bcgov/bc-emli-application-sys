@@ -6,11 +6,12 @@ import { EnergySavingsApplicationIndexScreen } from '../energy-savings-applicati
 import { AdminManagerHomeScreen } from './admin-manager-home-screen';
 import { ReviewerHomeScreen } from './reviewer-home-screen';
 import { SuperAdminHomeScreen } from './super-admin-home-screen';
+import { AdminHomeScreen } from './admin-home.screen';
 
 const roleSpecificScreens = (role: EUserRoles, props: IHomeScreenProps) => {
   return {
     [EUserRoles.systemAdmin]: <SuperAdminHomeScreen {...props} />,
-    [EUserRoles.admin]: <ReviewerHomeScreen {...props} />,
+    [EUserRoles.admin]: <AdminHomeScreen {...props} />,
     [EUserRoles.adminManager]: <AdminManagerHomeScreen {...props} />,
     //TODO: [EUserRoles.participantSupportRep]: <ParticipantSupportRep {...props} />,
     //TODO:
