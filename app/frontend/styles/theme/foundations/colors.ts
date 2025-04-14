@@ -2,7 +2,7 @@ export const colors = {
   text: {
     primary: '#292929',
     secondary: '#464341',
-    link: '#1A5A96',
+    link: '#255A90',
   },
   theme: {
     blue: '#003366',

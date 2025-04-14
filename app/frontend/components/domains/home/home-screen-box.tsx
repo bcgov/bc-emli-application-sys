@@ -38,18 +38,18 @@ export const HomeScreenBox = observer(
         className="jumbo-buttons"
         position="relative"
         opacity={isDisabled ? 0.75 : 1}
-        pointerEvents={isDisabled ? "none" : "auto"}
+        pointerEvents={isDisabled ? 'none' : 'auto'}
         transition="border-color 200ms ease-out, background-color 200ms ease-out"
         _hover={{
-          borderColor: "theme.blueAlt",
-          backgroundColor: "theme.BlueLight",
-          cursor: "pointer",
+          borderColor: 'theme.blueAlt',
+          backgroundColor: 'theme.BlueLight',
+          cursor: 'pointer',
         }}
         {...rest}
       >
         {isMarked && <SandboxHeader />}
 
-        <Flex direction={{ base: "column", md: "row" }} gap={8} align="center">
+        <Flex direction={{ base: 'column', md: 'row' }} gap={8} align="center">
           <Flex direction="column" gap={3} flex={1}>
             <Flex align="center" color="text.link">
               {icon}
@@ -63,7 +63,7 @@ export const HomeScreenBox = observer(
           </Flex>
           {isDisabled ? (
             <Text fontWeight="bold" color="greys.grey01" maxW={100}>
-              {t("sandbox.disabledFor")}
+              {t('sandbox.disabledFor')}
             </Text>
           ) : (
             <LinkOverlay
@@ -73,12 +73,14 @@ export const HomeScreenBox = observer(
               rightIcon={<CaretRight size={16} />}
               fontWeight="bold"
               fontSize="lg"
+              textDecoration="none"
+              color="theme.blueAlt"
             >
-              {linkText || t("ui.manage")}
+              {linkText || t('ui.manage')}
             </LinkOverlay>
           )}
         </Flex>
       </LinkBox>
-    )
+    );
   }
 )
