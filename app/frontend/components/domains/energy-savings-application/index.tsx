@@ -106,7 +106,10 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
                 <FormControl flex={1}>
                   <FormLabel>{t('ui.search')}</FormLabel>
                   <Box minW={{ md: 250, base: '100%' }}>
-                    <ModelSearchInput searchModel={permitApplicationStore} />
+                    <ModelSearchInput
+                      searchModel={permitApplicationStore}
+                      inputGroupProps={{ w: { md: '100%', base: 'full' } }}
+                    />
                   </Box>
                 </FormControl>
               </Flex>
