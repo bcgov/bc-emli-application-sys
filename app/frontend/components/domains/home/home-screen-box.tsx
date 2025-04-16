@@ -8,24 +8,35 @@ import { RouterLinkButton } from "../../shared/navigation/router-link-button"
 import SandboxHeader from "../../shared/sandbox/sandbox-header"
 
 interface IHomeScreenBoxProps extends BoxProps {
-  icon: ReactNode
-  href: string
-  title: string
-  description: string
-  linkText?: string
-  markForSandbox?: boolean
-  disableForSandbox?: boolean
+  icon: ReactNode;
+  href: string;
+  title: string;
+  description: string;
+  linkText?: string;
+  markForSandbox?: boolean;
+  disableForSandbox?: boolean;
+  headingColor?: string;
 }
 
 export const HomeScreenBox = observer(
-  ({ icon, title, description, href, linkText, markForSandbox, disableForSandbox, ...rest }: IHomeScreenBoxProps) => {
-    const { t } = useTranslation()
+  ({
+    icon,
+    title,
+    description,
+    href,
+    linkText,
+    markForSandbox,
+    disableForSandbox,
+    headingColor,
+    ...rest
+  }: IHomeScreenBoxProps) => {
+    const { t } = useTranslation();
 
-    const { sandboxStore } = useMst()
-    const { isSandboxActive } = sandboxStore
+    const { sandboxStore } = useMst();
+    const { isSandboxActive } = sandboxStore;
 
-    const isDisabled = disableForSandbox && isSandboxActive
-    const isMarked = markForSandbox
+    const isDisabled = disableForSandbox && isSandboxActive;
+    const isMarked = markForSandbox;
 
     return (
       <LinkBox
@@ -51,7 +62,7 @@ export const HomeScreenBox = observer(
 
         <Flex direction={{ base: 'column', md: 'row' }} gap={8} align="center">
           <Flex direction="column" gap={3} flex={1}>
-            <Flex align="center" color="text.link">
+            <Flex align="center" color={headingColor || 'theme.blueAlt'}>
               {icon}
               <Heading as="h3" ml={2} mb={0} size="md">
                 {title}
@@ -74,7 +85,7 @@ export const HomeScreenBox = observer(
               fontWeight="bold"
               fontSize="lg"
               textDecoration="none"
-              color="theme.blueAlt"
+              color={headingColor || 'theme.blueAlt'}
             >
               {linkText || t('ui.manage')}
             </LinkOverlay>
@@ -82,5 +93,5 @@ export const HomeScreenBox = observer(
         </Flex>
       </LinkBox>
     );
-  }
-)
+  },
+);

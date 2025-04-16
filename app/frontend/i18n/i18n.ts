@@ -2357,8 +2357,8 @@ const options = {
             settings: 'Site-wide message settings',
           },
           revisionReasonsAttributesSetup: {
-            title: 'Revision reasons',
-            description: 'Setup reasons to be applied to revision requests',
+            title: 'Update reasons',
+            description: 'Setup reasons for revision requests',
             options: 'Selectable options',
             fields: {
               reasonCode: 'Reason code',
@@ -2368,7 +2368,7 @@ const options = {
           },
           helpDrawerSetup: {
             title: 'Help drawer links',
-            description: 'Setup links to show in the help drawer for all users',
+            description: 'This function will be launched soon.',
             settings: 'Links',
             fields: {
               show: 'Show',
