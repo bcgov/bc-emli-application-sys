@@ -55,22 +55,20 @@ export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               linkText={t('ui.review')}
             />
             <HomeScreenBox
+              title={t('home.startApplicationTitle')}
+              description={t('home.startApplicationDescription')}
+              icon={<Pencil size={24} />}
+              href=""
+              linkText={t('ui.start')}
+            />
+            <HomeScreenBox
               title={t('home.configureUsersTitle')}
               description={t('home.configureUsersDescription')}
               icon={<Users size={24} />}
               href="/configure-users"
               linkText={t('ui.configure')}
             />
-            <HomeScreenBox
-              title={t('home.apiSettingsTitle')}
-              description={t('home.apiSettingsDescription')}
-              icon={<SlidersHorizontal size={24} />}
-              href="/api-settings"
-              pointerEvents="none"
-              opacity={0.6}
-              bg="gray.100"
-              linkText={t('ui.comingSoon')}
-            />
+
             <HomeScreenBox
               title={t('home.reportingTitle')}
               description={t('home.reportingDescription')}
