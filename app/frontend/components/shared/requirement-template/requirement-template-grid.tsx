@@ -22,6 +22,7 @@ interface RequirementTemplateGridProps {
 
 export const RequirementTemplateGrid: React.FC<RequirementTemplateGridProps> = observer(({ renderActions }) => {
   const { requirementTemplateStore } = useMst();
+  const { t } = useTranslation();
   const {
     tableRequirementTemplates,
     currentPage,
@@ -43,6 +44,10 @@ export const RequirementTemplateGrid: React.FC<RequirementTemplateGridProps> = o
         {isSearching ? (
           <Flex py={50} gridColumn={'span 7'} justifyContent="center">
             <SharedSpinner />
+          </Flex>
+        ) : tableRequirementTemplates.length === 0 ? (
+          <Flex py={50} gridColumn={'span 7'} justifyContent="center">
+            <Text color="gray.500"> {t('errors.noResults')}</Text>
           </Flex>
         ) : (
           tableRequirementTemplates.map((rt) => (
@@ -106,12 +111,10 @@ const GridHeaders = observer(function GridHeaders() {
           align="center"
         >
           <Text role={'heading'}>{t('requirementTemplate.index.tableHeading')}</Text>
-          <Box minW={250} maxW={300} w="100%">
-            <ModelSearchInput
-              searchModel={requirementTemplateStore}
-              inputGroupProps={{ w: { md: '100%', base: 'full' } }}
-            />
-          </Box>
+          <ModelSearchInput
+            searchModel={requirementTemplateStore}
+            inputGroupProps={{ w: { md: '100%', base: 'full' } }}
+          />
         </GridItem>
       </Box>
       <Box display={'contents'} role={'row'}>

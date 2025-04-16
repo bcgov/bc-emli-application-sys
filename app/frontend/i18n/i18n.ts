@@ -1913,6 +1913,7 @@ const options = {
           fetchJurisdictionTemplateVersionCustomization:
             'Something went wrong fetching jurisdiction template version customization',
           fetchIntegrationMapping: 'Something went wrong fetching jurisdiction integration requirements mapping',
+          noResults: 'No results found.',
         },
         user: {
           fields: {
@@ -2043,8 +2044,8 @@ const options = {
             participant: 'participant',
             admin: 'admin',
             contractor: 'contractor',
-            admin_manager: 'admin manager',
-            system_admin: 'system admin',
+            adminManager: 'admin manager',
+            system_admin: 'System admin',
           },
           rolesExplanation: {
             submitter:
@@ -2551,7 +2552,7 @@ const options = {
           loggedInWelcome: 'Welcome back!',
           myApplications: 'My applications',
           myPermits: 'My permits',
-          newApplication: 'New permit application',
+          newApplication: 'Start an application',
           activePermits: 'Active permits',
           approvedPermits: 'Approved permits',
           myAccount: 'My Account',
