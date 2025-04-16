@@ -170,11 +170,7 @@ export const NavBar = observer(function NavBar() {
                   <HelpDrawer />
                 </Hide>
               )}
-              {currentUser?.isSubmitter && !currentUser.isUnconfirmed && (
-                <RouterLinkButton to="/" variant="tertiary" leftIcon={<Folders size={16} />}>
-                  {t('site.myApplications')}
-                </RouterLinkButton>
-              )}
+
               {currentUser?.isReviewStaff && !currentUser.isRegionalReviewManager && (
                 <Flex direction="column">
                   {/* <Text color="greys.white">{currentUser.jurisdiction.name}</Text> */}
@@ -192,13 +188,7 @@ export const NavBar = observer(function NavBar() {
                   {/* <RegionalRMJurisdictionSelect key={rmJurisdictionSelectKey} /> */}
                 </VStack>
               )}
-              {loggedIn && <NotificationsPopover aria-label="notifications popover" color="text.primary" />}
-              {currentUser?.isSuperAdmin && (
-                <Text color="text.primary" textTransform="capitalize">
-                  {t('user.roles.system_admin')}
-                </Text>
-              )}
-
+              {currentUser?.isSuperAdmin && <Text color="text.primary">{t('user.roles.system_admin')}</Text>}
               {currentUser?.isAdminManager && (
                 <Text color="text.primary" textTransform="capitalize">
                   {t('user.roles.admin_manager')}
@@ -217,8 +207,7 @@ export const NavBar = observer(function NavBar() {
                   </RouterLinkButton>
                 </Show>
               )} */}
-
-              <NavBarMenu />
+              {loggedIn && <NotificationsPopover aria-label="notifications popover" color="text.primary" />}
               {!currentUser?.isSuperAdmin && !currentUser?.isAdminManager && (
                 <Show above="lg">
                   <RouterLinkButton variant="tertiary" color="text.primary" to={'/get-support'}>
@@ -233,13 +222,15 @@ export const NavBar = observer(function NavBar() {
                   </RouterLinkButton>
                 </Show>
               )}
-              {loggedIn && !currentUser?.isSuperAdmin && !currentUser?.isAdminManager && (
+              {loggedIn && <NavBarMenu />}
+
+              {/* {loggedIn && !currentUser?.isSuperAdmin && !currentUser?.isAdminManager && (
                 <Show above="md">
                   <RouterLinkButton variant="tertiary" color="text.primary" onClick={handleClickLogout}>
                     {t('auth.logout')}
                   </RouterLinkButton>
                 </Show>
-              )}
+              )} */}
             </HStack>
           </Flex>
         </Container>
@@ -400,40 +391,32 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
           <MenuList zIndex={99} boxShadow="2xl">
             {loggedIn && !currentUser.isUnconfirmed ? (
               <>
-                <Text fontSize="xs" fontStyle="italic" px={3} mb={-1} color="greys.grey01">
-                  {t('site.loggedInWelcome')}
-                </Text>
-                <MenuGroup title={currentUser.name} noOfLines={1}>
-                  <MenuDivider my={0} borderColor="border.light" />
-                  <NavMenuItem label={t('site.home')} to={'/'} />
-                  {currentUser.isSuperAdmin && (
-                    <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/programs/new'} />
-                  )}
-                  {currentUser?.isSuperAdmin && superAdminOnlyItems}
-                  {(currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) && reviewManagerOnlyItems}
-                  {(currentUser?.isSuperAdmin ||
-                    currentUser?.isReviewManager ||
-                    currentUser?.isRegionalReviewManager) &&
-                    adminOrManagerItems}
-                  {currentUser?.isReviewer && reviwerOnlyItems}
-                  {currentUser?.isSubmitter && submitterOnlyItems}
-                  {currentUser?.isReviewStaff && reviewStaffOnlyItems}
+                <MenuDivider my={0} borderColor="border.light" />
+                <NavMenuItem label={t('site.home')} to={'/'} />
+                {currentUser.isSuperAdmin && <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/programs/new'} />}
+                {currentUser?.isSuperAdmin && superAdminOnlyItems}
+                {(currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) && reviewManagerOnlyItems}
+                {(currentUser?.isSuperAdmin || currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) &&
+                  adminOrManagerItems}
+                {currentUser?.isReviewer && reviwerOnlyItems}
+                {currentUser?.isSubmitter && submitterOnlyItems}
+                {currentUser?.isReviewStaff && reviewStaffOnlyItems}
 
-                  {currentUser?.isSubmitter && (
-                    <>
-                      <MenuItem bg="greys.grey03" onClick={(e) => navigate('/applications/new')}>
-                        <Button as={Box} variant="primary">
-                          {t('site.newApplication')}
-                        </Button>
-                      </MenuItem>
-                      <NavMenuItem label={t('site.myPermits')} to="/applications" bg="greys.grey03" />
-                      <MenuDivider my={0} borderColor="border.light" />
-                    </>
-                  )}
-                  <MenuDivider my={0} borderColor="border.light" />
-                  <NavMenuItem label={t('user.myAccount')} to={'/profile'} />
-                  <NavMenuItem label={t('auth.logout')} onClick={handleClickLogout} />
-                </MenuGroup>
+                {currentUser?.isSubmitter && (
+                  <>
+                    <MenuItem bg="greys.grey03" onClick={(e) => navigate('/applications/new')}>
+                      <Button as={Box} variant="primary">
+                        {t('site.newApplication')}
+                      </Button>
+                    </MenuItem>
+
+                    <NavMenuItem label={t('site.myApplications')} to="/applications" bg="greys.grey03" />
+                    <MenuDivider my={0} borderColor="border.light" />
+                  </>
+                )}
+                <MenuDivider my={0} borderColor="border.light" />
+                <NavMenuItem label={t('user.myAccount')} to={'/profile'} />
+                <NavMenuItem label={t('auth.logout')} onClick={handleClickLogout} />
               </>
             ) : (
               <>

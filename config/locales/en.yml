@@ -456,7 +456,7 @@ en:
         message: '%{error_message}'
       create_success:
         title: ''
-        message: 'New Program created successfully!'
+        message: 'New program created successfully!'
       update_error:
         title: Error
         message: '%{error_message}'

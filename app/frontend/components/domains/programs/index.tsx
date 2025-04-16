@@ -59,6 +59,10 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
             <Flex py={50} gridColumn={'span 6'}>
               <SharedSpinner />
             </Flex>
+          ) : tablePrograms.length === 0 ? (
+            <Flex py={50} gridColumn={'span 7'} justifyContent="center">
+              <Text color="gray.500"> {t('errors.noResults')}</Text>
+            </Flex>
           ) : (
             tablePrograms.map((j) => {
               return (

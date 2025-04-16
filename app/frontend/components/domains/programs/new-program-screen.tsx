@@ -1,7 +1,7 @@
 import { Box, Button, Container, Flex, HStack, Heading, Text, VStack } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { IProgram } from '../../../models/program';
@@ -67,10 +67,12 @@ export const NewProgramScreen = observer(() => {
 
   const onSubmit = async (formData) => {
     try {
+      let createdProgram;
       if (programId) {
         await updateProgram(programId, formData);
+        createdProgram = { programId };
       } else {
-        const createdProgram = await createProgram(formData);
+        createdProgram = await createProgram(formData);
         if (createdProgram) {
           setProgram(createdProgram);
         }
@@ -151,11 +153,20 @@ export const NewProgramScreen = observer(() => {
                         borderColor="greys.lightGrey"
                         borderRadius="sm"
                       >
-                        <TextFormControl
-                          label={t('program.new.nameOfProgram')}
-                          fieldName={'programName'}
-                          required
-                          w={{ base: '100%', md: '30%' }}
+                        <Controller
+                          name="programName"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field, fieldState }) => (
+                            <TextFormControl
+                              label={t('program.new.nameOfProgram')}
+                              fieldName="programName"
+                              required
+                              w={{ base: '100%', md: '30%' }}
+                              value={field.value}
+                              onChange={field.onChange}
+                            />
+                          )}
                         />
                       </Flex>
                       <Flex
@@ -168,11 +179,20 @@ export const NewProgramScreen = observer(() => {
                         borderColor="greys.lightGrey"
                         borderRadius="sm"
                       >
-                        <TextFormControl
-                          label={t('program.new.fundedBy')}
-                          fieldName={'fundedBy'}
-                          required
-                          w={{ base: '100%', md: '30%' }}
+                        <Controller
+                          name="fundedBy"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field, fieldState }) => (
+                            <TextFormControl
+                              label={t('program.new.fundedBy')}
+                              fieldName="fundedBy"
+                              required
+                              w={{ base: '100%', md: '30%' }}
+                              value={field.value}
+                              onChange={field.onChange}
+                            />
+                          )}
                         />
                       </Flex>
                     </Flex>
