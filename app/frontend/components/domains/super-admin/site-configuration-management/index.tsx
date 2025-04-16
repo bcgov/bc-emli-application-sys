@@ -1,17 +1,17 @@
 import { Container, Grid, GridItem, Heading, VStack } from "@chakra-ui/react"
-import { FlagBanner, House, NotePencil, Question, Users } from "@phosphor-icons/react"
-import { t } from "i18next"
-import { observer } from "mobx-react-lite"
-import React from "react"
-import { HomeScreenBox } from "../../home/home-screen-box"
+import { FlagBanner, House, Info, NotePencil, Question, Users } from '@phosphor-icons/react';
+import { t } from 'i18next';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { HomeScreenBox } from '../../home/home-screen-box';
 
 export const SiteConfigurationManagementScreen = observer(function SiteConfigurationManagementScreen() {
-  const i18nPrefix = "siteConfiguration"
+  const i18nPrefix = 'siteConfiguration';
 
   return (
     <Container maxW="container.lg" py={8} px={{ base: 8, xl: 0 }} flexGrow={1}>
       <VStack spacing={8} align="start">
-        <Heading mb={0} fontSize="3xl">
+        <Heading mb={0} fontSize="3xl" color="theme.blueAlt">
           {t(`${i18nPrefix}.title`)}
         </Heading>
 
@@ -20,7 +20,7 @@ export const SiteConfigurationManagementScreen = observer(function SiteConfigura
             <HomeScreenBox
               title={t(`${i18nPrefix}.sitewideMessage.title`)}
               description={t(`${i18nPrefix}.sitewideMessage.description`)}
-              linkText={t("ui.edit")}
+              linkText={t('ui.edit')}
               icon={<FlagBanner size="24px" color="var(--chakra-colors-text-link)" />}
               href="sitewide-message"
               h="full"
@@ -30,7 +30,7 @@ export const SiteConfigurationManagementScreen = observer(function SiteConfigura
             <HomeScreenBox
               title={t(`${i18nPrefix}.adminUserIndex.title`)}
               description={t(`${i18nPrefix}.adminUserIndex.description`)}
-              linkText={t("ui.edit")}
+              linkText={t('ui.edit')}
               icon={<Users size="24px" color="var(--chakra-colors-text-link)" />}
               href="users"
               h="full"
@@ -40,34 +40,27 @@ export const SiteConfigurationManagementScreen = observer(function SiteConfigura
             <HomeScreenBox
               title={t(`${i18nPrefix}.helpDrawerSetup.title`)}
               description={t(`${i18nPrefix}.helpDrawerSetup.description`)}
-              linkText={t("ui.edit")}
-              icon={<Question size="24px" color="var(--chakra-colors-text-link)" />}
+              linkText={t('ui.edit')}
+              icon={<Info size="24px" />}
               href="help-drawer-setup"
               h="full"
+              pointerEvents="none"
+              bg="gray.100"
+              headingColor="greys.grey05"
             />
           </GridItem>
           <GridItem>
             <HomeScreenBox
               title={t(`${i18nPrefix}.revisionReasonsAttributesSetup.title`)}
               description={t(`${i18nPrefix}.revisionReasonsAttributesSetup.description`)}
-              linkText={t("ui.edit")}
+              linkText={t('ui.edit')}
               icon={<NotePencil size="24px" color="var(--chakra-colors-text-link)" />}
               href="revision-reason-setup"
-              h="full"
-            />
-          </GridItem>
-          <GridItem>
-            <HomeScreenBox
-              title={t(`${i18nPrefix}.landingPageSetup.title`)}
-              description={t(`${i18nPrefix}.landingPageSetup.description`)}
-              linkText={t("ui.edit")}
-              icon={<House size="24px" color="var(--chakra-colors-text-link)" />}
-              href="landing-setup"
               h="full"
             />
           </GridItem>
         </Grid>
       </VStack>
     </Container>
-  )
-})
+  );
+});
