@@ -145,7 +145,6 @@ export const UserStoreModel = types
         perPage: opts?.countPerPage ?? self.countPerPage,
         showArchived: self.showArchived,
       };
-      };
 
       const response = yield self.rootStore.programStore.currentProgram?.id
         ? self.environment.api.fetchUsersByProgram(self.rootStore.programStore.currentProgram.id, searchParams)
@@ -165,7 +164,10 @@ export const UserStoreModel = types
     getSuperAdminOptions: flow(function* () {
       if (!self.isSuperAdminsLoaded) yield self.fetchSuperAdmins();
 
-      return self.adminUsers.map((u) => ({ label: u.name, value: u.id }));
+      return self.adminUsers.map((u) => ({
+        label: u.name,
+        value: u.id,
+      }));
     }),
   }));
 
