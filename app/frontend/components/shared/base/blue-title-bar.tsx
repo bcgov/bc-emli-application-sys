@@ -1,9 +1,9 @@
-import { Box, BoxProps, Container, Flex, Heading, Image } from "@chakra-ui/react"
-import React from "react"
+import { Box, BoxProps, Container, Flex, Heading, Image } from '@chakra-ui/react';
+import React from 'react';
 
 interface IBlueTitleBarProps extends BoxProps {
-  title: string
-  imageSrc?: string
+  title: string;
+  imageSrc?: string;
 }
 
 export const BlueTitleBar = ({ title, imageSrc, ...rest }: IBlueTitleBarProps) => {
@@ -18,7 +18,7 @@ export const BlueTitleBar = ({ title, imageSrc, ...rest }: IBlueTitleBarProps) =
         minHeight="180px"
       >
         {/* <Box position="relative" minHeight="180px" alignItems="center"> */}
-        <Heading as="h1" color="greys.white" my="12">
+        <Heading as="h1" color="greys.white">
           {title}
         </Heading>
 
@@ -35,5 +35,5 @@ export const BlueTitleBar = ({ title, imageSrc, ...rest }: IBlueTitleBarProps) =
         {/* </Box> */}
       </Container>
     </Box>
-  )
-}
+  );
+};

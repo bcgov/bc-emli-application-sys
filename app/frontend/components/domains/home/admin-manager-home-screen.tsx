@@ -1,5 +1,18 @@
 import { Container, Flex } from '@chakra-ui/react';
-import { BookOpen, Buildings, Clock, FileText, Folder, Pencil } from '@phosphor-icons/react';
+import {
+  BookOpen,
+  Buildings,
+  ClipboardText,
+  Clock,
+  Envelope,
+  FileText,
+  Folder,
+  NotePencil,
+  Pencil,
+  SlidersHorizontal,
+  Tray,
+  Users,
+} from '@phosphor-icons/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { IHomeScreenProps } from '.';
@@ -10,7 +23,7 @@ export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
   const { t } = useTranslation();
 
   return (
-    <Flex as="main" direction="column" w="full" bg="greys.white" pb="24">
+    <Flex as="main" direction="column" w="full" bg="greys.white" pb="16">
       <BlueTitleBar title={t('home.adminManagerTitle')} />
       <Container maxW="container.md" py={16}>
         <Flex direction="column" align="center" w="full">
@@ -18,40 +31,40 @@ export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
             <HomeScreenBox
               title={t('home.contractorTitle')}
               description={t('home.contractorDescription')}
-              icon={<Buildings size={24} />}
+              icon={<NotePencil size={24} />}
               href="/contractor-management"
             />
             <HomeScreenBox
               title={t('home.submissionInboxSetupTitle')}
               description={t('home.submissionInboxSetupDescription')}
-              icon={<FileText size={24} />}
+              icon={<Envelope size={24} />}
               href="/submission-inbox-setup"
             />
             <HomeScreenBox
               title={t('home.submissionInboxTitle')}
               description={t('home.submissionInboxDescription')}
-              icon={<FileText size={24} />}
+              icon={<Tray size={24} />}
               href="/submission-inbox"
               linkText={t('ui.view')}
             />
             <HomeScreenBox
               title={t('home.applicationsDashboardTitle')}
               description={t('home.applicationsDashboardDescription')}
-              icon={<BookOpen size={24} />}
+              icon={<ClipboardText size={24} />}
               href="/applications-dashboard"
               linkText={t('ui.review')}
             />
             <HomeScreenBox
               title={t('home.configureUsersTitle')}
               description={t('home.configureUsersDescription')}
-              icon={<Pencil size={24} />}
+              icon={<Users size={24} />}
               href="/configure-users"
               linkText={t('ui.configure')}
             />
             <HomeScreenBox
               title={t('home.apiSettingsTitle')}
               description={t('home.apiSettingsDescription')}
-              icon={<Folder size={24} />}
+              icon={<SlidersHorizontal size={24} />}
               href="/api-settings"
               pointerEvents="none"
               opacity={0.6}
