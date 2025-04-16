@@ -536,10 +536,11 @@ const AppRoutes = observer(() => {
           {reviewManagerOnlyRoutes}
         </Route>
 
+        {/* TODO: we need to add security around some of the role logins */}
         <Route element={<ProtectedRoute isAllowed={!loggedIn} redirectPath="/" />}>
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/admin" element={<AdminPortalLogin isAdmin />} />
-          <Route path="/psr" element={<AdminPortalLogin isPSR />} />
+          {/* <Route path="/psr" element={<AdminPortalLogin isPSR />} /> */}
           <Route path="/admin-mgr" element={<AdminPortalLogin isAdminMgr />} />
           <Route path="/sys-admin" element={<AdminPortalLogin isSysAdmin />} />
         </Route>

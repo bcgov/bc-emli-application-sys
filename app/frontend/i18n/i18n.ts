@@ -1920,7 +1920,11 @@ const options = {
             email: 'Email',
             name: 'Name',
             createdAt: 'Date added',
-            lastSignInAt: 'Last sign in',
+            lastSignInAt: 'Last signed in',
+            action: 'Action',
+            submissionInbox: 'Submission Inbox',
+            addedBy: 'Added by',
+            status: 'Status',
           },
           index: {
             tableHeading: 'User accounts',

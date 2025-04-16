@@ -8,7 +8,7 @@ import { withMerge } from '../lib/with-merge';
 import { withRootStore } from '../lib/with-root-store';
 import { IUser, UserModel } from '../models/user';
 import { IInvitationResponse } from '../types/api-responses';
-import { EUserRoles, EUserSortFields } from '../types/enums';
+import { EUserRoles, EUserSortFields, EActiveUserSortFields } from '../types/enums';
 import { IEULA } from '../types/types';
 import { convertToDate, toCamelCase } from '../utils/utility-functions';
 
@@ -23,7 +23,7 @@ export const UserStoreModel = types
       tableUsers: types.array(types.reference(UserModel)),
       isSuperAdminsLoaded: types.optional(types.boolean, false),
     }),
-    createSearchModel<EUserSortFields>('searchUsers'),
+    createSearchModel<EActiveUserSortFields>('searchUsers'),
   )
   .extend(withEnvironment())
   .extend(withRootStore())
@@ -42,7 +42,7 @@ export const UserStoreModel = types
     get takenEmails(): string[] {
       return self.invitationResponse?.data?.emailTaken?.map((user) => user.email) || [];
     },
-    getSortColumnHeader(field: EUserSortFields) {
+    getSortColumnHeader(field: EActiveUserSortFields) {
       //@ts-ignore
       return t(`user.fields.${toCamelCase(field)}`);
     },

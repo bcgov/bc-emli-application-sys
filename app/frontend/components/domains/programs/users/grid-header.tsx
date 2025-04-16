@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMst } from '../../../../setup/root';
-import { EUserSortFields } from '../../../../types/enums';
+import { EUserSortFields, EActiveUserSortFields } from '../../../../types/enums';
 import { ModelSearchInput } from '../../../shared/base/model-search-input';
 import { GridHeader } from '../../../shared/grid/grid-header';
 import { SortIcon } from '../../../shared/sort-icon';
@@ -22,7 +22,7 @@ export const GridHeaders = observer(function GridHeaders() {
       <Box display={'contents'} role={'row'}>
         <GridItem
           as={Flex}
-          gridColumn={'span 6'}
+          gridColumn={'span 7'}
           p={6}
           bg={'greys.grey10'}
           justifyContent={'space-between'}
@@ -33,7 +33,7 @@ export const GridHeaders = observer(function GridHeaders() {
         </GridItem>
       </Box>
       <Box display={'contents'} role={'row'}>
-        {Object.values(EUserSortFields).map((field) => (
+        {Object.values(EActiveUserSortFields).map((field) => (
           <GridHeader key={field} role={'columnheader'}>
             <Flex
               w={'full'}
@@ -46,11 +46,15 @@ export const GridHeaders = observer(function GridHeaders() {
               px={4}
             >
               <Text textAlign="left">{getSortColumnHeader(field)}</Text>
-              <SortIcon<EUserSortFields> field={field} currentSort={sort} />
+              <SortIcon<EActiveUserSortFields> field={field} currentSort={sort} />
             </Flex>
           </GridHeader>
         ))}
-        <GridHeader role={'columnheader'} />
+        <GridHeader role={'columnheader'}>
+          <Text px={4} textAlign="left">
+            {t(`user.fields.action`)}
+          </Text>
+        </GridHeader>
       </Box>
     </Box>
   );
