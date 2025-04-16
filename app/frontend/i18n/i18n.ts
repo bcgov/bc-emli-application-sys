@@ -2037,10 +2037,9 @@ const options = {
             reviewer: 'reviewer',
             super_admin: 'super admin',
             participant: 'participant',
-            participantSupportRep: 'participant support representative',
             admin: 'admin',
             contractor: 'contractor',
-            adminManager: 'admin manager',
+            admin_manager: 'admin manager',
             system_admin: 'system admin',
           },
           rolesExplanation: {
