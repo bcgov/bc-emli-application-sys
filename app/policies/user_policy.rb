@@ -39,10 +39,9 @@ class UserPolicy < ApplicationPolicy
   end
 
   def search_program_membership_users?
-    if user.system_admin? && (record.manager? || record.system_admin?)
+    if user.system_admin? && !(record.participant? || record.contractor?)
       return true
     end
-    #user.manager? && record_in_users_jurisdictions?
   end
 
   def search_admin_users?
@@ -73,7 +72,7 @@ class UserPolicy < ApplicationPolicy
     user.jurisdictions.pluck(:id).intersect?(record.jurisdictions.pluck(:id))
   end
 
-  # TODO: do we need to check if user managing users is in the program??
+  # TODO: we need to check if user managing users is in the program??
   # def record_in_users_program?
   #   user.jurisdictions.pluck(:id).intersect?(record.jurisdictions.pluck(:id))
   # end

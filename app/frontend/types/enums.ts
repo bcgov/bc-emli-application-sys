@@ -136,6 +136,15 @@ export enum EUserSortFields {
   lastSignInAt = 'last_sign_in_at',
 }
 
+export enum EActiveUserSortFields {
+  name = 'name',
+  email = 'email',
+  role = 'role',
+  submissionInbox = 'submission_inbox',
+  createdAt = 'created_at',
+  lastSignInAt = 'last_sign_in_at',
+}
+
 export enum ERequirementTemplateSortFields {
   jurisdictionsSize = 'jurisdictions_size',
   userGroupType = 'user_group_type_desc',

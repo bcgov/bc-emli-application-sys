@@ -1,24 +1,20 @@
-import { Input, InputGroup, InputGroupProps, InputLeftElement, InputProps } from "@chakra-ui/react"
-import { MagnifyingGlass } from "@phosphor-icons/react"
-import { observer } from "mobx-react-lite"
-import React from "react"
-import { ISearch } from "../../../lib/create-search-model"
+import { Input, InputGroup, InputGroupProps, InputLeftElement, InputProps } from '@chakra-ui/react';
+import { MagnifyingGlass } from '@phosphor-icons/react';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { ISearch } from '../../../lib/create-search-model';
 
 interface IProps {
-  onQueryChange: (query: string | null | undefined) => void
-  query: string | undefined
-  inputGroupProps?: Partial<InputGroupProps>
-  inputProps?: Partial<InputProps>
+  query: string;
+  onQueryChange: (value: string) => void;
+  inputGroupProps?: InputGroupProps;
+  inputProps?: InputProps;
 }
 
-export const SearchInput = observer(function SearchInput<TSearchModel extends ISearch>({
-  query,
-  onQueryChange,
-  inputGroupProps,
-  inputProps,
-}: IProps) {
+export const SearchInput = observer(function SearchInput(props: IProps) {
+  const { query, onQueryChange, inputGroupProps = {}, inputProps } = props;
   return (
-    <InputGroup as={'section'} bg={'white'} {...inputGroupProps}>
+    <InputGroup as={'section'} bg={'white'} {...inputGroupProps} w={inputGroupProps?.w ?? { md: '20%', base: 'full' }}>
       <Input
         title={'search input'}
         type={'search'}
@@ -35,4 +31,4 @@ export const SearchInput = observer(function SearchInput<TSearchModel extends IS
       </InputLeftElement>
     </InputGroup>
   );
-})
+});
