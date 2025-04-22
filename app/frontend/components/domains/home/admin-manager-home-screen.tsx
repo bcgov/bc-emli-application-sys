@@ -29,23 +29,19 @@ export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
         <Flex direction="column" align="center" w="full">
           <Flex direction="column" align="center" w="full" gap={6}>
             <HomeScreenBox
-              title={t('home.contractorTitle')}
-              description={t('home.contractorDescription')}
-              icon={<NotePencil size={24} />}
-              href="/contractor-management"
-            />
-            <HomeScreenBox
-              title={t('home.submissionInboxSetupTitle')}
-              description={t('home.submissionInboxSetupDescription')}
-              icon={<Envelope size={24} />}
-              href="/submission-inbox-setup"
-            />
-            <HomeScreenBox
               title={t('home.submissionInboxTitle')}
-              description={t('home.submissionInboxDescription')}
+              description={t('home.adminSubmissionInboxDescription')}
               icon={<Tray size={24} />}
               href="/submission-inbox"
               linkText={t('ui.view')}
+            />
+
+            <HomeScreenBox
+              title={t('home.startApplicationTitle')}
+              description={t('home.startApplicationDescription')}
+              icon={<Pencil size={24} />}
+              href=""
+              linkText={t('ui.start')}
             />
             <HomeScreenBox
               title={t('home.applicationsDashboardTitle')}
@@ -55,30 +51,36 @@ export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               linkText={t('ui.review')}
             />
             <HomeScreenBox
+              title={t('home.contractorTitle')}
+              description={t('home.contractorDescription')}
+              icon={<NotePencil size={24} />}
+              href="/contractor-management"
+            />
+
+            <HomeScreenBox
+              title={t('home.submissionInboxSetupTitle')}
+              description={t('home.submissionInboxSetupDescription')}
+              icon={<Envelope size={24} />}
+              href="/submission-inbox-setup"
+            />
+
+            <HomeScreenBox
               title={t('home.configureUsersTitle')}
               description={t('home.configureUsersDescription')}
               icon={<Users size={24} />}
               href="/configure-users"
               linkText={t('ui.configure')}
             />
-            <HomeScreenBox
-              title={t('home.apiSettingsTitle')}
-              description={t('home.apiSettingsDescription')}
-              icon={<SlidersHorizontal size={24} />}
-              href="/api-settings"
-              pointerEvents="none"
-              opacity={0.6}
-              bg="gray.100"
-              linkText={t('ui.comingSoon')}
-            />
+
             <HomeScreenBox
               title={t('home.reportingTitle')}
               description={t('home.reportingDescription')}
               icon={<Folder size={24} />}
               href="/reporting"
               pointerEvents="none"
-              opacity={0.6}
-              bg="gray.100"
+              h="full"
+              bg="gray.white"
+              headingColor="greys.grey05"
               linkText={t('ui.comingSoon')}
             />
             <HomeScreenBox
@@ -87,8 +89,9 @@ export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               icon={<Clock size={24} />}
               href="/early-access"
               pointerEvents="none"
-              opacity={0.6}
-              bg="gray.100"
+              h="full"
+              bg="gray.white"
+              headingColor="greys.grey05"
               linkText={t('ui.comingSoon')}
             />
           </Flex>

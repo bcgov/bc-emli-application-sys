@@ -1767,36 +1767,35 @@ const options = {
           jurisdictionsTitle: 'Programs',
           siteConfigurationTitle: 'Configuration management',
           jurisdictionsDescription:
-            'Administer Review Managers and their roles within local jurisdictions through the Building Permit Hub. This includes inviting or removing managers, managing overall jurisdictions, customizing community pages, and handling jurisdiction-specific settings.',
+            'Invite or remove Business Area Managers, Program Managers, PSRs in the Better Homes Energy Savings Program.',
           permitTemplateCatalogueTitle: 'Applications templates catalogue',
           permitTemplateCatalogueTitleShort: 'Applications catalogue',
-          contractorTitle: 'Contractor Management',
+          contractorTitle: 'Contractor management',
           contractorDescription: 'View and edit contractor details. ',
-          submissionInboxSetupTitle: 'Submission Inbox Setup',
+          submissionInboxSetupTitle: 'Submission inbox set up',
           submissionInboxSetupDescription:
             'Set up your submission inbox and edit who receives submitted application forms.',
-          submissionInboxTitle: 'Submission Inbox',
+          submissionInboxTitle: 'Submissions inbox',
           submissionInboxDescription: 'Review all submitted applications.',
           adminSubmissionInboxDescription: 'View and process all submitted applications.',
-          applicationsDashboardTitle: 'Applications Dashboard',
+          applicationsDashboardTitle: 'Applications dashboard',
           applicationsDashboardDescription: 'Review applications you have submitted on behalf of an applicant.',
           adminApplicationsDashboardDescription: 'Access applications submitted on behalf of an applicants.',
           startApplicationTitle: 'Start an application form',
           startApplicationDescription: 'Submit an application on behalf of a participant. ',
-          configureUsersTitle: 'Configure Users',
+          configureUsersTitle: 'Configure users',
           configureUsersDescription: 'Invite or remove users.',
           apiSettingsTitle: 'API Settings',
           apiSettingsDescription: 'Configure API integrations and settings.',
           reportingTitle: 'Reporting',
           reportingDescription:
             'Explore reports and analytics to gain insights and make informed decisions about your permit applications',
-          permitTemplateCatalogueDescription:
-            'Develop and publish a collection of permit templates that provide a standardized foundation for building permits across local jurisdictions. These templates include requirement blocks to establish a structured flow for the building permit template.',
+          permitTemplateCatalogueDescription: 'Create and manage application templates for each program.',
           requirementsLibraryTitle: 'Requirements library',
           requirementsLibraryDescription:
-            'Construct and maintain requirement blocks that form the core structure of permit templates. This library allows you to create, update, and manage the questions that define each requirement block.',
+            'Create and manage requirement blocks that can be used inside of application templates.',
           earlyAccess: {
-            title: 'Early Access',
+            title: 'Early access',
             adminDescription:
               'Access and manage Early access previews and requirement sets before they become publicly available.',
             previews: {
@@ -2044,7 +2043,7 @@ const options = {
             participant: 'participant',
             admin: 'admin',
             contractor: 'contractor',
-            adminManager: 'admin manager',
+            admin_manager: 'Admin manager',
             system_admin: 'System admin',
           },
           rolesExplanation: {

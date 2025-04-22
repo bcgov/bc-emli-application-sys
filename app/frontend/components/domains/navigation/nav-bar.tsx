@@ -188,12 +188,6 @@ export const NavBar = observer(function NavBar() {
                   {/* <RegionalRMJurisdictionSelect key={rmJurisdictionSelectKey} /> */}
                 </VStack>
               )}
-              {currentUser?.isSuperAdmin && <Text color="text.primary">{t('user.roles.system_admin')}</Text>}
-              {currentUser?.isAdminManager && (
-                <Text color="text.primary" textTransform="capitalize">
-                  {t('user.roles.admin_manager')}
-                </Text>
-              )}
 
               {currentUser?.isAdmin && (
                 <Text color="text.primary" textTransform="capitalize">
@@ -208,7 +202,9 @@ export const NavBar = observer(function NavBar() {
                 </Show>
               )} */}
               {loggedIn && <NotificationsPopover aria-label="notifications popover" color="text.primary" />}
-              {!currentUser?.isSuperAdmin && !currentUser?.isAdminManager && (
+              {currentUser?.isSuperAdmin && <Text color="text.primary">{t('user.roles.system_admin')}</Text>}
+              {currentUser?.isAdminManager && <Text color="text.primary">{t('user.roles.admin_manager')}</Text>}
+              {!currentUser?.isSuperAdmin && !currentUser?.isAdminManager && !currentUser?.isAdmin && (
                 <Show above="lg">
                   <RouterLinkButton variant="tertiary" color="text.primary" to={'/get-support'}>
                     {t('site.support.getSupport')}
@@ -304,10 +300,9 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
 
   const superAdminOnlyItems = (
     <MenuGroup>
-      <NavMenuItem label={t('home.permitTemplateCatalogueTitleShort')} to={'/requirement-templates'} />
+      <NavMenuItem label={t('home.permitTemplateCatalogueTitle')} to={'/requirement-templates'} />
       <NavMenuItem label={t('home.requirementsLibraryTitle')} to={'/requirements-library'} />
       <NavMenuItem label={t('home.configurationManagement.title')} to={'/configuration-management'} />
-      <NavMenuItem label={t('home.auditLog')} to={'/audit-log'} />
       <MenuDivider my={0} borderColor="border.light" />
     </MenuGroup>
   );
@@ -320,24 +315,17 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
 
   const reviewManagerOnlyItems = (
     <MenuGroup>
+      <NavMenuItem label={t('site.breadcrumb.submissionInbox')} to={'/submission-inbox'} />
+      <NavMenuItem label={t('home.applicationsDashboardTitle')} to={'/application-dashboard'} />
       <NavMenuItem label={t('home.contractorTitle')} to={'/contractor-management'} />
       <NavMenuItem label={t('home.submissionInboxSetupTitle')} to={'/submission-inbox-setup'} />
-      <NavMenuItem label={t('site.breadcrumb.submissionInbox')} to={'/submission-inbox'} />
       <NavMenuItem label={t('home.configureUsersTitle')} to={'/configure-users'} />
-      <NavMenuItem label={t('home.auditLog')} to={`/audit-log`} />
       <MenuDivider my={0} borderColor="border.light" />
-      <NavMenuItem
-        label={t('home.applicationsDashboardTitle')}
-        to={'/application-dashboard'}
-        bg="theme.blue"
-        color="greys.white"
-        border="2px solid"
-        borderColor="greys.white"
-        _hover={{
-          bg: 'hover.blue',
-          color: 'black',
-        }}
-      />
+      <MenuItem bg="greys.grey03" onClick={(e) => navigate('/application-dashboard')}>
+        <Button as={Box} variant="primary">
+          {t('site.newApplication')}
+        </Button>
+      </MenuItem>
       <MenuDivider my={0} borderColor="border.light" />
     </MenuGroup>
   );
@@ -346,10 +334,15 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
 
   const reviwerOnlyItems = (
     <MenuGroup>
-      <NavMenuItem
-        label={t('site.breadcrumb.submissionInbox')}
-        to={`/jurisdictions/${currentUser?.jurisdiction?.slug}/submission-inbox`}
-      />
+      <NavMenuItem label={t('site.breadcrumb.submissionInbox')} to={`/submission-inbox`} />
+      <NavMenuItem label={t('home.applicationsDashboardTitle')} to={`/applications-dashboard`} />
+      <NavMenuItem label={t('home.contractorTitle')} to={`/contractor-management`} />
+      <MenuItem bg="greys.grey03" onClick={(e) => navigate('/applications/new')}>
+        <Button as={Box} variant="primary">
+          {t('site.newApplication')}
+        </Button>
+      </MenuItem>
+
       <MenuDivider my={0} borderColor="border.light" />
     </MenuGroup>
   );
@@ -391,32 +384,44 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
           <MenuList zIndex={99} boxShadow="2xl">
             {loggedIn && !currentUser.isUnconfirmed ? (
               <>
-                <MenuDivider my={0} borderColor="border.light" />
-                <NavMenuItem label={t('site.home')} to={'/'} />
-                {currentUser.isSuperAdmin && <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/programs/new'} />}
-                {currentUser?.isSuperAdmin && superAdminOnlyItems}
-                {(currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) && reviewManagerOnlyItems}
-                {(currentUser?.isSuperAdmin || currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) &&
-                  adminOrManagerItems}
-                {currentUser?.isReviewer && reviwerOnlyItems}
-                {currentUser?.isSubmitter && submitterOnlyItems}
-                {currentUser?.isReviewStaff && reviewStaffOnlyItems}
+                <Text fontSize="xs" fontStyle="italic" px={3} mb={-1} color="greys.grey01">
+                  {t('site.loggedInWelcome')}
+                </Text>
+                <MenuGroup title={currentUser.name} noOfLines={1}>
+                  <MenuDivider my={0} borderColor="border.light" />
+                  <NavMenuItem label={t('site.home')} to={'/'} />
+                  {currentUser.isSuperAdmin && (
+                    <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/programs/new'} />
+                  )}
+                  {currentUser?.isSuperAdmin && superAdminOnlyItems}
+                  {(currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) && reviewManagerOnlyItems}
+                  {(currentUser?.isSuperAdmin ||
+                    currentUser?.isReviewManager ||
+                    currentUser?.isRegionalReviewManager) &&
+                    adminOrManagerItems}
+                  {currentUser?.isReviewer && reviwerOnlyItems}
+                  {currentUser?.isSubmitter && submitterOnlyItems}
+                  {currentUser?.isReviewStaff && reviewStaffOnlyItems}
 
-                {currentUser?.isSubmitter && (
-                  <>
-                    <MenuItem bg="greys.grey03" onClick={(e) => navigate('/applications/new')}>
-                      <Button as={Box} variant="primary">
-                        {t('site.newApplication')}
-                      </Button>
-                    </MenuItem>
+                  {currentUser?.isSubmitter && (
+                    <>
+                      <MenuItem bg="greys.grey03" onClick={(e) => navigate('/applications/new')}>
+                        <Button as={Box} variant="primary">
+                          {t('site.newApplication')}
+                        </Button>
+                      </MenuItem>
 
-                    <NavMenuItem label={t('site.myApplications')} to="/applications" bg="greys.grey03" />
-                    <MenuDivider my={0} borderColor="border.light" />
-                  </>
-                )}
-                <MenuDivider my={0} borderColor="border.light" />
-                <NavMenuItem label={t('user.myAccount')} to={'/profile'} />
-                <NavMenuItem label={t('auth.logout')} onClick={handleClickLogout} />
+                      <NavMenuItem label={t('site.myApplications')} to="/applications" bg="greys.grey03" />
+                      <MenuDivider my={0} borderColor="border.light" />
+                    </>
+                  )}
+                  <MenuDivider my={0} borderColor="border.light" />
+                  {(currentUser?.isReviewManager || currentUser?.isSuperAdmin) && (
+                    <NavMenuItem label={t('home.auditLogTitle')} to={`/audit-log`} />
+                  )}
+                  <NavMenuItem label={t('user.myAccount')} to={'/profile'} />
+                  <NavMenuItem label={t('auth.logout')} onClick={handleClickLogout} />
+                </MenuGroup>
               </>
             ) : (
               <>
