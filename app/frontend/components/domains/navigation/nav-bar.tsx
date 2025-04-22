@@ -188,8 +188,6 @@ export const NavBar = observer(function NavBar() {
                   {/* <RegionalRMJurisdictionSelect key={rmJurisdictionSelectKey} /> */}
                 </VStack>
               )}
-              {currentUser?.isSuperAdmin && <Text color="text.primary">{t('user.roles.system_admin')}</Text>}
-              {currentUser?.isAdminManager && <Text color="text.primary">{t('user.roles.admin_manager')}</Text>}
 
               {currentUser?.isAdmin && (
                 <Text color="text.primary" textTransform="capitalize">
@@ -204,6 +202,8 @@ export const NavBar = observer(function NavBar() {
                 </Show>
               )} */}
               {loggedIn && <NotificationsPopover aria-label="notifications popover" color="text.primary" />}
+              {currentUser?.isSuperAdmin && <Text color="text.primary">{t('user.roles.system_admin')}</Text>}
+              {currentUser?.isAdminManager && <Text color="text.primary">{t('user.roles.admin_manager')}</Text>}
               {!currentUser?.isSuperAdmin && !currentUser?.isAdminManager && !currentUser?.isAdmin && (
                 <Show above="lg">
                   <RouterLinkButton variant="tertiary" color="text.primary" to={'/get-support'}>
@@ -300,7 +300,7 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
 
   const superAdminOnlyItems = (
     <MenuGroup>
-      <NavMenuItem label={t('home.permitTemplateCatalogueTitleShort')} to={'/requirement-templates'} />
+      <NavMenuItem label={t('home.permitTemplateCatalogueTitle')} to={'/requirement-templates'} />
       <NavMenuItem label={t('home.requirementsLibraryTitle')} to={'/requirements-library'} />
       <NavMenuItem label={t('home.configurationManagement.title')} to={'/configuration-management'} />
       <MenuDivider my={0} borderColor="border.light" />
@@ -315,10 +315,10 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
 
   const reviewManagerOnlyItems = (
     <MenuGroup>
-      <NavMenuItem label={t('home.contractorTitle')} to={'/contractor-management'} />
-      <NavMenuItem label={t('home.submissionInboxSetupTitle')} to={'/submission-inbox-setup'} />
       <NavMenuItem label={t('site.breadcrumb.submissionInbox')} to={'/submission-inbox'} />
       <NavMenuItem label={t('home.applicationsDashboardTitle')} to={'/application-dashboard'} />
+      <NavMenuItem label={t('home.contractorTitle')} to={'/contractor-management'} />
+      <NavMenuItem label={t('home.submissionInboxSetupTitle')} to={'/submission-inbox-setup'} />
       <NavMenuItem label={t('home.configureUsersTitle')} to={'/configure-users'} />
       <MenuDivider my={0} borderColor="border.light" />
       <MenuItem bg="greys.grey03" onClick={(e) => navigate('/application-dashboard')}>
@@ -336,6 +336,7 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
     <MenuGroup>
       <NavMenuItem label={t('site.breadcrumb.submissionInbox')} to={`/submission-inbox`} />
       <NavMenuItem label={t('home.applicationsDashboardTitle')} to={`/applications-dashboard`} />
+      <NavMenuItem label={t('home.contractorTitle')} to={`/contractor-management`} />
       <MenuItem bg="greys.grey03" onClick={(e) => navigate('/applications/new')}>
         <Button as={Box} variant="primary">
           {t('site.newApplication')}
@@ -415,8 +416,9 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
                     </>
                   )}
                   <MenuDivider my={0} borderColor="border.light" />
-                  {currentUser?.isReviewManager ||
-                    (currentUser?.isSuperAdmin && <NavMenuItem label={t('home.auditLogTitle')} to={`/audit-log`} />)}
+                  {(currentUser?.isReviewManager || currentUser?.isSuperAdmin) && (
+                    <NavMenuItem label={t('home.auditLogTitle')} to={`/audit-log`} />
+                  )}
                   <NavMenuItem label={t('user.myAccount')} to={'/profile'} />
                   <NavMenuItem label={t('auth.logout')} onClick={handleClickLogout} />
                 </MenuGroup>

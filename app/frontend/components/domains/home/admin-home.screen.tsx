@@ -1,5 +1,15 @@
 import { Container, Flex } from '@chakra-ui/react';
-import { BookOpen, Buildings, ClipboardText, Clock, FileText, Folder, Pencil, Tray } from '@phosphor-icons/react';
+import {
+  BookOpen,
+  Buildings,
+  ClipboardText,
+  Clock,
+  FileText,
+  Folder,
+  Pencil,
+  Tray,
+  NotePencil,
+} from '@phosphor-icons/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { IHomeScreenProps } from '.';
@@ -23,6 +33,13 @@ export const AdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               linkText={t('ui.view')}
             />
             <HomeScreenBox
+              title={t('home.startApplicationTitle')}
+              description={t('home.startApplicationDescription')}
+              icon={<Pencil size={24} />}
+              href=""
+              linkText={t('ui.start')}
+            />
+            <HomeScreenBox
               title={t('home.applicationsDashboardTitle')}
               description={t('home.adminApplicationsDashboardDescription')}
               icon={<ClipboardText size={24} />}
@@ -30,11 +47,11 @@ export const AdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               linkText={t('ui.review')}
             />
             <HomeScreenBox
-              title={t('home.startApplicationTitle')}
-              description={t('home.startApplicationDescription')}
-              icon={<Pencil size={24} />}
-              href=""
-              linkText={t('ui.start')}
+              title={t('home.contractorTitle')}
+              description={t('home.contractorDescription')}
+              icon={<NotePencil size={24} />}
+              href="/contractor-management"
+              linkText={t('ui.manage')}
             />
           </Flex>
         </Flex>

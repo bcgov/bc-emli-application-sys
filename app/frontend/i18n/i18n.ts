@@ -1767,15 +1767,15 @@ const options = {
           jurisdictionsTitle: 'Programs',
           siteConfigurationTitle: 'Configuration management',
           jurisdictionsDescription:
-            'Administer Review Managers and their roles within local jurisdictions through the Building Permit Hub. This includes inviting or removing managers, managing overall jurisdictions, customizing community pages, and handling jurisdiction-specific settings.',
+            'Invite or remove Business Area Managers, Program Managers, PSRs in the Better Homes Energy Savings Program.',
           permitTemplateCatalogueTitle: 'Applications templates catalogue',
           permitTemplateCatalogueTitleShort: 'Applications catalogue',
           contractorTitle: 'Contractor management',
           contractorDescription: 'View and edit contractor details. ',
-          submissionInboxSetupTitle: 'Submission inbox setup',
+          submissionInboxSetupTitle: 'Submission inbox set up',
           submissionInboxSetupDescription:
             'Set up your submission inbox and edit who receives submitted application forms.',
-          submissionInboxTitle: 'Submission inbox',
+          submissionInboxTitle: 'Submissions inbox',
           submissionInboxDescription: 'Review all submitted applications.',
           adminSubmissionInboxDescription: 'View and process all submitted applications.',
           applicationsDashboardTitle: 'Applications dashboard',
@@ -1790,11 +1790,10 @@ const options = {
           reportingTitle: 'Reporting',
           reportingDescription:
             'Explore reports and analytics to gain insights and make informed decisions about your permit applications',
-          permitTemplateCatalogueDescription:
-            'Develop and publish a collection of permit templates that provide a standardized foundation for building permits across local jurisdictions. These templates include requirement blocks to establish a structured flow for the building permit template.',
+          permitTemplateCatalogueDescription: 'Create and manage application templates for each program.',
           requirementsLibraryTitle: 'Requirements library',
           requirementsLibraryDescription:
-            'Construct and maintain requirement blocks that form the core structure of permit templates. This library allows you to create, update, and manage the questions that define each requirement block.',
+            'Create and manage requirement blocks that can be used inside of application templates.',
           earlyAccess: {
             title: 'Early access',
             adminDescription:

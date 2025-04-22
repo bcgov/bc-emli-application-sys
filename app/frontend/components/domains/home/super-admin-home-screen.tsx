@@ -1,13 +1,13 @@
-import { Container, Flex } from "@chakra-ui/react"
-import { BookOpen, Buildings, Clock, FileText, Folder, Pencil } from "@phosphor-icons/react"
-import React from "react"
-import { useTranslation } from "react-i18next"
-import { IHomeScreenProps } from "."
-import { BlueTitleBar } from "../../shared/base/blue-title-bar"
-import { HomeScreenBox } from "./home-screen-box"
+import { Container, Flex } from '@chakra-ui/react';
+import { BookOpen, Buildings, Clock, FileText, Folder, Pencil } from '@phosphor-icons/react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { IHomeScreenProps } from '.';
+import { BlueTitleBar } from '../../shared/base/blue-title-bar';
+import { HomeScreenBox } from './home-screen-box';
 
 export const SuperAdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <Flex as="main" direction="column" w="full" bg="greys.white" pb="24">
@@ -47,8 +47,9 @@ export const SuperAdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               icon={<Folder size={24} />}
               href="/reporting"
               pointerEvents="none"
-              opacity={0.6}
-              bg="gray.100"
+              h="full"
+              bg="gray.white"
+              headingColor="greys.grey05"
               linkText={t('ui.comingSoon')}
             />
             <HomeScreenBox
@@ -57,8 +58,9 @@ export const SuperAdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               icon={<Clock size={24} />}
               href="/early-access"
               pointerEvents="none"
-              opacity={0.6}
-              bg="gray.100"
+              h="full"
+              bg="gray.white"
+              headingColor="greys.grey05"
               linkText={t('ui.comingSoon')}
             />
           </Flex>
@@ -66,4 +68,4 @@ export const SuperAdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
       </Container>
     </Flex>
   );
-}
+};
