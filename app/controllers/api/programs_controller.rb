@@ -136,15 +136,17 @@ class Api::ProgramsController < Api::ApplicationController
     end
   end
 
-  # POST /api/programs/:id/users/search
+  # POST /api/programs/:id/users/search?status={active|pending|deactivated}
   def search_users
     authorize @program
     perform_user_search
+
     authorized_results =
       apply_search_authorization(
         @user_search.results,
         "search_program_membership_users"
       )
+
     render_success authorized_results,
                    nil,
                    {

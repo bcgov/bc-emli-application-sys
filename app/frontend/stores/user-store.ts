@@ -8,7 +8,13 @@ import { withMerge } from '../lib/with-merge';
 import { withRootStore } from '../lib/with-root-store';
 import { IUser, UserModel } from '../models/user';
 import { IInvitationResponse } from '../types/api-responses';
-import { EUserRoles, EUserSortFields, EActiveUserSortFields } from '../types/enums';
+import {
+  EUserRoles,
+  //EUserSortFields,
+  EActiveUserSortFields,
+  EPendingUserSortFields,
+  EDeactivatedUserSortFields,
+} from '../types/enums';
 import { IEULA } from '../types/types';
 import { convertToDate, toCamelCase } from '../utils/utility-functions';
 
@@ -21,9 +27,11 @@ export const UserStoreModel = types
       invitationResponse: types.maybeNull(types.frozen<IInvitationResponse>()),
       eula: types.maybeNull(types.frozen<IEULA>()),
       tableUsers: types.array(types.reference(UserModel)),
+      activeUsers: types.array(types.reference(UserModel)),
       isSuperAdminsLoaded: types.optional(types.boolean, false),
+      status: types.optional(types.enumeration(['active', 'pending', 'deactivated']), 'active'),
     }),
-    createSearchModel<EActiveUserSortFields>('searchUsers'),
+    createSearchModel<EActiveUserSortFields | EPendingUserSortFields | EDeactivatedUserSortFields>('searchUsers'),
   )
   .extend(withEnvironment())
   .extend(withRootStore())
@@ -42,7 +50,15 @@ export const UserStoreModel = types
     get takenEmails(): string[] {
       return self.invitationResponse?.data?.emailTaken?.map((user) => user.email) || [];
     },
-    getSortColumnHeader(field: EActiveUserSortFields) {
+    getActiveUserSortColumnHeader(field: EActiveUserSortFields) {
+      //@ts-ignore
+      return t(`user.fields.${toCamelCase(field)}`);
+    },
+    getPendingUserSortColumnHeader(field: EPendingUserSortFields) {
+      //@ts-ignore
+      return t(`user.fields.${toCamelCase(field)}`);
+    },
+    getDeactivatedUserSortColumnHeader(field: EDeactivatedUserSortFields) {
       //@ts-ignore
       return t(`user.fields.${toCamelCase(field)}`);
     },
@@ -68,6 +84,9 @@ export const UserStoreModel = types
     },
     setTableUsers: (users) => {
       self.tableUsers = users.map((user) => user.id);
+    },
+    setActiveUsers: (users) => {
+      self.activeUsers = users.map((user) => user.id);
     },
     setUsers(users) {
       R.forEach((u) => self.usersMap.put(u), users);
@@ -143,7 +162,7 @@ export const UserStoreModel = types
         sort: self.sort,
         page: opts?.page ?? self.currentPage,
         perPage: opts?.countPerPage ?? self.countPerPage,
-        showArchived: self.showArchived,
+        status: self.status,
       };
 
       const response = yield self.rootStore.programStore.currentProgram?.id
@@ -166,29 +185,12 @@ export const UserStoreModel = types
 
       return self.adminUsers.map((u) => ({ label: u.name, value: u.id }));
     }),
-    // fetchUsersByProgram: flow(function* (programId: string, opts?: { page?: number; countPerPage?: number }) {
-    //   const searchParams = {
-    //     query: self.query,
-    //     sort: self.sort,
-    //     page: opts?.page ?? self.currentPage,
-    //     perPage: opts?.countPerPage ?? self.countPerPage,
-    //     showArchived: self.showArchived,
-    //     ...Object.fromEntries(self.filters),
-    //   };
-
-    //   const response = yield self.environment.api.fetchUsersByProgram(programId, searchParams);
-
-    //   if (response.ok) {
-    //     self.mergeUpdateAll(response.data.data, 'usersMap');
-    //     self.setTableUsers(response.data.data);
-    //     self.currentPage = opts?.page ?? self.currentPage;
-    //     self.totalPages = response.data.meta.totalPages;
-    //     self.totalCount = response.data.meta.totalCount;
-    //     self.countPerPage = opts?.countPerPage ?? self.countPerPage;
-    //   }
-
-    //   return response.ok;
-    // }),
+  }))
+  .actions((self) => ({
+    setStatus(status: 'active' | 'pending' | 'deactivated') {
+      self.status = status;
+      self.searchUsers({ reset: true });
+    },
   }));
 
 export interface IUserStore extends Instance<typeof UserStoreModel> {}

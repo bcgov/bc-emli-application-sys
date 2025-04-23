@@ -44,10 +44,13 @@ import {
   IUsersResponse,
 } from '../../types/api-responses';
 import {
+  EActiveUserSortFields,
   ECollaborationType,
   ECollaboratorType,
+  EDeactivatedUserSortFields,
   EEarlyAccessRequirementTemplateSortFields,
   EJurisdictionSortFields,
+  EPendingUserSortFields,
   EPermitApplicationSortFields,
   EPermitBlockStatus,
   ERequirementLibrarySortFields,
@@ -233,11 +236,16 @@ export class Api {
     return this.client.post<IUsersResponse>(`/jurisdictions/${jurisdictionId}/users/search`, params);
   }
 
-  async fetchUsersByProgram(programId, params?: TSearchParams<EUserSortFields>) {
+  async fetchUsersByProgram(
+    programId,
+    params?: TSearchParams<EActiveUserSortFields | EPendingUserSortFields | EDeactivatedUserSortFields>,
+  ) {
     return this.client.post<IUsersResponse>(`/programs/${programId}/users/search`, params);
   }
 
-  async fetchAdminUsers(params?: TSearchParams<EUserSortFields>) {
+  async fetchAdminUsers(
+    params?: TSearchParams<EActiveUserSortFields | EPendingUserSortFields | EDeactivatedUserSortFields>,
+  ) {
     return this.client.post<IUsersResponse>(`/users/search`, params);
   }
 

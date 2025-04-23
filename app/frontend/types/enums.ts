@@ -117,12 +117,6 @@ export enum EProgramSortFields {
   templatesUsed = 'templates_used',
 }
 
-export enum EProgramExternalApiState {
-  jOn = 'j_on',
-  jOff = 'j_off',
-  gOff = 'g_off',
-}
-
 export enum EProgramUserGroupType {
   contractors = 'contractors',
   participants = 'participants',
@@ -137,6 +131,24 @@ export enum EUserSortFields {
 }
 
 export enum EActiveUserSortFields {
+  name = 'name',
+  email = 'email',
+  role = 'role',
+  submissionInbox = 'submission_inbox',
+  createdAt = 'created_at',
+  lastSignInAt = 'last_sign_in_at',
+}
+
+export enum EPendingUserSortFields {
+  email = 'email',
+  role = 'role',
+  submissionInbox = 'submission_inbox',
+  createdAt = 'created_at',
+  lastSignInAt = 'last_sign_in_at',
+  status = 'status',
+}
+
+export enum EDeactivatedUserSortFields {
   name = 'name',
   email = 'email',
   role = 'role',

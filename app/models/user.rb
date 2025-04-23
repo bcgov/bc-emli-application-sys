@@ -130,9 +130,12 @@ class User < ApplicationRecord
       first_name: first_name,
       last_name: last_name,
       email: email,
-      jurisdiction_ids: jurisdictions.pluck(:id),
       discarded: discarded_at.present?,
-      last_sign_in_at: last_sign_in_at
+      last_sign_in_at: last_sign_in_at,
+      reviewed: reviewed,
+      discarded_at: discarded_at,
+      invitation_sent_at: invitation_sent_at,
+      invitation_accepted_at: invitation_accepted_at
     }
   end
 

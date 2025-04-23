@@ -390,9 +390,7 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
                 <MenuGroup title={currentUser.name} noOfLines={1}>
                   <MenuDivider my={0} borderColor="border.light" />
                   <NavMenuItem label={t('site.home')} to={'/'} />
-                  {currentUser.isSuperAdmin && (
-                    <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/programs/new'} />
-                  )}
+                  {currentUser.isSuperAdmin && <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/programs'} />}
                   {currentUser?.isSuperAdmin && superAdminOnlyItems}
                   {(currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) && reviewManagerOnlyItems}
                   {(currentUser?.isSuperAdmin ||

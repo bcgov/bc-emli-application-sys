@@ -4,10 +4,12 @@ import { IPermitBlockStatus } from '../models/permit-block-status';
 import { IActivity, IPermitType } from '../models/permit-classification';
 import { IRequirement } from '../models/requirement';
 import {
+  EActiveUserSortFields,
   EAutoComplianceModule,
   EAutoComplianceType,
   ECollaborationType,
   ECollaboratorType,
+  EDeactivatedUserSortFields,
   EDoorsPerformanceType,
   EEnabledElectiveFieldReason,
   EEnergyStep,
@@ -16,6 +18,7 @@ import {
   EJurisdictionTypes,
   ENotificationActionType,
   ENumberUnit,
+  EPendingUserSortFields,
   EPermitApplicationSocketEventTypes,
   EPermitApplicationStatus,
   ERequirementType,
