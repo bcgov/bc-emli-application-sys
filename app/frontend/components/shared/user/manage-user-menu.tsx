@@ -1,60 +1,62 @@
-import { Button, Menu, MenuButton, MenuList } from "@chakra-ui/react"
-import { Archive, ArrowsLeftRight, ClockClockwise, PaperPlaneTilt } from "@phosphor-icons/react"
-import { t } from "i18next"
-import { observer } from "mobx-react-lite"
-import React from "react"
-import { useForm } from "react-hook-form"
-import { ISearch } from "../../../lib/create-search-model"
-import { IUser } from "../../../models/user"
-import { useMst } from "../../../setup/root"
-import { EUserRoles } from "../../../types/enums"
-import { ManageMenuItemButton } from "../base/manage-menu-item"
-import { Can } from "./can"
+import { Button, Menu, MenuButton, MenuList } from '@chakra-ui/react';
+import { Archive, ArrowsLeftRight, ClockClockwise, PaperPlaneTilt } from '@phosphor-icons/react';
+import { t } from 'i18next';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { ISearch } from '../../../lib/create-search-model';
+import { IUser } from '../../../models/user';
+import { useMst } from '../../../setup/root';
+import { EUserRoles } from '../../../types/enums';
+import { ManageMenuItemButton } from '../base/manage-menu-item';
+import { Can } from './can';
 
 interface IManageUserMenuProps<TSearchModel extends ISearch> {
-  user: IUser
-  searchModel?: TSearchModel
+  user: IUser;
+  searchModel?: TSearchModel;
+  type: 'active' | 'pending' | 'deactivated';
 }
 
 export const ManageUserMenu = observer(function ManageUserMenu<TSearchModel extends ISearch>({
   user,
   searchModel,
+  type,
 }: IManageUserMenuProps<TSearchModel>) {
   const handleRemove = async () => {
-    if (await user.destroy()) searchModel?.search()
-  }
+    if (await user.destroy()) searchModel?.search();
+  };
 
   const handleRestore = async () => {
-    if (await user.restore()) searchModel?.search()
-  }
+    if (await user.restore()) searchModel?.search();
+  };
 
   const handleChangeRole = async () => {
-    if (await user.changeRole()) searchModel?.search()
-  }
+    if (await user.changeRole()) searchModel?.search();
+  };
 
   const {
-    jurisdictionStore: { currentJurisdiction },
+    programStore: { currentProgram },
     userStore: { currentUser },
-  } = useMst()
+  } = useMst();
 
-  const isCurrentUser = user.id === currentUser.id
+  const isCurrentUser = user.id === currentUser.id;
 
   return (
-    <Can action="jurisdiction:manage" data={{ jurisdiction: currentJurisdiction }}>
+    <Can action="program:manage" data={{ program: currentProgram }}>
       <Menu>
         <MenuButton as={Button} variant="link">
-          {t("ui.manage")}
+          {t('ui.manage')}
         </MenuButton>
         <MenuList>
           {user.role != EUserRoles.systemAdmin && (
             <Can action="user:updateRole">
               <ManageMenuItemButton
-                color={isCurrentUser ? "greys.grey01" : "text.primary"}
+                color={isCurrentUser ? 'greys.grey01' : 'text.primary'}
                 leftIcon={<ArrowsLeftRight />}
                 onClick={handleChangeRole}
                 isDisabled={isCurrentUser}
               >
-                {t("user.changeRole")}
+                {t('user.changeRole')}
               </ManageMenuItemButton>
             </Can>
           )}
@@ -65,32 +67,32 @@ export const ManageUserMenu = observer(function ManageUserMenu<TSearchModel exte
               onClick={handleRestore}
               leftIcon={<ClockClockwise size={16} />}
             >
-              {t("ui.restore")}
+              {t('ui.restore')}
             </ManageMenuItemButton>
           ) : (
             <ManageMenuItemButton
-              color={isCurrentUser ? "greys.grey01" : "semantic.error"}
+              color={isCurrentUser ? 'greys.grey01' : 'semantic.error'}
               onClick={handleRemove}
               leftIcon={<Archive size={16} />}
               isDisabled={isCurrentUser}
             >
-              {t("ui.archive")}
+              {t('ui.archive')}
             </ManageMenuItemButton>
           )}
         </MenuList>
       </Menu>
     </Can>
-  )
-})
+  );
+});
 
 interface IFormProps {
-  user: IUser
+  user: IUser;
 }
 const ReinviteUserForm = function ReinviteUserForm({ user }: IFormProps) {
-  const { handleSubmit, formState } = useForm()
-  const { isSubmitting } = formState
+  const { handleSubmit, formState } = useForm();
+  const { isSubmitting } = formState;
 
-  const onSubmit = async () => await user.reinvite()
+  const onSubmit = async () => await user.reinvite();
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -101,8 +103,8 @@ const ReinviteUserForm = function ReinviteUserForm({ user }: IFormProps) {
         isLoading={isSubmitting}
         isDisabled={isSubmitting}
       >
-        {t("user.reinvite")}
+        {t('user.reinvite')}
       </ManageMenuItemButton>
     </form>
-  )
-}
+  );
+};
