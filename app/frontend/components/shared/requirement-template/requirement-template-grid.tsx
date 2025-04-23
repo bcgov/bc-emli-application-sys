@@ -111,10 +111,7 @@ const GridHeaders = observer(function GridHeaders() {
           align="center"
         >
           <Text role={'heading'}>{t('requirementTemplate.index.tableHeading')}</Text>
-          <ModelSearchInput
-            searchModel={requirementTemplateStore}
-            inputGroupProps={{ w: { md: '100%', base: 'full' } }}
-          />
+          <ModelSearchInput searchModel={requirementTemplateStore} />
         </GridItem>
       </Box>
       <Box display={'contents'} role={'row'}>
