@@ -771,22 +771,26 @@ const options = {
             submitted: 'Submitted permits',
           },
           columns: {
-            number: 'Application #',
+            number: 'Application ID',
             reference_number: 'Reference #',
+            address: 'Address',
             permit_classification: 'Types',
             submitter: 'Submitter',
-            submitted_at: 'Submitted at',
+            submitted_at: 'Submitted',
             viewed_at: 'Viewed at',
             updated_at: 'Last Updated',
             status: 'Status',
+            assigned: 'Assigned',
+            actions: 'Actions',
           },
           submissionInbox: {
             contactInviteWarning:
               'Please have a Review Manager setup the Submissions Inbox for all permit types to allow submissions to be received.',
             title: 'Submissions inbox',
             tableHeading: 'Permit applications',
-            submissionsSentTo:
-              'A copy of all submitted applications are also sent to one or more email addresses configured by the review manager.',
+            tableDescription:
+              'Choose a submission inbox to view from the dropdown list. Submitted applications will appear in the relevant submission inbox. ',
+            tableSubHeading: 'Participant applications',
           },
           fields: {
             number: 'Application #',

@@ -16,34 +16,33 @@ export const SearchGrid = ({
 }: ISearchGridProps) => {
   return (
     <Grid
-      mt={3}
-      role={"table"}
+      role={'table'}
       templateColumns={templateColumns}
       w="full"
-      maxW={"full"}
-      overflow={"auto"}
+      maxW={'full'}
+      overflow={'auto'}
       sx={{
-        borderCollapse: "separate",
+        borderCollapse: 'separate',
         ...(gridRowClassName
           ? {
               [`.${gridRowClassName}:not(:last-of-type) > div`]: {
-                borderBottom: "1px solid",
-                borderColor: "border.light",
+                borderBottom: '1px solid',
+                borderColor: 'border.light',
               },
             }
           : {}),
         "[role='row']:not(:last-child) > [role='cell']": {
-          borderBottom: "1px solid",
-          borderColor: "border.light",
+          borderBottom: '1px solid',
+          borderColor: 'border.light',
         },
         ...sx,
       }}
-      border={"1px solid"}
-      borderColor={"border.light"}
-      borderRadius={"sm"}
+      border={'1px solid'}
+      borderColor={'border.light'}
+      borderRadius={'sm'}
       {...containerProps}
     >
       {children}
     </Grid>
-  )
+  );
 }

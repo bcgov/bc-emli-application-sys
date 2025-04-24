@@ -167,21 +167,23 @@ export const NotificationStoreModel = types
     fetchNotifications: flow(function* (opts = {}) {
       if (opts.reset) self.page = self.totalPages = undefined;
       self.isLoaded = false;
-      const response = yield* toGenerator(self.environment.api.fetchNotifications(self.nextPage));
-      const {
-        ok,
-        data: {
-          data,
-          meta: { unreadCount, totalPages },
-        },
-      } = response;
+      const response = yield * toGenerator(self.environment.api.fetchNotifications(self.nextPage));
 
-      if (ok) {
+      if (response && response.ok && response.data) {
+        const {
+          data: {
+            data,
+            meta: { unreadCount, totalPages },
+          },
+        } = response;
+
         self.unreadNotificationsCount = unreadCount;
         opts.reset ? self.setNotifications(data) : self.concatToNotifications(data);
         self.totalPages = totalPages;
         self.page = self.nextPage;
         self.isLoaded = true;
+      } else {
+        console.error('Invalid response:', response);
       }
     }),
 

@@ -38,6 +38,10 @@ export enum EPermitClassificationCode {
   external = 'external',
   participant = 'participant',
   contractor = 'contractor',
+  invoice = 'invoice',
+  application = 'application',
+  supportRequest = 'support_request',
+  onboarding = 'onboarding',
 }
 
 export enum EPermitApplicationStatus {
@@ -104,7 +108,7 @@ export enum EJurisdictionSortFields {
   reviewersSize = 'reviewers_size',
   permitApplicationsSize = 'permit_applications_size',
   regionalDistrict = 'regional_district_name',
-  // submissionInboxSetUp = 'submission_inbox_set_up',
+  submissionInboxSetUp = 'submission_inbox_set_up',
   templatesUsed = 'templates_used',
 }
 
@@ -211,11 +215,14 @@ export enum EPermitApplicationSubmitterSortFields {
 export enum EPermitApplicationReviewerSortFields {
   status = 'status',
   number = 'number',
-  referenceNumber = 'reference_number',
-  permitClassification = 'permit_classification',
+  address = 'address',
+  // referenceNumber = 'reference_number',
+  // permitClassification = 'permit_classification',
   submitter = 'submitter',
-  viewedAt = 'viewed_at',
+  // viewedAt = 'viewed_at',
   submittedAt = 'submitted_at',
+  assigned = 'assigned',
+  actions = 'actions',
 }
 
 export enum ESortDirection {

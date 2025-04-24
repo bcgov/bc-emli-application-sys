@@ -26,135 +26,147 @@ import { Can } from "../../../shared/user/can"
 import { DesignatedCollaboratorAssignmentPopover } from "../../energy-savings-application/collaborator-management/designated-collaborator-assignment-popover"
 import { SubmissionDownloadModal } from "../../energy-savings-application/submission-download-modal"
 import { GridHeaders } from "./grid-header"
+import { AsyncDropdown } from '../../../shared/base/inputs/async-dropdown';
+import { FormProvider, useForm } from 'react-hook-form';
+import { useProgram } from '../../../../hooks/resources/use-program';
 
 export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionSubmissionInbox() {
-  const { t } = useTranslation()
-  const { permitApplicationStore, sandboxStore } = useMst()
-  const { currentJurisdiction, error } = useJurisdiction()
-  const { isLoaded: isPermitClassificationsLoaded } = usePermitClassificationsLoad()
+  const { t } = useTranslation();
+  const methods = useForm();
+  const {
+    permitApplicationStore,
+    sandboxStore,
+    permitClassificationStore: { fetchSubmissionTypeOptions },
+  } = useMst();
+  const { currentProgram, error } = useProgram();
+  const { isLoaded: isPermitClassificationsLoaded } = usePermitClassificationsLoad();
 
   const { currentPage, totalPages, totalCount, countPerPage, handleCountPerPageChange, handlePageChange, isSearching } =
-    permitApplicationStore
+    permitApplicationStore;
 
-  const { currentSandboxId } = sandboxStore
-  useSearch(permitApplicationStore, [currentJurisdiction?.id, JSON.stringify(currentSandboxId)])
+  const { currentSandboxId } = sandboxStore;
+  useSearch(permitApplicationStore, [currentProgram?.id, JSON.stringify(currentSandboxId)]);
 
-  if (error) return <ErrorScreen error={error} />
-  if (!currentJurisdiction || !isPermitClassificationsLoaded) return <LoadingScreen />
+  if (error) return <ErrorScreen error={error} />;
+  if (!currentProgram || !isPermitClassificationsLoaded) return <LoadingScreen />;
 
   return (
-    <Container maxW="container.xl" p={8} as={"main"}>
-      <VStack align={"start"} spacing={5} w={"full"} h={"full"}>
-        {!currentJurisdiction.submissionInboxSetUp && (
-          <CalloutBanner type={"error"} title={t("permitApplication.submissionInbox.contactInviteWarning")} />
-        )}
-        <Flex justify={"space-between"} w={"full"}>
+    <Container maxW="container.xl" as={'main'}>
+      <VStack align={'start'} spacing={5} w={'full'} h={'full'} py={8} px={16}>
+        {/* {!currentProgram.submissionInboxSetUp && (
+          <CalloutBanner type={'error'} title={t('permitApplication.submissionInbox.contactInviteWarning')} />
+        )} */}
+        <Flex justify={'space-between'} w={'full'}>
           <Box>
-            <Heading as="h1">{t("permitApplication.submissionInbox.title")}</Heading>
+            <Heading as="h1" color="theme.blueAlt">
+              {t('permitApplication.submissionInbox.title')}
+            </Heading>
             <Text fontSize="sm" color="text.secondary">
-              {t("permitApplication.submissionInbox.submissionsSentTo")}
+              {t('permitApplication.submissionInbox.tableDescription')}
             </Text>
+            <FormProvider {...methods}>
+              <form onSubmit={methods.handleSubmit((data) => console.log(data))}>
+                <AsyncDropdown
+                  mt={4}
+                  fetchOptions={fetchSubmissionTypeOptions}
+                  fieldName={'submissionTypeId'}
+                  useBoxWrapper={false}
+                />
+              </form>
+            </FormProvider>
+
+            <Heading as="h2" color="theme.blueAlt" mt={4}>
+              {t('permitApplication.submissionInbox.tableSubHeading')}
+            </Heading>
           </Box>
-          <Can action="jurisdiction:manage" data={{ jurisdiction: currentJurisdiction }}>
+          <Can action="jurisdiction:manage" data={{ jurisdiction: currentProgram }}>
             <Button
               as={RouterLink}
-              to={`/jurisdictions/${currentJurisdiction.slug}/configuration-management/submissions-inbox-setup`}
+              to={`/jurisdictions/${currentProgram.slug}/configuration-management/submissions-inbox-setup`}
               variant="secondary"
             >
-              {t("ui.setup")}
+              {t('ui.setup')}
             </Button>
           </Can>
         </Flex>
 
-        <SearchGrid templateColumns="repeat(8, 1fr)">
+        <SearchGrid templateColumns="repeat(7, 1fr)">
           <GridHeaders />
 
           {isSearching ? (
-            <Flex py={50} gridColumn={"span 7"}>
+            <Flex py={50} gridColumn={'span 7'}>
               <SharedSpinner />
             </Flex>
           ) : (
-            currentJurisdiction.tablePermitApplications.map((pa: IEnergySavingsApplication) => {
-              if (!pa.submitter) return <></>
+            currentProgram.tablePermitApplications.map((pa: IEnergySavingsApplication) => {
+              if (!pa.submitter) return <></>;
 
               return (
                 <Box
                   key={pa.id}
-                  className={"jurisdiction-permit-application-index-grid-row"}
-                  role={"row"}
-                  display={"contents"}
+                  className={'jurisdiction-permit-application-index-grid-row'}
+                  role={'row'}
+                  display={'contents'}
                 >
                   <SearchGridItem>
                     <EnergySavingsApplicationStatusTag energySavingsApplication={pa} />
                   </SearchGridItem>
                   <SearchGridItem>{pa.number}</SearchGridItem>
-                  <SearchGridItem wordBreak={"break-word"}>{pa.referenceNumber}</SearchGridItem>
+                  <SearchGridItem wordBreak={'break-word'}>{pa.referenceNumber}</SearchGridItem>
                   <SearchGridItem>
-                    <Flex direction="column">
-                      <Text fontWeight={700}>{pa.permitType.name}</Text>
-                      <Text>{pa.activity.name}</Text>
+                    <Flex>
+                      <Text fontWeight={700} flex={1}>
+                        {pa.submitter.name}
+                      </Text>
                     </Flex>
                   </SearchGridItem>
                   <SearchGridItem>
                     <Flex direction="column">
-                      <Text fontWeight={700}>{pa.submitter.name}</Text>
-                      <Text>{pa.submitter.email}</Text>
+                      <Text>{format(pa?.createdAt, 'yyyy-MM-dd')}</Text>
+                      <Text>{format(pa?.createdAt, 'HH:mm')}</Text>
                     </Flex>
                   </SearchGridItem>
                   <SearchGridItem>
-                    {pa.isViewed ? (
-                      <Flex direction="column">
-                        <Text>{format(pa.viewedAt, "yyyy-MM-dd")}</Text>
-                        <Text>{format(pa.viewedAt, "HH:mm")}</Text>
-                      </Flex>
-                    ) : (
-                      <PermitApplicationViewedAtTag permitApplication={pa} />
-                    )}
-                  </SearchGridItem>
-                  <SearchGridItem>
-                    {pa.isSubmitted && (
-                      <Flex direction="column">
-                        <Text>{format(pa.submittedAt, "yyyy-MM-dd")}</Text>
-                        <Text>{format(pa.submittedAt, "HH:mm")}</Text>
-                      </Flex>
-                    )}
-                  </SearchGridItem>
-                  <SearchGridItem gap={2}>
-                    <Stack>
-                      <HStack>
+                    <Flex>
+                      <Text fontWeight={700} flex={1}>
+                        {pa.submitter.name}
+                      </Text>
+                      <Box flex={1}>
                         <DesignatedCollaboratorAssignmentPopover
                           permitApplication={pa}
                           collaborationType={ECollaborationType.review}
                           avatarTrigger
                         />
+                      </Box>
+                    </Flex>
+                  </SearchGridItem>
+                  <SearchGridItem gap={2}>
+                    <Stack>
+                      <HStack>
                         <SubmissionDownloadModal
                           permitApplication={pa}
                           renderTrigger={(onOpen) => (
                             <IconButton
                               variant="secondary"
                               icon={<Download />}
-                              aria-label={"download"}
+                              aria-label={'download'}
                               onClick={onOpen}
                             />
                           )}
                           review
                         />
+                        <RouterLinkButton variant="primary" to={`/permit-applications/${pa.id}`}>
+                          {t('ui.view')}
+                        </RouterLinkButton>
                       </HStack>
-                      <RouterLinkButton
-                        variant="primary"
-                        rightIcon={<ArrowSquareOut />}
-                        to={`/permit-applications/${pa.id}`}
-                      >
-                        {t("ui.view")}
-                      </RouterLinkButton>
                     </Stack>
                   </SearchGridItem>
                 </Box>
-              )
+              );
             })
           )}
         </SearchGrid>
-        <Flex w={"full"} justifyContent={"space-between"}>
+        <Flex w={'full'} justifyContent={'space-between'}>
           <PerPageSelect
             handleCountPerPageChange={handleCountPerPageChange}
             countPerPage={countPerPage}
@@ -171,5 +183,5 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
         </Flex>
       </VStack>
     </Container>
-  )
-})
+  );
+});

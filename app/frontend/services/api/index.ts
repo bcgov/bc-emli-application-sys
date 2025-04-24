@@ -260,12 +260,12 @@ export class Api {
     );
   }
 
-  async fetchJurisdictionPermitApplications(
-    jurisdictionId,
+  async fetchProgramPermitApplications(
+    programId,
     params?: TSearchParams<EPermitApplicationSortFields, IPermitApplicationSearchFilters>,
   ) {
     return this.client.post<IJurisdictionPermitApplicationResponse>(
-      `/jurisdictions/${jurisdictionId}/permit_applications/search`,
+      `/programs/${programId}/permit_applications/search`,
       params,
     );
   }

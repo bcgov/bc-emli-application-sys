@@ -307,15 +307,13 @@ export const PermitApplicationStoreModel = types
         },
       } as TSearchParams<EPermitApplicationSortFields, IEnergySavingsApplicationSearchFilters>;
 
-      const currentJurisdictionId = self.rootStore?.jurisdictionStore?.currentJurisdiction?.id;
-      const response = currentJurisdictionId
-        ? yield self.environment.api.fetchJurisdictionPermitApplications(currentJurisdictionId, searchParams)
+      const currentProgramId = self.rootStore?.programStore?.currentProgram?.id;
+      const response = currentProgramId
+        ? yield self.environment.api.fetchProgramPermitApplications(currentProgramId, searchParams)
         : yield self.environment.api.fetchPermitApplications(searchParams);
       if (response.ok) {
         self.mergeUpdateAll(response.data.data, 'permitApplicationMap');
-        (self?.rootStore?.jurisdictionStore?.currentJurisdiction ?? self).setTablePermitApplications(
-          response.data.data,
-        );
+        (self?.rootStore?.programStore?.currentProgram ?? self).setTablePermitApplications(response.data.data);
 
         self.currentPage = opts?.page ?? self.currentPage;
         self.totalPages = response.data.meta.totalPages;

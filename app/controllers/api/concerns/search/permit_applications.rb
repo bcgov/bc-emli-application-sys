@@ -69,11 +69,9 @@ module Api::Concerns::Search::PermitApplications
     # Add the submitter ID if the user is a submitter. Necessary even with search auth filtering for consisent pagination
     # Only add the jurisdiction_id condition if @jurisdiction is present
     where =
-      if @jurisdiction
+      if @program
         {
-          jurisdiction_id: @jurisdiction.id,
-          # Overrides status filter, reorder the code if necessary
-          status: %i[newly_submitted resubmitted]
+          program_id: @program.id
         }
       else
         { user_ids_with_submission_edit_permissions: current_user.id }

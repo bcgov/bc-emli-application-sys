@@ -103,11 +103,11 @@ export const PermitClassificationStoreModel = types
         const submissionData = response.data.data.filter((pc) => pc.type == EPermitClassificationType.SubmissionType);
         const userGroupData = response.data.data.filter((pc) => pc.type == EPermitClassificationType.UserGroupType);
         const audienceData = response.data.data.filter((pc) => pc.type == EPermitClassificationType.AudienceType);
-        self.mergeUpdateAll(permitTypeData, 'permitTypeMap');
-        self.mergeUpdateAll(activityData, 'activityMap');
-        self.mergeUpdateAll(submissionData, 'submissionTypeMap');
-        self.mergeUpdateAll(userGroupData, 'userGroupTypeMap');
-        self.mergeUpdateAll(audienceData, 'audienceTypeMap');
+        if (permitTypeData.length) self.mergeUpdateAll(permitTypeData, 'permitTypeMap');
+        if (activityData.length) self.mergeUpdateAll(activityData, 'activityMap');
+        if (submissionData.length) self.mergeUpdateAll(submissionData, 'submissionTypeMap');
+        if (userGroupData.length) self.mergeUpdateAll(userGroupData, 'userGroupTypeMap');
+        if (audienceData.length) self.mergeUpdateAll(audienceData, 'audienceTypeMap');
       }
       self.isLoaded = true;
       return response.ok;
