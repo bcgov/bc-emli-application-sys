@@ -31,6 +31,10 @@ class UserPolicy < ApplicationPolicy
     user.system_admin?
   end
 
+  def admin_manager?
+    user.admin_manager?
+  end
+
   def search_jurisdiction_users?
     if user.system_admin? && (record.manager? || record.system_admin?)
       return true

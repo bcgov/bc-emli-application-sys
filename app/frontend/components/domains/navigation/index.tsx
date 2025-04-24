@@ -395,7 +395,7 @@ const AppRoutes = observer(() => {
 
   const managerOrReviewerRoutes = (
     <>
-      <Route path="/jurisdictions/:jurisdictionId/submission-inbox" element={<JurisdictionSubmissionInboxScreen />} />
+      <Route path="/:programId/submission-inbox" element={<JurisdictionSubmissionInboxScreen />} />
       <Route
         path="/jurisdictions/:jurisdictionId/configuration-management/submissions-inbox-setup"
         element={<SubmissionsInboxSetupScreen />}
@@ -517,7 +517,7 @@ const AppRoutes = observer(() => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={loggedIn && !mustAcceptEula && currentUser.isReviewStaff}
+              isAllowed={loggedIn && !mustAcceptEula && currentUser.isAdminManager}
               redirectPath={(mustAcceptEula && '/') || (loggedIn && '/not-found')}
             />
           }
@@ -558,7 +558,7 @@ const AppRoutes = observer(() => {
         {/* To be removed later  */}
         <Route
           path="/jurisdictions"
-          element={currentUser?.isSuperAdmin ? <JurisdictionIndexScreen /> : <LimitedJurisdictionIndexScreen />}
+          element={currentUser?.isAdminMgr ? <JurisdictionIndexScreen /> : <LimitedJurisdictionIndexScreen />}
         />
         <Route
           path="/programs"

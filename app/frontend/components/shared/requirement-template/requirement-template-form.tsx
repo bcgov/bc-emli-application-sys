@@ -109,6 +109,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
                 fieldName={'programId'}
                 question={t('requirementTemplate.new.programQuestion')}
                 placeholderOptionLabel={t('ui.selectProgram')}
+                useBoxWrapper={true}
               />
             )}
             <AsyncRadioGroup
@@ -127,6 +128,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
               fetchOptions={fetchSubmissionTypeOptions}
               fieldName={'submissionTypeId'}
               question={t('requirementTemplate.fields.submissionType')}
+              useBoxWrapper={true}
             />
             <Flex
               bg="greys.grey10"

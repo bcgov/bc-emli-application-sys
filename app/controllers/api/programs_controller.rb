@@ -165,7 +165,7 @@ class Api::ProgramsController < Api::ApplicationController
                    }
   end
 
-  # POST /api/jurisdictions/:id/permit_applications/search
+  # POST /api/programs/:id/permit_applications/search
   def search_permit_applications
     authorize @program
     perform_permit_application_search

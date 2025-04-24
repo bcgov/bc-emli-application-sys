@@ -134,7 +134,7 @@ Rails.application.routes.draw do
       post "users/search", on: :member, to: "jurisdictions#search_users"
       post "permit_applications/search",
            on: :member,
-           to: "jurisdictions#search_permit_applications"
+           to: "programs#search_permit_applications"
       patch "update_external_api_enabled",
             on: :member,
             to: "jurisdictions#update_external_api_enabled"
@@ -145,6 +145,9 @@ Rails.application.routes.draw do
     resources :programs, only: %i[index update show create] do
       post "search", on: :collection, to: "programs#index"
       post "users/search", on: :member, to: "programs#search_users"
+      post "permit_applications/search",
+           on: :member,
+           to: "programs#search_permit_applications"
 
       resources :program_classification_memberships, only: %i[create destroy] do
         collection do
