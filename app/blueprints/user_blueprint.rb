@@ -69,4 +69,20 @@ class UserBlueprint < Blueprinter::Base
         &.jurisdiction
     end
   end
+
+  view :with_membership do
+    include_view :minimal
+
+    field :membership do |user, options|
+      memberships_by_user_id = options[:memberships_by_user_id] || {}
+
+      membership = memberships_by_user_id[user.id]
+
+      {
+        deactivated_at: membership&.deactivated_at,
+        user_group_type: membership&.user_group_type&.name,
+        submission_type: membership&.submission_type&.name
+      }
+    end
+  end
 end

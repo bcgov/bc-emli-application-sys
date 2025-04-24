@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_10_205003) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_24_174917) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -432,6 +432,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_10_205003) do
     t.uuid "submission_type_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deactivated_at"
+    t.index ["deactivated_at"],
+            name: "index_program_classification_memberships_on_deactivated_at"
     t.index %w[user_id program_id user_group_type_id submission_type_id],
             name: "index_program_classification_memberships_unique",
             unique: true

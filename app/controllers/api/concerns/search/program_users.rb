@@ -5,31 +5,44 @@ module Api::Concerns::Search::ProgramUsers
   def perform_user_search(filters = {})
     query = params[:query].presence || "*"
 
-    user_ids = @program.program_classification_memberships.pluck(:user_id)
-
-    where_conditions = { id: user_ids }
+    memberships_scope =
+      @program.program_classification_memberships.includes(
+        :user,
+        :user_group_type,
+        :submission_type
+      )
 
     case (params[:status].presence || "active")
     when "active"
-      where_conditions[:reviewed] = true
-      where_conditions[:discarded_at] = nil
+      memberships_scope =
+        memberships_scope
+          .where(deactivated_at: nil)
+          .joins(:user)
+          .where(users: { reviewed: true })
     when "deactivated"
-      where_conditions[:discarded_at] = { not: nil }
+      memberships_scope = memberships_scope.where.not(deactivated_at: nil)
     when "pending"
-      where_conditions[:invitation_sent_at] = { not: nil }
-      where_conditions[:invitation_accepted_at] = nil
+      memberships_scope =
+        memberships_scope
+          .joins(:user)
+          .where.not(users: { invitation_sent_at: nil })
+          .where(users: { invitation_accepted_at: nil })
     end
-    #Rails.logger.info "Search WHERE conditions: #{where_conditions.inspect}"
+
+    # create a fully filtered list
+    memberships_array = memberships_scope.to_a
+    @memberships_by_user_id = memberships_array.index_by(&:user_id)
+    user_ids = @memberships_by_user_id.keys
+
     @user_search =
       User.search(
         query,
         fields: %i[name email],
-        where: where_conditions,
-        includes: %i[mailing_address physical_address preference],
+        where: {
+          id: user_ids
+        },
         page: params[:page] || 1,
         per_page: params[:per_page] || 25
       )
-
-    #Rails.logger.info "User Search results: #{@user_search.inspect}"
   end
 end

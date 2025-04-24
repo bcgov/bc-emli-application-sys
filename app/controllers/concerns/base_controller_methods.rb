@@ -54,8 +54,15 @@ module BaseControllerMethods
           raise "Error - cannot infer blueprint, please pass a blueprint class in"
         end
       end
-      blueprint_opts = opts[:blueprint_opts].merge({ root: "data", meta: meta })
-      render json: opts[:blueprint].render(resource, blueprint_opts),
+
+      # blueprint_opts = opts[:blueprint_opts].merge({ root: "data", meta: meta })
+      # render json: opts[:blueprint].render(resource, blueprint_opts),
+      #        status: opts[:status]
+      render json:
+               opts[:blueprint].render(
+                 resource,
+                 opts[:blueprint_opts].merge(root: "data", meta: meta)
+               ),
              status: opts[:status]
     end
   end

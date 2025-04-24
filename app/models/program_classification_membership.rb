@@ -6,10 +6,21 @@ class ProgramClassificationMembership < ApplicationRecord
              class_name: "PermitClassification",
              optional: true
 
+  scope :active, -> { where(deactivated_at: nil) }
+  scope :inactive, -> { where.not(deactivated_at: nil) }
+
   validates :user_group_type, presence: true
   validates :user, :program, presence: true
 
   validate :correct_classification_types
+
+  def deactivate!
+    update!(deactivated_at: Time.current)
+  end
+
+  def active?
+    deactivated_at.nil?
+  end
 
   def correct_classification_types
     if user_group_type&.type != "UserGroupType"
