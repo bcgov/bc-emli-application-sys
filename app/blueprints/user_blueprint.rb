@@ -71,18 +71,21 @@ class UserBlueprint < Blueprinter::Base
   end
 
   view :with_membership do
-    include_view :minimal
+    include_view :base
 
-    field :membership do |user, options|
-      memberships_by_user_id = options[:memberships_by_user_id] || {}
-
-      membership = memberships_by_user_id[user.id]
-
-      {
-        deactivated_at: membership&.deactivated_at,
-        user_group_type: membership&.user_group_type&.name,
-        submission_type: membership&.submission_type&.name
-      }
+    field :program_memberships do |user, options|
+      (options[:memberships_by_user_id][user.id] || []).map do |membership|
+        {
+          deactivated_at: membership.deactivated_at,
+          classifications:
+            membership.program_classification_memberships.map do |pcm|
+              {
+                user_group_type: pcm.user_group_type&.name,
+                submission_type: pcm.submission_type&.name
+              }
+            end
+        }
+      end
     end
   end
 end

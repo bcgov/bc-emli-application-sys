@@ -1,36 +1,29 @@
 class ProgramClassificationMembership < ApplicationRecord
-  belongs_to :user
-  belongs_to :program
+  belongs_to :program_membership
   belongs_to :user_group_type, class_name: "PermitClassification"
   belongs_to :submission_type,
              class_name: "PermitClassification",
              optional: true
 
-  scope :active, -> { where(deactivated_at: nil) }
-  scope :inactive, -> { where.not(deactivated_at: nil) }
+  # Convenience access to user and program through program_membership
+  delegate :user, :program, to: :program_membership
 
-  validates :user_group_type, presence: true
-  validates :user, :program, presence: true
+  # Required relationships
+  validates :program_membership, :user_group_type, presence: true
 
+  # Custom classification validation
   validate :correct_classification_types
 
-  def deactivate!
-    update!(deactivated_at: Time.current)
-  end
-
-  def active?
-    deactivated_at.nil?
-  end
-
   def correct_classification_types
-    if user_group_type&.type != "UserGroupType"
+    if user_group_type&.classification_type != "user_group"
       errors.add(
         :user_group_type,
         "must be a valid UserGroupType classification"
       )
     end
 
-    if submission_type && submission_type.type != "SubmissionType"
+    if submission_type &&
+         submission_type.classification_type != "submission_type"
       errors.add(
         :submission_type,
         "must be a valid SubmissionType classification"

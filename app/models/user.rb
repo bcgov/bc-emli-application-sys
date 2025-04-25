@@ -50,6 +50,9 @@ class User < ApplicationRecord
            as: :notifiable,
            dependent: :destroy
 
+  has_many :program_memberships, dependent: :destroy
+  has_many :programs, through: :program_memberships
+
   has_many :permit_applications,
            foreign_key: "submitter_id",
            dependent: :destroy

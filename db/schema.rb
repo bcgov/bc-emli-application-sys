@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_24_174917) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_24_235704) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -426,18 +426,29 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_24_174917) do
                id: :uuid,
                default: -> { "gen_random_uuid()" },
                force: :cascade do |t|
-    t.uuid "user_id", null: false
-    t.uuid "program_id", null: false
     t.uuid "user_group_type_id", null: false
     t.uuid "submission_type_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "program_membership_id"
+    t.index ["program_membership_id"],
+            name: "idx_on_program_membership_id_5e2504208f"
+  end
+
+  create_table "program_memberships",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "program_id", null: false
     t.datetime "deactivated_at"
-    t.index ["deactivated_at"],
-            name: "index_program_classification_memberships_on_deactivated_at"
-    t.index %w[user_id program_id user_group_type_id submission_type_id],
-            name: "index_program_classification_memberships_unique",
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["program_id"], name: "index_program_memberships_on_program_id"
+    t.index %w[user_id program_id],
+            name: "index_program_memberships_on_user_id_and_program_id",
             unique: true
+    t.index ["user_id"], name: "index_program_memberships_on_user_id"
   end
 
   create_table "programs",
@@ -1062,8 +1073,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_24_174917) do
   add_foreign_key "program_classification_memberships",
                   "permit_classifications",
                   column: "user_group_type_id"
-  add_foreign_key "program_classification_memberships", "programs"
-  add_foreign_key "program_classification_memberships", "users"
+  add_foreign_key "program_classification_memberships", "program_memberships"
+  add_foreign_key "program_memberships", "programs"
+  add_foreign_key "program_memberships", "users"
   add_foreign_key "requirement_template_sections",
                   "requirement_template_sections",
                   column: "copied_from_id"

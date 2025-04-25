@@ -2,16 +2,16 @@
 module Api::Concerns::Search::ProgramUsers
   extend ActiveSupport::Concern
 
-  def perform_user_search(filters = {})
+  def perform_user_search
     query = params[:query].presence || "*"
 
+    # Start with memberships scoped to the current program
     memberships_scope =
-      @program.program_classification_memberships.includes(
-        :user,
-        :user_group_type,
-        :submission_type
+      @program.program_memberships.includes(
+        program_classification_memberships: %i[user_group_type submission_type]
       )
 
+    # Filter by status
     case (params[:status].presence || "active")
     when "active"
       memberships_scope =
@@ -29,11 +29,15 @@ module Api::Concerns::Search::ProgramUsers
           .where(users: { invitation_accepted_at: nil })
     end
 
-    # create a fully filtered list
-    memberships_array = memberships_scope.to_a
-    @memberships_by_user_id = memberships_array.index_by(&:user_id)
-    user_ids = @memberships_by_user_id.keys
+    memberships = memberships_scope.to_a
 
+    # Index all memberships by user_id for rendering
+    @memberships_by_user_id = memberships.group_by(&:user_id)
+
+    # Extract user_ids for search
+    user_ids = memberships.map(&:user_id)
+
+    # Run the search
     @user_search =
       User.search(
         query,
@@ -41,6 +45,7 @@ module Api::Concerns::Search::ProgramUsers
         where: {
           id: user_ids
         },
+        includes: %i[mailing_address physical_address preference],
         page: params[:page] || 1,
         per_page: params[:per_page] || 25
       )
