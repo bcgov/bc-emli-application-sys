@@ -6,6 +6,7 @@ import { ILicenseAgreement } from '../types/types';
 import { convertToDate } from '../utils/utility-functions';
 import { IJurisdiction, JurisdictionModel } from './jurisdiction';
 import { IAddress, AddressModel } from './address';
+import { UserProgramMembershipModel } from './program-membership';
 
 export const UserModel = types
   .model('UserModel')
@@ -35,6 +36,7 @@ export const UserModel = types
     licenseAgreements: types.maybeNull(types.frozen<ILicenseAgreement[]>()),
     physicalAddress: types.maybeNull(AddressModel),
     mailingAddress: types.maybeNull(AddressModel),
+    programMemberships: types.optional(types.array(UserProgramMembershipModel), []),
   })
   .extend(withRootStore())
   .extend(withEnvironment())
