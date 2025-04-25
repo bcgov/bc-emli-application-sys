@@ -9,23 +9,28 @@ RSpec.describe "ProgramClassificationMemberships API", type: :request do
       pc.name = "Participant"
     end
   end
+
   let!(:contractor) do
     UserGroupType.find_or_create_by!(code: :contractor) do |pc|
       pc.name = "Contractor"
     end
   end
+
   let!(:onboarding) do
     SubmissionType.find_or_create_by!(code: :onboarding) do |pc|
       pc.name = "Onboarding"
     end
   end
 
+  let!(:program_membership) do
+    create(:program_membership, user: user, program: program)
+  end
+
   describe "GET /participant_inbox_memberships" do
     before do
       create(
         :program_classification_membership,
-        user: user,
-        program: program,
+        program_membership: program_membership,
         user_group_type: participant
       )
     end
@@ -44,8 +49,7 @@ RSpec.describe "ProgramClassificationMemberships API", type: :request do
     before do
       create(
         :program_classification_membership,
-        user: user,
-        program: program,
+        program_membership: program_membership,
         user_group_type: contractor
       )
     end
@@ -63,8 +67,7 @@ RSpec.describe "ProgramClassificationMemberships API", type: :request do
     before do
       create(
         :program_classification_membership,
-        user: user,
-        program: program,
+        program_membership: program_membership,
         user_group_type: contractor,
         submission_type: onboarding
       )
@@ -83,8 +86,7 @@ RSpec.describe "ProgramClassificationMemberships API", type: :request do
     before do
       create(
         :program_classification_membership,
-        user: user,
-        program: program,
+        program_membership: program_membership,
         user_group_type: contractor,
         submission_type: onboarding
       )
@@ -117,7 +119,9 @@ RSpec.describe "ProgramClassificationMemberships API", type: :request do
            }
 
       expect(response).to have_http_status(:created)
-      expect(JSON.parse(response.body)["user_id"]).to eq(user.id)
+      json = JSON.parse(response.body)
+      membership = ProgramClassificationMembership.find(json["id"])
+      expect(membership.user.id).to eq(user.id)
     end
   end
 
@@ -125,8 +129,7 @@ RSpec.describe "ProgramClassificationMemberships API", type: :request do
     let!(:membership) do
       create(
         :program_classification_membership,
-        user: user,
-        program: program,
+        program_membership: program_membership,
         user_group_type: contractor,
         submission_type: onboarding
       )

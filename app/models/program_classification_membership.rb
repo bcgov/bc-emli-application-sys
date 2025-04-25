@@ -15,15 +15,14 @@ class ProgramClassificationMembership < ApplicationRecord
   validate :correct_classification_types
 
   def correct_classification_types
-    if user_group_type&.classification_type != "user_group"
+    if user_group_type&.type != "UserGroupType"
       errors.add(
         :user_group_type,
         "must be a valid UserGroupType classification"
       )
     end
 
-    if submission_type &&
-         submission_type.classification_type != "submission_type"
+    if submission_type && submission_type.type != "SubmissionType"
       errors.add(
         :submission_type,
         "must be a valid SubmissionType classification"
