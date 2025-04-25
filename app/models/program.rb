@@ -19,8 +19,8 @@ class Program < ApplicationRecord
   has_many :permit_applications
   has_many :contacts, as: :contactable, dependent: :destroy
 
-  has_many :program_classification_memberships
-  has_many :users, through: :program_classification_memberships
+  has_many :program_memberships, dependent: :destroy
+  has_many :users, through: :program_memberships
 
   # has_many :jurisdiction_memberships, dependent: :destroy
   # has_many :users, through: :jurisdiction_memberships

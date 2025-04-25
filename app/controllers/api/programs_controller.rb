@@ -147,6 +147,8 @@ class Api::ProgramsController < Api::ApplicationController
         "search_program_membership_users"
       )
 
+    Rails.logger.info "Authorized results: #{authorized_results.inspect}"
+
     render_success authorized_results,
                    nil,
                    {
@@ -160,7 +162,8 @@ class Api::ProgramsController < Api::ApplicationController
                      },
                      blueprint: UserBlueprint,
                      blueprint_opts: {
-                       view: :base
+                       view: :with_membership,
+                       memberships_by_user_id: @memberships_by_user_id
                      }
                    }
   end

@@ -27,7 +27,13 @@ export function ActiveUserRow({ user, userStore }: UserRowProps) {
       <SearchGridItem fontWeight={700}>
         <RoleTag role={user.role} />
       </SearchGridItem>
-      <SearchGridItem fontSize="sm">{''}</SearchGridItem>
+      <SearchGridItem fontSize="sm">
+        {user.programMemberships.flatMap((membership) =>
+          membership.classifications.map((classification, i) => (
+            <div key={i}>{classification.presetLabel ?? 'Unknown Classification'}</div>
+          )),
+        )}
+      </SearchGridItem>
       <SearchGridItem fontSize="sm">{format(user.createdAt, 'yyyy-MM-dd')}</SearchGridItem>
       <SearchGridItem fontSize="sm">
         {user.lastSignInAt ? format(user.lastSignInAt, 'yyyy-MM-dd') : t('ui.never')}
@@ -50,7 +56,13 @@ export function PendingUserRow({ user, userStore }: UserRowProps) {
       <SearchGridItem fontWeight={700}>
         <RoleTag role={user.role} />
       </SearchGridItem>
-      <SearchGridItem>{''}</SearchGridItem>
+      <SearchGridItem fontSize="sm">
+        {user.programMemberships.flatMap((membership) =>
+          membership.classifications.map((classification, i) => (
+            <div key={i}>{classification.presetLabel ?? 'Unknown Classification'}</div>
+          )),
+        )}
+      </SearchGridItem>
       <SearchGridItem fontSize="sm">{format(user.createdAt, 'yyyy-MM-dd')}</SearchGridItem>
       <SearchGridItem fontSize="sm">
         {user.lastSignInAt ? format(user.lastSignInAt, 'yyyy-MM-dd') : t('ui.never')}
@@ -77,7 +89,13 @@ export function DeactivatedUserRow({ user, userStore }: UserRowProps) {
       <SearchGridItem fontWeight={700}>
         <RoleTag role={user.role} />
       </SearchGridItem>
-      <SearchGridItem>{''}</SearchGridItem>
+      <SearchGridItem fontSize="sm">
+        {user.programMemberships.flatMap((membership) =>
+          membership.classifications.map((classification, i) => (
+            <div key={i}>{classification.presetLabel ?? 'Unknown Classification'}</div>
+          )),
+        )}
+      </SearchGridItem>
       <SearchGridItem fontSize="sm">{format(user.createdAt, 'yyyy-MM-dd')}</SearchGridItem>
       <SearchGridItem fontSize="sm">
         {user.lastSignInAt ? format(user.lastSignInAt, 'yyyy-MM-dd') : t('ui.never')}

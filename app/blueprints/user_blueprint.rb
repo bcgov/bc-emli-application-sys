@@ -69,4 +69,23 @@ class UserBlueprint < Blueprinter::Base
         &.jurisdiction
     end
   end
+
+  view :with_membership do
+    include_view :base
+
+    field :program_memberships do |user, options|
+      (options[:memberships_by_user_id][user.id] || []).map do |membership|
+        {
+          deactivated_at: membership.deactivated_at,
+          classifications:
+            membership.program_classification_memberships.map do |pcm|
+              {
+                user_group_type: pcm.user_group_type&.name,
+                submission_type: pcm.submission_type&.name
+              }
+            end
+        }
+      end
+    end
+  end
 end

@@ -1,14 +1,17 @@
 class ProgramClassificationMembership < ApplicationRecord
-  belongs_to :user
-  belongs_to :program
+  belongs_to :program_membership
   belongs_to :user_group_type, class_name: "PermitClassification"
   belongs_to :submission_type,
              class_name: "PermitClassification",
              optional: true
 
-  validates :user_group_type, presence: true
-  validates :user, :program, presence: true
+  # Convenience access to user and program through program_membership
+  delegate :user, :program, to: :program_membership
 
+  # Required relationships
+  validates :program_membership, :user_group_type, presence: true
+
+  # Custom classification validation
   validate :correct_classification_types
 
   def correct_classification_types
