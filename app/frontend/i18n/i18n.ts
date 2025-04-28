@@ -112,7 +112,7 @@ const options = {
           troubleLogging: 'Trouble logging in? The Service BC Help Desk is here to help.',
           phoneNumber: '1-888-356-2741',
           phoneNumberHours:
-            'This phone line is answered 7:30 am - 5 pm, Monday to Friday (excluding statutory holidays).',
+            'This phone line is answered 7:30 am - 5 pm Monday to Friday (excluding statutory holidays).',
           role: 'Role',
           emailLabel: 'Email address',
           userFirstNameLabel: 'First name',
