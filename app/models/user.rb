@@ -331,8 +331,7 @@ class User < ApplicationRecord
   end
 
   def valid_role_change
-    # Only prevent if the user is changing their own role from system_admin
-    if role_was.to_sym == :system_admin && id == Current.user&.id
+    unless Current.user&.can_assign_role?(role)
       errors.add(:base, :admin_role_change)
     end
   end
