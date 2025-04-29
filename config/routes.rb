@@ -222,6 +222,7 @@ Rails.application.routes.draw do
     resources :users, only: %i[destroy update] do
       patch "restore", on: :member
       patch "accept_eula", on: :member
+      patch "role", on: :member, to: "users#update_user_role"
       post "search", on: :collection, to: "users#index"
       post "resend_confirmation", on: :member
       post "reinvite", on: :member
@@ -264,6 +265,13 @@ Rails.application.routes.draw do
     end
 
     resources :esp_application, only: [:create]
+
+    resources :program_memberships, only: [] do
+      member do
+        patch :deactivate
+        patch :reactivate
+      end
+    end
   end
 
   scope module: :external_api, path: :external_api do

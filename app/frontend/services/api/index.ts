@@ -302,6 +302,14 @@ export class Api {
     return this.client.patch<ApiResponse<IUser>>('/profile', { user: params });
   }
 
+  async removeUserFromProgram(id) {
+    return this.client.patch<ApiResponse<IUser>>(`/program_memberships/${id}/deactivate`);
+  }
+
+  async restoreUserToProgram(id) {
+    return this.client.patch<ApiResponse<IUser>>(`/program_memberships/${id}/reactivate`);
+  }
+
   async destroyUser(id) {
     return this.client.delete<ApiResponse<IUser>>(`/users/${id}`);
   }
@@ -312,6 +320,10 @@ export class Api {
 
   async acceptEULA(userId: string) {
     return this.client.patch<ApiResponse<IUser>>(`/users/${userId}/accept_eula`);
+  }
+
+  async updateUserRole(id: string, role: string) {
+    return this.client.patch<ApiResponse<IUser>>(`/users/${id}/role`, { role });
   }
 
   async getEULA() {

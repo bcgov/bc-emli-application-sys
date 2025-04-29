@@ -31,6 +31,17 @@ class User < ApplicationRecord
        },
        _default: :participant
 
+  #role ranking in order, these can be adjust or have
+  # other roles added without breaking the roles in the database
+  ROLE_PRIVILEGE = {
+    system_admin: 4,
+    admin_manager: 3,
+    admin: 2,
+    contractor: 1,
+    participant: 0,
+    unassigned: -1
+  }.freeze
+
   # https://github.com/waiting-for-dev/devise-jwt
   self.skip_session_storage = %i[http_auth params_auth]
 
@@ -230,6 +241,18 @@ class User < ApplicationRecord
     mailing_address.save!
   end
 
+  def can_assign_role?(new_role)
+    # System admins can assign any role to anyone (except themselves)
+    return true if system_admin?
+
+    # Everyone else can only assign roles lower than theirs
+    ROLE_PRIVILEGE[new_role.to_sym] < role_privilege_level
+  end
+
+  def role_privilege_level
+    ROLE_PRIVILEGE[role.to_sym]
+  end
+
   private
 
   def destroy_jurisdiction_collaborator
@@ -308,6 +331,9 @@ class User < ApplicationRecord
   end
 
   def valid_role_change
-    errors.add(:base, :admin_role_change) if role_was.to_sym == :system_admin
+    # Only prevent if the user is changing their own role from system_admin
+    if role_was.to_sym == :system_admin && id == Current.user&.id
+      errors.add(:base, :admin_role_change)
+    end
   end
 end

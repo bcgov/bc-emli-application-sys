@@ -80,7 +80,7 @@ export enum ExternalApiKeyStatus {
 export enum EUserRoles {
   participant = 'participant',
   //regionalReviewManager = "regional_review_manager",
-  participantSupportRep = 'participant_support_rep',
+  //participantSupportRep = 'participant_support_rep',
   adminManager = 'admin_manager',
   admin = 'admin',
   systemAdmin = 'system_admin',

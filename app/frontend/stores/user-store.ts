@@ -115,7 +115,6 @@ export const UserStoreModel = types
       return ok;
     }),
     updateProfile: flow(function* (formData) {
-      console.log(formData);
       const { ok, data: response } = yield self.environment.api.updateProfile(formData);
       if (ok) {
         self.mergeUpdate(response.data, 'usersMap');

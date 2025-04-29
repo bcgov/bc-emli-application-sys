@@ -142,8 +142,34 @@ export const UserModel = types
         acceptedAt: convertToDate(licenseAgreement.acceptedAt),
       }));
     },
+    getProgramMembershipForProgram(programId: string) {
+      return self.programMemberships.find((membership) => membership.programId === programId) ?? null;
+    },
   }))
   .actions((self) => ({
+    removeFromProgram: flow(function* (programId: string) {
+      const membership = self.getProgramMembershipForProgram(programId);
+      if (!membership) throw new Error('Program membership not found');
+
+      const response = yield self.environment.api.removeUserFromProgram(membership.id);
+      if (response.ok) {
+        //applySnapshot(self, response.data.data);
+        yield self.rootStore.userStore.searchUsers({ reset: true });
+      }
+      return response.ok;
+    }),
+
+    restoreToProgram: flow(function* (programId: string) {
+      const membership = self.getProgramMembershipForProgram(programId);
+      if (!membership) throw new Error('Program membership not found');
+
+      const response = yield self.environment.api.restoreUserToProgram(membership.id);
+      if (response.ok) {
+        //applySnapshot(self, response.data.data);
+        yield self.rootStore.userStore.searchUsers({ reset: false });
+      }
+      return response.ok;
+    }),
     destroy: flow(function* () {
       const response = yield self.environment.api.destroyUser(self.id);
       if (response.ok) applySnapshot(self, response.data.data);
@@ -154,19 +180,12 @@ export const UserModel = types
       if (response.ok) applySnapshot(self, response.data.data);
       return response.ok;
     }),
-    changeRole: flow(function* () {
-      let newRole = null;
-      if (self.role === EUserRoles.adminManager) {
-        newRole = EUserRoles.admin;
-      } else if (self.role === EUserRoles.admin) {
-        newRole = EUserRoles.adminManager;
-      } else {
-        return;
+    changeRole: flow(function* (newRole: string) {
+      const { ok, data } = yield self.environment.api.updateUserRole(self.id, newRole);
+      if (ok && data?.data) {
+        applySnapshot(self, data.data);
       }
-
-      const response = yield self.environment.api.updateUser(self.id, { role: newRole });
-      if (response.ok) applySnapshot(self, response.data.data);
-      return response.ok;
+      return ok;
     }),
     acceptEULA: flow(function* () {
       const response = yield self.environment.api.acceptEULA(self.id);

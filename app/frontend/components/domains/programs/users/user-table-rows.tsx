@@ -4,10 +4,11 @@ import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { IUser } from '../../../../models/user';
 import { RoleTag } from '../../../shared/user/role-tag';
-import { ManageUserMenu } from '../../../shared/user/manage-user-menu';
+import { ManageProgramUserMenu } from '../../../shared/user/manage-program-user-menu';
 import { SearchGridItem } from '../../../shared/grid/search-grid-item';
 import { IUserStore } from '../../../../stores/user-store';
 import { ISearch } from '../../../../lib/create-search-model';
+import { useMst } from '../../../../setup/root';
 
 interface UserRowProps {
   user: IUser;
@@ -17,6 +18,9 @@ interface UserRowProps {
 /** Active User Row */
 export function ActiveUserRow({ user, userStore }: UserRowProps) {
   const { t } = useTranslation();
+  const {
+    programStore: { currentProgram },
+  } = useMst();
 
   return (
     <Box key={user.id} className="user-index-grid-row" role="row" display="contents">
@@ -28,11 +32,9 @@ export function ActiveUserRow({ user, userStore }: UserRowProps) {
         <RoleTag role={user.role} />
       </SearchGridItem>
       <SearchGridItem fontSize="sm">
-        {user.programMemberships.flatMap((membership) =>
-          membership.classifications.map((classification, i) => (
-            <div key={i}>{classification.presetLabel ?? 'Unknown Classification'}</div>
-          )),
-        )}
+        {user
+          .getProgramMembershipForProgram(currentProgram.id)
+          ?.classifications.map((classification, i) => <div key={i}>{classification.presetLabel ?? ''}</div>)}
       </SearchGridItem>
       <SearchGridItem fontSize="sm">{format(user.createdAt, 'yyyy-MM-dd')}</SearchGridItem>
       <SearchGridItem fontSize="sm">
@@ -40,7 +42,7 @@ export function ActiveUserRow({ user, userStore }: UserRowProps) {
       </SearchGridItem>
       <SearchGridItem>
         <Flex justify="space-between" w="full">
-          <ManageUserMenu<ISearch> user={user} searchModel={userStore as ISearch} type="active" />
+          <ManageProgramUserMenu<ISearch> user={user} searchModel={userStore as ISearch} type="active" />
         </Flex>
       </SearchGridItem>
     </Box>
@@ -58,9 +60,7 @@ export function PendingUserRow({ user, userStore }: UserRowProps) {
       </SearchGridItem>
       <SearchGridItem fontSize="sm">
         {user.programMemberships.flatMap((membership) =>
-          membership.classifications.map((classification, i) => (
-            <div key={i}>{classification.presetLabel ?? 'Unknown Classification'}</div>
-          )),
+          membership.classifications.map((classification, i) => <div key={i}>{classification.presetLabel ?? ''}</div>),
         )}
       </SearchGridItem>
       <SearchGridItem fontSize="sm">{format(user.createdAt, 'yyyy-MM-dd')}</SearchGridItem>
@@ -70,7 +70,7 @@ export function PendingUserRow({ user, userStore }: UserRowProps) {
       <SearchGridItem>{''}</SearchGridItem>
       <SearchGridItem>
         <Flex justify="space-between" w="full">
-          <ManageUserMenu user={user} searchModel={userStore as ISearch} type="pending" />
+          <ManageProgramUserMenu user={user} searchModel={userStore as ISearch} type="pending" />
         </Flex>
       </SearchGridItem>
     </Box>
@@ -91,9 +91,7 @@ export function DeactivatedUserRow({ user, userStore }: UserRowProps) {
       </SearchGridItem>
       <SearchGridItem fontSize="sm">
         {user.programMemberships.flatMap((membership) =>
-          membership.classifications.map((classification, i) => (
-            <div key={i}>{classification.presetLabel ?? 'Unknown Classification'}</div>
-          )),
+          membership.classifications.map((classification, i) => <div key={i}>{classification.presetLabel ?? ''}</div>),
         )}
       </SearchGridItem>
       <SearchGridItem fontSize="sm">{format(user.createdAt, 'yyyy-MM-dd')}</SearchGridItem>
@@ -102,7 +100,7 @@ export function DeactivatedUserRow({ user, userStore }: UserRowProps) {
       </SearchGridItem>
       <SearchGridItem>
         <Flex justify="space-between" w="full">
-          <ManageUserMenu user={user} searchModel={userStore as ISearch} type="deactivated" />
+          <ManageProgramUserMenu user={user} searchModel={userStore as ISearch} type="deactivated" />
         </Flex>
       </SearchGridItem>
     </Box>

@@ -74,6 +74,10 @@ class UserPolicy < ApplicationPolicy
     user.jurisdictions.pluck(:id).intersect?(record.jurisdictions.pluck(:id))
   end
 
+  def update_role?
+    user.system_admin? && user != record
+  end
+
   # TODO: we need to check if user managing users is in the program??
   # def record_in_users_program?
   #   user.jurisdictions.pluck(:id).intersect?(record.jurisdictions.pluck(:id))

@@ -76,7 +76,9 @@ class UserBlueprint < Blueprinter::Base
     field :program_memberships do |user, options|
       (options[:memberships_by_user_id][user.id] || []).map do |membership|
         {
+          id: membership.id,
           deactivated_at: membership.deactivated_at,
+          program_id: membership.program_id,
           classifications:
             membership.program_classification_memberships.map do |pcm|
               {

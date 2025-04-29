@@ -101,7 +101,7 @@ export const ProgramUserIndexScreen = observer(function ProgramUserIndex() {
                   </Flex>
                 ) : (
                   userStore.tableUsers.map((u: IUser) => {
-                    return <ActiveUserRow user={u} userStore={userStore} />;
+                    return <ActiveUserRow key={u.id} user={u} userStore={userStore} />;
                   })
                 )}
               </SearchGrid>
@@ -116,7 +116,7 @@ export const ProgramUserIndexScreen = observer(function ProgramUserIndex() {
                   </Flex>
                 ) : (
                   userStore.tableUsers.map((u: IUser) => {
-                    return <PendingUserRow user={u} userStore={userStore} />;
+                    return <PendingUserRow key={u.id} user={u} userStore={userStore} />;
                   })
                 )}
               </SearchGrid>
@@ -131,7 +131,7 @@ export const ProgramUserIndexScreen = observer(function ProgramUserIndex() {
                   </Flex>
                 ) : (
                   userStore.tableUsers.map((u: IUser) => {
-                    return <DeactivatedUserRow user={u} userStore={userStore} />;
+                    return <DeactivatedUserRow key={u.id} user={u} userStore={userStore} />;
                   })
                 )}
               </SearchGrid>

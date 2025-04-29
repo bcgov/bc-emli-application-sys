@@ -1,7 +1,7 @@
-import { Button, Flex, Heading, Link, ListItem, Text, UnorderedList } from "@chakra-ui/react"
-import { ArrowSquareOut, CaretRight } from "@phosphor-icons/react"
-import React from "react"
-import { RouterLinkButton } from "../navigation/router-link-button"
+import { Button, Flex, Heading, Link, ListItem, Text, UnorderedList } from '@chakra-ui/react';
+import { ArrowSquareOut, CaretRight } from '@phosphor-icons/react';
+import React from 'react';
+import { RouterLinkButton } from '../navigation/router-link-button';
 
 export function BCServiceInfoBlock({ title, description, bulletPoints, ctaText, ctaLink, infoLink = null }) {
   return (
@@ -25,5 +25,5 @@ export function BCServiceInfoBlock({ title, description, bulletPoints, ctaText, 
         {ctaText}
       </RouterLinkButton>
     </Flex>
-  )
+  );
 }
