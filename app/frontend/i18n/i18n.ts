@@ -1937,6 +1937,22 @@ const options = {
             tableHeading: 'User accounts',
             inviteButton: 'Invite users',
           },
+          menuItems: {
+            changeUserRole: 'Change role',
+            inboxAccess: 'Submission inbox access',
+            removeUser: 'Remove user',
+            reinviteUser: 'Re-invite',
+            revokeUserInvite: 'Revoke invite',
+            reactivateUser: 'Reactivate',
+          },
+          changeRoleModal: {
+            title: 'Change role for',
+            selectionLabel: 'Select new role',
+          },
+          changeInboxModal: {
+            title: 'Change submission inbox access for',
+            selectionLabel: 'Select submission inbox access',
+          },
           changeRole: 'Change role',
           newEmail: 'New email address',
           changeEmail: 'Change email',

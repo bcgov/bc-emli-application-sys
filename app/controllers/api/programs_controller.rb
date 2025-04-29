@@ -147,8 +147,6 @@ class Api::ProgramsController < Api::ApplicationController
         "search_program_membership_users"
       )
 
-    Rails.logger.info "Authorized results: #{authorized_results.inspect}"
-
     render_success authorized_results,
                    nil,
                    {

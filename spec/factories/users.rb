@@ -1,6 +1,5 @@
 FactoryBot.define do
   factory :user do
-    
     transient { confirmed { true } }
 
     first_name { Faker::Name.first_name }
@@ -32,26 +31,26 @@ FactoryBot.define do
       password { "P@ssword1" }
     end
 
-    transient do
-      jurisdictions_count { 1 }
-      jurisdiction { build(:jurisdiction, factory: :sub_district) }
-    end
+    # transient do
+    #   jurisdictions_count { 1 }
+    #   jurisdiction { build(:jurisdiction, factory: :sub_district) }
+    # end
 
-    after(:build) do |user, context|
-      if context.confirmed
-        user.skip_confirmation_notification!
-        user.confirm
-      end
+    # after(:build) do |user, context|
+    #   if context.confirmed
+    #     user.skip_confirmation_notification!
+    #     user.confirm
+    #   end
 
-      if user.review_staff?
-        create_list(
-          :jurisdiction_membership,
-          context.jurisdictions_count,
-          user: user,
-          jurisdiction: context.jurisdiction
-        )
-        user.reload
-      end
-    end
+    #   if user.review_staff?
+    #     create_list(
+    #       #:jurisdiction_membership,
+    #       #context.jurisdictions_count,
+    #       user: user,
+    #       #jurisdiction: context.jurisdiction
+    #     )
+    #     user.reload
+    #   end
+    # end
   end
 end

@@ -9,6 +9,7 @@ class Api::UsersController < Api::ApplicationController
                   update
                   reinvite
                   accept_invitation
+                  update_user_role
                 ]
   skip_after_action :verify_policy_scoped, only: %i[index]
   skip_before_action :require_confirmation, only: %i[profile]
@@ -206,7 +207,49 @@ class Api::UsersController < Api::ApplicationController
     )
   end
 
+  def update_user_role
+    authorize @user, :update_role?
+    new_role = role_param
+
+    if current_user.id == @user.id
+      render json: {
+               error: "You cannot change your own role."
+             },
+             status: :forbidden
+      return
+    end
+
+    unless current_user.can_assign_role?(role_param)
+      render json: {
+               error: "You are not authorized to assign this role."
+             },
+             status: :forbidden
+      return
+    end
+
+    if @user.update(role: new_role)
+      render json: { success: true, role: @user.role }, status: :ok
+    else
+      render json: {
+               error: @user.errors.full_messages.join(", ")
+             },
+             status: :unprocessable_entity
+    end
+  end
+
   private
+
+  def role_param
+    role = params.require(:role).to_s
+    Rails.logger.info("Received role param: #{role}")
+    Rails.logger.info("Available enum keys: #{User.roles.keys.inspect}")
+
+    unless User.roles.key?(role)
+      raise ActionController::BadRequest, "Invalid role: #{role}"
+    end
+
+    role
+  end
 
   def email_changed?
     profile_params[:email] && profile_params[:email] != @user.email
