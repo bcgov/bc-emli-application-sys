@@ -1,43 +1,103 @@
-import { Box, Button, Container, Flex, Heading, HStack, IconButton, Stack, Text, VStack } from "@chakra-ui/react"
-import { ArrowSquareOut, Download } from "@phosphor-icons/react"
-import { format } from "date-fns"
-import { observer } from "mobx-react-lite"
-import React from "react"
-import { useTranslation } from "react-i18next"
-import { useJurisdiction } from "../../../../hooks/resources/use-jurisdiction"
-import { usePermitClassificationsLoad } from "../../../../hooks/resources/use-permit-classifications-load"
-import { useSearch } from "../../../../hooks/use-search"
-import { IEnergySavingsApplication } from "../../../../models/energy-savings-application"
-import { useMst } from "../../../../setup/root"
-import { ECollaborationType } from "../../../../types/enums"
-import { CalloutBanner } from "../../../shared/base/callout-banner"
-import { ErrorScreen } from "../../../shared/base/error-screen"
-import { Paginator } from "../../../shared/base/inputs/paginator"
-import { PerPageSelect } from "../../../shared/base/inputs/per-page-select"
-import { LoadingScreen } from "../../../shared/base/loading-screen"
-import { SharedSpinner } from "../../../shared/base/shared-spinner"
-import { SearchGrid } from "../../../shared/grid/search-grid"
-import { SearchGridItem } from "../../../shared/grid/search-grid-item"
-import { RouterLink } from "../../../shared/navigation/router-link"
-import { RouterLinkButton } from "../../../shared/navigation/router-link-button"
-import { EnergySavingsApplicationStatusTag } from "../../../shared/energy-savings-applications/energy-savings-application-status-tag"
-import { PermitApplicationViewedAtTag } from "../../../shared/energy-savings-applications/permit-application-viewed-at-tag"
-import { Can } from "../../../shared/user/can"
-import { DesignatedCollaboratorAssignmentPopover } from "../../energy-savings-application/collaborator-management/designated-collaborator-assignment-popover"
-import { SubmissionDownloadModal } from "../../energy-savings-application/submission-download-modal"
-import { GridHeaders } from "./grid-header"
+import { Box, Button, Container, Flex, Heading, HStack, IconButton, Stack, Text, VStack } from '@chakra-ui/react';
+import { ArrowSquareOut, Download } from '@phosphor-icons/react';
+import { format } from 'date-fns';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useJurisdiction } from '../../../../hooks/resources/use-jurisdiction';
+import { usePermitClassificationsLoad } from '../../../../hooks/resources/use-permit-classifications-load';
+import { useSearch } from '../../../../hooks/use-search';
+import { IEnergySavingsApplication } from '../../../../models/energy-savings-application';
+import { useMst } from '../../../../setup/root';
+import { ECollaborationType, EPermitClassificationCode } from '../../../../types/enums';
+import { ErrorScreen } from '../../../shared/base/error-screen';
+import { Paginator } from '../../../shared/base/inputs/paginator';
+import { PerPageSelect } from '../../../shared/base/inputs/per-page-select';
+import { LoadingScreen } from '../../../shared/base/loading-screen';
+import { SharedSpinner } from '../../../shared/base/shared-spinner';
+import { SearchGrid } from '../../../shared/grid/search-grid';
+import { SearchGridItem } from '../../../shared/grid/search-grid-item';
+import { RouterLink } from '../../../shared/navigation/router-link';
+import { RouterLinkButton } from '../../../shared/navigation/router-link-button';
+import { EnergySavingsApplicationStatusTag } from '../../../shared/energy-savings-applications/energy-savings-application-status-tag';
+import { PermitApplicationViewedAtTag } from '../../../shared/energy-savings-applications/permit-application-viewed-at-tag';
+import { Can } from '../../../shared/user/can';
+import { DesignatedCollaboratorAssignmentPopover } from '../../energy-savings-application/collaborator-management/designated-collaborator-assignment-popover';
+import { SubmissionDownloadModal } from '../../energy-savings-application/submission-download-modal';
+import { GridHeaders } from './grid-header';
 import { AsyncDropdown } from '../../../shared/base/inputs/async-dropdown';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, Controller } from 'react-hook-form';
 import { useProgram } from '../../../../hooks/resources/use-program';
+import { IOption } from '../../../../types/types';
 
 export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionSubmissionInbox() {
   const { t } = useTranslation();
   const methods = useForm();
+
+  const { permitApplicationStore, sandboxStore, permitClassificationStore } = useMst();
+
+  const { setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, search } = permitApplicationStore;
+
   const {
-    permitApplicationStore,
-    sandboxStore,
-    permitClassificationStore: { fetchSubmissionTypeOptions },
-  } = useMst();
+    getUserTypeIdByCode,
+    getSubmissionTypeIdByCode,
+    getAudienceTypeIdByCode,
+    getAllSubmissionTypeIds,
+    getSubmissionTypeIdsExceptOnboarding,
+  } = permitClassificationStore;
+
+  // Default option set for initial dropdown selection
+  const defaultOption = {
+    label: t('energySavingsApplication.submissionInbox.participantSubmission'),
+    value: {
+      userGroupType: getUserTypeIdByCode(EPermitClassificationCode.participant),
+      AudienceType: getAudienceTypeIdByCode(EPermitClassificationCode.internal),
+      SubmissionType: getAllSubmissionTypeIds(),
+    },
+  };
+
+  type FetchOptionI = {
+    userGroupType: string;
+    AudienceType: string;
+    SubmissionType: string[] | string;
+  };
+
+  const fetchOptionsTypes = useCallback(async (): Promise<IOption<FetchOptionI>[]> => {
+    return [
+      {
+        label: t('energySavingsApplication.submissionInbox.participantSubmission'),
+        value: {
+          userGroupType: getUserTypeIdByCode(EPermitClassificationCode.participant),
+          AudienceType: getAudienceTypeIdByCode(EPermitClassificationCode.internal),
+          SubmissionType: getAllSubmissionTypeIds(),
+        },
+      },
+      {
+        label: t('energySavingsApplication.submissionInbox.contractorSubmission'),
+        value: {
+          userGroupType: getUserTypeIdByCode(EPermitClassificationCode.contractor),
+          AudienceType: getAudienceTypeIdByCode(EPermitClassificationCode.internal),
+          SubmissionType: getSubmissionTypeIdsExceptOnboarding(),
+        },
+      },
+      {
+        label: t('energySavingsApplication.submissionInbox.contractorOnboarding'),
+        value: {
+          userGroupType: getUserTypeIdByCode(EPermitClassificationCode.contractor),
+          AudienceType: getAudienceTypeIdByCode(EPermitClassificationCode.internal),
+          SubmissionType: getSubmissionTypeIdByCode(EPermitClassificationCode.onboarding),
+        },
+      },
+    ];
+  }, [getUserTypeIdByCode, getAudienceTypeIdByCode, getAllSubmissionTypeIds, getSubmissionTypeIdsExceptOnboarding]);
+
+  const handleChange = (selectedOption) => {
+    setUserGroupFilter(selectedOption?.userGroupType);
+    setAudienceTypeFilter(selectedOption?.AudienceType);
+    setSubmissionTypeFilter(selectedOption?.SubmissionType);
+    search();
+  };
+
   const { currentProgram, error } = useProgram();
   const { isLoaded: isPermitClassificationsLoaded } = usePermitClassificationsLoad();
 
@@ -47,15 +107,18 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
   const { currentSandboxId } = sandboxStore;
   useSearch(permitApplicationStore, [currentProgram?.id, JSON.stringify(currentSandboxId)]);
 
+  useEffect(() => {
+    if (methods.getValues('selectedType')) {
+      handleChange(methods.getValues('selectedType'));
+    }
+  }, [methods.watch('selectedType')]);
+
   if (error) return <ErrorScreen error={error} />;
   if (!currentProgram || !isPermitClassificationsLoaded) return <LoadingScreen />;
 
   return (
     <Container maxW="container.xl" as={'main'}>
       <VStack align={'start'} spacing={5} w={'full'} h={'full'} py={8} px={16}>
-        {/* {!currentProgram.submissionInboxSetUp && (
-          <CalloutBanner type={'error'} title={t('permitApplication.submissionInbox.contactInviteWarning')} />
-        )} */}
         <Flex justify={'space-between'} w={'full'}>
           <Box>
             <Heading as="h1" color="theme.blueAlt">
@@ -65,12 +128,24 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
               {t('permitApplication.submissionInbox.tableDescription')}
             </Text>
             <FormProvider {...methods}>
-              <form onSubmit={methods.handleSubmit((data) => console.log(data))}>
-                <AsyncDropdown
-                  mt={4}
-                  fetchOptions={fetchSubmissionTypeOptions}
-                  fieldName={'submissionTypeId'}
-                  useBoxWrapper={false}
+              <form>
+                <Controller
+                  name="selectedType"
+                  control={methods.control}
+                  defaultValue={defaultOption.value}
+                  render={({ field }) => (
+                    <AsyncDropdown
+                      mt={4}
+                      fetchOptions={fetchOptionsTypes}
+                      fieldName={'selectedType'}
+                      useBoxWrapper={false}
+                      onValueChange={(value) => {
+                        handleChange(value);
+                        field.onChange(value);
+                      }}
+                      {...field}
+                    />
+                  )}
                 />
               </form>
             </FormProvider>

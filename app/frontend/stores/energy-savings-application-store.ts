@@ -12,12 +12,14 @@ import { IJurisdiction } from '../models/jurisdiction';
 import { IPermitBlockStatus } from '../models/permit-block-status';
 import { IRequirementTemplate } from '../models/requirement-template';
 import { IUser } from '../models/user';
+import { cast } from 'mobx-state-tree';
 import {
   ECustomEvents,
   EPermitApplicationSocketEventTypes,
   EPermitApplicationSortFields,
   EPermitApplicationStatus,
   EPermitApplicationStatusGroup,
+  EPermitClassificationCode,
 } from '../types/enums';
 import {
   IEnergySavingsApplicationComplianceUpdate,
@@ -45,6 +47,12 @@ export const PermitApplicationStoreModel = types
         EPermitApplicationStatus.approved,
         EPermitApplicationStatus.rejected,
       ]),
+      userGroupTypeIdFilter: types.maybeNull(types.string),
+      submissionTypeIdFilter: types.maybeNull(types.array(types.string)),
+
+      audienceTypeIdFilter: types.maybeNull(types.string),
+      submitterFilter: types.maybeNull(types.string),
+      auditUserFilter: types.maybeNull(types.string),
       templateVersionIdFilter: types.maybeNull(types.string),
       requirementTemplateIdFilter: types.maybeNull(types.string),
     }),
@@ -203,6 +211,29 @@ export const PermitApplicationStoreModel = types
       // @ts-ignore
       self.statusFilter = statuses;
     },
+    setUserGroupFilter(id: string) {
+      if (!id) return;
+      // setQueryParam('user_group_type_id', id);
+      // @ts-ignore
+      self.userGroupTypeIdFilter = id;
+    },
+    setSubmissionTypeFilter(id: string | string[]) {
+      if (!id || (Array.isArray(id) && id.length === 0)) return;
+
+      const ids = Array.isArray(id) ? id : [id];
+      const joinedIds = ids.join(',');
+
+      // setQueryParam('submission_type_id', ids);
+      // @ts-ignor"
+      self.submissionTypeIdFilter = cast(ids);
+    },
+
+    setAudienceTypeFilter(id: string) {
+      if (!id) return;
+      // setQueryParam('audience_type_id', id);
+      // @ts-ignore
+      self.audienceTypeIdFilter = id;
+    },
   }))
   .actions((self) => ({
     getEphemeralPermitApplication(
@@ -302,6 +333,9 @@ export const PermitApplicationStoreModel = types
         perPage: opts?.countPerPage ?? self.countPerPage,
         filters: {
           status: self.statusFilter,
+          userGroupTypeId: self.userGroupTypeIdFilter,
+          submissionTypeId: self.submissionTypeIdFilter,
+          audienceTypeId: self.audienceTypeIdFilter,
           templateVersionId: self.templateVersionIdFilter,
           requirementTemplateId: self.requirementTemplateIdFilter,
         },

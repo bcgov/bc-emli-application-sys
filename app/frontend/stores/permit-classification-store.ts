@@ -14,7 +14,7 @@ import {
   SubmissionTypeModel,
   ISubmissionType,
 } from '../models/permit-classification';
-import { EPermitClassificationType } from '../types/enums';
+import { EPermitClassificationCode, EPermitClassificationType } from '../types/enums';
 import { IOption } from '../types/types';
 
 export const PermitClassificationStoreModel = types
@@ -57,6 +57,11 @@ export const PermitClassificationStoreModel = types
     getAudienceTypeById(id: string) {
       return self.audienceTypeMap.get(id);
     },
+    // View to get a User group type id by code
+    getAudienceTypeIdByCode(code: string) {
+      const match = Array.from(self.audienceTypeMap.values()).find((item) => item.code === code);
+      return match?.id;
+    },
     // view to get all Audience types
     get audienceTypes() {
       return Array.from(self.audienceTypeMap.values());
@@ -65,6 +70,17 @@ export const PermitClassificationStoreModel = types
     getUserGroupTypeById(id: string) {
       return self.userGroupTypeMap.get(id);
     },
+
+    // View to get an Audience type by id
+    getUserGroupTypeByCode(code: number) {
+      return self.userGroupTypeMap.get(code.toString());
+    },
+    // View to get a User group type id by code
+    getUserTypeIdByCode(code: string) {
+      const match = Array.from(self.userGroupTypeMap.values()).find((item) => item.code === code);
+      return match?.id;
+    },
+
     // view to get all User group types
     get userGroupTypes() {
       return Array.from(self.userGroupTypeMap.values());
@@ -73,9 +89,25 @@ export const PermitClassificationStoreModel = types
     getSubmissionTypeById(id: string) {
       return self.submissionTypeMap.get(id);
     },
+
+    // View to get a User group type id by code
+    getSubmissionTypeIdByCode(code: string) {
+      const match = Array.from(self.submissionTypeMap.values()).find((item) => item.code === code);
+      return match?.id;
+    },
     // view to get all submission types
     get submissionTypes() {
       return Array.from(self.submissionTypeMap.values());
+    },
+    // view to get all submission types ids
+    getAllSubmissionTypeIds() {
+      return Array.from(self.submissionTypeMap.values()).map((item) => item.id);
+    },
+    // view to get all submission types
+    getSubmissionTypeIdsExceptOnboarding() {
+      return Array.from(self.submissionTypeMap.values())
+        .filter((item) => item.code !== EPermitClassificationCode.onboarding)
+        .map((item) => item.id);
     },
   }))
   .actions((self) => ({
@@ -192,7 +224,7 @@ export const PermitClassificationStoreModel = types
       return (response?.data?.data ?? []).map((item) => ({
         label: item.label,
         value: item.value.id,
-        raw: item.value, // optional: keep full object if needed later
+        raw: item.value,
       })) as Array<IOption<string> & { raw: ISubmissionType }>;
     }),
     fetchUserGroupTypeOptions: flow(function* (

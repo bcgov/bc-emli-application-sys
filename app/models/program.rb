@@ -10,7 +10,7 @@ class Program < ApplicationRecord
   # ]
   BASE_INCLUDES = %i[]
   include ActionView::Helpers::SanitizeHelper
-  searchkick searchable: %i[program_name funded_by],
+  searchkick searchable: %i[id program_name funded_by],
              word_start: %i[program_name funded_by],
              text_start: %i[program_name funded_by]
 

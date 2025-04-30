@@ -12,6 +12,9 @@ module Api::Concerns::Search::PermitApplications
         { permit_classifications: :word_middle },
         { submitter: :word_middle },
         { status: :word_middle },
+        { user_group_type_id: :word_middle },
+        { submission_type_id: :word_middle },
+        { audience_type_id: :word_middle },
         { review_delegatee_name: :word_middle }
       ],
       where: permit_application_where_clause,
@@ -40,7 +43,8 @@ module Api::Concerns::Search::PermitApplications
       :query,
       :page,
       :per_page,
-      filters: [:requirement_template_id, :template_version_id, { status: [] }],
+      program: {}, 
+      filters: [:requirement_template_id, :template_version_id, :user_group_type_id, { submission_type_id: [] }, :audience_type_id, { status: [] }],
       sort: %i[field direction]
     )
   end
@@ -65,9 +69,6 @@ module Api::Concerns::Search::PermitApplications
 
   def permit_application_where_clause
     filters = permit_application_search_params[:filters]
-
-    # Add the submitter ID if the user is a submitter. Necessary even with search auth filtering for consisent pagination
-    # Only add the jurisdiction_id condition if @jurisdiction is present
     where =
       if @program
         {
@@ -76,8 +77,8 @@ module Api::Concerns::Search::PermitApplications
       else
         { user_ids_with_submission_edit_permissions: current_user.id }
       end
-    where[:sandbox_id] = current_sandbox&.id if !current_user.system_admin?
+    where[:sandbox_id] = current_sandbox&.id unless current_user.system_admin?
 
-    (filters&.to_h || {}).deep_symbolize_keys.compact.merge!(where)
+    filters.to_h.deep_symbolize_keys.compact.merge!(where)
   end
 end
