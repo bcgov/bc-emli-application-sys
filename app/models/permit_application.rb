@@ -20,11 +20,9 @@ class PermitApplication < ApplicationRecord
     submission_versions
     activity
     submitter
-    user_group_type
-    submission_type
     sandbox
     program
-    audience_type
+    permit_classification
   ]
 
   searchkick word_middle: %i[
@@ -35,6 +33,9 @@ class PermitApplication < ApplicationRecord
                status
                review_delegatee_name
                updated_at
+               user_group_type_id
+               submission_type_id
+               audience_type_id
              ],
              text_end: %i[number]
 
@@ -43,9 +44,10 @@ class PermitApplication < ApplicationRecord
   belongs_to :permit_type, optional: true
   belongs_to :activity, optional: true
   belongs_to :program
-  belongs_to :audience_type
+  belongs_to :permit_classification
   belongs_to :submission_type
   belongs_to :user_group_type
+  belongs_to :audience_type
   belongs_to :template_version
   belongs_to :sandbox, optional: true
 
@@ -217,6 +219,9 @@ class PermitApplication < ApplicationRecord
       viewed_at: viewed_at,
       status: status,
       jurisdiction_id: jurisdiction&.id,
+      user_group_type_id: user_group_type&.id,
+      audience_type_id: audience_type&.id,
+      submission_type_id: submission_type&.id,
       program_id: program&.id,
       submitter_id: submitter.id,
       template_version_id: template_version.id,

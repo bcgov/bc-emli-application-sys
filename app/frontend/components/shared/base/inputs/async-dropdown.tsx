@@ -14,6 +14,7 @@ interface IAsyncDropdownProps<T> extends FlexProps {
   fieldName: string;
   placeholderOptionLabel?: string;
   useBoxWrapper?: boolean;
+  onValueChange?: (value: T | null) => void;
 }
 
 export const AsyncDropdown = observer(
@@ -24,6 +25,7 @@ export const AsyncDropdown = observer(
     fieldName,
     placeholderOptionLabel,
     useBoxWrapper,
+    onValueChange,
     ...rest
   }: IAsyncDropdownProps<T>) => {
     const { control } = useFormContext();
@@ -31,6 +33,7 @@ export const AsyncDropdown = observer(
     const [error, setError] = useState<Error | undefined>(undefined);
     const { t } = useTranslation();
 
+    // Effect to fetch options
     useEffect(() => {
       (async () => {
         try {
@@ -40,7 +43,7 @@ export const AsyncDropdown = observer(
           setError(e instanceof Error ? e : new Error(t('errors.fetchOptions')));
         }
       })();
-    }, []);
+    }, [fetchOptions, t]);
 
     const renderDropdown = (
       <Controller
@@ -52,23 +55,27 @@ export const AsyncDropdown = observer(
             isClearable={false}
             options={options}
             getOptionLabel={(opt) => opt.label}
-            getOptionValue={(opt) => String(opt.value)}
+            getOptionValue={(opt) => JSON.stringify(opt.value)}
             placeholder={placeholderOptionLabel ?? t('ui.selectPlaceholder')}
-            value={options.find((opt) => opt.value === value) ?? null}
+            value={options.find((opt) => JSON.stringify(opt.value) === JSON.stringify(value)) ?? null}
             onChange={(selectedOption) => {
-              onChange((selectedOption as IOption<T>)?.value ?? null);
+              const selectedValue = (selectedOption as IOption<T>)?.value ?? null;
+              onChange(selectedValue);
+              if (onValueChange) onValueChange(selectedValue);
             }}
             chakraStyles={{
               container: (base) => ({
                 ...base,
                 minWidth: '20rem',
                 width: 'fit-content',
+                cursor: 'pointer',
               }),
               control: (base) => ({
                 ...base,
                 minWidth: '20rem',
                 width: 'fit-content',
                 backgroundColor: 'white',
+                cursor: 'pointer',
               }),
               placeholder: (base) => ({
                 ...base,
@@ -89,6 +96,7 @@ export const AsyncDropdown = observer(
       />
     );
 
+    // Error rendering if fetch fails
     if (error) {
       return (
         <Flex direction="column" w="full" {...rest}>
@@ -97,6 +105,7 @@ export const AsyncDropdown = observer(
       );
     }
 
+    // Render options or spinner
     return options?.length > 0 ? (
       <Flex direction="column" w="full" {...rest}>
         {useBoxWrapper ? (

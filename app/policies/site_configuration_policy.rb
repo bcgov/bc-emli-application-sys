@@ -1,6 +1,6 @@
 class SiteConfigurationPolicy < ApplicationPolicy
   def update?
-    user.super_admin?
+    user.system_admin?
   end
 
   def show?

@@ -1024,6 +1024,10 @@ const options = {
             status: 'Status',
           },
           submissionInbox: {
+            participantSubmission: 'Participant submission inbox',
+            contractorSubmission: 'Contractor submission inbox',
+            contractorOnboarding: 'Contractor onboarding submission inbox',
+            assignedTo: 'Assigned to me',
             contactInviteWarning:
               'Please have a Review Manager setup the Submissions Inbox for all permit types to allow submissions to be received.',
             title: 'Submissions inbox',
