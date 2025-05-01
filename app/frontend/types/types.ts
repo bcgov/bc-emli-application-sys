@@ -360,6 +360,7 @@ export interface IUserPushPayload {
 export type TSiteWideMessageConfiguration = {
   displaySitewideMessage: boolean;
   sitewideMessage: string | null;
+  sitewideMessageColor: string;
 };
 
 export interface IContact {
