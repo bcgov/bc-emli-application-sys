@@ -300,7 +300,7 @@ export const Navigation = observer(() => {
         </Box>
       </Box>
       {displaySitewideMessage && (
-        <Center h={16} bg="theme.yellowLight">
+        <Center h={16} bg={siteConfigurationStore.sitewideMessageColor || 'theme.yellowLight'}>
           {sitewideMessage}
         </Center>
       )}

@@ -1,4 +1,4 @@
-import { Container, Grid, GridItem, Heading, VStack } from "@chakra-ui/react"
+import { Container, Grid, GridItem, Heading, VStack } from '@chakra-ui/react';
 import { FlagBanner, House, Info, NotePencil, Question, Users } from '@phosphor-icons/react';
 import { t } from 'i18next';
 import { observer } from 'mobx-react-lite';
@@ -45,7 +45,7 @@ export const SiteConfigurationManagementScreen = observer(function SiteConfigura
               href="help-drawer-setup"
               h="full"
               pointerEvents="none"
-              bg="gray.100"
+              bg="gray.white"
               headingColor="greys.grey05"
             />
           </GridItem>

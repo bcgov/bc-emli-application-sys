@@ -2391,6 +2391,13 @@ const options = {
             label: 'Site-wide message',
             hint: 'This message will appear at the top of each page for all users.',
             settings: 'Site-wide message settings',
+            colorLabel: 'Message colour',
+            colors: {
+              lightYellow: 'Light Yellow',
+              red: 'Red',
+              green: 'Green',
+              blue: 'Blue',
+            },
           },
           revisionReasonsAttributesSetup: {
             title: 'Update reasons',
