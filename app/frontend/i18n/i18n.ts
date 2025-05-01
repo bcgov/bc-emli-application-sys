@@ -393,6 +393,7 @@ const options = {
           totalItems: 'Total items',
           doLater: 'Do this later',
           add: 'Add',
+          addReason: 'Add reason',
           edit: 'Edit',
           optional: '(optional)',
           archive: 'Remove and archive',
@@ -871,6 +872,9 @@ const options = {
             clickToWriteNickname: 'Click to write a nickname',
           },
           show: {
+            update: 'Update',
+            screenIn: 'Screen in',
+            reject: 'Reject',
             wasSubmitted: 'Application was submitted on {{ date }} to {{ jurisdictionName }}',
             submittingTo: {
               title: "You're applying to the {{ jurisdictionName }}",
@@ -920,6 +924,12 @@ const options = {
               originallySubmitted: 'Previously submitted',
               confirmMessage: "The submitter will receive a notification end email about the changes you've requested.",
             },
+          },
+          review: {
+            readyToReject: 'Ready to reject this application?',
+            byRejecting: 'By rejecting this application',
+            confirmReject:
+              'You confirm that the information provided by the applicant disqualifies them to rebates set out by Better Homes Energy Savings Program.',
           },
         },
         energySavingsApplication: {

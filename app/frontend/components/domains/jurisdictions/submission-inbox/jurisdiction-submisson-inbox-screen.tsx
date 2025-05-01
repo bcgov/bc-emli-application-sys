@@ -2,7 +2,7 @@ import { Box, Button, Container, Flex, Heading, HStack, IconButton, Stack, Text,
 import { ArrowSquareOut, Download } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useJurisdiction } from '../../../../hooks/resources/use-jurisdiction';
 import { usePermitClassificationsLoad } from '../../../../hooks/resources/use-permit-classifications-load';
@@ -29,14 +29,23 @@ import { AsyncDropdown } from '../../../shared/base/inputs/async-dropdown';
 import { FormProvider, useForm, Controller } from 'react-hook-form';
 import { useProgram } from '../../../../hooks/resources/use-program';
 import { IOption } from '../../../../types/types';
+import { c } from 'vite/dist/node/types.d-aGj9QkWt';
 
 export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionSubmissionInbox() {
   const { t } = useTranslation();
-  const methods = useForm();
-
+  const methods = useForm({
+    defaultValues: {
+      selectedType: null,
+    },
+  });
+  const [options, setOptions] = useState<IOption<FetchOptionI>[]>([]);
   const { permitApplicationStore, sandboxStore, permitClassificationStore } = useMst();
-
   const { setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, search } = permitApplicationStore;
+  const { currentProgram, error } = useProgram();
+  const { isLoaded: isPermitClassificationsLoaded } = usePermitClassificationsLoad();
+
+  const { currentPage, totalPages, totalCount, countPerPage, handleCountPerPageChange, handlePageChange, isSearching } =
+    permitApplicationStore;
 
   const {
     getUserTypeIdByCode,
@@ -45,16 +54,6 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
     getAllSubmissionTypeIds,
     getSubmissionTypeIdsExceptOnboarding,
   } = permitClassificationStore;
-
-  // Default option set for initial dropdown selection
-  const defaultOption = {
-    label: t('energySavingsApplication.submissionInbox.participantSubmission'),
-    value: {
-      userGroupType: getUserTypeIdByCode(EPermitClassificationCode.participant),
-      AudienceType: getAudienceTypeIdByCode(EPermitClassificationCode.internal),
-      SubmissionType: getAllSubmissionTypeIds(),
-    },
-  };
 
   type FetchOptionI = {
     userGroupType: string;
@@ -98,20 +97,35 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
     search();
   };
 
-  const { currentProgram, error } = useProgram();
-  const { isLoaded: isPermitClassificationsLoaded } = usePermitClassificationsLoad();
-
-  const { currentPage, totalPages, totalCount, countPerPage, handleCountPerPageChange, handlePageChange, isSearching } =
-    permitApplicationStore;
-
-  const { currentSandboxId } = sandboxStore;
-  useSearch(permitApplicationStore, [currentProgram?.id, JSON.stringify(currentSandboxId)]);
-
   useEffect(() => {
     if (methods.getValues('selectedType')) {
       handleChange(methods.getValues('selectedType'));
     }
   }, [methods.watch('selectedType')]);
+
+  useEffect(() => {
+    if (options.length > 0) {
+      methods.setValue('selectedType', options[0].value);
+    }
+  }, [options, methods]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadData = async () => {
+      if (!permitClassificationStore.isLoaded) {
+        const success = await permitClassificationStore.fetchPermitClassifications();
+        if (!success) return;
+      }
+      const result = await fetchOptionsTypes();
+      if (isMounted) {
+        setOptions(result);
+      }
+    };
+    loadData();
+    return () => {
+      isMounted = false;
+    };
+  }, [permitClassificationStore]);
 
   if (error) return <ErrorScreen error={error} />;
   if (!currentProgram || !isPermitClassificationsLoaded) return <LoadingScreen />;
@@ -132,13 +146,13 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
                 <Controller
                   name="selectedType"
                   control={methods.control}
-                  defaultValue={defaultOption.value}
                   render={({ field }) => (
                     <AsyncDropdown
                       mt={4}
-                      fetchOptions={fetchOptionsTypes}
-                      fieldName={'selectedType'}
+                      fetchOptions={async () => options}
+                      fieldName="selectedType"
                       useBoxWrapper={false}
+                      value={field.value}
                       onValueChange={(value) => {
                         handleChange(value);
                         field.onChange(value);

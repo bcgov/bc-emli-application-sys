@@ -13,7 +13,7 @@ export const colors = {
     blueButtonHover: '#1E5189',
     blueText: '#2464A4',
     primary100: '#234075',
-    darkBlue: '#053662',
+    darkBlue: '#013366',
     radioOutline: '#0D6EFD',
     buttonHover: 'linear-gradient(0deg, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0.32) 100%), #234075;',
     blueAltGradient: 'linear-gradient(124.8deg, #142B43 -52.7%, #142B43 -52.68%, #054277 47.38%, #142B43 137.55%)',

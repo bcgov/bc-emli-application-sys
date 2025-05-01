@@ -305,8 +305,12 @@ class PermitApplication < ApplicationRecord
   end
 
   def update_viewed_at
-    latest_submission_version.update(viewed_at: Time.current)
-    reindex
+    if latest_submission_version.present?
+      latest_submission_version.update(viewed_at: Time.current)
+      reindex
+    else
+      Rails.logger.warn("Tried to update viewed_at, but latest_submission_version was nil")
+    end
   end
 
   def number_prefix
