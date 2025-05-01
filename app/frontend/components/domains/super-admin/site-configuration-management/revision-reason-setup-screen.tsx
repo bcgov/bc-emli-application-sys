@@ -61,30 +61,30 @@ export const RevisionReasonSetupScreen = observer(function RevisionReasonSetupSc
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Container maxW="container.lg" py={8} px={{ base: 8, xl: 0 }} flexGrow={1} as="main">
-        <Heading mb={0} fontSize="3xl">
-          {t("siteConfiguration.revisionReasonsAttributesSetup.title")}
+        <Heading mb={0} fontSize="3xl" color="theme.blueAlt">
+          {t('siteConfiguration.revisionReasonsAttributesSetup.title')}
         </Heading>
         <FormProvider {...formMethods}>
           <Flex mt={8} gap={16}>
             <Box minW="fit-content">
               <Heading as="h3" noOfLines={1}>
-                {t("siteConfiguration.revisionReasonsAttributesSetup.options")}
+                {t('siteConfiguration.revisionReasonsAttributesSetup.options')}
               </Heading>
             </Box>
 
-            <Box as="section" borderRadius="lg" borderWidth={1} borderColor="border.light" p={6} w="full">
+            <Box as="section" p={6} w="full">
               <Flex direction="column" justify="space-between" w="full" gap={8}>
                 {R.isNil(activeRevisionReasons) || !configurationLoaded ? (
                   <SharedSpinner />
                 ) : (
                   fields.map((field, index) => (
-                    <Box borderRadius="md" border="1px solid" borderColor={"border.light"} key={field.fieldId}>
+                    <Box borderRadius="md" border="1px solid" borderColor={'border.light'} key={field.fieldId}>
                       <Input type="hidden" {...register(`revisionReasonsAttributes.${index}.id`)} />
                       <Flex p={4} direction="column" gap={6}>
                         <Flex gap={4}>
                           <TextFormControl
                             flex={2}
-                            label={t("siteConfiguration.revisionReasonsAttributesSetup.fields.reasonCode")}
+                            label={t('siteConfiguration.revisionReasonsAttributesSetup.fields.reasonCode')}
                             fieldName={`revisionReasonsAttributes.${index}.reasonCode`}
                             required
                             isDisabled={field._discard}
@@ -93,12 +93,12 @@ export const RevisionReasonSetupScreen = observer(function RevisionReasonSetupSc
                         <Flex gap={4}>
                           <TextFormControl
                             flex={2}
-                            label={t("siteConfiguration.revisionReasonsAttributesSetup.fields.reasonDescription")}
+                            label={t('siteConfiguration.revisionReasonsAttributesSetup.fields.reasonDescription')}
                             fieldName={`revisionReasonsAttributes.${index}.description`}
-                            hint={t("siteConfiguration.revisionReasonsAttributesSetup.fields.descriptionHint")}
+                            hint={t('siteConfiguration.revisionReasonsAttributesSetup.fields.descriptionHint')}
                             inputProps={{
-                              minH: "40px",
-                              height: "40px",
+                              minH: '40px',
+                              height: '40px',
                             }}
                             required
                             isDisabled={field._discard}
@@ -106,18 +106,18 @@ export const RevisionReasonSetupScreen = observer(function RevisionReasonSetupSc
                         </Flex>
                         {!field._discard ? (
                           <Button type="button" variant="secondary" onClick={() => handleDelete(index)}>
-                            {t("ui.archive")}
+                            {t('ui.archive')}
                           </Button>
                         ) : (
-                          <Text color="semantic.error">{t("ui.markedForRemoval")}</Text>
+                          <Text color="semantic.error">{t('ui.markedForRemoval')}</Text>
                         )}
                       </Flex>
                     </Box>
                   ))
                 )}
                 {configurationLoaded && (
-                  <Button type="button" variant="secondary" onClick={() => append({ reasonCode: "", description: "" })}>
-                    {t("ui.add")}
+                  <Button type="button" variant="primary" onClick={() => append({ reasonCode: '', description: '' })}>
+                    {t('ui.addReason')}
                   </Button>
                 )}
               </Flex>
@@ -130,18 +130,20 @@ export const RevisionReasonSetupScreen = observer(function RevisionReasonSetupSc
         bottom={0}
         bg="greys.white"
         padding={4}
-        borderTop="1px solid"
         borderColor="border.light"
-        justify="center"
+        justify="flex-start"
         gap={4}
       >
-        <Button variant="primary" type="submit" isLoading={isSubmitting} isDisabled={isSubmitting}>
-          {t("ui.save")}
-        </Button>
-        <Button variant="secondary" onClick={() => navigate(-1)} isDisabled={isSubmitting}>
-          {t("ui.cancel")}
-        </Button>
+        <Box flex={1}></Box>
+        <Box flex={10} gap={8} display="flex">
+          <Button variant="primary" type="submit" isLoading={isSubmitting} isDisabled={isSubmitting}>
+            {t('ui.save')}
+          </Button>
+          <Button variant="secondary" onClick={() => navigate(-1)} isDisabled={isSubmitting}>
+            {t('ui.cancel')}
+          </Button>
+        </Box>
       </Flex>
     </form>
-  )
+  );
 })
