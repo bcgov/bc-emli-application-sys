@@ -7,6 +7,7 @@ import { convertToDate } from '../utils/utility-functions';
 import { IJurisdiction, JurisdictionModel } from './jurisdiction';
 import { IAddress, AddressModel } from './address';
 import { UserProgramMembershipModel } from './program-membership';
+import { ClassificationPresetName, classificationPresets } from './program-classification';
 
 export const UserModel = types
   .model('UserModel')
@@ -45,9 +46,9 @@ export const UserModel = types
     get isSystemAdmin() {
       return self.role == EUserRoles.systemAdmin;
     },
-    get isPSR() {
-      return self.role == EUserRoles.participantSupportRep;
-    },
+    // get isPSR() {
+    //   return self.role == EUserRoles.participantSupportRep;
+    // },
     get isContractor() {
       return self.role == EUserRoles.contractor;
     },
@@ -185,6 +186,27 @@ export const UserModel = types
       if (ok && data?.data) {
         applySnapshot(self, data.data);
       }
+      return ok;
+    }),
+    syncClassifications: flow(function* (programId: string, selectedInboxes: ClassificationPresetName[]) {
+      const classifications = selectedInboxes.map((preset) => {
+        const c = classificationPresets[preset];
+        return {
+          user_group_type: c.userGroupType.toLowerCase(),
+          submission_type: c.submissionType?.toLowerCase() ?? null,
+        };
+      });
+
+      const { ok, data, error } = yield self.environment.api.syncProgramClassifications(programId, {
+        user_id: self.id,
+        classifications,
+      });
+
+      if (!ok) {
+        console.error('Failed to sync classifications:', error);
+        return false;
+      }
+
       return ok;
     }),
     acceptEULA: flow(function* () {

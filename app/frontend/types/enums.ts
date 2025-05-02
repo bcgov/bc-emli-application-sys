@@ -44,6 +44,12 @@ export enum EPermitClassificationCode {
   onboarding = 'onboarding',
 }
 
+export enum ESubmissionInboxTypes {
+  participant = 'participant',
+  contractor = 'contractor',
+  onboarding = 'onboarding',
+}
+
 export enum EPermitApplicationStatus {
   draft = 'new_draft',
   submitted = 'newly_submitted',

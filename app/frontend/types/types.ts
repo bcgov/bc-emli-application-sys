@@ -558,3 +558,13 @@ export type TVisibility =
   | EVisibilityValues
   | `${EVisibilityValues},${EVisibilityValues}`
   | `${EVisibilityValues},${EVisibilityValues},${EVisibilityValues}`;
+
+export interface IClassificationInput {
+  user_group_type: string;
+  submission_type: string | null;
+}
+
+export interface ISyncClassificationsParams {
+  user_id: string;
+  classifications: IClassificationInput[];
+}

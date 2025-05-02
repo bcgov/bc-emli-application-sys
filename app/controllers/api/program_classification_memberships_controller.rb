@@ -1,45 +1,8 @@
 class Api::ProgramClassificationMembershipsController < ApplicationController
   before_action :set_program
 
-  def participant_inbox_memberships
-    memberships =
-      ProgramClassificationMembership
-        .joins(:program_membership)
-        .where(program_memberships: { program_id: @program.id })
-        .where(user_group_type_id: user_group_type_id(:participant))
-        .where(submission_type_id: nil)
-
-    render json: ProgramClassificationMembershipBlueprint.render(memberships)
-  end
-
-  def contractor_inbox_memberships
-    memberships =
-      ProgramClassificationMembership
-        .joins(:program_membership)
-        .where(program_memberships: { program_id: @program.id })
-        .where(user_group_type_id: user_group_type_id(:contractor))
-        .where(submission_type_id: nil)
-
-    render json: ProgramClassificationMembershipBlueprint.render(memberships)
-  end
-
-  def contractor_onboarding_memberships
-    memberships =
-      ProgramClassificationMembership
-        .joins(:program_membership)
-        .where(program_memberships: { program_id: @program.id })
-        .where(user_group_type_id: user_group_type_id(:contractor))
-        .where(submission_type_id: submission_type_id(:onboarding))
-
-    render json: ProgramClassificationMembershipBlueprint.render(memberships)
-  end
-
-  def inbox_membership_exists
-    program_membership =
-      ProgramMembership.find_by(
-        user_id: params[:user_id],
-        program_id: @program.id
-      )
+  def membership_exists
+    program_membership = find_or_create_membership
 
     exists =
       program_membership&.program_classification_memberships&.exists?(
@@ -75,6 +38,49 @@ class Api::ProgramClassificationMembershipsController < ApplicationController
     end
   end
 
+  def sync
+    program_membership = find_or_create_membership
+
+    # Normalize incoming
+    incoming =
+      params[:classifications]
+        .map do |c|
+          {
+            user_group_type_id: user_group_type_id(c[:user_group_type].to_sym),
+            submission_type_id: submission_type_id_or_nil(c[:submission_type])
+          }
+        end
+        .to_set
+
+    # Current classifications
+    existing =
+      program_membership
+        .program_classification_memberships
+        .map do |m|
+          {
+            user_group_type_id: m.user_group_type_id,
+            submission_type_id: m.submission_type_id
+          }
+        end
+        .to_set
+
+    # Add new
+    (incoming - existing).each do |c|
+      program_membership.program_classification_memberships.create!(c)
+    end
+
+    # Remove stale
+    (existing - incoming).each do |c|
+      program_membership.program_classification_memberships.where(c).destroy_all
+    end
+
+    render json:
+             ProgramClassificationMembershipBlueprint.render(
+               program_membership.program_classification_memberships.reload,
+               view: :default
+             )
+  end
+
   def destroy
     membership = ProgramClassificationMembership.find(params[:id])
     membership.destroy
@@ -82,6 +88,13 @@ class Api::ProgramClassificationMembershipsController < ApplicationController
   end
 
   private
+
+  def find_or_create_membership
+    ProgramMembership.find_or_create_by!(
+      user_id: params[:user_id],
+      program_id: @program.id
+    )
+  end
 
   def set_program
     @program = Program.find(params[:program_id])

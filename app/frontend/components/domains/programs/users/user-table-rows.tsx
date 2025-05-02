@@ -32,9 +32,13 @@ export function ActiveUserRow({ user, userStore }: UserRowProps) {
         <RoleTag role={user.role} />
       </SearchGridItem>
       <SearchGridItem fontSize="sm">
-        {user
-          .getProgramMembershipForProgram(currentProgram.id)
-          ?.classifications.map((classification, i) => <div key={i}>{classification.presetLabel ?? ''}</div>)}
+        <div>
+          {user.getProgramMembershipForProgram(currentProgram.id)?.classifications.map((classification, i) => (
+            <div style={{ paddingBottom: '.2rem' }} key={i}>
+              {classification.presetLabel ?? ''}
+            </div>
+          ))}
+        </div>
       </SearchGridItem>
       <SearchGridItem fontSize="sm">{format(user.createdAt, 'yyyy-MM-dd')}</SearchGridItem>
       <SearchGridItem fontSize="sm">

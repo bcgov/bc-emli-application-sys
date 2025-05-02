@@ -1,4 +1,5 @@
 import { Instance, flow, toGenerator, types } from 'mobx-state-tree';
+import { toTitleCase } from '../utils/utility-functions';
 
 export const ProgramClassificationModel = types
   .model('ProgramClassificationModel', {
@@ -6,45 +7,41 @@ export const ProgramClassificationModel = types
     submissionType: types.maybeNull(types.string),
     label: types.maybeNull(types.string),
   })
-  // After create isn't called when hydrating data using mergeUpdateAll, not sure a snapshotProcessor is worth the hassle?
-  // .actions((self) => ({
-  //   afterCreate() {
-  //     const match = Object.entries(CLASSIFICATION_PRESETS).find(
-  //       ([_, val]) => val.userGroupType === self.userGroupType && val.submissionType === self.submissionType,
-  //     );
-  //     self.label = (match?.[0] as ClassificationPresetName) ?? null;
-  //   },
-  // }))
-  .actions((self) => ({
-    applyPreset(presetName: ClassificationPresetName) {
-      const preset = CLASSIFICATION_PRESETS[presetName];
-      if (!preset) throw new Error(`Invalid preset: ${presetName}`);
-      self.userGroupType = preset.userGroupType;
-      self.submissionType = preset.submissionType;
-    },
-  }))
   .views((self) => ({
+    get userGroupTypeLabel(): string {
+      return toTitleCase(self.userGroupType);
+    },
+    get submissionTypeLabel(): string | null {
+      return self.submissionType ? toTitleCase(self.submissionType) : null;
+    },
     get presetLabel(): ClassificationPresetName | null {
-      const match = Object.entries(CLASSIFICATION_PRESETS).find(
-        ([_, val]) => val.userGroupType === self.userGroupType && val.submissionType === self.submissionType,
+      const match = Object.entries(classificationPresets).find(
+        ([_, val]) =>
+          val.userGroupType.toLowerCase() === self.userGroupType.toLowerCase() &&
+          (val.submissionType?.toLowerCase() ?? null) === (self.submissionType?.toLowerCase() ?? null),
       );
       return (match?.[0] as ClassificationPresetName) ?? null;
     },
+  }))
+  .actions((self) => ({
+    toApiFormat() {
+      return {
+        user_group_type: self.userGroupType,
+        submission_type: self.submissionType,
+      };
+    },
+    applyPreset(presetName: ClassificationPresetName) {
+      const preset = classificationPresets[presetName];
+      if (!preset) throw new Error(`Invalid preset: ${presetName}`);
+      self.userGroupType = preset.userGroupType.toLowerCase();
+      self.submissionType = preset.submissionType?.toLowerCase() ?? null;
+    },
   }));
 
-const CLASSIFICATION_PRESETS = {
-  'Participant Inbox': {
-    userGroupType: 'Participant',
-    submissionType: null,
-  },
-  'Contractor Onboarding Inbox': {
-    userGroupType: 'Contractor',
-    submissionType: 'Onboarding',
-  },
-  'Contractor Inbox': {
-    userGroupType: 'Contractor',
-    submissionType: null,
-  },
+export const classificationPresets = {
+  Participant: { userGroupType: 'Participant', submissionType: null },
+  Onboarding: { userGroupType: 'Contractor', submissionType: 'Onboarding' },
+  Contractor: { userGroupType: 'Contractor', submissionType: null },
 } as const;
 
-type ClassificationPresetName = keyof typeof CLASSIFICATION_PRESETS;
+export type ClassificationPresetName = keyof typeof classificationPresets;

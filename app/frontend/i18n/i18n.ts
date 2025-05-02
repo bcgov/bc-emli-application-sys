@@ -1953,7 +1953,7 @@ const options = {
           },
           menuItems: {
             changeUserRole: 'Change role',
-            inboxAccess: 'Submission inbox access',
+            inboxAccess: 'Application access',
             removeUser: 'Remove user',
             reinviteUser: 'Re-invite',
             revokeUserInvite: 'Revoke invite',
@@ -1964,8 +1964,8 @@ const options = {
             selectionLabel: 'Select new role',
           },
           changeInboxModal: {
-            title: 'Change submission inbox access for',
-            selectionLabel: 'Select submission inbox access',
+            title: 'Change application access for',
+            selectionLabel: 'Select application access',
           },
           changeRole: 'Change role',
           newEmail: 'New email address',
