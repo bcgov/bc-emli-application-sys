@@ -151,10 +151,8 @@ Rails.application.routes.draw do
 
       resources :program_classification_memberships, only: %i[create destroy] do
         collection do
-          get :participant_inbox_memberships
-          get :contractor_inbox_memberships
-          get :contractor_onboarding_memberships
-          get :inbox_membership_exists
+          get :membership_exists
+          patch :sync
         end
       end
     end
@@ -219,6 +217,7 @@ Rails.application.routes.draw do
           to: "users#license_agreements"
       get "super_admins", on: :collection, to: "users#super_admins"
     end
+
     resources :users, only: %i[destroy update] do
       patch "restore", on: :member
       patch "accept_eula", on: :member

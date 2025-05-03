@@ -68,6 +68,7 @@ import {
   TAutoComplianceModuleConfigurations,
   TCreateRequirementTemplateFormData,
   TSearchParams,
+  ISyncClassificationsParams,
 } from '../../types/types';
 import { camelizeResponse, decamelizeRequest } from '../../utils';
 import { getCsrfToken } from '../../utils/utility-functions';
@@ -247,6 +248,10 @@ export class Api {
     params?: TSearchParams<EActiveUserSortFields | EPendingUserSortFields | EDeactivatedUserSortFields>,
   ) {
     return this.client.post<IUsersResponse>(`/users/search`, params);
+  }
+
+  async syncProgramClassifications(programId, params?: ISyncClassificationsParams) {
+    return this.client.patch<ApiResponse>(`/programs/${programId}/program_classification_memberships/sync`, params);
   }
 
   async fetchPermitApplications(params?: TSearchParams<EPermitApplicationSortFields, IPermitApplicationSearchFilters>) {
