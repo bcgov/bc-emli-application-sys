@@ -13,6 +13,7 @@ import { NavBar } from './nav-bar';
 import { ProtectedRoute } from './protected-route';
 import { AdminPortalLogin } from '../admin/login';
 import { ProgramsIndexScreen } from '../programs';
+import { ProgramInviteUserScreen } from '../programs/invite-users';
 
 const ExternalApiKeysIndexScreen = lazy(() =>
   import('../external-api-key').then((module) => ({ default: module.ExternalApiKeysIndexScreen })),
@@ -355,6 +356,7 @@ const AppRoutes = observer(() => {
       <Route path="/programs/new-program" element={<NewProgramScreen />} />
       <Route path="/programs/:programId/edit" element={<NewProgramScreen />} />
       <Route path="/programs/:programId/users" element={<ProgramUserIndexScreen />} />
+      <Route path="/programs/:programId/invite" element={<ProgramInviteUserScreen />} />
       <Route path="/jurisdictions/new" element={<NewJurisdictionScreen />} />
       <Route path="/requirements-library" element={<RequirementsLibraryScreen />} />
       <Route path="/early-access/requirements-library" element={<EarlyAccessRequirementsLibraryScreen />} />

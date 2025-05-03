@@ -1,10 +1,8 @@
 import { Box, Container, Flex, Heading, Tab, Tabs, TabList, TabPanel, TabPanels, VStack } from '@chakra-ui/react';
-import { format } from 'date-fns';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProgram } from '../../../../hooks/resources/use-program';
-//import { useMountStatus } from '../../../hooks/use-mount-status';
 import { useSearch } from '../../../../hooks/use-search';
 import { IUser } from '../../../../models/user';
 import { useMst } from '../../../../setup/root';
@@ -13,12 +11,8 @@ import { Paginator } from '../../../shared/base/inputs/paginator';
 import { PerPageSelect } from '../../../shared/base/inputs/per-page-select';
 import { LoadingScreen } from '../../../shared/base/loading-screen';
 import { SharedSpinner } from '../../../shared/base/shared-spinner';
-//import { ToggleArchivedButton } from '../../../shared/buttons/show-archived-button';
 import { SearchGrid } from '../../../shared/grid/search-grid';
-//import { SearchGridItem } from '../../../shared/grid/search-grid-item';
 import { RouterLinkButton } from '../../../shared/navigation/router-link-button';
-//import { ManageUserMenu } from '../../../shared/user/manage-user-menu';
-//import { RoleTag } from '../../../shared/user/role-tag';
 import { ActiveGridHeaders, DeactivatedGridHeaders, PendingGridHeaders } from './grid-header';
 import { ActiveUserRow, DeactivatedUserRow, PendingUserRow } from './user-table-rows';
 import { ISearch } from '../../../../lib/create-search-model';
@@ -65,7 +59,7 @@ export const ProgramUserIndexScreen = observer(function ProgramUserIndex() {
               {`${currentProgram?.programName} users`}
             </Heading>
           </Box>
-          <RouterLinkButton alignSelf="flex-end" to={'invite'}>
+          <RouterLinkButton alignSelf="flex-end" to={`/programs/${currentProgram?.id}/invite`}>
             {t('user.index.inviteButton')}
           </RouterLinkButton>
         </Flex>

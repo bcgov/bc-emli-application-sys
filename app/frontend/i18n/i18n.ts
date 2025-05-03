@@ -1962,10 +1962,14 @@ const options = {
           changeRoleModal: {
             title: 'Change role for',
             selectionLabel: 'Select new role',
+            success: 'Role successfully assigned.',
+            failure: 'Role has not been assigned.',
           },
           changeInboxModal: {
             title: 'Change application access for',
             selectionLabel: 'Select application access',
+            success: 'Submission inbox successfully assigned.',
+            failure: 'Submission inbox has not been assigned.',
           },
           changeRole: 'Change role',
           newEmail: 'New email address',

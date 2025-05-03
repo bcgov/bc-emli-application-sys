@@ -64,26 +64,18 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
               <Text color="gray.500"> {t('errors.noResults')}</Text>
             </Flex>
           ) : (
-            tablePrograms.map((j) => {
+            tablePrograms.map((program) => {
               return (
-                <Box key={j.id} className={'jurisdiction-index-grid-row'} role={'row'} display={'contents'}>
-                  <SearchGridItem fontWeight={700}>{j.programName}</SearchGridItem>
-                  <SearchGridItem>{j.reviewManagersSize ?? 0}</SearchGridItem>
-                  <SearchGridItem>{j.reviewersSize ?? 0}</SearchGridItem>
-                  <SearchGridItem>{j.permitApplicationsSize ?? 0}</SearchGridItem>
-                  <SearchGridItem>
-                    {/* {j.submissionInboxSetUp && (
-                      <Flex gap={1}>
-                        <CheckCircle color="var(--chakra-colors-semantic-success)" size={18} />
-                        {t('ui.yes')}
-                      </Flex>
-                    )} */}
-                    <></>
-                  </SearchGridItem>
+                <Box key={program.id} className={'jurisdiction-index-grid-row'} role={'row'} display={'contents'}>
+                  <SearchGridItem fontWeight={700}>{program.programName}</SearchGridItem>
+                  <SearchGridItem>{program.reviewManagersSize ?? 0}</SearchGridItem>
+                  <SearchGridItem>{program.reviewersSize ?? 0}</SearchGridItem>
+                  <SearchGridItem>{program.permitApplicationsSize ?? 0}</SearchGridItem>
+                  <SearchGridItem>{program.templatesUsed ?? 0}</SearchGridItem>
                   <SearchGridItem>
                     <Flex justify="center" w="full" gap={3}>
-                      <RouterLink to={`${j.slug}/users/invite`}>{t('user.invite')}</RouterLink>
-                      <ManageProgramMenu program={j} searchModel={programStore} />
+                      <RouterLink to={`${program?.id}/invite`}>{t('user.invite')}</RouterLink>
+                      <ManageProgramMenu program={program} searchModel={programStore} />
                     </Flex>
                   </SearchGridItem>
                 </Box>

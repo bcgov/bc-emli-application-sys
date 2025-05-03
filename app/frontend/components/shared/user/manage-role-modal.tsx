@@ -37,12 +37,12 @@ export const ManageRoleModal = ({ isOpen, onClose, user }: ManageRoleModalProps)
     try {
       setIsSaving(true);
       await user.changeRole(selectedRole);
-      uiStore.flashMessage.show(EFlashMessageStatus.success, 'Role Changed', '');
+      uiStore.flashMessage.show(EFlashMessageStatus.success, t('user.changeRoleModal.success'), '');
       userStore?.search();
       onClose();
     } catch (error) {
       console.error('Failed to update role', error);
-      uiStore.flashMessage.show(EFlashMessageStatus.error, 'Failed to change role', 'Please try again.');
+      uiStore.flashMessage.show(EFlashMessageStatus.error, t('user.changeRoleModal.failure'), '');
     } finally {
       setIsSaving(false);
     }
