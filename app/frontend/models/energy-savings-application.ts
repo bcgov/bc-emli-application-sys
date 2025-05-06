@@ -736,6 +736,20 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         self.isLoading = false;
         return response;
       }),
+      updateStatus: flow(function* (params) {
+        self.isLoading = true;
+        const response = yield self.environment.api.setPermitApplicationStatus(self.id);
+        if (response.ok) {
+          const { data: permitApplication } = response.data;
+
+          self.rootStore.permitApplicationStore.mergeUpdate(
+            { ...permitApplication, revisionMode: true },
+            'permitApplicationMap',
+          );
+        }
+        self.isLoading = false;
+        return response;
+      }),
       fetchDiff: flow(function* () {
         const diffData = yield self.publishedTemplateVersion.fetchTemplateVersionCompare(self.templateVersion.id);
         self.diff = diffData.data;

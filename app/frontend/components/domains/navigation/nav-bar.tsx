@@ -71,7 +71,7 @@ function isTemplateVersionPath(path: string): boolean {
 }
 
 function isPermitApplicationPath(path: string): boolean {
-  const regex = /^\/applications\/([a-f\d-]+)/;
+  const regex = /^\/permit-applications\/([a-f\d-]+)/;
   return regex.test(path);
 }
 
@@ -82,6 +82,14 @@ function isPermitApplicationEditPath(path: string): boolean {
 
 function isApiMappingPath(path: string): boolean {
   const regex = /^(\/jurisdictions\/[a-z\d-]+)?\/api-settings\/api-mappings.*$/;
+  return regex.test(path);
+}
+function isRejectionPath(path: string): boolean {
+  const regex = /rejection-reason/;
+  return regex.test(path);
+}
+function isSuccessfullSubmissionPath(path: string): boolean {
+  const regex = /applications\/[a-f0-9-]{36}\/successful-submission/;
   return regex.test(path);
 }
 
@@ -96,6 +104,8 @@ function shouldHideSubNavbarForPath(path: string): boolean {
     isPermitApplicationPath,
     isDigitalPermitEditPath,
     isApiMappingPath,
+    isRejectionPath,
+    isSuccessfullSubmissionPath,
   ];
 
   return matchers.some((matcher) => matcher(path));

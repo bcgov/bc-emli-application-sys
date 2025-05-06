@@ -14,6 +14,7 @@ import { ProtectedRoute } from './protected-route';
 import { AdminPortalLogin } from '../admin/login';
 import { ProgramsIndexScreen } from '../programs';
 import { ProgramInviteUserScreen } from '../programs/invite-users';
+import RejectApplicationScreen from '../permit-application/application-rejection-reason';
 
 const ExternalApiKeysIndexScreen = lazy(() =>
   import('../external-api-key').then((module) => ({ default: module.ExternalApiKeysIndexScreen })),
@@ -353,6 +354,7 @@ const AppRoutes = observer(() => {
   const superAdminOnlyRoutes = (
     <>
       {/*<Route path="/programs/new" element={<NewProgramsScreen />} />*/}
+
       <Route path="/programs/new-program" element={<NewProgramScreen />} />
       <Route path="/programs/:programId/edit" element={<NewProgramScreen />} />
       <Route path="/programs/:programId/users" element={<ProgramUserIndexScreen />} />
@@ -547,6 +549,7 @@ const AppRoutes = observer(() => {
           <Route path="/sys-admin" element={<AdminPortalLogin isSysAdmin />} />
         </Route>
         {/* Public Routes */}
+        <Route path="/rejection-reason/:id" element={<RejectApplicationScreen />} />
         <Route path="/accept-invitation" element={<AcceptInvitationScreen />} />
         <Route path="/contact" element={<ContactScreen />} />
         <Route path="/confirmed" element={<EmailConfirmedScreen />} />

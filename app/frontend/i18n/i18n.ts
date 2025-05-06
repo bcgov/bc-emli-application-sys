@@ -777,10 +777,10 @@ const options = {
           columns: {
             number: 'Application ID',
             reference_number: 'Reference #',
-            address: 'Address',
             permit_classification: 'Types',
             submitter: 'Submitter',
             submitted_at: 'Submitted',
+            submission_type: 'Submission type',
             viewed_at: 'Viewed at',
             updated_at: 'Last Updated',
             status: 'Status',
@@ -874,7 +874,7 @@ const options = {
           show: {
             update: 'Update',
             screenIn: 'Screen in',
-            reject: 'Reject',
+            inEligible: 'Ineligible',
             wasSubmitted: 'Application was submitted on {{ date }} to {{ jurisdictionName }}',
             submittingTo: {
               title: "You're applying to the {{ jurisdictionName }}",
@@ -926,10 +926,11 @@ const options = {
             },
           },
           review: {
-            readyToReject: 'Ready to reject this application?',
-            byRejecting: 'By rejecting this application',
-            confirmReject:
-              'You confirm that the information provided by the applicant disqualifies them to rebates set out by Better Homes Energy Savings Program.',
+            readyToMarkIneligible: 'Ready to mark ineligible?',
+            confirmIneligible: 'I confirm that this application is ineligible for the Energy Savings Program.',
+            readyToScreen: 'Ready to screen in?',
+            confirmReview:
+              'I confirm this application has all the required information. This application is ready for review.',
           },
         },
         energySavingsApplication: {
@@ -1051,6 +1052,7 @@ const options = {
             jurisdiction: 'Jurisdiction',
           },
           new: {
+            viewAllSubmissions: 'View all submissions',
             locationHeading: 'Location for permit',
             submitToOwn:
               'Make sure you are submitting to a jurisdiction that you have inbox access to so that you can see it.',
@@ -1088,7 +1090,7 @@ const options = {
             applicationDisclaimerMoreInfo_CTA: 'Find your local jurisdiction',
             applicationDisclaimerMoreInfo_Link:
               'https://www2.gov.bc.ca/gov/content/governments/local-governments/facts-framework/local-government-maps',
-            submitted: 'Your application has been submitted!',
+            submitted: 'You sent this application for review.',
             hearBack: 'Need Help?',
             contactInstruction:
               'See the status of your application or your application history any time by logging in to the Better Homes Energy Savings Program. Contact <email /> if you have any questions about your application.',
@@ -1156,6 +1158,9 @@ const options = {
             locateRevisions: 'Locate each requested revision by clicking the links below.',
             revisionsWereRequested: 'Revisions to this application were requested on {{date}}',
             clickQuestion: 'Click on the question(s) or requirement(s) you want the submitter to revise.',
+            inEligibleDetails: 'Ineligible application details',
+            applicationId: 'Application ID is #',
+            inEligibleReason: 'Reason this application is ineligible:',
             revision: {
               newRevision: 'New revision',
               pastRequests: 'Past requests',

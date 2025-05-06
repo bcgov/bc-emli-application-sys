@@ -25,44 +25,15 @@ export const SuccessfulSubmissionScreen = observer(() => {
         <Icon as={CheckCircle} boxSize="14" color="semantic.success" />
 
         <VStack>
-          <Heading as="h1">{t('permitApplication.new.submitted')}</Heading>
-          <Text>{t('permitApplication.new.emailed', { jurisdictionName: qualifiedName })}</Text>
+          <Heading as="h1" color="theme.blueAlt">
+            {t('energySavingsApplication.new.submitted')}
+          </Heading>
           <Tag mt="4" color="semantic.info" border="1px solid" borderColor="semantic.info" p={2}>
             {t('permitApplication.new.yourReference', { number })}
           </Tag>
         </VStack>
-        <Flex direction="column" bg="greys.grey04" w="full" p={8} gap={8} borderRadius="md" position="relative">
-          {currentPermitApplication.sandbox && (
-            <SandboxHeader borderTopRadius={0} override sandbox={currentPermitApplication.sandbox} />
-          )}
-          <Heading variant="yellowline">{t('permitApplication.new.whatsNextTitle')}</Heading>
-          <Text fontSize="lg">{t('permitApplication.new.whatsNext')}</Text>
-          <Divider borderColor="greys.grey02" />
-          <Flex direction="column" gap={4}>
-            <Text>
-              <Text as="span" fontWeight="700">
-                {t('permitApplication.new.hearBack')}
-              </Text>{' '}
-              <Trans
-                i18nKey="energySavingsApplication.new.contactInstruction"
-                components={{
-                  email: (
-                    <a
-                      href={`mailto:${t('auth.betterHomesEmail')}`}
-                      style={{ color: '#3182ce', textDecoration: 'underline' }} // Chakra blue.500
-                    >
-                      {t('auth.betterHomesEmail')}
-                    </a>
-                  ),
-                }}
-              />
-            </Text>
-            {/* {primaryContact && <ContactCard w="fit-content" contact={primaryContact} />} */}
-          </Flex>
-        </Flex>
-
         <RouterLinkButton to={`/`} variant="primary">
-          {t('ui.returnHome')}
+          {t('energySavingsApplication.new.viewAllSubmissions')}
         </RouterLinkButton>
       </Flex>
     </Container>

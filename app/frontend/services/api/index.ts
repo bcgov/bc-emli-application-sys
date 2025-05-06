@@ -161,7 +161,9 @@ export class Api {
   async viewPermitApplication(id) {
     return this.client.post<ApiResponse<IPermitApplication>>(`/permit_applications/${id}/mark_as_viewed`);
   }
-
+  async setPermitApplicationStatus(id) {
+    return this.client.post<ApiResponse<IPermitApplication>>(`/permit_applications/${id}/mark_for_review`);
+  }
   async fetchLocalityTypeOptions() {
     return this.client.get<IOptionResponse>(`/jurisdictions/locality_type_options`);
   }
