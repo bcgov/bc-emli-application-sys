@@ -1,34 +1,66 @@
-import {
-  Box,
-  Container,
-  Flex,
-  Heading,
-  Tab,
-  Tabs,
-  TabList,
-  TabPanel,
-  TabPanels,
-  VStack,
-  Text,
-  Button,
-} from '@chakra-ui/react';
+import { Box, Container, Flex, Heading, VStack, Text, Button } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProgram } from '../../../hooks/resources/use-program';
-import { useMst } from '../../../setup/root';
 import { ErrorScreen } from '../../shared/base/error-screen';
 import { LoadingScreen } from '../../shared/base/loading-screen';
 import { InviteUserTable } from '../../shared/user/invite-user-table';
 import { PaperPlaneTilt } from '@phosphor-icons/react';
+import { TInviteUserParams } from '../../../types/types';
+import { ClassificationPresetName, classificationPresets } from '../../../models/program-classification';
+import { EPermitClassificationCode } from '../../../types/enums';
+
+const defaultRow: TInviteUserParams = {
+  email: '',
+  role: '',
+  inboxAccess: [] as ClassificationPresetName[],
+};
+
+const formatInboxAccessForApi = (
+  selectedPresets: ClassificationPresetName[],
+): { user_group_type: EPermitClassificationCode; submission_type: EPermitClassificationCode | null }[] => {
+  return selectedPresets.map((presetName) => {
+    const preset = classificationPresets[presetName];
+    return {
+      user_group_type: preset.userGroupType,
+      submission_type: preset.submissionType,
+    };
+  });
+};
 
 export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
   const { t } = useTranslation();
-  const { userStore } = useMst();
   const { currentProgram, error } = useProgram();
+  const [rows, setRows] = useState<TInviteUserParams[]>([{ ...defaultRow }]);
 
   if (error) return <ErrorScreen error={error} />;
   if (!currentProgram) return <LoadingScreen />;
+
+  const handleSendInvites = async () => {
+    try {
+      const apiRows = rows.map((row) => ({
+        email: row.email,
+        role: row.role,
+        inbox_access: formatInboxAccessForApi(row.inboxAccess as ClassificationPresetName[]),
+      }));
+
+      console.log(apiRows);
+
+      const result = await currentProgram.inviteUsers(apiRows);
+      console.log('Invites sent:', result);
+
+      // TODO: toast or flash message
+      // uiStore.flashMessage.show(EFlashMessageStatus.success, "Invites sent!", "");
+
+      // TODO: reset rows or redirect back to program??
+    } catch (error) {
+      console.error('Failed to send invites:', error);
+
+      // TODO: show error toast
+      // uiStore.flashMessage.show(EFlashMessageStatus.error, "Something went wrong.", "");
+    }
+  };
 
   return (
     <Container maxW="container.lg" p={8} as={'main'}>
@@ -53,13 +85,11 @@ export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
         </Flex>
       </VStack>
 
-      <InviteUserTable />
+      <InviteUserTable rows={rows} setRows={setRows} defaultRow={defaultRow} />
 
       <Flex gap={4} pt={3}>
         <Button
-          onClick={() => {
-            console.log('finished');
-          }}
+          onClick={handleSendInvites}
           variant={'primary'}
           alignSelf="flex-start"
           rightIcon={<PaperPlaneTilt size={16} />}

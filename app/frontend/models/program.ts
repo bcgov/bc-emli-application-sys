@@ -6,7 +6,14 @@ import { withMerge } from '../lib/with-merge';
 import { withRootStore } from '../lib/with-root-store';
 import { IExternalApiKeyParams } from '../types/api-request';
 import { EEnergyStep, EProgramExternalApiState, EProgramUserGroupType, EZeroCarbonStep } from '../types/enums';
-import { IContact, IOption, IPermitTypeRequiredStep, IPermitTypeSubmissionContact, TLatLngTuple } from '../types/types';
+import {
+  IContact,
+  IOption,
+  IPermitTypeRequiredStep,
+  IPermitTypeSubmissionContact,
+  TInviteUserParams,
+  TLatLngTuple,
+} from '../types/types';
 import { ExternalApiKeyModel } from './external-api-key';
 import { EnergySavingsApplicationModel } from './energy-savings-application';
 import { SandboxModel } from './sandbox';
@@ -16,10 +23,6 @@ export const ProgramModel = types
     id: types.identifier,
     fundedBy: types.maybeNull(types.string),
     programName: types.maybeNull(types.string),
-    // userGroupType: types.optional(
-    //   types.enumeration(Object.values(EProgramUserGroupType)),
-    //   EProgramUserGroupType.participants,
-    // ),
     slug: types.maybeNull(types.string),
     submissionEmail: types.maybeNull(types.string),
     qualifier: types.maybeNull(types.string),
@@ -166,6 +169,15 @@ export const ProgramModel = types
       }
 
       return response.ok;
+    }),
+    inviteUsers: flow(function* (users: TInviteUserParams[]) {
+      const { ok, data: response } = yield* toGenerator(self.environment.api.inviteUsersToProgram(self.id, users));
+
+      if (!ok) {
+        throw new Error('Failed to invite users');
+      }
+
+      return response;
     }),
   }))
   .actions((self) => ({

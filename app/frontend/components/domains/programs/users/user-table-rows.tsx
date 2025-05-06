@@ -56,6 +56,10 @@ export function ActiveUserRow({ user, userStore }: UserRowProps) {
 /** Pending User Row */
 export function PendingUserRow({ user, userStore }: UserRowProps) {
   const { t } = useTranslation();
+  const {
+    programStore: { currentProgram },
+  } = useMst();
+
   return (
     <Box key={user.id} className="user-index-grid-row" role="row" display="contents">
       <SearchGridItem fontSize="sm">{user.email}</SearchGridItem>
@@ -63,9 +67,13 @@ export function PendingUserRow({ user, userStore }: UserRowProps) {
         <RoleTag role={user.role} />
       </SearchGridItem>
       <SearchGridItem fontSize="sm">
-        {user.programMemberships.flatMap((membership) =>
-          membership.classifications.map((classification, i) => <div key={i}>{classification.presetLabel ?? ''}</div>),
-        )}
+        <div>
+          {user.getProgramMembershipForProgram(currentProgram.id)?.classifications.map((classification, i) => (
+            <div style={{ paddingBottom: '.2rem' }} key={i}>
+              {classification.presetLabel ?? ''}
+            </div>
+          ))}
+        </div>
       </SearchGridItem>
       <SearchGridItem fontSize="sm">{format(user.createdAt, 'yyyy-MM-dd')}</SearchGridItem>
       <SearchGridItem fontSize="sm">
@@ -84,6 +92,10 @@ export function PendingUserRow({ user, userStore }: UserRowProps) {
 /** Deactivated User Row */
 export function DeactivatedUserRow({ user, userStore }: UserRowProps) {
   const { t } = useTranslation();
+  const {
+    programStore: { currentProgram },
+  } = useMst();
+
   return (
     <Box key={user.id} className="user-index-grid-row" role="row" display="contents">
       <SearchGridItem fontSize="sm" maxWidth="200px" sx={{ wordBreak: 'break-word' }}>
@@ -94,9 +106,13 @@ export function DeactivatedUserRow({ user, userStore }: UserRowProps) {
         <RoleTag role={user.role} />
       </SearchGridItem>
       <SearchGridItem fontSize="sm">
-        {user.programMemberships.flatMap((membership) =>
-          membership.classifications.map((classification, i) => <div key={i}>{classification.presetLabel ?? ''}</div>),
-        )}
+        <div>
+          {user.getProgramMembershipForProgram(currentProgram.id)?.classifications.map((classification, i) => (
+            <div style={{ paddingBottom: '.2rem' }} key={i}>
+              {classification.presetLabel ?? ''}
+            </div>
+          ))}
+        </div>
       </SearchGridItem>
       <SearchGridItem fontSize="sm">{format(user.createdAt, 'yyyy-MM-dd')}</SearchGridItem>
       <SearchGridItem fontSize="sm">

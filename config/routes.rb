@@ -149,6 +149,8 @@ Rails.application.routes.draw do
            on: :member,
            to: "programs#search_permit_applications"
 
+      resources :invitations, only: %i[create show], controller: "invitations"
+
       resources :program_classification_memberships, only: %i[create destroy] do
         collection do
           get :membership_exists

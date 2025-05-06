@@ -1,6 +1,6 @@
 import { Box, Container, Flex, Heading, Tab, Tabs, TabList, TabPanel, TabPanels, VStack } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProgram } from '../../../../hooks/resources/use-program';
 import { useSearch } from '../../../../hooks/use-search';
@@ -22,6 +22,11 @@ export const ProgramUserIndexScreen = observer(function ProgramUserIndex() {
   const { userStore } = useMst();
   const { currentProgram, error } = useProgram();
   const [tabIndex, setTabIndex] = useState(0);
+
+  useEffect(() => {
+    setTabIndex(0);
+    userStore.setStatus('active');
+  }, []);
 
   const handleSetTabIndex = (index: number) => {
     setTabIndex(index);

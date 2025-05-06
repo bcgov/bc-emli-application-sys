@@ -1,23 +1,24 @@
-class Api::InvitationsController < Devise::InvitationsController
+class Api::InvitationsController < ApplicationController
   include BaseControllerMethods
   respond_to :json
-  before_action :authenticate_user!
+
+  before_action :authenticate_user!, except: %i[show]
+  before_action :set_current_program
   before_action :find_invited_user, only: %i[show]
-  skip_before_action :authenticate_user!, only: %i[show]
 
   def create
+    Rails.logger.info(`users_params: #{users_params.inspect}`)
     inviter =
-      Jurisdiction::UserInviter.new(
+      Program::UserInviter.new(
         inviter: current_user,
+        program: current_program,
         users_params: users_params
       ).call
-    if (
-         inviter.results[:invited] + inviter.results[:reinvited] +
-           inviter.results[:email_taken]
-       ).any?
+
+    if inviter.results.values.flatten.any?
       render_success(inviter.results, nil, { blueprint: InvitationBlueprint })
     else
-      render_error "user.create_invite_error" and return
+      render_error "user.create_invite_error"
     end
   end
 
@@ -38,22 +39,30 @@ class Api::InvitationsController < Devise::InvitationsController
 
   private
 
+  def set_current_program
+    @current_program = Program.find(params[:program_id])
+  end
+
+  def current_program
+    @current_program
+  end
+
   def users_params
+    Rails.logger.info("user_params: #{params[:users].inspect}")
     params
       .require(:users)
       .map do |user_param|
         user_param.permit(
           :email,
           :role,
-          :first_name,
-          :last_name,
-          :jurisdiction_id
+          inbox_access: %i[user_group_type submission_type]
         )
       end
   end
 
-  def user_params
-    params.require(:user).permit(:first_name, :last_name)
+  def find_invited_user
+    @invited_user =
+      User.find_by_invitation_token(params[:invitation_token], true)
   end
 
   def render_accept_invite_error(resource)
@@ -63,10 +72,5 @@ class Api::InvitationsController < Devise::InvitationsController
                      error_message: resource.errors.full_messages.join(", ")
                    }
                  }
-  end
-
-  def find_invited_user
-    @invited_user =
-      User.find_by_invitation_token(params[:invitation_token], true)
   end
 end

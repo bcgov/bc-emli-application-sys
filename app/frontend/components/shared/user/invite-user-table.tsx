@@ -5,6 +5,7 @@ import { MultiCheckSelect } from '../select/multi-check-select';
 import { Trash } from '@phosphor-icons/react';
 import { EUserRoles } from '../../../types/enums';
 import { toTitleCase } from '../../../utils/utility-functions';
+import { TInviteUserParams } from '../../../types/types';
 
 const assignableRoles = [EUserRoles.adminManager, EUserRoles.admin, EUserRoles.systemAdmin];
 const inboxOptions = Object.keys(classificationPresets).map((label) => ({
@@ -12,17 +13,15 @@ const inboxOptions = Object.keys(classificationPresets).map((label) => ({
   value: label as ClassificationPresetName,
 }));
 
-const defaultRow = {
-  email: '',
-  role: '',
-  inboxAccess: [] as ClassificationPresetName[],
-};
-
 const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-export const InviteUserTable = () => {
-  const [rows, setRows] = useState([{ ...defaultRow }]);
+export interface InviteUserTableProps {
+  rows: TInviteUserParams[];
+  setRows: React.Dispatch<React.SetStateAction<TInviteUserParams[]>>;
+  defaultRow: TInviteUserParams;
+}
 
+export const InviteUserTable: React.FC<InviteUserTableProps> = ({ rows, setRows, defaultRow }) => {
   const handleChange = (index, field, value) => {
     const updated = [...rows];
     updated[index][field] = value;
