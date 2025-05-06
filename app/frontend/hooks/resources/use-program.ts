@@ -23,7 +23,7 @@ export const useProgram = () => {
     '/programs/:programId/configuration-management/submissions-inbox-setup',
     '/programs/:programId/configuration-management/energy-step',
     '/programs/:programId/users',
-    '/programs/:programId/users/invite',
+    '/programs/:programId/invite',
     '/programs/:programId/api-settings',
   ];
 

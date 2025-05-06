@@ -1,36 +1,28 @@
 import React from 'react';
-import {
-  Box,
-  Checkbox,
-  FormControl,
-  FormLabel,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Button,
-  useTheme,
-} from '@chakra-ui/react';
+import { Checkbox, FormControl, FormLabel, Menu, MenuButton, MenuList, MenuItem, Button } from '@chakra-ui/react';
 import { CaretDown } from '@phosphor-icons/react';
-import { Dispatch, SetStateAction } from 'react';
 
-interface IMultiCheckSelectProps {
-  selectedValues: string[];
-  setSelectedValues: Dispatch<SetStateAction<string[]>>;
-  allItems: { label: string; value: string }[];
+interface IMultiCheckSelectProps<T extends string> {
+  selectedValues: T[];
+  setSelectedValues: (values: T[]) => void;
+  allItems: { label: string; value: T }[];
   placeholder?: string;
   label?: string;
 }
 
-export const MultiCheckSelect: React.FC<IMultiCheckSelectProps> = ({
+export const MultiCheckSelect = <T extends string>({
   selectedValues,
   setSelectedValues,
   allItems,
   label,
   placeholder = 'Select items...',
-}) => {
-  const toggleItem = (value: string) => {
-    setSelectedValues((prev: string[]) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
+}: IMultiCheckSelectProps<T>) => {
+  const toggleItem = (value: T) => {
+    const newValues = selectedValues.includes(value)
+      ? selectedValues.filter((v) => v !== value)
+      : [...selectedValues, value];
+
+    setSelectedValues(newValues);
   };
 
   const selectedLabels = allItems

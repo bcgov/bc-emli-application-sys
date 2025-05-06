@@ -256,8 +256,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_30_222646) do
     t.integer "status", default: 0
     t.uuid "submitter_id", null: false
     t.uuid "jurisdiction_id"
-    t.timestamptz "created_at", precision: 6, null: false
-    t.timestamptz "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.uuid "permit_type_id"
     t.uuid "activity_id"
     t.string "full_address"
@@ -614,6 +614,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_30_222646) do
                default: -> { "gen_random_uuid()" },
                force: :cascade do |t|
     t.boolean "display_sitewide_message"
+    t.text "sitewide_message"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "help_link_items",
@@ -651,7 +652,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_30_222646) do
     t.jsonb "revision_reason_options"
     t.uuid "small_scale_requirement_template_id"
     t.string "sitewide_message_color"
-    t.text "sitewide_message"
     t.index ["small_scale_requirement_template_id"],
             name: "idx_on_small_scale_requirement_template_id_235b636c86"
   end

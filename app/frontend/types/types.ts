@@ -568,3 +568,9 @@ export interface ISyncClassificationsParams {
   user_id: string;
   classifications: IClassificationInput[];
 }
+
+export type TInviteUserParams = {
+  email: string;
+  role: string;
+  inboxAccess: string[];
+};

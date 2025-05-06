@@ -156,9 +156,9 @@ class User < ApplicationRecord
   def invitable_roles
     case role
     when "system_admin"
-      %w[admin admin_manager participant_support_rep]
+      %w[admin admin_manager system_admin]
     when "admin_manager"
-      %w[admin participant_support_rep]
+      %w[admin admin_manager]
     else
       []
     end

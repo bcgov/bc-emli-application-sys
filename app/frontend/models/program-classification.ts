@@ -1,5 +1,6 @@
 import { Instance, flow, toGenerator, types } from 'mobx-state-tree';
 import { toTitleCase } from '../utils/utility-functions';
+import { EPermitClassificationCode } from '../types/enums';
 
 export const ProgramClassificationModel = types
   .model('ProgramClassificationModel', {
@@ -39,9 +40,18 @@ export const ProgramClassificationModel = types
   }));
 
 export const classificationPresets = {
-  Participant: { userGroupType: 'Participant', submissionType: null },
-  Onboarding: { userGroupType: 'Contractor', submissionType: 'Onboarding' },
-  Contractor: { userGroupType: 'Contractor', submissionType: null },
+  Participant: {
+    userGroupType: EPermitClassificationCode.participant,
+    submissionType: null,
+  },
+  Contractor: {
+    userGroupType: EPermitClassificationCode.contractor,
+    submissionType: null,
+  },
+  Onboarding: {
+    userGroupType: EPermitClassificationCode.contractor,
+    submissionType: EPermitClassificationCode.onboarding,
+  },
 } as const;
 
 export type ClassificationPresetName = keyof typeof classificationPresets;

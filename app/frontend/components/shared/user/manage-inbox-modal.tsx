@@ -54,12 +54,12 @@ export const ManageInboxModal = ({ isOpen, onClose, user }: ManageInboxModalProp
     try {
       setIsSaving(true);
       await user.syncClassifications(currentProgram.id, selectedInboxes);
-      uiStore.flashMessage.show(EFlashMessageStatus.success, 'Inboxes Updated', '');
+      uiStore.flashMessage.show(EFlashMessageStatus.success, t('user.changeInboxModal.success'), '');
       userStore?.search();
       onClose();
     } catch (error) {
       console.error('Failed to update inboxes', error);
-      uiStore.flashMessage.show(EFlashMessageStatus.error, 'Failed to update inboxes', 'Please try again.');
+      uiStore.flashMessage.show(EFlashMessageStatus.error, t('user.changeInboxModal.failure'), '');
     } finally {
       setIsSaving(false);
     }

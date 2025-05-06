@@ -69,6 +69,7 @@ import {
   TCreateRequirementTemplateFormData,
   TSearchParams,
   ISyncClassificationsParams,
+  TInviteUserParams,
 } from '../../types/types';
 import { camelizeResponse, decamelizeRequest } from '../../utils';
 import { getCsrfToken } from '../../utils/utility-functions';
@@ -223,6 +224,12 @@ export class Api {
     return this.client.patch<ApiResponse<IJurisdiction>>(`/programs/${id}`, { program: params });
   }
 
+  async inviteUsersToProgram(id: string, users: TInviteUserParams[]) {
+    return this.client.post<ApiResponse<any>>(`/programs/${id}/invitations`, {
+      users,
+    });
+  }
+
   async updateJurisdictionExternalApiEnabled(id: string, externalApiEnabled: boolean) {
     return this.client.patch<ApiResponse<IJurisdiction>>(`/jurisdictions/${id}/update_external_api_enabled`, {
       externalApiEnabled: externalApiEnabled,
@@ -251,8 +258,13 @@ export class Api {
   }
 
   async syncProgramClassifications(programId, params?: ISyncClassificationsParams) {
-    return this.client.patch<ApiResponse>(`/programs/${programId}/program_classification_memberships/sync`, params);
+    return this.client.patch<ApiResponse<any>>(
+      `/programs/${programId}/program_classification_memberships/sync`,
+      params,
+    );
   }
+
+  ay;
 
   async fetchPermitApplications(params?: TSearchParams<EPermitApplicationSortFields, IPermitApplicationSearchFilters>) {
     return this.client.post<IJurisdictionPermitApplicationResponse>(`/permit_applications/search`, params);
