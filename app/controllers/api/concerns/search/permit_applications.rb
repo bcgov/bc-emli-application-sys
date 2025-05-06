@@ -6,7 +6,7 @@ module Api::Concerns::Search::PermitApplications
       order: permit_application_order,
       match: :word_start,
       fields: [
-        { number: :text_end },
+        { number: :word_middle },
         { nickname: :word_middle },
         { full_address: :word_middle },
         { permit_classifications: :word_middle },

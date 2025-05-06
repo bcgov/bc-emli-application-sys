@@ -221,7 +221,7 @@ export enum EPermitApplicationSubmitterSortFields {
 export enum EPermitApplicationReviewerSortFields {
   status = 'status',
   number = 'number',
-  address = 'address',
+  submissionType = 'submission_type',
   // referenceNumber = 'reference_number',
   // permitClassification = 'permit_classification',
   submitter = 'submitter',

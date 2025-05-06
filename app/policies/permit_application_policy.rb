@@ -22,7 +22,12 @@ class PermitApplicationPolicy < ApplicationPolicy
     user.review_staff?
   end
 
+  def mark_for_review?
+    user.admin_manager?
+  end
+
   def update?
+    return true if user.admin_manager?
     if record.draft?
       record.submission_requirement_block_edit_permissions(
         user_id: user.id

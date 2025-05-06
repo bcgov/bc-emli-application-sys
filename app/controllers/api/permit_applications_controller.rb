@@ -9,6 +9,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
                   upload_supporting_document
                   finalize_revision_requests
                   mark_as_viewed
+                  mark_for_review
                   update_version
                   generate_missing_pdfs
                   update_revision_requests
@@ -41,6 +42,14 @@ class Api::PermitApplicationsController < Api::ApplicationController
   def mark_as_viewed
     authorize @permit_application
     @permit_application.update_viewed_at
+    render_success @permit_application,
+                   nil,
+                   { blueprint_opts: { view: :jurisdiction_review_extended } }
+  end
+
+  def mark_for_review
+    authorize @permit_application
+    @permit_application.set_for_review
     render_success @permit_application,
                    nil,
                    { blueprint_opts: { view: :jurisdiction_review_extended } }

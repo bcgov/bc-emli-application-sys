@@ -1,12 +1,12 @@
 import { Box, Button, Divider, Flex, HStack, Heading, Spacer, Stack, Text, useDisclosure } from "@chakra-ui/react"
-import { CaretDown, CaretRight, CaretUp, CheckCircle, Info, NotePencil } from '@phosphor-icons/react';
+import { CaretDown, CaretRight, CaretUp, CheckCircle, Info, NotePencil, Prohibit } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useRef, useState } from 'react';
 import { useController, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
-import { ECollaborationType } from '../../../types/enums';
+import { ECollaborationType, EPermitApplicationStatus } from '../../../types/enums';
 import { CopyableValue } from '../../shared/base/copyable-value';
 import { ErrorScreen } from '../../shared/base/error-screen';
 import { LoadingScreen } from '../../shared/base/loading-screen';
@@ -32,7 +32,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const { currentPermitApplication, error } = usePermitApplication({ review: true });
   const { t } = useTranslation();
   const formRef = useRef(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const { requirementBlockAssignmentNodes, updateRequirementBlockAssignmentNode } = useCollaborationAssignmentNodes({
     formRef,
   });
@@ -49,7 +49,8 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const [referenceNumberSnapshot, setReferenceNumberSnapshot] = useState<null | string>(null);
 
   const [completedBlocks, setCompletedBlocks] = useState({});
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isScreenIn, onOpen: onScreenIn, onClose: onScreenInclose } = useDisclosure();
   const { isOpen: isContactsOpen, onOpen: onContactsOpen, onClose: onContactsClose } = useDisclosure();
 
   const [hideRevisionList, setHideRevisionList] = useState(false);
@@ -100,7 +101,18 @@ export const ReviewPermitApplicationScreen = observer(() => {
       onReferenceNumberChange(referenceNumberSnapshot);
     }
   });
-
+  const handleConfirm = async () => {
+    try {
+      const response = await currentPermitApplication.updateStatus({
+        status: EPermitApplicationStatus.inReview,
+      });
+      if (response.ok) {
+        navigate(`/applications/${response?.data?.data?.id}/successful-submission`);
+      }
+    } catch (e) {
+    }
+    onScreenInclose();
+  };
   // @ts-ignore
   const permitHeaderHeight = permitHeaderRef?.current?.offsetHeight ?? 0;
 
@@ -222,13 +234,13 @@ export const ReviewPermitApplicationScreen = observer(() => {
                 return (
                   !revisionMode && (
                     <HStack spacing={6}>
-                      {/* <Button variant="callout" leftIcon={<NotePencil />} onClick={() => setRevisionMode(true)}>
+                      <Button variant="callout" leftIcon={<NotePencil />} onClick={() => setRevisionMode(true)}>
                         {currentPermitApplication.isRevisionsRequested
                           ? t('permitApplication.show.viewRevisionRequests')
                           : t('permitApplication.show.requestRevisions')}{' '}
                         {currentPermitApplication?.latestRevisionRequests?.length > 0 &&
                           `(${currentPermitApplication.latestRevisionRequests.length})`}
-                      </Button> */}
+                      </Button>
                       <Button
                         variant="calloutInverse"
                         leftIcon={<NotePencil />}
@@ -243,7 +255,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                         variant="calloutInverse"
                         leftIcon={<CheckCircle />}
                         px={14}
-                        onClick={() => setRevisionMode(true)}
+                        onClick={onScreenIn}
                         borderColor="green"
                       >
                         {t('permitApplication.show.screenIn')}
@@ -257,12 +269,12 @@ export const ReviewPermitApplicationScreen = observer(() => {
                       /> */}
                       <Button
                         variant="calloutInverse"
-                        leftIcon={<CheckCircle />}
+                        leftIcon={<Prohibit />}
                         px={14}
                         onClick={onOpen}
                         borderColor="red"
                       >
-                        {t('permitApplication.show.reject')}
+                        {t('permitApplication.show.inEligible')}
                       </Button>
                     </HStack>
                   )
@@ -273,7 +285,24 @@ export const ReviewPermitApplicationScreen = observer(() => {
           </Flex>
         )}
       </Box>
-      {onOpen && <ApplicationReviewModal isOpen={isOpen} onClose={onClose} />}
+      {onOpen && (
+        <ApplicationReviewModal
+          isOpen={isOpen}
+          onClose={onClose}
+          onConfirm={() => navigate(`/rejection-reason/${number}`)}
+          title={t('permitApplication.review.readyToMarkIneligible')}
+          message={t('permitApplication.review.confirmIneligible')}
+        />
+      )}
+      {isScreenIn && (
+        <ApplicationReviewModal
+          isOpen={isScreenIn}
+          onClose={onScreenInclose}
+          onConfirm={handleConfirm}
+          title={t('permitApplication.review.readyToScreen')}
+          message={t('permitApplication.review.confirmReview')}
+        />
+      )}
       {isContactsOpen && (
         <ContactSummaryModal
           isOpen={isContactsOpen}

@@ -52,6 +52,7 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
     getSubmissionTypeIdByCode,
     getAudienceTypeIdByCode,
     getAllSubmissionTypeIds,
+    getSubmissionTypeById,
     getSubmissionTypeIdsExceptOnboarding,
   } = permitClassificationStore;
 
@@ -201,7 +202,7 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
                     <EnergySavingsApplicationStatusTag energySavingsApplication={pa} />
                   </SearchGridItem>
                   <SearchGridItem>{pa.number}</SearchGridItem>
-                  <SearchGridItem wordBreak={'break-word'}>{pa.referenceNumber}</SearchGridItem>
+                  <SearchGridItem wordBreak={'break-word'}>{pa.submissionType.name}</SearchGridItem>
                   <SearchGridItem>
                     <Flex>
                       <Text fontWeight={700} flex={1}>

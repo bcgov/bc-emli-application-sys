@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Button,
   Flex,
@@ -12,49 +11,54 @@ import {
   ModalOverlay,
   Text,
   Alert,
-  AlertIcon,
 } from '@chakra-ui/react';
-import { Warning } from '@phosphor-icons/react';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { Warning } from '@phosphor-icons/react';
 
-function ApplicationReviewModal({ isOpen, onClose }) {
-  const { t } = useTranslation();
+function ApplicationReviewModal({
+  isOpen,
+  onClose,
+  title,
+  message,
+  confirmLabel = 'Confirm',
+  cancelLabel = 'Cancel',
+  onConfirm,
+  icon = <Warning size={27} aria-label={'warning icon'} />,
+  alertBg = 'theme.orangeLight02',
+  iconColor = 'theme.orange',
+  width = '540px',
+}) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
-      <ModalContent maxW="sm" minW="540px">
+      <ModalContent maxW="sm" minW={width}>
         <ModalHeader>
           <Flex align="center" justify="space-between">
             <Text fontSize="lg" fontWeight="bold" color="theme.blueAlt">
-              {t('permitApplication.review.readyToReject')}
+              {title}
             </Text>
           </Flex>
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Alert bg="theme.orangeLight02" borderRadius="md">
+          <Alert bg={alertBg} borderRadius="md">
             <Box ml={4}>
-              <Box display="flex" alignItems="center">
-                <Box color={`semantic.warning`}>{<Warning size={16} aria-label={'warning icon'} />}</Box>
-                <Text fontWeight="bold" ml={2}>
-                  {t('permitApplication.review.byRejecting')}
-                </Text>
+              <Box display="flex" alignItems="flex-start">
+                <Box color={iconColor} mt={1}>
+                  {icon}
+                </Box>
+                <Text ml={2}>{message}</Text>
               </Box>
-
-              <Text fontSize="sm" mt={2} ml={4}>
-                {t('permitApplication.review.confirmReject')}
-              </Text>
             </Box>
           </Alert>
         </ModalBody>
 
-        <ModalFooter>
-          <Button variant="primary" mr={3}>
-            {t('ui.confirm')}
+        <ModalFooter justifyContent={'center'}>
+          <Button variant="primary" mr={3} onClick={onConfirm} px={8}>
+            {confirmLabel}
           </Button>
-          <Button variant="outline" onClick={onClose}>
-            {t('ui.cancel')}
+          <Button variant="outline" onClick={onClose} px={8}>
+            {cancelLabel}
           </Button>
         </ModalFooter>
       </ModalContent>

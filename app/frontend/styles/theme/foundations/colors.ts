@@ -11,7 +11,7 @@ export const colors = {
     blueLight: '#ECF6FF',
     blueLightBg: '#E4F2FF',
     blueButtonHover: '#1E5189',
-    blueText: '#2464A4',
+    blueText: '#053662',
     primary100: '#234075',
     darkBlue: '#013366',
     radioOutline: '#0D6EFD',

@@ -194,6 +194,8 @@ Rails.application.routes.draw do
       post "search", on: :collection, to: "permit_applications#index"
       post "submit", on: :member
       post "mark_as_viewed", on: :member
+      post "mark_for_review", 
+           on: :member
       patch "upload_supporting_document", on: :member
       patch "update_version", on: :member
       patch "revision_requests",

@@ -36,15 +36,15 @@ class PermitApplication < ApplicationRecord
                user_group_type_id
                submission_type_id
                audience_type_id
-             ],
-             text_end: %i[number]
+               number
+  ]
 
   belongs_to :submitter, class_name: "User"
   belongs_to :jurisdiction, optional: true
   belongs_to :permit_type, optional: true
   belongs_to :activity, optional: true
   belongs_to :program
-  belongs_to :permit_classification
+  belongs_to :permit_classification, optional: true
   belongs_to :submission_type
   belongs_to :user_group_type
   belongs_to :audience_type
@@ -313,6 +313,16 @@ class PermitApplication < ApplicationRecord
     end
   end
 
+  def set_for_review
+    if update(status: :in_review)
+      Rails.logger.debug("Successfully updated: #{self.attributes}")
+      self
+    else
+      Rails.logger.error("Failed to update: #{errors.full_messages.join(', ')}")
+      nil
+    end
+  end
+  
   def number_prefix
     jurisdiction.prefix
   end
