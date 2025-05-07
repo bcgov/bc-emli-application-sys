@@ -153,6 +153,7 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader color="theme.blueAlt">{t('ui.publishBanner')}</ModalHeader>
+          <ModalCloseButton size="sm" color="greys.anotherGrey" />
           <ModalFooter justifyContent="center">
             <Button
               bg="theme.darkBlue"
@@ -163,7 +164,7 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
             >
               {t('ui.confirm')}
             </Button>
-            <Button variant="ghost" onClick={onClose} border="2px" borderColor="border.light" color="grey.anotherGrey">
+            <Button variant="ghost" onClick={onClose} border="2px" borderColor="border.light" color="greys.anotherGrey">
               {t('ui.cancel')}
             </Button>
           </ModalFooter>
