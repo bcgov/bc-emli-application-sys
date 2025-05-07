@@ -22,7 +22,7 @@ export const SiteConfigurationManagementScreen = observer(function SiteConfigura
               description={t(`${i18nPrefix}.sitewideMessage.description`)}
               linkText={t('ui.edit')}
               icon={<FlagBanner size="24px" color="var(--chakra-colors-text-link)" />}
-              href="sitewide-message"
+              href="sitewide-banner"
               h="full"
             />
           </GridItem>

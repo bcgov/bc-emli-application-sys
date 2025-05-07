@@ -30,6 +30,7 @@ export const colors = {
     orange: '#F8BB47',
     orangeLight: '#FFFBF0',
     orangeLight02: '#FEF1D8',
+    softRose: '#F4E1E2',
     // green: {
     //   100: "#F5FFF8",
     // },
@@ -53,12 +54,14 @@ export const colors = {
     grey80: '#EDEBE9',
     grey90: '#3B3A39',
     grey100: '#1A1A1A',
+    anotherGrey: '#2D2D2D',
   },
   border: {
     base: '#606060',
     dark: '#323130',
     light: '#D9D9D9',
     input: '#CCCCCC',
+    randomBorderColorforthePublishModal: '#353433',
   },
   error: '#D9292F',
   success: '#2E8540',
