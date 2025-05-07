@@ -399,7 +399,7 @@ const AppRoutes = observer(() => {
 
   const managerOrReviewerRoutes = (
     <>
-      <Route path="/:programId/submission-inbox" element={<JurisdictionSubmissionInboxScreen />} />
+      <Route path="/programs/submission-inbox" element={<JurisdictionSubmissionInboxScreen />} />
       <Route
         path="/jurisdictions/:jurisdictionId/configuration-management/submissions-inbox-setup"
         element={<SubmissionsInboxSetupScreen />}

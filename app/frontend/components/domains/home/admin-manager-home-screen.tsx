@@ -32,7 +32,7 @@ export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               title={t('home.submissionInboxTitle')}
               description={t('home.adminSubmissionInboxDescription')}
               icon={<Tray size={24} />}
-              href="/submission-inbox"
+              href="/programs/submission-inbox"
               linkText={t('ui.view')}
             />
 

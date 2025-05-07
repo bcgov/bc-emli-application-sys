@@ -53,6 +53,7 @@ import {
   EPendingUserSortFields,
   EPermitApplicationSortFields,
   EPermitBlockStatus,
+  EProgramSortFields,
   ERequirementLibrarySortFields,
   ERequirementTemplateSortFields,
   ETemplateVersionStatus,
@@ -138,7 +139,7 @@ export class Api {
     return this.client.get<ApiResponse<IUser>>(`/invitations/${token}`);
   }
 
-  async searchPrograms(params?: TSearchParams<EJurisdictionSortFields, IJurisdictionSearchFilters>) {
+  async searchPrograms(params?: TSearchParams<EProgramSortFields, IJurisdictionSearchFilters>) {
     return this.client.post<IJurisdictionResponse>('/programs/search', params);
   }
 

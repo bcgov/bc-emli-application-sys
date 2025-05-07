@@ -18,7 +18,7 @@ export const useProgram = () => {
   const { t } = useTranslation();
 
   const programRoutes = [
-    '/:programId/submission-inbox',
+    '/programs/submission-inbox',
     '/programs/:programId/configuration-management',
     '/programs/:programId/configuration-management/submissions-inbox-setup',
     '/programs/:programId/configuration-management/energy-step',
@@ -56,13 +56,6 @@ export const useProgram = () => {
           if (program) {
             setError(null);
             setCurrentProgram(programId);
-          }
-        } else {
-          //assume slug
-          const program = await fetchProgram(programId);
-          if (program) {
-            setError(null);
-            setCurrentProgramBySlug(programId);
           }
         }
       } catch (e) {
