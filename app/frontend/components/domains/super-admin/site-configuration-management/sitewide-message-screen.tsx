@@ -11,6 +11,14 @@ import {
   Switch,
   VStack,
   Select,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
@@ -53,9 +61,13 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
   const { handleSubmit, formState, control, reset } = formMethods;
   const { isSubmitting } = formState;
 
+  const { isOpen, onOpen, onClose } = useDisclosure(); // Chakra UI hook for modal state
+
   const onSubmit = async (formData) => {
     await updateSiteConfiguration(formData);
+    onClose(); // Close the modal after saving
   };
+
   return (
     <Container maxW="container.lg" py={8} px={{ base: 8, xl: 8 }} flexGrow={1} as="main">
       <Heading mb={0} fontSize="3xl" color="theme.blueAlt">
@@ -127,7 +139,7 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
 
           <Divider my={16} />
           <HStack alignSelf="end">
-            <Button variant="primary" type="submit" isLoading={isSubmitting} isDisabled={isSubmitting}>
+            <Button variant="primary" onClick={onOpen} isDisabled={isSubmitting}>
               {t('ui.save')}
             </Button>
             <Button variant="secondary" onClick={() => navigate(-1)} isDisabled={isSubmitting}>
@@ -136,6 +148,27 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
           </HStack>
         </form>
       </FormProvider>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader color="theme.blueAlt">{t('ui.publishBanner')}</ModalHeader>
+          <ModalFooter justifyContent="center">
+            <Button
+              bg="theme.darkBlue"
+              color="white"
+              _hover={{ bg: 'theme.blueButtonHover' }}
+              mr={8}
+              onClick={handleSubmit(onSubmit)}
+            >
+              {t('ui.confirm')}
+            </Button>
+            <Button variant="ghost" onClick={onClose} border="2px" borderColor="border.light" color="grey.anotherGrey">
+              {t('ui.cancel')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Container>
   );
 });

@@ -467,6 +467,7 @@ const options = {
           review: 'Review',
           configure: 'Configure',
           start: 'Start',
+          publishBanner: 'Ready to publish site-wide banner?',
         },
         notification: {
           title: 'Notifications',
