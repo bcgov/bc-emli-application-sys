@@ -50,7 +50,7 @@ const DynamicBreadcrumb = observer(({ path }: IDynamicBreadcrumbProps) => {
 
   const [breadcrumbs, setBreadcrumbs] = useState<TBreadcrumbSegment[]>([]);
 
-  const FRIENDLY_SLUG_RESOURCES = ['jurisdictions', 'programs'];
+  const FRIENDLY_SLUG_RESOURCES = ['jurisdictions'];
 
   useEffect(() => {
     // Get the current path and split into segments

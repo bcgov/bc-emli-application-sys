@@ -44,13 +44,6 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
   useSearch(programStore);
   const [copyExisting, setCopyExisting] = useState(false);
 
-  // const fetchUserGroupTypeOptions = async (): Promise<IOption<string>[]> => {
-  //   return Object.keys(EProgramUserGroupType).map((key) => {
-  //     const value = EProgramUserGroupType[key as keyof typeof EProgramUserGroupType];
-  //     return { value: key, label: value };
-  //   });
-  // };
-
   const fetchPrograms = async (): Promise<IOption<string>[]> => {
     return tablePrograms.map((program) => {
       return {

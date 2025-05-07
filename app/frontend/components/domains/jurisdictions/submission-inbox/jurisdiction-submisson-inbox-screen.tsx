@@ -39,13 +39,16 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
     },
   });
   const [options, setOptions] = useState<IOption<FetchOptionI>[]>([]);
-  const { permitApplicationStore, sandboxStore, permitClassificationStore } = useMst();
+  const { permitApplicationStore, permitClassificationStore, programStore } = useMst();
   const { setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, search } = permitApplicationStore;
-  const { currentProgram, error } = useProgram();
-  const { isLoaded: isPermitClassificationsLoaded } = usePermitClassificationsLoad();
 
+  const { isLoaded: isPermitClassificationsLoaded } = usePermitClassificationsLoad();
   const { currentPage, totalPages, totalCount, countPerPage, handleCountPerPageChange, handlePageChange, isSearching } =
     permitApplicationStore;
+  const { tablePrograms } = programStore;
+  useSearch(programStore);
+
+  const { currentProgram, error } = useProgram();
 
   const {
     getUserTypeIdByCode,
@@ -62,6 +65,7 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
     SubmissionType: string[] | string;
   };
 
+  // Retained for future use: Contractor submission inbox. Refer to commit history prior to May 7th for changes
   const fetchOptionsTypes = useCallback(async (): Promise<IOption<FetchOptionI>[]> => {
     return [
       {
@@ -98,38 +102,56 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
     search();
   };
 
-  useEffect(() => {
-    if (methods.getValues('selectedType')) {
-      handleChange(methods.getValues('selectedType'));
-    }
-  }, [methods.watch('selectedType')]);
+  const handleProgramChange = (programId) => {
+    console.log('programId', programId);
+    programStore.setCurrentProgram(programId);
+    search();
+  };
+  // Retained for future use: Contractor submission inbox. Refer to commit history prior to May 7th for changes
+
+  // useEffect(() => {
+  //   if (methods.getValues('selectedType')) {
+  //     handleChange(methods.getValues('selectedType'));
+  //   }
+  // }, [methods.watch('selectedType')]);
+
+  // useEffect(() => {
+  //   if (options.length > 0) {
+  //     methods.setValue('selectedType', options[0].value);
+  //   }
+  // }, [options, methods]);
 
   useEffect(() => {
-    if (options.length > 0) {
-      methods.setValue('selectedType', options[0].value);
-    }
-  }, [options, methods]);
-
-  useEffect(() => {
-    let isMounted = true;
+    // let isMounted = true;
     const loadData = async () => {
       if (!permitClassificationStore.isLoaded) {
         const success = await permitClassificationStore.fetchPermitClassifications();
         if (!success) return;
       }
       const result = await fetchOptionsTypes();
-      if (isMounted) {
-        setOptions(result);
-      }
+      setUserGroupFilter(result[0].value.userGroupType);
+      setAudienceTypeFilter(result[0].value.AudienceType);
+      setSubmissionTypeFilter(result[0].value.SubmissionType);
+      // if (isMounted) {
+      //   setOptions(result);
+      // }
     };
     loadData();
-    return () => {
-      isMounted = false;
-    };
+    // return () => {
+    //   isMounted = false;
+    // };
   }, [permitClassificationStore]);
 
+  const fetchPrograms = async (): Promise<IOption<string>[]> => {
+    return tablePrograms.map((program) => {
+      return {
+        value: program.id,
+        label: program.programName || 'No Program Name',
+      };
+    });
+  };
   if (error) return <ErrorScreen error={error} />;
-  if (!currentProgram || !isPermitClassificationsLoaded) return <LoadingScreen />;
+  if (!isPermitClassificationsLoaded) return <LoadingScreen />;
 
   return (
     <Container maxW="container.xl" as={'main'}>
@@ -140,11 +162,23 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
               {t('permitApplication.submissionInbox.title')}
             </Heading>
             <Text fontSize="sm" color="text.secondary">
-              {t('permitApplication.submissionInbox.tableDescription')}
+              {t('permitApplication.submissionInbox.chooseProgram')}
             </Text>
             <FormProvider {...methods}>
               <form>
-                <Controller
+                {tablePrograms.length > 0 && (
+                  <AsyncDropdown
+                    mt={4}
+                    fetchOptions={fetchPrograms}
+                    fieldName={'programId'}
+                    placeholderOptionLabel={t('ui.selectProgram')}
+                    useBoxWrapper={false}
+                    onValueChange={(value) => {
+                      handleProgramChange(value);
+                    }}
+                  />
+                )}
+                {/* <Controller
                   name="selectedType"
                   control={methods.control}
                   render={({ field }) => (
@@ -161,23 +195,14 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
                       {...field}
                     />
                   )}
-                />
+                /> */}
               </form>
             </FormProvider>
 
-            <Heading as="h2" color="theme.blueAlt" mt={4}>
+            <Heading as="h2" color="theme.blueAlt" mt={8}>
               {t('permitApplication.submissionInbox.tableSubHeading')}
             </Heading>
           </Box>
-          <Can action="jurisdiction:manage" data={{ jurisdiction: currentProgram }}>
-            <Button
-              as={RouterLink}
-              to={`/jurisdictions/${currentProgram.slug}/configuration-management/submissions-inbox-setup`}
-              variant="secondary"
-            >
-              {t('ui.setup')}
-            </Button>
-          </Can>
         </Flex>
 
         <SearchGrid templateColumns="repeat(7, 1fr)">
@@ -187,8 +212,12 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
             <Flex py={50} gridColumn={'span 7'}>
               <SharedSpinner />
             </Flex>
+          ) : currentProgram?.tablePermitApplications.length === 0 ? (
+            <Flex py={50} gridColumn="span 7" justify="center" align="center">
+              <Text>{t('errors.noResults')}</Text>
+            </Flex>
           ) : (
-            currentProgram.tablePermitApplications.map((pa: IEnergySavingsApplication) => {
+            currentProgram?.tablePermitApplications.map((pa: IEnergySavingsApplication) => {
               if (!pa.submitter) return <></>;
 
               return (
@@ -212,8 +241,8 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
                   </SearchGridItem>
                   <SearchGridItem>
                     <Flex direction="column">
-                      <Text>{format(pa?.createdAt, 'yyyy-MM-dd')}</Text>
-                      <Text>{format(pa?.createdAt, 'HH:mm')}</Text>
+                      <Text>{format(pa.createdAt, 'yyyy-MM-dd')}</Text>
+                      <Text>{format(pa.createdAt, 'HH:mm')}</Text>
                     </Flex>
                   </SearchGridItem>
                   <SearchGridItem>
@@ -256,6 +285,7 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
             })
           )}
         </SearchGrid>
+
         <Flex w={'full'} justifyContent={'space-between'}>
           <PerPageSelect
             handleCountPerPageChange={handleCountPerPageChange}

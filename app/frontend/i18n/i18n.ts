@@ -792,6 +792,7 @@ const options = {
               'Please have a Review Manager setup the Submissions Inbox for all permit types to allow submissions to be received.',
             title: 'Submissions inbox',
             tableHeading: 'Permit applications',
+            chooseProgram: 'Choose a program from the drop down list.',
             tableDescription:
               'Choose a submission inbox to view from the dropdown list. Submitted applications will appear in the relevant submission inbox. ',
             tableSubHeading: 'Participant applications',
