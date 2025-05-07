@@ -107,20 +107,20 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
             )}
             <AsyncRadioGroup
               valueField="id"
-              question={t('requirementTemplate.fields.userGroupType')}
+              question={t('requirementTemplate.fields.userGroupTypeSelect')}
               fetchOptions={fetchUserGroupTypeOptions}
               fieldName={'userGroupTypeId'}
             />
             <AsyncRadioGroup
               valueField="id"
-              question={t('requirementTemplate.fields.audienceType')}
+              question={t('requirementTemplate.fields.audienceTypeSelect')}
               fetchOptions={fetchAudienceTypeOptions}
               fieldName={'audienceTypeId'}
             />
             <AsyncDropdown
               fetchOptions={fetchSubmissionTypeOptions}
               fieldName={'submissionTypeId'}
-              question={t('requirementTemplate.fields.submissionType')}
+              question={t('requirementTemplate.fields.submissionTypeSelect')}
               useBoxWrapper={true}
             />
             <Flex

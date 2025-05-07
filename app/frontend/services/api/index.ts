@@ -39,6 +39,7 @@ import {
   IJurisdictionResponse,
   INotificationResponse,
   IOptionResponse,
+  IProgramResponse,
   IRequirementBlockResponse,
   IRequirementTemplateResponse,
   IUsersResponse,
@@ -140,7 +141,7 @@ export class Api {
   }
 
   async searchPrograms(params?: TSearchParams<EProgramSortFields, IJurisdictionSearchFilters>) {
-    return this.client.post<IJurisdictionResponse>('/programs/search', params);
+    return this.client.post<IProgramResponse>('/programs/search', params);
   }
 
   async searchJurisdictions(params?: TSearchParams<EJurisdictionSortFields, IJurisdictionSearchFilters>) {

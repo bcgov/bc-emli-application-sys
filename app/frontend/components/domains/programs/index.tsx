@@ -5,7 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearch } from '../../../hooks/use-search';
 import { useMst } from '../../../setup/root';
-import { EJurisdictionSortFields, EProgramSortFields } from '../../../types/enums';
+import { EProgramSortFields } from '../../../types/enums';
 import { Paginator } from '../../shared/base/inputs/paginator';
 import { PerPageSelect } from '../../shared/base/inputs/per-page-select';
 import { SharedSpinner } from '../../shared/base/shared-spinner';

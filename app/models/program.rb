@@ -140,7 +140,7 @@ class Program < ApplicationRecord
 
   def search_data
     {
-      program_name: program_name,
+      program_name: program_name.downcase ,
       funded_by: funded_by,
       description_html: description_html
     }
