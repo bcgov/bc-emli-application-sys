@@ -63,7 +63,7 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
       </Heading>
       <FormProvider {...formMethods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Flex mt={8} direction="column" gap={8}>
+          <Flex mt={8} direction="row" gap={32} align="flex-start">
             {/* Site-wide Message Settings Heading */}
             <Box minW="fit-content">
               <Heading as="h3" noOfLines={1}>
@@ -74,45 +74,53 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
             {/* Site-wide Message Box */}
             <SectionBox w="80%">
               <Flex justify="space-between" w="full" gap={12}>
-                <Flex direction="column">
+                <Flex direction="column" w="full">
+                  {/* Banner Type Select Box and Show Button */}
+                  <Flex align="center" gap={8} mb={4}>
+                    {/* Banner Type Select Box */}
+                    <FormControl>
+                      <FormLabel htmlFor="sitewideMessageColor" mb={2}>
+                        {t('siteConfiguration.sitewideMessage.colorLabel')}
+                      </FormLabel>
+                      <Controller
+                        name="sitewideMessageColor"
+                        control={control}
+                        render={({ field }) => (
+                          <Select {...field} id="sitewideMessageColor" w="fit-content">
+                            <option value="theme.orangeLight02">
+                              {t('siteConfiguration.sitewideMessage.colors.lightYellow')}
+                            </option>
+                            <option value="theme.softRose">{t('siteConfiguration.sitewideMessage.colors.red')}</option>
+                            <option value="greys.offWhite">{t('siteConfiguration.sitewideMessage.colors.blue')}</option>
+                          </Select>
+                        )}
+                      />
+                    </FormControl>
+
+                    {/* Show Button */}
+                    <FormControl display="flex" alignItems="center" w="fit-content" gap={2}>
+                      <Controller
+                        name="displaySitewideMessage"
+                        control={control}
+                        render={({ field }) => (
+                          <Switch id="displaySitewideMessage" isChecked={field.value} onChange={field.onChange} />
+                        )}
+                      />
+                      <FormLabel htmlFor="displaySitewideMessage" mb={0}>
+                        {t('siteConfiguration.sitewideMessage.enable')}
+                      </FormLabel>
+                    </FormControl>
+                  </Flex>
+
+                  {/* Text for Banner */}
                   <TextFormControl
                     label={t('siteConfiguration.sitewideMessage.label')}
                     fieldName="sitewideMessage"
                     hint={t('siteConfiguration.sitewideMessage.hint')}
                     showOptional={false}
+                    inputProps={{ w: 'lg', maxLength: 255 }} // Added maxLength to limit input to 255 characters
                   />
                 </Flex>
-                <Flex direction="column">
-                  <FormLabel htmlFor="sitewideMessageColor" mb={4}>
-                    {t('siteConfiguration.sitewideMessage.colorLabel')}
-                  </FormLabel>
-                  <Controller
-                    name="sitewideMessageColor"
-                    control={control}
-                    render={({ field }) => (
-                      <Select {...field} id="sitewideMessageColor">
-                        <option value="theme.yellowLight">
-                          {t('siteConfiguration.sitewideMessage.colors.lightYellow')}
-                        </option>
-                        <option value="red">{t('siteConfiguration.sitewideMessage.colors.red')}</option>
-                        <option value="blue">{t('siteConfiguration.sitewideMessage.colors.blue')}</option>
-                        <option value="green">{t('siteConfiguration.sitewideMessage.colors.green')}</option>
-                      </Select>
-                    )}
-                  />
-                </Flex>
-                <FormControl display="flex" alignItems="center" w="fit-content" gap={2}>
-                  <Controller
-                    name="displaySitewideMessage"
-                    control={control}
-                    render={({ field }) => (
-                      <Switch id="displaySitewideMessage" isChecked={field.value} onChange={field.onChange} />
-                    )}
-                  />
-                  <FormLabel htmlFor="displaySitewideMessage">
-                    {t('siteConfiguration.sitewideMessage.enable')}
-                  </FormLabel>
-                </FormControl>
               </Flex>
             </SectionBox>
           </Flex>

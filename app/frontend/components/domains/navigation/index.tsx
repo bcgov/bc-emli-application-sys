@@ -373,7 +373,7 @@ const AppRoutes = observer(() => {
       <Route path="/requirement-templates/:requirementTemplateId/edit" element={<EditRequirementTemplateScreen />} />
       <Route path="/template-versions/:templateVersionId" element={<TemplateVersionScreen />} />
       <Route path="/configuration-management" element={<SiteConfigurationManagementScreen />} />
-      <Route path="/configuration-management/sitewide-message" element={<SitewideMessageScreen />} />
+      <Route path="/configuration-management/sitewide-banner" element={<SitewideMessageScreen />} />
       <Route path="/configuration-management/help-drawer-setup" element={<HelpDrawerSetupScreen />} />
       <Route path="/configuration-management/revision-reason-setup" element={<RevisionReasonSetupScreen />} />
       <Route path="/configuration-management/landing-setup" element={<LandingSetupScreen />} />

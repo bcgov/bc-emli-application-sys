@@ -30,6 +30,7 @@ export const colors = {
     orange: '#F8BB47',
     orangeLight: '#FFFBF0',
     orangeLight02: '#FEF1D8',
+    softRose: '#F4E1E2',
     // green: {
     //   100: "#F5FFF8",
     // },
