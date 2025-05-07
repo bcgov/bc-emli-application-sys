@@ -27,6 +27,7 @@ module Api::Concerns::Search::ProgramUsers
           .joins(:user)
           .where.not(users: { invitation_sent_at: nil })
           .where(users: { invitation_accepted_at: nil })
+          .where(users: { discarded_at: nil })
     end
 
     memberships = memberships_scope.to_a

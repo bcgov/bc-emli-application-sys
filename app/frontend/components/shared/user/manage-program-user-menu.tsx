@@ -94,6 +94,14 @@ export const ManageProgramUserMenu = observer(function ManageProgramUserMenu<TSe
     openInboxModal();
   };
 
+  const revokeUserInvite = async () => {
+    const success = await user.destroy();
+    if (success) {
+      //uiStore.flashMessage.show(EFlashMessageStatus.success, 'User reactivated', '');
+      searchModel?.search();
+    }
+  };
+
   const isCurrentUser = user.id === currentUser.id;
 
   return (
@@ -154,9 +162,7 @@ export const ManageProgramUserMenu = observer(function ManageProgramUserMenu<TSe
                       {user.isUnconfirmed ? <ReinviteUserForm user={user} /> : null}
                       <ManageMenuItemButton
                         color="text.primary"
-                        onClick={() => {
-                          console.log('');
-                        }}
+                        onClick={revokeUserInvite}
                         leftIcon={<WarningCircle size={16} />}
                       >
                         {t('user.menuItems.revokeUserInvite')}

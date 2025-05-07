@@ -50,8 +50,13 @@ class UserPolicy < ApplicationPolicy
     user.system_admin? && record.system_admin?
   end
 
+  def record_in_users_programs?
+    (user.program_ids & record.program_ids).any?
+  end
+
   def destroy?
-    search_jurisdiction_users?
+    return true if user.system_admin?
+    user.admin_manager? && record_in_users_programs?
   end
 
   def restore?

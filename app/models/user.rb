@@ -184,6 +184,10 @@ class User < ApplicationRecord
     role.gsub("_", " ")
   end
 
+  def program_ids
+    programs.pluck(:id)
+  end
+
   def blueprint
     UserBlueprint
   end

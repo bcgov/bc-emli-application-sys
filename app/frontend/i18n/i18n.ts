@@ -2060,7 +2060,7 @@ const options = {
           acceptInstructions: 'Enter your login and other user info below to finalize your account creation.',
           rolesAndPermissions: 'User roles & permissions',
           inviteInstructions:
-            'Enter the email addresses of whom you wish to invite below.  For details about permissions for each role, please see',
+            'Enter the email addresses of whom you wish to invite below. For details about permissions for each role, please see <a>User Roles & Permissions</a>',
           notifications: {
             essential: 'Essential communications (cannot disable)',
             event: 'Event',

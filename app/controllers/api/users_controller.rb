@@ -128,11 +128,14 @@ class Api::UsersController < Api::ApplicationController
   def destroy
     authorize @user
     if @user.discard
-      render_success(
-        @user,
-        "user.destroy_success",
-        { blueprint_opts: { view: :base } }
-      )
+      message =
+        if @user.invitation_accepted_at.nil?
+          "user.invitation_removed_success" # Add this key to your locale file
+        else
+          "user.destroy_success"
+        end
+
+      render_success(@user, message, { blueprint_opts: { view: :base } })
     else
       render_error "user.destroy_error", {}
     end

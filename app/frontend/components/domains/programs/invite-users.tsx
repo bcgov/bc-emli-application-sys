@@ -1,7 +1,7 @@
 import { Box, Container, Flex, Heading, VStack, Text, Button } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { useProgram } from '../../../hooks/resources/use-program';
 import { ErrorScreen } from '../../shared/base/error-screen';
 import { LoadingScreen } from '../../shared/base/loading-screen';
@@ -10,6 +10,9 @@ import { PaperPlaneTilt } from '@phosphor-icons/react';
 import { TInviteUserParams } from '../../../types/types';
 import { ClassificationPresetName, classificationPresets } from '../../../models/program-classification';
 import { EPermitClassificationCode } from '../../../types/enums';
+import { RouterLink } from '../../shared/navigation/router-link';
+import { useNavigate } from 'react-router-dom';
+import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 
 const defaultRow: TInviteUserParams = {
   email: '',
@@ -68,11 +71,10 @@ export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
         <Flex justifyContent={'space-between'} w={'full'} alignItems={'flex-end'}>
           <Box>
             <Heading as="h1" color={'theme.blueAlt'}>
-              {`Invite users`}
+              {t('user.inviteTitle')}
             </Heading>
             <Text color={'text.secondary'}>
-              Enter the email addresses of whom you wish to invite below. For details about permissions for each role,
-              please see <u>User Roles & Permissions</u>
+              <Trans i18nKey={'user.inviteInstructions'} components={{ a: <RouterLink to={'#'} /> }} />
             </Text>
           </Box>
         </Flex>
@@ -94,17 +96,11 @@ export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
           alignSelf="flex-start"
           rightIcon={<PaperPlaneTilt size={16} />}
         >
-          Send Invites
+          {t('user.sendInvites')}
         </Button>
-        <Button
-          onClick={() => {
-            console.log('Cancel');
-          }}
-          variant={'secondary'}
-          alignSelf="flex-start"
-        >
-          Cancel
-        </Button>
+        <RouterLinkButton variant={'secondary'} to={`/programs/${currentProgram.id}/users`}>
+          {t('ui.cancel')}
+        </RouterLinkButton>
       </Flex>
     </Container>
   );
