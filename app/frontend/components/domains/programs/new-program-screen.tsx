@@ -121,7 +121,7 @@ export const NewProgramScreen = observer(() => {
                   {t('program.new.nextStep')}
                 </Text>
                 <HStack>
-                  <RouterLinkButton to={`/programs/${program?.slug}/users/invite`} variant="primary">
+                  <RouterLinkButton to={`/programs/${program?.id}/invite`} variant="primary">
                     {t('user.index.inviteButton')}
                   </RouterLinkButton>
                   <RouterLinkButton to={`/programs`} variant="secondary">
