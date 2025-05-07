@@ -50,33 +50,33 @@ jobs:
           type=ref,event=branch
           type=sha,format=long,prefix=,suffix=
 
-  build-push-app-artifacts:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 20
-    continue-on-error: true
-    steps:
-    - uses: hmarr/debug-action@f7318c783045ac39ed9bb497e22ce835fdafbfe6
-    - uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
+  # build-push-app-artifacts:
+  #   runs-on: ubuntu-22.04
+  #   timeout-minutes: 20
+  #   continue-on-error: true
+  #   steps:
+  #   - uses: hmarr/debug-action@f7318c783045ac39ed9bb497e22ce835fdafbfe6
+  #   - uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
 
-    - name: Setup Tools
-      uses: ./.github/actions/setup-tools
+  #   - name: Setup Tools
+  #     uses: ./.github/actions/setup-tools
 
-    - name: Set Deployment Timestamp
-      run: echo "DEPLOYMENT_TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+  #   - name: Set Deployment Timestamp
+  #     run: echo "DEPLOYMENT_TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
 
-    - name: Build and Push
-      uses: egose/actions/docker-build-push@46d589997e49cae4a8a3d06644ae8b04351a30f2
-      with:
-        registry-url: ${{ env.ARTIFACTORY_REGISTRY }}
-        registry-username: ${{ secrets.ARTIFACTORY_USERNAME }}
-        registry-password: ${{ secrets.ARTIFACTORY_PASSWORD }}
-        image-name: bbfc-dev/hesp-dev
-        docker-context: .
-        docker-file: devops/docker/app/Dockerfile
-        docker-args: |
-          DEPLOYMENT_TIMESTAMP=${{ env.DEPLOYMENT_TIMESTAMP }}
-        metadata-tags: |
-          type=sha,format=long,prefix=,suffix=
+  #   - name: Build and Push
+  #     uses: egose/actions/docker-build-push@46d589997e49cae4a8a3d06644ae8b04351a30f2
+  #     with:
+  #       registry-url: ${{ env.ARTIFACTORY_REGISTRY }}
+  #       registry-username: ${{ secrets.ARTIFACTORY_USERNAME }}
+  #       registry-password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+  #       image-name: bbfc-dev/hesp-dev
+  #       docker-context: .
+  #       docker-file: devops/docker/app/Dockerfile
+  #       docker-args: |
+  #         DEPLOYMENT_TIMESTAMP=${{ env.DEPLOYMENT_TIMESTAMP }}
+  #       metadata-tags: |
+  #         type=sha,format=long,prefix=,suffix=
 
   deploy:
     needs: [build-push-app-ghcr]
