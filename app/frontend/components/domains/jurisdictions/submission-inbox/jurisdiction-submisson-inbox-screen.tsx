@@ -171,7 +171,7 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
                     mt={4}
                     fetchOptions={fetchPrograms}
                     fieldName={'programId'}
-                    placeholderOptionLabel={t('ui.selectProgram')}
+                    placeholderOptionLabel={t('ui.chooseProgram')}
                     useBoxWrapper={false}
                     onValueChange={(value) => {
                       handleProgramChange(value);

@@ -375,6 +375,7 @@ const options = {
           selectPlaceholder: 'Select',
           selectApplicable: 'Select applicable:',
           selectProgram: 'Select',
+          chooseProgram: 'Select a program',
           clickHere: 'Click here',
           clickToEdit: 'Click to edit',
           clickToShow: 'Click to show',
