@@ -5,6 +5,7 @@ import { IRequirementBlock } from "../models/requirement-block"
 import { IRequirementTemplate } from "../models/requirement-template"
 import { IUser } from "../models/user"
 import { INotification, IOption, ITemplateVersionDiff } from "./types"
+import { IProgram } from '../models/program';
 
 export interface IApiResponse<TData, TMeta> {
   data: TData
@@ -24,6 +25,8 @@ export interface IRequirementBlockResponse extends IApiResponse<IRequirementBloc
 export interface IRequirementTemplateResponse extends IApiResponse<IRequirementTemplate[], IPageMeta> {}
 
 export interface IJurisdictionResponse extends IApiResponse<IJurisdiction[], IPageMeta> {}
+
+export interface IProgramResponse extends IApiResponse<IProgram[], IPageMeta> {}
 
 export interface IUsersResponse extends IApiResponse<IUser[], IPageMeta> {}
 

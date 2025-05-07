@@ -119,7 +119,7 @@ export enum EJurisdictionSortFields {
 }
 
 export enum EProgramSortFields {
-  reverseQualifiedName = 'reverse_qualified_name',
+  programName = 'program_name',
   adminManagersSize = 'admin_managers_size',
   adminSize = 'admins_size',
   permitApplicationsSize = 'permit_applications_size',
@@ -168,11 +168,11 @@ export enum EDeactivatedUserSortFields {
 }
 
 export enum ERequirementTemplateSortFields {
-  jurisdictionsSize = 'jurisdictions_size',
-  userGroupType = 'user_group_type_desc',
-  audienceType = 'audience_type_desc',
-  submissionType = 'submission_type_desc',
-  templateName = 'template_name',
+  programName = 'program',
+  userGroupType = 'user_group_type',
+  audienceType = 'audience_type',
+  submissionType = 'submission_type',
+  nickname = 'nickname',
   // activity = 'activity',
   // firstNations = 'first_nations',
   // description = 'description',
