@@ -58,7 +58,7 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
   };
   return (
     <Container maxW="container.lg" py={8} px={{ base: 8, xl: 8 }} flexGrow={1} as="main">
-      <Heading mb={0} fontSize="3xl">
+      <Heading mb={0} fontSize="3xl" color="theme.blueAlt">
         {t('siteConfiguration.sitewideMessage.title')}
       </Heading>
       <FormProvider {...formMethods}>
