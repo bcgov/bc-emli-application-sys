@@ -17,51 +17,47 @@ export const SuperAdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
           <Flex direction="column" align="center" w="full" gap={6}>
             <HomeScreenBox
               title={t('home.jurisdictionsTitle')}
-              description={t('home.jurisdictionsDescription')}
+              description=""
               icon={<Buildings size={24} />}
               href="/programs"
             />
             <HomeScreenBox
               title={t('home.permitTemplateCatalogueTitle')}
-              description={t('home.permitTemplateCatalogueDescription')}
+              description=""
               icon={<FileText size={24} />}
               href="/requirement-templates"
-              linkText={t('ui.create')}
             />
             <HomeScreenBox
               title={t('home.requirementsLibraryTitle')}
-              description={t('home.requirementsLibraryDescription')}
+              description=""
               icon={<BookOpen size={24} />}
               href="/requirements-library"
-              linkText={t('ui.create')}
             />
             <HomeScreenBox
               title={t('home.configurationManagement.title')}
-              description={t('home.configurationManagement.adminDescription')}
+              description=""
               icon={<Pencil size={24} />}
               href="/configuration-management"
             />
             <HomeScreenBox
               title={t('home.reportingTitle')}
-              description={t('home.reportingDescription')}
+              description=""
               icon={<Folder size={24} />}
               href="/reporting"
               pointerEvents="none"
               h="full"
-              bg="gray.white"
-              headingColor="greys.grey05"
-              linkText={t('ui.comingSoon')}
+              bg="greys.grey10"
+              headingColor="greys.homeScreenGrey"
             />
             <HomeScreenBox
               title={t('home.earlyAccess.title')}
-              description={t('home.earlyAccess.adminDescription')}
+              description=""
               icon={<Clock size={24} />}
               href="/early-access"
               pointerEvents="none"
               h="full"
-              bg="gray.white"
-              headingColor="greys.grey05"
-              linkText={t('ui.comingSoon')}
+              bg="greys.grey10"
+              headingColor="greys.homeScreenGrey"
             />
           </Flex>
         </Flex>

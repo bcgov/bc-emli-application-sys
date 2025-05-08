@@ -55,6 +55,7 @@ export const colors = {
     grey90: '#3B3A39',
     grey100: '#1A1A1A',
     anotherGrey: '#2D2D2D',
+    homeScreenGrey: '#474543',
   },
   border: {
     base: '#606060',
@@ -62,6 +63,7 @@ export const colors = {
     light: '#D9D9D9',
     input: '#CCCCCC',
     randomBorderColorforthePublishModal: '#353433',
+    homeScreenBorderColor: '#D8D8D8',
   },
   error: '#D9292F',
   success: '#2E8540',

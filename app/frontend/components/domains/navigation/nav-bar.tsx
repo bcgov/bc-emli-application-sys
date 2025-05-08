@@ -199,11 +199,6 @@ export const NavBar = observer(function NavBar() {
                 </VStack>
               )}
 
-              {currentUser?.isAdmin && (
-                <Text color="text.primary" textTransform="capitalize">
-                  {t('user.roles.admin')}
-                </Text>
-              )}
               {/* {(!loggedIn || currentUser?.isSubmitter) && (
                 <Show above="md">
                   <RouterLinkButton variant="tertiary" to="/jurisdictions">
@@ -212,6 +207,11 @@ export const NavBar = observer(function NavBar() {
                 </Show>
               )} */}
               {loggedIn && <NotificationsPopover aria-label="notifications popover" color="text.primary" />}
+              {currentUser?.isAdmin && (
+                <Text color="text.primary" textTransform="capitalize">
+                  {t('user.roles.admin')}
+                </Text>
+              )}
               {currentUser?.isSuperAdmin && <Text color="text.primary">{t('user.roles.system_admin')}</Text>}
               {currentUser?.isAdminManager && <Text color="text.primary">{t('user.roles.admin_manager')}</Text>}
               {!currentUser?.isSuperAdmin && !currentUser?.isAdminManager && !currentUser?.isAdmin && (
