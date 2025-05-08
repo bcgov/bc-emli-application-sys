@@ -68,8 +68,8 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
               return (
                 <Box key={program.id} className={'jurisdiction-index-grid-row'} role={'row'} display={'contents'}>
                   <SearchGridItem fontWeight={700}>{program.programName}</SearchGridItem>
-                  <SearchGridItem>{program.reviewManagersSize ?? 0}</SearchGridItem>
-                  <SearchGridItem>{program.reviewersSize ?? 0}</SearchGridItem>
+                  <SearchGridItem>{program.adminManagersSize ?? 0}</SearchGridItem>
+                  <SearchGridItem>{program.adminSize ?? 0}</SearchGridItem>
                   <SearchGridItem>{program.permitApplicationsSize ?? 0}</SearchGridItem>
                   <SearchGridItem>{program.templatesUsed ?? 0}</SearchGridItem>
                   <SearchGridItem>

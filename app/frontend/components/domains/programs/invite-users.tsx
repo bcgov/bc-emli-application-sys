@@ -9,10 +9,10 @@ import { InviteUserTable } from '../../shared/user/invite-user-table';
 import { PaperPlaneTilt } from '@phosphor-icons/react';
 import { TInviteUserParams } from '../../../types/types';
 import { ClassificationPresetName, classificationPresets } from '../../../models/program-classification';
-import { EPermitClassificationCode } from '../../../types/enums';
+import { EFlashMessageStatus, EPermitClassificationCode } from '../../../types/enums';
 import { RouterLink } from '../../shared/navigation/router-link';
-import { useNavigate } from 'react-router-dom';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
+import { useMst } from '../../../setup/root';
 
 const defaultRow: TInviteUserParams = {
   email: '',
@@ -35,6 +35,8 @@ const formatInboxAccessForApi = (
 export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
   const { t } = useTranslation();
   const { currentProgram, error } = useProgram();
+  const rootStore = useMst();
+  const { uiStore } = rootStore;
   const [rows, setRows] = useState<TInviteUserParams[]>([{ ...defaultRow }]);
 
   if (error) return <ErrorScreen error={error} />;
@@ -51,17 +53,16 @@ export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
       console.log(apiRows);
 
       const result = await currentProgram.inviteUsers(apiRows);
-      console.log('Invites sent:', result);
 
-      // TODO: toast or flash message
-      // uiStore.flashMessage.show(EFlashMessageStatus.success, "Invites sent!", "");
-
-      // TODO: reset rows or redirect back to program??
+      uiStore.flashMessage.show(
+        EFlashMessageStatus.success,
+        'Invite sent. Review the status of the invite in the user table.',
+        '',
+      );
     } catch (error) {
       console.error('Failed to send invites:', error);
 
-      // TODO: show error toast
-      // uiStore.flashMessage.show(EFlashMessageStatus.error, "Something went wrong.", "");
+      uiStore.flashMessage.show(EFlashMessageStatus.error, 'Failed to send invite', '');
     }
   };
 
