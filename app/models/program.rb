@@ -22,8 +22,6 @@ class Program < ApplicationRecord
   has_many :program_memberships, dependent: :destroy
   has_many :users, through: :program_memberships
 
-  # has_many :jurisdiction_memberships, dependent: :destroy
-  # has_many :users, through: :jurisdiction_memberships
   has_many :submitters, through: :permit_applications, source: :submitter
   has_many :jurisdiction_template_version_customizations
   has_many :template_versions,
@@ -71,17 +69,13 @@ class Program < ApplicationRecord
     jurisdiction_template_version_customizations
   end
 
-  # def regional_review_managers
-  #   users&.kept&.regional_review_manager
-  # end
+  def admin_manager
+    users&.kept&.admin_manager
+  end
 
-  # def review_managers
-  #   users&.kept&.admin_manager
-  # end
-
-  # def reviewers
-  #   users&.kept&.admin
-  # end
+  def admin
+    users&.kept&.admin
+  end
 
   # def assign_unique_prefix
   #   # Initial prefix from the first letter of the qualifier and the name
@@ -140,9 +134,11 @@ class Program < ApplicationRecord
 
   def search_data
     {
-      program_name: program_name.downcase ,
+      program_name: program_name.downcase,
       funded_by: funded_by,
-      description_html: description_html
+      description_html: description_html,
+      admin_managers_size: admin_managers_size,
+      admin_size: admin_size
     }
   end
 
@@ -167,13 +163,13 @@ class Program < ApplicationRecord
     "#{name}, #{qualifier}"
   end
 
-  # def review_managers_size
-  #   (review_managers&.size || 0) + (regional_review_managers&.size || 0)
-  # end
+  def admin_managers_size
+    admin_manager&.size || 0
+  end
 
-  # def reviewers_size
-  #   reviewers&.size || 0
-  # end
+  def admin_size
+    admin&.size || 0
+  end
 
   def permit_applications_size
     permit_applications&.size || 0
