@@ -1793,25 +1793,27 @@ const options = {
         },
         home: {
           auditLog: 'Audit Log',
-          jurisdictionsTitle: 'Programs',
+          jurisdictionsTitle: 'Manage programs',
           siteConfigurationTitle: 'Configuration management',
           jurisdictionsDescription:
             'Invite or remove Business Area Managers, Program Managers, PSRs in the Better Homes Energy Savings Program.',
-          permitTemplateCatalogueTitle: 'Applications templates catalogue',
+          permitTemplateCatalogueTitle: 'Manage applications templates catalog',
           permitTemplateCatalogueTitleShort: 'Applications catalogue',
-          contractorTitle: 'Contractor management',
+          contractorTitle: 'Manage contractor details',
           contractorDescription: 'View and edit contractor details. ',
+          contractorProgramResources: 'Contractor program resources',
           submissionInboxSetupTitle: 'Submission inbox set up',
           submissionInboxSetupDescription:
             'Set up your submission inbox and edit who receives submitted application forms.',
-          submissionInboxTitle: 'Submissions inbox',
+          submissionInboxTitle: 'View submissions inbox',
           submissionInboxDescription: 'Review all submitted applications.',
           adminSubmissionInboxDescription: 'View and process all submitted applications.',
-          applicationsDashboardTitle: 'Applications dashboard',
+          viewSupportedApplicationsTitle: 'View supported applications',
           applicationsDashboardDescription: 'Review applications you have submitted on behalf of an applicant.',
           adminApplicationsDashboardDescription: 'Access applications submitted on behalf of an applicants.',
-          startApplicationTitle: 'Start an application form',
+          startApplicationTitle: 'Start an application',
           startApplicationDescription: 'Submit an application on behalf of a participant. ',
+          viewBlankApplicationsTitle: 'View blank applications',
           configureUsersTitle: 'Configure users',
           configureUsersDescription: 'Invite or remove users.',
           apiSettingsTitle: 'API Settings',
@@ -1820,7 +1822,7 @@ const options = {
           reportingDescription:
             'Explore reports and analytics to gain insights and make informed decisions about your permit applications',
           permitTemplateCatalogueDescription: 'Create and manage application templates for each program.',
-          requirementsLibraryTitle: 'Requirements library',
+          requirementsLibraryTitle: 'Manage requirements library',
           requirementsLibraryDescription:
             'Create and manage requirement blocks that can be used inside of application templates.',
           earlyAccess: {
@@ -1839,7 +1841,7 @@ const options = {
             },
           },
           configurationManagement: {
-            title: 'Configuration management',
+            title: 'Manage configuration',
             reviewManagerDescription:
               "Configure your jurisdiction's operational setup within the Building Permit Hub. Set up your submission inbox, define energy step codes, and edit the 'About' page to reflect specific local information.",
             adminDescription:
@@ -2530,7 +2532,7 @@ const options = {
         site: {
           title: 'Better Homes Energy Savings Program application',
           titleLong: 'Better Homes Energy Savings Program',
-          adminNavBarTitle: 'Better Homes Energy Savings Program application',
+          adminNavBarTitle: 'Better Homes Energy Savings Program',
           adminPanel: 'Admin Panel',
           beta: 'Beta',
           linkHome: 'Navigate home',

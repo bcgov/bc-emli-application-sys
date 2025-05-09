@@ -9,6 +9,8 @@ import {
   Pencil,
   Tray,
   NotePencil,
+  MagnifyingGlass,
+  File,
 } from '@phosphor-icons/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,31 +29,49 @@ export const AdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
           <Flex direction="column" align="center" w="full" gap={6}>
             <HomeScreenBox
               title={t('home.submissionInboxTitle')}
-              description={t('home.adminSubmissionInboxDescription')}
+              description=""
               icon={<Tray size={24} />}
-              href="/submission-inbox"
-              linkText={t('ui.view')}
+              href="/programs/submission-inbox"
             />
             <HomeScreenBox
               title={t('home.startApplicationTitle')}
-              description={t('home.startApplicationDescription')}
+              description=""
               icon={<Pencil size={24} />}
-              href=""
-              linkText={t('ui.start')}
+              href="/applications/new"
             />
             <HomeScreenBox
-              title={t('home.applicationsDashboardTitle')}
-              description={t('home.adminApplicationsDashboardDescription')}
+              title={t('home.viewBlankApplicationsTitle')}
+              description=""
+              icon={<MagnifyingGlass size={24} />}
+              href="/view-blank-applications"
+            />
+            <HomeScreenBox
+              title={t('home.viewSupportedApplicationsTitle')}
+              description=""
               icon={<ClipboardText size={24} />}
-              href="/applications-dashboard"
-              linkText={t('ui.review')}
+              href="/view-supported-applications"
             />
             <HomeScreenBox
               title={t('home.contractorTitle')}
-              description={t('home.contractorDescription')}
+              description=""
               icon={<NotePencil size={24} />}
               href="/contractor-management"
-              linkText={t('ui.manage')}
+              pointerEvents="none"
+              h="full"
+              bg="greys.grey10"
+              headingColor="greys.homeScreenGrey"
+              linkText={t('ui.comingSoon')}
+            />
+            <HomeScreenBox
+              title={t('home.contractorProgramResources')}
+              description=""
+              icon={<File size={24} />}
+              href="/contractor-management"
+              pointerEvents="none"
+              h="full"
+              bg="greys.grey10"
+              headingColor="greys.homeScreenGrey"
+              linkText={t('ui.comingSoon')}
             />
           </Flex>
         </Flex>

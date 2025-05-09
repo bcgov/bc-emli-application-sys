@@ -12,6 +12,9 @@ import {
   SlidersHorizontal,
   Tray,
   Users,
+  MagnifyingGlass,
+  UserSquare,
+  File,
 } from '@phosphor-icons/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,68 +33,76 @@ export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
           <Flex direction="column" align="center" w="full" gap={6}>
             <HomeScreenBox
               title={t('home.submissionInboxTitle')}
-              description={t('home.adminSubmissionInboxDescription')}
+              description=""
               icon={<Tray size={24} />}
               href="/programs/submission-inbox"
-              linkText={t('ui.view')}
             />
 
+            <HomeScreenBox title={t('home.startApplicationTitle')} description="" icon={<Pencil size={24} />} href="" />
             <HomeScreenBox
-              title={t('home.startApplicationTitle')}
-              description={t('home.startApplicationDescription')}
-              icon={<Pencil size={24} />}
-              href=""
-              linkText={t('ui.start')}
+              title={t('home.viewBlankApplicationsTitle')}
+              description=""
+              icon={<MagnifyingGlass size={24} />}
+              href="/view-blank-applications"
             />
             <HomeScreenBox
-              title={t('home.applicationsDashboardTitle')}
-              description={t('home.applicationsDashboardDescription')}
+              title={t('home.viewSupportedApplicationsTitle')}
+              description=""
               icon={<ClipboardText size={24} />}
               href="/applications-dashboard"
-              linkText={t('ui.review')}
+            />
+            <HomeScreenBox
+              title={t('home.configureUsersTitle')}
+              description=""
+              icon={<Users size={24} />}
+              href="/configure-users"
             />
             <HomeScreenBox
               title={t('home.contractorTitle')}
-              description={t('home.contractorDescription')}
+              description=""
               icon={<NotePencil size={24} />}
               href="/contractor-management"
+              pointerEvents="none"
+              h="full"
+              bg="greys.grey10"
+              headingColor="greys.homeScreenGrey"
+              linkText={t('ui.comingSoon')}
             />
-
             <HomeScreenBox
-              title={t('home.submissionInboxSetupTitle')}
-              description={t('home.submissionInboxSetupDescription')}
-              icon={<Envelope size={24} />}
-              href="/submission-inbox-setup"
-            />
-
-            <HomeScreenBox
-              title={t('home.configureUsersTitle')}
-              description={t('home.configureUsersDescription')}
-              icon={<Users size={24} />}
-              href="/configure-users"
-              linkText={t('ui.configure')}
+              title={t('home.contractorProgramResources')}
+              description=""
+              //description={t('home.contractorDescription')}
+              icon={<File size={24} />}
+              href="/contractor-management"
+              pointerEvents="none"
+              h="full"
+              bg="greys.grey10"
+              headingColor="greys.homeScreenGrey"
+              linkText={t('ui.comingSoon')}
             />
 
             <HomeScreenBox
               title={t('home.reportingTitle')}
-              description={t('home.reportingDescription')}
+              description=""
+              //description={t('home.reportingDescription')}
               icon={<Folder size={24} />}
               href="/reporting"
               pointerEvents="none"
               h="full"
-              bg="gray.white"
-              headingColor="greys.grey05"
+              bg="greys.grey10"
+              headingColor="greys.homeScreenGrey"
               linkText={t('ui.comingSoon')}
             />
             <HomeScreenBox
               title={t('home.earlyAccess.title')}
-              description={t('home.earlyAccess.adminDescription')}
+              description=""
+              //description={t('home.earlyAccess.adminDescription')}
               icon={<Clock size={24} />}
               href="/early-access"
               pointerEvents="none"
               h="full"
-              bg="gray.white"
-              headingColor="greys.grey05"
+              bg="greys.grey10"
+              headingColor="greys.homeScreenGrey"
               linkText={t('ui.comingSoon')}
             />
           </Flex>

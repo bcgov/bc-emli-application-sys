@@ -1,11 +1,11 @@
-import { BoxProps, Flex, Heading, LinkBox, LinkOverlay, Text } from "@chakra-ui/react"
-import { CaretRight } from "@phosphor-icons/react"
-import { observer } from "mobx-react-lite"
-import React, { ReactNode } from "react"
-import { useTranslation } from "react-i18next"
-import { useMst } from "../../../setup/root"
-import { RouterLinkButton } from "../../shared/navigation/router-link-button"
-import SandboxHeader from "../../shared/sandbox/sandbox-header"
+import { BoxProps, Flex, Heading, LinkBox, LinkOverlay, Text } from '@chakra-ui/react';
+import { CaretRight } from '@phosphor-icons/react';
+import { observer } from 'mobx-react-lite';
+import React, { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useMst } from '../../../setup/root';
+import { RouterLinkButton } from '../../shared/navigation/router-link-button';
+import SandboxHeader from '../../shared/sandbox/sandbox-header';
 
 interface IHomeScreenBoxProps extends BoxProps {
   icon: ReactNode;
@@ -43,7 +43,7 @@ export const HomeScreenBox = observer(
         as="section"
         borderRadius="lg"
         borderWidth={1}
-        borderColor="border.light"
+        borderColor="border.homeScreenBorderColor"
         p={8}
         w="full"
         className="jumbo-buttons"
@@ -62,33 +62,35 @@ export const HomeScreenBox = observer(
 
         <Flex direction={{ base: 'column', md: 'row' }} gap={8} align="center">
           <Flex direction="column" gap={3} flex={1}>
-            <Flex align="center" color={headingColor || 'theme.blueAlt'}>
-              {icon}
-              <Heading as="h3" ml={2} mb={0} size="md">
-                {title}
-              </Heading>
+            <Flex align="center" justify="space-between" w="full" color={headingColor || 'theme.blueAlt'}>
+              <Flex align="center">
+                {icon}
+                <Heading as="h3" ml={2} mb={0} size="md">
+                  {title}
+                </Heading>
+              </Flex>
+              {!isDisabled && (
+                <LinkOverlay
+                  as={RouterLinkButton}
+                  to={href}
+                  variant="link"
+                  fontWeight="bold"
+                  fontSize="lg"
+                  textDecoration="none"
+                  color={headingColor || 'theme.blueAlt'}
+                >
+                  {linkText || ''}
+                </LinkOverlay>
+              )}
             </Flex>
             <Text ml={8} fontSize="sm" color="gray.600">
               {description}
             </Text>
           </Flex>
-          {isDisabled ? (
+          {isDisabled && (
             <Text fontWeight="bold" color="greys.grey01" maxW={100}>
               {t('sandbox.disabledFor')}
             </Text>
-          ) : (
-            <LinkOverlay
-              as={RouterLinkButton}
-              to={href}
-              variant="link"
-              rightIcon={<CaretRight size={16} />}
-              fontWeight="bold"
-              fontSize="lg"
-              textDecoration="none"
-              color={headingColor || 'theme.blueAlt'}
-            >
-              {linkText || t('ui.manage')}
-            </LinkOverlay>
           )}
         </Flex>
       </LinkBox>
