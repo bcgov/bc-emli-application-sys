@@ -1808,7 +1808,7 @@ const options = {
           submissionInboxTitle: 'View submissions inbox',
           submissionInboxDescription: 'Review all submitted applications.',
           adminSubmissionInboxDescription: 'View and process all submitted applications.',
-          applicationsDashboardTitle: 'View supported applications',
+          viewSupportedApplicationsTitle: 'View supported applications',
           applicationsDashboardDescription: 'Review applications you have submitted on behalf of an applicant.',
           adminApplicationsDashboardDescription: 'Access applications submitted on behalf of an applicants.',
           startApplicationTitle: 'Start an application',

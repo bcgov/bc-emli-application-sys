@@ -30,39 +30,30 @@ export const AdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
             <HomeScreenBox
               title={t('home.submissionInboxTitle')}
               description=""
-              // description={t('home.adminSubmissionInboxDescription')}
               icon={<Tray size={24} />}
               href="/programs/submission-inbox"
-              // linkText={t('ui.view')}
             />
             <HomeScreenBox
               title={t('home.startApplicationTitle')}
               description=""
-              //description={t('home.startApplicationDescription')}
               icon={<Pencil size={24} />}
-              href=""
-              //linkText={t('ui.start')}
+              href="/applications/new"
             />
             <HomeScreenBox
               title={t('home.viewBlankApplicationsTitle')}
               description=""
-              //description={t('home.startApplicationDescription')}
               icon={<MagnifyingGlass size={24} />}
-              href=""
-              //linkText={t('ui.start')}
+              href="/view-blank-applications"
             />
             <HomeScreenBox
-              title={t('home.applicationsDashboardTitle')}
+              title={t('home.viewSupportedApplicationsTitle')}
               description=""
-              // description={t('home.adminApplicationsDashboardDescription')}
               icon={<ClipboardText size={24} />}
-              href="/applications-dashboard"
-              // linkText={t('ui.review')}
+              href="/view-supported-applications"
             />
             <HomeScreenBox
               title={t('home.contractorTitle')}
               description=""
-              //description={t('home.contractorDescription')}
               icon={<NotePencil size={24} />}
               href="/contractor-management"
               pointerEvents="none"
@@ -74,7 +65,6 @@ export const AdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
             <HomeScreenBox
               title={t('home.contractorProgramResources')}
               description=""
-              //description={t('home.contractorDescription')}
               icon={<File size={24} />}
               href="/contractor-management"
               pointerEvents="none"

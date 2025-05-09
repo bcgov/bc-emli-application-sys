@@ -34,48 +34,32 @@ export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
             <HomeScreenBox
               title={t('home.submissionInboxTitle')}
               description=""
-              //description={t('home.adminSubmissionInboxDescription')}
               icon={<Tray size={24} />}
               href="/programs/submission-inbox"
-              //linkText={t('ui.view')}
             />
 
-            <HomeScreenBox
-              title={t('home.startApplicationTitle')}
-              description=""
-              //description={t('home.startApplicationDescription')}
-              icon={<Pencil size={24} />}
-              href=""
-              //inkText={t('ui.start')}
-            />
+            <HomeScreenBox title={t('home.startApplicationTitle')} description="" icon={<Pencil size={24} />} href="" />
             <HomeScreenBox
               title={t('home.viewBlankApplicationsTitle')}
               description=""
-              //description={t('home.startApplicationDescription')}
               icon={<MagnifyingGlass size={24} />}
-              href=""
-              //linkText={t('ui.start')}
+              href="/view-blank-applications"
             />
             <HomeScreenBox
-              title={t('home.applicationsDashboardTitle')}
+              title={t('home.viewSupportedApplicationsTitle')}
               description=""
-              //description={t('home.applicationsDashboardDescription')}
               icon={<ClipboardText size={24} />}
               href="/applications-dashboard"
-              //linkText={t('ui.review')}
             />
             <HomeScreenBox
               title={t('home.configureUsersTitle')}
               description=""
-              //description={t('home.applicationsDashboardDescription')}
               icon={<Users size={24} />}
-              href="/applications-dashboard"
-              //linkText={t('ui.review')}
+              href="/configure-users"
             />
             <HomeScreenBox
               title={t('home.contractorTitle')}
               description=""
-              //description={t('home.contractorDescription')}
               icon={<NotePencil size={24} />}
               href="/contractor-management"
               pointerEvents="none"

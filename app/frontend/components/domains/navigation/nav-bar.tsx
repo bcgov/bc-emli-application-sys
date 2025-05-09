@@ -175,11 +175,11 @@ export const NavBar = observer(function NavBar() {
               <Spacer />
             </Show>
             <HStack gap={3} w="full" justify="flex-end">
-              {!loggedIn && (
+              {/*!loggedIn && (
                 <Hide above="md">
                   <HelpDrawer />
                 </Hide>
-              )}
+              )*/}
 
               {currentUser?.isReviewStaff && !currentUser.isRegionalReviewManager && (
                 <Flex direction="column">
@@ -215,18 +215,14 @@ export const NavBar = observer(function NavBar() {
               {currentUser?.isSuperAdmin && <Text color="text.primary">{t('user.roles.system_admin')}</Text>}
               {currentUser?.isAdminManager && <Text color="text.primary">{t('user.roles.admin_manager')}</Text>}
               {!currentUser?.isSuperAdmin && !currentUser?.isAdminManager && !currentUser?.isAdmin && (
-                <Show above="lg">
-                  <RouterLinkButton variant="tertiary" color="text.primary" to={'/get-support'}>
-                    {t('site.support.getSupport')}
-                  </RouterLinkButton>
-                </Show>
+                <RouterLinkButton variant="tertiary" color="text.primary" to={'/get-support'}>
+                  {t('site.support.getSupport')}
+                </RouterLinkButton>
               )}
               {!loggedIn && (
-                <Show above="lg">
-                  <RouterLinkButton variant="tertiary" color="text.primary" to="/login">
-                    {t('auth.login')}
-                  </RouterLinkButton>
-                </Show>
+                <RouterLinkButton variant="tertiary" color="text.primary" to="/login">
+                  {t('auth.login')}
+                </RouterLinkButton>
               )}
               {loggedIn && <NavBarMenu />}
 
@@ -313,7 +309,6 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
       <NavMenuItem label={t('home.permitTemplateCatalogueTitle')} to={'/requirement-templates'} />
       <NavMenuItem label={t('home.requirementsLibraryTitle')} to={'/requirements-library'} />
       <NavMenuItem label={t('home.configurationManagement.title')} to={'/configuration-management'} />
-      <MenuDivider my={0} borderColor="border.light" />
     </MenuGroup>
   );
 
@@ -325,18 +320,11 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
 
   const reviewManagerOnlyItems = (
     <MenuGroup>
-      <NavMenuItem label={t('site.breadcrumb.submissionInbox')} to={'/submission-inbox'} />
-      <NavMenuItem label={t('home.applicationsDashboardTitle')} to={'/application-dashboard'} />
-      <NavMenuItem label={t('home.contractorTitle')} to={'/contractor-management'} />
-      <NavMenuItem label={t('home.submissionInboxSetupTitle')} to={'/submission-inbox-setup'} />
+      <NavMenuItem label={t('home.submissionInboxTitle')} to={'/programs/submission-inbox'} />
+      <NavMenuItem label={t('site.newApplication')} to={`/applications/new`} />
+      <NavMenuItem label={t('home.viewBlankApplicationsTitle')} to={`/view-blank-applications`} />
+      <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/view-supported-applications'} />
       <NavMenuItem label={t('home.configureUsersTitle')} to={'/configure-users'} />
-      <MenuDivider my={0} borderColor="border.light" />
-      <MenuItem bg="greys.grey03" onClick={(e) => navigate('/application-dashboard')}>
-        <Button as={Box} variant="primary">
-          {t('site.newApplication')}
-        </Button>
-      </MenuItem>
-      <MenuDivider my={0} borderColor="border.light" />
     </MenuGroup>
   );
 
@@ -344,16 +332,10 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
 
   const reviwerOnlyItems = (
     <MenuGroup>
-      <NavMenuItem label={t('site.breadcrumb.submissionInbox')} to={`/submission-inbox`} />
-      <NavMenuItem label={t('home.applicationsDashboardTitle')} to={`/applications-dashboard`} />
-      <NavMenuItem label={t('home.contractorTitle')} to={`/contractor-management`} />
-      <MenuItem bg="greys.grey03" onClick={(e) => navigate('/applications/new')}>
-        <Button as={Box} variant="primary">
-          {t('site.newApplication')}
-        </Button>
-      </MenuItem>
-
-      <MenuDivider my={0} borderColor="border.light" />
+      <NavMenuItem label={t('home.submissionInboxTitle')} to={`/programs/submission-inbox`} />
+      <NavMenuItem label={t('site.newApplication')} to={`/applications/new`} />
+      <NavMenuItem label={t('home.viewBlankApplicationsTitle')} to={`/view-blank-applications`} />
+      <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/view-supported-applications'} />
     </MenuGroup>
   );
 
@@ -420,7 +402,6 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
                       </MenuItem>
 
                       <NavMenuItem label={t('site.myApplications')} to="/applications" bg="greys.grey03" />
-                      <MenuDivider my={0} borderColor="border.light" />
                     </>
                   )}
                   <MenuDivider my={0} borderColor="border.light" />

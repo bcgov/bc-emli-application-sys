@@ -397,18 +397,10 @@ const AppRoutes = observer(() => {
     </>
   );
 
-  const managerOrReviewerRoutes = (
+  const adminManagerOrAdmin = (
     <>
       <Route path="/programs/submission-inbox" element={<JurisdictionSubmissionInboxScreen />} />
-      <Route
-        path="/jurisdictions/:jurisdictionId/configuration-management/submissions-inbox-setup"
-        element={<SubmissionsInboxSetupScreen />}
-      />
-      <Route
-        path="/jurisdictions/:jurisdictionId/configuration-management/energy-step"
-        element={<EnergyStepRequirementsScreen />}
-      />
-      <Route path="/permit-applications/:permitApplicationId" element={<ReviewPermitApplicationScreen />} />
+      // view blank applications and view supported applications to go here
       {import.meta.env.DEV && (
         <>
           <Route
@@ -521,12 +513,12 @@ const AppRoutes = observer(() => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={loggedIn && !mustAcceptEula && currentUser.isAdminManager}
+              isAllowed={loggedIn && !mustAcceptEula && (currentUser.isAdminManager || currentUser.isAdmin)}
               redirectPath={(mustAcceptEula && '/') || (loggedIn && '/not-found')}
             />
           }
         >
-          {managerOrReviewerRoutes}
+          {adminManagerOrAdmin}
         </Route>
 
         <Route
