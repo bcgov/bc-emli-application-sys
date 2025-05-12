@@ -38,7 +38,12 @@ export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               href="/programs/submission-inbox"
             />
 
-            <HomeScreenBox title={t('home.startApplicationTitle')} description="" icon={<Pencil size={24} />} href="" />
+            <HomeScreenBox
+              title={t('home.startApplicationTitle')}
+              description=""
+              icon={<Pencil size={24} />}
+              href="/applications/new"
+            />
             <HomeScreenBox
               title={t('home.viewBlankApplicationsTitle')}
               description=""

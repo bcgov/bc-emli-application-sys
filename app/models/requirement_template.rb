@@ -7,8 +7,22 @@ class RequirementTemplate < ApplicationRecord
     scheduled_template_versions
   ]
 
-  searchkick searchable: %i[permit_type program nickname user_group_type audience_type submission_type],
-             word_start: %i[permit_type program nickname user_group_type audience_type submission_type]
+  searchkick searchable: %i[
+               permit_type
+               program
+               nickname
+               user_group_type
+               audience_type
+               submission_type
+             ],
+             word_start: %i[
+               permit_type
+               program
+               nickname
+               user_group_type
+               audience_type
+               submission_type
+             ]
 
   #  text_middle: %i[description current_version permit_type program nickname]
 
@@ -220,8 +234,8 @@ class RequirementTemplate < ApplicationRecord
   def search_data
     {
       program_id: program_id,
-      nickname: nickname.downcase,
-      program:  program&.program_name.to_s.downcase,     
+      nickname: nickname&.downcase,
+      program: program&.program_name.to_s.downcase,
       description: description,
       first_nations: first_nations,
       current_version: published_template_version&.version_date,
