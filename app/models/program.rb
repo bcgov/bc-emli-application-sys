@@ -34,6 +34,8 @@ class Program < ApplicationRecord
   has_many :collaborators, as: :collaboratorable, dependent: :destroy
   has_many :sandboxes, dependent: :destroy
 
+  validates :program_name, presence: true
+
   # validates :name, uniqueness: { scope: :locality_type, case_sensitive: false }
   # validates :locality_type, presence: true
 
@@ -138,7 +140,8 @@ class Program < ApplicationRecord
       funded_by: funded_by,
       description_html: description_html,
       admin_managers_size: admin_managers_size,
-      admin_size: admin_size
+      admin_size: admin_size,
+      created_at: created_at
     }
   end
 
@@ -279,18 +282,20 @@ class Program < ApplicationRecord
   # end
 
   def normalize_name
+    return if program_name.blank?
+  
     # Replace underscores with spaces
     normalized = program_name.gsub("_", " ")
-
+  
     # Remove commas and periods
-    normalized.gsub(/[,.]/, "")
-
+    normalized = normalized.gsub(/[,.]/, "")
+  
     # Remove leading and trailing whitespaces
-    normalized.strip!
-
+    normalized = normalized.strip
+  
     self.program_name = normalized
   end
-
+  
   # def normalize_locality_type
   #   # Convert to lowercase
   #   normalized = locality_type.downcase

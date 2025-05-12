@@ -15,6 +15,10 @@ class ProgramPolicy < ApplicationPolicy
     index?
   end
 
+  def program_options?
+    index?
+  end
+
   def create?
     user.system_admin?
   end
