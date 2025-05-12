@@ -458,6 +458,11 @@ export interface IJurisdictionFilters {
   type?: EJurisdictionTypes;
   userId?: string;
 }
+export interface IProgramFilters {
+  name?: string;
+  type?: EJurisdictionTypes;
+  userId?: string;
+}
 
 export interface IJurisdictionSearchFilters {
   submissionInboxSetUp?: boolean;

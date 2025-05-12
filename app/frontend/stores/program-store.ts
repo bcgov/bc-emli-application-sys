@@ -16,7 +16,8 @@ export const ProgramStoreModel = types
     types.model('ProgramStore').props({
       programMap: types.map(ProgramModel),
       tablePrograms: types.array(types.safeReference(ProgramModel)),
-      currentProgram: types.maybeNull(types.maybe(types.reference(ProgramModel))),
+      currentProgram: types.maybeNull(types.safeReference(ProgramModel)),
+
       submissionInboxSetUpFilter: types.maybeNull(types.string),
     }),
     createSearchModel<EProgramSortFields>('searchPrograms', 'setProgramFilters'),

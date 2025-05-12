@@ -148,6 +148,7 @@ Rails.application.routes.draw do
       post "permit_applications/search",
            on: :member,
            to: "programs#search_permit_applications"
+      get "program_options", on: :collection
 
       resources :invitations, only: %i[create show], controller: "invitations"
 

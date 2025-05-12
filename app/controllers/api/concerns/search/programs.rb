@@ -55,7 +55,7 @@ module Api::Concerns::Search::Programs
       # Only use unmapped_type if the field is truly numeric
       { field => { order: direction || :asc, unmapped_type: "long" } }
     else
-      { program_name: { order: :asc } }
+      { created_at: { order: :desc } }
     end
   end
 

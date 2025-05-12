@@ -36,17 +36,21 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
   const methods = useForm({
     defaultValues: {
       selectedType: null,
+      programId: null,
     },
   });
-  const [options, setOptions] = useState<IOption<FetchOptionI>[]>([]);
-  const { permitApplicationStore, permitClassificationStore, programStore } = useMst();
+  const { programStore, permitApplicationStore, permitClassificationStore } = useMst();
+  const { fetchProgramOptions } = programStore;
+  const { setValue } = methods;
+
   const { setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, search } = permitApplicationStore;
+
+  const [programOptions, setProgramOptions] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const { isLoaded: isPermitClassificationsLoaded } = usePermitClassificationsLoad();
   const { currentPage, totalPages, totalCount, countPerPage, handleCountPerPageChange, handlePageChange, isSearching } =
     permitApplicationStore;
-  const { tablePrograms } = programStore;
-  useSearch(programStore);
 
   const { currentProgram, error } = useProgram();
 
@@ -102,56 +106,53 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
     search();
   };
 
+  // Fetch submission options and program options separately
+  const fetchSubmissionOptions = useCallback(async () => {
+    try {
+      const result = await fetchOptionsTypes();
+      setUserGroupFilter(result[0].value.userGroupType);
+      setAudienceTypeFilter(result[0].value.AudienceType);
+      setSubmissionTypeFilter(result[0].value.SubmissionType);
+    } catch (error) {
+      console.error('Failed to fetch submission options', error);
+    }
+  }, [permitClassificationStore, t]);
+
+  const loadProgramOptions = useCallback(async () => {
+    try {
+      const response = await fetchProgramOptions({});
+      const options = response.map((option) => ({
+        label: option.label,
+        value: option.value.id,
+      }));
+      setProgramOptions(options);
+      programStore.mergeUpdateAll(
+        response.map((p) => p.value),
+        'programMap',
+      );
+      await fetchSubmissionOptions();
+      if (options.length > 0) {
+        const firstOption = options[0];
+        methods.setValue('programId', firstOption.value);
+        handleProgramChange(firstOption.value);
+      }
+    } catch (error) {
+      console.error('Failed to fetch program options', error);
+    }
+  }, [fetchProgramOptions, programStore, methods, fetchSubmissionOptions, t]);
+
   const handleProgramChange = (programId) => {
     console.log('programId', programId);
     programStore.setCurrentProgram(programId);
     search();
   };
-  // Retained for future use: Contractor submission inbox. Refer to commit history prior to May 7th for changes
-
-  // useEffect(() => {
-  //   if (methods.getValues('selectedType')) {
-  //     handleChange(methods.getValues('selectedType'));
-  //   }
-  // }, [methods.watch('selectedType')]);
-
-  // useEffect(() => {
-  //   if (options.length > 0) {
-  //     methods.setValue('selectedType', options[0].value);
-  //   }
-  // }, [options, methods]);
 
   useEffect(() => {
-    // let isMounted = true;
-    const loadData = async () => {
-      if (!permitClassificationStore.isLoaded) {
-        const success = await permitClassificationStore.fetchPermitClassifications();
-        if (!success) return;
-      }
-      const result = await fetchOptionsTypes();
-      setUserGroupFilter(result[0].value.userGroupType);
-      setAudienceTypeFilter(result[0].value.AudienceType);
-      setSubmissionTypeFilter(result[0].value.SubmissionType);
-      // if (isMounted) {
-      //   setOptions(result);
-      // }
-    };
-    loadData();
-    // return () => {
-    //   isMounted = false;
-    // };
-  }, [permitClassificationStore]);
+    loadProgramOptions();
+  }, [loadProgramOptions]);
 
-  const fetchPrograms = async (): Promise<IOption<string>[]> => {
-    return tablePrograms.map((program) => {
-      return {
-        value: program.id,
-        label: program.programName || 'No Program Name',
-      };
-    });
-  };
-  if (error) return <ErrorScreen error={error} />;
-  if (!isPermitClassificationsLoaded) return <LoadingScreen />;
+  if (errorMessage) return <ErrorScreen error={errorMessage} />;
+  if (!permitClassificationStore.isLoaded) return <LoadingScreen />;
 
   return (
     <Container maxW="container.xl" as={'main'}>
@@ -166,18 +167,25 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
             </Text>
             <FormProvider {...methods}>
               <form>
-                {tablePrograms.length > 0 && (
-                  <AsyncDropdown
-                    mt={4}
-                    fetchOptions={fetchPrograms}
-                    fieldName={'programId'}
-                    placeholderOptionLabel={t('ui.chooseProgram')}
-                    useBoxWrapper={false}
-                    onValueChange={(value) => {
-                      handleProgramChange(value);
-                    }}
-                  />
-                )}
+                <Controller
+                  name="programId"
+                  control={methods.control}
+                  defaultValue={methods.getValues('programId')}
+                  render={({ field }) => (
+                    <AsyncDropdown
+                      mt={4}
+                      fetchOptions={() => Promise.resolve(programOptions)}
+                      fieldName="programId"
+                      placeholderOptionLabel={t('ui.chooseProgram')}
+                      useBoxWrapper={false}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        handleProgramChange(value);
+                      }}
+                    />
+                  )}
+                />
+                {/* Retained for future use: Contractor submission inbox. Refer to commit history prior to May 7th for changes */}
                 {/* <Controller
                   name="selectedType"
                   control={methods.control}
@@ -217,72 +225,9 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
               <Text>{t('errors.noResults')}</Text>
             </Flex>
           ) : (
-            currentProgram?.tablePermitApplications.map((pa: IEnergySavingsApplication) => {
-              if (!pa.submitter) return <></>;
-
-              return (
-                <Box
-                  key={pa.id}
-                  className={'jurisdiction-permit-application-index-grid-row'}
-                  role={'row'}
-                  display={'contents'}
-                >
-                  <SearchGridItem>
-                    <EnergySavingsApplicationStatusTag energySavingsApplication={pa} />
-                  </SearchGridItem>
-                  <SearchGridItem>{pa.number}</SearchGridItem>
-                  <SearchGridItem wordBreak={'break-word'}>{pa.submissionType.name}</SearchGridItem>
-                  <SearchGridItem>
-                    <Flex>
-                      <Text fontWeight={700} flex={1}>
-                        {pa.submitter.name}
-                      </Text>
-                    </Flex>
-                  </SearchGridItem>
-                  <SearchGridItem>
-                    <Flex direction="column">
-                      <Text>{format(pa.createdAt, 'yyyy-MM-dd')}</Text>
-                      <Text>{format(pa.createdAt, 'HH:mm')}</Text>
-                    </Flex>
-                  </SearchGridItem>
-                  <SearchGridItem>
-                    <Flex>
-                      <Text fontWeight={700} flex={1}>
-                        {pa.submitter.name}
-                      </Text>
-                      <Box flex={1}>
-                        <DesignatedCollaboratorAssignmentPopover
-                          permitApplication={pa}
-                          collaborationType={ECollaborationType.review}
-                          avatarTrigger
-                        />
-                      </Box>
-                    </Flex>
-                  </SearchGridItem>
-                  <SearchGridItem gap={2}>
-                    <Stack>
-                      <HStack>
-                        <SubmissionDownloadModal
-                          permitApplication={pa}
-                          renderTrigger={(onOpen) => (
-                            <IconButton
-                              variant="secondary"
-                              icon={<Download />}
-                              aria-label={'download'}
-                              onClick={onOpen}
-                            />
-                          )}
-                          review
-                        />
-                        <RouterLinkButton variant="primary" to={`/permit-applications/${pa.id}`}>
-                          {t('ui.view')}
-                        </RouterLinkButton>
-                      </HStack>
-                    </Stack>
-                  </SearchGridItem>
-                </Box>
-              );
-            })
+            currentProgram?.tablePermitApplications.map((pa: IEnergySavingsApplication) => (
+              <ApplicationItem key={pa.id} permitApplication={pa} />
+            ))
           )}
         </SearchGrid>
 
@@ -305,3 +250,64 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
     </Container>
   );
 });
+// New Component for Rendering Each Application Item
+const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavingsApplication }) => {
+  const { t } = useTranslation();
+  return (
+    <Box
+      key={permitApplication.id}
+      className="jurisdiction-permit-application-index-grid-row"
+      role="row"
+      display="contents"
+    >
+      <SearchGridItem>
+        <EnergySavingsApplicationStatusTag energySavingsApplication={permitApplication} />
+      </SearchGridItem>
+      <SearchGridItem>{permitApplication.number}</SearchGridItem>
+      <SearchGridItem wordBreak="break-word">{permitApplication?.submissionType?.name}</SearchGridItem>
+      <SearchGridItem>
+        <Flex>
+          <Text fontWeight={700} flex={1}>
+            {permitApplication.submitter.name}
+          </Text>
+        </Flex>
+      </SearchGridItem>
+      <SearchGridItem>
+        <Flex direction="column">
+          <Text>{format(permitApplication.createdAt, 'yyyy-MM-dd')}</Text>
+          <Text>{format(permitApplication.createdAt, 'HH:mm')}</Text>
+        </Flex>
+      </SearchGridItem>
+      <SearchGridItem>
+        <Flex>
+          <Text fontWeight={700} flex={1}>
+            {permitApplication.submitter.name}
+          </Text>
+          <Box flex={1}>
+            <DesignatedCollaboratorAssignmentPopover
+              permitApplication={permitApplication}
+              collaborationType={ECollaborationType.review}
+              avatarTrigger
+            />
+          </Box>
+        </Flex>
+      </SearchGridItem>
+      <SearchGridItem gap={2}>
+        <Stack>
+          <HStack>
+            <SubmissionDownloadModal
+              permitApplication={permitApplication}
+              renderTrigger={(onOpen) => (
+                <IconButton variant="secondary" icon={<Download />} aria-label="download" onClick={onOpen} />
+              )}
+              review
+            />
+            <RouterLinkButton variant="primary" to={`/permit-applications/${permitApplication.id}`}>
+              {t('ui.view')}
+            </RouterLinkButton>
+          </HStack>
+        </Stack>
+      </SearchGridItem>
+    </Box>
+  );
+};

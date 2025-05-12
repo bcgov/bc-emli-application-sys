@@ -14,7 +14,7 @@ class Api::ProgramsController < Api::ApplicationController
   skip_after_action :verify_policy_scoped,
                     only: %i[index search_users search_permit_applications]
   skip_before_action :authenticate_user!,
-                     only: %i[create show index jurisdiction_options]
+                     only: %i[create show index program_options]
 
   # skip_before_action :verify_authenticity_token, only: [:create]
   # skip_after_action :verify_authorized, only: :create
@@ -187,24 +187,20 @@ class Api::ProgramsController < Api::ApplicationController
                    }
   end
 
-  def jurisdiction_options
-    authorize :jurisdiction, :jurisdiction_options?
-
-    # TODO: refactor jurisdictions search to accomodate filters,
-    # then use that here instead of having the search logic in the controller
-    name = program_params["name"]
-    type = program_params["type"]
-    user_id = program_params["user_id"]
-
+  def program_options
+    authorize :program, :program_options?
+  
+    program_name = params[:program_name]
+    funded_by = params[:funded_by]
+    description_html = params[:description_html]
+  
     filters = {}
-    filters = { type: type } if type.present?
-    filters = filters.merge({ user_ids: [user_id] }) if user_id.present?
-    filters = { where: filters, match: :word_start }
-
-    search = Jurisdiction.search(name || "*", **filters)
-    options = search.results.map { |j| { label: j.qualified_name, value: j } }
-    render_success options, nil, { blueprint: JurisdictionOptionBlueprint }
+    search = Program.search(program_name || "*", **filters)
+    options = search.results.map { |j| { label: j.program_name, value: j } }
+  
+    render_success options, nil, { blueprint: ProgramOptionBlueprint }
   end
+  
 
   private
 
