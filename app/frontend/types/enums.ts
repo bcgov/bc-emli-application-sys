@@ -124,7 +124,7 @@ export enum EProgramSortFields {
   adminSize = 'admins_size',
   permitApplicationsSize = 'permit_applications_size',
   regionalDistrict = 'regional_district_name',
-  templatesUsed = 'templates_used',
+  //templatesUsed = 'templates_used',
 }
 
 export enum EProgramUserGroupType {

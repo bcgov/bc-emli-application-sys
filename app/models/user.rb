@@ -1,7 +1,19 @@
 class User < ApplicationRecord
   PASSWORD_REGEX = /\A(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_]).{8,64}\z/
-  searchkick searchable: %i[first_name last_name email],
-             word_start: %i[first_name last_name email]
+  searchkick text_middle: %i[
+               role_text
+               classification_labels_text
+               first_name
+               last_name
+               email
+             ],
+             searchable: %i[
+               first_name
+               last_name
+               email
+               role_text
+               classification_labels_text
+             ]
 
   include Devise::JWT::RevocationStrategies::Allowlist
   include Discard::Model
@@ -139,7 +151,7 @@ class User < ApplicationRecord
     {
       updated_at: updated_at,
       created_at: created_at,
-      role: role,
+      role_text: role.to_s,
       name: name,
       first_name: first_name,
       last_name: last_name,
@@ -149,8 +161,23 @@ class User < ApplicationRecord
       reviewed: reviewed,
       discarded_at: discarded_at,
       invitation_sent_at: invitation_sent_at,
-      invitation_accepted_at: invitation_accepted_at
+      invitation_accepted_at: invitation_accepted_at,
+      classification_labels_text: program_classifications_for_search
     }
+  end
+
+  def program_classifications_for_search
+    program_memberships
+      .includes(
+        program_classification_memberships: %i[user_group_type submission_type]
+      )
+      .flat_map do |membership|
+        membership.program_classification_memberships.flat_map do |pcm|
+          [pcm.user_group_type&.name, pcm.submission_type&.name]
+        end
+      end
+      .compact
+      .uniq
   end
 
   def invitable_roles

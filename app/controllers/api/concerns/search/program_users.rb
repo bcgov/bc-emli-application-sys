@@ -42,11 +42,18 @@ module Api::Concerns::Search::ProgramUsers
     @user_search =
       User.search(
         query,
-        fields: %i[name email],
+        fields: %i[
+          first_name
+          last_name
+          email
+          role_text
+          classification_labels_text
+        ],
+        match: :text_middle,
         where: {
           id: user_ids
         },
-        includes: %i[mailing_address physical_address preference],
+        includes: %i[physical_address mailing_address preference],
         page: params[:page] || 1,
         per_page: params[:per_page] || 25
       )
