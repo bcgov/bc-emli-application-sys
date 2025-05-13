@@ -16,6 +16,7 @@ import { ProgramsIndexScreen } from '../programs';
 import { ProgramInviteUserScreen } from '../programs/invite-users';
 import RejectApplicationScreen from '../permit-application/application-rejection-reason';
 
+
 const ExternalApiKeysIndexScreen = lazy(() =>
   import('../external-api-key').then((module) => ({ default: module.ExternalApiKeysIndexScreen })),
 );
@@ -85,9 +86,9 @@ const LimitedJurisdictionIndexScreen = lazy(() =>
 const NewJurisdictionScreen = lazy(() =>
   import('../jurisdictions/new-jurisdiction-screen').then((module) => ({ default: module.NewJurisdictionScreen })),
 );
-const JurisdictionSubmissionInboxScreen = lazy(() =>
-  import('../jurisdictions/submission-inbox/jurisdiction-submisson-inbox-screen').then((module) => ({
-    default: module.JurisdictionSubmissionInboxScreen,
+const ProgramSubmissionInboxScreen = lazy(() =>
+  import('../programs/submission-inbox/program-submisson-inbox-screen').then((module) => ({
+    default: module.ProgramSubmissionInboxScreen,
   })),
 );
 const JurisdictionUserIndexScreen = lazy(() =>
@@ -399,7 +400,7 @@ const AppRoutes = observer(() => {
 
   const adminManagerOrAdmin = (
     <>
-      <Route path="/programs/submission-inbox" element={<JurisdictionSubmissionInboxScreen />} />
+      <Route path="/programs/submission-inbox" element={<ProgramSubmissionInboxScreen />} />
       // view blank applications and view supported applications to go here
       {import.meta.env.DEV && (
         <>
@@ -407,6 +408,8 @@ const AppRoutes = observer(() => {
             path="/permit-applications/:permitApplicationId/pdf-content"
             element={<PermitApplicationPDFViewer mode={'pdf'} />}
           />
+
+          <Route path="/permit-applications/:permitApplicationId" element={<ReviewPermitApplicationScreen />} />
           <Route
             path="/permit-applications/:permitApplicationId/pdf-html"
             element={<PermitApplicationPDFViewer mode={'html'} />}
