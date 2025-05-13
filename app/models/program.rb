@@ -10,7 +10,7 @@ class Program < ApplicationRecord
   # ]
   BASE_INCLUDES = %i[]
   include ActionView::Helpers::SanitizeHelper
-  searchkick searchable: %i[id program_name funded_by],
+  searchkick searchable: %i[id program_name funded_by created_at],
              word_start: %i[program_name funded_by],
              text_start: %i[program_name funded_by]
 
@@ -283,19 +283,19 @@ class Program < ApplicationRecord
 
   def normalize_name
     return if program_name.blank?
-  
+
     # Replace underscores with spaces
     normalized = program_name.gsub("_", " ")
-  
+
     # Remove commas and periods
     normalized = normalized.gsub(/[,.]/, "")
-  
+
     # Remove leading and trailing whitespaces
     normalized = normalized.strip
-  
+
     self.program_name = normalized
   end
-  
+
   # def normalize_locality_type
   #   # Convert to lowercase
   #   normalized = locality_type.downcase
