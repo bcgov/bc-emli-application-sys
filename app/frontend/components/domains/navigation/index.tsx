@@ -269,7 +269,7 @@ const EarlyAccessRequirementsLibraryScreen = lazy(() =>
 );
 
 const AcceptInvitationScreen = lazy(() =>
-  import('../users/accept-invitation-screen').then((module) => ({ default: module.AcceptInvitationScreen })),
+  import('../programs/accept-invitation-screen').then((module) => ({ default: module.AcceptInvitationScreen })),
 );
 const InviteScreen = lazy(() => import('../users/invite-screen').then((module) => ({ default: module.InviteScreen })));
 const ProfileScreen = lazy(() =>
@@ -542,7 +542,8 @@ const AppRoutes = observer(() => {
         </Route>
         {/* Public Routes */}
         <Route path="/rejection-reason/:id" element={<RejectApplicationScreen />} />
-        <Route path="/accept-invitation" element={<AcceptInvitationScreen />} />
+        <Route path="/programs/:programId/accept-invitation" element={<AcceptInvitationScreen />} />
+        {/* <Route path="/accept-invitation" element={<AcceptInvitationScreen />} /> */}
         <Route path="/contact" element={<ContactScreen />} />
         <Route path="/confirmed" element={<EmailConfirmedScreen />} />
         <Route path="/welcome" element={<LandingScreen />} />

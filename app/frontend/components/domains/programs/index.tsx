@@ -1,5 +1,4 @@
 import { Box, Container, Flex, Heading, Text, VStack } from '@chakra-ui/react';
-import { CheckCircle } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,13 +10,12 @@ import { PerPageSelect } from '../../shared/base/inputs/per-page-select';
 import { SharedSpinner } from '../../shared/base/shared-spinner';
 import { SearchGrid } from '../../shared/grid/search-grid';
 import { SearchGridItem } from '../../shared/grid/search-grid-item';
-import { ManageJurisdictionMenu } from '../../shared/jurisdiction/manage-jurisdiction-menu';
 import { RouterLink } from '../../shared/navigation/router-link';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { GridHeaders } from './grid-header';
 import { ManageProgramMenu } from '../../shared/program/manage-program-menu';
 
-export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
+export const ProgramsIndexScreen = observer(function ProgramsIndex() {
   const { programStore } = useMst();
   const {
     tablePrograms,
@@ -48,9 +46,9 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
           </RouterLinkButton>
         </Flex>
 
-        <SearchGrid templateColumns="3fr repeat(5, 1fr)">
+        <SearchGrid templateColumns="3fr repeat(4, 1fr)">
           <GridHeaders
-            span={6}
+            span={5}
             includeActionColumn
             columns={Object.values(EProgramSortFields).filter((field) => field !== EProgramSortFields.regionalDistrict)}
           />
@@ -60,7 +58,7 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
               <SharedSpinner />
             </Flex>
           ) : tablePrograms.length === 0 ? (
-            <Flex py={50} gridColumn={'span 7'} justifyContent="center">
+            <Flex py={50} gridColumn={'span 6'} justifyContent="center">
               <Text color="gray.500"> {t('errors.noResults')}</Text>
             </Flex>
           ) : (
@@ -71,7 +69,7 @@ export const ProgramsIndexScreen = observer(function JurisdictionIndex() {
                   <SearchGridItem>{program.adminManagersSize ?? 0}</SearchGridItem>
                   <SearchGridItem>{program.adminSize ?? 0}</SearchGridItem>
                   <SearchGridItem>{program.permitApplicationsSize ?? 0}</SearchGridItem>
-                  <SearchGridItem>{program.templatesUsed ?? 0}</SearchGridItem>
+                  {/* <SearchGridItem>{program.templatesUsed ?? 0}</SearchGridItem> */}
                   <SearchGridItem>
                     <Flex justify="center" w="full" gap={3}>
                       <RouterLink to={`${program?.id}/invite`}>{t('user.invite')}</RouterLink>

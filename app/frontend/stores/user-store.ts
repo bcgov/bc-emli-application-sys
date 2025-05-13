@@ -17,6 +17,7 @@ import {
 } from '../types/enums';
 import { IEULA } from '../types/types';
 import { convertToDate, toCamelCase } from '../utils/utility-functions';
+import { SortUtil } from '../utils/sort-util';
 
 export const UserStoreModel = types
   .compose(
@@ -172,6 +173,12 @@ export const UserStoreModel = types
         self.mergeUpdateAll(response.data.data, 'usersMap');
 
         self.setTableUsers(response.data.data);
+
+        // Perform local sort if needed
+        if (self.sort) {
+          const modelField = toCamelCase(self.sort.field as string) as keyof IUser;
+          self.setTableUsers(SortUtil.applySortToArray(response.data.data, modelField, self.sort.direction));
+        }
         self.currentPage = opts?.page ?? self.currentPage;
         self.totalPages = response.data.meta.totalPages;
         self.totalCount = response.data.meta.totalCount;

@@ -21,6 +21,7 @@ export const useSearch = (searchModel: ISearch, dependencyArray: any[] = []) => 
   }, [programId, permitApplicationId]);
 
   useEffect(() => {
+    console.log('useEffect for useSearch');
     // This is necessary for preventing failed calls, IE when the currentJursidiction for user search is undefined
     if (dependencyArray.some((dep) => dep == null)) return;
 
