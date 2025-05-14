@@ -479,6 +479,12 @@ en:
       create_success:
         title: ''
         message: 'New Application started!'
+      delete_error:
+        title: Error
+        message: '%{error_message}'
+      delete_success:
+        title: ''
+        message: 'Application deleted successfully!'
       update_error:
         title: Error
         message: '%{error_message}'

@@ -10,6 +10,13 @@ import {
   Text,
   Tooltip,
   useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
 } from '@chakra-ui/react';
 import { CaretDown, CaretRight, CaretUp, FloppyDiskBack, Info, NotePencil } from '@phosphor-icons/react';
 import { t } from 'i18next';
@@ -43,6 +50,7 @@ import { useCollaborationAssignmentNodes } from './collaborator-management/hooks
 import { ContactSummaryModal } from './contact-summary-modal';
 import { RevisionSideBar } from './revision-sidebar';
 import { SubmissionDownloadModal } from './submission-download-modal';
+import { WithdrawApplicationModal } from './withdraw-application-modal';
 
 interface IEditPermitApplicationScreenProps {}
 
@@ -77,6 +85,8 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
     onOpen: onSubmitBlockedModalOpen,
     onClose: onSubmitBlockedModalClose,
   } = useDisclosure();
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handlePermitApplicationUpdate = (_event: ICustomEventMap[ECustomEvents.handlePermitApplicationUpdate]) => {
     if (formRef.current) {
@@ -137,6 +147,20 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
       setIsDirty(false);
       formio.setPristine(true);
       return response.ok;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  const handleWithdrawl = async () => {
+    try {
+      const response = await currentPermitApplication.destroy();
+      if (response.ok) {
+        onClose();
+        navigate('/');
+        return true;
+      }
+      return false;
     } catch (e) {
       return false;
     }
@@ -204,6 +228,18 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
   const handleClickFinishLater = async () => {
     const success = await handleSave();
     if (success) {
+      navigate('/');
+    }
+  };
+
+  const handleClickWithdrawl = async () => {
+    onOpen(); // Open confirmation dialog instead of immediate withdrawal
+  };
+
+  const handleConfirmWithdrawal = async () => {
+    const success = await handleWithdrawl();
+    if (success) {
+      onClose();
       navigate('/');
     }
   };
@@ -356,6 +392,9 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                   permitApplication={currentPermitApplication}
                   collaborationType={ECollaborationType.submission}
                 /> */}
+                <Button variant="primary" onClick={handleClickWithdrawl}>
+                  {t('permitApplication.edit.withdrawl')}
+                </Button>
                 <Button variant="primary" onClick={handleClickFinishLater}>
                   {t('permitApplication.edit.saveDraft')}
                 </Button>
@@ -457,6 +496,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
           />
         );
       })}
+      <WithdrawApplicationModal isOpen={isOpen} onClose={onClose} onConfirm={handleConfirmWithdrawal} />
     </Box>
   );
 });

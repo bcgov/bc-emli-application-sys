@@ -320,6 +320,9 @@ export const PermitApplicationStoreModel = types
     }),
     // Action to remove a PermitApplication
     removePermitApplication(id: string) {
+      if (self.currentPermitApplication?.id === id) {
+        self.resetCurrentPermitApplication();
+      }
       self.permitApplicationMap.delete(id);
     },
     searchPermitApplications: flow(function* (opts?: { reset?: boolean; page?: number; countPerPage?: number }) {

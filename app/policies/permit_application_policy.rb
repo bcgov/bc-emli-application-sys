@@ -2,7 +2,7 @@ class PermitApplicationPolicy < ApplicationPolicy
   # All user types can use the search permit application
   def index?
     if user.system_admin? || record.submitter == user || user.admin_manager?
-         record.collaborator?(user_id: user.id, collaboration_type: :submission)
+      record.collaborator?(user_id: user.id, collaboration_type: :submission)
       true
     elsif user.review_staff?
       user.jurisdictions.find(record.jurisdiction.id).present? &&
@@ -54,6 +54,13 @@ class PermitApplicationPolicy < ApplicationPolicy
 
   def upload_supporting_document?
     record.draft? && record.submitter == user
+  end
+
+  def destroy?
+    return true if user.admin? || user.admin_manager? # who can destroy applications TBD?
+
+    # Submitters can only destroy their own draft applications
+    record.submitter == user && record.draft?
   end
 
   def submit?

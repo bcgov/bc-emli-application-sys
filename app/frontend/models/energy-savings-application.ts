@@ -837,6 +837,20 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         self.zipfileName = data.zipfileName;
         self.zipfileUrl = data.zipfileUrl;
       },
+      destroy: flow(function* () {
+        self.isLoading = true;
+        try {
+          const response = yield self.environment.api.deletePermitApplication(self.id);
+          if (response.ok) {
+            self.rootStore.permitApplicationStore.removePermitApplication(self.id);
+          }
+          self.isLoading = false;
+          return response;
+        } catch (error) {
+          self.isLoading = false;
+          throw error;
+        }
+      }),
     })),
   {
     preProcessor: (snapshot: any) => {
