@@ -1008,7 +1008,7 @@ const options = {
             in_review: 'In Review',
             update_needed: 'Update needed',
             approved: 'Approved',
-            rejected: 'Rejected',
+            ineligible: 'Ineligible',
           },
           filter: {
             draft: 'Draft',
@@ -1016,7 +1016,7 @@ const options = {
             inReview: 'In Review',
             updateNeeded: 'Update needed',
             approved: 'Approved',
-            rejected: 'Rejected',
+            ineligible: 'Ineligible',
           },
           statusGroup: {
             filter: 'Filter',
@@ -1026,7 +1026,7 @@ const options = {
             inReview: 'In Review',
             updateNeeded: 'Update needed',
             approved: 'Approved',
-            rejected: 'Rejected',
+            ineligible: 'Ineligible',
           },
           columns: {
             number: 'Application #',
@@ -1094,6 +1094,7 @@ const options = {
             applicationDisclaimerMoreInfo_Link:
               'https://www2.gov.bc.ca/gov/content/governments/local-governments/facts-framework/local-government-maps',
             submitted: 'You sent this application for review.',
+            markedIneligible: 'You have marked this application ineligible.',
             hearBack: 'Need Help?',
             contactInstruction:
               'See the status of your application or your application history any time by logging in to the Better Homes Energy Savings Program. Contact <email /> if you have any questions about your application.',

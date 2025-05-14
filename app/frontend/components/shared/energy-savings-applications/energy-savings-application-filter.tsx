@@ -41,7 +41,7 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
   const inReviewFilters = [EPermitApplicationStatus.inReview];
   const updateNeededFilters = [EPermitApplicationStatus.updateNeeded];
   const approvedFilters = [EPermitApplicationStatus.approved];
-  const rejectedFilters = [EPermitApplicationStatus.rejected];
+  const ineligibleFilters = [EPermitApplicationStatus.ineligible];
 
   // Handle selected filters
   const [selectedFilters, setSelectedFilters] = useState<string[]>(paramStatusFilter);
@@ -90,8 +90,8 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
         return updateNeededFilters;
       case 'approved':
         return approvedFilters;
-      case 'rejected':
-        return rejectedFilters;
+      case 'ineligible':
+        return ineligibleFilters;
       default:
         return [];
     }
@@ -109,8 +109,8 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
         return 'updateNeeded';
       case EPermitApplicationStatus.approved:
         return 'approved';
-      case EPermitApplicationStatus.rejected:
-        return 'rejected';
+      case EPermitApplicationStatus.ineligible:
+        return 'ineligible';
       default:
         return [];
     }

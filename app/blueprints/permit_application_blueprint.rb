@@ -131,6 +131,20 @@ class PermitApplicationBlueprint < Blueprinter::Base
                 view: :review_extended
   end
 
+  view :program_review_extended do
+    include_view :extended
+    # reinclude fields to show all data for reviewers, which were filtered out in the extended view due to collaboration
+    field :form_json
+    field :submission_data do |pa, options|
+      pa.formatted_submission_data
+    end
+    association :all_submission_version_completed_supporting_documents,
+                blueprint: SupportingDocumentBlueprint
+    association :submission_versions,
+                blueprint: SubmissionVersionBlueprint,
+                view: :review_extended
+  end
+
   view :compliance_update do
     identifier :id
     fields :formatted_compliance_data, :front_end_form_update

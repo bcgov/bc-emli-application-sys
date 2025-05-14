@@ -738,7 +738,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       }),
       updateStatus: flow(function* (params) {
         self.isLoading = true;
-        const response = yield self.environment.api.setPermitApplicationStatus(self.id);
+        const response = yield self.environment.api.setPermitApplicationStatus(self.id, params);
         if (response.ok) {
           const { data: permitApplication } = response.data;
 

@@ -313,8 +313,8 @@ class PermitApplication < ApplicationRecord
     end
   end
 
-  def set_for_review
-    if update(status: :in_review)
+  def set_status(new_status,reason)
+    if update(status: new_status, status_update_reason: reason)
       Rails.logger.debug("Successfully updated: #{self.attributes}")
       self
     else
@@ -322,6 +322,7 @@ class PermitApplication < ApplicationRecord
       nil
     end
   end
+  
   
   def number_prefix
     jurisdiction.prefix

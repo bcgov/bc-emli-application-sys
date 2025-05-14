@@ -107,10 +107,13 @@ export const ReviewPermitApplicationScreen = observer(() => {
         status: EPermitApplicationStatus.inReview,
       });
       if (response.ok) {
-        navigate(`/applications/${response?.data?.data?.id}/successful-submission`);
+        navigate(`/applications/${response?.data?.data?.id}/successful-submission`, {
+          state: {
+            message: t('energySavingsApplication.new.submitted'),
+          },
+        });
       }
-    } catch (e) {
-    }
+    } catch (e) {}
     onScreenInclose();
   };
   // @ts-ignore
@@ -286,7 +289,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
         <ApplicationReviewModal
           isOpen={isOpen}
           onClose={onClose}
-          onConfirm={() => navigate(`/rejection-reason/${number}`)}
+          onConfirm={() => navigate(`/rejection-reason/${currentPermitApplication.id}/${number}`)}
           title={t('permitApplication.review.readyToMarkIneligible')}
           message={t('permitApplication.review.confirmIneligible')}
         />

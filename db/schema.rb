@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_30_222646) do
+ActiveRecord::Schema[7.1].define(version: 2025_05_14_172320) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -216,6 +216,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_30_222646) do
     t.uuid "user_group_type_id"
     t.uuid "audience_type_id"
     t.uuid "submission_type_id"
+    t.text "status_update_reason"
     t.index ["activity_id"], name: "index_permit_applications_on_activity_id"
     t.index ["audience_type_id"], name: "index_permit_applications_on_audience_type_id"
     t.index ["jurisdiction_id"], name: "index_permit_applications_on_jurisdiction_id"

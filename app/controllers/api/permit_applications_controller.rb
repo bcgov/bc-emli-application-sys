@@ -9,7 +9,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
                   upload_supporting_document
                   finalize_revision_requests
                   mark_as_viewed
-                  mark_for_review
+                  change_status
                   update_version
                   generate_missing_pdfs
                   update_revision_requests
@@ -44,16 +44,25 @@ class Api::PermitApplicationsController < Api::ApplicationController
     @permit_application.update_viewed_at
     render_success @permit_application,
                    nil,
-                   { blueprint_opts: { view: :jurisdiction_review_extended } }
+                   { blueprint_opts: { view: :program_review_extended } }
   end
 
-  def mark_for_review
+  def change_status
     authorize @permit_application
-    @permit_application.set_for_review
+  
+    status_param = params[:status]
+    status_update_reason_param = params[:status_update_reason]
+    unless PermitApplication.statuses.key?(status_param)
+      return render_error('Invalid status', :unprocessable_entity)
+    end
+  
+    @permit_application.set_status(status_param,status_update_reason_param)
+  
     render_success @permit_application,
                    nil,
-                   { blueprint_opts: { view: :jurisdiction_review_extended } }
+                   { blueprint_opts: { view: :program_review_extended } }
   end
+  
 
   def show
     authorize @permit_application
