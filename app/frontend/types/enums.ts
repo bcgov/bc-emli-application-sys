@@ -59,7 +59,9 @@ export enum EPermitApplicationStatus {
   inReview = 'in_review',
   updateNeeded = 'update_needed',
   approved = 'approved',
-  rejected = 'rejected',
+  ineligible = 'ineligible',
+  unread = 'unread',
+  prescreen = 'prescreen',
 }
 
 export enum EPermitApplicationStatusGroup {
@@ -68,7 +70,7 @@ export enum EPermitApplicationStatusGroup {
   inReview = 'inReview',
   updateNeeded = 'updateNeeded',
   approved = 'approved',
-  rejected = 'rejected',
+  ineligible = 'ineligible',
 }
 
 export enum ETemplateVersionStatus {

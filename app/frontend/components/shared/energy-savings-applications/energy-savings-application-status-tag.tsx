@@ -23,7 +23,7 @@ export const EnergySavingsApplicationStatusTag = ({
     [EPermitApplicationStatus.inReview]: 'theme.offWhite',
     [EPermitApplicationStatus.updateNeeded]: 'semantic.errorLight',
     [EPermitApplicationStatus.approved]: 'theme.lightGreen',
-    [EPermitApplicationStatus.rejected]: 'theme.blueLight',
+    [EPermitApplicationStatus.ineligible]: 'theme.blueLight',
   };
 
   const colorMap = {
@@ -35,7 +35,7 @@ export const EnergySavingsApplicationStatusTag = ({
     [EPermitApplicationStatus.inReview]: 'text.primary',
     [EPermitApplicationStatus.updateNeeded]: 'text.primary',
     [EPermitApplicationStatus.approved]: 'theme.primary',
-    [EPermitApplicationStatus.rejected]: 'theme.primary',
+    [EPermitApplicationStatus.ineligible]: 'theme.primary',
   };
 
   const borderColorMap = {
@@ -47,7 +47,7 @@ export const EnergySavingsApplicationStatusTag = ({
     [EPermitApplicationStatus.inReview]: 'theme.darkBlue',
     [EPermitApplicationStatus.updateNeeded]: 'semantic.errorDark',
     [EPermitApplicationStatus.approved]: 'theme.darkGreen',
-    [EPermitApplicationStatus.rejected]: 'theme.darkBlue',
+    [EPermitApplicationStatus.ineligible]: 'theme.darkBlue',
   };
   return (
     <Tag

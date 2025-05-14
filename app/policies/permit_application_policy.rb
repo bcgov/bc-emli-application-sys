@@ -22,7 +22,7 @@ class PermitApplicationPolicy < ApplicationPolicy
     user.review_staff?
   end
 
-  def mark_for_review?
+  def change_status?
     user.admin_manager?
   end
 

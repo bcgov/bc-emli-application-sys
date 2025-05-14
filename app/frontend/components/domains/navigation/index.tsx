@@ -544,7 +544,7 @@ const AppRoutes = observer(() => {
           <Route path="/sys-admin" element={<AdminPortalLogin isSysAdmin />} />
         </Route>
         {/* Public Routes */}
-        <Route path="/rejection-reason/:id" element={<RejectApplicationScreen />} />
+        <Route path="/rejection-reason/:permitApplicationId/:id" element={<RejectApplicationScreen />} />
         <Route path="/programs/:programId/accept-invitation" element={<AcceptInvitationScreen />} />
         {/* <Route path="/accept-invitation" element={<AcceptInvitationScreen />} /> */}
         <Route path="/contact" element={<ContactScreen />} />

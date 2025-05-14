@@ -131,18 +131,19 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
         'programMap',
       );
       await fetchSubmissionOptions();
-      if (options.length > 0) {
-        const firstOption = options[0];
-        methods.setValue('programId', firstOption.value);
-        handleProgramChange(firstOption.value);
+      if (!currentProgram) {
+        if (options.length > 0) {
+          const firstOption = options[0];
+          methods.setValue('programId', firstOption.value);
+          handleProgramChange(firstOption.value);
+        }
+      } else {
+        methods.setValue('programId', currentProgram.id);
       }
-    } catch (error) {
-      console.error('Failed to fetch program options', error);
-    }
+    } catch (error) {}
   }, [fetchProgramOptions, programStore, methods, fetchSubmissionOptions, t]);
 
   const handleProgramChange = (programId) => {
-    console.log('programId', programId);
     programStore.setCurrentProgram(programId);
     search();
   };

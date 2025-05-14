@@ -20,7 +20,7 @@ RSpec.describe PermitApplication, type: :model do
            in_review: 5,
            update_needed: 6,
            approved: 7,
-           rejected: 8
+           ineligible: 8
              )
     end
   end
