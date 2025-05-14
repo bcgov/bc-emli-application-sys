@@ -354,8 +354,7 @@ const AppRoutes = observer(() => {
 
   const superAdminOnlyRoutes = (
     <>
-      {/*<Route path="/programs/new" element={<NewProgramsScreen />} />*/}
-
+      <Route path="/programs" element={<ProgramsIndexScreen />} />
       <Route path="/programs/new-program" element={<NewProgramScreen />} />
       <Route path="/programs/:programId/edit" element={<NewProgramScreen />} />
       <Route path="/programs/:programId/users" element={<ProgramUserIndexScreen />} />
@@ -386,15 +385,11 @@ const AppRoutes = observer(() => {
     </>
   );
 
-  const adminOrManagerRoutes = (
+  const adminManagerRoutes = (
     <>
-      <Route path="/jurisdictions/:jurisdictionId/users" element={<JurisdictionUserIndexScreen />} />
-      <Route path="/jurisdictions/:jurisdictionId/users/invite" element={<InviteScreen />} />
-      <Route path="/jurisdictions/:jurisdictionId/export-templates" element={<ExportTemplatesScreen />} />
-      <Route path="/jurisdictions/:jurisdictionId/api-settings" element={<ExternalApiKeysIndexScreen />}>
-        <Route path="create" element={<ExternalApiKeyModalSubRoute />} />
-        <Route path=":externalApiKeyId/manage" element={<ExternalApiKeyModalSubRoute />} />
-      </Route>
+      <Route path="/configure-users" element={<ProgramsIndexScreen />} />
+      <Route path="/configure-users/:programId/users" element={<ProgramUserIndexScreen />} />
+      <Route path="/configure-users/:programId/invite" element={<ProgramInviteUserScreen />} />
     </>
   );
 
@@ -493,16 +488,12 @@ const AppRoutes = observer(() => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={
-                loggedIn &&
-                !mustAcceptEula &&
-                (currentUser.isReviewManager || currentUser.isRegionalReviewManager || currentUser.isSuperAdmin)
-              }
+              isAllowed={loggedIn && !mustAcceptEula && (currentUser.isAdminManager || currentUser.isSuperAdmin)}
               redirectPath={(mustAcceptEula && '/') || (loggedIn && '/not-found')}
             />
           }
         >
-          {adminOrManagerRoutes}
+          {adminManagerRoutes}
         </Route>
 
         <Route
@@ -555,15 +546,6 @@ const AppRoutes = observer(() => {
         <Route
           path="/early-access/requirement-templates/:requirementTemplateId"
           element={<EarlyAccessRequirementTemplateScreen />}
-        />
-        {/* To be removed later  */}
-        <Route
-          path="/jurisdictions"
-          element={currentUser?.isAdminMgr ? <JurisdictionIndexScreen /> : <LimitedJurisdictionIndexScreen />}
-        />
-        <Route
-          path="/programs"
-          element={currentUser?.isSuperAdmin ? <ProgramsIndexScreen /> : <LimitedJurisdictionIndexScreen />}
         />
         <Route path="/jurisdictions/:jurisdictionId" element={<JurisdictionScreen />} />
         <Route path="/not-found" element={<NotFoundScreen />} />

@@ -30,8 +30,11 @@ export const ManageRoleModal = ({ isOpen, onClose, user }: ManageRoleModalProps)
   const [selectedRole, setSelectedRole] = React.useState(user.role);
   const [isSaving, setIsSaving] = React.useState(false);
   const { uiStore, userStore } = useMst();
+  const currentUser = userStore.currentUser;
 
-  const assignableRoles = [EUserRoles.adminManager, EUserRoles.admin, EUserRoles.systemAdmin];
+  const assignableRoles = currentUser.isAdminManager
+    ? [EUserRoles.adminManager, EUserRoles.admin]
+    : [EUserRoles.adminManager, EUserRoles.admin, EUserRoles.systemAdmin];
 
   const handleSave = async () => {
     try {

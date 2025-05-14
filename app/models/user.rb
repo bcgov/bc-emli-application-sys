@@ -277,7 +277,7 @@ class User < ApplicationRecord
     return true if system_admin?
 
     # Everyone else can only assign roles lower than theirs
-    ROLE_PRIVILEGE[new_role.to_sym] < role_privilege_level
+    ROLE_PRIVILEGE[new_role.to_sym] <= role_privilege_level
   end
 
   def role_privilege_level

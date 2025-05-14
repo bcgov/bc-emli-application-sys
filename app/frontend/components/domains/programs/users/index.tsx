@@ -16,12 +16,16 @@ import { RouterLinkButton } from '../../../shared/navigation/router-link-button'
 import { ActiveGridHeaders, DeactivatedGridHeaders, PendingGridHeaders } from './grid-header';
 import { ActiveUserRow, DeactivatedUserRow, PendingUserRow } from './user-table-rows';
 import { ISearch } from '../../../../lib/create-search-model';
+import { useLocation } from 'react-router-dom';
 
 export const ProgramUserIndexScreen = observer(function ProgramUserIndex() {
   const { t } = useTranslation();
   const { userStore } = useMst();
   const { currentProgram, error } = useProgram();
   const [tabIndex, setTabIndex] = useState(0);
+  const location = useLocation();
+
+  const basePath = location.pathname.startsWith('/configure-users') ? '/configure-users' : '/programs';
 
   useEffect(() => {
     setTabIndex(0);
@@ -64,7 +68,7 @@ export const ProgramUserIndexScreen = observer(function ProgramUserIndex() {
               {`${currentProgram?.programName} users`}
             </Heading>
           </Box>
-          <RouterLinkButton alignSelf="flex-end" to={`/programs/${currentProgram?.id}/invite`}>
+          <RouterLinkButton alignSelf="flex-end" to={`${basePath}/${currentProgram?.id}/invite`}>
             {t('user.index.inviteButton')}
           </RouterLinkButton>
         </Flex>

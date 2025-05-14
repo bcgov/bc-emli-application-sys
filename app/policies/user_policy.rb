@@ -20,7 +20,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def index?
-    user.system_admin?
+    user.system_admin? || user.admin_manager?
   end
 
   def super_admins?
@@ -80,7 +80,10 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update_role?
-    user.system_admin? && user != record
+    Rails.logger.info(
+      "can update? #{(user.system_admin? || user.admin_manager?)}"
+    )
+    (user.system_admin? || user.admin_manager?) && user != record
   end
 
   # TODO: we need to check if user managing users is in the program??
