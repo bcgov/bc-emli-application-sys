@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Box, Button, FormControl, FormLabel, HStack, IconButton, Input, Link, Select, VStack } from '@chakra-ui/react';
+import React from 'react';
+import { Box, FormControl, FormLabel, HStack, IconButton, Input, Link, Select, VStack } from '@chakra-ui/react';
 import { ClassificationPresetName, classificationPresets } from '../../../models/program-classification';
 import { MultiCheckSelect } from '../select/multi-check-select';
 import { Trash } from '@phosphor-icons/react';
 import { EUserRoles } from '../../../types/enums';
 import { toTitleCase } from '../../../utils/utility-functions';
 import { TInviteUserParams } from '../../../types/types';
+import { useMst } from '../../../setup/root';
 
-const assignableRoles = [EUserRoles.adminManager, EUserRoles.admin, EUserRoles.systemAdmin];
 const inboxOptions = Object.keys(classificationPresets).map((label) => ({
   label,
   value: label as ClassificationPresetName,
@@ -22,6 +22,13 @@ export interface InviteUserTableProps {
 }
 
 export const InviteUserTable: React.FC<InviteUserTableProps> = ({ rows, setRows, defaultRow }) => {
+  const { userStore } = useMst();
+  const currentUser = userStore.currentUser;
+
+  const assignableRoles = currentUser.isAdminManager
+    ? [EUserRoles.adminManager, EUserRoles.admin]
+    : [EUserRoles.adminManager, EUserRoles.admin, EUserRoles.systemAdmin];
+
   const handleChange = (index, field, value) => {
     const updated = [...rows];
     updated[index][field] = value;

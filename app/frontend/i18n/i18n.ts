@@ -2646,6 +2646,7 @@ const options = {
             newTemplate: 'Create a new template',
             newProgram: 'Create a new program',
             programs: 'Programs',
+            configureUsers: 'Configure users',
             invite: 'Invite',
             templateVersions: 'Template versions',
             requirementsLibrary: 'Requirements library',

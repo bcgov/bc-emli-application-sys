@@ -13,6 +13,7 @@ import { EFlashMessageStatus, EPermitClassificationCode } from '../../../types/e
 import { RouterLink } from '../../shared/navigation/router-link';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { useMst } from '../../../setup/root';
+import { useLocation } from 'react-router-dom';
 
 const defaultRow: TInviteUserParams = {
   email: '',
@@ -37,7 +38,10 @@ export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
   const { currentProgram, error } = useProgram();
   const rootStore = useMst();
   const { uiStore } = rootStore;
+  const location = useLocation();
+
   const [rows, setRows] = useState<TInviteUserParams[]>([{ ...defaultRow }]);
+  const basePath = location.pathname.startsWith('/configure-users') ? '/configure-users' : '/programs';
 
   if (error) return <ErrorScreen error={error} />;
   if (!currentProgram) return <LoadingScreen />;
@@ -99,7 +103,7 @@ export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
         >
           {t('user.sendInvites')}
         </Button>
-        <RouterLinkButton variant={'secondary'} to={`/programs/${currentProgram.id}/users`}>
+        <RouterLinkButton variant={'secondary'} to={`${basePath}/${currentProgram.id}/users`}>
           {t('ui.cancel')}
         </RouterLinkButton>
       </Flex>

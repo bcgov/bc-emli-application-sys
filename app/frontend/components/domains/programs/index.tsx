@@ -16,7 +16,8 @@ import { GridHeaders } from './grid-header';
 import { ManageProgramMenu } from '../../shared/program/manage-program-menu';
 
 export const ProgramsIndexScreen = observer(function ProgramsIndex() {
-  const { programStore } = useMst();
+  const { programStore, userStore } = useMst();
+  const currentUser = userStore.currentUser;
   const {
     tablePrograms,
     currentPage,
@@ -41,9 +42,11 @@ export const ProgramsIndexScreen = observer(function ProgramsIndex() {
             </Heading>
             <Text color={'text.secondary'}>{t('program.index.description')}</Text>
           </Box>
-          <RouterLinkButton variant={'primary'} to={'/programs/new-program'}>
-            {t('program.index.createButton')}
-          </RouterLinkButton>
+          {currentUser.isSystemAdmin ? (
+            <RouterLinkButton variant={'primary'} to={'/programs/new-program'}>
+              {t('program.index.createButton')}
+            </RouterLinkButton>
+          ) : null}
         </Flex>
 
         <SearchGrid templateColumns="3fr repeat(4, 1fr)">
@@ -69,11 +72,14 @@ export const ProgramsIndexScreen = observer(function ProgramsIndex() {
                   <SearchGridItem>{program.adminManagersSize ?? 0}</SearchGridItem>
                   <SearchGridItem>{program.adminSize ?? 0}</SearchGridItem>
                   <SearchGridItem>{program.permitApplicationsSize ?? 0}</SearchGridItem>
-                  {/* <SearchGridItem>{program.templatesUsed ?? 0}</SearchGridItem> */}
                   <SearchGridItem>
                     <Flex justify="center" w="full" gap={3}>
                       <RouterLink to={`${program?.id}/invite`}>{t('user.invite')}</RouterLink>
-                      <ManageProgramMenu program={program} searchModel={programStore} />
+                      {currentUser.isSystemAdmin ? (
+                        <ManageProgramMenu program={program} searchModel={programStore} />
+                      ) : (
+                        <RouterLink to={`${program.id}/users`}>{t('ui.manage')}</RouterLink>
+                      )}
                     </Flex>
                   </SearchGridItem>
                 </Box>
