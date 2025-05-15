@@ -38,6 +38,13 @@ module Api::Concerns::Search::ProgramUsers
     # Extract user_ids for search
     user_ids = memberships.map(&:user_id)
 
+    # Filter out system_admin users if current user is an admin_manager
+    if Current.user.admin_manager?
+      system_admin_ids =
+        User.where(id: user_ids, role: "system_admin").pluck(:id)
+      user_ids -= system_admin_ids
+    end
+
     # Run the search
     @user_search =
       User.search(

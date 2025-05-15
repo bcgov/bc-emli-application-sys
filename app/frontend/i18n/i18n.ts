@@ -516,7 +516,9 @@ const options = {
         program: {
           index: {
             title: 'Manage programs',
-            description: 'Below is a list of all programs in the system',
+            adminTitle: 'Configure users',
+            description: 'Below is a list of all programs in the system.',
+            adminDescription: 'Choose the program you wish to configure users for.',
             createButton: 'Create a new program',
             tableHeading: 'Programs',
             users: 'Users',

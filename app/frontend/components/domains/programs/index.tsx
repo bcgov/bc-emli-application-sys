@@ -38,9 +38,11 @@ export const ProgramsIndexScreen = observer(function ProgramsIndex() {
         <Flex justifyContent={'space-between'} w={'full'} alignItems={'flex-end'}>
           <Box>
             <Heading as="h1" color={'theme.blueAlt'}>
-              {t('program.index.title')}
+              {currentUser.isSystemAdmin ? t('program.index.title') : t('program.index.adminTitle')}
             </Heading>
-            <Text color={'text.secondary'}>{t('program.index.description')}</Text>
+            <Text color={'text.secondary'}>
+              {t('program.index.description')} {!currentUser.isSystemAdmin ? t('program.index.adminDescription') : null}
+            </Text>
           </Box>
           {currentUser.isSystemAdmin ? (
             <RouterLinkButton variant={'primary'} to={'/programs/new-program'}>
