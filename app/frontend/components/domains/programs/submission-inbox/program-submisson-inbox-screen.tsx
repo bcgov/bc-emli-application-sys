@@ -76,7 +76,7 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
         label: t('energySavingsApplication.submissionInbox.participantSubmission'),
         value: {
           userGroupType: getUserTypeIdByCode(EPermitClassificationCode.participant),
-          AudienceType: getAudienceTypeIdByCode(EPermitClassificationCode.internal),
+          AudienceType: getAudienceTypeIdByCode(EPermitClassificationCode.external),
           SubmissionType: getAllSubmissionTypeIds(),
         },
       },
