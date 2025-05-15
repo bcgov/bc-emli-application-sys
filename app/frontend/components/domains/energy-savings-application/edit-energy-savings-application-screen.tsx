@@ -240,7 +240,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
     const success = await handleWithdrawl();
     if (success) {
       onClose();
-      navigate('/');
+      navigate('/applications/withdrawl-success');
     }
   };
 
@@ -392,9 +392,11 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                   permitApplication={currentPermitApplication}
                   collaborationType={ECollaborationType.submission}
                 /> */}
-                <Button variant="primary" onClick={handleClickWithdrawl}>
-                  {t('permitApplication.edit.withdrawl')}
-                </Button>
+                {currentPermitApplication?.isDraft && (
+                  <Button variant="primary" onClick={handleClickWithdrawl}>
+                    {t('permitApplication.edit.withdrawl')}
+                  </Button>
+                )}
                 <Button variant="primary" onClick={handleClickFinishLater}>
                   {t('permitApplication.edit.saveDraft')}
                 </Button>

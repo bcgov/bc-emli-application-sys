@@ -49,7 +49,7 @@ export const AdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               title={t('home.viewSupportedApplicationsTitle')}
               description=""
               icon={<ClipboardText size={24} />}
-              href="/view-supported-applications"
+              href="/applications"
             />
             <HomeScreenBox
               title={t('home.contractorTitle')}

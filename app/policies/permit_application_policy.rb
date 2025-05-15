@@ -57,8 +57,6 @@ class PermitApplicationPolicy < ApplicationPolicy
   end
 
   def destroy?
-    return true if user.admin? || user.admin_manager? # who can destroy applications TBD?
-
     # Submitters can only destroy their own draft applications
     record.submitter == user && record.draft?
   end

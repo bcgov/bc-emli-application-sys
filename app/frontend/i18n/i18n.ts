@@ -872,6 +872,11 @@ const options = {
             confirmTitle: 'Are you sure you want to withdraw this application?',
             confirmMessage: 'By withdrawing this application your draft application will not be saved.',
             confirm: 'Withdraw application',
+            success: {
+              title: 'Your application has been withdrawn.',
+              subtitleEmail: 'You will receive a notification email.',
+              returnHome: 'Return to supported applications',
+            },
           },
           edit: {
             saveDraft: 'Save and finish later',

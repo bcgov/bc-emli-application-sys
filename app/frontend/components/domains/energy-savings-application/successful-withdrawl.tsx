@@ -1,0 +1,37 @@
+import { Container, Flex, Heading, Icon, Text, VStack } from '@chakra-ui/react';
+import { CheckCircle } from '@phosphor-icons/react';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { RouterLinkButton } from '../../shared/navigation/router-link-button';
+
+export const SuccessfulWithdrawalScreen = observer(() => {
+  const { t } = useTranslation();
+
+  return (
+    <Container maxW="container.lg">
+      <Flex direction="column" align="center" my={24} gap={8}>
+        <Icon as={CheckCircle} boxSize={12} color="theme.darkGreen" />
+
+        <VStack spacing={4}>
+          <Heading as="h2" fontSize="32px" fontWeight="700" color="theme.blueAlt" textAlign="center">
+            {t('permitApplication.withdraw.success.title')}
+          </Heading>
+          <Text fontSize="16px" fontWeight="400" color="greys.anotherGrey" textAlign="center">
+            {t('permitApplication.withdraw.success.subtitleEmail')}
+          </Text>
+        </VStack>
+
+        <RouterLinkButton
+          to="/applications"
+          bg="theme.darkBlue"
+          color="white"
+          px={8}
+          _hover={{ bg: 'theme.blueButtonHover' }}
+        >
+          {t('permitApplication.withdraw.success.returnHome')}
+        </RouterLinkButton>
+      </Flex>
+    </Container>
+  );
+});
