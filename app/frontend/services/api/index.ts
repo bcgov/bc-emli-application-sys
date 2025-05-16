@@ -478,6 +478,10 @@ export class Api {
     });
   }
 
+  async deletePermitApplication(id: string) {
+    return this.client.delete(`/permit_applications/${id}`);
+  }
+
   async finalizeRevisionRequests(id) {
     return this.client.post<ApiResponse<IPermitApplication>>(`/permit_applications/${id}/revision_requests/finalize`);
   }

@@ -837,6 +837,37 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         self.zipfileName = data.zipfileName;
         self.zipfileUrl = data.zipfileUrl;
       },
+      destroy: flow(function* () {
+        try {
+          // Remove from table references first
+          self.rootStore.permitApplicationStore.setTablePermitApplications(
+            self.rootStore.permitApplicationStore.tablePermitApplications.filter((app) => app.id !== self.id),
+          );
+
+          // Make API call to delete
+          const response = yield self.environment.api.deletePermitApplication(self.id);
+
+          if (response.ok) {
+            // Use store action to handle deletion
+            self.rootStore.permitApplicationStore.removePermitApplication(self.id);
+
+            // Reset any dirty state
+            self.setIsDirty(false);
+
+            // Reset any revisions mode
+            self.setRevisionMode(false);
+
+            // Clear any diffs
+            self.resetDiff();
+
+            return response;
+          }
+          return response;
+        } catch (error) {
+          console.error('Error deleting application:', error);
+          throw error;
+        }
+      }),
     })),
   {
     preProcessor: (snapshot: any) => {

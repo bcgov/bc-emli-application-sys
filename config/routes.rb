@@ -176,7 +176,7 @@ Rails.application.routes.draw do
       get "pid_details", on: :collection
     end
 
-    resources :permit_applications, only: %i[create update show] do
+    resources :permit_applications, only: %i[create update show destroy] do
       post "generate_missing_pdfs",
            on: :member,
            to: "permit_applications#generate_missing_pdfs"

@@ -17,6 +17,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
                   invite_new_collaborator
                   remove_collaborator_collaborations
                   create_or_update_permit_block_status
+                  destroy
                 ]
   skip_after_action :verify_policy_scoped, only: [:index]
 
@@ -433,6 +434,20 @@ class Api::PermitApplicationsController < Api::ApplicationController
 
     csv_data = PermitApplicationExportService.new.application_metrics_csv
     send_data csv_data, type: "text/csv"
+  end
+
+  def destroy
+    authorize @permit_application
+
+    if @permit_application.destroy
+      render_success nil, "permit_application.delete_success"
+    else
+      render_error "permit_application.delete_error",
+                   message_opts: {
+                     error_message:
+                       @permit_application.errors.full_messages.join(", ")
+                   }
+    end
   end
 
   private

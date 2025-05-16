@@ -16,7 +16,6 @@ import { ProgramsIndexScreen } from '../programs';
 import { ProgramInviteUserScreen } from '../programs/invite-users';
 import RejectApplicationScreen from '../permit-application/application-rejection-reason';
 
-
 const ExternalApiKeysIndexScreen = lazy(() =>
   import('../external-api-key').then((module) => ({ default: module.ExternalApiKeysIndexScreen })),
 );
@@ -125,6 +124,12 @@ const SuccessfulSubmissionScreen = lazy(() =>
     default: module.SuccessfulSubmissionScreen,
   })),
 );
+const SuccessfulWithdrawalScreen = lazy(() =>
+  import('../energy-savings-application/successful-withdrawl').then((module) => ({
+    default: module.SuccessfulWithdrawalScreen,
+  })),
+);
+
 const NewRequirementTemplateScreen = lazy(() =>
   import('../requirement-template/new-requirement-template-screen').then((module) => ({
     default: module.NewRequirementTemplateScreen,
@@ -471,6 +476,7 @@ const AppRoutes = observer(() => {
           <Route path="/applications/:permitApplicationId/edit" element={<EditPermitApplicationScreen />}>
             <Route path="step-code" element={<StepCodeForm />} />
           </Route>
+          <Route path="/applications/withdrawl-success" element={<SuccessfulWithdrawalScreen />} />
           <Route
             path="/applications/:permitApplicationId/successful-submission"
             element={<SuccessfulSubmissionScreen />}

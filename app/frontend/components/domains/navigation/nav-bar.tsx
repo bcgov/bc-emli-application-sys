@@ -93,6 +93,11 @@ function isSuccessfullSubmissionPath(path: string): boolean {
   return regex.test(path);
 }
 
+function isSuccessfullWithdrawlPath(path: string): boolean {
+  const regex = /withdrawl-success/;
+  return regex.test(path);
+}
+
 function shouldHideSubNavbarForPath(path: string): boolean {
   const matchers: Array<(path: string) => boolean> = [
     (path) => path === '/',
@@ -106,6 +111,7 @@ function shouldHideSubNavbarForPath(path: string): boolean {
     isApiMappingPath,
     isRejectionPath,
     isSuccessfullSubmissionPath,
+    isSuccessfullWithdrawlPath,
   ];
 
   return matchers.some((matcher) => matcher(path));
@@ -323,7 +329,7 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
       <NavMenuItem label={t('home.submissionInboxTitle')} to={'/programs/submission-inbox'} />
       <NavMenuItem label={t('site.newApplication')} to={`/applications/new`} />
       <NavMenuItem label={t('home.viewBlankApplicationsTitle')} to={`/view-blank-applications`} />
-      <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/view-supported-applications'} />
+      <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/applications'} />
       <NavMenuItem label={t('home.configureUsersTitle')} to={'/configure-users'} />
     </MenuGroup>
   );
@@ -335,7 +341,7 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
       <NavMenuItem label={t('home.submissionInboxTitle')} to={`/programs/submission-inbox`} />
       <NavMenuItem label={t('site.newApplication')} to={`/applications/new`} />
       <NavMenuItem label={t('home.viewBlankApplicationsTitle')} to={`/view-blank-applications`} />
-      <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/view-supported-applications'} />
+      <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/applications'} />
     </MenuGroup>
   );
 
