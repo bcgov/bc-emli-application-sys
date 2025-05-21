@@ -441,7 +441,6 @@ class Api::PermitApplicationsController < Api::ApplicationController
     # Store application data before transaction
     application_data = {
       number: @permit_application.number,
-      email: @permit_application.submitter.email,
       user: @permit_application.submitter
     }
 

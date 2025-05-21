@@ -182,16 +182,13 @@ class PermitHubMailer < ApplicationMailer
     @user = user
     @application_number = application_number
 
-    result =
-      send_user_mail(
-        email: @user.email,
-        template_key: "notify_application_withdrawn",
-        subject_i18n_params: {
-          permit_application_number: application_number
-        }
-      )
-
-    result
+    send_user_mail(
+      email: @user.email,
+      template_key: "notify_application_withdrawn",
+      subject_i18n_params: {
+        permit_application_number: application_number
+      }
+    )
   end
 
   #### PermitTypeSubmission Contact Mailer
