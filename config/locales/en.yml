@@ -150,6 +150,7 @@ en:
       notify_new_or_unconfirmed_preview: 'You’re Invited to Preview a Building Permit Template'
       notify_preview: 'You’re Invited to Preview a Building Permit Template'
       notify_batched_integration_mapping: 'New API mappings'
+      notify_application_withdrawn: 'Application %{permit_application_number} Withdrawn'
   arbitrary_message_construct:
     devise:
       failure:

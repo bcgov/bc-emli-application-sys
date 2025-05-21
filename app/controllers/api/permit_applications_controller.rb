@@ -50,20 +50,19 @@ class Api::PermitApplicationsController < Api::ApplicationController
 
   def change_status
     authorize @permit_application
-  
+
     status_param = params[:status]
     status_update_reason_param = params[:status_update_reason]
     unless PermitApplication.statuses.key?(status_param)
-      return render_error('Invalid status', :unprocessable_entity)
+      return render_error("Invalid status", :unprocessable_entity)
     end
-  
-    @permit_application.set_status(status_param,status_update_reason_param)
-  
+
+    @permit_application.set_status(status_param, status_update_reason_param)
+
     render_success @permit_application,
                    nil,
                    { blueprint_opts: { view: :program_review_extended } }
   end
-  
 
   def show
     authorize @permit_application
@@ -439,7 +438,24 @@ class Api::PermitApplicationsController < Api::ApplicationController
   def destroy
     authorize @permit_application
 
-    if @permit_application.destroy
+    # Store application data before transaction
+    application_data = {
+      number: @permit_application.number,
+      user: @permit_application.submitter
+    }
+
+    success =
+      ActiveRecord::Base.transaction do
+        @permit_application.destroy ? true : false
+      end
+
+    if success
+      # Send email after successful transaction
+      PermitHubMailer.notify_application_withdrawn(
+        application_data[:number],
+        application_data[:user]
+      )&.deliver_later
+
       render_success nil, "permit_application.delete_success"
     else
       render_error "permit_application.delete_error",

@@ -178,6 +178,19 @@ class PermitHubMailer < ApplicationMailer
     )
   end
 
+  def notify_application_withdrawn(application_number, user)
+    @user = user
+    @application_number = application_number
+
+    send_user_mail(
+      email: @user.email,
+      template_key: "notify_application_withdrawn",
+      subject_i18n_params: {
+        permit_application_number: application_number
+      }
+    )
+  end
+
   #### PermitTypeSubmission Contact Mailer
   def permit_type_submission_contact_confirm(permit_type_submission_contact)
     @permit_type_submission_contact = permit_type_submission_contact
@@ -189,6 +202,13 @@ class PermitHubMailer < ApplicationMailer
 
   def send_user_mail(*args, **kwargs)
     return if @user.discarded? || !@user.confirmed?
-    send_mail(*args, **kwargs)
+
+    Rails.logger.info "[PermitHubMailer] Attempting to send email to #{@user.email} for template: #{kwargs[:template_key]}"
+
+    result = send_mail(*args, **kwargs)
+
+    Rails.logger.info "[PermitHubMailer] Email delivery #{result ? "succeeded" : "failed"} for #{@user.email}, template: #{kwargs[:template_key]}"
+
+    result
   end
 end
