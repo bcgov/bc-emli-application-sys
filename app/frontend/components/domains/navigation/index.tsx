@@ -364,7 +364,11 @@ const AppRoutes = observer(() => {
       <Route path="/programs/:programId/edit" element={<NewProgramScreen />} />
       <Route path="/programs/:programId/users" element={<ProgramUserIndexScreen />} />
       <Route path="/programs/:programId/invite" element={<ProgramInviteUserScreen />} />
-      <Route path="/jurisdictions/new" element={<NewJurisdictionScreen />} />
+      <Route path="/programs/:programId/api-settings" element={<ExternalApiKeysIndexScreen />}>
+        <Route path="create" element={<ExternalApiKeyModalSubRoute />} />
+        <Route path=":externalApiKeyId/manage" element={<ExternalApiKeyModalSubRoute />} />
+      </Route>
+      {/* <Route path="/jurisdictions/new" element={<NewJurisdictionScreen />} /> */}
       <Route path="/requirements-library" element={<RequirementsLibraryScreen />} />
       <Route path="/early-access/requirements-library" element={<EarlyAccessRequirementsLibraryScreen />} />
       <Route path="/requirement-templates" element={<RequirementTemplatesScreen />} />

@@ -59,6 +59,29 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
     end
   end
 
+  def show_integration_mapping
+    @integration_mapping =
+      @template_version.integration_mappings.find_by(
+        jurisdiction: current_external_api_key.jurisdiction
+      )
+
+    authorize @integration_mapping,
+              policy_class: ExternalApi::PermitApplicationPolicy
+
+    if @integration_mapping.present?
+      render_success @integration_mapping,
+                     nil,
+                     {
+                       blueprint: IntegrationMappingBlueprint,
+                       blueprint_opts: {
+                         view: :external_api
+                       }
+                     }
+    else
+      render_error "integration_mapping.not_found_error", status: 404
+    end
+  end
+
   private
 
   def set_permit_application

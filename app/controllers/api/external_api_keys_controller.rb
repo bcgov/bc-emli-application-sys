@@ -3,19 +3,16 @@ class Api::ExternalApiKeysController < Api::ApplicationController
 
   def index
     # Only authorized to query own jurisdiction for review managers
-    if (
-         current_user.review_manager? || current_user.regional_review_manager?
-       ) && params[:jurisdiction_id].present? &&
-         !current_user.jurisdictions.find(params[:jurisdiction_id])
+    if (current_user.system_admin? || current_user.admin_manager?) &&
+         params[:program_id].present? &&
+         !current_user.programs.find(params[:program_id])
       raise Pundit::NotAuthorizedError
     end
 
     @external_api_key =
       (
-        if params[:jurisdiction_id].present?
-          policy_scope(ExternalApiKey).where(
-            jurisdiction_id: params[:jurisdiction_id]
-          )
+        if params[:program_id].present?
+          policy_scope(ExternalApiKey).where(program_id: params[:program_id])
         else
           policy_scope(ExternalApiKey)
         end
@@ -40,6 +37,10 @@ class Api::ExternalApiKeysController < Api::ApplicationController
   end
 
   def create
+    Rails.logger.info(
+      "api key params: #{external_api_key_create_params.inspect}"
+    )
+
     @external_api_key = ExternalApiKey.build(external_api_key_create_params)
 
     authorize @external_api_key
@@ -130,7 +131,7 @@ class Api::ExternalApiKeysController < Api::ApplicationController
       :expired_at,
       :connecting_application,
       :notification_email,
-      :jurisdiction_id,
+      :program_id,
       :webhook_url,
       :sandbox_id
     )
@@ -142,7 +143,7 @@ class Api::ExternalApiKeysController < Api::ApplicationController
       :expired_at,
       :connecting_application,
       :notification_email,
-      :jurisdiction_id,
+      :program_id,
       :webhook_url
     )
   end

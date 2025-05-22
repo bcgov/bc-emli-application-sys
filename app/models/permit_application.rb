@@ -37,7 +37,7 @@ class PermitApplication < ApplicationRecord
                submission_type_id
                audience_type_id
                number
-  ]
+             ]
 
   belongs_to :submitter, class_name: "User"
   belongs_to :jurisdiction, optional: true
@@ -276,9 +276,9 @@ class PermitApplication < ApplicationRecord
     self.class.searchkick_index.retrieve(self)["using_current_template_version"]
   end
 
-  def formatted_permit_classifications
-    "#{permit_type.name} - #{activity.name}"
-  end
+  # def formatted_permit_classifications
+  #   "#{permit_type.name} - #{activity.name}"
+  # end
 
   def using_current_template_version
     self.template_version === current_published_template_version
@@ -309,21 +309,22 @@ class PermitApplication < ApplicationRecord
       latest_submission_version.update(viewed_at: Time.current)
       reindex
     else
-      Rails.logger.warn("Tried to update viewed_at, but latest_submission_version was nil")
+      Rails.logger.warn(
+        "Tried to update viewed_at, but latest_submission_version was nil"
+      )
     end
   end
 
-  def set_status(new_status,reason)
+  def set_status(new_status, reason)
     if update(status: new_status, status_update_reason: reason)
       Rails.logger.debug("Successfully updated: #{self.attributes}")
       self
     else
-      Rails.logger.error("Failed to update: #{errors.full_messages.join(', ')}")
+      Rails.logger.error("Failed to update: #{errors.full_messages.join(", ")}")
       nil
     end
   end
-  
-  
+
   def number_prefix
     jurisdiction.prefix
   end

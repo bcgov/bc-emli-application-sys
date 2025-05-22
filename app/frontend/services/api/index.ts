@@ -240,6 +240,12 @@ export class Api {
     });
   }
 
+  async updateProgramExternalApiEnabled(id: string, externalApiEnabled: boolean) {
+    return this.client.patch<ApiResponse<IProgram>>(`/programs/${id}/update_external_api_enabled`, {
+      externalApiEnabled: externalApiEnabled,
+    });
+  }
+
   async fetchRequirementBlocks(params?: TSearchParams<ERequirementLibrarySortFields>) {
     return this.client.post<IRequirementBlockResponse>('/requirement_blocks/search', params);
   }
@@ -688,8 +694,8 @@ export class Api {
     return this.client.get<ApiResponse<ISiteConfigurationStore>>(`/site_configuration`, {});
   }
 
-  async fetchExternalApiKeys(jurisdictionId: string) {
-    return this.client.get<ApiResponse<IExternalApiKey[]>>(`/external_api_keys/`, { jurisdictionId });
+  async fetchExternalApiKeys(programId: string) {
+    return this.client.get<ApiResponse<IExternalApiKey[]>>(`/external_api_keys/`, { programId });
   }
 
   async fetchExternalApiKey(externalApiKeyId: string) {
