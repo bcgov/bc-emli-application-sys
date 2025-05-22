@@ -40,7 +40,7 @@ class ProgramBlueprint < Blueprinter::Base
   view :minimal do
     fields :program_name,
            :funded_by,
-           :submission_inbox_set_up,
+           # :submission_inbox_set_up,
            :external_api_state
 
     field :external_api_enabled do |program, options|

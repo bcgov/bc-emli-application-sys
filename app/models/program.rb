@@ -1,7 +1,7 @@
 class Program < ApplicationRecord
   extend FriendlyId
   friendly_id :program_name, use: :slugged
-  include JurisdictionExternalApiState
+  include ProgramExternalApiState
 
   # BASE_INCLUDES = %i[
   #   permit_type_submission_contacts

@@ -39,8 +39,7 @@ services:
       IS_APP_SERVER: true
       <<: *default-env-vars
     command: >
-      bash -c "
-      bundle exec rails s -b '0.0.0.0' -p 3000"
+      bash -c "bundle exec rails s -b '0.0.0.0' -p 3000"
 
   vite:
     image: hous-permit-portal-dev:latest

@@ -131,7 +131,7 @@ export const ProgramModel = types
       return response.ok;
     }),
     createExternalApiKey: flow(function* (params: IExternalApiKeyParams) {
-      params.jurisdictionId = self.id;
+      params.programId = self.id;
       const response = yield* toGenerator(self.environment.api.createExternalApiKey(params));
 
       if (response.ok) {
@@ -144,7 +144,7 @@ export const ProgramModel = types
       return response.ok;
     }),
     updateExternalApiKey: flow(function* (externalApiKeyId: string, params: IExternalApiKeyParams) {
-      params.jurisdictionId = self.id;
+      params.programId = self.id;
       const response = yield* toGenerator(self.environment.api.updateExternalApiKey(externalApiKeyId, params));
 
       if (response.ok) {
@@ -183,7 +183,7 @@ export const ProgramModel = types
   .actions((self) => ({
     toggleExternalApiEnabled: flow(function* () {
       const response = yield* toGenerator(
-        self.environment.api.updateJurisdictionExternalApiEnabled(self.id, !self.externalApiEnabled),
+        self.environment.api.updateProgramExternalApiEnabled(self.id, !self.externalApiEnabled),
       );
 
       if (response.ok) {

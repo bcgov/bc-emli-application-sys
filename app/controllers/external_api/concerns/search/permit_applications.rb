@@ -2,11 +2,11 @@ module ExternalApi::Concerns::Search::PermitApplications
   extend ActiveSupport::Concern
 
   def perform_permit_application_search
-    # This search should always be scoped to a jurisdiction via the api key.
+    # This search should always be scoped to a program via the api key.
     # The following condition should never be true, but is an added reduncy
     # for security purposes.
     if current_external_api_key.blank? ||
-         current_external_api_key.jurisdiction_id.blank?
+         current_external_api_key.program_id.blank?
       raise Pundit::NotAuthorizedError
     end
 
@@ -66,8 +66,8 @@ module ExternalApi::Concerns::Search::PermitApplications
     constraints = permit_application_search_params[:constraints]
 
     where = {
-      jurisdiction_id: current_external_api_key.jurisdiction_id,
-      sandbox_id: current_sandbox&.id
+      program_id: current_external_api_key.program_id
+      # sandbox_id: current_sandbox&.id
     }
 
     where[:status] = %i[newly_submitted resubmitted] if constraints.blank? ||

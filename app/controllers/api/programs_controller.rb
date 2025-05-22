@@ -74,11 +74,15 @@ class Api::ProgramsController < Api::ApplicationController
     desired_enabled = update_external_api_enabled_params
 
     begin
+      Rails.logger.info(
+        "starting api_state #{desired_enabled}, and #{current_user.system_admin?}"
+      )
       @program.update_external_api_state!(
         enable_external_api: desired_enabled,
-        allow_reset: current_user.super_admin?
+        allow_reset: current_user.system_admin?
       )
 
+      Rails.logger.info("external_api_state: #{@program.external_api_state}")
       # Determine the appropriate success message based on the new state
       message =
         case @program.external_api_state
@@ -93,14 +97,15 @@ class Api::ProgramsController < Api::ApplicationController
       render_success @program,
                      message,
                      {
-                       blueprint: JurisdictionBlueprint,
+                       blueprint: ProgramBlueprint,
                        blueprint_opts: {
                          view: :minimal
                        }
                      }
-    rescue AASM::InvalidTransition, StandardError
+    rescue AASM::InvalidTransition, StandardError => e
       render_error "jurisdiction.update_external_api_enabled_error",
                    message_opts: {
+                     error_message: e.message
                    }
     end
   end
@@ -189,18 +194,17 @@ class Api::ProgramsController < Api::ApplicationController
 
   def program_options
     authorize :program, :program_options?
-  
+
     program_name = params[:program_name]
     funded_by = params[:funded_by]
     description_html = params[:description_html]
-  
+
     filters = {}
     search = Program.search(program_name || "*", **filters)
     options = search.results.map { |j| { label: j.program_name, value: j } }
-  
+
     render_success options, nil, { blueprint: ProgramOptionBlueprint }
   end
-  
 
   private
 

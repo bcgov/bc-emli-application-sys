@@ -165,9 +165,9 @@ class PermitApplicationBlueprint < Blueprinter::Base
       pa.formatted_submission_data_for_external_use
     end
 
-    field :permit_classifications do |pa, _options|
-      pa.formatted_permit_classifications
-    end
+    # field :permit_classifications do |pa, _options|
+    #   pa.formatted_permit_classifications
+    # end
 
     field :raw_h2k_files do |pa, _options|
       pa.formatted_raw_h2k_files_for_external_use

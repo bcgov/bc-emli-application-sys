@@ -108,6 +108,7 @@ export interface IExternalApiKeyParams {
   webhookUrl?: string;
   expiredAt?: Date;
   jurisdictionId?: string;
+  programId?: string;
   notificationEmail?: string;
   sandboxId?: string;
 }

@@ -9,18 +9,19 @@ class ExternalApiKey < ApplicationRecord
 
   scope :active,
         -> do
-          joins(:jurisdiction).where(
-            "jurisdictions.external_api_state = ? AND (expired_at IS NULL OR expired_at > ?) AND revoked_at IS NULL",
+          joins(:program).where(
+            "programs.external_api_state = ? AND (expired_at IS NULL OR expired_at > ?) AND revoked_at IS NULL",
             "j_on",
             Time.current
           )
         end
 
-  belongs_to :jurisdiction
+  #belongs_to :jurisdiction
+  belongs_to :program
   belongs_to :sandbox, optional: true
 
   validates :token, uniqueness: true
-  validates :name, presence: true, uniqueness: { scope: :jurisdiction_id }
+  validates :name, presence: true, uniqueness: { scope: :program_id }
   validates :connecting_application, presence: true
   validates :expired_at, presence: true
   validates :notification_email,
@@ -52,7 +53,7 @@ class ExternalApiKey < ApplicationRecord
   end
 
   def enabled?
-    jurisdiction.external_api_enabled && !expired? && !revoked?
+    program.external_api_enabled && !expired? && !revoked?
   end
 
   def revoke

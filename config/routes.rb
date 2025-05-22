@@ -148,6 +148,9 @@ Rails.application.routes.draw do
       post "permit_applications/search",
            on: :member,
            to: "programs#search_permit_applications"
+      patch "update_external_api_enabled",
+            on: :member,
+            to: "programs#update_external_api_enabled"
       get "program_options", on: :collection
 
       resources :invitations, only: %i[create show], controller: "invitations"
@@ -195,8 +198,7 @@ Rails.application.routes.draw do
       post "search", on: :collection, to: "permit_applications#index"
       post "submit", on: :member
       post "mark_as_viewed", on: :member
-      post "change_status", 
-           on: :member
+      post "change_status", on: :member
       patch "upload_supporting_document", on: :member
       patch "update_version", on: :member
       patch "revision_requests",
