@@ -31,7 +31,7 @@ export const AdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               title={t('home.submissionInboxTitle')}
               description=""
               icon={<Tray size={24} />}
-              href="/programs/submission-inbox"
+              href="/submission-inbox"
             />
             <HomeScreenBox
               title={t('home.startApplicationTitle')}

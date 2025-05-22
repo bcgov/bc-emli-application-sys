@@ -18,7 +18,7 @@ export const useProgram = () => {
   const { t } = useTranslation();
 
   const programRoutes = [
-    '/programs/submission-inbox',
+    '/submission-inbox',
     '/programs/:programId/configuration-management',
     '/programs/:programId/configuration-management/submissions-inbox-setup',
     '/programs/:programId/configuration-management/energy-step',

@@ -92,6 +92,10 @@ class User < ApplicationRecord
            class_name: "Collaborator",
            dependent: :destroy
 
+  has_many :application_assignments
+  has_many :assigned_permit_applications, through: :application_assignments, source: :permit_application
+           
+
   has_many :early_access_previews,
            dependent: :destroy,
            foreign_key: :previewer_id

@@ -16,6 +16,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
                   create_permit_collaboration
                   invite_new_collaborator
                   remove_collaborator_collaborations
+                  assign_user_to_application
                   create_or_update_permit_block_status
                   destroy
                 ]
@@ -315,6 +316,30 @@ class Api::PermitApplicationsController < Api::ApplicationController
                    }
     end
   end
+  
+  def assign_user_to_application
+    authorize @permit_application, :assign_user_to_application?
+    begin
+      user = User.find(application_assignment_params[:user_id])
+  
+      @application_assignment = ApplicationAssignments::AssignmentManagementService
+        .new(@permit_application)
+        .assign_user_to_application(user)
+  
+      render_success @application_assignment,
+               "permit_application.assign_user_success",
+               {
+                 blueprint: ApplicationAssignmentBlueprint,
+                 blueprint_opts: { view: :base }  
+               }
+    rescue ActiveRecord::RecordNotFound => e
+      render_error "permit_application.assign_user_error",
+      message_opts: {
+        error_message: e.message
+      }
+    end
+  end
+  
 
   def invite_new_collaborator
     begin
@@ -499,6 +524,12 @@ class Api::PermitApplicationsController < Api::ApplicationController
       }
     )
   end
+
+  def application_assignment_params
+    params.require(:application_assignment).permit(:user_id)
+  end
+  
+
 
   def submission_collaborator_permit_application_params # permit application params collaborators can update if they are a collaborator during submission
     designated_submitter =

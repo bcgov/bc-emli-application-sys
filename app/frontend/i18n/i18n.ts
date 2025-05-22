@@ -688,7 +688,7 @@ const options = {
               inEligibleForReInvite: 'Ineligible for re-invite.',
             },
             assignment: {
-              title: 'Assign collaborator',
+              title: 'Assign application',
               noneAssigned: 'None assigned',
               inviteWarning: {
                 title: 'Assign a collaborator?',

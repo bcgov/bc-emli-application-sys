@@ -400,6 +400,20 @@ export class Api {
     );
   }
 
+  async assignUserToApplication(
+    permitApplicationId: string,
+    params: {
+      userId: string;
+    },
+  ) {
+    return this.client.post<ApiResponse<IPermitCollaboration>>(
+      `/permit_applications/${permitApplicationId}/application_assignments`,
+      {
+        applicationAssignment: params,
+      },
+    );
+  }
+
   async removeCollaboratorCollaborationsFromPermitApplication(
     permitApplicationId: string,
     {

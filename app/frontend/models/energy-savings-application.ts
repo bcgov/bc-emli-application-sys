@@ -17,6 +17,7 @@ import {
   IDownloadableFile,
   IFormIOBlock,
   IFormJson,
+  IMinimalFrozenUser,
   IPermitApplicationSupportingDocumentsUpdate,
   ISubmissionData,
   ISubmissionVersion,
@@ -65,6 +66,8 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       program: types.frozen<IProgram>(),
       status: types.enumeration(Object.values(EPermitApplicationStatus)),
       submitter: types.maybeNull(types.maybe(types.reference(types.late(() => UserModel)))),
+      // assignedUsers: types.maybeNull(types.array(types.late(() => UserModel))),
+      assignedUsers: types.array(types.frozen<IMinimalFrozenUser>()),
       jurisdiction: types.maybeNull(types.maybe(types.reference(types.late(() => JurisdictionModel)))),
       templateVersion: types.maybeNull(types.reference(types.late(() => TemplateVersionModel))),
       sandbox: types.maybeNull(types.reference(types.late(() => SandboxModel))),
@@ -536,6 +539,9 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       },
     }))
     .actions((self) => ({
+      setAssignedUsers(users: IMinimalFrozenUser[]) {
+        self.assignedUsers.splice(0, self.assignedUsers.length, ...users);
+      },
       updatePermitCollaboration(permitCollaborationData: IPermitCollaboration) {
         if (permitCollaborationData.collaborator) {
           self.rootStore.collaboratorStore.mergeUpdate(permitCollaborationData.collaborator, 'collaboratorMap');
@@ -589,6 +595,19 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         self.updatePermitCollaboration(permitCollaboration);
 
         return self.getPermitCollaboration(permitCollaboration.id);
+      }),
+      assignUserToApplication: flow(function* (userId: string) {
+        const response = yield self.environment.api.assignUserToApplication(self.id, {
+          userId,
+        });
+
+        if (!response.ok) {
+          return false;
+        }
+        const { data: applicationAssignment } = response.data;
+
+        return applicationAssignment;
+        // return self.getApplicationAssignment(applicationAssignment.id);
       }),
       removeCollaboratorCollaborations: flow(function* (
         collaboratorId: string,

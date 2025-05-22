@@ -170,7 +170,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
               {t('permitApplication.show.contactsSummary')}
             </Button>
             <SubmissionDownloadModal permitApplication={currentPermitApplication} review />
-            <Button rightIcon={<CaretRight />} onClick={() => navigate(`/programs/submission-inbox`)}>
+            <Button rightIcon={<CaretRight />} onClick={() => navigate(`/submission-inbox`)}>
               {t('ui.backToInbox')}
             </Button>
           </Stack>
