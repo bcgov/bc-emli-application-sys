@@ -204,11 +204,11 @@ class User < ApplicationRecord
   end
 
   def participant?
-    role.include?("participant")
+    role&.include?("participant")
   end
 
   def role_name
-    role.gsub("_", " ")
+    role&.gsub("_", " ")
   end
 
   def program_ids
