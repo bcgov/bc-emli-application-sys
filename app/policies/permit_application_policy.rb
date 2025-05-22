@@ -83,6 +83,10 @@ class PermitApplicationPolicy < ApplicationPolicy
     user.admin_manager? && record.submitted?
   end
 
+  def assign_user_to_application?
+    user.admin_manager? 
+  end
+
   def create_permit_collaboration?
     permit_collaboration = record
 

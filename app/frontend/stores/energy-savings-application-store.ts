@@ -25,6 +25,7 @@ import {
   IEnergySavingsApplicationComplianceUpdate,
   IEnergySavingsApplicationSearchFilters,
   IEnergySavingsApplicationSupportingDocumentsUpdate,
+  IMinimalFrozenUser,
   IUserPushPayload,
   TSearchParams,
 } from '../types/types';

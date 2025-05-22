@@ -326,7 +326,7 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
 
   const reviewManagerOnlyItems = (
     <MenuGroup>
-      <NavMenuItem label={t('home.submissionInboxTitle')} to={'/programs/submission-inbox'} />
+      <NavMenuItem label={t('home.submissionInboxTitle')} to={'/submission-inbox'} />
       <NavMenuItem label={t('site.newApplication')} to={`/applications/new`} />
       <NavMenuItem label={t('home.viewBlankApplicationsTitle')} to={`/view-blank-applications`} />
       <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/applications'} />
@@ -338,7 +338,7 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
 
   const reviwerOnlyItems = (
     <MenuGroup>
-      <NavMenuItem label={t('home.submissionInboxTitle')} to={`/programs/submission-inbox`} />
+      <NavMenuItem label={t('home.submissionInboxTitle')} to={`/submission-inbox`} />
       <NavMenuItem label={t('site.newApplication')} to={`/applications/new`} />
       <NavMenuItem label={t('home.viewBlankApplicationsTitle')} to={`/view-blank-applications`} />
       <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/applications'} />

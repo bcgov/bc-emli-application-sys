@@ -13,55 +13,59 @@ import { Plus, X } from "@phosphor-icons/react"
 import { observer } from "mobx-react-lite"
 import React, { useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { ISearch } from "../../../../lib/create-search-model"
-import { useMst } from "../../../../setup/root"
-import { ECollaborationType } from "../../../../types/enums"
-import { ModelSearchInput } from "../../../shared/base/model-search-input"
-import { ConfirmationModal } from "../../../shared/confirmation-modal"
-import { RequestLoadingButton } from "../../../shared/request-loading-button"
+import { ECollaborationType } from "../../../types/enums"
+import { ConfirmationModal } from "../../shared/confirmation-modal"
+import { RequestLoadingButton } from "../../shared/request-loading-button"
+import { ModelSearchInput } from "../../shared/base/model-search-input"
+import { ISearch } from "../../../lib/create-search-model"
+import { useMst } from "../../../setup/root"
 
-export const CollaborationAssignmentPopoverContent = observer(function CollaboratorSearch({
+export const AssignmentPopoverContent = observer(function CollaboratorSearch({
   onSelect,
   onUnselect,
-  takenCollaboratorIds = new Set<string>(),
+  takenuserIds = new Set<string>(),
   onClose,
   getConfirmationModalDisclosureProps,
   transitionToInvite,
   takenCollaboratorStrategy = "exclude",
   collaborationType,
+  onAssignment,
 }: {
-  onSelect: (collaboratorId?: string) => Promise<void>
-  onUnselect?: (collaboratorId?: string) => Promise<void>
-  takenCollaboratorIds?: Set<string>
+  onSelect: (userId?: string) => Promise<void>
+  onUnselect?: (userId?: string) => Promise<void>
+  takenuserIds?: Set<string>
   takenCollaboratorStrategy?: "include" | "exclude"
   onClose?: () => void
   getConfirmationModalDisclosureProps?: (
-    collaboratorId: string
+    userId: string
   ) => Partial<Omit<ReturnType<typeof useDisclosure>, "onToggle">>
   transitionToInvite?: () => void
   collaborationType: ECollaborationType
+  onAssignment?: (response: any) => void
 }) {
-  const { collaboratorStore, userStore } = useMst();
-  const collaboratorSearchList =
-    takenCollaboratorStrategy === 'exclude'
-      ? collaboratorStore.getFilteredCollaborationSearchList(takenCollaboratorIds)
-      : collaboratorStore.collaboratorSearchList;
+  const {  userStore } = useMst();
+  const {  tableUsers } = userStore;
+  const collaboratorSearchList = userStore.tableUsers;
   const { t } = useTranslation();
 
+  // useEffect(() => {
+  //   userStore.setSearchContext(collaborationType);
+
+  //   return () => userStore.setSearchContext(null);
+  // }, []);
+
   useEffect(() => {
-    collaboratorStore.setSearchContext(collaborationType);
+    console.log('tableUsers', tableUsers);
+  }, [tableUsers]);
 
-    return () => collaboratorStore.setSearchContext(null);
-  }, []);
+  // useEffect(() => {
+  //   userStore.search();
+  //   return () => userStore.setQuery(null);
+  // }, []);
 
-  useEffect(() => {
-    collaboratorStore.search();
-    return () => collaboratorStore.setQuery(null);
-  }, []);
-
-  const onSelectCreator = (collaboratorId: string) => {
+  const onSelectCreator = (userId: string) => {
     return async (onClose?: () => void) => {
-      await onSelect(collaboratorId);
+      await onSelect(userId);
       onClose?.();
     };
   };
@@ -97,14 +101,14 @@ export const CollaborationAssignmentPopoverContent = observer(function Collabora
       </PopoverHeader>
       <PopoverBody p={4}>
         <Stack as={'ul'} w={'full'} listStyleType={'none'} pl={0}>
-          {collaboratorSearchList.length === 0 && (
+          {tableUsers?.length === 0 && (
             <Text textAlign={'center'} fontSize={'sm'} color={'text.secondary'} fontStyle={'italic'}>
               {t(
                 `permitCollaboration.popover.assignment.noResultsText.${transitionToInvite ? 'invitable' : 'default'}`,
               )}
             </Text>
           )}
-          {collaboratorSearchList.map((collaborator) => {
+          {tableUsers?.map((collaborator) => {
             return (
               <Text
                 key={collaborator.id}
@@ -122,8 +126,56 @@ export const CollaborationAssignmentPopoverContent = observer(function Collabora
                   bg: 'theme.blueLight',
                 }}
               >
-                {collaborator.user?.name}
-                {takenCollaboratorIds.has(collaborator.id) ? (
+                {collaborator.firstName}
+                <Button
+                    variant={'ghost'}
+                    color={'text.link'}
+                    size={'sm'}
+                    fontWeight={'semibold'}
+                    fontSize={'sm'}
+                    onClick={() => onUnselect?.(collaborator.id)}
+                  >
+                    {t('permitCollaboration.popover.collaborations.unassignButton')}
+                  </Button>
+                  {/* <ConfirmationModal
+                    title={t('permitCollaboration.popover.assignment.inviteWarning.title')}
+                    body={t('permitCollaboration.popover.assignment.inviteWarning.body')}
+                    triggerText={t('ui.proceed')}
+                    renderTriggerButton={({ onClick, ...rest }) => (
+                      <Button
+                        variant={'ghost'}
+                        color={'text.link'}
+                        size={'sm'}
+                        fontWeight={'semibold'}
+                        fontSize={'sm'}
+                        onClick={onClick}
+                        {...rest}
+                      >
+                        {t('ui.select')}
+                      </Button>
+                    )}
+                    renderConfirmationButton={({ onClick }) => (
+                      <RequestLoadingButton variant={'primary'} onClick={onClick as () => Promise<any>}>
+                        {t('ui.confirm')}
+                      </RequestLoadingButton>
+                    )}
+                    onConfirm={onSelectCreator(collaborator.id)}
+                    modalControlProps={getConfirmationModalDisclosureProps(collaborator.id)}
+                    modalContentProps={{
+                      maxW: '700px',
+                    }}
+                  /> */}
+                  <RequestLoadingButton
+                    variant={'ghost'}
+                    color={'text.link'}
+                    size={'sm'}
+                    fontWeight={'semibold'}
+                    fontSize={'sm'}
+                    onClick={() => onSelectCreator(collaborator.id)()}
+                  >
+                    {t('ui.select')}
+                  </RequestLoadingButton>
+                {/* {takenuserIds.has(collaborator.id) ? (
                   <Button
                     variant={'ghost'}
                     color={'text.link'}
@@ -174,7 +226,7 @@ export const CollaborationAssignmentPopoverContent = observer(function Collabora
                   >
                     {t('ui.select')}
                   </RequestLoadingButton>
-                )}
+                )} */}
               </Text>
             );
           })}

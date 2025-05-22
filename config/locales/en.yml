@@ -498,6 +498,12 @@ en:
       assign_collaborator_error:
         title: ''
         message: '%{error_message}'
+      assign_user_success:
+        title: ''
+        message: 'User successfully assigned!'
+      assign_user_error:
+        title: ''
+        message: '%{error_message}'
       update_version_succes:
         title: ''
         message: 'Application successfully updated to new version!'

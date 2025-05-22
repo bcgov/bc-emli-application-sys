@@ -28,7 +28,7 @@ import { GridHeaders } from './grid-header';
 import { AsyncDropdown } from '../../../shared/base/inputs/async-dropdown';
 import { FormProvider, useForm, Controller } from 'react-hook-form';
 import { useProgram } from '../../../../hooks/resources/use-program';
-import { IOption } from '../../../../types/types';
+import { IMinimalFrozenUser, IOption } from '../../../../types/types';
 import { c } from 'vite/dist/node/types.d-aGj9QkWt';
 
 export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionInbox() {
@@ -254,6 +254,7 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
 // New Component for Rendering Each Application Item
 const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavingsApplication }) => {
   const { t } = useTranslation();
+  const [newUser, setNewUser] = useState<IMinimalFrozenUser | null>(null);
   return (
     <Box
       key={permitApplication.id}
@@ -282,13 +283,31 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
       <SearchGridItem>
         <Flex>
           <Text fontWeight={700} flex={1}>
-            {permitApplication.submitter.name}
+            {newUser
+              ? `${newUser?.firstName || ''} ${newUser?.lastName || ''}`.trim()
+              : `${permitApplication?.assignedUsers?.[0]?.firstName || ''} ${permitApplication?.assignedUsers?.[0]?.lastName || ''}`.trim()}
           </Text>
           <Box flex={1}>
             <DesignatedCollaboratorAssignmentPopover
               permitApplication={permitApplication}
               collaborationType={ECollaborationType.review}
               avatarTrigger
+              onAssignComplete={(response) => {
+                console.log('Assignment Response:', response);
+                // Assuming response?.user contains the assigned user object
+                const assignedUser = response?.user;
+
+                console.log(
+                  'Assigned Users:',
+                  permitApplication.assignedUsers.map((u) => u.firstName),
+                );
+
+                if (assignedUser) {
+                  // Set the user in both the MobX store and the local state
+                  setNewUser(assignedUser); // Update local state to reflect the newly assigned user
+                  permitApplication.setAssignedUsers([assignedUser]); // Update MobX store with the new user
+                }
+              }}
             />
           </Box>
         </Flex>

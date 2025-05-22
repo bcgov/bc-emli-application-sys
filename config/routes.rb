@@ -186,6 +186,9 @@ Rails.application.routes.draw do
       post "permit_collaborations",
            on: :member,
            to: "permit_applications#create_permit_collaboration"
+      post "application_assignments",
+           on: :member,
+           to: "permit_applications#assign_user_to_application"
       post "permit_block_status",
            on: :member,
            to: "permit_applications#create_or_update_permit_block_status"
