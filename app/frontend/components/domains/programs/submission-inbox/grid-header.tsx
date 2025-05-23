@@ -1,6 +1,6 @@
 import { Box, Checkbox, Flex, GridItem, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMst } from '../../../../setup/root';
 import { EPermitApplicationReviewerSortFields, EPermitApplicationSortFields } from '../../../../types/enums';
@@ -10,9 +10,12 @@ import { SortIcon } from '../../../shared/sort-icon';
 import { EnergySavingsApplicationFilter } from '../../../shared/energy-savings-applications/energy-savings-application-filter';
 
 export const GridHeaders = observer(function GridHeaders() {
-  const { permitApplicationStore } = useMst();
+  const { permitApplicationStore, userStore } = useMst();
   const { t } = useTranslation();
   const getSortColumnHeader = permitApplicationStore?.getSortColumnHeader;
+  const { search } = permitApplicationStore;
+  const currentUserId = userStore.currentUser?.id;
+  const [assignedToMeOnly, setAssignedToMeOnly] = useState(false);
 
   const { toggleSort, sort } = permitApplicationStore;
 
@@ -40,7 +43,22 @@ export const GridHeaders = observer(function GridHeaders() {
                 alignItems="center"
                 justifyContent="center"
               >
-                <Checkbox colorScheme="gray"> {t('energySavingsApplication.submissionInbox.assignedTo')}</Checkbox>
+                <Checkbox
+                  colorScheme="gray"
+                  isChecked={assignedToMeOnly}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setAssignedToMeOnly(checked);
+
+                    if (checked && currentUserId) {
+                      search({ assignedUserId: currentUserId });
+                    } else {
+                      search();
+                    }
+                  }}
+                >
+                  {t('energySavingsApplication.submissionInbox.assignedTo')}
+                </Checkbox>
               </Box>
             </Flex>
           </Flex>

@@ -102,6 +102,7 @@ export const ProgramModel = types
     setTablePermitApplications: (permitApplications) => {
       self.tablePermitApplications = permitApplications.map((pa) => pa.id);
     },
+
     update: flow(function* (params) {
       const { ok, data: response } = yield* toGenerator(self.environment.api.updateProgram(self.id, params));
       if (ok) {
