@@ -146,11 +146,16 @@ class Api::ProgramsController < Api::ApplicationController
     authorize @program
     perform_user_search
 
-    authorized_results =
-      apply_search_authorization(
-        @user_search.results,
-        "search_program_membership_users"
-      )
+    # Check if `all_users` is passed true
+    if ActiveModel::Type::Boolean.new.cast(params[:all_users])
+      authorized_results = @user_search.results
+    else
+      authorized_results =
+        apply_search_authorization(
+          @user_search.results,
+          "search_program_membership_users"
+        )
+    end
 
     render_success authorized_results,
                    nil,

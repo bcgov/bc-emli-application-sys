@@ -31,6 +31,7 @@ export const UserStoreModel = types
       activeUsers: types.array(types.reference(UserModel)),
       isSuperAdminsLoaded: types.optional(types.boolean, false),
       status: types.optional(types.enumeration(['active', 'pending', 'deactivated']), 'active'),
+      allUsers: types.optional(types.boolean, false),
     }),
     createSearchModel<EActiveUserSortFields | EPendingUserSortFields | EDeactivatedUserSortFields>('searchUsers'),
   )
@@ -163,6 +164,7 @@ export const UserStoreModel = types
         page: opts?.page ?? self.currentPage,
         perPage: opts?.countPerPage ?? self.countPerPage,
         status: self.status,
+        allUsers: self.allUsers,
       };
 
       const response = yield self.rootStore.programStore.currentProgram?.id
@@ -195,6 +197,10 @@ export const UserStoreModel = types
   .actions((self) => ({
     setStatus(status: 'active' | 'pending' | 'deactivated') {
       self.status = status;
+      self.searchUsers({ reset: true });
+    },
+    setAllUsers(allUsers: boolean) {
+      self.allUsers = allUsers;
       self.searchUsers({ reset: true });
     },
   }));
