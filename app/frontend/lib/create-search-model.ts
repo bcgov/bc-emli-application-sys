@@ -2,11 +2,13 @@ import { flow, Instance, types } from 'mobx-state-tree';
 import { ESortDirection } from '../types/enums';
 import { ISort, TVisibility } from '../types/types';
 import { setQueryParam } from '../utils/utility-functions';
+import { assign } from 'mobx/dist/internal';
 
 interface IFetchOptions {
   reset?: boolean;
   page?: number;
   countPerPage?: number;
+  assignedUserId?: string;
 }
 
 export const createSearchModel = <TSortField, TFetchOptions extends IFetchOptions = IFetchOptions>(
@@ -24,6 +26,7 @@ export const createSearchModel = <TSortField, TFetchOptions extends IFetchOption
       visibility: types.maybeNull(types.frozen<TVisibility>()),
       totalPages: types.maybeNull(types.number),
       totalCount: types.maybeNull(types.number),
+      assignedUserId: types.maybeNull(types.string),
       countPerPage: types.optional(types.number, 10),
       isSearching: types.optional(types.boolean, false),
     })

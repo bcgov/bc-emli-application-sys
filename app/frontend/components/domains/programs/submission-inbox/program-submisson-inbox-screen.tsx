@@ -255,6 +255,7 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
 const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavingsApplication }) => {
   const { t } = useTranslation();
   const [newUser, setNewUser] = useState<IMinimalFrozenUser | null>(null);
+
   return (
     <Box
       key={permitApplication.id}

@@ -202,6 +202,7 @@ export const PermitApplicationStoreModel = types
     setTablePermitApplications: (permitApplications) => {
       self.tablePermitApplications = permitApplications.map((pa) => pa.id);
     },
+
     // Action to add a new PermitApplication
     addPermitApplication(permitapplication: IEnergySavingsApplication) {
       self.permitApplicationMap.put(permitapplication);
@@ -326,10 +327,16 @@ export const PermitApplicationStoreModel = types
       }
       self.permitApplicationMap.delete(id);
     },
-    searchPermitApplications: flow(function* (opts?: { reset?: boolean; page?: number; countPerPage?: number }) {
+    searchPermitApplications: flow(function* (opts?: {
+      reset?: boolean;
+      page?: number;
+      countPerPage?: number;
+      assignedUserId?: string;
+    }) {
       if (opts?.reset) {
         self.resetPages();
       }
+
       const searchParams = {
         query: self.query,
         sort: self.sort,
@@ -349,17 +356,27 @@ export const PermitApplicationStoreModel = types
       const response = currentProgramId
         ? yield self.environment.api.fetchProgramPermitApplications(currentProgramId, searchParams)
         : yield self.environment.api.fetchPermitApplications(searchParams);
+
       if (response.ok) {
-        self.mergeUpdateAll(response.data.data, 'permitApplicationMap');
-        (self?.rootStore?.programStore?.currentProgram ?? self).setTablePermitApplications(response.data.data);
+        const permitApplications = response.data.data;
+
+        // Filter based on assignedUserId if provided
+        const filteredApplications = opts?.assignedUserId
+          ? permitApplications.filter((app) => app.assignedUsers?.some((user) => user.id === opts.assignedUserId))
+          : permitApplications;
+
+        self.mergeUpdateAll(permitApplications, 'permitApplicationMap');
+        (self?.rootStore?.programStore?.currentProgram ?? self).setTablePermitApplications(filteredApplications);
 
         self.currentPage = opts?.page ?? self.currentPage;
         self.totalPages = response.data.meta.totalPages;
         self.totalCount = response.data.meta.totalCount;
         self.countPerPage = opts?.countPerPage ?? self.countPerPage;
       }
+
       return response.ok;
     }),
+
     fetchPermitApplication: flow(function* (id: string, review?: boolean) {
       // If the user is review staff, we still need to hit the show endpoint to update viewedAt
       const { ok, data: response } = yield self.environment.api.fetchPermitApplication(id, review);
