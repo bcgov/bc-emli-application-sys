@@ -6,7 +6,13 @@ class ApplicationAssignments::AssignmentManagementService
   end
 
   def assign_user_to_application(user)
-    ApplicationAssignment.find_or_create_by(
+    # Remove existing assignment for this permit_application
+    ApplicationAssignment.find_by(
+      permit_application_id: permit_application.id
+    )&.destroy
+
+    # Create new assignment with current user
+    ApplicationAssignment.create!(
       user_id: user.id,
       permit_application_id: permit_application.id
     )

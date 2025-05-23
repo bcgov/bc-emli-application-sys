@@ -42,8 +42,7 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
   onAssignment?: (response: any) => void;
 }) {
   const { userStore } = useMst();
-  const { tableUsers } = userStore;
-  const collaboratorSearchList = userStore.tableUsers;
+  const { tableUsers, setTableUsers } = userStore;
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -53,8 +52,15 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
   const onSelectCreator = (userId: string) => {
     return async (onClose?: () => void) => {
       await onSelect(userId);
+      setTableUsers([]);
       onClose?.();
     };
+  };
+
+  const enhancedOnClose = () => {
+    setTableUsers([]);
+    userStore.setQuery(null);
+    onClose?.();
   };
 
   return (
@@ -66,7 +72,7 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
           </Text>
           <IconButton
             size={'xs'}
-            onClick={onClose}
+            onClick={enhancedOnClose}
             variant={'ghost'}
             aria-label={'close assignment screen'}
             icon={<X />}
@@ -96,10 +102,10 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
               )}
             </Text>
           )}
-          {tableUsers?.map((collaborator) => {
+          {tableUsers?.map((user) => {
             return (
               <Text
-                key={collaborator.id}
+                key={user.id}
                 as={'li'}
                 px={2}
                 py={'0.375rem'}
@@ -114,8 +120,10 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
                   bg: 'theme.blueLight',
                 }}
               >
-                {collaborator.firstName}
-                <Button
+                {`${user.firstName} ${user.lastName}`}
+
+                {/*  Note: Retaining it for future reference */}
+                {/* <Button
                   variant={'ghost'}
                   color={'text.link'}
                   size={'sm'}
@@ -124,7 +132,7 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
                   onClick={() => onUnselect?.(collaborator.id)}
                 >
                   {t('permitCollaboration.popover.collaborations.unassignButton')}
-                </Button>
+                </Button> */}
                 {/* <ConfirmationModal
                     title={t('permitCollaboration.popover.assignment.inviteWarning.title')}
                     body={t('permitCollaboration.popover.assignment.inviteWarning.body')}
@@ -159,7 +167,7 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
                   size={'sm'}
                   fontWeight={'semibold'}
                   fontSize={'sm'}
-                  onClick={() => onSelectCreator(collaborator.id)()}
+                  onClick={() => onSelectCreator(user.id)()}
                 >
                   {t('ui.select')}
                 </RequestLoadingButton>

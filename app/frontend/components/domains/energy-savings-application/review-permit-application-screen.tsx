@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Flex, HStack, Heading, Spacer, Stack, Text, useDisclosure } from "@chakra-ui/react"
+import { Box, Button, Divider, Flex, HStack, Heading, Spacer, Stack, Text, useDisclosure } from '@chakra-ui/react';
 import { CaretDown, CaretRight, CaretUp, CheckCircle, Info, NotePencil, Prohibit } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useRef, useState } from 'react';
@@ -16,9 +16,9 @@ import { PermitApplicationViewedAtTag } from '../../shared/energy-savings-applic
 import { RequirementForm } from '../../shared/energy-savings-applications/requirement-form';
 import SandboxHeader from '../../shared/sandbox/sandbox-header';
 import { ChecklistSideBar } from './checklist-sidebar';
-import { BlockCollaboratorAssignmentManagement } from './collaborator-management/block-collaborator-assignment-management';
-import { CollaboratorsSidebar } from './collaborator-management/collaborators-sidebar';
-import { useCollaborationAssignmentNodes } from './collaborator-management/hooks/use-collaboration-assignment-nodes';
+import { BlockCollaboratorAssignmentManagement } from './assignment-management/block-collaborator-assignment-management';
+import { CollaboratorsSidebar } from './assignment-management/collaborators-sidebar';
+import { useCollaborationAssignmentNodes } from './assignment-management/hooks/use-collaboration-assignment-nodes';
 import { ContactSummaryModal } from './contact-summary-modal';
 import { RevisionSideBar } from './revision-sidebar';
 import { SubmissionDownloadModal } from './submission-download-modal';

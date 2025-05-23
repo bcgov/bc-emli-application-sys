@@ -1,14 +1,14 @@
-import { Avatar, Button, IconButton, Popover, PopoverContent, PopoverTrigger, useDisclosure } from "@chakra-ui/react"
-import { Plus } from "@phosphor-icons/react"
-import { observer } from "mobx-react-lite"
-import React, { useEffect } from "react"
-import { useTranslation } from "react-i18next"
-import { IPermitApplication } from "../../../../models/energy-savings-application"
-import { useMst } from "../../../../setup/root"
-import { ECollaborationType, ECollaboratorType } from "../../../../types/enums"
-import { CollaborationAssignmentPopoverContent } from "./collaboration-assignment-popover-content"
-import { CollaboratorInvite } from "./collaborator-invite-popover-content"
-import { EAssignmentPopoverScreen } from "./types"
+import { Avatar, Button, IconButton, Popover, PopoverContent, PopoverTrigger, useDisclosure } from '@chakra-ui/react';
+import { Plus } from '@phosphor-icons/react';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { IPermitApplication } from '../../../../models/energy-savings-application';
+import { useMst } from '../../../../setup/root';
+import { ECollaborationType, ECollaboratorType } from '../../../../types/enums';
+import { CollaborationAssignmentPopoverContent } from './collaboration-assignment-popover-content';
+import { CollaboratorInvite } from './collaborator-invite-popover-content';
+import { EAssignmentPopoverScreen } from './types';
 import { AssignmentPopoverContent } from '../assignment-popover-content';
 
 interface IProps {
@@ -133,6 +133,7 @@ export const DesignatedCollaboratorAssignmentPopover = observer(function Designa
       </PopoverTrigger>
       <PopoverContent w={'370px'} maxW={'370px'} ref={contentRef}>
         {canManage && currentScreen === EAssignmentPopoverScreen.collaborationAssignment && (
+          // Note: Retaining it for future reference
           // <CollaborationAssignmentPopoverContent
           //   onSelect={async (collaboratorId) => {
           //     const response = await permitApplication.assignCollaborator(collaboratorId, ECollaboratorType.delegatee)
@@ -165,12 +166,13 @@ export const DesignatedCollaboratorAssignmentPopover = observer(function Designa
               isSubmissionCollaboration ? () => changeScreen(EAssignmentPopoverScreen.collaboratorInvite) : undefined
             }
             takenCollaboratorStrategy={'include'}
-            onUnselect={async () => {
-              if (!existingDelegateeCollaboration) return;
+            // Note: Retaining it for future reference
+            // onUnselect={async () => {
+            //   if (!existingDelegateeCollaboration) return;
 
-              const response = await permitApplication.unassignPermitCollaboration(existingDelegateeCollaboration.id);
-              response && onClose();
-            }}
+            //   const response = await permitApplication.unassignPermitCollaboration(existingDelegateeCollaboration.id);
+            //   response && onClose();
+            // }}
             collaborationType={collaborationType}
           />
         )}

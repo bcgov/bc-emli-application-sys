@@ -44,9 +44,9 @@ import { RequirementForm } from '../../shared/energy-savings-applications/requir
 import { FloatingHelpDrawer } from '../../shared/floating-help-drawer';
 import SandboxHeader from '../../shared/sandbox/sandbox-header';
 import { ChecklistSideBar } from './checklist-sidebar';
-import { BlockCollaboratorAssignmentManagement } from './collaborator-management/block-collaborator-assignment-management';
+import { BlockCollaboratorAssignmentManagement } from './assignment-management/block-collaborator-assignment-management';
 //import { CollaboratorsSidebar } from './collaborator-management/collaborators-sidebar';
-import { useCollaborationAssignmentNodes } from './collaborator-management/hooks/use-collaboration-assignment-nodes';
+import { useCollaborationAssignmentNodes } from './assignment-management/hooks/use-collaboration-assignment-nodes';
 import { ContactSummaryModal } from './contact-summary-modal';
 import { RevisionSideBar } from './revision-sidebar';
 import { SubmissionDownloadModal } from './submission-download-modal';
