@@ -22,7 +22,7 @@ import { RouterLinkButton } from '../../../shared/navigation/router-link-button'
 import { EnergySavingsApplicationStatusTag } from '../../../shared/energy-savings-applications/energy-savings-application-status-tag';
 import { PermitApplicationViewedAtTag } from '../../../shared/energy-savings-applications/permit-application-viewed-at-tag';
 import { Can } from '../../../shared/user/can';
-import { DesignatedCollaboratorAssignmentPopover } from '../../energy-savings-application/collaborator-management/designated-collaborator-assignment-popover';
+import { DesignatedCollaboratorAssignmentPopover } from '../../energy-savings-application/assignment-management/designated-user-assignment-popover';
 import { SubmissionDownloadModal } from '../../energy-savings-application/submission-download-modal';
 import { GridHeaders } from './grid-header';
 import { AsyncDropdown } from '../../../shared/base/inputs/async-dropdown';

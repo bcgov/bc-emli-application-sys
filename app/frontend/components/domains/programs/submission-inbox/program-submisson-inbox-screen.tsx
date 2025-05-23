@@ -22,7 +22,7 @@ import { RouterLinkButton } from '../../../shared/navigation/router-link-button'
 import { EnergySavingsApplicationStatusTag } from '../../../shared/energy-savings-applications/energy-savings-application-status-tag';
 import { PermitApplicationViewedAtTag } from '../../../shared/energy-savings-applications/permit-application-viewed-at-tag';
 import { Can } from '../../../shared/user/can';
-import { DesignatedCollaboratorAssignmentPopover } from '../../energy-savings-application/collaborator-management/designated-collaborator-assignment-popover';
+import { DesignatedCollaboratorAssignmentPopover } from '../../energy-savings-application/assignment-management/designated-user-assignment-popover';
 import { SubmissionDownloadModal } from '../../energy-savings-application/submission-download-modal';
 import { GridHeaders } from './grid-header';
 import { AsyncDropdown } from '../../../shared/base/inputs/async-dropdown';
@@ -293,19 +293,13 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
               collaborationType={ECollaborationType.review}
               avatarTrigger
               onAssignComplete={(response) => {
-                console.log('Assignment Response:', response);
                 // Assuming response?.user contains the assigned user object
                 const assignedUser = response?.user;
 
-                console.log(
-                  'Assigned Users:',
-                  permitApplication.assignedUsers.map((u) => u.firstName),
-                );
-
                 if (assignedUser) {
                   // Set the user in both the MobX store and the local state
-                  setNewUser(assignedUser); // Update local state to reflect the newly assigned user
-                  permitApplication.setAssignedUsers([assignedUser]); // Update MobX store with the new user
+                  setNewUser(assignedUser);
+                  permitApplication.setAssignedUsers([assignedUser]);
                 }
               }}
             />

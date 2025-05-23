@@ -8,17 +8,17 @@ import {
   Stack,
   Text,
   useDisclosure,
-} from "@chakra-ui/react"
-import { Plus, X } from "@phosphor-icons/react"
-import { observer } from "mobx-react-lite"
-import React, { useEffect } from "react"
-import { useTranslation } from "react-i18next"
-import { ISearch } from "../../../../lib/create-search-model"
-import { useMst } from "../../../../setup/root"
-import { ECollaborationType } from "../../../../types/enums"
-import { ModelSearchInput } from "../../../shared/base/model-search-input"
-import { ConfirmationModal } from "../../../shared/confirmation-modal"
-import { RequestLoadingButton } from "../../../shared/request-loading-button"
+} from '@chakra-ui/react';
+import { Plus, X } from '@phosphor-icons/react';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ISearch } from '../../../../lib/create-search-model';
+import { useMst } from '../../../../setup/root';
+import { ECollaborationType } from '../../../../types/enums';
+import { ModelSearchInput } from '../../../shared/base/model-search-input';
+import { ConfirmationModal } from '../../../shared/confirmation-modal';
+import { RequestLoadingButton } from '../../../shared/request-loading-button';
 
 export const CollaborationAssignmentPopoverContent = observer(function CollaboratorSearch({
   onSelect,
@@ -27,19 +27,19 @@ export const CollaborationAssignmentPopoverContent = observer(function Collabora
   onClose,
   getConfirmationModalDisclosureProps,
   transitionToInvite,
-  takenCollaboratorStrategy = "exclude",
+  takenCollaboratorStrategy = 'exclude',
   collaborationType,
 }: {
-  onSelect: (collaboratorId?: string) => Promise<void>
-  onUnselect?: (collaboratorId?: string) => Promise<void>
-  takenCollaboratorIds?: Set<string>
-  takenCollaboratorStrategy?: "include" | "exclude"
-  onClose?: () => void
+  onSelect: (collaboratorId?: string) => Promise<void>;
+  onUnselect?: (collaboratorId?: string) => Promise<void>;
+  takenCollaboratorIds?: Set<string>;
+  takenCollaboratorStrategy?: 'include' | 'exclude';
+  onClose?: () => void;
   getConfirmationModalDisclosureProps?: (
-    collaboratorId: string
-  ) => Partial<Omit<ReturnType<typeof useDisclosure>, "onToggle">>
-  transitionToInvite?: () => void
-  collaborationType: ECollaborationType
+    collaboratorId: string,
+  ) => Partial<Omit<ReturnType<typeof useDisclosure>, 'onToggle'>>;
+  transitionToInvite?: () => void;
+  collaborationType: ECollaborationType;
 }) {
   const { collaboratorStore, userStore } = useMst();
   const collaboratorSearchList =
@@ -182,4 +182,4 @@ export const CollaborationAssignmentPopoverContent = observer(function Collabora
       </PopoverBody>
     </>
   );
-})
+});
