@@ -799,7 +799,7 @@ const options = {
             tableHeading: 'Permit applications',
             chooseProgram: 'Choose a program from the drop down list.',
             tableDescription:
-              'Choose a submission inbox to view from thedropdown list. Submitted applications will appear in the relevant submission inbox. ',
+              'Choose a submission inbox to view from the dropdown list. Submitted applications will appear in the relevant submission inbox. ',
             tableSubHeading: 'Participant applications',
           },
           fields: {
