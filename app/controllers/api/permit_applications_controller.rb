@@ -141,12 +141,11 @@ class Api::PermitApplicationsController < Api::ApplicationController
 
   def update_revision_requests
     authorize @permit_application
-    if @permit_application.submitted? &&
-         @permit_application.latest_submission_version&.update(
-           revision_request_params
-         )
+
+    latest_version = @permit_application.latest_submission_version
+    if latest_version&.update(revision_request_params)
       render_success @permit_application,
-                     ("permit_application.save_success"),
+                     "permit_application.save_success",
                      {
                        blueprint: PermitApplicationBlueprint,
                        blueprint_opts: {
@@ -154,10 +153,22 @@ class Api::PermitApplicationsController < Api::ApplicationController
                        }
                      }
     else
+      # Collect more detailed error messages
+      latest_version_errors =
+        if latest_version.respond_to?(:errors)
+          latest_version.errors.full_messages
+        else
+          []
+        end
+      permit_application_errors = @permit_application.errors.full_messages
+      detailed_errors =
+        (latest_version_errors + permit_application_errors).join(
+          ", "
+        ).presence || "An unknown error occurred"
+      # Render the detailed error response
       render_error "permit_application.update_error",
                    message_opts: {
-                     error_message:
-                       @permit_application.errors.full_messages.join(", ")
+                     error_message: detailed_errors
                    }
     end
   end
@@ -316,30 +327,32 @@ class Api::PermitApplicationsController < Api::ApplicationController
                    }
     end
   end
-  
+
   def assign_user_to_application
     authorize @permit_application, :assign_user_to_application?
     begin
       user = User.find(application_assignment_params[:user_id])
-  
-      @application_assignment = ApplicationAssignments::AssignmentManagementService
-        .new(@permit_application)
-        .assign_user_to_application(user)
-  
+
+      @application_assignment =
+        ApplicationAssignments::AssignmentManagementService.new(
+          @permit_application
+        ).assign_user_to_application(user)
+
       render_success @application_assignment,
-               "permit_application.assign_user_success",
-               {
-                 blueprint: ApplicationAssignmentBlueprint,
-                 blueprint_opts: { view: :base }  
-               }
+                     "permit_application.assign_user_success",
+                     {
+                       blueprint: ApplicationAssignmentBlueprint,
+                       blueprint_opts: {
+                         view: :base
+                       }
+                     }
     rescue ActiveRecord::RecordNotFound => e
       render_error "permit_application.assign_user_error",
-      message_opts: {
-        error_message: e.message
-      }
+                   message_opts: {
+                     error_message: e.message
+                   }
     end
   end
-  
 
   def invite_new_collaborator
     begin
@@ -528,8 +541,6 @@ class Api::PermitApplicationsController < Api::ApplicationController
   def application_assignment_params
     params.require(:application_assignment).permit(:user_id)
   end
-  
-
 
   def submission_collaborator_permit_application_params # permit application params collaborators can update if they are a collaborator during submission
     designated_submitter =

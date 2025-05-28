@@ -23,6 +23,7 @@ import { ContactSummaryModal } from './contact-summary-modal';
 import { RevisionSideBar } from './revision-sidebar';
 import { SubmissionDownloadModal } from './submission-download-modal';
 import ApplicationReviewModal from '../../shared/modals/application-review-modal';
+import UpdatePathwayModal from '../../shared/modals/application-update-pathway';
 
 interface IReferenceNumberForm {
   referenceNumber?: string;
@@ -52,6 +53,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isScreenIn, onOpen: onScreenIn, onClose: onScreenInclose } = useDisclosure();
   const { isOpen: isContactsOpen, onOpen: onContactsOpen, onClose: onContactsClose } = useDisclosure();
+  const { isOpen: isUpdatePathwayOpen, onOpen: onUpdatePathwayOpen, onClose: onUpdatePathwayClose } = useDisclosure();
 
   const [hideRevisionList, setHideRevisionList] = useState(false);
 
@@ -191,7 +193,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
             <Flex width={'sidebar.width'} align="center" gap={2}>
               <NotePencil size={24} />
               <Heading fontSize="lg" mt={2}>
-                {t('permitApplication.show.requestingRevisions')}
+                {t('energySavingsApplication.show.updatesTracker')}
               </Heading>
               <Spacer />
               <Button
@@ -245,7 +247,8 @@ export const ReviewPermitApplicationScreen = observer(() => {
                         variant="calloutInverse"
                         leftIcon={<NotePencil />}
                         px={14}
-                        onClick={() => setRevisionMode(true)}
+                        // onClick={() => setRevisionMode(true)}
+                        onClick={onUpdatePathwayOpen}
                         borderColor="theme.yellow"
                       >
                         {t('permitApplication.show.update')}
@@ -292,6 +295,13 @@ export const ReviewPermitApplicationScreen = observer(() => {
           onConfirm={() => navigate(`/rejection-reason/${currentPermitApplication.id}/${number}`)}
           title={t('permitApplication.review.readyToMarkIneligible')}
           message={t('permitApplication.review.confirmIneligible')}
+        />
+      )}
+      {isUpdatePathwayOpen && (
+        <UpdatePathwayModal
+          isOpen={isUpdatePathwayOpen}
+          onClose={onUpdatePathwayClose}
+          setRevisionMode={setRevisionMode}
         />
       )}
       {isScreenIn && (

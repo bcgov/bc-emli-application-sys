@@ -125,6 +125,9 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       get isEphemeral() {
         return self.status === EPermitApplicationStatus.ephemeral;
       },
+      get isPrescreened() {
+        return self.status === EPermitApplicationStatus.prescreen;
+      },
       get sortedSubmissionVersions() {
         return self.submissionVersions.slice().sort((a, b) => b.createdAt - a.createdAt);
       },
@@ -245,10 +248,11 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
             self.latestSubmissionVersion.submissionData,
           );
         }
-        const changedMarkedFormJson = combineChangeMarkers(diffColoredFormJson, self.isSubmitted, changedKeys);
+        const status = self.isSubmitted || self.isPrescreened;
+        const changedMarkedFormJson = combineChangeMarkers(diffColoredFormJson, status, changedKeys);
         const revisionModeFormJson =
           self.revisionMode || self.isRevisionsRequested
-            ? combineRevisionButtons(changedMarkedFormJson, self.isSubmitted, revisionRequestsToUse)
+            ? combineRevisionButtons(changedMarkedFormJson, status, revisionRequestsToUse)
             : diffColoredFormJson;
         return revisionModeFormJson;
       },

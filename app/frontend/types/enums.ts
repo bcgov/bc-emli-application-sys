@@ -53,6 +53,7 @@ export enum ESubmissionInboxTypes {
 export enum EPermitApplicationStatus {
   draft = 'new_draft',
   submitted = 'newly_submitted',
+  prescreen = 'prescreen',
   revisionsRequested = 'revisions_requested',
   resubmitted = 'resubmitted',
   ephemeral = 'ephemeral',
@@ -60,17 +61,17 @@ export enum EPermitApplicationStatus {
   updateNeeded = 'update_needed',
   approved = 'approved',
   ineligible = 'ineligible',
-  unread = 'unread',
-  prescreen = 'prescreen',
 }
 
 export enum EPermitApplicationStatusGroup {
   draft = 'draft',
   submitted = 'submitted',
-  inReview = 'inReview',
+  prescreen = 'prescreen',
   updateNeeded = 'updateNeeded',
-  approved = 'approved',
+  inReview = 'inReview',
   ineligible = 'ineligible',
+  approved = 'approved',
+  revisionsRequested = 'revisionsRequested',
 }
 
 export enum ETemplateVersionStatus {

@@ -47,6 +47,8 @@ export const PermitApplicationStoreModel = types
         EPermitApplicationStatus.updateNeeded,
         EPermitApplicationStatus.approved,
         EPermitApplicationStatus.ineligible,
+        EPermitApplicationStatus.prescreen,
+        EPermitApplicationStatus.revisionsRequested,
       ]),
       userGroupTypeIdFilter: types.maybeNull(types.string),
       submissionTypeIdFilter: types.maybeNull(types.array(types.string)),
@@ -95,6 +97,8 @@ export const PermitApplicationStoreModel = types
         [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.updateNeeded,
         [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.approved,
         [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.ineligible,
+        [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.prescreen,
+        [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.revisionsRequested,
       };
       return map[self.statusFilter.join(',')];
     },
@@ -225,7 +229,6 @@ export const PermitApplicationStoreModel = types
       const ids = Array.isArray(id) ? id : [id];
       const joinedIds = ids.join(',');
 
-      // setQueryParam('submission_type_id', ids);
       // @ts-ignor"
       self.submissionTypeIdFilter = cast(ids);
     },

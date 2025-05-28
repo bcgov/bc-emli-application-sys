@@ -9,7 +9,7 @@ import { usePermitClassificationsLoad } from '../../../../hooks/resources/use-pe
 import { useSearch } from '../../../../hooks/use-search';
 import { IEnergySavingsApplication } from '../../../../models/energy-savings-application';
 import { useMst } from '../../../../setup/root';
-import { ECollaborationType, EPermitClassificationCode } from '../../../../types/enums';
+import { ECollaborationType, EPermitApplicationStatus, EPermitClassificationCode } from '../../../../types/enums';
 import { ErrorScreen } from '../../../shared/base/error-screen';
 import { Paginator } from '../../../shared/base/inputs/paginator';
 import { PerPageSelect } from '../../../shared/base/inputs/per-page-select';
@@ -29,7 +29,6 @@ import { AsyncDropdown } from '../../../shared/base/inputs/async-dropdown';
 import { FormProvider, useForm, Controller } from 'react-hook-form';
 import { useProgram } from '../../../../hooks/resources/use-program';
 import { IMinimalFrozenUser, IOption } from '../../../../types/types';
-import { c } from 'vite/dist/node/types.d-aGj9QkWt';
 
 export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionInbox() {
   const { t } = useTranslation();
@@ -256,6 +255,16 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
   const { t } = useTranslation();
   const [newUser, setNewUser] = useState<IMinimalFrozenUser | null>(null);
 
+  const changeStatus = async (status: EPermitApplicationStatus) => {
+    try {
+      if (status === EPermitApplicationStatus.submitted) {
+        const response = await permitApplication.updateStatus({
+          status: EPermitApplicationStatus.prescreen,
+        });
+      }
+    } catch (e) {}
+  };
+
   return (
     <Box
       key={permitApplication.id}
@@ -264,7 +273,7 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
       display="contents"
     >
       <SearchGridItem>
-        <EnergySavingsApplicationStatusTag energySavingsApplication={permitApplication} />
+        <EnergySavingsApplicationStatusTag energySavingsApplication={permitApplication} type="submission-inbox" />
       </SearchGridItem>
       <SearchGridItem>{permitApplication.number}</SearchGridItem>
       <SearchGridItem wordBreak="break-word">{permitApplication?.submissionType?.name}</SearchGridItem>
@@ -317,7 +326,13 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
               )}
               review
             />
-            <RouterLinkButton variant="primary" to={`/permit-applications/${permitApplication.id}`}>
+            <RouterLinkButton
+              variant="primary"
+              to={`/permit-applications/${permitApplication.id}`}
+              onClick={() => {
+                changeStatus(permitApplication.status);
+              }}
+            >
               {t('ui.view')}
             </RouterLinkButton>
           </HStack>

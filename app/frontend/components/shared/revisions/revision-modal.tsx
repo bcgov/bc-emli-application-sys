@@ -17,26 +17,26 @@ import {
   Spacer,
   Textarea,
   useDisclosure,
-} from "@chakra-ui/react"
-import { Trash } from "@phosphor-icons/react"
-import React, { useState } from "react"
-import { UseFieldArrayReturn } from "react-hook-form"
-import { useTranslation } from "react-i18next"
-import { useMst } from "../../../setup/root"
-import { IFormIORequirement, IRevisionRequest } from "../../../types/types"
-import { singleRequirementFormJson } from "../../../utils/formio-helpers"
-import { IRevisionRequestForm } from "../../domains/energy-savings-application/revision-sidebar"
-import { SingleRequirementForm } from "../energy-savings-applications/single-requirement-form"
+} from '@chakra-ui/react';
+import { Trash } from '@phosphor-icons/react';
+import React, { useState } from 'react';
+import { UseFieldArrayReturn } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useMst } from '../../../setup/root';
+import { IFormIORequirement, IRevisionRequest } from '../../../types/types';
+import { singleRequirementFormJson } from '../../../utils/formio-helpers';
+import { IRevisionRequestForm } from '../../domains/energy-savings-application/revision-sidebar';
+import { SingleRequirementForm } from '../energy-savings-applications/single-requirement-form';
 
 export interface IRevisionModalProps extends Partial<ReturnType<typeof useDisclosure>> {
-  requirementJson: IFormIORequirement
-  submissionJson: any
-  revisionRequest: IRevisionRequest
-  revisionRequestDefault?: IRevisionRequest
-  useFieldArrayMethods: UseFieldArrayReturn<IRevisionRequestForm, "revisionRequestsAttributes", "fieldId">
-  onSave: () => Promise<void>
-  isRevisionsRequested?: boolean
-  disableInput?: boolean
+  requirementJson: IFormIORequirement;
+  submissionJson: any;
+  revisionRequest: IRevisionRequest;
+  revisionRequestDefault?: IRevisionRequest;
+  useFieldArrayMethods: UseFieldArrayReturn<IRevisionRequestForm, 'revisionRequestsAttributes', 'fieldId'>;
+  onSave: () => Promise<void>;
+  isRevisionsRequested?: boolean;
+  disableInput?: boolean;
 }
 
 export const RevisionModal: React.FC<IRevisionModalProps> = ({
@@ -52,34 +52,34 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
   isRevisionsRequested,
   disableInput,
 }) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const [reasonCode, setReasonCode] = useState<string>(
-    revisionRequestDefault?.reasonCode ?? revisionRequest?.reasonCode ?? ""
-  )
-  const [comment, setComment] = useState<string>(revisionRequestDefault?.comment ?? revisionRequest?.comment ?? "")
+    revisionRequestDefault?.reasonCode ?? revisionRequest?.reasonCode ?? '',
+  );
+  const [comment, setComment] = useState<string>(revisionRequestDefault?.comment ?? revisionRequest?.comment ?? '');
 
-  const { update, append, fields } = useFieldArrayMethods
+  const { update, append, fields } = useFieldArrayMethods;
 
-  const { userStore, siteConfigurationStore } = useMst()
-  const { currentUser } = userStore
-  const { revisionReasonOptions } = siteConfigurationStore
+  const { userStore, siteConfigurationStore } = useMst();
+  const { currentUser } = userStore;
+  const { revisionReasonOptions } = siteConfigurationStore;
 
-  const className = `formio-component-${requirementJson?.key}`
-  const elements = document.getElementsByClassName(className)
+  const className = `formio-component-${requirementJson?.key}`;
+  const elements = document.getElementsByClassName(className);
 
   const resetFields = () => {
-    setReasonCode("")
-    setComment("")
-  }
+    setReasonCode('');
+    setComment('');
+  };
 
   const handleClose = () => {
-    resetFields()
-    onClose()
-  }
-  const index = fields.findIndex((field) => field.id === revisionRequest?.id)
+    resetFields();
+    onClose();
+  };
+  const index = fields.findIndex((field) => field.id === revisionRequest?.id);
 
   const handleUpsert = () => {
-    if (!reasonCode || !requirementJson) return
+    if (!reasonCode || !requirementJson) return;
 
     const newItem = {
       id: revisionRequest?.id,
@@ -88,39 +88,39 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
       requirementJson,
       submissionJson,
       comment,
-    }
+    };
     if (revisionRequest) {
       // Item exists, replace it
-      update(index, newItem)
+      update(index, newItem);
     } else {
       // Item does not exist, append it
-      append(newItem)
+      append(newItem);
     }
 
     onSave().then(() => {
-      elements?.[0]?.classList?.add("revision-requested")
-      handleClose()
-    })
-  }
+      elements?.[0]?.classList?.add('revision-requested');
+      handleClose();
+    });
+  };
 
   const handleDelete = () => {
     if (revisionRequest?.id) {
-      update(index, { _destroy: true, id: revisionRequest.id })
+      update(index, { _destroy: true, id: revisionRequest.id });
     }
 
     onSave().then(() => {
-      elements?.[0]?.classList?.remove("revision-requested")
-      handleClose()
-    })
-  }
+      elements?.[0]?.classList?.remove('revision-requested');
+      handleClose();
+    });
+  };
 
   const requirementForm = singleRequirementFormJson(
-    revisionRequestDefault?.requirementJson ?? revisionRequest?.requirementJson ?? requirementJson
-  )
+    revisionRequestDefault?.requirementJson ?? revisionRequest?.requirementJson ?? requirementJson,
+  );
   const requirementSubmission =
-    revisionRequestDefault?.submissionJson ?? revisionRequest?.submissionJson ?? submissionJson
+    revisionRequestDefault?.submissionJson ?? revisionRequest?.submissionJson ?? submissionJson;
 
-  const selectedLabel = revisionReasonOptions.find((opt) => opt.value === reasonCode)?.label
+  const selectedLabel = revisionReasonOptions.find((opt) => opt.value === reasonCode)?.label;
 
   return (
     <Modal onClose={handleClose} isOpen={isOpen} size="lg">
@@ -129,19 +129,19 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
       <ModalContent mt={48}>
         <ModalHeader textAlign="center">
           <ModalCloseButton fontSize="11px" />
-          <Heading as="h3" fontSize="xl">
-            {t("permitApplication.show.revision.revisionRequest")}
+          <Heading as="h3" fontSize="xl" color="theme.blueAlt">
+            {t('energySavingsApplication.show.revision.revisionRequest')}
           </Heading>
         </ModalHeader>
         <ModalBody>
           <Flex direction="column" gap={4}>
             <FormControl>
-              <FormLabel>{t("permitApplication.show.revision.reasonFor")}</FormLabel>
+              <FormLabel>{t('energySavingsApplication.show.revision.reasonFor')}</FormLabel>
               {isRevisionsRequested ? (
                 <Textarea disabled={true}>{selectedLabel}</Textarea>
               ) : (
                 <Select
-                  placeholder={t("ui.pleaseSelect")}
+                  placeholder={t('ui.pleaseSelect')}
                   value={reasonCode}
                   onChange={(e) => setReasonCode(e.target.value)}
                 >
@@ -154,43 +154,43 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
               )}
             </FormControl>
             <FormControl>
-              <FormLabel>{t("permitApplication.show.revision.comment")}</FormLabel>
+              <FormLabel>{t('permitApplication.show.revision.comment')}</FormLabel>
               <Textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder={t("permitApplication.show.revision.comment")}
+                placeholder={t('permitApplication.show.revision.comment')}
                 maxLength={350}
                 isDisabled={isRevisionsRequested}
                 sx={{
                   _disabled: {
-                    color: "text.primary",
-                    cursor: "not-allowed",
+                    color: 'text.primary',
+                    cursor: 'not-allowed',
                   },
                 }}
               />
-              {!disableInput && <FormHelperText>{t("permitApplication.show.revision.maxCharacters")}</FormHelperText>}
+              {!disableInput && <FormHelperText>{t('permitApplication.show.revision.maxCharacters')}</FormHelperText>}
             </FormControl>
 
             <Divider />
 
-            <SingleRequirementForm requirementJson={requirementForm} submissionJson={requirementSubmission} />
+            {/* <SingleRequirementForm requirementJson={requirementForm} submissionJson={requirementSubmission} /> */}
           </Flex>
           <ModalFooter>
             <Flex width="full" justify="center" gap={4}>
               {disableInput ? (
                 <>
                   <Button variant="secondary" onClick={onClose}>
-                    {t("ui.ok")}
+                    {t('ui.ok')}
                   </Button>
                 </>
               ) : (
                 <>
                   <Button onClick={handleUpsert} variant="primary" isDisabled={!reasonCode || isRevisionsRequested}>
-                    {t("permitApplication.show.revision.useButton")}
+                    {t('permitApplication.show.revision.useButton')}
                   </Button>
 
                   <Button variant="secondary" onClick={onClose}>
-                    {t("ui.cancel")}
+                    {t('ui.cancel')}
                   </Button>
                   <Spacer />
                   {revisionRequest && (
@@ -201,7 +201,7 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
                       onClick={handleDelete}
                       isDisabled={isRevisionsRequested}
                     >
-                      {t("ui.delete")}
+                      {t('ui.delete')}
                     </Button>
                   )}
                 </>
@@ -211,5 +211,5 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
         </ModalBody>
       </ModalContent>
     </Modal>
-  )
-}
+  );
+};

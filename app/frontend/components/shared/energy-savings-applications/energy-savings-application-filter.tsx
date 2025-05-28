@@ -9,39 +9,41 @@ import {
   MenuItem,
   MenuList,
   Text,
-} from "@chakra-ui/react"
-import { CaretDown, Funnel } from "@phosphor-icons/react"
-import { observer } from "mobx-react-lite"
-import React, { useEffect, useState } from "react"
-import { useTranslation } from "react-i18next"
-import { ISearch } from "../../../lib/create-search-model"
-import { useMst } from "../../../setup/root"
-import { TFilterableStatus } from "../../../stores/energy-savings-application-store"
-import { EPermitApplicationStatus, EPermitApplicationStatusGroup } from "../../../types/enums"
+} from '@chakra-ui/react';
+import { CaretDown, Funnel } from '@phosphor-icons/react';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ISearch } from '../../../lib/create-search-model';
+import { useMst } from '../../../setup/root';
+import { TFilterableStatus } from '../../../stores/energy-savings-application-store';
+import { EPermitApplicationStatus, EPermitApplicationStatusGroup } from '../../../types/enums';
 
 interface IPermitApplicationStatusTabsProps<TSearchModel extends ISearch> extends ContainerProps {}
 
 export const EnergySavingsApplicationFilter = observer(function ToggleArchivedButton<TSearchModel extends ISearch>({
   ...rest
 }: IPermitApplicationStatusTabsProps<TSearchModel>) {
-  const { permitApplicationStore } = useMst()
-  const { t } = useTranslation()
-  const queryParams = new URLSearchParams(location.search)
-  const paramStatusFilterString = queryParams.get("status") || t("energySavingsApplication.statusGroup.filter")
+  const { permitApplicationStore } = useMst();
+  const { t } = useTranslation();
+  const queryParams = new URLSearchParams(location.search);
+  const paramStatusFilterString = queryParams.get('status') || t('energySavingsApplication.statusGroup.filter');
 
-  const paramStatusFilter = paramStatusFilterString.split(",") as TFilterableStatus[] // Filter parameters
+  const paramStatusFilter = paramStatusFilterString.split(',') as TFilterableStatus[]; // Filter parameters
   const [selectedFilterLabel, setSelectedFilterLabel] = useState<string>(
-    t("energySavingsApplication.statusGroup.filter")
-  )
-  const { statusFilter, setStatusFilter, search } = permitApplicationStore
+    t('energySavingsApplication.statusGroup.filter'),
+  );
+  const { statusFilter, setStatusFilter, search } = permitApplicationStore;
 
   // Define the filters
-  const draftFilters = [EPermitApplicationStatus.draft]
-  const submittedFilters = [EPermitApplicationStatus.submitted]
+  const draftFilters = [EPermitApplicationStatus.draft];
+  const submittedFilters = [EPermitApplicationStatus.submitted];
   const inReviewFilters = [EPermitApplicationStatus.inReview];
   const updateNeededFilters = [EPermitApplicationStatus.updateNeeded];
   const approvedFilters = [EPermitApplicationStatus.approved];
   const ineligibleFilters = [EPermitApplicationStatus.ineligible];
+  const prescreenFilters = [EPermitApplicationStatus.prescreen];
+  const revisionRequestedFilters = [EPermitApplicationStatus.revisionsRequested];
 
   // Handle selected filters
   const [selectedFilters, setSelectedFilters] = useState<string[]>(paramStatusFilter);
@@ -92,6 +94,10 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
         return approvedFilters;
       case 'ineligible':
         return ineligibleFilters;
+      case 'prescreen':
+        return prescreenFilters;
+      case 'revisionRequested':
+        return revisionRequestedFilters;
       default:
         return [];
     }
@@ -111,6 +117,10 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
         return 'approved';
       case EPermitApplicationStatus.ineligible:
         return 'ineligible';
+      case EPermitApplicationStatus.prescreen:
+        return 'prescreen';
+      case EPermitApplicationStatus.revisionsRequested:
+        return 'revisionsRequested';
       default:
         return [];
     }
@@ -118,51 +128,51 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
 
   // Handle reset functionality
   const handleResetFilters = () => {
-    setSelectedFilters([])
-    setStatusFilter(Object.values(EPermitApplicationStatus) as EPermitApplicationStatus[])
-    search()
-    window.history.replaceState(null, "", "?currentPage=1")
-  }
+    setSelectedFilters([]);
+    setStatusFilter(Object.values(EPermitApplicationStatus) as EPermitApplicationStatus[]);
+    search();
+    window.history.replaceState(null, '', '?currentPage=1');
+  };
 
   useEffect(() => {
-    let label: string = ""
+    let label: string = '';
     // If there are selected filters, show the number of selected filters
     if (selectedFilters.length === 0) {
-      label = t("energySavingsApplication.statusGroup.filter")
+      label = t('energySavingsApplication.statusGroup.filter');
     } else {
-      label = `${t("energySavingsApplication.statusGroup.filter")} (${selectedFilters.length})`
+      label = `${t('energySavingsApplication.statusGroup.filter')} (${selectedFilters.length})`;
     }
 
-    setSelectedFilterLabel(label)
-  }, [selectedFilters, t])
+    setSelectedFilterLabel(label);
+  }, [selectedFilters, t]);
 
   useEffect(() => {
     //functionality to handle filters When first time page loads
 
-    const params = new URLSearchParams(window.location.search)
+    const params = new URLSearchParams(window.location.search);
 
     // Get the 'status' parameter and split it into an array
-    const statusParam = params.get("status")
+    const statusParam = params.get('status');
     if (statusParam) {
-      const statusParamArray = statusParam.split(",")
-      setSelectedFilters(statusParamArray.flatMap(mapStatusToFilterArray))
+      const statusParamArray = statusParam.split(',');
+      setSelectedFilters(statusParamArray.flatMap(mapStatusToFilterArray));
     } else {
       const mappedStatusArray = statusFilter
         .map((status: string) => {
           // Find the key of the enum that corresponds to the value
           const statusKey = Object.keys(EPermitApplicationStatusGroup).find(
-            (key) => EPermitApplicationStatus[key as keyof typeof EPermitApplicationStatus] === status
-          )
+            (key) => EPermitApplicationStatus[key as keyof typeof EPermitApplicationStatus] === status,
+          );
 
           // Return the key (the enum name) if it exists
-          return statusKey ? statusKey : undefined
+          return statusKey ? statusKey : undefined;
         })
-        .filter((status): status is keyof typeof EPermitApplicationStatus => status !== undefined)
+        .filter((status): status is keyof typeof EPermitApplicationStatus => status !== undefined);
 
       // Set the selected filters using the mapped keys
-      setSelectedFilters(mappedStatusArray)
+      setSelectedFilters(mappedStatusArray);
     }
-  }, [])
+  }, []);
 
   return (
     <Container maxW="container.lg" {...rest}>
@@ -201,4 +211,4 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
       </Menu>
     </Container>
   );
-})
+});
