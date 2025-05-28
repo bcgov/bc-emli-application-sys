@@ -39,12 +39,23 @@ module Api::Concerns::Search::PermitApplications
   private
 
   def permit_application_search_params
+    params.delete(:sort) if params[:sort].nil?
     params.permit(
       :query,
       :page,
       :per_page,
-      program: {}, 
-      filters: [:requirement_template_id, :template_version_id, :user_group_type_id, { submission_type_id: [] }, :audience_type_id, { status: [] }],
+      program: {
+      },
+      permit_application: {
+      },
+      filters: [
+        :requirement_template_id,
+        :template_version_id,
+        :user_group_type_id,
+        { submission_type_id: [] },
+        :audience_type_id,
+        { status: [] }
+      ],
       sort: %i[field direction]
     )
   end
@@ -71,9 +82,7 @@ module Api::Concerns::Search::PermitApplications
     filters = permit_application_search_params[:filters]
     where =
       if @program
-        {
-          program_id: @program.id
-        }
+        { program_id: @program.id }
       else
         { user_ids_with_submission_edit_permissions: current_user.id }
       end

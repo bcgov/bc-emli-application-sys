@@ -10,7 +10,8 @@ module PermitApplicationStatus
            in_review: 5,
            update_needed: 6,
            approved: 7,
-           ineligible: 8
+           ineligible: 8,
+           prescreen: 9
          },
          _default: 0
 
@@ -30,6 +31,7 @@ module PermitApplicationStatus
       state :in_review
       state :approved
       state :ineligible
+      state :prescreen
 
       event :submit do
         transitions from: :new_draft,
@@ -43,7 +45,7 @@ module PermitApplicationStatus
       end
 
       event :finalize_revision_requests do
-        transitions from: %i[newly_submitted resubmitted ineligible],
+        transitions from: %i[newly_submitted resubmitted prescreen],
                     to: :revisions_requested,
                     guard: :can_finalize_requests?,
                     after: :handle_finalize_revision_requests

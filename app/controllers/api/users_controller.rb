@@ -56,7 +56,9 @@ class Api::UsersController < Api::ApplicationController
 
   def update
     authorize @user
-    unless %w[reviewer review_manager].include?(user_params[:role])
+    unless %w[reviewer review_manager admin_manager].include?(
+             user_params[:role]
+           )
       return render_error "misc.user_not_authorized_error"
     end
 

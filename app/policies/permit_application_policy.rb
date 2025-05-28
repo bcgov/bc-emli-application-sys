@@ -49,7 +49,7 @@ class PermitApplicationPolicy < ApplicationPolicy
   end
 
   def update_revision_requests?
-    record.submitted? && user.review_staff?
+    user.admin_manager? || user.admin?
   end
 
   def upload_supporting_document?
@@ -80,11 +80,11 @@ class PermitApplicationPolicy < ApplicationPolicy
   end
 
   def finalize_revision_requests?
-    user.admin_manager? && record.submitted?
+    user.admin_manager? || user.admin?
   end
 
   def assign_user_to_application?
-    user.admin_manager? 
+    user.admin_manager?
   end
 
   def create_permit_collaboration?

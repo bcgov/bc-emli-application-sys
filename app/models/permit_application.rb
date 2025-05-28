@@ -514,7 +514,7 @@ class PermitApplication < ApplicationRecord
       "action_type" =>
         Constants::NotificationActionTypes::APPLICATION_REVISIONS_REQUEST,
       "action_text" =>
-        "#{I18n.t("notification.permit_application.revisions_request_notification", number: number, jurisdiction_name: jurisdiction_name)}",
+        "#{I18n.t("notification.permit_application.revisions_request_notification", number: number, program_name: program_name)}",
       "object_data" => {
         "permit_application_id" => id,
         "permit_application_number" => number
@@ -527,7 +527,7 @@ class PermitApplication < ApplicationRecord
       "id" => SecureRandom.uuid,
       "action_type" => Constants::NotificationActionTypes::APPLICATION_VIEW,
       "action_text" =>
-        "#{I18n.t("notification.permit_application.view_notification", number: number, jurisdiction_name: jurisdiction_name)}",
+        "#{I18n.t("notification.permit_application.view_notification", number: number, program_name: program_name)}",
       "object_data" => {
         "permit_application_id" => id
       }
