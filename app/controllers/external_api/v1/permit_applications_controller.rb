@@ -6,15 +6,24 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
 
   def index
     perform_permit_application_search
+
     authorized_results =
       apply_search_authorization(@permit_application_search.results)
+
     render_success authorized_results,
                    nil,
                    {
                      meta: {
-                       total_pages: @permit_application_search.total_pages,
-                       total_count: @permit_application_search.total_count,
+                       total_pages:
+                         (
+                           authorized_results.count.to_f /
+                             @permit_application_search.per_page
+                         ).ceil,
+                       total_count: authorized_results.count,
                        current_page: @permit_application_search.current_page
+                       #  total_pages: @permit_application_search.total_pages,
+                       #  total_count: @permit_application_search.total_count,
+                       #  current_page: @permit_application_search.current_page
                      },
                      blueprint: PermitApplicationBlueprint,
                      blueprint_opts: {

@@ -26,7 +26,7 @@ module ExternalApi::Concerns::Search::PermitApplications
             nil
           end
         ),
-      includes: PermitApplication::SEARCH_INCLUDES
+      includes: PermitApplication::API_SEARCH_INCLUDES
     }
 
     @permit_application_search =
@@ -70,7 +70,7 @@ module ExternalApi::Concerns::Search::PermitApplications
       # sandbox_id: current_sandbox&.id
     }
 
-    where[:status] = %i[newly_submitted resubmitted] if constraints.blank? ||
+    where[:status] = %i[in_review] if constraints.blank? ||
       constraints[:status].blank?
 
     where.merge!(constraints.to_h.deep_symbolize_keys) if constraints.present?

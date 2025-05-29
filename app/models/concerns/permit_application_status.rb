@@ -60,6 +60,10 @@ module PermitApplicationStatus
       newly_submitted? || resubmitted?
     end
 
+    def screen_in?
+      in_review?
+    end
+
     def can_submit?
       signed =
         submission_data.dig("data", "section-completion-key", "signed").present?

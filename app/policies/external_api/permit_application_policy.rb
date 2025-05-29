@@ -1,7 +1,7 @@
 class ExternalApi::PermitApplicationPolicy < ExternalApi::ApplicationPolicy
   def index?
-    external_api_key.program == record.program && record.submitted? &&
-      record.sandbox == sandbox
+    # we're only checking
+    external_api_key.program == record.program
   end
 
   def show?
