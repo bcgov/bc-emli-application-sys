@@ -1,17 +1,17 @@
-import { colors } from "../foundations/colors"
+import { colors } from '../foundations/colors';
 
-const disabledStyles = { bg: "greys.grey03", color: "greys.grey01", borderColor: "border.light" }
-const activeStyles = { borderWidth: 1, borderColor: "focus" }
+const disabledStyles = { bg: 'greys.grey03', color: 'greys.grey01', borderColor: 'border.light' };
+const activeStyles = { borderWidth: 1, borderColor: 'focus' };
 const focusStyles = {
   // boxShadow: "0 0 0 3px rgba(46,93,215,0.4)",
   outline: `2px solid ${colors.focus}`,
   outlineOffset: 3,
-}
+};
 const focusInverseStyles = {
   // boxShadow: "0 0 0 3px rgba(255,255,255,0.4)"
   outline: `2px solid ${colors.focus}`,
   outlineOffset: 3,
-}
+};
 
 export const Button = {
   baseStyle: {
@@ -125,6 +125,14 @@ export const Button = {
         _disabled: { ...disabledStyles },
         _hover: { bg: 'greys.grey02', borderColor: 'border.base' },
       },
+    },
+    whiteButton: {
+      bg: 'white',
+      color: 'text.primary',
+      fontWeight: 'normal',
+      fontSize: 'inherit',
+      borderWidth: 1,
+      borderColor: 'black',
     },
     ghost: {
       _hover: { bg: 'lighten.100', _disabled: { ...disabledStyles }, _active: { ...activeStyles } },

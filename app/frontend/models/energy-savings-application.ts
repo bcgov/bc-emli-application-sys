@@ -128,6 +128,12 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       get isPrescreened() {
         return self.status === EPermitApplicationStatus.prescreen;
       },
+      get isInReview() {
+        return self.status === EPermitApplicationStatus.inReview;
+      },
+      get isIneligible() {
+        return self.status === EPermitApplicationStatus.ineligible;
+      },
       get sortedSubmissionVersions() {
         return self.submissionVersions.slice().sort((a, b) => b.createdAt - a.createdAt);
       },
@@ -801,11 +807,10 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       finalizeRevisionRequests: flow(function* () {
         const response = yield self.environment.api.finalizeRevisionRequests(self.id);
         if (response.ok) {
-          const { data: permitApplication } = response.data;
-          self.rootStore.permitApplicationStore.mergeUpdate(
-            { revisionMode: true, ...permitApplication },
-            'permitApplicationMap',
-          );
+          // const { data: permitApplication } = response.data;
+          self.revisionMode = true;
+          self.status = EPermitApplicationStatus.revisionsRequested;
+          self.rootStore.permitApplicationStore.mergeUpdate(self, 'permitApplicationMap');
         }
         return response.ok;
       }),

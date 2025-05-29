@@ -54,7 +54,9 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
       borderRadius="lg"
       border="1px solid"
       borderColor={
-        energySavingsApplication.status === EPermitApplicationStatus.updateNeeded ? 'theme.yellow' : 'border.light'
+        energySavingsApplication.status === EPermitApplicationStatus.revisionsRequested
+          ? 'theme.yellow'
+          : 'border.light'
       }
       p={8}
       align="center"
@@ -62,7 +64,9 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
       position="relative"
       cursor="pointer"
       bg={
-        energySavingsApplication.status === EPermitApplicationStatus.updateNeeded ? 'theme.orangeLight' : 'greys.white'
+        energySavingsApplication.status === EPermitApplicationStatus.revisionsRequested
+          ? 'theme.orangeLight'
+          : 'greys.white'
       }
     >
       {energySavingsApplication.sandbox && <SandboxHeader override sandbox={energySavingsApplication.sandbox} />}
@@ -146,7 +150,7 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
                 <b>Action required:</b> Please review the changes an agent made to your application.  
               </Text>
             </Flex> */}
-            {energySavingsApplication.status === EPermitApplicationStatus.updateNeeded && (
+            {energySavingsApplication.status === EPermitApplicationStatus.revisionsRequested && (
               <Flex bg="theme.orange" p={2} borderRadius={4} alignItems={'center'}>
                 <Box>
                   <Warning size={16} aria-label={'warning icon'} />

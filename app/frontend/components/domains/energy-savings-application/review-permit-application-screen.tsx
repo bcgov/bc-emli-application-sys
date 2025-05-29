@@ -80,7 +80,11 @@ export const ReviewPermitApplicationScreen = observer(() => {
     } else {
       container.classList.remove('revision-mode');
     }
-  }, [currentPermitApplication?.revisionMode]);
+
+    if (currentPermitApplication?.status === EPermitApplicationStatus.revisionsRequested) {
+      setRevisionMode(true);
+    }
+  }, [currentPermitApplication?.revisionMode, currentPermitApplication?.status]);
 
   if (error) return <ErrorScreen error={error} />;
   if (!currentPermitApplication?.isFullyLoaded) return <LoadingScreen />;
@@ -118,6 +122,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
     } catch (e) {}
     onScreenInclose();
   };
+
   // @ts-ignore
   const permitHeaderHeight = permitHeaderRef?.current?.offsetHeight ?? 0;
 
@@ -247,9 +252,12 @@ export const ReviewPermitApplicationScreen = observer(() => {
                         variant="calloutInverse"
                         leftIcon={<NotePencil />}
                         px={14}
-                        // onClick={() => setRevisionMode(true)}
                         onClick={onUpdatePathwayOpen}
                         borderColor="theme.yellow"
+                        isDisabled={
+                          currentPermitApplication?.status === EPermitApplicationStatus.inReview ||
+                          currentPermitApplication?.status === EPermitApplicationStatus.ineligible
+                        }
                       >
                         {t('permitApplication.show.update')}
                       </Button>
@@ -260,6 +268,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                         px={14}
                         onClick={onScreenIn}
                         borderColor="green"
+                        isDisabled={currentPermitApplication?.status === EPermitApplicationStatus.ineligible}
                       >
                         {t('permitApplication.show.screenIn')}
                       </Button>
@@ -276,6 +285,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                         px={14}
                         onClick={onOpen}
                         borderColor="red"
+                        isDisabled={currentPermitApplication?.status === EPermitApplicationStatus.inReview}
                       >
                         {t('permitApplication.show.inEligible')}
                       </Button>

@@ -162,9 +162,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
         end
       permit_application_errors = @permit_application.errors.full_messages
       detailed_errors =
-        (latest_version_errors + permit_application_errors).join(
-          ", "
-        ).presence || "An unknown error occurred"
+        (latest_version_errors + permit_application_errors).join(", ").presence
       # Render the detailed error response
       render_error "permit_application.update_error",
                    message_opts: {

@@ -26,7 +26,7 @@ export const GridHeaders = observer(function GridHeaders() {
           <Flex justifyContent="flex-end" w="100%">
             <Flex gap={2} maxW="1000px" w="fit-content">
               <Box flex="1">
-                <EnergySavingsApplicationFilter />
+                <EnergySavingsApplicationFilter type="submission-inbox" />
               </Box>
               <Box flex="1">
                 <ModelSearchInput searchModel={permitApplicationStore} inputGroupProps={{ w: 'full' }} />

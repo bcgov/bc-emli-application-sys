@@ -22,8 +22,9 @@ import { EPermitApplicationStatus, EPermitApplicationStatusGroup } from '../../.
 interface IPermitApplicationStatusTabsProps<TSearchModel extends ISearch> extends ContainerProps {}
 
 export const EnergySavingsApplicationFilter = observer(function ToggleArchivedButton<TSearchModel extends ISearch>({
+  type,
   ...rest
-}: IPermitApplicationStatusTabsProps<TSearchModel>) {
+}: IPermitApplicationStatusTabsProps<TSearchModel> & { type?: string }) {
   const { permitApplicationStore } = useMst();
   const { t } = useTranslation();
   const queryParams = new URLSearchParams(location.search);
@@ -39,7 +40,6 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
   const draftFilters = [EPermitApplicationStatus.draft];
   const submittedFilters = [EPermitApplicationStatus.submitted];
   const inReviewFilters = [EPermitApplicationStatus.inReview];
-  const updateNeededFilters = [EPermitApplicationStatus.updateNeeded];
   const approvedFilters = [EPermitApplicationStatus.approved];
   const ineligibleFilters = [EPermitApplicationStatus.ineligible];
   const prescreenFilters = [EPermitApplicationStatus.prescreen];
@@ -88,8 +88,6 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
         return submittedFilters;
       case 'inReview':
         return inReviewFilters;
-      case 'updateNeeded':
-        return updateNeededFilters;
       case 'approved':
         return approvedFilters;
       case 'ineligible':
@@ -111,8 +109,6 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
         return 'submitted';
       case EPermitApplicationStatus.inReview:
         return 'inReview';
-      case EPermitApplicationStatus.updateNeeded:
-        return 'updateNeeded';
       case EPermitApplicationStatus.approved:
         return 'approved';
       case EPermitApplicationStatus.ineligible:
@@ -163,12 +159,10 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
           const statusKey = Object.keys(EPermitApplicationStatusGroup).find(
             (key) => EPermitApplicationStatus[key as keyof typeof EPermitApplicationStatus] === status,
           );
-
           // Return the key (the enum name) if it exists
           return statusKey ? statusKey : undefined;
         })
         .filter((status): status is keyof typeof EPermitApplicationStatus => status !== undefined);
-
       // Set the selected filters using the mapped keys
       setSelectedFilters(mappedStatusArray);
     }
