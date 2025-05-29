@@ -16,13 +16,20 @@ class PermitApplication < ApplicationRecord
   # ]
 
   SEARCH_INCLUDES = %i[
-    permit_type
     submission_versions
-    activity
     submitter
     sandbox
     program
     permit_classification
+  ]
+
+  API_SEARCH_INCLUDES = %i[
+    program
+    submitter
+    template_version
+    submission_versions
+    submission_type
+    user_group_type
   ]
 
   searchkick word_middle: %i[
@@ -214,13 +221,13 @@ class PermitApplication < ApplicationRecord
       number: number,
       nickname: nickname,
       permit_classifications:
-        "#{permit_type&.name} #{activity&.name} #{user_group_type&.name} #{audience_type&.name} #{submission_type&.name}",
+        "#{user_group_type&.name} #{audience_type&.name} #{submission_type&.name}",
       submitter: "#{submitter.name} #{submitter.email}",
       submitted_at: submitted_at,
       resubmitted_at: resubmitted_at,
       viewed_at: viewed_at,
       status: status,
-      jurisdiction_id: jurisdiction&.id,
+      #jurisdiction_id: jurisdiction&.id,
       user_group_type_id: user_group_type&.id,
       audience_type_id: audience_type&.id,
       submission_type_id: submission_type&.id,
@@ -235,13 +242,13 @@ class PermitApplication < ApplicationRecord
         [submitter.id] +
           users_by_collaboration_options(collaboration_type: :submission).pluck(
             :id
-          ),
-      review_delegatee_name:
-        users_by_collaboration_options(
-          collaboration_type: :review,
-          collaborator_type: :delegatee
-        ).first&.name,
-      sandbox_id: sandbox_id
+          )
+      # review_delegatee_name:
+      #   users_by_collaboration_options(
+      #     collaboration_type: :review,
+      #     collaborator_type: :delegatee
+      #   ).first&.name,
+      # sandbox_id: sandbox_id
     }
   end
 
@@ -436,24 +443,24 @@ class PermitApplication < ApplicationRecord
 
     #TODO: if we want to implement webhooks were we call an external API when an application is submitted
 
-    # jurisdiction
-    #   .active_external_api_keys
-    #   .where.not(
-    #     webhook_url: [nil, ""]
-    #   ) # Only send webhooks to keys with a webhook URL
-    #   .each do |external_api_key|
-    #     PermitWebhookJob.perform_async(
-    #       external_api_key.id,
-    #       (
-    #         if newly_submitted?
-    #           Constants::Webhooks::Events::PermitApplication::PERMIT_SUBMITTED
-    #         else
-    #           Constants::Webhooks::Events::PermitApplication::PERMIT_RESUBMITTED
-    #         end
-    #       ),
-    #       id
-    #     )
-    #   end
+    program
+      .active_external_api_keys
+      .where.not(
+        webhook_url: [nil, ""]
+      ) # Only send webhooks to keys with a webhook URL
+      .each do |external_api_key|
+        PermitWebhookJob.perform_async(
+          external_api_key.id,
+          (
+            if newly_submitted?
+              Constants::Webhooks::Events::PermitApplication::PERMIT_SUBMITTED
+            else
+              Constants::Webhooks::Events::PermitApplication::PERMIT_RESUBMITTED
+            end
+          ),
+          id
+        )
+      end
   end
 
   def missing_pdfs

@@ -156,9 +156,9 @@ class PermitApplicationBlueprint < Blueprinter::Base
     fields :status,
            :number,
            :full_address,
-           :pid,
-           :pin,
-           :reference_number,
+           #  :pid,
+           #  :pin,
+           #  :reference_number,
            :submitted_at,
            :resubmitted_at
 
@@ -170,9 +170,9 @@ class PermitApplicationBlueprint < Blueprinter::Base
     #   pa.formatted_permit_classifications
     # end
 
-    field :raw_h2k_files do |pa, _options|
-      pa.formatted_raw_h2k_files_for_external_use
-    end
+    # field :raw_h2k_files do |pa, _options|
+    #   pa.formatted_raw_h2k_files_for_external_use
+    # end
 
     association :template_version,
                 blueprint: TemplateVersionBlueprint,
@@ -182,10 +182,14 @@ class PermitApplicationBlueprint < Blueprinter::Base
                 blueprint: UserBlueprint,
                 view: :external_api,
                 name: :account_holder
-    association :permit_type, blueprint: PermitClassificationBlueprint
-    association :activity,
-                blueprint: PermitClassificationBlueprint,
-                name: :activity_type
+
+    field :user_group_type, name: :user_group_type do |obj|
+      obj.user_group_type&.code
+    end
+
+    field :submission_type, name: :submission_type do |obj|
+      obj.submission_type&.code
+    end
   end
 
   view :supporting_docs_update do

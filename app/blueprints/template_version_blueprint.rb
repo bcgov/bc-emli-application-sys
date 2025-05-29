@@ -31,6 +31,12 @@ class TemplateVersionBlueprint < Blueprinter::Base
   end
 
   view :external_api do
-    excludes :deprecation_reason, :created_at, :updated_at, :label
+    excludes :deprecation_reason,
+             :created_at,
+             :updated_at,
+             :label,
+             :first_nations,
+             :early_access,
+             :public
   end
 end
