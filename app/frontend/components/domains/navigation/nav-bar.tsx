@@ -20,7 +20,6 @@ import {
   Show,
   Spacer,
   Text,
-  VStack,
 } from '@chakra-ui/react';
 import { Folders, List, Warning } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
@@ -124,14 +123,9 @@ export const NavBar = observer(function NavBar() {
   const { currentUser } = userStore;
   const { loggedIn, logout } = sessionStore;
   const { criticalNotifications } = notificationStore;
-  const { rmJurisdictionSelectKey } = uiStore;
 
   const location = useLocation();
   const path = location.pathname;
-
-  const handleClickLogout = async () => {
-    await logout();
-  };
 
   return (
     <PopoverProvider>
@@ -139,30 +133,32 @@ export const NavBar = observer(function NavBar() {
         as="nav"
         id="mainNav"
         w="full"
-        bg={'greys.white'}
-        color={'text.primary'}
+        maxW="100%"
+        color={'greys.anotherGrey'}
         zIndex={10}
-        borderBottomWidth={2}
+        borderBottomWidth={1}
         borderColor="border.light"
-        shadow="elevations.elevation01"
+        shadow="none"
+        minH="80px"
+        display="flex"
+        alignItems="center"
       >
-        <Container maxW="container.lg" p={2} px={{ base: 4, md: 8 }}>
-          <Flex align="center" gap={2} w="full">
-            <RouterLink to="/welcome">
-              <Box w={150} mr={2}>
-                <Image
-                  fit="contain"
-                  htmlHeight="30.853px"
-                  htmlWidth="145.386px"
-                  alt={t('site.linkHome')}
-                  src={'/images/logo.png'}
-                />
-              </Box>
-            </RouterLink>
-            <Show above="md">
+        <Container maxW="container.lg" h="100%" mx="auto" p={0}>
+          <Flex align="center" gap={2} w="full" h="100%">
+            <Box display="flex" alignItems="center" h="100%">
+              <Image
+                height="80px"
+                width="auto"
+                maxW="280px"
+                fit="contain"
+                src={'/images/logo.png'}
+                alt={t('site.linkHome')}
+              />
+            </Box>
+            <Hide below="xl">
               <Flex direction="column" w="full">
-                <HStack>
-                  <Text fontSize="xl" fontWeight="normal" mb="0" whiteSpace="nowrap">
+                <HStack spacing={8}>
+                  <Text fontSize="2xl" fontWeight="400" color="greys.anotherGrey" whiteSpace="nowrap">
                     {currentUser?.isSuperAdmin ? t('site.adminNavBarTitle') : t('site.titleLong')}
                   </Text>
                 </HStack>
@@ -179,66 +175,39 @@ export const NavBar = observer(function NavBar() {
                 )}
               </Flex>
               <Spacer />
-            </Show>
-            <HStack gap={3} w="full" justify="flex-end">
-              {/*!loggedIn && (
-                <Hide above="md">
-                  <HelpDrawer />
+            </Hide>
+            <HStack gap={0} w="full" justify="flex-end">
+              {loggedIn && <NotificationsPopover aria-label="notifications popover" color="greys.anotherGrey" />}
+
+              {loggedIn && (
+                <Hide below="md">
+                  <RouterLinkButton fontSize="xl" variant="tertiary" color="greys.anotherGrey" to={'/'}>
+                    {t('site.home')}
+                  </RouterLinkButton>
+                  {!currentUser?.isSuperAdmin && !currentUser?.isAdminManager && !currentUser?.isAdmin && (
+                    <Hide below="sm">
+                      <RouterLinkButton fontSize="xl" variant="tertiary" color="greys.anotherGrey" to={'/get-support'}>
+                        {t('site.support.getSupport')}
+                      </RouterLinkButton>
+                    </Hide>
+                  )}
                 </Hide>
-              )*/}
-
-              {currentUser?.isReviewStaff && !currentUser.isRegionalReviewManager && (
-                <Flex direction="column">
-                  {/* <Text color="greys.white">{currentUser.jurisdiction.name}</Text> */}
-                  <Text color="whiteAlpha.700" textAlign="right" variant="tiny_uppercase">
-                    {t(`user.roles.${currentUser.role}`, { defaultValue: currentUser.role })}
-                  </Text>
-                </Flex>
               )}
 
-              {currentUser?.isRegionalReviewManager && (
-                <VStack align="flex-end" gap={1}>
-                  <Text color="whiteAlpha.700" textAlign="right" variant="tiny_uppercase">
-                    {t(`user.roles.${currentUser.role}`, { defaultValue: currentUser.role })}
-                  </Text>
-                  {/* <RegionalRMJurisdictionSelect key={rmJurisdictionSelectKey} /> */}
-                </VStack>
-              )}
-
-              {/* {(!loggedIn || currentUser?.isSubmitter) && (
-                <Show above="md">
-                  <RouterLinkButton variant="tertiary" to="/jurisdictions">
-                    {t("home.jurisdictionsTitle")}
-                  </RouterLinkButton>
-                </Show>
-              )} */}
-              {loggedIn && <NotificationsPopover aria-label="notifications popover" color="text.primary" />}
-              {currentUser?.isAdmin && (
-                <Text color="text.primary" textTransform="capitalize">
-                  {t('user.roles.admin')}
-                </Text>
-              )}
-              {currentUser?.isSuperAdmin && <Text color="text.primary">{t('user.roles.system_admin')}</Text>}
-              {currentUser?.isAdminManager && <Text color="text.primary">{t('user.roles.admin_manager')}</Text>}
-              {!currentUser?.isSuperAdmin && !currentUser?.isAdminManager && !currentUser?.isAdmin && (
-                <RouterLinkButton variant="tertiary" color="text.primary" to={'/get-support'}>
-                  {t('site.support.getSupport')}
-                </RouterLinkButton>
-              )}
               {!loggedIn && (
-                <RouterLinkButton variant="tertiary" color="text.primary" to="/login">
-                  {t('auth.login')}
-                </RouterLinkButton>
-              )}
-              {loggedIn && <NavBarMenu />}
-
-              {/* {loggedIn && !currentUser?.isSuperAdmin && !currentUser?.isAdminManager && (
-                <Show above="md">
-                  <RouterLinkButton variant="tertiary" color="text.primary" onClick={handleClickLogout}>
-                    {t('auth.logout')}
+                <>
+                  <Hide below="sm">
+                    <RouterLinkButton fontSize="xl" variant="tertiary" color="greys.anotherGrey" to={'/get-support'}>
+                      {t('site.support.getSupport')}
+                    </RouterLinkButton>
+                  </Hide>
+                  <RouterLinkButton fontSize="xl" variant="tertiary" color="greys.anotherGrey" to="/login">
+                    {t('auth.login')}
                   </RouterLinkButton>
-                </Show>
-              )} */}
+                </>
+              )}
+
+              {loggedIn && <NavBarMenu />}
             </HStack>
           </Flex>
         </Container>
@@ -296,9 +265,7 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
   );
 });
 
-interface INavBarMenuProps {}
-
-const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
+const NavBarMenu = observer(function NavBarMenu() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { sessionStore, userStore } = useMst();
@@ -349,7 +316,7 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
 
   return (
     <Menu onClose={() => setIsMenuOpen(false)} onOpen={() => setIsMenuOpen(true)} computePositionOnMount>
-      <Show below="md">
+      <Hide above="md">
         <MenuButton
           as={IconButton}
           borderRadius="lg"
@@ -360,9 +327,9 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
           aria-label="menu dropdown button"
           icon={<List size={16} weight="bold" />}
         />
-      </Show>
+      </Hide>
 
-      <Show above="md">
+      <Hide below="md">
         <MenuButton
           as={Button}
           borderRadius="lg"
@@ -372,10 +339,11 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
           variant="primaryInverse"
           aria-label="menu dropdown button"
           leftIcon={<List size={16} weight="bold" />}
+          fontSize="xl"
         >
           {t('site.menu')}
         </MenuButton>
-      </Show>
+      </Hide>
 
       <Portal>
         <Box color="text.primary" className={isMenuOpen && 'show-menu-overlay-background'}>
@@ -387,7 +355,9 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
                 </Text>
                 <MenuGroup title={currentUser.name} noOfLines={1}>
                   <MenuDivider my={0} borderColor="border.light" />
-                  <NavMenuItem label={t('site.home')} to={'/'} />
+                  <Show below="md">
+                    <NavMenuItem label={t('site.home')} to={'/'} />
+                  </Show>
                   {currentUser.isSuperAdmin && <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/programs'} />}
                   {currentUser?.isSuperAdmin && superAdminOnlyItems}
                   {(currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) && reviewManagerOnlyItems}
@@ -401,13 +371,19 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
 
                   {currentUser?.isSubmitter && (
                     <>
-                      <MenuItem bg="greys.grey03" onClick={(e) => navigate('/applications/new')}>
+                      <Show below="md">
+                        <MenuGroup>
+                          <NavMenuItem label={t('site.support.getSupport')} to={'/get-support'} />
+                          <MenuDivider my={0} borderColor="border.light" />
+                        </MenuGroup>
+                      </Show>
+                      <MenuItem onClick={(e) => navigate('/applications/new')}>
                         <Button as={Box} variant="primary">
                           {t('site.newApplication')}
                         </Button>
                       </MenuItem>
-
-                      <NavMenuItem label={t('site.myApplications')} to="/applications" bg="greys.grey03" />
+                      <MenuDivider my={0} borderColor="border.light" />
+                      <NavMenuItem label={t('site.myApplications')} to="/applications" />
                     </>
                   )}
                   <MenuDivider my={0} borderColor="border.light" />
@@ -447,7 +423,7 @@ const NavBarMenu = observer(function NavBarMenu({}: INavBarMenuProps) {
   );
 });
 
-// Looks complicated but this is jsut how you make it so that either to or onClick must be given, but not necessarily both
+// Looks complicated but this is just how you make it so that either to or onClick must be given, but not necessarily both
 interface INavMenuItemProps extends MenuItemProps {
   label: string;
   to?: string;
