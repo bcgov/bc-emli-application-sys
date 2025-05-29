@@ -3,7 +3,12 @@ import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMst } from '../../../../setup/root';
-import { EPermitApplicationReviewerSortFields, EPermitApplicationSortFields } from '../../../../types/enums';
+import {
+  EPermitApplicationReviewerSortFields,
+  EPermitApplicationSortFields,
+  EPermitApplicationStatus,
+  EPermitApplicationStatusGroup,
+} from '../../../../types/enums';
 import { ModelSearchInput } from '../../../shared/base/model-search-input';
 import { GridHeader } from '../../../shared/grid/grid-header';
 import { SortIcon } from '../../../shared/sort-icon';
@@ -26,7 +31,16 @@ export const GridHeaders = observer(function GridHeaders() {
           <Flex justifyContent="flex-end" w="100%">
             <Flex gap={2} maxW="1000px" w="fit-content">
               <Box flex="1">
-                <EnergySavingsApplicationFilter type="submission-inbox" />
+                <EnergySavingsApplicationFilter
+                  statusGroups={[
+                    EPermitApplicationStatusGroup.approved,
+                    EPermitApplicationStatusGroup.prescreen,
+                    EPermitApplicationStatusGroup.inReview,
+                    EPermitApplicationStatusGroup.revisionsRequested,
+                    EPermitApplicationStatusGroup.ineligible,
+                    EPermitApplicationStatusGroup.submitted,
+                  ]}
+                />
               </Box>
               <Box flex="1">
                 <ModelSearchInput searchModel={permitApplicationStore} inputGroupProps={{ w: 'full' }} />

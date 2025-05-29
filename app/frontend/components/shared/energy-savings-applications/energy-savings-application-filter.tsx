@@ -22,9 +22,9 @@ import { EPermitApplicationStatus, EPermitApplicationStatusGroup } from '../../.
 interface IPermitApplicationStatusTabsProps<TSearchModel extends ISearch> extends ContainerProps {}
 
 export const EnergySavingsApplicationFilter = observer(function ToggleArchivedButton<TSearchModel extends ISearch>({
-  type,
+  statusGroups,
   ...rest
-}: IPermitApplicationStatusTabsProps<TSearchModel> & { type?: string }) {
+}: IPermitApplicationStatusTabsProps<TSearchModel> & { statusGroups: EPermitApplicationStatusGroup[] }) {
   const { permitApplicationStore } = useMst();
   const { t } = useTranslation();
   const queryParams = new URLSearchParams(location.search);
@@ -57,8 +57,8 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
 
     // If no filters are selected, set all filters
     if (newSelectedFilters.length === 0) {
-      setSelectedFilters(newSelectedFilters);
-      setStatusFilter(Object.values(EPermitApplicationStatus) as EPermitApplicationStatus[]);
+      setSelectedFilters(statusGroups.map((group) => group.toString()));
+      setStatusFilter(statusGroups.flatMap(mapFilterToStatusArray));
     } else {
       setSelectedFilters(newSelectedFilters);
       // Map the selected filters to their corresponding status array
@@ -94,7 +94,7 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
         return ineligibleFilters;
       case 'prescreen':
         return prescreenFilters;
-      case 'revisionRequested':
+      case 'revisionsRequested':
         return revisionRequestedFilters;
       default:
         return [];
@@ -124,10 +124,12 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
 
   // Handle reset functionality
   const handleResetFilters = () => {
-    setSelectedFilters([]);
-    setStatusFilter(Object.values(EPermitApplicationStatus) as EPermitApplicationStatus[]);
-    search();
-    window.history.replaceState(null, '', '?currentPage=1');
+    setSelectedFilters(statusGroups.map((group) => group.toString()));
+    setStatusFilter(statusGroups.flatMap(mapFilterToStatusArray));
+    search(); // Trigger search with default filters
+    const newParams = new URLSearchParams(location.search);
+    newParams.delete('status');
+    window.history.replaceState(null, '', '?' + newParams.toString());
   };
 
   useEffect(() => {
@@ -153,19 +155,18 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
       const statusParamArray = statusParam.split(',');
       setSelectedFilters(statusParamArray.flatMap(mapStatusToFilterArray));
     } else {
-      const mappedStatusArray = statusFilter
-        .map((status: string) => {
-          // Find the key of the enum that corresponds to the value
-          const statusKey = Object.keys(EPermitApplicationStatusGroup).find(
-            (key) => EPermitApplicationStatus[key as keyof typeof EPermitApplicationStatus] === status,
-          );
-          // Return the key (the enum name) if it exists
-          return statusKey ? statusKey : undefined;
-        })
-        .filter((status): status is keyof typeof EPermitApplicationStatus => status !== undefined);
-      // Set the selected filters using the mapped keys
-      setSelectedFilters(mappedStatusArray);
+      // Set the selected filters based on the provided statusGroups
+      const statusArray = statusGroups.flatMap(mapFilterToStatusArray);
+      setSelectedFilters(statusGroups.map((group) => group.toString()));
+      setStatusFilter(statusArray);
+      search();
     }
+  }, []);
+
+  useEffect(() => {
+    setSelectedFilters(statusGroups.map((group) => group.toString())); // Select all filter buttons based on statusGroups
+    setStatusFilter(statusGroups.flatMap(mapFilterToStatusArray)); // Apply statuses based on statusGroups
+    search(); // Trigger search with all filters
   }, []);
 
   return (
@@ -183,7 +184,7 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
           {selectedFilterLabel}
         </MenuButton>
         <MenuList>
-          {Object.values(EPermitApplicationStatusGroup).map((filterValue) => (
+          {statusGroups.map((filterValue) => (
             <MenuItem
               key={filterValue}
               onClick={() => {

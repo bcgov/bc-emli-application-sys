@@ -20,7 +20,7 @@ import { useResetQueryParams } from '../../../hooks/use-reset-query-params';
 import { useSearch } from '../../../hooks/use-search';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { useMst } from '../../../setup/root';
-import { EPermitApplicationSubmitterSortFields } from '../../../types/enums';
+import { EPermitApplicationStatusGroup, EPermitApplicationSubmitterSortFields } from '../../../types/enums';
 import { BlueTitleBar } from '../../shared/base/blue-title-bar';
 import { Paginator } from '../../shared/base/inputs/paginator';
 import { PerPageSelect } from '../../shared/base/inputs/per-page-select';
@@ -97,7 +97,14 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
               w={{ base: 'full', md: 'fit-content' }}
             >
               <Flex direction={{ base: 'row' }} alignItems={{ md: 'end', base: 'end' }} gap={4}>
-                <EnergySavingsApplicationFilter />
+                <EnergySavingsApplicationFilter
+                  statusGroups={[
+                    EPermitApplicationStatusGroup.approved,
+                    EPermitApplicationStatusGroup.revisionsRequested,
+                    EPermitApplicationStatusGroup.ineligible,
+                    EPermitApplicationStatusGroup.submitted,
+                  ]}
+                />
                 {hasResetableFilters && (
                   <Button variant="link" mb={2} onClick={resetQueryParams}>
                     {t('ui.resetFilters')}
