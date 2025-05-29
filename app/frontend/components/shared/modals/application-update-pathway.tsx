@@ -13,9 +13,11 @@ import {
   Text,
   Box,
 } from '@chakra-ui/react';
+import { useTranslation } from 'react-i18next';
 
 const UpdatePathwayModal = ({ isOpen, onClose, setRevisionMode }) => {
   const [selectedOption, setSelectedOption] = useState('');
+  const { t } = useTranslation();
 
   const handleSelectChange = (e) => {
     setSelectedOption(e.target.value);
@@ -31,22 +33,22 @@ const UpdatePathwayModal = ({ isOpen, onClose, setRevisionMode }) => {
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader color="blue.700">Update pathway</ModalHeader>
+        <ModalHeader color="blue.700"> {t('energySavingsApplication.show.updatePathway')}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text mb={2}>Update performed by</Text>
+          <Text mb={2}>{t('energySavingsApplication.show.performedBy')}</Text>
           <Select placeholder="Select" onChange={handleSelectChange}>
-            <option value="applicant">{'{applicant}'}</option>
-            <option value="staff">Staff</option>
+            <option value="applicant">{t('energySavingsApplication.show.applicant')}</option>
+            <option value="staff">{t('energySavingsApplication.show.staff')}</option>
           </Select>
         </ModalBody>
 
         <ModalFooter>
           <Button colorScheme="blue" mr={3} onClick={handleNext} isDisabled={!selectedOption}>
-            Next
+            {t('ui.next')}
           </Button>
           <Button variant="outline" onClick={onClose}>
-            Back
+            {t('ui.back')}
           </Button>
         </ModalFooter>
       </ModalContent>

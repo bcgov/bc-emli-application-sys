@@ -18,7 +18,6 @@ RSpec.describe PermitApplication, type: :model do
                revisions_requested: 3,
                resubmitted: 4,
                in_review: 5,
-               update_needed: 6,
                approved: 7,
                ineligible: 8,
                prescreen: 9

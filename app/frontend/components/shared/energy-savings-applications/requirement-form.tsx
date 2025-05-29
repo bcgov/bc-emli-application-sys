@@ -54,6 +54,8 @@ export const RequirementForm = observer(
       blockClasses,
       formattedFormJson,
       isDraft,
+      isInReview,
+      isIneligible,
       previousSubmissionVersion,
       selectedPastSubmissionVersion,
       isViewingPastRequests,
@@ -291,8 +293,8 @@ export const RequirementForm = observer(
 
     let permitAppOptions = {
       ...defaultOptions,
-      ...(isDraft ? { readOnly: shouldShowDiff } : { readOnly: false }),
-      // readonly loggic depends on formattedJson for submitted applications
+      ...(isDraft || isInReview || isIneligible ? { readOnly: true } : { readOnly: false }),
+      // readonly logic depends on formattedJson for submitted applications or if the application is in review
     };
     permitAppOptions.componentOptions.simplefile.config['formCustomOptions'] = {
       persistFileUploadAction: 'PATCH',
@@ -353,14 +355,17 @@ export const RequirementForm = observer(
             ))}
           {permitApplication?.isRevisionsRequested && (
             <CustomMessageBox
-              description={t('permitApplication.show.revisionsWereRequested', {
+              description={t('energySavingsApplication.show.revisionsWereRequested', {
                 date: format(permitApplication.revisionsRequestedAt, 'MMM d, yyyy h:mm a'),
               })}
               status="warning"
             />
           )}
           {showVersionDiffContactWarning && (
-            <CustomMessageBox description={t('permitApplication.show.versionDiffContactWarning')} status="warning" />
+            <CustomMessageBox
+              description={t('energySavingsApplication.show.versionDiffContactWarning')}
+              status="warning"
+            />
           )}
 
           <Box bg="greys.grey03" p={3} borderRadius="sm">

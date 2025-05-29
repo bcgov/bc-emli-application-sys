@@ -58,7 +58,6 @@ export enum EPermitApplicationStatus {
   resubmitted = 'resubmitted',
   ephemeral = 'ephemeral',
   inReview = 'in_review',
-  updateNeeded = 'update_needed',
   approved = 'approved',
   ineligible = 'ineligible',
 }
@@ -67,7 +66,6 @@ export enum EPermitApplicationStatusGroup {
   draft = 'draft',
   submitted = 'submitted',
   prescreen = 'prescreen',
-  updateNeeded = 'updateNeeded',
   inReview = 'inReview',
   ineligible = 'ineligible',
   approved = 'approved',
