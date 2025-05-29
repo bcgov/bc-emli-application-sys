@@ -140,8 +140,8 @@ export const NavBar = observer(function NavBar() {
         borderColor="border.light"
         shadow="none"
         minH="80px"
-        display="flex" // Add display flex
-        alignItems="center" // Center align items
+        display="flex"
+        alignItems="center"
       >
         <Container maxW="container.lg" h="100%" mx="auto" p={0}>
           <Flex align="center" gap={2} w="full" h="100%">
@@ -410,8 +410,6 @@ const NavBarMenu = observer(function NavBarMenu() {
                     <NavMenuItemCTA label={t('auth.login')} to="/login" />
                   </MenuList>
                 )}
-                <MenuDivider my={0} borderColor="border.light" />
-
                 <MenuDivider my={0} borderColor="border.light" />
                 <NavMenuItem label={t('site.home')} to="/" />
                 <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/programs/new'} />
