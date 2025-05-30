@@ -4,11 +4,9 @@ import {
   Container,
   Flex,
   HStack,
-  Heading,
   Hide,
   IconButton,
   Image,
-  Link,
   Menu,
   MenuButton,
   MenuDivider,
@@ -20,8 +18,10 @@ import {
   Show,
   Spacer,
   Text,
+  Heading,
+  Link,
 } from '@chakra-ui/react';
-import { Folders, List, Warning } from '@phosphor-icons/react';
+import { List, Warning } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import * as R from 'ramda';
 import React, { useState } from 'react';
@@ -29,38 +29,30 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { PopoverProvider, useNotificationPopover } from '../../../hooks/use-notification-popover';
 import { useMst } from '../../../setup/root';
-import { EUserRoles } from '../../../types/enums';
 import { INotification, IPermitNotificationObjectData } from '../../../types/types';
-import { HelpDrawer } from '../../shared/help-drawer';
-import { RouterLink } from '../../shared/navigation/router-link';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import SandboxHeader from '../../shared/sandbox/sandbox-header';
 import { NotificationsPopover } from '../home/notifications/notifications-popover';
-import { RegionalRMJurisdictionSelect } from './regional-rm-jurisdiction-select';
-
 import { SubNavBar } from './sub-nav-bar';
 
+// ===== PATH UTILITIES =====
 function isTemplateEditPath(path: string): boolean {
   const regex = /^\/requirement-templates\/([a-f\d-]+)\/edit$/;
-
   return regex.test(path);
 }
 
 function isEarlyAccessTemplateEditPath(path: string): boolean {
   const regex = /^\/early-access?\/requirement-templates\/([a-f\d-]+)\/edit$/;
-
   return regex.test(path);
 }
 
 function isEarlyAccessTemplateViewPath(path: string): boolean {
   const regex = /^\/early-access\/requirement-templates\/([a-f\d-]+)$/;
-
   return regex.test(path);
 }
 
 function isDigitalPermitEditPath(path: string): boolean {
   const regex = /^\/digital-building-permits\/([a-f\d-]+)\/edit$/;
-
   return regex.test(path);
 }
 
@@ -83,10 +75,12 @@ function isApiMappingPath(path: string): boolean {
   const regex = /^(\/jurisdictions\/[a-z\d-]+)?\/api-settings\/api-mappings.*$/;
   return regex.test(path);
 }
+
 function isRejectionPath(path: string): boolean {
   const regex = /rejection-reason/;
   return regex.test(path);
 }
+
 function isSuccessfullSubmissionPath(path: string): boolean {
   const regex = /applications\/[a-f0-9-]{36}\/successful-submission/;
   return regex.test(path);
@@ -116,14 +110,13 @@ function shouldHideSubNavbarForPath(path: string): boolean {
   return matchers.some((matcher) => matcher(path));
 }
 
+// ===== MAIN NAVBAR COMPONENT =====
 export const NavBar = observer(function NavBar() {
   const { t } = useTranslation();
-  const { sessionStore, userStore, notificationStore, uiStore, sandboxStore } = useMst();
-
+  const { sessionStore, userStore, notificationStore } = useMst();
   const { currentUser } = userStore;
-  const { loggedIn, logout } = sessionStore;
+  const { loggedIn } = sessionStore;
   const { criticalNotifications } = notificationStore;
-
   const location = useLocation();
   const path = location.pathname;
 
@@ -145,80 +138,96 @@ export const NavBar = observer(function NavBar() {
       >
         <Container maxW="container.lg" h="100%" mx="auto" p={0}>
           <Flex align="center" gap={2} w="full" h="100%">
-            <Box display="flex" alignItems="center" h="100%">
-              <Image
-                height="80px"
-                width="auto"
-                maxW="280px"
-                fit="contain"
-                src={'/images/logo.png'}
-                alt={t('site.linkHome')}
-              />
-            </Box>
-            <Hide below="xl">
-              <Flex direction="column" w="full">
-                <HStack spacing={8}>
+            {/* Logo */}
+            <Image
+              height="80px"
+              width="auto"
+              maxW="280px"
+              fit="contain"
+              src={'/images/logo.png'}
+              alt={t('site.linkHome')}
+            />
+
+            {loggedIn && (
+              <Hide below="xl">
+                <Flex direction="column" w="full">
                   <Text fontSize="2xl" fontWeight="400" color="greys.anotherGrey" whiteSpace="nowrap">
                     {currentUser?.isSuperAdmin ? t('site.adminNavBarTitle') : t('site.titleLong')}
                   </Text>
-                </HStack>
-                {currentUser?.isReviewStaff && (
-                  <SandboxHeader
-                    justify="center"
-                    align="center"
-                    position="static"
-                    borderTopRadius={0}
-                    mb={-2}
-                    color="text.primary"
-                    expanded
-                  />
-                )}
-              </Flex>
-              <Spacer />
-            </Hide>
-            <HStack gap={0} w="full" justify="flex-end">
+                  {currentUser?.isReviewStaff && (
+                    <SandboxHeader
+                      justify="center"
+                      align="center"
+                      position="static"
+                      borderTopRadius={0}
+                      mb={-2}
+                      color="text.primary"
+                      expanded
+                    />
+                  )}
+                </Flex>
+                <Spacer />
+              </Hide>
+            )}
+
+            {!loggedIn && (
+              <Hide below="lg">
+                <Flex direction="column" w="full">
+                  <Text fontSize="2xl" fontWeight="400" color="greys.anotherGrey" whiteSpace="nowrap">
+                    {t('site.titleLong')}
+                  </Text>
+                </Flex>
+                <Spacer />
+              </Hide>
+            )}
+
+            <HStack gap={2} w="full" justify="flex-end">
+              {/* Notifications - Logged in users only */}
               {loggedIn && <NotificationsPopover aria-label="notifications popover" color="greys.anotherGrey" />}
 
+              {/* Desktop Links - Logged in users (md+) */}
               {loggedIn && (
                 <Hide below="md">
                   <RouterLinkButton fontSize="xl" variant="tertiary" color="greys.anotherGrey" to={'/'}>
                     {t('site.home')}
                   </RouterLinkButton>
                   {!currentUser?.isSuperAdmin && !currentUser?.isAdminManager && !currentUser?.isAdmin && (
-                    <Hide below="sm">
-                      <RouterLinkButton fontSize="xl" variant="tertiary" color="greys.anotherGrey" to={'/get-support'}>
-                        {t('site.support.getSupport')}
-                      </RouterLinkButton>
-                    </Hide>
+                    <RouterLinkButton fontSize="xl" variant="tertiary" color="greys.anotherGrey" to={'/get-support'}>
+                      {t('site.support.getSupport')}
+                    </RouterLinkButton>
                   )}
                 </Hide>
               )}
 
+              {/* Desktop Links - Non-logged in users (md+) */}
               {!loggedIn && (
-                <>
-                  <Hide below="sm">
-                    <RouterLinkButton fontSize="xl" variant="tertiary" color="greys.anotherGrey" to={'/get-support'}>
-                      {t('site.support.getSupport')}
-                    </RouterLinkButton>
-                  </Hide>
+                <Hide below="md">
+                  <RouterLinkButton fontSize="xl" variant="tertiary" color="greys.anotherGrey" to={'/get-support'}>
+                    {t('site.support.getSupport')}
+                  </RouterLinkButton>
                   <RouterLinkButton fontSize="xl" variant="tertiary" color="greys.anotherGrey" to="/login">
                     {t('auth.login')}
                   </RouterLinkButton>
-                </>
+                </Hide>
               )}
 
-              {loggedIn && <NavBarMenu />}
+              {/* Mobile/Desktop Menu */}
+              <NavBarMenu />
             </HStack>
           </Flex>
         </Container>
       </Box>
+
+      {/* Critical Notifications */}
       {!R.isEmpty(criticalNotifications) && <ActionRequiredBox notification={criticalNotifications[0]} />}
 
+      {/* Sub Navigation */}
       {!shouldHideSubNavbarForPath(path) && loggedIn && <SubNavBar borderBottom={'none'} />}
     </PopoverProvider>
   );
 });
 
+// ===== ACTION REQUIRED BOX =====
 interface IActionRequiredBoxProps {
   notification: INotification;
 }
@@ -234,13 +243,13 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
     <Flex
       direction="column"
       gap={2}
-      bg={`semantic.warningLight`}
+      bg="semantic.warningLight"
       borderBottom="1px solid"
-      borderColor={`semantic.warning`}
+      borderColor="semantic.warning"
       p={4}
     >
-      <Flex align="flex-start" gap={2} whiteSpace={'normal'}>
-        <Box color={`semantic.warning`}>{<Warning size={24} aria-label={'warning icon'} />}</Box>
+      <Flex align="flex-start" gap={2} whiteSpace="normal">
+        <Warning size={24} color="var(--chakra-colors-semantic-warning)" aria-label="warning icon" />
         <Flex direction="column" gap={2}>
           <Heading as="h3" fontSize="md">
             {t('ui.actionRequired')}
@@ -265,6 +274,7 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
   );
 });
 
+// ===== MENU COMPONENT =====
 const NavBarMenu = observer(function NavBarMenu() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -277,7 +287,8 @@ const NavBarMenu = observer(function NavBarMenu() {
     await logout();
   };
 
-  const superAdminOnlyItems = (
+  // ===== MENU ITEMS BY ROLE =====
+  const superAdminItems = (
     <MenuGroup>
       <NavMenuItem label={t('home.permitTemplateCatalogueTitle')} to={'/requirement-templates'} />
       <NavMenuItem label={t('home.requirementsLibraryTitle')} to={'/requirements-library'} />
@@ -285,13 +296,7 @@ const NavBarMenu = observer(function NavBarMenu() {
     </MenuGroup>
   );
 
-  const reviewStaffOnlyItems = (
-    <MenuGroup>
-      <MenuDivider my={0} borderColor="border.light" />
-    </MenuGroup>
-  );
-
-  const reviewManagerOnlyItems = (
+  const reviewManagerItems = (
     <MenuGroup>
       <NavMenuItem label={t('home.submissionInboxTitle')} to={'/submission-inbox'} />
       <NavMenuItem label={t('site.newApplication')} to={`/applications/new`} />
@@ -301,9 +306,7 @@ const NavBarMenu = observer(function NavBarMenu() {
     </MenuGroup>
   );
 
-  const adminOrManagerItems = <></>;
-
-  const reviwerOnlyItems = (
+  const reviewerItems = (
     <MenuGroup>
       <NavMenuItem label={t('home.submissionInboxTitle')} to={`/submission-inbox`} />
       <NavMenuItem label={t('site.newApplication')} to={`/applications/new`} />
@@ -312,63 +315,80 @@ const NavBarMenu = observer(function NavBarMenu() {
     </MenuGroup>
   );
 
-  const submitterOnlyItems = <></>;
+  const reviewStaffItems = (
+    <MenuGroup>
+      <MenuDivider my={0} borderColor="border.light" />
+    </MenuGroup>
+  );
 
-  return (
-    <Menu onClose={() => setIsMenuOpen(false)} onOpen={() => setIsMenuOpen(true)} computePositionOnMount>
+  // Combine the menu button rendering logic
+  const renderMenuButton = () => {
+    return (
       <Hide above="md">
         <MenuButton
           as={IconButton}
           borderRadius="lg"
-          border={currentUser?.isSubmitter || !loggedIn ? 'solid black' : 'solid white'}
+          border={loggedIn && !currentUser?.isSubmitter ? 'solid white' : 'solid black'}
           borderWidth="1px"
           p={3}
-          variant={currentUser?.isSubmitter || !loggedIn ? 'primaryInverse' : 'primary'}
+          variant={loggedIn && !currentUser?.isSubmitter ? 'primary' : 'primaryInverse'}
           aria-label="menu dropdown button"
           icon={<List size={16} weight="bold" />}
         />
       </Hide>
+    );
+  };
 
-      <Hide below="md">
-        <MenuButton
-          as={Button}
-          borderRadius="lg"
-          border="solid black"
-          borderWidth="1px"
-          p={3}
-          variant="primaryInverse"
-          aria-label="menu dropdown button"
-          leftIcon={<List size={16} weight="bold" />}
-          fontSize="xl"
-        >
-          {t('site.menu')}
-        </MenuButton>
-      </Hide>
+  return (
+    <Menu onClose={() => setIsMenuOpen(false)} onOpen={() => setIsMenuOpen(true)} computePositionOnMount>
+      {/* Unified mobile menu button */}
+      {renderMenuButton()}
 
+      {/* Desktop Menu Button - Logged in users only */}
+      {loggedIn && (
+        <Hide below="md">
+          <MenuButton
+            as={Button}
+            borderRadius="lg"
+            border="solid black"
+            borderWidth="1px"
+            p={3}
+            variant="primaryInverse"
+            aria-label="menu dropdown button"
+            leftIcon={<List size={16} weight="bold" />}
+            fontSize="xl"
+          >
+            {t('site.menu')}
+          </MenuButton>
+        </Hide>
+      )}
+
+      {/* ===== MENU DROPDOWN ===== */}
       <Portal>
         <Box color="text.primary" className={isMenuOpen && 'show-menu-overlay-background'}>
           <MenuList zIndex={99} boxShadow="2xl">
-            {loggedIn && !currentUser.isUnconfirmed ? (
+            {/* ===== LOGGED IN MENU ===== */}
+            {loggedIn && !currentUser?.isUnconfirmed ? (
               <>
                 <Text fontSize="xs" fontStyle="italic" px={3} mb={-1} color="greys.grey01">
                   {t('site.loggedInWelcome')}
                 </Text>
                 <MenuGroup title={currentUser.name} noOfLines={1}>
                   <MenuDivider my={0} borderColor="border.light" />
+
+                  {/* Mobile Home Link */}
                   <Show below="md">
                     <NavMenuItem label={t('site.home')} to={'/'} />
                   </Show>
-                  {currentUser.isSuperAdmin && <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/programs'} />}
-                  {currentUser?.isSuperAdmin && superAdminOnlyItems}
-                  {(currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) && reviewManagerOnlyItems}
-                  {(currentUser?.isSuperAdmin ||
-                    currentUser?.isReviewManager ||
-                    currentUser?.isRegionalReviewManager) &&
-                    adminOrManagerItems}
-                  {currentUser?.isReviewer && reviwerOnlyItems}
-                  {currentUser?.isSubmitter && submitterOnlyItems}
-                  {currentUser?.isReviewStaff && reviewStaffOnlyItems}
 
+                  {/* Role-based menu items */}
+                  {currentUser.isSuperAdmin && <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/programs'} />}
+                  {currentUser?.isSuperAdmin && superAdminItems}
+                  {(currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) && reviewManagerItems}
+                  {currentUser?.isReviewer && reviewerItems}
+                  {currentUser?.isReviewStaff && reviewStaffItems}
+
+                  {/* Participants specific items */}
                   {currentUser?.isSubmitter && (
                     <>
                       <Show below="md">
@@ -386,34 +406,27 @@ const NavBarMenu = observer(function NavBarMenu() {
                       <NavMenuItem label={t('site.myApplications')} to="/applications" />
                     </>
                   )}
+
                   <MenuDivider my={0} borderColor="border.light" />
+
+                  {/* Admin-only items */}
                   {(currentUser?.isReviewManager || currentUser?.isSuperAdmin) && (
                     <NavMenuItem label={t('home.auditLogTitle')} to={`/audit-log`} />
                   )}
+
+                  {/* Common logged-in items */}
                   <NavMenuItem label={t('user.myAccount')} to={'/profile'} />
                   <NavMenuItem label={t('auth.logout')} onClick={handleClickLogout} />
                 </MenuGroup>
               </>
             ) : (
+              /* ===== NON-LOGGED IN MENU ===== */
               <>
-                {!loggedIn && (
-                  <MenuList
-                    display="flex"
-                    flexWrap="wrap"
-                    px={2}
-                    py={0}
-                    gap={2}
-                    border="0"
-                    boxShadow="none"
-                    maxW="300px"
-                  >
-                    <NavMenuItemCTA label={t('auth.login')} to="/login" />
-                  </MenuList>
-                )}
+                <MenuList display="flex" flexWrap="wrap" px={2} py={0} gap={2} border="0" boxShadow="none" maxW="300px">
+                  <NavMenuItemCTA label={t('auth.login')} to="/login" />
+                </MenuList>
                 <MenuDivider my={0} borderColor="border.light" />
-                <NavMenuItem label={t('site.home')} to="/" />
-                <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/programs/new'} />
-                {loggedIn && <NavMenuItem label={t('auth.logout')} onClick={handleClickLogout} />}
+                <NavMenuItem label={t('site.support.getSupport')} to="/get-support" />
               </>
             )}
           </MenuList>
@@ -434,20 +447,17 @@ const NavMenuItem = ({ label, to, onClick, ...rest }: INavMenuItemProps) => {
   const navigate = useNavigate();
 
   const handleClick = (e) => {
-    navigate(to);
-    onClick && onClick(e);
+    if (to) navigate(to);
+    if (onClick) onClick(e);
   };
 
   return (
-    <MenuItem as={'a'} py={2} px={3} onClick={handleClick} _hover={{ cursor: 'pointer', bg: 'hover.blue' }} {...rest}>
-      <Text textAlign="left" w="full">
-        {label}
-      </Text>
+    <MenuItem py={2} px={3} onClick={handleClick} _hover={{ cursor: 'pointer', bg: 'hover.blue' }} {...rest}>
+      {label}
     </MenuItem>
   );
 };
 
-// THIS IS CTA BUTTON VERSION FOR THE NAV MENU
 interface INavMenuItemCTAProps {
   label: string;
   to?: string;
