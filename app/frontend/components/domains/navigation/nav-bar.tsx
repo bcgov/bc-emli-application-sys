@@ -281,7 +281,6 @@ const NavBarMenu = observer(function NavBarMenu() {
   const { sessionStore, userStore } = useMst();
   const { currentUser } = userStore;
   const { logout, loggedIn } = sessionStore;
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleClickLogout = async () => {
     await logout();
@@ -331,6 +330,7 @@ const NavBarMenu = observer(function NavBarMenu() {
           border={loggedIn && !currentUser?.isSubmitter ? 'solid white' : 'solid black'}
           borderWidth="1px"
           p={3}
+          mr={3}
           variant={loggedIn && !currentUser?.isSubmitter ? 'primary' : 'primaryInverse'}
           aria-label="menu dropdown button"
           icon={<List size={16} weight="bold" />}
@@ -340,7 +340,7 @@ const NavBarMenu = observer(function NavBarMenu() {
   };
 
   return (
-    <Menu onClose={() => setIsMenuOpen(false)} onOpen={() => setIsMenuOpen(true)} computePositionOnMount>
+    <Menu closeOnSelect={true} placement="bottom-end">
       {/* Unified mobile menu button */}
       {renderMenuButton()}
 
@@ -353,6 +353,7 @@ const NavBarMenu = observer(function NavBarMenu() {
             border="solid black"
             borderWidth="1px"
             p={3}
+            mr={3}
             variant="primaryInverse"
             aria-label="menu dropdown button"
             leftIcon={<List size={16} weight="bold" />}
@@ -365,7 +366,7 @@ const NavBarMenu = observer(function NavBarMenu() {
 
       {/* ===== MENU DROPDOWN ===== */}
       <Portal>
-        <Box color="text.primary" className={isMenuOpen && 'show-menu-overlay-background'}>
+        <Box color="text.primary">
           <MenuList zIndex={99} boxShadow="2xl">
             {/* ===== LOGGED IN MENU ===== */}
             {loggedIn && !currentUser?.isUnconfirmed ? (
