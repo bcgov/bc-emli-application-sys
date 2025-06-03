@@ -31,10 +31,10 @@ export const SuccessfulSubmissionScreen = observer(() => {
             {message}
           </Heading>
           <Tag mt="4" color="semantic.info" border="1px solid" borderColor="semantic.info" p={2}>
-            {t('permitApplication.new.yourReference', { number })}
+            {t('energySavingsApplication.new.yourReference', { number })}
           </Tag>
         </VStack>
-        <RouterLinkButton to={`/submission-inbox`} variant="primary">
+        <RouterLinkButton to={`/`} variant="primary">
           {t('energySavingsApplication.new.viewAllSubmissions')}
         </RouterLinkButton>
       </Flex>

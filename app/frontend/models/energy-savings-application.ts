@@ -134,6 +134,9 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       get isIneligible() {
         return self.status === EPermitApplicationStatus.ineligible;
       },
+      get isScreenedIn() {
+        return self.status === EPermitApplicationStatus.inReview;
+      },
       get sortedSubmissionVersions() {
         return self.submissionVersions.slice().sort((a, b) => b.createdAt - a.createdAt);
       },
@@ -255,10 +258,21 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
           );
         }
         const status = self.isSubmitted || self.isPrescreened;
-        const changedMarkedFormJson = combineChangeMarkers(diffColoredFormJson, status, changedKeys);
+        const changedMarkedFormJson = combineChangeMarkers(
+          diffColoredFormJson,
+          status,
+          changedKeys,
+          self.rootStore.userStore.currentUser?.role,
+        );
         const revisionModeFormJson =
           self.revisionMode || self.isRevisionsRequested
-            ? combineRevisionButtons(changedMarkedFormJson, status, revisionRequestsToUse)
+            ? combineRevisionButtons(
+                changedMarkedFormJson,
+                status,
+                revisionRequestsToUse,
+                self.rootStore.userStore.currentUser?.role,
+                self.status,
+              )
             : diffColoredFormJson;
         return revisionModeFormJson;
       },

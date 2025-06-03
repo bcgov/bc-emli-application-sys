@@ -136,14 +136,14 @@ export const ReviewPermitApplicationScreen = observer(() => {
               <Heading fontSize="xl" as="h3">
                 {currentPermitApplication.nickname}
               </Heading>
-              <Text noOfLines={1}>{permitTypeAndActivity}</Text>
+              <Text noOfLines={1}>{currentPermitApplication.program.programName}</Text>
               <HStack>
                 <CopyableValue
                   textTransform={'uppercase'}
                   value={number}
                   label={t('permitApplication.fields.number')}
                 />
-                <HStack mt={2} sx={{ svg: { fill: 'theme.yellow' } }}>
+                {/* <HStack mt={2} sx={{ svg: { fill: 'theme.yellow' } }}>
                   <Text textTransform={'uppercase'}> {t('permitApplication.referenceNumber')}:</Text>
                   <EditableInputWithControls
                     size={'xs'}
@@ -167,15 +167,15 @@ export const ReviewPermitApplicationScreen = observer(() => {
                     aria-label={'Edit Template Description'}
                     onCancel={(previousValue) => onReferenceNumberChange(previousValue)}
                   />
-                </HStack>
+                </HStack> */}
               </HStack>
             </Flex>
           </HStack>
           <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
-            <BrowserSearchPrompt />
-            <Button variant="ghost" leftIcon={<Info size={20} />} color="white" onClick={onContactsOpen}>
+            {/* <BrowserSearchPrompt /> */}
+            {/* <Button variant="ghost" leftIcon={<Info size={20} />} color="white" onClick={onContactsOpen}>
               {t('permitApplication.show.contactsSummary')}
-            </Button>
+            </Button> */}
             <SubmissionDownloadModal permitApplication={currentPermitApplication} review />
             <Button rightIcon={<CaretRight />} onClick={() => navigate(`/submission-inbox`)}>
               {t('ui.backToInbox')}

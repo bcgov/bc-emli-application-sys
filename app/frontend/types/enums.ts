@@ -70,6 +70,7 @@ export enum EPermitApplicationStatusGroup {
   ineligible = 'ineligible',
   approved = 'approved',
   revisionsRequested = 'revisionsRequested',
+  resubmitted = 'resubmitted',
 }
 
 export enum ETemplateVersionStatus {

@@ -218,17 +218,20 @@ class RequirementTemplate < ApplicationRecord
   end
 
   def self.published_requirement_template_version(
-    activity,
-    permit_type,
-    first_nations
+    user_group_type_id,
+    audience_type_id,
+    submission_type_id
   )
-    find_by(
-      activity: activity,
-      permit_type: permit_type,
-      first_nations: first_nations
-    ).published_template_version
+    requirement_template =
+      find_by(
+        user_group_type_id: user_group_type_id,
+        audience_type_id: audience_type_id,
+        submission_type_id: submission_type_id
+      )
+    published_version = requirement_template&.published_template_version
+    published_version
   rescue NoMethodError => e
-    Rails.logger.error e.message
+    Rails.logger.error "Error in published_requirement_template_version: #{e.message}"
   end
 
   def search_data

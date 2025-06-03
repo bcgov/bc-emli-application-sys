@@ -20,7 +20,7 @@ export const EnergySavingsApplicationStatusTag = ({
 
   const bgMap = {
     [EPermitApplicationStatus.submitted]: 'theme.orangeLight02',
-    [EPermitApplicationStatus.resubmitted]: 'theme.yellow',
+    [EPermitApplicationStatus.resubmitted]: 'theme.orangeLight02',
     [EPermitApplicationStatus.draft]: 'theme.blueLight',
     [EPermitApplicationStatus.revisionsRequested]: 'theme.softRose',
     // [EPermitApplicationStatus.ephemeral]: 'theme.blueLight',
@@ -44,7 +44,7 @@ export const EnergySavingsApplicationStatusTag = ({
 
   const borderColorMap = {
     [EPermitApplicationStatus.submitted]: 'theme.orange',
-    [EPermitApplicationStatus.resubmitted]: 'theme.yellow',
+    [EPermitApplicationStatus.resubmitted]: 'theme.orange',
     [EPermitApplicationStatus.draft]: 'greys.lightGrey',
     [EPermitApplicationStatus.revisionsRequested]: 'semantic.errorDark',
     // [EPermitApplicationStatus.ephemeral]: 'theme.blueLight',

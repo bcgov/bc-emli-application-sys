@@ -501,6 +501,12 @@ en:
       assign_user_success:
         title: ''
         message: 'User successfully assigned!'
+      already_submitted_error:
+        title: Error
+        message: 'This application has already been submitted'
+      update_success:
+        title: ''
+        message: 'Application successfully updated!'
       assign_user_error:
         title: ''
         message: '%{error_message}'

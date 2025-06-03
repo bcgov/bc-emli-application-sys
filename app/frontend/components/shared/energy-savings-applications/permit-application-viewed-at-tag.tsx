@@ -1,6 +1,6 @@
-import { Tag, TagProps } from "@chakra-ui/react"
-import React from "react"
-import { useTranslation } from "react-i18next"
+import { Tag, TagProps } from '@chakra-ui/react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { EPermitApplicationStatus } from '../../../types/enums';
 
@@ -18,6 +18,8 @@ export const PermitApplicationViewedAtTag = ({ permitApplication, ...rest }: IPe
     [EPermitApplicationStatus.resubmitted]: t('energySavingsApplication.status.resubmitted'),
     [EPermitApplicationStatus.ineligible]: t('energySavingsApplication.status.ineligible'),
     [EPermitApplicationStatus.approved]: t('energySavingsApplication.status.approved'),
+    [EPermitApplicationStatus.prescreen]: t('energySavingsApplication.status.prescreen'),
+    [EPermitApplicationStatus.submitted]: t('energySavingsApplication.status.unread'),
   };
   return (
     <Tag

@@ -54,8 +54,7 @@ export const RequirementForm = observer(
       blockClasses,
       formattedFormJson,
       isDraft,
-      isInReview,
-      isIneligible,
+      isScreenedIn,
       previousSubmissionVersion,
       selectedPastSubmissionVersion,
       isViewingPastRequests,
@@ -232,7 +231,11 @@ export const RequirementForm = observer(
 
     const onModalSubmit = async () => {
       if (await permitApplication.submit({ submissionData: imminentSubmission })) {
-        navigate(`/applications/${permitApplication.id}/successful-submission`);
+        navigate(`/applications/${permitApplication.id}/successful-submission`, {
+          state: {
+            message: t('energySavingsApplication.new.sucessfulSubmission'),
+          },
+        });
       }
     };
 
@@ -290,11 +293,11 @@ export const RequirementForm = observer(
       const firstComponent = rootComponent.form.components[0];
       setFirstComponentKey(firstComponent.key);
     };
-
+    // formio-component-${requirementJson.key}
     let permitAppOptions = {
       ...defaultOptions,
-      ...(isDraft || isInReview || isIneligible ? { readOnly: true } : { readOnly: false }),
-      // readonly logic depends on formattedJson for submitted applications or if the application is in review
+      readOnly: isScreenedIn ? true : false,
+      // ...(isDraft || isScreenedIn ? { readOnly: true } : { readOnly: false }),
     };
     permitAppOptions.componentOptions.simplefile.config['formCustomOptions'] = {
       persistFileUploadAction: 'PATCH',
@@ -359,6 +362,16 @@ export const RequirementForm = observer(
                 date: format(permitApplication.revisionsRequestedAt, 'MMM d, yyyy h:mm a'),
               })}
               status="warning"
+            />
+          )}
+          {permitApplication?.isPrescreened && (
+            <CustomMessageBox
+              description={t('energySavingsApplication.show.applicationSubmitted', {
+                date: permitApplication?.submittedAt
+                  ? format(new Date(permitApplication.submittedAt), 'MMM d, yyyy h:mm a')
+                  : '',
+              })}
+              status="info"
             />
           )}
           {showVersionDiffContactWarning && (

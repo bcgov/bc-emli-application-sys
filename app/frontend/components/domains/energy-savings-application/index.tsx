@@ -99,10 +99,12 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
               <Flex direction={{ base: 'row' }} alignItems={{ md: 'end', base: 'end' }} gap={4}>
                 <EnergySavingsApplicationFilter
                   statusGroups={[
+                    EPermitApplicationStatusGroup.draft,
                     EPermitApplicationStatusGroup.approved,
                     EPermitApplicationStatusGroup.revisionsRequested,
                     EPermitApplicationStatusGroup.ineligible,
                     EPermitApplicationStatusGroup.submitted,
+                    EPermitApplicationStatusGroup.resubmitted,
                   ]}
                 />
                 {hasResetableFilters && (
