@@ -44,6 +44,7 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
   const ineligibleFilters = [EPermitApplicationStatus.ineligible];
   const prescreenFilters = [EPermitApplicationStatus.prescreen];
   const revisionRequestedFilters = [EPermitApplicationStatus.revisionsRequested];
+  const resubmittedFilters = [EPermitApplicationStatus.resubmitted];
 
   // Handle selected filters
   const [selectedFilters, setSelectedFilters] = useState<string[]>(paramStatusFilter);
@@ -92,6 +93,8 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
         return approvedFilters;
       case 'ineligible':
         return ineligibleFilters;
+      case 'resubmitted':
+        return resubmittedFilters;
       case 'prescreen':
         return prescreenFilters;
       case 'revisionsRequested':
@@ -117,6 +120,8 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
         return 'prescreen';
       case EPermitApplicationStatus.revisionsRequested:
         return 'revisionsRequested';
+      case EPermitApplicationStatus.resubmitted:
+        return 'resubmitted';
       default:
         return [];
     }

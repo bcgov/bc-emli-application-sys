@@ -39,6 +39,7 @@ export const GridHeaders = observer(function GridHeaders() {
                     EPermitApplicationStatusGroup.revisionsRequested,
                     EPermitApplicationStatusGroup.ineligible,
                     EPermitApplicationStatusGroup.submitted,
+                    EPermitApplicationStatusGroup.resubmitted,
                   ]}
                 />
               </Box>

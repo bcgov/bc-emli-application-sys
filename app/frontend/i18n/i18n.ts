@@ -994,8 +994,12 @@ const options = {
             contactInfo: 'Contact information',
             applicantInfo: 'Applicant contact details',
           },
+          consent: {
+            title: '  Collection of consent',
+            acknowledgement: 'I acknowledge that the participant has consented to this update.',
+          },
           usePid: "Use '{{ inputValue }}' as PID",
-          indexTitle: 'My application',
+          indexTitle: 'My applications',
           start: 'Start an application',
           drafts: 'Draft Permits',
           startedOn: 'Started',
@@ -1032,6 +1036,7 @@ const options = {
             inReview: 'Screened In',
             approved: 'Approved',
             ineligible: 'Ineligible',
+            resubmitted: 'Resubmitted',
             revisionsRequested: 'Update needed',
             prescreen: 'Prescreen',
           },
@@ -1040,6 +1045,7 @@ const options = {
             all: 'All',
             draft: 'Draft',
             submitted: 'Submitted',
+            resubmitted: 'Resubmitted',
             inReview: 'Screened In',
             revisionsRequested: 'Update needed',
             approved: 'Approved',
@@ -1073,6 +1079,7 @@ const options = {
             jurisdiction: 'Jurisdiction',
           },
           new: {
+            sucessfulSubmission: 'Application submitted',
             viewAllSubmissions: 'View all submissions',
             locationHeading: 'Location for permit',
             submitToOwn:
@@ -1121,7 +1128,7 @@ const options = {
             bySubmitting: 'By submitting this application',
             confirmation:
               'You confirm that the information you provided was completed to the best of your knowledge and ability',
-            yourReference: 'For reference, your BC Building Permit Hub Application # is {{ number }}',
+            yourReference: 'Share the application ID: #{{ number }}',
             noContactsAvailable:
               'This jurisdiction is not ready to accept applications through this tool yet. Please check with your local jurisdiction.',
             whatsNext:
@@ -1185,6 +1192,7 @@ const options = {
             backToInbox: 'Back to inbox',
             locateRevisions: 'Locate each requested revision by clicking the links below.',
             revisionsWereRequested: 'Updates to this application were requested on {{date}}',
+            applicationSubmitted: 'Application was submitted on {{date}}',
             clickQuestion: 'Click on the question(s) or requirement(s) you want the submitter to revise.',
             inEligibleDetails: 'Ineligible application details',
             applicationId: 'Application ID is #',
@@ -2657,8 +2665,7 @@ const options = {
           accessibility: 'Accessibility',
           copyright: 'Copyright',
           foippaWarning:
-            'We are collecting your personal information under section 26(c) & (e) of the Freedom of Information and Protection of Privacy Act. We are collecting this information to process your application to the CleanBC Better Homes Energy Savings Program, and for program planning and evaluation. The Ministry of Energy and Climate Solutions administers this program. If you have questions about the collection of your information, please contact us at ',
-          needMoreHelp: 'Need more help?',
+            'We are collecting your personal information under section 26(c) & (e) of the Freedom of Information and Protection of Privacy Act. We are collecting this information to process your application to the CleanBC Better Homes Energy Savings Program, and for program planning and evaluation. The Ministry of Energy and Climate Solutions administers this program. If you have questions about the collection of your information, please contact us at betterhomesbc@gov.bc.ca. ',
           pleaseContact:
             'Please contact your local government for questions related to your energy savings application.',
           forHelp: 'For help with the Building Permit Hub please contact:',

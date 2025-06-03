@@ -350,21 +350,12 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 </form>
 
                 <Text noOfLines={1}>{programNameAndTypes}</Text>
-                <HStack>
-                  <CopyableValue value={number} label={t('permitApplication.fields.number')} />
-                  {currentPermitApplication.referenceNumber && (
-                    <CopyableValue
-                      value={currentPermitApplication.referenceNumber}
-                      label={t('permitApplication.referenceNumber')}
-                    />
-                  )}
-                </HStack>
               </Flex>
             </HStack>
 
             {isSubmitted ? (
               <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
-                <BrowserSearchPrompt />
+                {/* <BrowserSearchPrompt /> */}
                 {/* <Button variant="ghost" leftIcon={<Info size={20} />} color="white" onClick={onContactsOpen}>
                   {t('permitApplication.show.contactsSummary')}
                 </Button>{' '} */}
@@ -473,7 +464,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               onCompletedBlocksChange={setCompletedBlocks}
               triggerSave={handleSave}
               showHelpButton
-              isEditing={currentPermitApplication?.isDraft}
+              isEditing={currentPermitApplication?.isDraft || currentPermitApplication?.isRevisionsRequested}
               renderSaveButton={() => <SaveButton handleSave={handleSave} />}
               updateCollaborationAssignmentNodes={updateRequirementBlockAssignmentNode}
             />

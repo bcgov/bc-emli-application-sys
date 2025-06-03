@@ -232,15 +232,14 @@ class Api::PermitApplicationsController < Api::ApplicationController
     is_current_user_submitter =
       current_user.id == @permit_application.submitter_id
 
-    if @permit_application.update(
-         (
-           if is_current_user_submitter
-             permit_application_params
-           else
-             submission_collaborator_permit_application_params
-           end
-         )
-       ) && @permit_application.submit!
+    update_params =
+      if is_current_user_submitter
+        permit_application_params
+      else
+        submission_collaborator_permit_application_params
+      end
+
+    if @permit_application.update(update_params) && @permit_application.submit!
       render_success @permit_application,
                      nil,
                      {
@@ -257,8 +256,11 @@ class Api::PermitApplicationsController < Api::ApplicationController
                        @permit_application.errors.full_messages.join(", ")
                    }
     end
-  rescue AASM::InvalidTransition
-    render_error "permit_application.submit_state_error", message_opts: {}
+  rescue AASM::InvalidTransition => e
+    render_error "permit_application.submit_state_error",
+                 message_opts: {
+                   error: e.message
+                 }
   end
 
   def create
@@ -514,7 +516,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
 
   def set_permit_application
     @permit_application =
-      if current_user.system_admin?
+      if current_user.system_admin? || current_user.participant?
         PermitApplication.find(params[:id])
       else
         PermitApplication.for_sandbox(current_sandbox).find(params[:id])
