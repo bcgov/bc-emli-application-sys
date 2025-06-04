@@ -405,6 +405,7 @@ const AppRoutes = observer(() => {
   const adminManagerOrAdmin = (
     <>
       <Route path="/submission-inbox" element={<ProgramSubmissionInboxScreen />} />
+      <Route path="/permit-applications/:permitApplicationId" element={<ReviewPermitApplicationScreen />} />
       // view blank applications and view supported applications to go here
       {import.meta.env.DEV && (
         <>
