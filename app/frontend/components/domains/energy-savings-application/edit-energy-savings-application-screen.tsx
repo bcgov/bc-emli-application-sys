@@ -276,6 +276,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
     formJson,
     number,
     isSubmitted,
+    isIneligible,
     isDirty,
     setIsDirty,
     isRevisionsRequested,
@@ -306,11 +307,11 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               <EnergySavingsApplicationStatusTag energySavingsApplication={currentPermitApplication} />
               <Flex direction="column" w="full">
                 {/* <form>
-                  <Tooltip label={t('permitApplication.edit.clickToWriteNickname')} placement="top-start">
+                  <Tooltip label={t('energySavingsApplication.edit.clickToWriteNickname')} placement="top-start">
                     <Box>
                       <EditableInputWithControls
                         w="full"
-                        initialHint={t('permitApplication.edit.clickToWriteNickname')}
+                        initialHint={t('energySavingsApplication.edit.clickToWriteNickname')}
                         value={currentPermitApplication.fullAddress || ''}
                         isDisabled={!doesUserHaveSubmissionPermission || isSubmitted}
                         controlsProps={{
@@ -356,27 +357,27 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                   <CopyableValue
                     textTransform={'uppercase'}
                     value={number}
-                    label={t('permitApplication.fields.number')}
+                    label={t('energySavingsApplication.fields.number')}
                   />
                 </HStack>
               </Flex>
             </HStack>
 
-            {isSubmitted ? (
+            {isSubmitted || isIneligible ? (
               <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
                 {/* <BrowserSearchPrompt /> */}
                 {/* <Button variant="ghost" leftIcon={<Info size={20} />} color="white" onClick={onContactsOpen}>
-                  {t('permitApplication.show.contactsSummary')}
+                  {t('energySavingsApplication.show.contactsSummary')}
                 </Button>{' '} */}
                 {/* <CollaboratorsSidebar
                   permitApplication={currentPermitApplication}
                   collaborationType={ECollaborationType.submission}
                 /> */}
-                {doesUserHaveSubmissionPermission && (
+                {/* {doesUserHaveSubmissionPermission && (
                   <SubmissionDownloadModal permitApplication={currentPermitApplication} />
-                )}
+                )} */}
                 <Button rightIcon={<CaretRight />} onClick={() => navigate('/')}>
-                  {t('permitApplication.show.backToInbox')}
+                  {t('energySavingsApplication.show.backToInbox')}
                 </Button>
               </Stack>
             ) : (
@@ -394,13 +395,13 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 /> */}
                 {currentPermitApplication?.isDraft && (
                   <Button variant="primary" onClick={handleClickWithdrawl}>
-                    {t('permitApplication.edit.withdrawl')}
+                    {t('energySavingsApplication.edit.withdrawl')}
                   </Button>
                 )}
                 {!currentPermitApplication?.isIneligible && (
                   <>
                     <Button variant="primary" onClick={handleClickFinishLater}>
-                      {t('permitApplication.edit.saveDraft')}
+                      {t('energySavingsApplication.edit.saveDraft')}
                     </Button>
                     <Button
                       rightIcon={<CaretRight />}
@@ -410,10 +411,11 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                           : onSubmitBlockedModalOpen
                       }
                     >
-                      {t('permitApplication.edit.submit')}
+                      {t('energySavingsApplication.edit.submit')}
                     </Button>
                   </>
                 )}
+
                 {!currentPermitApplication.canUserSubmit(currentUser) && isSubmitBlockedModalOpen && (
                   <PermitApplicationSubmitModal
                     permitApplication={currentPermitApplication}
@@ -441,7 +443,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               <Flex width={'sidebar.width'} align="center" gap={2}>
                 <NotePencil size={24} />
                 <Heading fontSize="lg" mt={2}>
-                  {t('permitApplication.show.requestedRevisions')}
+                  {t('energySavingsApplication.show.requestedRevisions')}
                 </Heading>
                 <Spacer />
                 <Button
@@ -452,7 +454,9 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                   rightIcon={hideRevisionList ? <CaretDown /> : <CaretUp />}
                   onClick={() => setHideRevisionList((cur) => !cur)}
                 >
-                  {hideRevisionList ? t('permitApplication.show.showList') : t('permitApplication.show.hideList')}
+                  {hideRevisionList
+                    ? t('energySavingsApplication.show.showList')
+                    : t('energySavingsApplication.show.hideList')}
                 </Button>
                 <Divider orientation="vertical" height="24px" mx={4} borderColor="greys.grey01" />
               </Flex>

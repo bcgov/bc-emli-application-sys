@@ -1143,6 +1143,7 @@ const options = {
               'After you’ve submitted your application, local officials will review it. They may ask you to fix issues or show that your application meets requirements before approving it.',
           },
           edit: {
+            back: 'Back to My applications',
             saveDraft: 'Save and finish later',
             withdrawl: 'Withdraw application',
             submit: 'Submit application',
@@ -1187,7 +1188,7 @@ const options = {
               'Only the the specified fields highlighted below (in yellow) and their corresponding blocks can be edited',
             showList: 'Show list',
             hideList: 'Hide list',
-            backToInbox: 'Back to inbox',
+            backToInbox: 'Back to My Applications',
             locateRevisions: 'Locate each requested revision by clicking the links below.',
             revisionsWereRequested: 'Updates to this application were requested on {{date}}',
             applicationSubmitted: 'Application was submitted on {{date}}',
