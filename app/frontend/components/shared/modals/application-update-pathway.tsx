@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Modal,
@@ -15,19 +15,23 @@ import {
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import CollectionConsentModal from './consent-modal';
+import { EUpdateRoles } from '../../../types/enums';
 
-const UpdatePathwayModal = ({ isOpen, onClose, setRevisionMode }) => {
-  const [selectedOption, setSelectedOption] = useState('');
+const UpdatePathwayModal = ({ isOpen, onClose, setRevisionMode, setPerformedBy }) => {
   const { t } = useTranslation();
 
+  const [selectedOption, setSelectedOption] = useState(null);
+
   const handleSelectChange = (e) => {
-    setSelectedOption(e.target.value);
+    const selectedValue = e.target.value;
+    setSelectedOption(selectedValue);
+    setPerformedBy(selectedValue); // Pass selected value to parent component
   };
 
   const [isCollectionConsentModalOpen, setCollectionConsentModalOpen] = useState(false);
 
   const handleNext = () => {
-    if (selectedOption === 'staff') {
+    if (selectedOption === EUpdateRoles.staff) {
       setCollectionConsentModalOpen(true); // Open CollectionConsentModal
       setRevisionMode(false);
     } else {
@@ -51,8 +55,11 @@ const UpdatePathwayModal = ({ isOpen, onClose, setRevisionMode }) => {
           <ModalBody>
             <Text mb={2}>{t('energySavingsApplication.show.performedBy')}</Text>
             <Select placeholder="Select" onChange={handleSelectChange}>
-              <option value="applicant">{t('energySavingsApplication.show.applicant')}</option>
-              <option value="staff">{t('energySavingsApplication.show.staff')}</option>
+              {Object.entries(EUpdateRoles).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value}
+                </option>
+              ))}
             </Select>
           </ModalBody>
 

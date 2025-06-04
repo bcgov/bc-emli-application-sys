@@ -773,7 +773,6 @@
   .btn.submission-change-marker {
     background: transparent !important;
     color: var(--chakra-colors-border-dark);
-    padding: 15px;
     position: absolute;
     top: 7px;
     right: 126px;
@@ -808,7 +807,6 @@
   .btn.revision-marker {
     background: transparent !important;
     color: var(--chakra-colors-border-dark);
-    padding: 15px;
     position: absolute;
     top: 7px;
     right: 126px;
@@ -823,7 +821,7 @@
       color: var(--chakra-colors-text-primary);
       text-transform: uppercase;
       text-decoration: underline;
-      content: "Revision requested";
+      content: "Update requested";
       position: absolute;
       font-weight: 200;
       top: 0;
@@ -831,7 +829,7 @@
       padding-right: 4px;
       padding-top: 4px;
       padding-bottom: 4px;
-      transform: translateY(-50%);
+      transform: translateY(-50%) translateX(-5%);
       font-size: 14px;
       width: "fit-content";
       white-space: nowrap;

@@ -281,7 +281,6 @@ export const combineChangeMarkers = (
       for (let i = 0; i < block.components.length; i++) {
         const requirement = block.components[i];
         requirement.disabled ||= isInReview;
-        console.log('changedKeys:', changedKeys);
         if (section.id === COMPLETTION_SECTION_ID || !changedKeys.includes(requirement.key)) continue;
 
         const changeMarker = convertToChangeMarker(requirement);

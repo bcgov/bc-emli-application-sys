@@ -514,7 +514,8 @@ class Api::PermitApplicationsController < Api::ApplicationController
 
   def set_permit_application
     @permit_application =
-      if current_user.system_admin? || current_user.participant?
+      if current_user.system_admin? || current_user.participant? ||
+           current_user.admin_manager?
         PermitApplication.find(params[:id])
       else
         PermitApplication.for_sandbox(current_sandbox).find(params[:id])
@@ -590,6 +591,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
         :_destroy,
         :reason_code,
         :comment,
+        :performed_by,
         requirement_json: {
         },
         submission_json: {

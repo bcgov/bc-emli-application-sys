@@ -43,7 +43,16 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
   const isSubmissionCollaboration = energySavingsApplication.submitter?.id !== currentUser?.id;
 
   const routingButtonText = (() => {
-    if (energySavingsApplication.isSubmitted) return t('ui.view');
+    if (
+      [
+        energySavingsApplication.isSubmitted,
+        energySavingsApplication.isIneligible,
+        energySavingsApplication.isResubmitted,
+        energySavingsApplication.isApproved,
+      ].some(Boolean)
+    ) {
+      return t('energySavingsApplication.card.viewApplication');
+    }
 
     return isSubmissionCollaboration ? t('energySavingsApplication.card.collaborateButton') : t('ui.continue');
   })();
@@ -62,7 +71,6 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
       align="center"
       gap={4}
       position="relative"
-      cursor="pointer"
       bg={
         energySavingsApplication.status === EPermitApplicationStatus.revisionsRequested
           ? 'theme.orangeLight'
@@ -99,7 +107,8 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
           </Flex>
         </Show>
         <Flex direction="column" gap={2} flex={{ base: 0, md: 5 }} maxW={{ base: '100%', md: '75%' }}>
-          {showNewVersionWarning && (
+          {/* Commented for future reference */}
+          {/* {showNewVersionWarning && (
             <Flex bg="semantic.warning" {...calloutBannerContainerProps}>
               <Warning size={14} />
               <Text {...calloutBannerTextProps}>
@@ -110,7 +119,7 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
                 {t('energySavingsApplication.newVersionPublished')}
               </Text>
             </Flex>
-          )}
+          )} */}
           {isSubmissionCollaboration && (
             <Flex bg="semantic.info" color={'white'} {...calloutBannerContainerProps}>
               <Info size={14} />

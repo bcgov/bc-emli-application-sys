@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { ISearch } from '../../../lib/create-search-model';
 import { useMst } from '../../../setup/root';
 import { TFilterableStatus } from '../../../stores/energy-savings-application-store';
-import { EPermitApplicationStatus, EPermitApplicationStatusGroup } from '../../../types/enums';
+import { EPermitApplicationStatus, EPermitApplicationStatusGroup, EUserRoles } from '../../../types/enums';
 
 interface IPermitApplicationStatusTabsProps<TSearchModel extends ISearch> extends ContainerProps {}
 
@@ -25,7 +25,8 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
   statusGroups,
   ...rest
 }: IPermitApplicationStatusTabsProps<TSearchModel> & { statusGroups: EPermitApplicationStatusGroup[] }) {
-  const { permitApplicationStore } = useMst();
+  const { permitApplicationStore, userStore } = useMst();
+  const currentUser = userStore.currentUser;
   const { t } = useTranslation();
   const queryParams = new URLSearchParams(location.search);
   const paramStatusFilterString = queryParams.get('status') || t('energySavingsApplication.statusGroup.filter');
@@ -42,7 +43,6 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
   const inReviewFilters = [EPermitApplicationStatus.inReview];
   const approvedFilters = [EPermitApplicationStatus.approved];
   const ineligibleFilters = [EPermitApplicationStatus.ineligible];
-  const prescreenFilters = [EPermitApplicationStatus.prescreen];
   const revisionRequestedFilters = [EPermitApplicationStatus.revisionsRequested];
   const resubmittedFilters = [EPermitApplicationStatus.resubmitted];
 
@@ -95,8 +95,6 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
         return ineligibleFilters;
       case 'resubmitted':
         return resubmittedFilters;
-      case 'prescreen':
-        return prescreenFilters;
       case 'revisionsRequested':
         return revisionRequestedFilters;
       default:
@@ -116,8 +114,6 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
         return 'approved';
       case EPermitApplicationStatus.ineligible:
         return 'ineligible';
-      case EPermitApplicationStatus.prescreen:
-        return 'prescreen';
       case EPermitApplicationStatus.revisionsRequested:
         return 'revisionsRequested';
       case EPermitApplicationStatus.resubmitted:
@@ -198,7 +194,10 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
               }}
             >
               <Checkbox isChecked={selectedFilters.includes(filterValue)} pointerEvents="none">
-                {t(`energySavingsApplication.statusGroup.${filterValue}`)}
+                {filterValue === EPermitApplicationStatusGroup.submitted &&
+                [EUserRoles.admin, EUserRoles.adminManager].includes(currentUser.role)
+                  ? t(`energySavingsApplication.status.unread`)
+                  : t(`energySavingsApplication.statusGroup.${filterValue}`)}
               </Checkbox>
             </MenuItem>
           ))}

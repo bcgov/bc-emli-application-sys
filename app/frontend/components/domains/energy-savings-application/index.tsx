@@ -100,10 +100,10 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
                 <EnergySavingsApplicationFilter
                   statusGroups={[
                     EPermitApplicationStatusGroup.draft,
-                    EPermitApplicationStatusGroup.approved,
-                    EPermitApplicationStatusGroup.revisionsRequested,
-                    EPermitApplicationStatusGroup.ineligible,
                     EPermitApplicationStatusGroup.submitted,
+                    EPermitApplicationStatusGroup.revisionsRequested,
+                    EPermitApplicationStatusGroup.approved,
+                    EPermitApplicationStatusGroup.ineligible,
                     EPermitApplicationStatusGroup.resubmitted,
                   ]}
                 />

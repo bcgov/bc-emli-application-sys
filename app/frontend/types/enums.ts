@@ -53,7 +53,6 @@ export enum ESubmissionInboxTypes {
 export enum EPermitApplicationStatus {
   draft = 'new_draft',
   submitted = 'newly_submitted',
-  prescreen = 'prescreen',
   revisionsRequested = 'revisions_requested',
   resubmitted = 'resubmitted',
   ephemeral = 'ephemeral',
@@ -65,7 +64,6 @@ export enum EPermitApplicationStatus {
 export enum EPermitApplicationStatusGroup {
   draft = 'draft',
   submitted = 'submitted',
-  prescreen = 'prescreen',
   inReview = 'inReview',
   ineligible = 'ineligible',
   approved = 'approved',
@@ -96,6 +94,10 @@ export enum EUserRoles {
   unassigned = 'unassigned',
 }
 
+export enum EUpdateRoles {
+  applicant = 'applicant',
+  staff = 'staff',
+}
 export enum ERequirementLibrarySortFields {
   name = 'name',
   firstNations = 'first_nations',

@@ -55,6 +55,7 @@ export const RequirementForm = observer(
       formattedFormJson,
       isDraft,
       isScreenedIn,
+      isIneligible,
       previousSubmissionVersion,
       selectedPastSubmissionVersion,
       isViewingPastRequests,
@@ -296,7 +297,7 @@ export const RequirementForm = observer(
     // formio-component-${requirementJson.key}
     let permitAppOptions = {
       ...defaultOptions,
-      readOnly: isScreenedIn ? true : false,
+      readOnly: isScreenedIn || isIneligible ? true : false,
       // ...(isDraft || isScreenedIn ? { readOnly: true } : { readOnly: false }),
     };
     permitAppOptions.componentOptions.simplefile.config['formCustomOptions'] = {
@@ -356,7 +357,7 @@ export const RequirementForm = observer(
             ) : (
               <SharedSpinner position="fixed" right={24} top="50vh" zIndex={12} />
             ))}
-          {permitApplication?.isRevisionsRequested && (
+          {permitApplication?.isRevisionsRequested && permitApplication?.revisionsRequestedAt && (
             <CustomMessageBox
               description={t('energySavingsApplication.show.revisionsWereRequested', {
                 date: format(permitApplication.revisionsRequestedAt, 'MMM d, yyyy h:mm a'),
@@ -364,7 +365,7 @@ export const RequirementForm = observer(
               status="warning"
             />
           )}
-          {permitApplication?.isPrescreened && (
+          {permitApplication?.isSubmitted && (
             <CustomMessageBox
               description={t('energySavingsApplication.show.applicationSubmitted', {
                 date: permitApplication?.submittedAt

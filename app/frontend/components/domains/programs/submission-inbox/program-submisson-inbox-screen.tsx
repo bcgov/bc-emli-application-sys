@@ -255,16 +255,6 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
   const { t } = useTranslation();
   const [newUser, setNewUser] = useState<IMinimalFrozenUser | null>(null);
 
-  const changeStatus = async (status: EPermitApplicationStatus) => {
-    try {
-      if (status === EPermitApplicationStatus.submitted) {
-        const response = await permitApplication.updateStatus({
-          status: EPermitApplicationStatus.prescreen,
-        });
-      }
-    } catch (e) {}
-  };
-
   return (
     <Box
       key={permitApplication.id}
@@ -326,13 +316,7 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
               )}
               review
             />
-            <RouterLinkButton
-              variant="primary"
-              to={`/permit-applications/${permitApplication.id}`}
-              onClick={() => {
-                changeStatus(permitApplication.status);
-              }}
-            >
+            <RouterLinkButton variant="primary" to={`/permit-applications/${permitApplication.id}`}>
               {t('ui.view')}
             </RouterLinkButton>
           </HStack>

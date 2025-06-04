@@ -973,6 +973,7 @@ const options = {
           reviewCustomizedMessage: 'Filters have been applied. Please review the draft applications below.',
           newVersionPublished: 'New version of template has been published - please review changes',
           card: {
+            viewApplication: 'View application',
             collaborateButton: 'Collaborate',
             collaborationCalloutDraft:
               '<1>{{authorName}} has assigned you to this permit.</1> Collaborate on this permit application.',
@@ -1027,7 +1028,6 @@ const options = {
             approved: 'Approved',
             ineligible: 'Ineligible',
             screen_in: 'Screened In',
-            prescreen: 'Prescreen',
             unread: 'Unread',
           },
           filter: {
@@ -1038,7 +1038,6 @@ const options = {
             ineligible: 'Ineligible',
             resubmitted: 'Resubmitted',
             revisionsRequested: 'Update needed',
-            prescreen: 'Prescreen',
           },
           statusGroup: {
             filter: 'Filter',
@@ -1050,7 +1049,6 @@ const options = {
             revisionsRequested: 'Update needed',
             approved: 'Approved',
             ineligible: 'Ineligible',
-            prescreen: 'Prescreen',
           },
           columns: {
             number: 'Application #',

@@ -46,7 +46,6 @@ export const PermitApplicationStoreModel = types
         EPermitApplicationStatus.inReview,
         EPermitApplicationStatus.approved,
         EPermitApplicationStatus.ineligible,
-        EPermitApplicationStatus.prescreen,
         EPermitApplicationStatus.revisionsRequested,
       ]),
       userGroupTypeIdFilter: types.maybeNull(types.string),
@@ -95,7 +94,6 @@ export const PermitApplicationStoreModel = types
         [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.inReview,
         [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.approved,
         [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.ineligible,
-        [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.prescreen,
         [self.submittedStatuses.join(',')]: EPermitApplicationStatusGroup.revisionsRequested,
       };
       return map[self.statusFilter.join(',')];

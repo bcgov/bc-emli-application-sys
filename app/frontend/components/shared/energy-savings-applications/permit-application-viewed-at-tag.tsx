@@ -18,8 +18,8 @@ export const PermitApplicationViewedAtTag = ({ permitApplication, ...rest }: IPe
     [EPermitApplicationStatus.resubmitted]: t('energySavingsApplication.status.resubmitted'),
     [EPermitApplicationStatus.ineligible]: t('energySavingsApplication.status.ineligible'),
     [EPermitApplicationStatus.approved]: t('energySavingsApplication.status.approved'),
-    [EPermitApplicationStatus.prescreen]: t('energySavingsApplication.status.prescreen'),
     [EPermitApplicationStatus.submitted]: t('energySavingsApplication.status.unread'),
+    [EPermitApplicationStatus.revisionsRequested]: t('energySavingsApplication.status.revisions_requested'),
   };
   return (
     <Tag
