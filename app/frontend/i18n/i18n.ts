@@ -434,6 +434,7 @@ const options = {
           reset: 'Reset',
           autofill: 'Autofill',
           help: 'Help',
+          contact: 'Contact',
           pleaseSelect: 'Please select',
           checked: 'Checked',
           unchecked: 'Unhecked',
@@ -2580,6 +2581,13 @@ const options = {
             missingInfo: 'This page is missing the information I need',
             notRelated: 'This page is not related to what I searched for',
             other: 'Other',
+          },
+          helpDrawer: {
+            phoneTitle: 'Telephone',
+            phoneHours: '9 am - 5 pm, Monday - Friday',
+            phoneHoursNote: '(excluding statutory holidays).',
+            emailTitle: 'Email',
+            emailAddress: 'betterhomesep@clearesult.com',
           },
           support: {
             getSupport: 'Get support',

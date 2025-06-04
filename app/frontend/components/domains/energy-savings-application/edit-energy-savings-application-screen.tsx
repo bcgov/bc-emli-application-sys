@@ -18,6 +18,7 @@ import {
   ModalFooter,
   ModalCloseButton,
 } from '@chakra-ui/react';
+import { Phone } from '@phosphor-icons/react';
 import { CaretDown, CaretRight, CaretUp, FloppyDiskBack, Info, NotePencil } from '@phosphor-icons/react';
 import { t } from 'i18next';
 import { observer } from 'mobx-react-lite';
@@ -425,7 +426,12 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 )}
               </HStack>
             )}
-            <FloatingHelpDrawer top={permitHeaderHeight + 20} position="absolute" />
+            <FloatingHelpDrawer
+              icon={Phone}
+              iconProps={{ size: 14, color: 'white', weight: 'regular' }}
+              top={permitHeaderHeight + 20}
+              position="absolute"
+            />
           </Flex>
           {currentPermitApplication.isRevisionsRequested && (
             <Flex
