@@ -274,8 +274,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_03_225156) do
     t.integer "status", default: 0
     t.uuid "submitter_id", null: false
     t.uuid "jurisdiction_id"
-    t.timestamptz "created_at", precision: 6, null: false
-    t.timestamptz "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.uuid "permit_type_id"
     t.uuid "activity_id"
     t.string "full_address"

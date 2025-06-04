@@ -15,13 +15,7 @@ class PermitApplication < ApplicationRecord
   #   permit_collaborations
   # ]
 
-  SEARCH_INCLUDES = %i[
-    submission_versions
-    submitter
-    sandbox
-    program
-    permit_classification
-  ]
+  SEARCH_INCLUDES = %i[submission_versions submitter sandbox program]
 
   API_SEARCH_INCLUDES = %i[
     program

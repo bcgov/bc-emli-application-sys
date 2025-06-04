@@ -19,7 +19,9 @@ class PermitApplicationBlueprint < Blueprinter::Base
            :revisions_requested_at,
            :missing_pdfs
     association :permit_type, blueprint: PermitClassificationBlueprint
-    association :submission_type, blueprint: PermitClassificationBlueprint
+    association :submission_type,
+                blueprint: PermitClassificationBlueprint,
+                view: :base
     association :activity, blueprint: PermitClassificationBlueprint
     association :program, blueprint: ProgramBlueprint, view: :summary
     association :sandbox, blueprint: SandboxBlueprint
