@@ -3,6 +3,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { EPermitApplicationStatus } from '../../../types/enums';
+import { useMst } from '../../../setup/root';
+import { EUserRoles } from '../../../types/enums';
 
 interface IEnergySavingsApplicationStatusTagProps extends TagProps {
   energySavingsApplication: IEnergySavingsApplication;
@@ -15,6 +17,8 @@ export const EnergySavingsApplicationStatusTag = ({
   ...rest
 }: IEnergySavingsApplicationStatusTagProps) => {
   const { t } = useTranslation();
+  const { userStore } = useMst();
+  const currentUser = userStore.currentUser;
 
   const { status, viewedAt } = energySavingsApplication;
 
@@ -26,8 +30,7 @@ export const EnergySavingsApplicationStatusTag = ({
     // [EPermitApplicationStatus.ephemeral]: 'theme.blueLight',
     [EPermitApplicationStatus.inReview]: 'theme.lightGreen',
     [EPermitApplicationStatus.approved]: 'theme.lightGreen',
-    [EPermitApplicationStatus.ineligible]: 'theme.blueLight',
-    [EPermitApplicationStatus.prescreen]: 'greys.offWhite',
+    [EPermitApplicationStatus.ineligible]: 'semantic.infoLight',
   };
 
   const colorMap = {
@@ -37,9 +40,8 @@ export const EnergySavingsApplicationStatusTag = ({
     [EPermitApplicationStatus.revisionsRequested]: 'text.primary',
     // [EPermitApplicationStatus.ephemeral]: 'text.primary',
     [EPermitApplicationStatus.inReview]: 'text.primary',
-    [EPermitApplicationStatus.approved]: 'theme.primary',
-    [EPermitApplicationStatus.ineligible]: 'theme.primary',
-    [EPermitApplicationStatus.prescreen]: 'theme.primary',
+    [EPermitApplicationStatus.approved]: 'text.primary',
+    [EPermitApplicationStatus.ineligible]: 'text.primary',
   };
 
   const borderColorMap = {
@@ -51,16 +53,15 @@ export const EnergySavingsApplicationStatusTag = ({
     [EPermitApplicationStatus.inReview]: 'theme.darkGreen',
     [EPermitApplicationStatus.approved]: 'theme.darkGreen',
     [EPermitApplicationStatus.ineligible]: 'theme.darkBlue',
-    [EPermitApplicationStatus.prescreen]: 'theme.blueText',
   };
 
   const getStatusText = (status: EPermitApplicationStatus) => {
-    if (type === 'submission-inbox') {
-      if (status === EPermitApplicationStatus.submitted) {
-        return t(`energySavingsApplication.status.unread`);
-      }
+    if (
+      status === EPermitApplicationStatus.submitted &&
+      [EUserRoles.admin, EUserRoles.adminManager].includes(currentUser.role)
+    ) {
+      return t(`energySavingsApplication.status.unread`);
     }
-
     return t(`energySavingsApplication.status.${status}`);
   };
 

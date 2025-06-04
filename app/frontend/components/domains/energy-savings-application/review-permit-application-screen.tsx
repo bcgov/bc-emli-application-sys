@@ -24,6 +24,7 @@ import { RevisionSideBar } from './revision-sidebar';
 import { SubmissionDownloadModal } from './submission-download-modal';
 import ApplicationReviewModal from '../../shared/modals/application-review-modal';
 import UpdatePathwayModal from '../../shared/modals/application-update-pathway';
+import { EnergySavingsApplicationStatusTag } from '../../shared/energy-savings-applications/energy-savings-application-status-tag';
 
 interface IReferenceNumberForm {
   referenceNumber?: string;
@@ -50,6 +51,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const [referenceNumberSnapshot, setReferenceNumberSnapshot] = useState<null | string>(null);
 
   const [completedBlocks, setCompletedBlocks] = useState({});
+  const [performedBy, setPerformedBy] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isScreenIn, onOpen: onScreenIn, onClose: onScreenInclose } = useDisclosure();
   const { isOpen: isContactsOpen, onOpen: onContactsOpen, onClose: onContactsClose } = useDisclosure();
@@ -131,12 +133,12 @@ export const ReviewPermitApplicationScreen = observer(() => {
       <Flex id="permitHeader" direction="column" position="sticky" top={0} zIndex={12} ref={permitHeaderRef}>
         <Flex w="full" px={6} py={3} bg="theme.blue" justify="space-between" color="greys.white">
           <HStack gap={4} flex={1}>
-            <PermitApplicationViewedAtTag permitApplication={currentPermitApplication} />
+            <EnergySavingsApplicationStatusTag energySavingsApplication={currentPermitApplication} />
             <Flex direction="column" w="full">
               <Heading fontSize="xl" as="h3">
-                {currentPermitApplication.nickname}
+                {currentPermitApplication.fullAddress}
               </Heading>
-              <Text noOfLines={1}>{currentPermitApplication.program.programName}</Text>
+              <Text noOfLines={1}>{currentPermitApplication.nickname}</Text>
               <HStack>
                 <CopyableValue
                   textTransform={'uppercase'}
@@ -226,6 +228,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
             permitApplication={currentPermitApplication}
             onCancel={() => setRevisionMode(false)}
             sendRevisionContainerRef={sendRevisionContainerRef}
+            updatePerformedBy={performedBy}
           />
         ) : (
           <ChecklistSideBar permitApplication={currentPermitApplication} completedBlocks={completedBlocks} />
@@ -312,6 +315,9 @@ export const ReviewPermitApplicationScreen = observer(() => {
           isOpen={isUpdatePathwayOpen}
           onClose={onUpdatePathwayClose}
           setRevisionMode={setRevisionMode}
+          setPerformedBy={(performedByValue) => {
+            setPerformedBy(performedByValue);
+          }}
         />
       )}
       {isScreenIn && (

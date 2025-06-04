@@ -33,13 +33,12 @@ export const GridHeaders = observer(function GridHeaders() {
               <Box flex="1">
                 <EnergySavingsApplicationFilter
                   statusGroups={[
-                    EPermitApplicationStatusGroup.approved,
-                    EPermitApplicationStatusGroup.prescreen,
-                    EPermitApplicationStatusGroup.inReview,
-                    EPermitApplicationStatusGroup.revisionsRequested,
-                    EPermitApplicationStatusGroup.ineligible,
-                    EPermitApplicationStatusGroup.submitted,
                     EPermitApplicationStatusGroup.resubmitted,
+                    EPermitApplicationStatusGroup.submitted,
+                    EPermitApplicationStatusGroup.revisionsRequested,
+                    EPermitApplicationStatusGroup.inReview,
+                    EPermitApplicationStatusGroup.ineligible,
+                    EPermitApplicationStatusGroup.approved,
                   ]}
                 />
               </Box>

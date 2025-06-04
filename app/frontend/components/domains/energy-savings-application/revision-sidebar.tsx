@@ -39,6 +39,7 @@ interface IRevisionSideBarProps {
   onCancel?: () => void;
   sendRevisionContainerRef?: MutableRefObject<HTMLDivElement>;
   forSubmitter?: boolean;
+  updatePerformedBy?: string;
 }
 
 export interface IRevisionRequestForm {
@@ -46,7 +47,13 @@ export interface IRevisionRequestForm {
 }
 
 export const RevisionSideBar = observer(
-  ({ permitApplication, onCancel, sendRevisionContainerRef, forSubmitter }: IRevisionSideBarProps) => {
+  ({
+    permitApplication,
+    onCancel,
+    sendRevisionContainerRef,
+    forSubmitter,
+    updatePerformedBy,
+  }: IRevisionSideBarProps) => {
     const { t } = useTranslation();
     const isMounted = useMountStatus();
     const [requirementForRevision, setRequirementForRevision] = useState<IFormIORequirement>();
@@ -93,6 +100,10 @@ export const RevisionSideBar = observer(
 
     const onSaveRevision = (formData: IRevisionRequestForm) => {
       setTabIndex(0);
+      formData.revisionRequestsAttributes = formData.revisionRequestsAttributes.map((attribute) => ({
+        ...attribute,
+        performedBy: updatePerformedBy,
+      }));
       permitApplication.updateRevisionRequests(formData);
     };
 

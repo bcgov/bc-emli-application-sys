@@ -305,13 +305,13 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
             <HStack gap={4} flex={1}>
               <EnergySavingsApplicationStatusTag energySavingsApplication={currentPermitApplication} />
               <Flex direction="column" w="full">
-                <form>
+                {/* <form>
                   <Tooltip label={t('permitApplication.edit.clickToWriteNickname')} placement="top-start">
                     <Box>
                       <EditableInputWithControls
                         w="full"
                         initialHint={t('permitApplication.edit.clickToWriteNickname')}
-                        value={nicknameWatch || ''}
+                        value={currentPermitApplication.fullAddress || ''}
                         isDisabled={!doesUserHaveSubmissionPermission || isSubmitted}
                         controlsProps={{
                           iconButtonProps: {
@@ -347,9 +347,18 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                       />
                     </Box>
                   </Tooltip>
-                </form>
-
-                <Text noOfLines={1}>{programNameAndTypes}</Text>
+                </form> */}
+                <Heading fontSize="xl" as="h3">
+                  {currentPermitApplication.fullAddress}
+                </Heading>
+                <Text noOfLines={1}>{currentPermitApplication.nickname}</Text>
+                <HStack>
+                  <CopyableValue
+                    textTransform={'uppercase'}
+                    value={number}
+                    label={t('permitApplication.fields.number')}
+                  />
+                </HStack>
               </Flex>
             </HStack>
 
@@ -378,7 +387,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 }}
                 gap={4}
               >
-                <BrowserSearchPrompt />
+                {/* <BrowserSearchPrompt /> */}
                 {/* <CollaboratorsSidebar
                   permitApplication={currentPermitApplication}
                   collaborationType={ECollaborationType.submission}
@@ -388,19 +397,23 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                     {t('permitApplication.edit.withdrawl')}
                   </Button>
                 )}
-                <Button variant="primary" onClick={handleClickFinishLater}>
-                  {t('permitApplication.edit.saveDraft')}
-                </Button>
-                <Button
-                  rightIcon={<CaretRight />}
-                  onClick={
-                    currentPermitApplication.canUserSubmit(currentUser)
-                      ? handleScrollToBottom
-                      : onSubmitBlockedModalOpen
-                  }
-                >
-                  {t('permitApplication.edit.submit')}
-                </Button>
+                {!currentPermitApplication?.isIneligible && (
+                  <>
+                    <Button variant="primary" onClick={handleClickFinishLater}>
+                      {t('permitApplication.edit.saveDraft')}
+                    </Button>
+                    <Button
+                      rightIcon={<CaretRight />}
+                      onClick={
+                        currentPermitApplication.canUserSubmit(currentUser)
+                          ? handleScrollToBottom
+                          : onSubmitBlockedModalOpen
+                      }
+                    >
+                      {t('permitApplication.edit.submit')}
+                    </Button>
+                  </>
+                )}
                 {!currentPermitApplication.canUserSubmit(currentUser) && isSubmitBlockedModalOpen && (
                   <PermitApplicationSubmitModal
                     permitApplication={currentPermitApplication}
@@ -465,7 +478,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               triggerSave={handleSave}
               showHelpButton
               isEditing={currentPermitApplication?.isDraft || currentPermitApplication?.isRevisionsRequested}
-              renderSaveButton={() => <SaveButton handleSave={handleSave} />}
+              renderSaveButton={() => !currentPermitApplication?.isIneligible && <SaveButton handleSave={handleSave} />}
               updateCollaborationAssignmentNodes={updateRequirementBlockAssignmentNode}
             />
           </Flex>

@@ -19,8 +19,7 @@ RSpec.describe PermitApplication, type: :model do
                resubmitted: 4,
                in_review: 5,
                approved: 7,
-               ineligible: 8,
-               prescreen: 9
+               ineligible: 8
              )
     end
   end
