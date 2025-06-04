@@ -17,6 +17,6 @@ class IntegrationMappingBlueprint < Blueprinter::Base
     association :template_version,
                 blueprint: TemplateVersionBlueprint,
                 view: :external_api,
-                name: :permit_version
+                name: :application_version
   end
 end
