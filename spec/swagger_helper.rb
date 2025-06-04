@@ -15,7 +15,7 @@ RSpec.configure do |config|
       description: "Server url",
       variables: {
         serverUrl: {
-          default: "https:/buildingpermit.gov.bc.ca"
+          default: ""
         }
       }
     }
@@ -82,15 +82,15 @@ in this document.
         DESC
       },
       webhooks: {
-        permit_submitted: {
+        application_submitted: {
           tags: ["Webhooks"],
           post: {
             requestBody: {
               description:
-                "### Request body:\nThis webhook sends information about a recently submitted permit
-        application in a JSON format to the webhook URL specified by the external integrator.\nIt includes
-        the permit application ID, which can be used to fetch the complete details of the permit application using the
-        `GET/permit_applications/{id}` endpoint.\n\n### Retries:\nIf the webhook does not receive a 200 status response
+                "### Request body:\nThis webhook sends information about a recently submitted 
+        applications in a JSON format to the webhook URL specified by the external integrator.\nIt includes
+        the application ID, which can be used to fetch the complete details of the application using the
+        `GET/applications/{id}` endpoint.\n\n### Retries:\nIf the webhook does not receive a 200 status response
         from the external integrator, it will attempt to resend the notification up to 8 times using an exponential backoff
         strategy. This ensures multiple attempts to deliver the webhook in case of temporary issues on the receiving end.\n\n
 ### Expected responses:\nThe external integrator is expected to return a 200 status code to confirm successful receipt
@@ -111,15 +111,15 @@ in this document.
             }
           }
         },
-        permit_resubmitted: {
+        application_resubmitted: {
           tags: ["Webhooks"],
           post: {
             requestBody: {
               description:
-                "### Request body:\nThis webhook sends information about a recently resubmitted permit
-        application. A permit can be resubmitted due to revision requests. After resubmission a payload is sent in JSON format to the webhook URL specified by the external integrator.\nIt includes
-        the permit application ID, which can be used to fetch the complete details of the permit application using the
-        `GET/permit_applications/{id}` endpoint.\n\n### Retries:\nIf the webhook does not receive a 200 status response
+                "### Request body:\nThis webhook sends information about a recently resubmitted 
+        application. A application can be resubmitted due to revision requests. After resubmission a payload is sent in JSON format to the webhook URL specified by the external integrator.\nIt includes
+        the application ID, which can be used to fetch the complete details of the application using the
+        `GET/applications/{id}` endpoint.\n\n### Retries:\nIf the webhook does not receive a 200 status response
         from the external integrator, it will attempt to resend the notification up to 8 times using an exponential backoff
         strategy. This ensures multiple attempts to deliver the webhook in case of temporary issues on the receiving end.\n\n
 ### Expected responses:\nThe external integrator is expected to return a 200 status code to confirm successful receipt
@@ -146,9 +146,8 @@ in this document.
       servers: servers,
       tags: [
         {
-          name: "Permit applications",
-          description:
-            "Submitted permit applications (scoped to API key jurisdiction)"
+          name: "Applications",
+          description: "Submitted applications (scoped to Program API key)"
         }
       ],
       components: {
@@ -160,7 +159,7 @@ in this document.
           }
         },
         schemas: {
-          PermitApplication: {
+          Application: {
             type: :object,
             properties: {
               id: {
@@ -168,79 +167,58 @@ in this document.
               },
               full_address: {
                 type: :string,
-                description: "The full address of the permit application.",
+                description: "The full address of the application.",
                 nullable: true
               },
               number: {
                 type: :string,
-                description:
-                  "The permit application number displayed to the user.",
-                nullable: true
-              },
-              pid: {
-                type: :string,
-                description: "The PID of the permit application.",
-                nullable: true
-              },
-              pin: {
-                type: :string,
-                description: "The PIN of the permit application.",
+                description: "The application number displayed to the user.",
                 nullable: true
               },
               reference_number: {
                 type: :string,
                 description:
-                  "The reference number of the permit application in external system.",
+                  "The reference number of the application in external system.",
                 nullable: true
               },
               submitted_at: {
                 type: :number,
                 format: :int64, # Indicates that it's an integer representing time in milliseconds since epoch
                 description:
-                  "Datetime in milliseconds since the epoch (Unix time). This is the timestamp when the permit application was first submitted."
+                  "Datetime in milliseconds since the epoch (Unix time). This is the timestamp when the application was first submitted."
               },
               resubmitted_at: {
                 type: :number,
                 format: :int64, # Indicates that it's an integer representing time in milliseconds since epoch
                 description:
-                  "Datetime in milliseconds since the epoch (Unix time). This is the timestamp when the permit application was last resubmitted due to a revision request. Note: there might be multiple resubmissions for a permit application, but this date is the last resubmission date.",
+                  "Datetime in milliseconds since the epoch (Unix time). This is the timestamp when the application was last resubmitted due to a revision request. Note: there might be multiple resubmissions for an application, but this date is the last resubmission date.",
                 nullable: true
               },
-              permit_classifications: {
+              user_group_type: {
                 type: :string,
-                description:
-                  "This is the combined permit type and activity (work) type of the permit application. This is derived as `${permit_type.name} - ${activity_type.name}` e.g. '4+ Unit housing - New Construction'"
+                enum: %w[participant contractor],
+                description: "What user group the application belongs to"
               },
-              permit_type: {
-                "$ref" => "#/components/schemas/PermitClassification"
-              },
-              activity: {
-                "$ref" => "#/components/schemas/PermitClassification"
+              submission_type: {
+                type: :string,
+                enum: %w[application onboarding support_request invoice],
+                description: "The submission type of the application"
               },
               account_holder: {
                 "$ref" => "#/components/schemas/AccountHolder"
               },
-              permit_version: {
-                "$ref" => "#/components/schemas/PermitVersion"
+              application_version: {
+                "$ref" => "#/components/schemas/ApplicationVersion"
               },
               submission_data: {
                 "$ref" => "#/components/schemas/SubmissionData"
-              },
-              raw_h2k_files: {
-                description:
-                  "The raw h2k files uploaded by the submitter. Note: the urls are signed and will expire after 1 hour.",
-                type: :array,
-                items: {
-                  "$ref" => "#/components/schemas/File"
-                },
-                nullable: true
               }
             }
           },
           SubmissionData: {
             type: :object,
             description:
-              "The submitted permit application data. This will reflect the most recent submitted data in case of resubmission. Note: the keys are the requirement block codes.",
+              "The submitted application data. This will reflect the most recent submitted data in case of resubmission. Note: the keys are the requirement block codes.",
             additionalProperties: {
               type: :object,
               properties: {
@@ -251,7 +229,7 @@ in this document.
                 requirement_block_code: {
                   type: :string,
                   description:
-                    "The code of the requirement block. This is unique within the permit application."
+                    "The code of the requirement block. This is unique within the application."
                 },
                 name: {
                   type: :string,
@@ -315,10 +293,9 @@ in this document.
               required: %w[id requirement_block_code name requirements]
             }
           },
-          PermitClassification: {
+          Classification: {
             type: :object,
-            description:
-              "This object represents a permit classification. e.g. a permit type or activity (work) type.",
+            description: "This object represents a classification.",
             properties: {
               id: {
                 type: :string
@@ -332,18 +309,18 @@ in this document.
               },
               code: {
                 type: :string,
-                description: "The code of the permit classification."
+                description: "The code of the classification."
               }
             }
           },
-          PermitVersion: {
+          ApplicationVersion: {
             type: :object,
-            description: "The object represents the permit version.",
+            description: "The object represents the application version.",
             properties: {
               id: {
                 type: :string,
                 description:
-                  "The ID of the version. This can be used to retrieve the integration mapping of the Jurisdiction for this version."
+                  "The ID of the version. This can be used to retrieve the integration mapping of the Program for this version."
               },
               version_date: {
                 type: :integer,
@@ -361,14 +338,14 @@ in this document.
           IntegrationMapping: {
             type: :object,
             description:
-              "The integration mapping of the jurisdiction for a specific permit version.",
+              "The integration mapping of the program for a specific application version.",
             properties: {
               id: {
                 type: :string,
                 description: "The ID of the integration mapping."
               },
-              permit_version: {
-                "$ref" => "#/components/schemas/PermitVersion"
+              application_version: {
+                "$ref" => "#/components/schemas/ApplicationVersion"
               },
               requirements_mapping: {
                 "$ref" => "#/components/schemas/RequirementsMapping"
@@ -378,11 +355,11 @@ in this document.
           RequirementsMapping: {
             type: :object,
             description:
-              "The mapping of the requirements between the Building Permit Hub system and local jurisdiction integration system. Note: the top level keys are the requirement block codes.",
+              "The mapping of the requirements between the system and program integration system. Note: the top level keys are the requirement block codes.",
             additionalProperties: {
               type: :object,
               description:
-                "The requirement block mapping. This contains a requirements hash, where the keys are the requirement codes and the value is another hash containing the field mapping to the local jurisdiction system.",
+                "The requirement block mapping. This contains a requirements hash, where the keys are the requirement codes and the value is another hash containing the field mapping to the program system.",
               properties: {
                 id: {
                   type: :string,
@@ -391,7 +368,7 @@ in this document.
                 requirements: {
                   type: :object,
                   description:
-                    "A hash of the requirement code to the local jurisdiction system field mapping.",
+                    "A hash of the requirement code to the program system field mapping.",
                   additionalProperties: {
                     type: :object,
                     properties: {
@@ -402,7 +379,7 @@ in this document.
                       local_system_mapping: {
                         type: :string,
                         description:
-                          "The local jurisdiction integration system field mapping for this requirement. This should be the field name of the requirement in your system."
+                          "The program integration system field mapping for this requirement. This should be the field name of the requirement in your system."
                       }
                     },
                     required: %w[id local_system_mapping]
@@ -497,7 +474,7 @@ in this document.
           },
           AccountHolder: {
             type: :object,
-            description: "The account holder of the permit application.",
+            description: "The account holder of the application.",
             properties: {
               id: {
                 type: :string,
@@ -553,13 +530,13 @@ in this document.
                 properties: {
                   permit_id: {
                     type: :string,
-                    description: "The permit application ID."
+                    description: "The application ID."
                   },
                   submitted_at: {
                     type: :integer,
                     format: "int64",
                     description:
-                      "The timestamp of when the permit application was submitted or resubmitted. This is in milliseconds since the epoch (UNIX time)."
+                      "The timestamp of when the application was submitted or resubmitted. This is in milliseconds since the epoch (UNIX time)."
                   }
                 }
               }

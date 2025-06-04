@@ -1,6 +1,6 @@
 require "swagger_helper"
 
-RSpec.describe "external_api/v1/permit_applications",
+RSpec.describe "external_api/v1/applications",
                type: :request,
                openapi_spec: "external_api/v1/swagger.yaml" do
   let!(:external_api_key) { create(:external_api_key) }
@@ -34,102 +34,22 @@ RSpec.describe "external_api/v1/permit_applications",
     PermitApplication.reindex
   end
 
-  path "/permit_applications/search" do
-    post "This endpoint retrieves a list of permit applications in a paginated format. It allows you to search through permit applications based on specified criteria, returning results in manageable pages." do
-      tags "Permit applications"
+  path "/applications/search" do
+    post "This endpoint retrieves a list of applications in a paginated format. It allows you to search through applications based on specified criteria, returning results in manageable pages." do
+      tags "Applications"
       let(:constraints) { nil }
       consumes "application/json"
       produces "application/json"
-      parameter name: :constraints,
-                in: :body,
-                schema: {
-                  type: :object,
-                  description:
-                    "Filters permit applications by status, submitted date, resubmitted_date and permit classifications",
-                  properties: {
-                    permit_classifications: {
-                      description: "Filters by permit classifications",
-                      type: :string
-                    },
-                    status: {
-                      type: :string,
-                      enum: %w[newly_submitted resubmitted],
-                      description:
-                        "Filters by submitted status. Newly submitted: permit applications submitted for the first time. Resubmitted: permit applications resubmitted after a revision request."
-                    },
-                    submitted_at: {
-                      type: :object,
-                      description:
-                        "Filters by submitted date. This is the date the permit application was first submitted. Example format `2024-04-30T13:22:41-07:00`",
-                      properties: {
-                        gt: {
-                          type: :string,
-                          format: "date-time",
-                          description:
-                            "Greater than: submitted date is greater than this date"
-                        },
-                        lt: {
-                          type: :string,
-                          format: "date-time",
-                          description:
-                            "Less than: submitted date is less than this date"
-                        },
-                        gte: {
-                          type: :string,
-                          format: "date-time",
-                          description:
-                            "Greater than or equal to: submitted date is greater than or equal to this date"
-                        },
-                        lte: {
-                          type: :string,
-                          format: "date-time",
-                          description:
-                            "Less than or equal to: submitted date is less than or equal to this date"
-                        }
-                      }
-                    },
-                    resubmitted_at: {
-                      type: :object,
-                      description:
-                        "Filters by resubmitted date. This is the date the permit application was most recently resubmitted. Example format `2024-04-30T13:22:41-07:00`",
-                      properties: {
-                        gt: {
-                          type: :string,
-                          format: "date-time",
-                          description:
-                            "Greater than: resubmitted date is greater than this date"
-                        },
-                        lt: {
-                          type: :string,
-                          format: "date-time",
-                          description:
-                            "Less than: resubmitted date is less than this date"
-                        },
-                        gte: {
-                          type: :string,
-                          format: "date-time",
-                          description:
-                            "Greater than or equal to: resubmitted date is greater than or equal to this date"
-                        },
-                        lte: {
-                          type: :string,
-                          format: "date-time",
-                          description:
-                            "Less than or equal to: resubmitted date is less than or equal to this date"
-                        }
-                      }
-                    }
-                  }
-                }
+      parameter name: :constraints, in: :body, required: false
 
       response(200, "Successful") do
         schema type: :object,
                properties: {
                  data: {
                    type: :array,
-                   description: "Submitted permit applications",
+                   description: "Submitted applications",
                    items: {
-                     "$ref" => "#/components/schemas/PermitApplication"
+                     "$ref" => "#/components/schemas/Application"
                    }
                  },
                  meta: {
@@ -141,7 +61,7 @@ RSpec.describe "external_api/v1/permit_applications",
                      },
                      total_count: {
                        type: :integer,
-                       description: "Total number of permit applications"
+                       description: "Total number of applications"
                      },
                      current_page: {
                        type: :integer,
@@ -188,15 +108,15 @@ RSpec.describe "external_api/v1/permit_applications",
     end
   end
 
-  path "/permit_applications/{id}" do
+  path "/applications/{id}" do
     get(
-      "This endpoint retrieves detailed information about a specific permit application using its unique identifier (ID). Please note that requests to this endpoint are subject to rate limiting to ensure optimal performance and fair usage."
+      "This endpoint retrieves detailed information about a specific application using its unique identifier (ID). Please note that requests to this endpoint are subject to rate limiting to ensure optimal performance and fair usage."
     ) do
       parameter name: "id",
                 in: :path,
                 type: :string,
-                description: "Submitted permit application id"
-      tags "Permit applications"
+                description: "Submitted application id"
+      tags "Applications"
       consumes "application/json"
       produces "application/json"
 
@@ -206,7 +126,7 @@ RSpec.describe "external_api/v1/permit_applications",
         schema type: :object,
                properties: {
                  data: {
-                   "$ref" => "#/components/schemas/PermitApplication"
+                   "$ref" => "#/components/schemas/Application"
                  }
                },
                required: %w[data]
@@ -220,15 +140,12 @@ RSpec.describe "external_api/v1/permit_applications",
         end
       end
 
-      response(
-        403,
-        "Accessing a permit application for unauthorized jurisdiction"
-      ) do
+      response(403, "Accessing a application for unauthorized jurisdiction") do
         let(:id) { unauthorized_jurisdiction_permit_applications.first.id }
         run_test! { |response| expect(response.status).to eq(403) }
       end
 
-      response(404, "Accessing a permit application which does not exist") do
+      response(404, "Accessing a application which does not exist") do
         let(:id) { "does_not_exist" }
         run_test! { |response| expect(response.status).to eq(404) }
       end
@@ -256,17 +173,17 @@ RSpec.describe "external_api/v1/permit_applications",
     end
   end
 
-  path "/permit_applications/versions/{version_id}/integration_mapping" do
+  path "/applications/versions/{version_id}/integration_mapping" do
     get(
-      "This endpoint retrieves the integration mapping between the Building Permit Hub system and the local jurisdiction’s integration system. It uses a unique ID associated with a specific version of the permit template."
+      "This endpoint retrieves the integration mapping for the system. It uses a unique ID associated with a specific version of the template."
     ) do
       parameter name: "version_id",
                 in: :path,
                 type: :string,
                 description:
-                  "This identifier corresponds to a specific version of the permit template, distinct from the permit application ID, which uniquely identifies an individual permit application."
+                  "This identifier corresponds to a specific version of the template, distinct from the application ID, which uniquely identifies an individuals application."
 
-      tags "Permit applications"
+      tags "Applications"
       consumes "application/json"
       produces "application/json"
 
@@ -313,7 +230,7 @@ RSpec.describe "external_api/v1/permit_applications",
         end
         before do
           5.times do
-            get "/external_api/v1/permit_applications/versions/#{version_id}/integration_mapping",
+            get "/external_api/v1/applications/versions/#{version_id}/integration_mapping",
                 headers: {
                   Authorization: "Bearer #{token}"
                 }
