@@ -11,7 +11,7 @@ class LiveRequirementTemplate < RequirementTemplate
   def support_request_internal_only
     return unless discarded_at.nil?
 
-    return unless submission_type&.code.to_sym == :support_request
+    return unless submission_type&.code&.to_sym == :support_request
     return if audience_type&.code.to_sym == :internal
 
     errors.add(

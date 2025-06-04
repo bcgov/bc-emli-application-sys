@@ -1,12 +1,10 @@
 class PermitApplicationPolicy < ApplicationPolicy
   # All user types can use the search permit application
   def index?
-    if user.system_admin? || record.submitter == user || user.admin_manager?
-      record.collaborator?(user_id: user.id, collaboration_type: :submission)
+    if user.system_admin? || record.submitter == user || user.admin_manager? ||
+         user.admin?
+      # record.collaborator?(user_id: user.id, collaboration_type: :submission)
       true
-    elsif user.review_staff?
-      user.jurisdictions.find(record.jurisdiction.id).present? &&
-        !record.draft? && record.sandbox == sandbox
     end
   end
 
@@ -23,7 +21,7 @@ class PermitApplicationPolicy < ApplicationPolicy
   end
 
   def change_status?
-    user.admin_manager?
+    user.admin_manager? || user.admin?
   end
 
   def update?
@@ -76,7 +74,7 @@ class PermitApplicationPolicy < ApplicationPolicy
 
   def generate_missing_pdfs?
     user.system_admin? || (user.participant? && record.submitter == user) ||
-      ((user.admin_manager?))
+      ((user.admin_manager? || user.admin?))
   end
 
   def finalize_revision_requests?

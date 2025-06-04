@@ -24,7 +24,7 @@ class ProgramPolicy < ApplicationPolicy
   end
 
   def update?
-    user.system_admin? || user.admin_manager? || (user.staff? && user.jurisdictions.find(record.id))
+    user.admin_manager? || user.admin?
   end
 
   def update_external_api_enabled?
