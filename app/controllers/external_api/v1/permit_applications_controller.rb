@@ -21,9 +21,6 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
                          ).ceil,
                        total_count: authorized_results.count,
                        current_page: @permit_application_search.current_page
-                       #  total_pages: @permit_application_search.total_pages,
-                       #  total_count: @permit_application_search.total_count,
-                       #  current_page: @permit_application_search.current_page
                      },
                      blueprint: PermitApplicationBlueprint,
                      blueprint_opts: {

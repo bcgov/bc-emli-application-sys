@@ -285,7 +285,7 @@ Rails.application.routes.draw do
 
   scope module: :external_api, path: :external_api do
     namespace :v1 do
-      resources :permit_applications, only: %i[show] do
+      resources :applications, only: %i[show] do
         post "search", on: :collection, to: "permit_applications#index"
         collection do
           resources :versions, as: "template_versions", only: [] do
