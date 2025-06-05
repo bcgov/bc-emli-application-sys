@@ -24,12 +24,11 @@ class ProgramPolicy < ApplicationPolicy
   end
 
   def update?
-    user.admin_manager? || user.admin?
+    user.system_admin? || user.admin_manager?
   end
 
   def update_external_api_enabled?
-    user.system_admin? ||
-      (user.manager? && user.jurisdictions.find(record.id) && !record.g_off?)
+    user.system_admin? && !record.g_off?
   end
 
   def search_users?
@@ -37,8 +36,7 @@ class ProgramPolicy < ApplicationPolicy
   end
 
   def search_permit_applications?
-    # note that this applies to the jurisdiction, not the permit applications
-    update?
+    user.admin_manager? || user.admin?
   end
 
   def sandboxes?
