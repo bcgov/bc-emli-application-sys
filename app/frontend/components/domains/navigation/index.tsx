@@ -405,26 +405,24 @@ const AppRoutes = observer(() => {
   const adminManagerOrAdmin = (
     <>
       <Route path="/submission-inbox" element={<ProgramSubmissionInboxScreen />} />
-      <Route path="/permit-applications/:permitApplicationId" element={<ReviewPermitApplicationScreen />} />
+      <Route path="/applications/:permitApplicationId" element={<ReviewPermitApplicationScreen />} />
       // view blank applications and view supported applications to go here
       {import.meta.env.DEV && (
         <>
           <Route
-            path="/permit-applications/:permitApplicationId/pdf-content"
+            path="/applications/:permitApplicationId/pdf-content"
             element={<PermitApplicationPDFViewer mode={'pdf'} />}
           />
-
-          <Route path="/permit-applications/:permitApplicationId" element={<ReviewPermitApplicationScreen />} />
           <Route
-            path="/permit-applications/:permitApplicationId/pdf-html"
+            path="/applications/:permitApplicationId/pdf-html"
             element={<PermitApplicationPDFViewer mode={'html'} />}
           />
           <Route
-            path="/permit-applications/:permitApplicationId/step-code-pdf-content"
+            path="/applications/:permitApplicationId/step-code-pdf-content"
             element={<StepCodeChecklistPDFViewer mode={'pdf'} />}
           />
           <Route
-            path="/permit-applications/:permitApplicationId/step-code-pdf-html"
+            path="/applications/:permitApplicationId/step-code-pdf-html"
             element={<StepCodeChecklistPDFViewer mode={'html'} />}
           />
         </>
@@ -564,7 +562,7 @@ const AppRoutes = observer(() => {
       </Routes>
       {enableStepCodeRoute && (
         <Routes>
-          <Route path="/permit-applications/:permitApplicationId/edit/step-code" element={<StepCodeForm />} />
+          <Route path="/applications/:permitApplicationId/edit/step-code" element={<StepCodeForm />} />
         </Routes>
       )}
     </>
