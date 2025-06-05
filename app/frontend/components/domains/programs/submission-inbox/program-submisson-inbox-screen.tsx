@@ -316,7 +316,7 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
               )}
               review
             />
-            <RouterLinkButton variant="primary" to={`/permit-applications/${permitApplication.id}`}>
+            <RouterLinkButton variant="primary" to={`/applications/${permitApplication.id}`}>
               {t('ui.view')}
             </RouterLinkButton>
           </HStack>
