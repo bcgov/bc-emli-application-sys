@@ -62,7 +62,7 @@ class Api::UsersController < Api::ApplicationController
       return render_error "misc.user_not_authorized_error"
     end
 
-    Rails.logger.info("Updating user: #{user_params}")
+    # Rails.logger.info("Updating user: #{user_params}")
 
     if @user.update(user_params)
       render_success @user,
@@ -240,6 +240,15 @@ class Api::UsersController < Api::ApplicationController
              },
              status: :unprocessable_entity
     end
+  end
+
+  def active_programs
+    programs =
+      current_user.active_programs.map do |program|
+        { value: program.id, label: program.name }
+      end
+
+    render json: programs, status: :ok
   end
 
   private
