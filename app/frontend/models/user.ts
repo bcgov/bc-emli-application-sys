@@ -38,6 +38,7 @@ export const UserModel = types
     physicalAddress: types.maybeNull(AddressModel),
     mailingAddress: types.maybeNull(AddressModel),
     programMemberships: types.optional(types.array(UserProgramMembershipModel), []),
+    activePrograms: types.optional(types.array(types.frozen()), []), // NEW
   })
   .extend(withRootStore())
   .extend(withEnvironment())
@@ -133,6 +134,9 @@ export const UserModel = types
     },
   }))
   .actions((self) => ({
+    setActivePrograms(programs) {
+      self.activePrograms = programs;
+    },
     setAddresses(physical: IAddress | null, mailing: IAddress | null) {
       self.physicalAddress = physical ? AddressModel.create(physical) : null;
       self.mailingAddress = mailing ? AddressModel.create(mailing) : null;

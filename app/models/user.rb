@@ -93,8 +93,9 @@ class User < ApplicationRecord
            dependent: :destroy
 
   has_many :application_assignments
-  has_many :assigned_permit_applications, through: :application_assignments, source: :permit_application
-           
+  has_many :assigned_permit_applications,
+           through: :application_assignments,
+           source: :permit_application
 
   has_many :early_access_previews,
            dependent: :destroy,
@@ -217,6 +218,13 @@ class User < ApplicationRecord
 
   def program_ids
     programs.pluck(:id)
+  end
+
+  def active_programs
+    program_memberships
+      .where(deactivated_at: nil)
+      .includes(:program)
+      .map(&:program)
   end
 
   def blueprint

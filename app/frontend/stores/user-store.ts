@@ -151,6 +151,15 @@ export const UserStoreModel = types
       self.isSuperAdminsLoaded = true;
       return response.ok;
     }),
+    fetchActivePrograms: flow(function* () {
+      if (!self.currentUser) return;
+
+      const response = yield self.environment.api.getUsersActivePrograms();
+      if (response.ok) {
+        self.currentUser.setActivePrograms(response.data);
+        return response.ok;
+      }
+    }),
   }))
   .actions((self) => ({
     searchUsers: flow(function* (opts?: { reset?: boolean; page?: number; countPerPage?: number }) {

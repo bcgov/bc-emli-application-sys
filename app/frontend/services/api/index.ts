@@ -742,6 +742,10 @@ export class Api {
     return this.client.get<IOptionResponse>(`/users/super_admins`, {});
   }
 
+  async getUsersActivePrograms() {
+    return this.client.get<IOptionResponse>(`/users/active_programs`, {});
+  }
+
   async createContact(params: TContactFormData) {
     return this.client.post<ApiResponse<IContact>>('/contacts', { contact: params });
   }
