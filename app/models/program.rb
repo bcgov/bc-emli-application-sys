@@ -175,7 +175,8 @@ class Program < ApplicationRecord
   end
 
   def permit_applications_size
-    permit_applications&.size || 0
+    permit_applications_count
+    #permit_applications&.size || 0
   end
 
   def unviewed_permit_applications

@@ -15,7 +15,15 @@ class PermitApplication < ApplicationRecord
   #   permit_collaborations
   # ]
 
-  SEARCH_INCLUDES = %i[submission_versions submitter sandbox program]
+  SEARCH_INCLUDES = %i[
+    submission_versions
+    submitter
+    sandbox
+    program
+    assigned_users
+    submission_type
+    supporting_documents
+  ]
 
   API_SEARCH_INCLUDES = %i[
     program
@@ -44,7 +52,7 @@ class PermitApplication < ApplicationRecord
   belongs_to :jurisdiction, optional: true
   belongs_to :permit_type, optional: true
   belongs_to :activity, optional: true
-  belongs_to :program
+  belongs_to :program, counter_cache: true
   belongs_to :permit_classification, optional: true
   belongs_to :submission_type
   belongs_to :user_group_type
