@@ -41,6 +41,7 @@ module Api::Concerns::Search::PermitApplications
   def permit_application_search_params
     params.delete(:sort) if params[:sort].nil?
     params.permit(
+      :id,
       :query,
       :page,
       :per_page,
@@ -52,7 +53,7 @@ module Api::Concerns::Search::PermitApplications
         :requirement_template_id,
         :template_version_id,
         :user_group_type_id,
-        { submission_type_id: [] },
+        :submission_type_id,
         :audience_type_id,
         { status: [] }
       ],

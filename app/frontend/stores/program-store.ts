@@ -133,7 +133,11 @@ export const ProgramStoreModel = types
       const { ok, data: response } = yield self.environment.api.fetchProgramOptions(filters);
       return response.data;
     }),
-    setCurrentProgram(programId) {
+    setCurrentProgram(programId: string) {
+      if (!self.programMap.has(programId)) {
+        console.warn(`Program ID ${programId} not found in programMap.`);
+        return;
+      }
       self.currentProgram = programId;
     },
     resetCurrentProgram() {

@@ -125,8 +125,8 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
 
   // Handle reset functionality
   const handleResetFilters = () => {
-    setSelectedFilters(statusGroups.map((group) => group.toString()));
-    setStatusFilter(statusGroups.flatMap(mapFilterToStatusArray));
+    setSelectedFilters([]);
+    setStatusFilter([]);
     search(); // Trigger search with default filters
     const newParams = new URLSearchParams(location.search);
     newParams.delete('status');

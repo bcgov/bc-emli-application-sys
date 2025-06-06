@@ -226,7 +226,7 @@ Rails.application.routes.draw do
           on: :collection,
           to: "users#license_agreements"
       get "super_admins", on: :collection, to: "users#super_admins"
-      get "active_programs", to: "users#active_programs"
+      get "active_programs", on: :collection, to: "users#active_programs"
     end
 
     resources :users, only: %i[destroy update] do

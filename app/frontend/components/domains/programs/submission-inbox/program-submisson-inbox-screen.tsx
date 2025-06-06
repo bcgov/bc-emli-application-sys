@@ -38,7 +38,7 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
       programId: null,
     },
   });
-  const { programStore, permitApplicationStore, permitClassificationStore } = useMst();
+  const { programStore, permitApplicationStore, permitClassificationStore, userStore } = useMst();
   const { fetchProgramOptions } = programStore;
   const { setValue } = methods;
 
@@ -119,30 +119,27 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
 
   const loadProgramOptions = useCallback(async () => {
     try {
-      const response = await fetchProgramOptions({});
-      const options = response.map((option) => ({
-        label: option.label,
-        value: option.value.id,
+      await userStore.fetchActivePrograms();
+      const activePrograms = userStore.currentUser?.activePrograms ?? [];
+      const options = activePrograms.map((program) => ({
+        label: program.programName,
+        value: program.id,
       }));
       setProgramOptions(options);
-      programStore.mergeUpdateAll(
-        response.map((p) => p.value),
-        'programMap',
-      );
       await fetchSubmissionOptions();
-      if (!currentProgram) {
-        if (options.length > 0) {
-          const firstOption = options[0];
-          methods.setValue('programId', firstOption.value);
-          handleProgramChange(firstOption.value);
-        }
-      } else {
-        methods.setValue('programId', currentProgram.id);
+
+      if (options?.length > 0) {
+        const firstOption = options[0];
+        methods.setValue('programId', firstOption.value);
+
+        handleProgramChange(firstOption.value);
       }
     } catch (error) {}
   }, [fetchProgramOptions, programStore, methods, fetchSubmissionOptions, t]);
 
-  const handleProgramChange = (programId) => {
+  const handleProgramChange = async (programId) => {
+    // Fetch program before setting it
+    await programStore.fetchProgram(programId);
     programStore.setCurrentProgram(programId);
     search();
   };
