@@ -161,11 +161,8 @@ class Api::ProgramsController < Api::ApplicationController
                    nil,
                    {
                      meta: {
-                       total_pages:
-                         (
-                           authorized_results.count.to_f / @user_search.per_page
-                         ).ceil,
-                       total_count: authorized_results.count,
+                       total_pages: @user_search.total_pages,
+                       total_count: @user_search.total_count,
                        current_page: @user_search.current_page
                      },
                      blueprint: UserBlueprint,
