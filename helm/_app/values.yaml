@@ -36,7 +36,7 @@ route:
 
 logVolume:
   enabled: false
-  storage: 100Mi
+  storage: 256Mi
 
 crunchydbSecret: hesp-crunchydb-pguser-postgres
 
