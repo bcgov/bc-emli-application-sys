@@ -243,12 +243,16 @@ class Api::UsersController < Api::ApplicationController
   end
 
   def active_programs
-    programs =
-      current_user.active_programs.map do |program|
-        { value: program.id, label: program.name }
-      end
+    authorize current_user, :active_programs?
 
-    render json: programs, status: :ok
+    programs = current_user.active_programs
+    render json: {
+             data: programs,
+             meta: {
+               total_count: programs.count
+             }
+           },
+           status: :ok
   end
 
   private

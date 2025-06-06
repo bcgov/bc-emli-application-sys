@@ -63,6 +63,10 @@ class UserPolicy < ApplicationPolicy
     destroy?
   end
 
+  def active_programs?
+    user.admin_manager? || user.admin?
+  end
+
   def accept_eula?
     profile?
   end

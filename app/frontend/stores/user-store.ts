@@ -156,7 +156,7 @@ export const UserStoreModel = types
 
       const response = yield self.environment.api.getUsersActivePrograms();
       if (response.ok) {
-        self.currentUser.setActivePrograms(response.data);
+        self.currentUser.setActivePrograms(response.data.data);
         return response.ok;
       }
     }),
