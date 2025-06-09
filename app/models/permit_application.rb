@@ -441,9 +441,11 @@ class PermitApplication < ApplicationRecord
   end
 
   def send_submitted_webhook
-    return unless submitted?
+    return unless in_review?
 
     #TODO: if we want to implement webhooks were we call an external API when an application is submitted
+
+    Rails.logger.info("submitting webhook start #{in_review?}")
 
     program
       .active_external_api_keys
@@ -451,15 +453,10 @@ class PermitApplication < ApplicationRecord
         webhook_url: [nil, ""]
       ) # Only send webhooks to keys with a webhook URL
       .each do |external_api_key|
+        Rails.logger.info("#{external_api_key}")
         PermitWebhookJob.perform_async(
           external_api_key.id,
-          (
-            if newly_submitted?
-              Constants::Webhooks::Events::PermitApplication::PERMIT_SUBMITTED
-            else
-              Constants::Webhooks::Events::PermitApplication::PERMIT_RESUBMITTED
-            end
-          ),
+          Constants::Webhooks::Events::Application::APPLICATION_INREVIEW,
           id
         )
       end
