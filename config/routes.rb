@@ -286,14 +286,14 @@ Rails.application.routes.draw do
 
   scope module: :external_api, path: :external_api do
     namespace :v1 do
-      resources :applications, only: %i[show] do
-        post "search", on: :collection, to: "permit_applications#index"
-        collection do
-          resources :versions, as: "template_versions", only: [] do
-            get "integration_mapping",
-                to: "permit_applications#show_integration_mapping"
-          end
-        end
+      get "applications/:id",
+          to: "permit_applications#show",
+          as: :external_api_application
+      post "applications/search", to: "permit_applications#index"
+
+      resources :versions, as: "template_versions", only: [] do
+        get "integration_mapping",
+            to: "permit_applications#show_integration_mapping"
       end
     end
   end
