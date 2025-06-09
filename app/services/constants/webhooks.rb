@@ -1,9 +1,10 @@
 module Constants
   module Webhooks
     module Events
-      module PermitApplication
-        PERMIT_SUBMITTED = "permit_submitted"
-        PERMIT_RESUBMITTED = "permit_resubmitted"
+      module Application
+        APPLICATION_SUBMITTED = "application_submitted"
+        APPLICATION_RESUBMITTED = "application_resubmitted"
+        APPLICATION_INREVIEW = "application_inreview"
       end
     end
   end

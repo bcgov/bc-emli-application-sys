@@ -29,23 +29,16 @@ and name: #{external_api_key.name}"
   def send_submitted_event(permit_id)
     permit_application = PermitApplication.find(permit_id)
 
-    unless permit_application.submitted?
+    unless permit_application.screen_in?
       raise PermitWebhookError.new(
-              "Permit application with ID #{permit_id} is not submitted."
+              "Permit application with ID #{permit_id} has not been screened in."
             )
     end
 
     payload = {
-      event:
-        (
-          if permit_application.newly_submitted?
-            Constants::Webhooks::Events::PermitApplication::PERMIT_SUBMITTED
-          else
-            Constants::Webhooks::Events::PermitApplication::PERMIT_RESUBMITTED
-          end
-        ),
+      event: Constants::Webhooks::Events::Application::APPLICATION_INREVIEW,
       payload: {
-        permit_id: permit_id,
+        application_id: permit_id,
         submitted_at: permit_application.submitted_at
       }
     }
