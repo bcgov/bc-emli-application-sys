@@ -2,7 +2,7 @@ import { Box, Button, Container, Flex, Heading, HStack, IconButton, Stack, Text,
 import { ArrowSquareOut, Download } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useCallback, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useJurisdiction } from '../../../../hooks/resources/use-jurisdiction';
 import { usePermitClassificationsLoad } from '../../../../hooks/resources/use-permit-classifications-load';
@@ -20,8 +20,6 @@ import { SearchGridItem } from '../../../shared/grid/search-grid-item';
 import { RouterLink } from '../../../shared/navigation/router-link';
 import { RouterLinkButton } from '../../../shared/navigation/router-link-button';
 import { EnergySavingsApplicationStatusTag } from '../../../shared/energy-savings-applications/energy-savings-application-status-tag';
-import { PermitApplicationViewedAtTag } from '../../../shared/energy-savings-applications/permit-application-viewed-at-tag';
-import { Can } from '../../../shared/user/can';
 import { DesignatedCollaboratorAssignmentPopover } from '../../energy-savings-application/assignment-management/designated-user-assignment-popover';
 import { SubmissionDownloadModal } from '../../energy-savings-application/submission-download-modal';
 import { GridHeaders } from './grid-header';
@@ -31,6 +29,7 @@ import { useProgram } from '../../../../hooks/resources/use-program';
 import { IMinimalFrozenUser, IOption } from '../../../../types/types';
 
 export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionInbox() {
+  const { isLoaded: isPermitClassificationsLoaded } = usePermitClassificationsLoad();
   const { t } = useTranslation();
   const methods = useForm({
     defaultValues: {
@@ -39,7 +38,6 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
     },
   });
   const { programStore, permitApplicationStore, permitClassificationStore, userStore } = useMst();
-  const { fetchProgramOptions } = programStore;
   const { setValue } = methods;
 
   const { setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, search } = permitApplicationStore;
@@ -47,68 +45,23 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
   const [programOptions, setProgramOptions] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
 
-  const { isLoaded: isPermitClassificationsLoaded } = usePermitClassificationsLoad();
   const { currentPage, totalPages, totalCount, countPerPage, handleCountPerPageChange, handlePageChange, isSearching } =
     permitApplicationStore;
 
   const { currentProgram, error } = useProgram();
 
-  const {
-    getUserTypeIdByCode,
-    getSubmissionTypeIdByCode,
-    getAudienceTypeIdByCode,
-    getAllSubmissionTypeIds,
-    getSubmissionTypeById,
-    getSubmissionTypeIdsExceptOnboarding,
-  } = permitClassificationStore;
-
-  type FetchOptionI = {
-    userGroupType: string;
-    AudienceType: string;
-    SubmissionType: string[] | string;
-  };
-
-  // Retained for future use: Contractor submission inbox. Refer to commit history prior to May 7th for changes
-  const fetchOptionsTypes = useCallback(async (): Promise<IOption<FetchOptionI>[]> => {
-    return [
-      {
-        label: t('energySavingsApplication.submissionInbox.participantSubmission'),
-        value: {
-          userGroupType: getUserTypeIdByCode(EPermitClassificationCode.participant),
-          AudienceType: getAudienceTypeIdByCode(EPermitClassificationCode.external),
-          SubmissionType: getAllSubmissionTypeIds(),
-        },
-      },
-      {
-        label: t('energySavingsApplication.submissionInbox.contractorSubmission'),
-        value: {
-          userGroupType: getUserTypeIdByCode(EPermitClassificationCode.contractor),
-          AudienceType: getAudienceTypeIdByCode(EPermitClassificationCode.internal),
-          SubmissionType: getSubmissionTypeIdsExceptOnboarding(),
-        },
-      },
-      {
-        label: t('energySavingsApplication.submissionInbox.contractorOnboarding'),
-        value: {
-          userGroupType: getUserTypeIdByCode(EPermitClassificationCode.contractor),
-          AudienceType: getAudienceTypeIdByCode(EPermitClassificationCode.internal),
-          SubmissionType: getSubmissionTypeIdByCode(EPermitClassificationCode.onboarding),
-        },
-      },
-    ];
-  }, [getUserTypeIdByCode, getAudienceTypeIdByCode, getAllSubmissionTypeIds, getSubmissionTypeIdsExceptOnboarding]);
-
-  const handleChange = (selectedOption) => {
-    setUserGroupFilter(selectedOption?.userGroupType);
-    setAudienceTypeFilter(selectedOption?.AudienceType);
-    setSubmissionTypeFilter(selectedOption?.SubmissionType);
-    search();
-  };
+  //For future use: Contractor submission inbox. Refer to commit history prior to May 7th for changes
+  // const handleChange = (selectedOption) => {
+  //   setUserGroupFilter(selectedOption?.userGroupType);
+  //   setAudienceTypeFilter(selectedOption?.AudienceType);
+  //   setSubmissionTypeFilter(selectedOption?.SubmissionType);
+  //   search();
+  // };
 
   // Fetch submission options and program options separately
   const fetchSubmissionOptions = useCallback(async () => {
     try {
-      const result = await fetchOptionsTypes();
+      const result = await permitClassificationStore.submissionOptionTypes();
       setUserGroupFilter(result[0].value.userGroupType);
       setAudienceTypeFilter(result[0].value.AudienceType);
       setSubmissionTypeFilter(result[0].value.SubmissionType);
@@ -126,19 +79,18 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
         value: program.id,
       }));
       setProgramOptions(options);
+
       await fetchSubmissionOptions();
 
       if (options?.length > 0) {
         const firstOption = options[0];
         methods.setValue('programId', firstOption.value);
-
         handleProgramChange(firstOption.value);
       }
     } catch (error) {}
-  }, [fetchProgramOptions, programStore, methods, fetchSubmissionOptions, t]);
+  }, [programStore, methods, fetchSubmissionOptions, t]);
 
   const handleProgramChange = async (programId) => {
-    // Fetch program before setting it
     await programStore.fetchProgram(programId);
     programStore.setCurrentProgram(programId);
     search();

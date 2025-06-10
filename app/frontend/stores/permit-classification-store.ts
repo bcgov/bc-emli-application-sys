@@ -17,6 +17,12 @@ import {
 import { EPermitClassificationCode, EPermitClassificationType } from '../types/enums';
 import { IOption } from '../types/types';
 
+interface FetchOptionI {
+  userGroupType: string;
+  AudienceType: string;
+  SubmissionType: string[] | string;
+}
+
 export const PermitClassificationStoreModel = types
   .model('PermitClassificationStore', {
     // old classifications, TODO: remove at some point
@@ -144,6 +150,44 @@ export const PermitClassificationStoreModel = types
       self.isLoaded = true;
       return response.ok;
     }),
+    submissionOptionTypes(): Array<IOption<FetchOptionI>> {
+      const participantId = self.getUserTypeIdByCode(EPermitClassificationCode.participant);
+      const contractorId = self.getUserTypeIdByCode(EPermitClassificationCode.contractor);
+      const externalId = self.getAudienceTypeIdByCode(EPermitClassificationCode.external);
+      const internalId = self.getAudienceTypeIdByCode(EPermitClassificationCode.internal);
+      const onboardingId = self.getSubmissionTypeIdByCode(EPermitClassificationCode.onboarding);
+
+      if (!participantId || !contractorId || !externalId || !internalId || !onboardingId) {
+        return [];
+      }
+
+      return [
+        {
+          label: 'participantSubmission',
+          value: {
+            userGroupType: participantId,
+            AudienceType: externalId,
+            SubmissionType: self.getAllSubmissionTypeIds(),
+          },
+        },
+        {
+          label: 'contractorSubmission',
+          value: {
+            userGroupType: contractorId,
+            AudienceType: internalId,
+            SubmissionType: self.getSubmissionTypeIdsExceptOnboarding(),
+          },
+        },
+        {
+          label: 'contractorOnboarding',
+          value: {
+            userGroupType: contractorId,
+            AudienceType: internalId,
+            SubmissionType: onboardingId,
+          },
+        },
+      ];
+    },
   }))
   .actions((self) => ({
     fetchPermitTypeOptions: flow(function* (

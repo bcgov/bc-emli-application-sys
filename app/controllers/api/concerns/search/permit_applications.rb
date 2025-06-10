@@ -53,8 +53,8 @@ module Api::Concerns::Search::PermitApplications
         :requirement_template_id,
         :template_version_id,
         :user_group_type_id,
-        :submission_type_id,
         :audience_type_id,
+        { submission_type_id: [] },
         { status: [] }
       ],
       sort: %i[field direction]
