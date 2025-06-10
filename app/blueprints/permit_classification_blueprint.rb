@@ -1,7 +1,7 @@
 class PermitClassificationBlueprint < Blueprinter::Base
   view :base do
-    identifier :id
-    fields :name, :code, :description, :enabled, :type, :description, :image_url
+    # identifier :id
+    fields :id, :name, :code, :description, :enabled, :type
   end
 
   view :name do

@@ -7,7 +7,7 @@ export const PermitClassificationModel = types.model('PermitClassificationModel'
   code: types.enumeration(Object.values(EPermitClassificationCode)),
   description: types.maybeNull(types.string),
   enabled: types.boolean,
-  imageUrl: types.string,
+  // imageUrl: types.string,
 });
 
 // Subclass Model for PermitType

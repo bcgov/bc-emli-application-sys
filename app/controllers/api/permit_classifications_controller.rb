@@ -1,9 +1,11 @@
 class Api::PermitClassificationsController < Api::ApplicationController
   def index
     @permit_classifications = policy_scope(PermitClassification)
-    render_success @permit_classifications,
-                   nil,
-                   { blueprint: PermitClassificationBlueprint }
+    serialized =
+      @permit_classifications.map do |record|
+        PermitClassificationBlueprint.render_as_hash(record, view: :base)
+      end
+    render json: { success: true, data: serialized }
   end
 
   def permit_classification_options
@@ -54,7 +56,6 @@ class Api::PermitClassificationsController < Api::ApplicationController
 
       options =
         permit_classifications.map { |pc| { label: pc.name, value: pc } }
-
       render_success options,
                      nil,
                      { blueprint: PermitClassificationOptionBlueprint }

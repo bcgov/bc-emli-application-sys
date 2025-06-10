@@ -36,7 +36,6 @@ interface IEnergySavingsApplicationIndexScreenProps {}
 
 export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsApplicationIndexScreenProps) => {
   const { t } = useTranslation();
-  const [selectedFilter, setSelectedFilter] = useState('filter');
   const { permitApplicationStore, sandboxStore } = useMst();
   const {
     tablePermitApplications,
@@ -66,11 +65,6 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
   ]);
   useFlashQueryParam();
   const resetQueryParams = useResetQueryParams();
-
-  const handleFilterSelect = (filter) => {
-    setSelectedFilter(filter);
-    // Add logic here for applying the filter (e.g., fetching data based on selected filter)
-  };
 
   return (
     <Flex as="main" direction="column" w="full" bg="greys.white" pb="24">
