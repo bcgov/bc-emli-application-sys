@@ -43,13 +43,13 @@ info:
     a better understanding of how our APIs work, including webhook setups and request
     handling, please refer to the code examples included later\nin this document.\n"
 webhooks:
-  application_submitted:
+  application_inreview:
     tags:
     - Webhooks
     post:
       requestBody:
         description: "### Request body:\nThis webhook sends information about a recently
-          submitted \n        applications in a JSON format to the webhook URL specified
+          screened in \n        application in a JSON format to the webhook URL specified
           by the external integrator.\nIt includes\n        the application ID, which
           can be used to fetch the complete details of the application using the\n
           \       `GET/applications/{id}` endpoint.\n\n### Retries:\nIf the webhook
@@ -60,33 +60,6 @@ webhooks:
           responses:\nThe external integrator is expected to return a 200 status code
           to confirm successful receipt\n        of the data. This acknowledgment
           indicates that the payload was received and processed without issues"
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/WebhookPayload"
-      responses:
-        '200':
-          description: The external integrator should return a 200 status to indicate
-            that the data was received successfully.
-  application_resubmitted:
-    tags:
-    - Webhooks
-    post:
-      requestBody:
-        description: "### Request body:\nThis webhook sends information about a recently
-          resubmitted \n        application. A application can be resubmitted due
-          to revision requests. After resubmission a payload is sent in JSON format
-          to the webhook URL specified by the external integrator.\nIt includes\n
-          \       the application ID, which can be used to fetch the complete details
-          of the application using the\n        `GET/applications/{id}` endpoint.\n\n###
-          Retries:\nIf the webhook does not receive a 200 status response\n        from
-          the external integrator, it will attempt to resend the notification up to
-          8 times using an exponential backoff\n        strategy. This ensures multiple
-          attempts to deliver the webhook in case of temporary issues on the receiving
-          end.\n\n\n### Expected responses:\nThe external integrator is expected to
-          return a 200 status code to confirm successful receipt\n        of the data.
-          This acknowledgment indicates that the payload was received and processed
-          without issues"
         content:
           application/json:
             schema:
@@ -541,13 +514,12 @@ components:
         event:
           type: string
           enum:
-          - permit_submitted
-          - permit_resubmitted
+          - application_inreview
           description: The event type.
         payload:
           type: object
           properties:
-            permit_id:
+            application_id:
               type: string
               description: The application ID.
             submitted_at:
