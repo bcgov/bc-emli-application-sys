@@ -492,6 +492,9 @@ en:
       save_success:
         title: ''
         message: 'Application successfully updated!'
+      remove_success:
+        title: ''
+        message: 'Updates have been successfully removed!'
       assign_collaborator_success:
         title: ''
         message: 'Collaborator successfully assigned!'

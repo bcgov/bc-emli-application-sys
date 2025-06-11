@@ -828,6 +828,10 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         }
         return response.ok;
       }),
+      removeRevisionRequests: flow(function* () {
+        const response = yield self.environment.api.removeRevisionRequests(self.id);
+        return response.ok;
+      }),
       markAsViewed: flow(function* () {
         const response = yield self.environment.api.viewPermitApplication(self.id);
         if (response.ok) {

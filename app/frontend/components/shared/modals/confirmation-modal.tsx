@@ -14,13 +14,15 @@ import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface IConfirmationModalProps {
+  isSubmit?: boolean; // Optional prop to indicate if the modal is for a submit action
   onConfirm: () => void; // Function type for the confirmation action
   promptMessage?: string;
   promptHeader?: string;
-  renderTrigger: (onOpen: () => void) => ReactNode;
+  renderTrigger?: (onOpen: () => void) => ReactNode;
 }
 
 export const ConfirmationModal = ({
+  isSubmit,
   onConfirm,
   promptMessage,
   promptHeader,
@@ -40,7 +42,13 @@ export const ConfirmationModal = ({
 
   return (
     <>
-      {renderTrigger ? renderTrigger(onOpen) : <Button onClick={onOpen}>{t('ui.confirm')}</Button>}
+      {renderTrigger ? (
+        renderTrigger(onOpen)
+      ) : (
+        <Button onClick={onOpen} variant="whiteButton">
+          {isSubmit ? t('ui.confirm') : t('ui.cancel')}
+        </Button>
+      )}
       <Modal isOpen={isOpen} onClose={onClose} size="lg">
         <ModalOverlay />
         <ModalContent p={4}>
@@ -50,7 +58,7 @@ export const ConfirmationModal = ({
           <ModalFooter>
             <Flex justify="flex-start" w="full" gap={4}>
               <Button variant="primary" onClick={handleConfirm}>
-                {t('ui.confirm')}
+                {isSubmit ? t('ui.confirm') : 'Cancel update request'}
               </Button>
               <Button variant="secondary" onClick={handleCancel}>
                 {t('ui.neverMind')}

@@ -23,7 +23,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMountStatus } from '../../../hooks/use-mount-status';
-import { IPermitApplication } from '../../../models/energy-savings-application';
+import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { IRevisionRequestsAttributes } from '../../../types/api-request';
 import { IFormIORequirement, IRevisionRequest, ISubmissionVersion } from '../../../types/types';
 import { getRequirementByKey } from '../../../utils/formio-component-traversal';
@@ -35,7 +35,7 @@ import { RevisionModal } from '../../shared/revisions/revision-modal';
 import SubmissionVersionSelect from '../../shared/select/selectors/submission-version-select';
 
 interface IRevisionSideBarProps {
-  permitApplication: IPermitApplication;
+  permitApplication: IEnergySavingsApplication;
   onCancel?: () => void;
   sendRevisionContainerRef?: MutableRefObject<HTMLDivElement>;
   forSubmitter?: boolean;
@@ -56,10 +56,12 @@ export const RevisionSideBar = observer(
   }: IRevisionSideBarProps) => {
     const { t } = useTranslation();
     const isMounted = useMountStatus();
+    const [isCancelModalOpen, setCancelModalOpen] = useState(false);
     const [requirementForRevision, setRequirementForRevision] = useState<IFormIORequirement>();
     const [submissionJsonForRevision, setSubmissionJsonForRevision] = useState<any>();
     const [revisionRequest, setRevisionRequest] = useState<IRevisionRequest>();
     const [revisionRequestDefault, setRevisionRequestDefault] = useState<IRevisionRequest>();
+    const [isSubmitted, setIsSubmitted] = useState(false);
     const {
       selectedPastSubmissionVersion,
       setSelectedPastSubmissionVersion,
@@ -131,6 +133,17 @@ export const RevisionSideBar = observer(
 
     const onFinalizeRevisions = async () => {
       const ok = await permitApplication.finalizeRevisionRequests();
+      if (ok) {
+        setIsSubmitted(true);
+      }
+    };
+
+    const onRevisionsRemoval = async () => {
+      const ok = await permitApplication.removeRevisionRequests();
+
+      if (ok) {
+        navigate(0);
+      }
     };
 
     const handleOpenRequestRevision = async (event, upToDateFields) => {
@@ -176,7 +189,9 @@ export const RevisionSideBar = observer(
 
       return (
         <Flex gap={4}>
+          {/* First ConfirmationModal for "Send" */}
           <ConfirmationModal
+            isSubmit={true}
             promptHeader={t('energySavingsApplication.show.revision.confirmHeader')}
             promptMessage={t('energySavingsApplication.show.revision.confirmMessage')}
             renderTrigger={(onOpen) => (
@@ -199,10 +214,30 @@ export const RevisionSideBar = observer(
             )}
             onConfirm={onFinalizeRevisions}
           />
+
+          {/* Cancel button triggers remove updates modal */}
           {onCancel && (
-            <Button variant="whiteButton" onClick={onCancel}>
-              {t('ui.cancel')}
-            </Button>
+            <>
+              {fields.length > 0 && !permitApplication.isRevisionsRequested ? (
+                <ConfirmationModal
+                  isSubmit={false}
+                  promptHeader={t('energySavingsApplication.show.revision.cancelRequest')}
+                  promptMessage={t('energySavingsApplication.show.revision.noNotification')}
+                  onConfirm={() => {
+                    onRevisionsRemoval();
+                  }}
+                />
+              ) : (
+                <Button
+                  variant="whiteButton"
+                  onClick={() => {
+                    permitApplication.setRevisionMode(false);
+                  }}
+                >
+                  {t('ui.cancel')}
+                </Button>
+              )}
+            </>
           )}
         </Flex>
       );

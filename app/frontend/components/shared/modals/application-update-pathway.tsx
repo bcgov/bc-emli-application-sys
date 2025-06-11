@@ -64,7 +64,7 @@ const UpdatePathwayModal = ({ isOpen, onClose, setRevisionMode, setPerformedBy }
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleNext} isDisabled={!selectedOption}>
+            <Button variant="primary" mr={3} onClick={handleNext} isDisabled={!selectedOption}>
               {t('ui.next')}
             </Button>
             <Button variant="outline" onClick={onClose}>
