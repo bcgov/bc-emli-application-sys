@@ -514,6 +514,20 @@ class PermitApplication < ApplicationRecord
     }
   end
 
+  def ineligible_event_notification_data
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::APPLICATION_INELIGIBLE,
+      "action_text" =>
+        "#{I18n.t("notification.permit_application.ineligible_notification", number: number, program_name: program_name)}",
+      "object_data" => {
+        "permit_application_id" => id,
+        "permit_application_number" => number
+      }
+    }
+  end
+
   def revisions_request_event_notification_data
     {
       "id" => SecureRandom.uuid,

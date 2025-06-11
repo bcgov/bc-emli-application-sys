@@ -14,6 +14,8 @@ module PermitApplicationStatus
          },
          _default: 0
 
+    after_update :check_ineligible_transition
+
     def self.draft_statuses
       %w[new_draft revisions_requested]
     end
@@ -101,6 +103,19 @@ module PermitApplicationStatus
       zip_and_upload_supporting_documents
 
       send_submit_notifications
+    end
+
+    def handle_ineligible_status
+      NotificationService.publish_application_ineligible_event(self)
+    end
+
+    private
+
+    def check_ineligible_transition
+      if saved_change_to_status? && status_before_last_save != "ineligible" &&
+           ineligible?
+        handle_ineligible_status
+      end
     end
   end
 end

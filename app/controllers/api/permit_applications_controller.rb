@@ -391,10 +391,9 @@ class Api::PermitApplicationsController < Api::ApplicationController
 
   def generate_missing_pdfs
     authorize @permit_application
-
-    ZipfileJob.perform_async(@permit_application.id)
-
-    head :ok
+    # Commented out because we are not generating any PDF's right now. Maybe later
+    # ZipfileJob.perform_async(@permit_application.id)
+    # head :ok
   end
 
   def finalize_revision_requests
