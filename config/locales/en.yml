@@ -706,6 +706,7 @@ en:
       resubmission_notification: 'Your revised application %{number} has been received by %{jurisdiction_name} and is pending review.'
       revisions_request_notification: '%{program_name} has reviewed your application %{number} and has requested revisions. Please review and re-submit.'
       view_notification: '%{program_name} has viewed your application %{number}.'
+      ineligible_notification: 'Application %{number} has been marked as ineligible for %{program_name}'
     permit_collaboration:
       submission_delegatee_collaboration_notification: 'Collaboration request from %{author_name}. You have been assigned as a designated submitter for permit application %{number}.'
       submission_assignee_collaboration_notification: 'Collaboration request from %{author_name} on requirement “%{requirement_block_name}” for permit application %{number}'

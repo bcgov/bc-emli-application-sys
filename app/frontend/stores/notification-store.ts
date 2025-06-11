@@ -47,99 +47,111 @@ export const NotificationStoreModel = types
     },
     generateSpecificLinkData(notification: INotification): ILinkData[] {
       const currentUser = self.rootStore.userStore.currentUser;
-      let objectData = notification.objectData;
+      const objectData = notification.objectData;
       const draftFilterUriComponent = encodeURIComponent(self.rootStore.permitApplicationStore.draftStatuses.join(','));
-      if (notification.actionType === ENotificationActionType.newTemplateVersionPublish) {
-        const linkData = [
-          {
-            text: t('permitApplication.reviewOutdatedSubmissionLink'),
-            href: `/applications?requirementTemplateId=${(objectData as IRequirementTemplateNotificationObjectData).requirementTemplateId}&status=${draftFilterUriComponent}&flash=${encodeURIComponent(
-              JSON.stringify({
-                type: 'success',
-                title: t('permitApplication.reviewOutdatedTitle'),
-                message: t('permitApplication.reviewOutdatedMessage'),
-              }),
-            )}`,
-          },
-        ];
-        if (currentUser.isManager) {
-          linkData.push({
-            text: t('permitApplication.reviewUpdatedEditLink'),
-            href: `/digital-building-permits/${(objectData as ITemplateVersionNotificationObjectData).templateVersionId}/edit?compare=true`,
-          });
+
+      // Helper function for application links
+      const getApplicationLink = (permitApplicationId: string, isEdit = true) =>
+        `/applications/${permitApplicationId}${isEdit ? '/edit' : ''}`;
+
+      // Helper function for flash message URLs
+      const getFlashUrl = (templateId: string, title: string, message: string) =>
+        `/applications?requirementTemplateId=${templateId}&status=${draftFilterUriComponent}&flash=${encodeURIComponent(
+          JSON.stringify({ type: 'success', title, message }),
+        )}`;
+
+      switch (notification.actionType) {
+        case ENotificationActionType.newTemplateVersionPublish: {
+          const data = objectData as IRequirementTemplateNotificationObjectData;
+          const links = [
+            {
+              text: t('permitApplication.reviewOutdatedSubmissionLink'),
+              href: getFlashUrl(
+                data.requirementTemplateId,
+                t('permitApplication.reviewOutdatedTitle'),
+                t('permitApplication.reviewOutdatedMessage'),
+              ),
+            },
+          ];
+
+          if (currentUser.isManager) {
+            const templateData = objectData as ITemplateVersionNotificationObjectData;
+            links.push({
+              text: t('permitApplication.reviewUpdatedEditLink'),
+              href: `/digital-building-permits/${templateData.templateVersionId}/edit?compare=true`,
+            });
+          }
+          return links;
         }
 
-        return linkData;
-      } else if (notification.actionType === ENotificationActionType.customizationUpdate) {
-        return [
-          {
-            text: t('permitApplication.reviewCustomizedSubmissionLink'),
-            href: `/applications?requirementTemplateId=${(objectData as IRequirementTemplateNotificationObjectData).requirementTemplateId}&status=${draftFilterUriComponent}&flash=${encodeURIComponent(
-              JSON.stringify({
-                type: 'success',
-                title: t('permitApplication.reviewCustomizedTitle'),
-                message: t('permitApplication.reviewCustomizedMessage'),
-              }),
-            )}`,
-          },
-        ];
-      } else if (
-        [
-          ENotificationActionType.submissionCollaborationAssignment,
-          ENotificationActionType.submissionCollaborationUnassignment,
-          ENotificationActionType.reviewCollaborationAssignment,
-          ENotificationActionType.reviewCollaborationUnassignment,
-        ].includes(notification.actionType)
-      ) {
-        const collaborationData = objectData as IPermitCollaborationNotificationObjectData;
-        return [
-          ENotificationActionType.submissionCollaborationAssignment,
-          ENotificationActionType.reviewCollaborationAssignment,
-        ].includes(notification.actionType)
-          ? [
-              {
-                text: t('ui.show'),
-                href:
-                  notification.actionType === ENotificationActionType.submissionCollaborationAssignment
-                    ? `/applications/${collaborationData.permitApplicationId}/edit`
-                    : `/applications/${collaborationData.permitApplicationId}`,
-              },
-            ]
-          : [];
-      } else if (notification.actionType === ENotificationActionType.permitBlockStatusReady) {
-        const collaborationData = objectData as IPermitBlockStatusReadyNotificationObjectData;
-        return [
-          {
-            text: t('ui.show'),
-            href:
-              collaborationData?.collaborationType === ECollaborationType.review
-                ? `/applications/${collaborationData.permitApplicationId}`
-                : `/applications/${collaborationData.permitApplicationId}/edit`,
-          },
-        ];
-      } else if (
-        [
-          ENotificationActionType.publishedTemplateMissingRequirementsMapping,
-          ENotificationActionType.scheduledTemplateMissingRequirementsMapping,
-        ].includes(notification.actionType)
-      ) {
-        return [
-          {
-            text: 'View integration mapping',
-            href: `/api-settings/api-mappings/digital-building-permits/${(objectData as ITemplateVersionNotificationObjectData).templateVersionId}/edit`,
-          },
-        ];
-      } else if (
-        notification.actionType === ENotificationActionType.applicationSubmission ||
-        notification.actionType === ENotificationActionType.applicationRevisionsRequest ||
-        notification.actionType === ENotificationActionType.applicationView
-      ) {
-        return [
-          {
-            text: t('ui.show'),
-            href: `/applications/${(notification.objectData as IPermitNotificationObjectData).permitApplicationId}/edit`,
-          },
-        ];
+        case ENotificationActionType.customizationUpdate: {
+          const data = objectData as IRequirementTemplateNotificationObjectData;
+          return [
+            {
+              text: t('permitApplication.reviewCustomizedSubmissionLink'),
+              href: getFlashUrl(
+                data.requirementTemplateId,
+                t('permitApplication.reviewCustomizedTitle'),
+                t('permitApplication.reviewCustomizedMessage'),
+              ),
+            },
+          ];
+        }
+
+        case ENotificationActionType.submissionCollaborationAssignment:
+        case ENotificationActionType.reviewCollaborationAssignment: {
+          const data = objectData as IPermitCollaborationNotificationObjectData;
+          const isEdit = notification.actionType === ENotificationActionType.submissionCollaborationAssignment;
+          return [
+            {
+              text: t('ui.show'),
+              href: getApplicationLink(data.permitApplicationId, isEdit),
+            },
+          ];
+        }
+
+        case ENotificationActionType.submissionCollaborationUnassignment:
+        case ENotificationActionType.reviewCollaborationUnassignment:
+          return []; // No links for unassignment notifications
+
+        case ENotificationActionType.permitBlockStatusReady: {
+          const data = objectData as IPermitBlockStatusReadyNotificationObjectData;
+          const isEdit = data.collaborationType !== ECollaborationType.review;
+          return [
+            {
+              text: t('ui.show'),
+              href: getApplicationLink(data.permitApplicationId, isEdit),
+            },
+          ];
+        }
+
+        case ENotificationActionType.publishedTemplateMissingRequirementsMapping:
+        case ENotificationActionType.scheduledTemplateMissingRequirementsMapping: {
+          const data = objectData as ITemplateVersionNotificationObjectData;
+          return [
+            {
+              text: 'View integration mapping',
+              href: `/api-settings/api-mappings/digital-building-permits/${data.templateVersionId}/edit`,
+            },
+          ];
+        }
+
+        case ENotificationActionType.applicationSubmission:
+        case ENotificationActionType.applicationRevisionsRequest:
+        case ENotificationActionType.applicationView:
+        case ENotificationActionType.applicationIneligible: {
+          const data = objectData as IPermitNotificationObjectData;
+          return [
+            {
+              text: t('ui.show'),
+              href: getApplicationLink(data.permitApplicationId, true),
+            },
+          ];
+        }
+
+        default:
+          console.warn(`Unhandled notification type: ${notification.actionType}`);
+          return [];
       }
     },
   }))
@@ -167,7 +179,7 @@ export const NotificationStoreModel = types
     fetchNotifications: flow(function* (opts = {}) {
       if (opts.reset) self.page = self.totalPages = undefined;
       self.isLoaded = false;
-      const response = yield * toGenerator(self.environment.api.fetchNotifications(self.nextPage));
+      const response = yield* toGenerator(self.environment.api.fetchNotifications(self.nextPage));
 
       if (response && response.ok && response.data) {
         const {
@@ -183,7 +195,7 @@ export const NotificationStoreModel = types
         self.page = self.nextPage;
         self.isLoaded = true;
       } else {
-        console.error('Invalid response:', response);
+        console.error('New Logging Invalid response:', response);
       }
     }),
 
@@ -196,12 +208,13 @@ export const NotificationStoreModel = types
   }))
   .actions((self) => ({
     initialFetch: flow(function* () {
-      self.fetchNotifications();
+      yield* toGenerator(self.fetchNotifications());
     }),
     processWebsocketChange: flow(function* (payload: IUserPushPayload) {
       self.notifications.unshift(self.convertNotificationToUseDate(payload.data));
       self.unreadNotificationsCount = self.popoverOpen ? 0 : payload.meta.unreadCount;
       self.totalPages = payload.meta.totalPages;
+      yield;
     }),
   }));
 

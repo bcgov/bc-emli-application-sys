@@ -211,4 +211,18 @@ class PermitHubMailer < ApplicationMailer
 
     result
   end
+
+  def notify_application_ineligible(permit_application)
+    @user = permit_application.submitter
+    @permit_application = permit_application
+    @program = permit_application.program
+
+    send_user_mail(
+      email: @user.email,
+      template_key: "notify_application_ineligible",
+      subject_i18n_params: {
+        permit_application_number: permit_application.number
+      }
+    )
+  end
 end

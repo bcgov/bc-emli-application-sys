@@ -5,23 +5,32 @@ class NotificationService
   end
 
   def self.total_page_count(total_count)
-    (total_count.to_f / (ENV["NOTIFICATION_FEED_PER_PAGE"] || 5).to_f || 5).ceil
+    (total_count.to_f / (ENV["NOTIFICATION_FEED_PER_PAGE"] || 5) || 5).ceil
   end
 
   def self.user_feed_for(user_id, page)
     uf = SimpleFeed.user_feed.activity(user_id)
-
     user_feed_items = uf.paginate(page: page.to_i || 1, reset_last_read: false)
 
+    feed_items =
+      user_feed_items
+        .map do |f|
+          begin
+            parsed_data = JSON.parse(f.value, symbolize_names: true)
+            OpenStruct.new(parsed_data.merge({ at: f.at }))
+          rescue JSON::ParserError => e
+            Rails.logger.error "Failed to parse notification JSON: #{e.message}"
+            nil
+          end
+        end
+        .compact
+
     {
-      feed_items:
-        user_feed_items.map do |f|
-          OpenStruct.new(
-            JSON.parse(f.value, symbolize_names: true).merge({ at: f.at })
-          )
-        end,
-      total_pages: total_page_count(uf.total_count),
-      feed_object: uf
+      feed_items: feed_items,
+      feed_object: uf,
+      total_pages:
+        total_page_count(activity_metadata(user_id, uf, :total_count)),
+      unread_count: activity_metadata(user_id, uf, :unread_count)
     }
   end
 
@@ -43,6 +52,7 @@ class NotificationService
       # Get the user's feed and store the event
       activity = SimpleFeed.user_feed.activity(user_id)
       activity.store(event: event)
+
       payloads[user_id] = {
         domain: Constants::Websockets::Events::Notification::DOMAIN,
         event_type: Constants::Websockets::Events::Notification::TYPES[:update],
@@ -58,6 +68,7 @@ class NotificationService
         }
       }
     end
+
     WebsocketBroadcaster.push_user_payloads(payloads)
   end
 
@@ -317,6 +328,21 @@ class NotificationService
       ).deliver_later
     end
     if preference.enable_in_app_application_view_notification
+      NotificationPushJob.perform_async(notification_user_hash)
+    end
+  end
+
+  def self.publish_application_ineligible_event(permit_application)
+    notification_user_hash = {
+      permit_application.submitter_id =>
+        permit_application.ineligible_event_notification_data
+    }
+
+    PermitHubMailer.notify_application_ineligible(
+      permit_application
+    ).deliver_later
+
+    unless notification_user_hash.empty?
       NotificationPushJob.perform_async(notification_user_hash)
     end
   end
