@@ -195,7 +195,7 @@ export const NotificationStoreModel = types
         self.page = self.nextPage;
         self.isLoaded = true;
       } else {
-        console.error('New Logging Invalid response:', response);
+        console.error('[Error] fetchNotifications: Invalid response received.', { response });
       }
     }),
 
