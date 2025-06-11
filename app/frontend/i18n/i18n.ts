@@ -1212,6 +1212,9 @@ const options = {
               originallySubmitted: 'Previously submitted',
               confirmMessage:
                 'The applicant will receive an notification and email about the changes you’ve requested.',
+              cancelRequest: 'Are you sure you want to cancel?',
+              noNotification:
+                'No notifications will be sent to the applicant and you will lose any current revisions you may have added.',
             },
           },
         },

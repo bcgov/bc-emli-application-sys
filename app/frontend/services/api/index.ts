@@ -8,7 +8,7 @@ import { IExternalApiKey } from '../../models/external-api-key';
 import { IIntegrationMapping } from '../../models/integration-mapping';
 import { IJurisdiction } from '../../models/jurisdiction';
 import { IJurisdictionTemplateVersionCustomization } from '../../models/jurisdiction-template-version-customization';
-import { IPermitApplication } from '../../models/energy-savings-application';
+import { IEnergySavingsApplication } from '../../models/energy-savings-application';
 import {
   IActivity,
   IPermitType,
@@ -503,7 +503,20 @@ export class Api {
   }
 
   async finalizeRevisionRequests(id) {
-    return this.client.post<ApiResponse<IPermitApplication>>(`/permit_applications/${id}/revision_requests/finalize`);
+    return this.client.post<ApiResponse<IEnergySavingsApplication>>(
+      `/permit_applications/${id}/revision_requests/finalize`,
+    );
+  }
+
+  async removeRevisionRequests(id) {
+    return this.client.post<ApiResponse<IEnergySavingsApplication>>(
+      `/permit_applications/${id}/revision_requests/remove`,
+      {
+        submission_version: {
+          revision_requests_attributes: [],
+        },
+      },
+    );
   }
 
   async fetchRequirementTemplates(

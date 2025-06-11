@@ -50,6 +50,10 @@ class PermitApplicationPolicy < ApplicationPolicy
     user.admin_manager? || user.admin?
   end
 
+  def remove_revision_requests?
+    user.admin_manager? || user.admin?
+  end
+
   def upload_supporting_document?
     record.draft? && record.submitter == user
   end

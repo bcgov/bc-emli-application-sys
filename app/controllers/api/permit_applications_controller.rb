@@ -8,6 +8,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
                   submit
                   upload_supporting_document
                   finalize_revision_requests
+                  remove_revision_requests
                   mark_as_viewed
                   change_status
                   update_version
@@ -410,6 +411,33 @@ class Api::PermitApplicationsController < Api::ApplicationController
                      }
     else
       render_error "permit_application.revision_request_finalize_error"
+    end
+  end
+
+  def remove_revision_requests
+    authorize @permit_application
+    latest_version = @permit_application.latest_submission_version
+
+    unless latest_version
+      return(
+        render_error "permit_application.remove_error",
+                     message_opts: {
+                       error_message: "No latest version found."
+                     }
+      )
+    end
+
+    # Remove revision requests explicitly
+    if latest_version.revision_requests.destroy_all
+      render_success @permit_application,
+                     "permit_application.remove_success",
+                     { blueprint: PermitApplicationBlueprint }
+    else
+      render_error "permit_application.remove_success",
+                   message_opts: {
+                     error_message:
+                       latest_version.errors.full_messages.join(", ")
+                   }
     end
   end
 
