@@ -210,13 +210,17 @@ export const NotificationStoreModel = types
       // Optimistically remove from frontend first for immediate feedback
       const notificationIndex = self.notifications.findIndex((n) => n.id === notificationId);
       let removedNotification = null;
+      let wasUnread = false; // Track if this was an unread notification
 
       if (notificationIndex >= 0) {
         removedNotification = self.notifications[notificationIndex];
+        // Check if this notification was unread BEFORE modifying the array
+        wasUnread = notificationIndex < self.unreadNotificationsCount;
+
         self.notifications.splice(notificationIndex, 1);
 
         // Update unread count if this was an unread notification
-        if (notificationIndex < self.unreadNotificationsCount) {
+        if (wasUnread) {
           self.unreadNotificationsCount = Math.max(0, self.unreadNotificationsCount - 1);
         }
       }
@@ -237,7 +241,7 @@ export const NotificationStoreModel = types
 
         if (removedNotification && notificationIndex >= 0) {
           self.notifications.splice(notificationIndex, 0, removedNotification);
-          if (notificationIndex < self.unreadNotificationsCount) {
+          if (wasUnread) {
             self.unreadNotificationsCount += 1;
           }
         }
