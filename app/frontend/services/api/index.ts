@@ -805,6 +805,10 @@ export class Api {
     return this.client.get<INotificationResponse>(`/notifications`, { page });
   }
 
+  deleteNotification(notificationId: string) {
+    return this.client.delete(`/notifications/${notificationId}`);
+  }
+
   async resetLastReadNotifications() {
     return this.client.post(`/notifications/reset_last_read`);
   }

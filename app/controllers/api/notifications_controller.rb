@@ -24,4 +24,16 @@ class Api::NotificationsController < Api::ApplicationController
     NotificationService.reset_user_feed_last_read(current_user.id)
     render_success nil, nil, { meta: { last_read_at: Time.now } }
   end
+
+  def destroy
+    authorize :notification, :destroy?
+    result =
+      NotificationService.delete_user_notification(current_user.id, params[:id])
+
+    if result[:success]
+      render_success nil, nil
+    else
+      render_error nil, nil, { error: result[:error] }
+    end
+  end
 end

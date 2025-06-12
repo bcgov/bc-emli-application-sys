@@ -347,6 +347,32 @@ class NotificationService
     end
   end
 
+  def self.delete_user_notification(user_id, notification_id)
+    activity = SimpleFeed.user_feed.activity(user_id)
+    all_notifications =
+      activity.paginate(page: 1, per_page: 1000, reset_last_read: false)
+
+    notification_to_delete =
+      all_notifications.find do |notification|
+        begin
+          parsed_data = JSON.parse(notification.value, symbolize_names: true)
+          parsed_data[:id] == notification_id
+        rescue JSON::ParserError
+          false
+        end
+      end
+
+    if notification_to_delete
+      activity.delete(value: notification_to_delete.value)
+      { success: true }
+    else
+      { success: false, error: "Notification not found" }
+    end
+  rescue StandardError => e
+    Rails.logger.error "Failed to delete notification #{notification_id} for user #{user_id}: #{e.message}"
+    { success: false, error: e.message }
+  end
+
   private
 
   # this is just a wrapper around the activity's metadata methods

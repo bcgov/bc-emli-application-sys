@@ -6,4 +6,8 @@ class NotificationPolicy < ApplicationPolicy
   def reset_last_read?
     true
   end
+
+  def destroy?
+    true
+  end
 end

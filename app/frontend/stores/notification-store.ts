@@ -205,6 +205,48 @@ export const NotificationStoreModel = types
         self.unreadNotificationsCount = 0;
       }
     }),
+
+    deleteNotification: flow(function* (notificationId: string) {
+      // Optimistically remove from frontend first for immediate feedback
+      const notificationIndex = self.notifications.findIndex((n) => n.id === notificationId);
+      let removedNotification = null;
+      let wasUnread = false; // Track if this was an unread notification
+
+      if (notificationIndex >= 0) {
+        removedNotification = self.notifications[notificationIndex];
+        // Check if this notification was unread BEFORE modifying the array
+        wasUnread = notificationIndex < self.unreadNotificationsCount;
+
+        self.notifications.splice(notificationIndex, 1);
+
+        // Update unread count if this was an unread notification
+        if (wasUnread) {
+          self.unreadNotificationsCount = Math.max(0, self.unreadNotificationsCount - 1);
+        }
+      }
+
+      // Make API call to delete from backend
+      try {
+        const response = yield* toGenerator(self.environment.api.deleteNotification(notificationId));
+
+        if (!response.ok) {
+          throw new Error('API call failed');
+        }
+      } catch (error) {
+        // If API call fails, restore the notification
+        console.error('[Error] deleteNotification: Failed to delete from backend', {
+          notificationId,
+          error,
+        });
+
+        if (removedNotification && notificationIndex >= 0) {
+          self.notifications.splice(notificationIndex, 0, removedNotification);
+          if (wasUnread) {
+            self.unreadNotificationsCount += 1;
+          }
+        }
+      }
+    }),
   }))
   .actions((self) => ({
     initialFetch: flow(function* () {
