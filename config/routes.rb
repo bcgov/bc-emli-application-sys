@@ -61,13 +61,7 @@ Rails.application.routes.draw do
           to: "requirement_blocks#auto_compliance_module_configurations"
     end
 
-    resources :notifications, only: %i[index] do
-      post "reset_last_read",
-           on: :collection,
-           to: "notifications#reset_last_read"
-    end
-
-    resources :notifications, only: %i[index] do
+    resources :notifications, only: %i[index destroy] do
       post "reset_last_read",
            on: :collection,
            to: "notifications#reset_last_read"

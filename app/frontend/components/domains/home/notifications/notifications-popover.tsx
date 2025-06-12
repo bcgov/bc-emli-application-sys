@@ -19,7 +19,7 @@ import {
   Text,
   UnorderedList,
 } from '@chakra-ui/react';
-import { Bell, BellRinging, CaretDown, CaretRight } from '@phosphor-icons/react';
+import { Bell, BellRinging, CaretDown, CaretRight, X } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import * as R from 'ramda';
 import React, { useEffect } from 'react';
@@ -35,8 +35,15 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
   ...rest
 }) {
   const { notificationStore } = useMst();
-  const { notifications, initialFetch, fetchNotifications, anyUnread, generateSpecificLinkData, getSemanticKey } =
-    notificationStore;
+  const {
+    notifications,
+    initialFetch,
+    fetchNotifications,
+    anyUnread,
+    generateSpecificLinkData,
+    getSemanticKey,
+    deleteNotification,
+  } = notificationStore;
 
   useEffect(() => {
     initialFetch();
@@ -47,6 +54,11 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
   const { t } = useTranslation();
 
   const notificationsToShow = showRead ? notifications : notifications.slice(0, numberJustRead);
+
+  const handleDeleteNotification = (notificationId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent any parent click handlers
+    deleteNotification(notificationId);
+  };
 
   return (
     <Popover isOpen={isOpen} onOpen={handleOpen} onClose={handleClose}>
@@ -96,37 +108,58 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
                 <Text color="greys.grey01">{t('notification.noUnread')}</Text>
               ) : (
                 notificationsToShow.map((n) => (
-                  <CustomMessageBox status={getSemanticKey(n)} description={n.actionText} key={n.id}>
-                    <UnorderedList pl={0} mb={0}>
-                      {generateSpecificLinkData(n).map((link) => (
-                        <ListItem whiteSpace={'normal'} key={link.href}>
-                          <RouterLinkButton
-                            variant="link"
-                            rightIcon={<CaretRight />}
-                            to={link.href}
-                            color="text.primary"
-                            onClick={handleClose}
-                            whiteSpace={'normal'}
-                            wordBreak={'break-word'}
-                          >
-                            {link.text}
-                          </RouterLinkButton>
-                        </ListItem>
-                      ))}
-                    </UnorderedList>
-                  </CustomMessageBox>
+                  <Box key={n.id} position="relative">
+                    <IconButton
+                      aria-label="Delete notification"
+                      icon={<X size={16} />}
+                      size="xs"
+                      variant="ghost"
+                      position="absolute"
+                      top={2}
+                      right={2}
+                      zIndex={1}
+                      onClick={(e) => handleDeleteNotification(n.id, e)}
+                      _hover={{ bg: 'greys.grey04' }}
+                    />
+                    <CustomMessageBox status={getSemanticKey(n)} description={n.actionText}>
+                      <UnorderedList pl={0} mb={0}>
+                        {generateSpecificLinkData(n).map((link) => (
+                          <ListItem whiteSpace={'normal'} key={link.href}>
+                            <RouterLinkButton
+                              variant="link"
+                              rightIcon={<CaretRight />}
+                              to={link.href}
+                              color="text.primary"
+                              onClick={handleClose}
+                              whiteSpace={'normal'}
+                              wordBreak={'break-word'}
+                            >
+                              {link.text}
+                            </RouterLinkButton>
+                          </ListItem>
+                        ))}
+                      </UnorderedList>
+                    </CustomMessageBox>
+                  </Box>
                 ))
               )}
             </Flex>
           </PopoverBody>
           <PopoverFooter border={0} padding={2}>
-            <Button
-              variant="ghost"
-              leftIcon={<CaretDown />}
-              onClick={showRead ? fetchNotifications : () => setShowRead(true)}
-            >
-              {t('ui.seeMore')}
-            </Button>
+            {/* Only show "See more" if there are notifications and either:
+                1. We're showing only unread and there are read notifications, OR
+                2. We're showing all but there are more pages */}
+            {notifications.length > 0 &&
+              ((!showRead && notifications.length > numberJustRead) ||
+                (showRead && notificationStore.page < notificationStore.totalPages)) && (
+                <Button
+                  variant="ghost"
+                  leftIcon={<CaretDown />}
+                  onClick={showRead ? fetchNotifications : () => setShowRead(true)}
+                >
+                  {t('ui.seeMore')}
+                </Button>
+              )}
           </PopoverFooter>
         </PopoverContent>
       </Portal>
