@@ -9,7 +9,12 @@ import { usePermitClassificationsLoad } from '../../../../hooks/resources/use-pe
 import { useSearch } from '../../../../hooks/use-search';
 import { IEnergySavingsApplication } from '../../../../models/energy-savings-application';
 import { useMst } from '../../../../setup/root';
-import { ECollaborationType, EPermitApplicationStatus, EPermitClassificationCode } from '../../../../types/enums';
+import {
+  ECollaborationType,
+  EFlashMessageStatus,
+  EPermitApplicationStatus,
+  EPermitClassificationCode,
+} from '../../../../types/enums';
 import { ErrorScreen } from '../../../shared/base/error-screen';
 import { Paginator } from '../../../shared/base/inputs/paginator';
 import { PerPageSelect } from '../../../shared/base/inputs/per-page-select';
@@ -37,7 +42,7 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
       programId: null,
     },
   });
-  const { programStore, permitApplicationStore, permitClassificationStore, userStore } = useMst();
+  const { programStore, permitApplicationStore, permitClassificationStore, userStore, uiStore } = useMst();
   const { setValue } = methods;
 
   const { setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, search } = permitApplicationStore;
@@ -74,6 +79,14 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
     try {
       await userStore.fetchActivePrograms();
       const activePrograms = userStore.currentUser?.activePrograms ?? [];
+      if (activePrograms.length === 0) {
+        uiStore.flashMessage.show(
+          EFlashMessageStatus.error,
+          t('energySavingsApplication.submissionInbox.noAccess'),
+          '',
+        );
+        return;
+      }
       const options = activePrograms.map((program) => ({
         label: program.programName,
         value: program.id,
@@ -109,55 +122,55 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
         <Flex justify={'space-between'} w={'full'}>
           <Box>
             <Heading as="h1" color="theme.blueAlt">
-              {t('permitApplication.submissionInbox.title')}
+              {t('energySavingsApplication.submissionInbox.title')}
             </Heading>
-            <Text fontSize="sm" color="text.secondary">
-              {t('permitApplication.submissionInbox.chooseProgram')}
-            </Text>
+
             <FormProvider {...methods}>
-              <form>
-                <Controller
-                  name="programId"
-                  control={methods.control}
-                  defaultValue={methods.getValues('programId')}
-                  render={({ field }) => (
-                    <AsyncDropdown
-                      mt={4}
-                      fetchOptions={() => Promise.resolve(programOptions)}
-                      fieldName="programId"
-                      placeholderOptionLabel={t('ui.chooseProgram')}
-                      useBoxWrapper={false}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        handleProgramChange(value);
-                      }}
-                    />
-                  )}
-                />
-                {/* Retained for future use: Contractor submission inbox. Refer to commit history prior to May 7th for changes */}
-                {/* <Controller
+              {programOptions.length > 0 && (
+                <form>
+                  <Controller
+                    name="programId"
+                    control={methods.control}
+                    defaultValue={methods.getValues('programId')}
+                    render={({ field }) => (
+                      <AsyncDropdown
+                        mt={4}
+                        fetchOptions={() => Promise.resolve(programOptions)}
+                        fieldName="programId"
+                        placeholderOptionLabel={t('ui.chooseProgram')}
+                        useBoxWrapper={false}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          handleProgramChange(value);
+                        }}
+                      />
+                    )}
+                  />
+                  {/* Retained for future use: Contractor submission inbox. Refer to commit history prior to May 7th for changes */}
+                  {/* <Controller
                   name="selectedType"
                   control={methods.control}
                   render={({ field }) => (
                     <AsyncDropdown
-                      mt={4}
-                      fetchOptions={async () => options}
-                      fieldName="selectedType"
-                      useBoxWrapper={false}
-                      value={field.value}
-                      onValueChange={(value) => {
-                        handleChange(value);
-                        field.onChange(value);
-                      }}
-                      {...field}
+                    mt={4}
+                    fetchOptions={async () => options}
+                    fieldName="selectedType"
+                    useBoxWrapper={false}
+                    value={field.value}
+                    onValueChange={(value) => {
+                      handleChange(value);
+                      field.onChange(value);
+                    }}
+                    {...field}
                     />
                   )}
-                /> */}
-              </form>
+                  /> */}
+                </form>
+              )}
             </FormProvider>
 
             <Heading as="h2" color="theme.blueAlt" mt={8}>
-              {t('permitApplication.submissionInbox.tableSubHeading')}
+              {t('energySavingsApplication.submissionInbox.tableSubHeading')}
             </Heading>
           </Box>
         </Flex>
