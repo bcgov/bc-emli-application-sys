@@ -110,7 +110,7 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
                 notificationsToShow.map((n) => (
                   <Box key={n.id} position="relative">
                     <IconButton
-                      aria-label="Delete notification"
+                      aria-label="delete notification"
                       icon={<X size={16} />}
                       size="xs"
                       variant="ghost"
