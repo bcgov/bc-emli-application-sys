@@ -515,12 +515,28 @@ class PermitApplication < ApplicationRecord
   end
 
   def ineligible_event_notification_data
+    # Choose the appropriate translation key based on whether reason exists
+    action_text =
+      if status_update_reason.present?
+        I18n.t(
+          "notification.permit_application.ineligible_notification_with_reason",
+          number: number,
+          program_name: program_name,
+          reason: status_update_reason
+        )
+      else
+        I18n.t(
+          "notification.permit_application.ineligible_notification",
+          number: number,
+          program_name: program_name
+        )
+      end
+
     {
       "id" => SecureRandom.uuid,
       "action_type" =>
         Constants::NotificationActionTypes::APPLICATION_INELIGIBLE,
-      "action_text" =>
-        "#{I18n.t("notification.permit_application.ineligible_notification", number: number, program_name: program_name)}",
+      "action_text" => action_text,
       "object_data" => {
         "permit_application_id" => id,
         "permit_application_number" => number
