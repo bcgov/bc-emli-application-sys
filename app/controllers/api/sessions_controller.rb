@@ -14,7 +14,17 @@ class Api::SessionsController < Devise::SessionsController
     authenticate_user!
     if current_user
       warden.authenticate({ scope: :user })
-      render_success current_user, nil, { blueprint_opts: { view: :extended } }
+      Rails.logger.info "Session entry_point: #{session[:entry_point].inspect}"
+
+      # Include entry_point from session, if set
+      extra_meta = {}
+      extra_meta[:entry_point] = session[:entry_point] if session[
+        :entry_point
+      ].present?
+
+      render_success current_user,
+                     nil,
+                     { blueprint_opts: { view: :extended }, meta: extra_meta }
     else
       # clear the cookie so user can try and login again
       name, cookie = Devise::JWT::Cookie::CookieHelper.new.build(nil)

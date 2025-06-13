@@ -6,17 +6,18 @@
         <!-- START CONTENT ROW -->
         <td style="font-family: 'Open Sans', sans-serif; font-size: 16px; vertical-align: top;" valign="top">
           <h1>You've been invited</h1>
-          <p>Hello <%= @resource.email %>!</p>
+          <p>Hello,</p>
 
-          <p>You have been invited to join the BC Building Permit Hub
-            app.</p>
+          <p>You’ve been invited to join the Energy Savings Program as a <%= @role_text %></p>
 
-          <p><%= link_to 'Accept invitation', accept_invitation_url(invitation_token: @token), class: "btn btn-primary" %></p>
-
-          <p>–––</p>
           <p>
-            <a href="<%= @root_url %>" target="_blank" style="color: inherit; text-decoration: none; font-weight: bold;">The
-              Building Permit Hub Team</a></p>
+            Click <%= link_to 'here',
+                        "#{@root_url}programs/#{@program_id}/accept-invitation?invitation_token=#{@token}",
+                        class: "btn btn-primary" %> to log in and get started.
+          </p>
+
+          <p>Thank you,<br/>
+          Energy Savings Program Support</a></p>
 
         </td>
         <!-- END OF CONTENT ROW -->

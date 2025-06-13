@@ -142,7 +142,6 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
   }, [fetchProgramOptions, programStore, methods, fetchSubmissionOptions, t]);
 
   const handleProgramChange = (programId) => {
-    console.log('programId', programId);
     programStore.setCurrentProgram(programId);
     search();
   };

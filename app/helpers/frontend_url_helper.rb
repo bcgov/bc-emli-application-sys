@@ -4,9 +4,10 @@ module FrontendUrlHelper
   end
 
   def self.frontend_url(path)
-    Addressable::URI.join(
-      Rails.application.routes.url_helpers.root_url,
-      path
-    ).to_s
+    base_url =
+      Rails.application.routes.url_helpers.root_url(
+        Rails.application.config.action_mailer.default_url_options
+      )
+    Addressable::URI.join(base_url, path).to_s
   end
 end

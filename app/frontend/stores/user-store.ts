@@ -108,9 +108,10 @@ export const UserStoreModel = types
       self.invitationResponse = response.data;
       return response.ok;
     }),
-    fetchInvitedUser: flow(function* (token: string) {
-      const { ok, data: response } = yield* toGenerator(self.environment.api.fetchInvitedUser(token));
+    fetchInvitedUser: flow(function* (token: string, programId) {
+      const { ok, data: response } = yield* toGenerator(self.environment.api.fetchInvitedUser(token, programId));
       if (ok) {
+        console.log(response.data);
         self.mergeUpdate(response.data, 'usersMap');
         self.invitedUser = response.data.id;
       }

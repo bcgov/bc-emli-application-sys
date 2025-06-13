@@ -53,20 +53,14 @@ class UserBlueprint < Blueprinter::Base
   view :invited_user do
     fields :email, :role
 
-    association :jurisdictions, blueprint: JurisdictionBlueprint, view: :minimal
-
     field :invited_by_email do |user, _options|
       user.invited_by&.email
     end
 
-    association :invited_to_jurisdiction,
-                blueprint: JurisdictionBlueprint,
+    association :invited_to_program,
+                blueprint: ProgramBlueprint,
                 view: :minimal do |user, _options|
-      user
-        .jurisdiction_memberships
-        &.order(updated_at: :desc)
-        &.first
-        &.jurisdiction
+      _options[:program]
     end
   end
 

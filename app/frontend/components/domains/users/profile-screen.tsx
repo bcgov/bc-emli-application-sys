@@ -83,7 +83,6 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
 
   const navigate = useNavigate();
   const onSubmit = async (formData) => {
-    console.log(formData);
     await updateProfile(formData);
     setIsEditingEmail(false);
     reset(getDefaults());

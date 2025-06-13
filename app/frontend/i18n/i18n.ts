@@ -2027,8 +2027,7 @@ const options = {
           addUser: 'Add more emails',
           invite: 'Invite',
           invitedBy: '<strong>{{email}}</strong> has invited you to join:',
-          invitedAsAdmin:
-            '<strong>{{email}}</strong> has invited you to join BC Building Permit Hub as an administrator',
+          invitedAsAdmin: '<strong>{{email}}</strong> has invited you to join {{program}} as a {{role}}',
           invitedAs: 'as a',
           invitationIntent:
             'This invitation is intended for <strong>{{email}}</strong>, if this is incorrect please contact the sender above.',

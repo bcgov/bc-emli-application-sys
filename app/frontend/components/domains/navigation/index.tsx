@@ -336,7 +336,7 @@ const AppRoutes = observer(() => {
   const enableStepCodeRoute = location.state?.enableStepCodeRoute;
 
   const { currentUser } = userStore;
-  const { afterLoginPath, setAfterLoginPath, resetAuth } = sessionStore;
+  const { afterLoginPath, setAfterLoginPath, resetAuth, entryPoint } = sessionStore;
 
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -345,7 +345,12 @@ const AppRoutes = observer(() => {
     if (tokenExpired) {
       resetAuth();
       setAfterLoginPath(location.pathname);
-      navigate('/login');
+      console.log('entry point value:', entryPoint);
+      if (entryPoint) {
+        navigate('/admin');
+      } else {
+        navigate('/login');
+      }
       uiStore.flashMessage.show(EFlashMessageStatus.warning, t('auth.tokenExpired'), null);
     }
   }, [tokenExpired]);
