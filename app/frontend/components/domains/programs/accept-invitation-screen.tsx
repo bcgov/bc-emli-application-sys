@@ -11,8 +11,9 @@ import { EUserRoles } from '../../../types/enums';
 import { LoadingScreen } from '../../shared/base/loading-screen';
 import { BusinessBCeIDInfo } from '../../shared/bceid/business';
 import { CenterContainer } from '../../shared/containers/center-container';
-import { HelpDrawer } from '../../shared/help-drawer';
+import { AdminPortalLogin, LoginForm } from '../admin/login';
 import { RouterLink } from '../../shared/navigation/router-link';
+import { storeEntryPoint } from '../../shared/store-entry-point';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 
 export const AcceptInvitationScreen = observer(() => {
@@ -27,7 +28,8 @@ export const AcceptInvitationScreen = observer(() => {
 
   useEffect(() => {
     const fetch = async () => {
-      const result = await fetchInvitedUser(invitationToken);
+      const result = await fetchInvitedUser(invitationToken, programId);
+
       if (!result) setInvalidToken(true);
     };
     fetch();
@@ -47,85 +49,75 @@ const Content = observer(function Content({ invitedUser }: Readonly<IProps>) {
   const { sessionStore } = useMst();
   const { loggedIn } = sessionStore;
 
-  const { invitedByEmail, invitedToJurisdiction, isSuperAdmin, email, role, jurisdiction } = invitedUser;
-  const defaultedJurisdiction = invitedToJurisdiction ?? jurisdiction;
+  const { invitedByEmail, invitedToProgram, email, role } = invitedUser;
+
+  const loginScreenProps = {
+    isAdmin: role === 'admin',
+    isAdminMgr: role === 'admin_manager',
+    isSysAdmin: role === 'system_admin',
+  };
+
+  // const loginKey = Object.keys(loginScreenProps).find((key) => loginScreenProps[key as keyof typeof loginScreenProps]);
+
+  // const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault(); // Prevent the default form submission
+
+  //   // Store the entry point in the session
+  //   await storeEntryPoint(loginKey);
+
+  //   // Submit the form after storing the entry point
+  //   (event.target as HTMLFormElement).submit();
+  // };
+
   return (
-    <CenterContainer>
-      <Flex
-        direction="column"
-        gap={6}
-        maxW="500px"
-        p={10}
-        border="solid 1px"
-        borderColor="border.light"
-        bg="greys.white"
-      >
-        <Heading as="h1">{t('user.acceptInvitation')}</Heading>
-        {invitedByEmail && defaultedJurisdiction ? (
-          <>
-            <Text>
-              <Trans i18nKey="user.invitedBy" values={{ email: invitedByEmail }} />
-            </Text>
+    <AdminPortalLogin
+      isAdmin={loginScreenProps.isAdmin}
+      isAdminMgr={loginScreenProps.isAdminMgr}
+      isSysAdmin={loginScreenProps.isSysAdmin}
+    />
+    // <CenterContainer>
+    //   <Flex
+    //     direction="column"
+    //     gap={6}
+    //     maxW="500px"
+    //     p={10}
+    //     border="solid 1px"
+    //     borderColor="border.light"
+    //     bg="greys.white"
+    //   >
+    //     <Heading as="h1">{t('user.acceptInvitation')}</Heading>
+    //     <>
+    //       <Text>
+    //         <Trans i18nKey="user.invitedBy" values={{ email: invitedByEmail }} />
+    //       </Text>
 
-            <VStack spacing={4} w="full" p={4} bg="theme.blueLight" rounded="sm" textAlign="center">
-              <Heading as="h2" m={0}>
-                {defaultedJurisdiction.qualifiedName}
-              </Heading>
-              <Text>{t('user.invitedAs')}</Text>
-              <Text fontWeight="bold">{t(`user.roles.${role as EUserRoles}`)}</Text>
-            </VStack>
-          </>
-        ) : (
-          isSuperAdmin && (
-            <Text>
-              <Trans i18nKey="user.invitedAsAdmin" values={{ email: invitedByEmail }} />
-            </Text>
-          )
-        )}
+    //       <VStack spacing={4} w="full" p={4} bg="theme.blueLight" rounded="sm" textAlign="center">
+    //         <Heading as="h2" m={0}>
+    //           {invitedToProgram.programName}
+    //         </Heading>
+    //         <Text>{t('user.invitedAs')}</Text>
+    //         <Text fontWeight="bold">{t(`user.roles.${role as EUserRoles}`)}</Text>
+    //       </VStack>
+    //     </>
 
-        <Text fontStyle="italic" fontSize="sm" textAlign="center">
-          <Trans i18nKey="user.invitationIntent" values={{ email }} />
-        </Text>
+    //     <Text fontStyle="italic" fontSize="sm" textAlign="center">
+    //       <Trans i18nKey="user.invitationIntent" values={{ email }} />
+    //     </Text>
 
-        <Divider my={4} />
+    //     <Divider my={4} />
 
-        {loggedIn ? (
-          <AcceptInviteForm />
-        ) : (
-          <>
-            <Heading as="h3" textAlign="center">
-              {t('user.createAccount')}
-            </Heading>
-            <form action={`/api/auth/keycloak`} method="post">
-              <input type="hidden" name="kc_idp_hint" value={isSuperAdmin ? 'idir' : 'bceidboth'} />
-              <input
-                type="hidden"
-                name="authenticity_token"
-                value={(document.querySelector('[name=csrf-token]') as HTMLMetaElement).content}
-              />
-              <Button variant="primary" w="full" type="submit">
-                {isSuperAdmin ? t('auth.idir_login') : t('auth.bceid_login')}
-              </Button>
-            </form>
-          </>
-        )}
-
-        {!isSuperAdmin && (
-          <>
-            <Divider my={4} />
-            <BusinessBCeIDInfo />
-
-            <HelpDrawer
-              renderTriggerButton={({ onClick }) => (
-                <Button variant="link" onClick={onClick}>
-                  {t('ui.help')}
-                </Button>
-              )}
-            />
-          </>
-        )}
-      </Flex>
-    </CenterContainer>
+    //     {loggedIn ? (
+    //       <AcceptInviteForm />
+    //     ) : (
+    //       <>
+    //         <Heading as="h3" textAlign="center">
+    //           {t('user.createAccount')}
+    //         </Heading>
+    //         <LoginForm handleSubmit={handleSubmit} />
+    //       </>
+    //     )}
+    //   </Flex>
+    // </CenterContainer>
   );
 });
 

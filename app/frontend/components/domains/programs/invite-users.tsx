@@ -54,8 +54,6 @@ export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
         inbox_access: formatInboxAccessForApi(row.inboxAccess as ClassificationPresetName[]),
       }));
 
-      console.log(apiRows);
-
       const result = await currentProgram.inviteUsers(apiRows);
 
       uiStore.flashMessage.show(

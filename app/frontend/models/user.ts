@@ -23,7 +23,7 @@ export const UserModel = types
     lastName: types.maybeNull(types.string),
     certified: types.maybeNull(types.boolean),
     organization: types.maybeNull(types.string),
-    jurisdictions: types.array(types.reference(types.late(() => JurisdictionModel))),
+    //jurisdictions: types.optional(types.array(types.reference(types.late(() => JurisdictionModel))), []),
     createdAt: types.maybeNull(types.Date),
     confirmationSentAt: types.maybeNull(types.Date),
     confirmedAt: types.maybeNull(types.Date),
@@ -31,9 +31,9 @@ export const UserModel = types
     lastSignInAt: types.maybeNull(types.Date),
     eulaAccepted: types.maybeNull(types.boolean),
     invitedByEmail: types.maybeNull(types.string),
-    reviewed: types.boolean,
-    preference: types.frozen<IPreference>(),
-    invitedToJurisdiction: types.maybeNull(types.frozen<IJurisdiction>()),
+    reviewed: types.maybeNull(types.boolean),
+    preference: types.maybeNull(types.frozen<IPreference>()),
+    invitedToProgram: types.maybeNull(types.frozen<IProgram>()),
     licenseAgreements: types.maybeNull(types.frozen<ILicenseAgreement[]>()),
     physicalAddress: types.maybeNull(AddressModel),
     mailingAddress: types.maybeNull(AddressModel),
@@ -47,9 +47,6 @@ export const UserModel = types
     get isSystemAdmin() {
       return self.role == EUserRoles.systemAdmin;
     },
-    // get isPSR() {
-    //   return self.role == EUserRoles.participantSupportRep;
-    // },
     get isContractor() {
       return self.role == EUserRoles.contractor;
     },

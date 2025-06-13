@@ -26,17 +26,12 @@ class OmniauthUserResolver
   }
 
   def resolve_user
-    if should_promote_user?
-      result = PromoteUser.new(existing_user:, invited_user:).call
-      self.invited_user = result.existing_user
-    end
-
     accept_invitation_with_omniauth if invited_user.present?
 
     if existing_user
       self.user = update_user
     else
-      self.user = invited_user || create_user
+      self.user = invited_user # || create_user
     end
 
     self.error_key = error_message_key unless user&.valid? && user&.persisted?
@@ -86,8 +81,6 @@ class OmniauthUserResolver
 
     selected_role = entry_points[@entry_point] || :unassigned
 
-    Rails.logger.info("Role: #{selected_role}")
-
     user =
       User.new(
         password: Devise.friendly_token[0, 20],
@@ -105,7 +98,6 @@ class OmniauthUserResolver
     # skip confirmation until user has a chance to add/verify their notification email
     user.skip_confirmation_notification!
 
-    Rails.logger.info("Auth Provider: #{omniauth_provider}")
     # Skip validation initially, so we can add addresses first
     if user.save(validate: false)
       #if omniauth_provider == ENV["KEYCLOAK_CLIENT"]
@@ -133,7 +125,10 @@ class OmniauthUserResolver
       omniauth_provider:,
       omniauth_uid:,
       omniauth_email:,
-      omniauth_username:
+      omniauth_username:,
+      first_name: omniauth_givenname,
+      last_name: omniauth_familyname,
+      confirmed_at: Time.current
     )
     invited_user.accept_invitation! if invited_user.valid?
   end
@@ -150,7 +145,6 @@ class OmniauthUserResolver
   end
 
   def omniauth_provider
-    #Rails.logger.info("RawInfo: #{raw_info}")
     @provider ||=
       case raw_info.identity_provider
       when OMNIAUTH_PROVIDERS[:bceid_business]
@@ -168,7 +162,6 @@ class OmniauthUserResolver
   end
 
   def omniauth_uid
-    Rails.logger.info("RawInfo: #{raw_info}")
     @uid ||=
       case raw_info.identity_provider
       when ENV["KEYCLOAK_CLIENT"]

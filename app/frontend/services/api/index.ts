@@ -136,8 +136,8 @@ export class Api {
     return this.client.post<IAcceptInvitationResponse>(`/users/${userId}/accept_invitation`, params);
   }
 
-  async fetchInvitedUser(token: string) {
-    return this.client.get<ApiResponse<IUser>>(`/invitations/${token}`);
+  async fetchInvitedUser(token: string, programId) {
+    return this.client.get<ApiResponse<IUser>>(`/programs/${programId}/invitations/${token}`);
   }
 
   async searchPrograms(params?: TSearchParams<EProgramSortFields, IJurisdictionSearchFilters>) {

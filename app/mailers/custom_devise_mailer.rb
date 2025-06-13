@@ -9,6 +9,14 @@ class CustomDeviseMailer < Devise::Mailer
     super
   end
 
+  def invitation_instructions(record, token, opts = {})
+    @token = token
+    @user = record
+    @program_id = opts[:program_id]
+    @role_text = opts[:role_text]
+    devise_mail(record, :invitation_instructions, opts)
+  end
+
   def devise_mail(record, action, opts = {}, &block)
     initialize_from_record(record)
     mail_headers = headers_for(action, opts)

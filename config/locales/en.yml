@@ -35,6 +35,14 @@ en:
         phone: 'Phone no.'
       requirement_template:
         first_nations: 'First Nations'
+      user:
+        roles:
+          admin_manager: 'Admin Manager'
+          admin: 'Admin'
+          contractor: 'Contractor'
+          participant: 'Participant'
+          system_admin: 'System Admin'
+          unassigned: 'Unassigned'
     errors:
       models:
         early_access_preview:

@@ -3,11 +3,12 @@ class Api::InvitationsController < ApplicationController
   respond_to :json
 
   before_action :authenticate_user!, except: %i[show]
-  before_action :set_current_program
+  before_action :set_current_program, only: %i[show create]
   before_action :find_invited_user, only: %i[show]
 
   def create
-    Rails.logger.info(`users_params: #{users_params.inspect}`)
+    @program = Program.find(params[:program_id])
+
     inviter =
       Program::UserInviter.new(
         inviter: current_user,
@@ -23,13 +24,15 @@ class Api::InvitationsController < ApplicationController
   end
 
   def show
+    @program = Program.find(params[:program_id])
     if @invited_user
       render_success @invited_user,
                      nil,
                      {
                        blueprint: UserBlueprint,
                        blueprint_opts: {
-                         view: :invited_user
+                         view: :invited_user,
+                         program: @program
                        }
                      }
     else
@@ -48,7 +51,6 @@ class Api::InvitationsController < ApplicationController
   end
 
   def users_params
-    Rails.logger.info("user_params: #{params[:users].inspect}")
     params
       .require(:users)
       .map do |user_param|
@@ -61,8 +63,7 @@ class Api::InvitationsController < ApplicationController
   end
 
   def find_invited_user
-    @invited_user =
-      User.find_by_invitation_token(params[:invitation_token], true)
+    @invited_user = User.find_by_invitation_token(params[:id], true)
   end
 
   def render_accept_invite_error(resource)

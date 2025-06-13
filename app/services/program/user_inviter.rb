@@ -32,14 +32,11 @@ class Program::UserInviter
       if reinvited
         Current.user = inviter
         user.update!(role: role) if inviter.invitable_roles.include?(role.to_s)
-        user.skip_confirmation_notification!
-        user.invite!(inviter)
+        force_invite!(user, inviter, program: @program, role: role)
         self.results[:reinvited] << user
       else
-        user = User.new(email: email, role: role, discarded_at: nil)
-        user.skip_confirmation_notification!
-        user.save!
-        user.invite!(inviter)
+        user = User.create!(email: email, role: role, discarded_at: nil)
+        force_invite!(user, inviter, program: @program, role: role)
         self.results[:invited] << user
       end
 
@@ -77,5 +74,33 @@ class Program::UserInviter
         )
       end
     end
+  end
+
+  def force_invite!(user, inviter, program:, role:)
+    # Associate the inviter and set invitation timestamps
+    user.assign_attributes(
+      invited_by: inviter,
+      invitation_created_at: Time.current,
+      invitation_sent_at: Time.current
+    )
+
+    # Generate a new secure random token and hash it for storage
+    token = Devise.friendly_token
+    user.invitation_token =
+      Devise.token_generator.digest(User, :invitation_token, token)
+
+    # Suppress Devise's default confirmation email (we're only inviting)
+    user.skip_confirmation_notification!
+
+    # Save the user without validation
+    user.save!(validate: false)
+
+    # Send the custom invitation email with program ID and friendly role text
+    CustomDeviseMailer.invitation_instructions(
+      user,
+      token,
+      program_id: program.id,
+      role_text: User.human_attribute_name("roles.#{role}")
+    ).deliver_later
   end
 end
