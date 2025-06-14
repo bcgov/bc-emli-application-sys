@@ -159,7 +159,7 @@ en:
       notify_preview: 'You’re Invited to Preview a Building Permit Template'
       notify_batched_integration_mapping: 'New API mappings'
       notify_application_withdrawn: 'Application %{permit_application_number} withdrawn'
-      notify_application_ineligible: 'Application %{permit_application_number} is Ineligible'
+      notify_application_ineligible: 'Application %{permit_application_number} is ineligible'
   arbitrary_message_construct:
     devise:
       failure:
