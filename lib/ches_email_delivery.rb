@@ -2,6 +2,7 @@ class ChesEmailDelivery
   attr_accessor :config, :client, :bearer_token, :delivery_method
 
   def initialize(config)
+    Rails.logger.info "[CHES] Initialized with config: #{config}"
     @config = config
 
     obtain_bearer_token
@@ -14,6 +15,7 @@ class ChesEmailDelivery
   end
 
   def deliver!(mail)
+    Rails.logger.info "[CHES] Delivering email to #{mail.to}"
     ensure_ches_token_is_valid_and_health_check_passes
     params = {
       to: mail.to,
