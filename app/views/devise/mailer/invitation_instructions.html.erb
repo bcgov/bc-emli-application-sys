@@ -11,9 +11,8 @@
           <p>You’ve been invited to join the Energy Savings Program as a <%= @role_text %></p>
 
           <p>
-            Click <%= link_to 'here',
-                        "#{@root_url}programs/#{@program_id}/accept-invitation?invitation_token=#{@token}",
-                        %> to log in and get started.
+            Click <%= link_to 'here', 
+              "#{@root_url}programs/#{@program_id}/accept-invitation?invitation_token=#{@token}" %> to log in and get started.
           </p>
 
           <p>Thank you,<br/>
