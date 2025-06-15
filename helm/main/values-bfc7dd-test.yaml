@@ -44,6 +44,7 @@ sidekiq:
 
   env:
     'APP_DOMAIN': 'test-hesp.apps.silver.devops.gov.bc.ca'
+    'FROM_EMAIL': 'no-reply@gov.bc.ca'
 
 anycable-rpc:
   enabled: true
