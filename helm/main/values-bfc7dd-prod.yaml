@@ -42,7 +42,8 @@ sidekiq:
       cpu: 100m
       memory: 256Mi
 
-  env: {}
+  env:
+    'APP_DOMAIN': 'hesp.apps.silver.devops.gov.bc.ca'
 
 anycable-rpc:
   enabled: true

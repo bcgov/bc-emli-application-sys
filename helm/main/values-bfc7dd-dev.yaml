@@ -17,14 +17,14 @@ app:
       memory: 512Mi
 
   env:
-    "APP_DOMAIN": "dev-hesp.apps.silver.devops.gov.bc.ca"
-    "ANYCABLE_URL": "wss://dev-hesp-anycable.apps.silver.devops.gov.bc.ca/cable"
-    "KEYCLOAK_AUTH_URL": "https://dev.loginproxy.gov.bc.ca/"
-    "VITE_SITEMINDER_LOGOUT_URL": "https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi"
-    "VITE_BCEID_URL": "https://www.development.bceid.ca"
-    "VITE_BUSINESS_BCEID_REGISTRATION_URL": "https://www.development.bceid.ca/register/business/getting_started/getting_started.aspx"
-    "VITE_KEYCLOAK_LOGOUT_URL": "https://dev.loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/logout"
-    "VITE_POST_LOGOUT_REDIRECT_URL": "https://dev-hesp.apps.silver.devops.gov.bc.ca"
+    'APP_DOMAIN': 'dev-hesp.apps.silver.devops.gov.bc.ca'
+    'ANYCABLE_URL': 'wss://dev-hesp-anycable.apps.silver.devops.gov.bc.ca/cable'
+    'KEYCLOAK_AUTH_URL': 'https://dev.loginproxy.gov.bc.ca/'
+    'VITE_SITEMINDER_LOGOUT_URL': 'https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi'
+    'VITE_BCEID_URL': 'https://www.development.bceid.ca'
+    'VITE_BUSINESS_BCEID_REGISTRATION_URL': 'https://www.development.bceid.ca/register/business/getting_started/getting_started.aspx'
+    'VITE_KEYCLOAK_LOGOUT_URL': 'https://dev.loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/logout'
+    'VITE_POST_LOGOUT_REDIRECT_URL': 'https://dev-hesp.apps.silver.devops.gov.bc.ca'
 
   route:
     enabled: true
@@ -42,7 +42,8 @@ sidekiq:
       cpu: 100m
       memory: 256Mi
 
-  env: {}
+  env:
+    'APP_DOMAIN': 'dev-hesp.apps.silver.devops.gov.bc.ca'
 
 anycable-rpc:
   enabled: true
@@ -77,7 +78,7 @@ crunchy-postgres:
         memory: 32Mi
 
   pgBackRest:
-    retention: "1"
+    retention: '1'
     repos:
       volume:
         storage: 256Mi
@@ -98,13 +99,6 @@ crunchy-postgres:
         min_wal_size: 32MB
         max_wal_size: 64MB # default is 1GB
         max_slot_wal_keep_size: 128MB # default is -1, allowing unlimited wal growth when replicas fall behind
-
-  proxy:
-    pgBouncer:
-      replicas: 1
-      requests:
-        cpu: 10m
-        memory: 64Mi
 
   proxy:
     pgBouncer:
