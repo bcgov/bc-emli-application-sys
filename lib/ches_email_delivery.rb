@@ -30,11 +30,16 @@ class ChesEmailDelivery
       bodyType: body_type(mail)
     }
 
+    Rails.logger.debug "[CHES] Request params: #{params}"
     response = client.post("email", params.to_json)
 
     if response.success?
       body = JSON.parse(response.body)
+      Rails.logger.info "[CHES] Email sent successfully. msgId=#{body.dig("messages", 0, "msgId")}"
       return body.dig("messages", 0, "msgId")
+    else
+      Rails.logger.error "[CHES] Failed to send email: #{response.status} #{response.body}"
+      #raise "CHES email delivery failed: #{response.status} #{response.body}"
     end
   end
 
@@ -66,6 +71,7 @@ class ChesEmailDelivery
       obtain_bearer_token
       ensure_ches_token_is_valid_and_health_check_passes
     else
+      Rails.logger.error "ERROR: CHES Healthcheck failed - check with bcgov service status"
       raise "ERROR: CHES Healthcheck failed - check with bcgov service status"
     end
   end
@@ -90,6 +96,7 @@ class ChesEmailDelivery
       body = JSON.parse(response.body)
       self.bearer_token = body["access_token"]
     else
+      Rails.logger.error "Error: Unable to authenticate with CHES - check ENV vars"
       raise "Error: Unable to authenticate with CHES - check ENV vars"
     end
   end
