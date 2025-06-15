@@ -30,7 +30,7 @@ class ChesEmailDelivery
       bodyType: body_type(mail)
     }
 
-    Rails.logger.debug "[CHES] Request params: #{params}"
+    # Rails.logger.debug "[CHES] Request params: #{params}"
     response = client.post("email", params.to_json)
 
     if response.success?
