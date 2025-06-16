@@ -159,59 +159,10 @@
         border: none;
       }
 
-      .footer-table {
-        width: 600px;
-        background: #F2F2F2;
-      }
-
-      .footer-cell {
-        padding: 32px 32px 24px 32px;
-      }
-
-      .footer-cell p {
-        font-family: 'BC Sans', 'Segoe UI', Arial, sans-serif;
-        font-size: 14px;
-        line-height: 20px;
-        color: #464341;
-        margin: 0 0 16px 0;
-      }
-
-      .footer-cell p:last-child {
-        margin-bottom: 0;
-      }
-
-      .footer-cell h3 {
-        font-family: 'BC Sans', 'Segoe UI', Arial, sans-serif;
-        font-weight: 700;
-        font-size: 16px;
-        line-height: 20px;
-        color: #292929;
-        margin: 24px 0 16px 0;
-      }
-
-      .footer-cell a {
-        color: #464341;
-        text-decoration: underline;
-      }
-
-      .footer-links {
-        margin: 0 0 24px 0;
-      }
-
-      .footer-links a {
-        margin-right: 20px;
-      }
-
-      .footer-divider {
-        border-top: 1px solid #464341;
-        margin: 24px 0 16px 0;
-      }
-
       @media only screen and (max-width: 620px) {
         .email-container,
         .header-table,
-        .content-table,
-        .footer-table {
+        .content-table {
           width: 100% !important;
         }
 
@@ -227,8 +178,7 @@
           padding: 16px 16px 16px 8px !important;
         }
 
-        .content-cell,
-        .footer-cell {
+        .content-cell {
           padding: 16px !important;
         }
 
@@ -255,11 +205,6 @@
           display: block !important;
           width: 100% !important;
           box-sizing: border-box;
-        }
-
-        .footer-links a {
-          display: block !important;
-          margin: 0 0 8px 0 !important;
         }
       }
     </style>
@@ -295,39 +240,6 @@
             <tr>
               <td class="content-cell">
                 <%= yield %>
-              </td>
-            </tr>
-          </table>
-
-          <!-- Footer -->
-          <table class="footer-table" cellpadding="0" cellspacing="0" border="0" role="presentation">
-            <tr>
-              <td class="footer-cell">
-                <p>
-                  This is an automated message, please do not hit reply. If you have questions, please email
-                  <a href="mailto:betterHomesESP@clearesult.com">betterHomesESP@clearesult.com</a>.
-                </p>
-                <p>
-                  You are receiving this email because you are registered on
-                  <a href="https://www.betterhomesbc.ca/">Better Homes Energy Savings Program</a>.
-                </p>
-                <p>
-                  The B.C. Public Service acknowledges the territories of
-                  First Nations around B.C. and is grateful to carry out our
-                  work on these lands. We acknowledge the rights, interests,
-                  priorities, and concerns of all Indigenous Peoples - First
-                  Nations, Métis, and Inuit - respecting and acknowledging
-                  their distinct cultures, histories, rights, laws, and
-                  governments.
-                </p>
-                <h3>Better Homes Energy Savings Program</h3>
-                <div class="footer-links">
-                  <a href="<%= @root_url %>">Home</a>
-                  <a href="<%= FrontendUrlHelper.frontend_url("/get-support") %>">Get Support</a>              
-                  <a href="<%= FrontendUrlHelper.frontend_url("/login") %>">Login</a>
-                </div>
-                <div class="footer-divider"></div>
-                <p>© <%= Time.now.year.to_s %> Government of British Columbia.</p>
               </td>
             </tr>
           </table>
