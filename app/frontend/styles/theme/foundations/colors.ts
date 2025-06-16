@@ -10,6 +10,7 @@ export const colors = {
     blueAlt: '#005C97',
     blueLight: '#ECF6FF',
     blueLightBg: '#E4F2FF',
+    blueLight02: '#F1F8FE',
     blueButtonHover: '#1E5189',
     blueText: '#053662',
     primary100: '#234075',

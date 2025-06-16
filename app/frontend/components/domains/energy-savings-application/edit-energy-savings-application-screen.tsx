@@ -308,12 +308,12 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               <EnergySavingsApplicationStatusTag energySavingsApplication={currentPermitApplication} />
               <Flex direction="column" w="full">
                 {/* <form>
-                  <Tooltip label={t('energySavingsApplication.edit.clickToWriteNickname')} placement="top-start">
+                  <Tooltip label={t('permitApplication.edit.clickToWriteNickname')} placement="top-start">
                     <Box>
                       <EditableInputWithControls
                         w="full"
-                        initialHint={t('energySavingsApplication.edit.clickToWriteNickname')}
-                        value={currentPermitApplication.fullAddress || ''}
+                        initialHint={t('permitApplication.edit.clickToWriteNickname')}
+                        value={nicknameWatch || ''}
                         isDisabled={!doesUserHaveSubmissionPermission || isSubmitted}
                         controlsProps={{
                           iconButtonProps: {
@@ -353,7 +353,11 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 <Heading fontSize="xl" as="h3">
                   {currentPermitApplication.fullAddress}
                 </Heading>
-                <Text noOfLines={1}>{currentPermitApplication.nickname}</Text>
+                <Text noOfLines={1}>
+                  {currentPermitApplication?.nickname !== 'undefined undefined'
+                    ? currentPermitApplication.nickname
+                    : 'Address Not Available'}
+                </Text>
                 <HStack>
                   <CopyableValue
                     textTransform={'uppercase'}

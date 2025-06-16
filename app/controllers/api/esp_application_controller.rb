@@ -27,7 +27,6 @@ class Api::EspApplicationController < Api::ApplicationController
   def set_resources
     # Handles both nested and flat JSON params
     app_params = params[:esp_application]
-
     if app_params.blank?
       render json: {
                error: "Request body is missing or malformed"
@@ -36,15 +35,27 @@ class Api::EspApplicationController < Api::ApplicationController
       return
     end
 
-    @user_group_type = UserGroupType.find_by(code: :participant)
-    @audience_type = AudienceType.find_by(code: :external)
-    @submission_type = SubmissionType.find_by(code: :application)
+    @user_group_type = UserGroupType.find_by(code: app_params[:user_group_type])
+    @audience_type = AudienceType.find_by(code: app_params[:audience_type])
+    @submission_type =
+      SubmissionType.find_by(code: app_params[:submission_type])
 
-    @program = Program.find_by!(slug: "energy-savings-program")
+    if @user_group_type.blank? || @audience_type.blank? ||
+         @submission_type.blank?
+      render json: {
+               error:
+                 "Invalid user_group_type, audience_type, or submission_type"
+             },
+             status: :bad_request
+      return
+    end
+
+    @program = Program.find_by!(slug: app_params[:slug])
     @user = User.find(app_params[:user_id])
 
     @nickname =
-      app_params[:nickname] || "#{program&.program_name} #{SecureRandom.hex(4)}"
+      app_params[:nickname] ||
+        "#{@program&.program_name} #{SecureRandom.hex(4)}"
 
     begin
       requirement =
@@ -59,7 +70,6 @@ class Api::EspApplicationController < Api::ApplicationController
         "application_controller.participant_application_not_found",
         status: :not_found
       ) and return
-      return
     end
 
     begin
@@ -73,7 +83,6 @@ class Api::EspApplicationController < Api::ApplicationController
         "application_controller.participant_application_not_published",
         status: :not_found
       ) and return
-      return
     end
   end
 end

@@ -1080,6 +1080,11 @@ const options = {
             jurisdiction: 'Jurisdiction',
           },
           new: {
+            fillApplication: "Select an application to fill out on someone's behalf:",
+            program: 'Program',
+            lastUpdated: 'Last updated:',
+            startApplication: 'Start an application',
+            noTemplate: 'No templates available for this program.',
             sucessfulSubmission: 'Application submitted',
             viewAllSubmissions: 'View all submissions',
             locationHeading: 'Location for permit',

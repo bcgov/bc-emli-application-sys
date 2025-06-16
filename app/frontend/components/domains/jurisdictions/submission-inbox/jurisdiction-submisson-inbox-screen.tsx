@@ -54,50 +54,11 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
 
   const { currentProgram, error } = useProgram();
 
-  const {
-    getUserTypeIdByCode,
-    getSubmissionTypeIdByCode,
-    getAudienceTypeIdByCode,
-    getAllSubmissionTypeIds,
-    getSubmissionTypeById,
-    getSubmissionTypeIdsExceptOnboarding,
-  } = permitClassificationStore;
-
   type FetchOptionI = {
     userGroupType: string;
     AudienceType: string;
     SubmissionType: string[] | string;
   };
-
-  // Retained for future use: Contractor submission inbox. Refer to commit history prior to May 7th for changes
-  const fetchOptionsTypes = useCallback(async (): Promise<IOption<FetchOptionI>[]> => {
-    return [
-      {
-        label: t('energySavingsApplication.submissionInbox.participantSubmission'),
-        value: {
-          userGroupType: getUserTypeIdByCode(EPermitClassificationCode.participant),
-          AudienceType: getAudienceTypeIdByCode(EPermitClassificationCode.internal),
-          SubmissionType: getAllSubmissionTypeIds(),
-        },
-      },
-      {
-        label: t('energySavingsApplication.submissionInbox.contractorSubmission'),
-        value: {
-          userGroupType: getUserTypeIdByCode(EPermitClassificationCode.contractor),
-          AudienceType: getAudienceTypeIdByCode(EPermitClassificationCode.internal),
-          SubmissionType: getSubmissionTypeIdsExceptOnboarding(),
-        },
-      },
-      {
-        label: t('energySavingsApplication.submissionInbox.contractorOnboarding'),
-        value: {
-          userGroupType: getUserTypeIdByCode(EPermitClassificationCode.contractor),
-          AudienceType: getAudienceTypeIdByCode(EPermitClassificationCode.internal),
-          SubmissionType: getSubmissionTypeIdByCode(EPermitClassificationCode.onboarding),
-        },
-      },
-    ];
-  }, [getUserTypeIdByCode, getAudienceTypeIdByCode, getAllSubmissionTypeIds, getSubmissionTypeIdsExceptOnboarding]);
 
   const handleChange = (selectedOption) => {
     setUserGroupFilter(selectedOption?.userGroupType);
@@ -105,18 +66,6 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
     setSubmissionTypeFilter(selectedOption?.SubmissionType);
     search();
   };
-
-  // Fetch submission options and program options separately
-  const fetchSubmissionOptions = useCallback(async () => {
-    try {
-      const result = await fetchOptionsTypes();
-      setUserGroupFilter(result[0].value.userGroupType);
-      setAudienceTypeFilter(result[0].value.AudienceType);
-      setSubmissionTypeFilter(result[0].value.SubmissionType);
-    } catch (error) {
-      console.error('Failed to fetch submission options', error);
-    }
-  }, [permitClassificationStore, t]);
 
   const loadProgramOptions = useCallback(async () => {
     try {
@@ -130,7 +79,6 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
         response.map((p) => p.value),
         'programMap',
       );
-      await fetchSubmissionOptions();
       if (options.length > 0) {
         const firstOption = options[0];
         methods.setValue('programId', firstOption.value);
@@ -139,7 +87,7 @@ export const JurisdictionSubmissionInboxScreen = observer(function JurisdictionS
     } catch (error) {
       console.error('Failed to fetch program options', error);
     }
-  }, [fetchProgramOptions, programStore, methods, fetchSubmissionOptions, t]);
+  }, [fetchProgramOptions, programStore, methods, t]);
 
   const handleProgramChange = (programId) => {
     programStore.setCurrentProgram(programId);

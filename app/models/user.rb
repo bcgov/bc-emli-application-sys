@@ -220,11 +220,35 @@ class User < ApplicationRecord
     programs.pluck(:id)
   end
 
+  # def active_programs
+  #   program_memberships
+  #     .where(deactivated_at: nil)
+  #     .includes(:program)
+  #     .map(&:program)
+  # end
+
   def active_programs
-    program_memberships
-      .where(deactivated_at: nil)
-      .includes(:program)
-      .map(&:program)
+    active_programs =
+      program_memberships
+        .where(deactivated_at: nil)
+        .includes(:program)
+        .map(&:program)
+
+    programs_with_requirements =
+      active_programs.map do |program|
+        {
+          program: program,
+          requirement_templates:
+            RequirementTemplate
+              .where(program_id: program.id)
+              .distinct
+              .map do |template|
+                { template: template, requirements: template.requirements }
+              end
+        }
+      end
+
+    programs_with_requirements
   end
 
   def blueprint

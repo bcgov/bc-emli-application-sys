@@ -298,11 +298,13 @@ export class Api {
   }
 
   async createPermitApplication(params: TCreatePermitApplicationFormData) {
-    return this.client.post<ApiResponse<IPermitApplication>>('/permit_applications', { permitApplication: params });
+    return this.client.post<ApiResponse<IEnergySavingsApplication>>('/permit_applications', {
+      permitApplication: params,
+    });
   }
 
   async createEnergyApplication(params: TCreateEnergyApplicationFormData) {
-    return this.client.post<ApiResponse<IPermitApplication>>('/esp_application', params, {
+    return this.client.post<ApiResponse<IEnergySavingsApplication>>('/esp_application', params, {
       headers: {
         'Content-Type': 'application/json',
       },
