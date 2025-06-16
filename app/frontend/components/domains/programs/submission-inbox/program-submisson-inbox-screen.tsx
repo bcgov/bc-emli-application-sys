@@ -87,9 +87,9 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
         );
         return;
       }
-      const options = activePrograms.map((program) => ({
-        label: program.programName,
-        value: program.id,
+      const options = activePrograms.map((data) => ({
+        label: data.program.programName,
+        value: data.program.id,
       }));
       setProgramOptions(options);
 

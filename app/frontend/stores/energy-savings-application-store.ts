@@ -50,7 +50,6 @@ export const PermitApplicationStoreModel = types
       ]),
       userGroupTypeIdFilter: types.maybeNull(types.string),
       submissionTypeIdFilter: types.maybeNull(types.array(types.string)),
-
       audienceTypeIdFilter: types.maybeNull(types.string),
       submitterFilter: types.maybeNull(types.string),
       auditUserFilter: types.maybeNull(types.string),
@@ -236,6 +235,7 @@ export const PermitApplicationStoreModel = types
       self.audienceTypeIdFilter = id;
     },
   }))
+
   .actions((self) => ({
     getEphemeralPermitApplication(
       requirementTemplate: IRequirementTemplate,
