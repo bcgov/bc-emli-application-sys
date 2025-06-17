@@ -1,13 +1,23 @@
 class NotificationPolicy < ApplicationPolicy
   def index?
-    true
+    authenticated?
   end
 
   def reset_last_read?
-    true
+    authenticated?
   end
 
   def destroy?
-    true
+    authenticated?
+  end
+
+  def clear_all?
+    authenticated?
+  end
+
+  private
+
+  def authenticated?
+    user.present?
   end
 end

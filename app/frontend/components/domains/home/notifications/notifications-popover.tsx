@@ -43,21 +43,28 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
     generateSpecificLinkData,
     getSemanticKey,
     deleteNotification,
+    clearAllNotifications,
   } = notificationStore;
 
   useEffect(() => {
     initialFetch();
-  }, []);
+  }, [initialFetch]);
 
-  const { isOpen, handleOpen, handleClose, numberJustRead, showRead, setShowRead } = useNotificationPopover();
+  const { isOpen, handleOpen, handleClose, numberJustRead, showRead, setShowRead, setNumberJustRead } =
+    useNotificationPopover();
 
   const { t } = useTranslation();
 
   const notificationsToShow = showRead ? notifications : notifications.slice(0, numberJustRead);
 
   const handleDeleteNotification = (notificationId: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent any parent click handlers
+    e.stopPropagation();
     deleteNotification(notificationId);
+  };
+
+  const handleClearAllNotifications = () => {
+    clearAllNotifications();
+    setNumberJustRead(0);
   };
 
   return (
@@ -91,15 +98,18 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
           <PopoverArrow />
           <PopoverCloseButton mt={1} />
           <PopoverHeader>
-            <Flex gap={4}>
-              <Heading as="h3" fontSize="lg" mb={0}>
-                {t('notification.title')}
-              </Heading>
-              {numberJustRead > 0 && (
-                <Badge fontWeight="normal" textTransform="lowercase">
-                  {t('notification.nUnread', { n: numberJustRead })}
-                </Badge>
-              )}
+            <Flex gap={4} justifyContent="space-between" alignItems="center">
+              <Flex gap={4} alignItems="center">
+                <Heading as="h3" fontSize="lg" mb={0}>
+                  {t('notification.title')}
+                </Heading>
+                {/* Use numberJustRead for the popover header badge */}
+                {numberJustRead > 0 && (
+                  <Badge fontWeight="normal" textTransform="lowercase">
+                    {t('notification.nUnread', { n: numberJustRead })}
+                  </Badge>
+                )}
+              </Flex>
             </Flex>
           </PopoverHeader>
           <PopoverBody p={4} maxH="50vh" overflow="auto">
@@ -145,21 +155,29 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
               )}
             </Flex>
           </PopoverBody>
-          <PopoverFooter border={0} padding={2}>
-            {/* Only show "See more" if there are notifications and either:
-                1. We're showing only unread and there are read notifications, OR
-                2. We're showing all but there are more pages */}
+          <PopoverFooter border={0} padding={2} display="flex" justifyContent="space-between" alignItems="center">
+            {/* "See more" button container */}
             {notifications.length > 0 &&
-              ((!showRead && notifications.length > numberJustRead) ||
-                (showRead && notificationStore.page < notificationStore.totalPages)) && (
-                <Button
-                  variant="ghost"
-                  leftIcon={<CaretDown />}
-                  onClick={showRead ? fetchNotifications : () => setShowRead(true)}
-                >
-                  {t('ui.seeMore')}
-                </Button>
-              )}
+            ((!showRead && notifications.length > numberJustRead) ||
+              (showRead && notificationStore.page < notificationStore.totalPages)) ? (
+              <Button
+                variant="ghost"
+                leftIcon={<CaretDown />}
+                onClick={showRead ? fetchNotifications : () => setShowRead(true)}
+                size="sm"
+              >
+                {t('ui.seeMore', 'See more')}
+              </Button>
+            ) : (
+              <Box /> /* Placeholder to keep "Clear All" on the right if "See more" is hidden */
+            )}
+
+            {/* "Clear All" button */}
+            {notifications.length > 0 && (
+              <Button variant="outline" colorScheme="red" size="sm" onClick={handleClearAllNotifications}>
+                {t('notification.clearAll')}
+              </Button>
+            )}
           </PopoverFooter>
         </PopoverContent>
       </Portal>

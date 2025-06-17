@@ -36,4 +36,10 @@ class Api::NotificationsController < Api::ApplicationController
       render_error nil, nil, { error: result[:error] }
     end
   end
+
+  def clear_all
+    authorize :notification, :clear_all?
+    NotificationService.clear_all_user_notifications(current_user.id)
+    render_success nil, nil
+  end
 end

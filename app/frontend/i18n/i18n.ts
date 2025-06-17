@@ -475,6 +475,7 @@ const options = {
           title: 'Notifications',
           nUnread: '{{ n }} new',
           noUnread: 'No unread notifications',
+          clearAll: 'Clear All',
         },
         eula: {
           title: 'Terms and Conditions',

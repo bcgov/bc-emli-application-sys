@@ -1,54 +1,58 @@
-import React, { createContext, useContext, useState } from "react"
-import { useMst } from "../setup/root"
+import React, { createContext, useContext, useState } from 'react';
+import { useMst } from '../setup/root';
 
 interface PopoverContextProps {
-  isOpen: boolean
-  handleOpen: () => void
-  handleClose: () => void
-  numberJustRead: number
-  showRead: boolean
-  setShowRead: (boolean) => void
+  isOpen: boolean;
+  handleOpen: () => void;
+  handleClose: () => void;
+  numberJustRead: number;
+  showRead: boolean;
+  setShowRead: (boolean) => void;
+  setNumberJustRead: (n: number) => void;
 }
 
-const PopoverContext = createContext<PopoverContextProps | undefined>(undefined)
+const PopoverContext = createContext<PopoverContextProps | undefined>(undefined);
 
 interface IPopoverProvider {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export const PopoverProvider: React.FC<IPopoverProvider> = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [showRead, setShowRead] = useState<boolean>(false)
-  const [numberJustRead, setNumberJustRead] = useState<number>()
+  const [isOpen, setIsOpen] = useState(false);
+  const [showRead, setShowRead] = useState<boolean>(false);
+  const [numberJustRead, setNumberJustRead] = useState<number>(0);
 
-  const onOpen = () => setIsOpen(true)
-  const onClose = () => setIsOpen(false)
-
-  const { notificationStore } = useMst()
-  const { unreadNotificationsCount, markAllAsRead } = notificationStore
+  const { notificationStore } = useMst();
+  const { unreadNotificationsCount, markAllAsRead, setPopoverOpen } = notificationStore;
 
   const handleOpen = () => {
-    onOpen()
-    setNumberJustRead(unreadNotificationsCount)
-    markAllAsRead()
-  }
+    setIsOpen(true);
+    setPopoverOpen(true);
+    setNumberJustRead(unreadNotificationsCount);
+    if (unreadNotificationsCount > 0) {
+      markAllAsRead();
+    }
+  };
 
   const handleClose = () => {
-    setShowRead(false)
-    onClose()
-  }
+    setIsOpen(false);
+    setPopoverOpen(false);
+    setShowRead(false);
+  };
 
   return (
-    <PopoverContext.Provider value={{ isOpen, handleOpen, handleClose, numberJustRead, showRead, setShowRead }}>
+    <PopoverContext.Provider
+      value={{ isOpen, handleOpen, handleClose, numberJustRead, showRead, setShowRead, setNumberJustRead }}
+    >
       {children}
     </PopoverContext.Provider>
-  )
-}
+  );
+};
 
 export const useNotificationPopover = () => {
-  const context = useContext(PopoverContext)
+  const context = useContext(PopoverContext);
   if (!context) {
-    throw new Error("usePopover must be used within a PopoverProvider")
+    throw new Error('useNotificationPopover must be used within a PopoverProvider');
   }
-  return context
-}
+  return context;
+};
