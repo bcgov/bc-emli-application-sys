@@ -373,12 +373,20 @@ class NotificationService
     { success: false, error: e.message }
   end
 
-  private
+  def self.clear_all_user_notifications(user_id)
+    activity = SimpleFeed.user_feed.activity(user_id)
+    activity.wipe
+    activity.reset_last_read
+    { success: true }
+  rescue StandardError => e
+    Rails.logger.error "Failed to clear all notifications for user #{user_id}: #{e.message}"
+    { success: false, error: e.message }
+  end
 
   # this is just a wrapper around the activity's metadata methods
   # since in the case of a single instance it returns a specific return type (eg. Integer)
   # but in the case of multiple user_ids the activity is a hash object
-  def self.activity_metadata(user_id, activity_obj, method)
+  private_class_method def self.activity_metadata(user_id, activity_obj, method)
     metadata = activity_obj.send(method)
     metadata.is_a?(Hash) ? metadata[user_id] : metadata
   end

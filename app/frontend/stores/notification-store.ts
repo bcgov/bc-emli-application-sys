@@ -200,9 +200,25 @@ export const NotificationStoreModel = types
     }),
 
     markAllAsRead: flow(function* () {
-      const { ok } = yield* toGenerator(self.environment.api.resetLastReadNotifications());
-      if (ok) {
-        self.unreadNotificationsCount = 0;
+      try {
+        const apiCallPromise = self.environment.api.resetLastReadNotifications();
+
+        if (!apiCallPromise || typeof apiCallPromise.then !== 'function') {
+          console.error(
+            '[Error] markAllAsRead: api.resetLastReadNotifications() did not return a Promise',
+            apiCallPromise,
+          );
+          return;
+        }
+
+        const response = yield* toGenerator(apiCallPromise);
+        if (response.ok) {
+          self.unreadNotificationsCount = 0;
+        } else {
+          console.error('[Error] markAllAsRead: API call failed', response);
+        }
+      } catch (e) {
+        console.error('[Error] markAllAsRead: Unexpected error', e);
       }
     }),
 
@@ -210,22 +226,19 @@ export const NotificationStoreModel = types
       // Optimistically remove from frontend first for immediate feedback
       const notificationIndex = self.notifications.findIndex((n) => n.id === notificationId);
       let removedNotification = null;
-      let wasUnread = false; // Track if this was an unread notification
+      let wasUnread = false;
 
       if (notificationIndex >= 0) {
         removedNotification = self.notifications[notificationIndex];
-        // Check if this notification was unread BEFORE modifying the array
         wasUnread = notificationIndex < self.unreadNotificationsCount;
 
         self.notifications.splice(notificationIndex, 1);
 
-        // Update unread count if this was an unread notification
         if (wasUnread) {
           self.unreadNotificationsCount = Math.max(0, self.unreadNotificationsCount - 1);
         }
       }
 
-      // Make API call to delete from backend
       try {
         const response = yield* toGenerator(self.environment.api.deleteNotification(notificationId));
 
@@ -247,17 +260,31 @@ export const NotificationStoreModel = types
         }
       }
     }),
+
+    clearAllNotifications: flow(function* () {
+      try {
+        const response = yield* toGenerator(self.environment.api.clearAllNotifications());
+
+        if (response.ok) {
+          self.notifications.clear();
+          self.unreadNotificationsCount = 0;
+        } else {
+          console.error('[Error] clearAllNotifications: API call failed', response);
+        }
+      } catch (error) {
+        console.error('[Error] clearAllNotifications: Unexpected error', error);
+      }
+    }),
   }))
   .actions((self) => ({
     initialFetch: flow(function* () {
       yield* toGenerator(self.fetchNotifications());
     }),
-    processWebsocketChange: flow(function* (payload: IUserPushPayload) {
+    processWebsocketChange: (payload: IUserPushPayload) => {
       self.notifications.unshift(self.convertNotificationToUseDate(payload.data));
       self.unreadNotificationsCount = self.popoverOpen ? 0 : payload.meta.unreadCount;
       self.totalPages = payload.meta.totalPages;
-      yield;
-    }),
+    },
   }));
 
 const criticalNotificationTypes = [ENotificationActionType.applicationRevisionsRequest];

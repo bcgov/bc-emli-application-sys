@@ -65,6 +65,7 @@ Rails.application.routes.draw do
       post "reset_last_read",
            on: :collection,
            to: "notifications#reset_last_read"
+      delete "clear_all", on: :collection, to: "notifications#clear_all"
     end
 
     resources :requirement_templates, only: %i[show create destroy update] do

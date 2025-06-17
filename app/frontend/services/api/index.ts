@@ -811,6 +811,10 @@ export class Api {
     return this.client.delete(`/notifications/${notificationId}`);
   }
 
+  async clearAllNotifications() {
+    return this.client.delete<ApiResponse<null>>('/notifications/clear_all');
+  }
+
   async resetLastReadNotifications() {
     return this.client.post(`/notifications/reset_last_read`);
   }
