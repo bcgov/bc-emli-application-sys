@@ -52,7 +52,7 @@ export const PopoverProvider: React.FC<IPopoverProvider> = ({ children }) => {
 export const useNotificationPopover = () => {
   const context = useContext(PopoverContext);
   if (!context) {
-    throw new Error('usePopover must be used within a PopoverProvider');
+    throw new Error('useNotificationPopover must be used within a PopoverProvider');
   }
   return context;
 };
