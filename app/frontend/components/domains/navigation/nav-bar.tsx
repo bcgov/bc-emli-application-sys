@@ -299,7 +299,7 @@ const NavBarMenu = observer(function NavBarMenu() {
     <MenuGroup>
       <NavMenuItem label={t('home.submissionInboxTitle')} to={'/submission-inbox'} />
       <NavMenuItem label={t('site.newApplication')} to={`/applications/new`} />
-      <NavMenuItem label={t('home.viewBlankApplicationsTitle')} to={`/view-blank-applications`} />
+      <NavMenuItem label={t('home.viewBlankApplicationsTitle')} to={`/blank-applications`} />
       <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/applications'} />
       <NavMenuItem label={t('home.configureUsersTitle')} to={'/configure-users'} />
     </MenuGroup>
