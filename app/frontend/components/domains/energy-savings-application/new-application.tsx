@@ -1,13 +1,15 @@
 import { observer } from 'mobx-react-lite';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Button, Container, Flex, Heading, Text, VStack } from '@chakra-ui/react';
 import { BlueTitleBar } from '../../shared/base/blue-title-bar';
-import { EFlashMessageStatus, EPermitClassificationCode } from '../../../types/enums';
+import { EFlashMessageStatus, EPermitClassificationCode, EUserRoles } from '../../../types/enums';
 import { usePermitClassificationsLoad } from '../../../hooks/resources/use-permit-classifications-load';
+import { TemplateVersionsSidebar } from '../requirement-template/template-versions-sidebar';
+import { VersionTag } from '../../shared/version-tag';
 
 interface INewApplicationScreenProps {}
 
@@ -22,12 +24,12 @@ export type TCreateEnergyApplicationFormData = {
 
 export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) => {
   const { t } = useTranslation();
-  const [isCreating, setIsCreating] = useState(false);
 
   const { permitApplicationStore, userStore, uiStore, permitClassificationStore } = useMst();
   const { getAudienceTypeIdByCode } = permitClassificationStore;
   const { currentUser } = userStore;
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { isLoaded: isPermitClassificationsLoaded } = usePermitClassificationsLoad();
 
   const [audienceTypeId, setaudienceTypeId] = useState<string | null>(null);
@@ -45,24 +47,24 @@ export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) =>
     },
   });
 
-  const handleCreatePermitApplication = async (slug: string) => {
-    setIsCreating(true);
-    console.log('currentUser:', currentUser);
+  const handleCreatePermitApplication = async (slug, template) => {
     const nickname = currentUser.physicalAddress?.streetAddress + ' ' + currentUser.physicalAddress?.locality;
     const params = {
       user_id: currentUser.id,
       nickname: nickname,
       user_group_type: EPermitClassificationCode.participant,
       audience_type:
-        currentUser.role === 'participant' ? EPermitClassificationCode.external : EPermitClassificationCode.internal,
+        currentUser.role === EUserRoles.participant
+          ? EPermitClassificationCode.external
+          : EPermitClassificationCode.internal,
       submission_type: EPermitClassificationCode.application,
       slug: slug,
     };
 
     const permitApplicationId = await permitApplicationStore.createEnergyApplication(params);
-
     if (permitApplicationId) {
-      navigate(`/applications/${permitApplicationId}/edit`);
+      const isBlankApplication = pathname === '/blank-applications';
+      navigate(`/applications/${permitApplicationId}/edit${isBlankApplication ? '?is_blank=true' : ''}`);
     } else {
       navigate(`/`);
     }
@@ -86,7 +88,7 @@ export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) =>
   }, [userStore, uiStore, t]);
 
   useEffect(() => {
-    if (currentUser.role !== 'participant') {
+    if (currentUser.role !== EUserRoles.participant) {
       loadProgramOptions();
     } else {
       handleCreatePermitApplication('energy-savings-program');
@@ -146,7 +148,7 @@ export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) =>
                 {selectedProgramData?.requirementTemplates.length > 0 ? (
                   selectedProgramData.requirementTemplates.map(({ template }, idx) => {
                     return (
-                      template.audienceTypeId === audienceTypeId && (
+                      (pathname === '/blank-applications' || template.audienceTypeId === audienceTypeId) && (
                         <Box key={template.id} p={8} border="1px solid" borderColor="gray.200" borderRadius="md">
                           <Flex
                             direction={{ base: 'column', md: 'row' }}
@@ -155,20 +157,29 @@ export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) =>
                             wrap="wrap"
                           >
                             <Box mb={{ base: 4, md: 0 }}>
-                              <Heading size="md" color="blue.700" mb={1}>
-                                {template.nickname || template.description || `Form ${idx + 1}`}
+                              <Heading size="md" color="theme.blueAlt" mb={1}>
+                                {template.nickname || `Form ${idx + 1}`}
                               </Heading>
-                              <Text fontSize="sm" color="gray.600">
-                                {t('energySavingsApplication.new.lastUpdated')}{' '}
-                                {new Date(template.updated_at).toLocaleDateString()}
-                              </Text>
+                              <Flex mt={4}>
+                                <Text fontWeight="bold" color="gray.600" fontSize="sm">
+                                  {t('energySavingsApplication.new.lastUpdated')}
+                                </Text>
+                                <Text fontSize="sm" ml={2}>
+                                  {new Date(template.updatedAt).toLocaleDateString('en-US')}
+                                </Text>
+                                {/* {template.publishedTemplateVersion?.versionDate ? (
+                                  <VersionTag versionDate={template.publishedTemplateVersion.versionDate} />
+                                ) : null} */}
+                              </Flex>
                             </Box>
                             <Button
                               variant="primary"
                               mt={{ base: 4, md: 0 }}
-                              onClick={() => handleCreatePermitApplication(selectedProgramData?.program.slug)}
+                              onClick={() => handleCreatePermitApplication(selectedProgramData?.program.slug, template)}
                             >
-                              {t('energySavingsApplication.new.startApplication')}
+                              {pathname === '/blank-applications'
+                                ? t('ui.view')
+                                : t('energySavingsApplication.new.startApplication')}
                             </Button>
                           </Flex>
                         </Box>

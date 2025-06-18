@@ -1,15 +1,4 @@
-import {
-  Box,
-  Button,
-  Container,
-  Flex,
-  FormControl,
-  FormLabel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-} from '@chakra-ui/react';
+import { Box, Button, Container, Flex, FormControl, FormLabel } from '@chakra-ui/react';
 import { CaretDown, Funnel } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
@@ -20,7 +9,12 @@ import { useResetQueryParams } from '../../../hooks/use-reset-query-params';
 import { useSearch } from '../../../hooks/use-search';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { useMst } from '../../../setup/root';
-import { EPermitApplicationStatusGroup, EPermitApplicationSubmitterSortFields } from '../../../types/enums';
+import {
+  EPermitApplicationStatusGroup,
+  EPermitApplicationSubmitterSortFields,
+  EPermitClassificationCode,
+  EUserRoles,
+} from '../../../types/enums';
 import { BlueTitleBar } from '../../shared/base/blue-title-bar';
 import { Paginator } from '../../shared/base/inputs/paginator';
 import { PerPageSelect } from '../../shared/base/inputs/per-page-select';
@@ -31,12 +25,13 @@ import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { SortSelect } from '../../shared/select/selectors/sort-select';
 import { PermitApplicationStatusTabs } from '../../shared/energy-savings-applications/permit-application-status-tabs';
 import { EnergySavingsApplicationFilter } from '../../shared/energy-savings-applications/energy-savings-application-filter';
+import { useLocation } from 'react-router-dom';
 
 interface IEnergySavingsApplicationIndexScreenProps {}
 
 export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsApplicationIndexScreenProps) => {
   const { t } = useTranslation();
-  const { permitApplicationStore, sandboxStore } = useMst();
+  const { permitApplicationStore, sandboxStore, userStore } = useMst();
   const {
     tablePermitApplications,
     currentPage,
@@ -51,12 +46,22 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
   } = permitApplicationStore;
 
   const { currentSandboxId } = sandboxStore;
-
+  const location = useLocation();
   const query = useQuery();
+  const currentUser = userStore.currentUser;
 
+  const { setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, search } = permitApplicationStore;
   const requirementTemplateId = query.get('requirementTemplateId');
   const templateVersionId = query.get('templateVersionId');
   const filters = t('energySavingsApplication.filter', { returnObjects: true }) as { [key: string]: string };
+
+  setUserGroupFilter(EPermitClassificationCode.participant);
+  setAudienceTypeFilter(
+    currentUser.role === EUserRoles.participant
+      ? EPermitClassificationCode.external
+      : EPermitClassificationCode.internal,
+  );
+  setSubmissionTypeFilter(EPermitClassificationCode.application);
 
   useSearch(permitApplicationStore, [
     requirementTemplateId || '',
@@ -69,7 +74,13 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
   return (
     <Flex as="main" direction="column" w="full" bg="greys.white" pb="24">
       {/* <PermitApplicationStatusTabs /> */}
-      <BlueTitleBar title={t('energySavingsApplication.indexTitle')} />
+      <BlueTitleBar
+        title={
+          location.pathname.endsWith('/supported-applications')
+            ? t('site.breadcrumb.supportedApplications')
+            : t('site.myApplications')
+        }
+      />
       <Container maxW="container.lg" pb={4}>
         <Flex as="section" direction="column" p={6} gap={6} flex={1}>
           <Flex

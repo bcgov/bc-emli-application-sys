@@ -1133,8 +1133,10 @@ const options = {
             whatsNextTitle: "What's next?",
             ready: 'Ready to submit this application?',
             bySubmitting: 'By submitting this application',
+            confirmationOnBehalf:
+              'I confirm that the information provided is accurate to the best of my knowledge. The applicant has given consent for me to submit this application on their behalf.',
             confirmation:
-              'You confirm that the information you provided was completed to the best of your knowledge and ability',
+              'By submitting this application you confirm that the information you provided was completed to the best of your knowledge and ability',
             yourReference: 'Share the application ID: #{{ number }}',
             noContactsAvailable:
               'This jurisdiction is not ready to accept applications through this tool yet. Please check with your local jurisdiction.',
@@ -2705,6 +2707,8 @@ const options = {
             editTemplate: 'Edit template',
             editPermit: 'Edit permit',
             applications: 'Applications',
+            supportedApplications: 'View supported applications',
+            blankApplications: ' View blank applications',
             submissionInbox: 'Submissions inbox',
             configuration: 'Configure jurisdiction',
             sucessfulSubmission: 'Application submitted',

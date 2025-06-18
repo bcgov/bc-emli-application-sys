@@ -26,7 +26,7 @@ import * as R from 'ramda';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { requirementTypeToFormioType } from '../../../constants';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
 import { useInterval } from '../../../hooks/use-interval';
@@ -88,6 +88,9 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
   } = useDisclosure();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const isBlank = queryParams.get('is_blank') === 'true';
 
   const handlePermitApplicationUpdate = (_event: ICustomEventMap[ECustomEvents.handlePermitApplicationUpdate]) => {
     if (formRef.current) {
@@ -494,6 +497,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               isEditing={currentPermitApplication?.isDraft || currentPermitApplication?.isRevisionsRequested}
               renderSaveButton={() => !currentPermitApplication?.isIneligible && <SaveButton handleSave={handleSave} />}
               updateCollaborationAssignmentNodes={updateRequirementBlockAssignmentNode}
+              isBlank={isBlank}
             />
           </Flex>
         )}

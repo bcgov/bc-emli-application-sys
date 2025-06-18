@@ -9,21 +9,21 @@ import {
   OrderedList,
   Text,
   useDisclosure,
-} from "@chakra-ui/react"
-import { CaretDown, CaretUp, Warning } from "@phosphor-icons/react"
-import * as R from "ramda"
-import React from "react"
-import { useTranslation } from "react-i18next"
-import { ICompareRequirementsBoxData, ICompareRequirementsBoxDiff } from "../../../types/types"
-import { ScrollLink } from "../../shared/energy-savings-applications/scroll-link"
-import { RouterLinkButton } from "../../shared/navigation/router-link-button"
+} from '@chakra-ui/react';
+import { CaretDown, CaretUp, Warning } from '@phosphor-icons/react';
+import * as R from 'ramda';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { ICompareRequirementsBoxData, ICompareRequirementsBoxDiff } from '../../../types/types';
+import { ScrollLink } from '../../shared/energy-savings-applications/scroll-link';
+import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 
 interface ICompareRequirementsBoxDataProps {
-  data: ICompareRequirementsBoxDiff
-  handleUpdatePermitApplicationVersion?: () => void
-  showingCompareAfter?: boolean
-  handleClickDismiss?: () => void
-  isUpdatable?: boolean
+  data: ICompareRequirementsBoxDiff;
+  handleUpdatePermitApplicationVersion?: () => void;
+  showingCompareAfter?: boolean;
+  handleClickDismiss?: () => void;
+  isUpdatable?: boolean;
 }
 
 export const CompareRequirementsBox = ({
@@ -33,16 +33,16 @@ export const CompareRequirementsBox = ({
   handleClickDismiss,
   isUpdatable,
 }: ICompareRequirementsBoxDataProps) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
-  const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: true })
+  const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: true });
   return (
     <Flex
       direction="column"
-      key={"template-changes"}
-      bgColor={"semantic.warningLight"}
-      borderColor={"semantic.warning"}
-      borderWidth={"1px"}
+      key={'template-changes'}
+      bgColor={'semantic.warningLight'}
+      borderColor={'semantic.warning'}
+      borderWidth={'1px'}
       borderRadius="lg"
       minH="200px"
       maxH="calc(80vh - 250px)"
@@ -60,21 +60,21 @@ export const CompareRequirementsBox = ({
       <Box p={4}>
         <Flex direction="column">
           <Flex align="center" justify="space-between">
-            <Box color={"semantic.warning"}>
-              <Warning size={24} aria-label={"warning icon"} />
+            <Box color={'theme.orange'}>
+              <Warning size={24} aria-label={'warning icon'} />
             </Box>
 
             {(data.added || data.changed || data.removed) && (
-              <Heading as="h3" mb="0" fontSize="xl" overflowWrap={"break-word"}>
-                {t("requirementTemplate.edit.diffBox.title")}
+              <Heading as="h3" mb="0" fontSize="xl" overflowWrap={'break-word'}>
+                {t('requirementTemplate.edit.diffBox.title')}
               </Heading>
             )}
             <IconButton
               onClick={onToggle}
               icon={isOpen ? <CaretUp /> : <CaretDown />}
-              variant={"secondary"}
-              size={"sm"}
-              aria-label={"Open errors"}
+              variant={'secondary'}
+              size={'sm'}
+              aria-label={'Open errors'}
             ></IconButton>
           </Flex>
           {isUpdatable ? (
@@ -85,30 +85,30 @@ export const CompareRequirementsBox = ({
               color="greys.white"
               onClick={showingCompareAfter ? handleClickDismiss : handleUpdatePermitApplicationVersion}
             >
-              {showingCompareAfter ? t("ui.dismiss") : t("requirementTemplate.edit.diffBox.updateToNewVersion")}
+              {showingCompareAfter ? t('ui.dismiss') : t('requirementTemplate.edit.diffBox.updateToNewVersion')}
             </Button>
           ) : (
             <RouterLinkButton to="#" alignSelf="center" mt={2} color="greys.white">
-              {t("ui.dismiss")}
+              {t('ui.dismiss')}
             </RouterLinkButton>
           )}
         </Flex>
       </Box>
       <Box
         p={4}
-        display={isOpen ? "block" : "none"}
+        display={isOpen ? 'block' : 'none'}
         borderTop="1px solid"
         borderColor="semantic.warning"
         overflow="auto"
       >
         <Text fontSize="sm" mt="2">
-          {t("requirementTemplate.edit.diffBox.instructions")}
+          {t('requirementTemplate.edit.diffBox.instructions')}
         </Text>
 
         <Flex direction="column" mt={4}>
           {(showingCompareAfter || !isUpdatable) && (
             <>
-              <Heading as="h3">{t("requirementTemplate.edit.diffBox.added")}</Heading>
+              <Heading as="h3">{t('requirementTemplate.edit.diffBox.added')}</Heading>
               <Divider borderColor="black" my={0} />
               <CompareRequirementsList data={data.added} />
             </>
@@ -116,7 +116,7 @@ export const CompareRequirementsBox = ({
 
           {
             <>
-              <Heading as="h3">{t("requirementTemplate.edit.diffBox.changed")}</Heading>
+              <Heading as="h3">{t('requirementTemplate.edit.diffBox.changed')}</Heading>
               <Divider borderColor="black" my={0} />
               <CompareRequirementsList data={data.changed} />
             </>
@@ -124,7 +124,7 @@ export const CompareRequirementsBox = ({
 
           {!showingCompareAfter && (
             <>
-              <Heading as="h3">{t("requirementTemplate.edit.diffBox.removed")}</Heading>
+              <Heading as="h3">{t('requirementTemplate.edit.diffBox.removed')}</Heading>
               <Divider borderColor="black" my={0} />
               <CompareRequirementsList data={data.removed} />
             </>
@@ -132,29 +132,29 @@ export const CompareRequirementsBox = ({
         </Flex>
       </Box>
     </Flex>
-  )
-}
+  );
+};
 
 interface ICompareRequirementsListProps {
-  data: ICompareRequirementsBoxData[]
+  data: ICompareRequirementsBoxData[];
 }
 
 const CompareRequirementsList: React.FC<ICompareRequirementsListProps> = ({ data }) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
-  if (R.isEmpty(data)) return <Text mb={6}>{t("ui.notApplicable")}</Text>
+  if (R.isEmpty(data)) return <Text mb={6}>{t('ui.notApplicable')}</Text>;
 
   const partitionedData = data.reduce(
     (acc, item) => {
-      const section = item.diffSectionLabel
+      const section = item.diffSectionLabel;
       if (!acc[section]) {
-        acc[section] = []
+        acc[section] = [];
       }
-      acc[section].push(item)
-      return acc
+      acc[section].push(item);
+      return acc;
     },
-    {} as Record<string, ICompareRequirementsBoxData[]>
-  )
+    {} as Record<string, ICompareRequirementsBoxData[]>,
+  );
 
   return (
     <>
@@ -168,8 +168,8 @@ const CompareRequirementsList: React.FC<ICompareRequirementsListProps> = ({ data
             ml="0"
             fontSize="sm"
             sx={{
-              "li a": {
-                color: "text.primary",
+              'li a': {
+                color: 'text.primary',
               },
             }}
           >
@@ -184,5 +184,5 @@ const CompareRequirementsList: React.FC<ICompareRequirementsListProps> = ({ data
         </Box>
       ))}
     </>
-  )
-}
+  );
+};

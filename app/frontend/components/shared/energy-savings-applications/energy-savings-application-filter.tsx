@@ -29,9 +29,9 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
   const currentUser = userStore.currentUser;
   const { t } = useTranslation();
   const queryParams = new URLSearchParams(location.search);
-  const paramStatusFilterString = queryParams.get('status') || t('energySavingsApplication.statusGroup.filter');
+  const paramStatusFilterString = queryParams.get('status');
 
-  const paramStatusFilter = paramStatusFilterString.split(',') as TFilterableStatus[]; // Filter parameters
+  const paramStatusFilter = paramStatusFilterString?.split(',') as TFilterableStatus[];
   const [selectedFilterLabel, setSelectedFilterLabel] = useState<string>(
     t('energySavingsApplication.statusGroup.filter'),
   );
@@ -125,25 +125,13 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
 
   // Handle reset functionality
   const handleResetFilters = () => {
-    setSelectedFilters(statusGroups.map((group) => group.toString()));
-    setStatusFilter(statusGroups.flatMap(mapFilterToStatusArray));
+    setSelectedFilters([]);
+    setStatusFilter([]);
     search(); // Trigger search with default filters
     const newParams = new URLSearchParams(location.search);
     newParams.delete('status');
     window.history.replaceState(null, '', '?' + newParams.toString());
   };
-
-  useEffect(() => {
-    let label: string = '';
-    // If there are selected filters, show the number of selected filters
-    if (selectedFilters.length === 0) {
-      label = t('energySavingsApplication.statusGroup.filter');
-    } else {
-      label = `${t('energySavingsApplication.statusGroup.filter')} (${selectedFilters.length})`;
-    }
-
-    setSelectedFilterLabel(label);
-  }, [selectedFilters, t]);
 
   useEffect(() => {
     //functionality to handle filters When first time page loads
@@ -182,18 +170,20 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
           whiteSpace="normal"
           wordBreak="break-word"
         >
-          {selectedFilterLabel}
+          {selectedFilters?.length > 0
+            ? `${t('energySavingsApplication.statusGroup.filter')} (${selectedFilters.length})`
+            : t('energySavingsApplication.statusGroup.filter')}
         </MenuButton>
         <MenuList>
           {statusGroups.map((filterValue) => (
             <MenuItem
               key={filterValue}
               onClick={() => {
-                const isSelected = selectedFilters.includes(filterValue);
+                const isSelected = selectedFilters?.includes(filterValue);
                 handleFilterSelect(filterValue, !isSelected);
               }}
             >
-              <Checkbox isChecked={selectedFilters.includes(filterValue)} pointerEvents="none">
+              <Checkbox isChecked={selectedFilters?.includes(filterValue)} pointerEvents="none">
                 {filterValue === EPermitApplicationStatusGroup.submitted &&
                 [EUserRoles.admin, EUserRoles.adminManager].includes(currentUser.role)
                   ? t(`energySavingsApplication.status.unread`)

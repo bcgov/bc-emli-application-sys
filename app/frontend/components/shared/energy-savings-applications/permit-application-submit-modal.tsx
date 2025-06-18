@@ -20,6 +20,8 @@ import { useTranslation } from 'react-i18next';
 import { IPermitApplication } from '../../../models/energy-savings-application';
 import { useMst } from '../../../setup/root';
 import SandboxHeader from '../sandbox/sandbox-header';
+import { EUserRoles } from '../../../types/enums';
+import { Warning } from '@phosphor-icons/react';
 
 interface IProps {
   permitApplication: IPermitApplication;
@@ -34,7 +36,7 @@ export const PermitApplicationSubmitModal = observer(function PermitApplicationS
   onSubmit,
   onClose,
 }: IProps) {
-  const { userStore } = useMst();
+  const { userStore, permitApplicationStore } = useMst();
   const currentUser = userStore.currentUser;
   const { t } = useTranslation();
 
@@ -59,26 +61,36 @@ export const PermitApplicationSubmitModal = observer(function PermitApplicationS
         <ModalBody py={6}>
           {permitApplication.canUserSubmit(currentUser) ? (
             <Flex direction="column" gap={8}>
-              <Heading as="h3">{t('permitApplication.new.ready')}</Heading>
+              <Heading as="h3" color="theme.blueAlt">
+                {currentUser.role === EUserRoles.participant
+                  ? t('energySavingsApplication.new.ready')
+                  : 'Ready to submit on someone’s behalf?'}
+              </Heading>
               <Box
                 borderRadius="md"
                 border="1px solid"
-                borderColor="semantic.warning"
+                borderColor="theme.orange"
                 backgroundColor="semantic.warningLight"
                 px={6}
                 py={3}
               >
-                <Heading as="h3" fontSize="lg">
-                  {t('permitApplication.new.bySubmitting')}
-                </Heading>
-                <Text>{t('permitApplication.new.confirmation')}</Text>
+                <HStack spacing={4}>
+                  <Box color={'theme.orange'} alignSelf={'start'}>
+                    <Warning size={24} aria-label={'warning icon'} />
+                  </Box>
+                  <Text>
+                    {currentUser.role == EUserRoles.participant
+                      ? t('energySavingsApplication.new.confirmation')
+                      : t('energySavingsApplication.new.confirmationOnBehalf')}
+                  </Text>
+                </HStack>
               </Box>
               <Flex justify="center" gap={6}>
                 <Button onClick={onSubmit} variant="primary">
                   {t('ui.submit')}
                 </Button>
                 <Button onClick={onClose} variant="secondary">
-                  {t('ui.neverMind')}
+                  {t('ui.cancel')}
                 </Button>
               </Flex>
             </Flex>
@@ -106,19 +118,19 @@ const CollaboratorSubmitBlockModalContent = observer(function CollaboratorSubmit
   return (
     <VStack spacing={8} textAlign={'center'}>
       <Heading as="h3" fontSize={'2xl'}>
-        {t('permitApplication.submissionBlockModal.title')}
+        {t('energySavingsApplication.submissionBlockModal.title')}
       </Heading>
-      <Text textAlign={'center'}> {t('permitApplication.submissionBlockModal.description')}</Text>
+      <Text textAlign={'center'}> {t('energySavingsApplication.submissionBlockModal.description')}</Text>
 
       <HStack justifyContent={'center'} w={'full'} spacing={6} alignItems={'stretch'}>
         <CollaboratorSubmitBlockModalCard
-          title={t('permitApplication.submissionBlockModal.designatedSubmitter')}
+          title={t('energySavingsApplication.submissionBlockModal.designatedSubmitter')}
           name={delegatee?.name}
           organization={delegatee?.organization}
         />
 
         <CollaboratorSubmitBlockModalCard
-          title={t('permitApplication.submissionBlockModal.author')}
+          title={t('energySavingsApplication.submissionBlockModal.author')}
           name={submitter?.name}
           organization={submitter?.organization || 'some organization'}
         />
