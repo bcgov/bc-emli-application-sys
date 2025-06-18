@@ -79,20 +79,23 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
     >
       {energySavingsApplication.sandbox && <SandboxHeader override sandbox={energySavingsApplication.sandbox} />}
       <Flex flexDirection={{ base: 'column', md: 'row' }} gap={6} w="full">
-        <Show above="md">
-          <Flex direction="column" flex={{ base: 0, md: 1 }} maxW={{ base: '100%', md: '20%' }} justifyContent="center">
+        <Flex
+          display={{ base: 'none', md: 'flex' }}
+          direction="column"
+          flex={{ base: 0, md: 1 }}
+          maxW={{ base: '100%', md: '20%' }}
+          justifyContent="center"
+        >
+          <Box position="relative" w="full" h="full">
             <Image
-              p={2}
               src="/images/permit_classifications/low_residential.png"
               alt={`thumbnail for ${nickname}`}
               bg="semantic.infoLight"
               objectFit="contain"
+              boxSize="100%"
             />
-            {/* <Text align="center" mt="1" color="text.secondary" fontSize="sm" fontWeight="bold" lineHeight="1.2">
-                {permitTypeAndActivity}
-              </Text> */}
-          </Flex>
-        </Show>
+          </Box>
+        </Flex>
         <Show below="md">
           <Flex justify="space-between" alignItems="center">
             <Image
@@ -107,19 +110,6 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
           </Flex>
         </Show>
         <Flex direction="column" gap={2} flex={{ base: 0, md: 5 }} maxW={{ base: '100%', md: '75%' }}>
-          {/* Commented for future reference */}
-          {/* {showNewVersionWarning && (
-            <Flex bg="semantic.warning" {...calloutBannerContainerProps}>
-              <Warning size={14} />
-              <Text {...calloutBannerTextProps}>
-                <Text as="span" fontWeight="bold">
-                  {t('ui.actionRequired')}
-                </Text>
-                {': '}
-                {t('energySavingsApplication.newVersionPublished')}
-              </Text>
-            </Flex>
-          )} */}
           {isSubmissionCollaboration && (
             <Flex bg="semantic.info" color={'white'} {...calloutBannerContainerProps}>
               <Info size={14} />
@@ -140,25 +130,6 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
             </Flex>
           )}
           <Flex direction="column" flex={1} gap={2}>
-            {/* Commented as per new design- */}
-            {/* <RouterLinkButton
-              variant="link"
-              whiteSpace="normal"
-              overflowWrap="break-word"
-              fontSize="lg"
-              fontWeight="bold"
-              color="text.link"
-              to={`/permit-applications/${id}/edit`}
-              rightIcon={<CaretRight size={16} />}
-            >
-              {nickname}
-            </RouterLinkButton> */}
-            {/* <Flex bg="#F8BB47" p={2} alignItems="center" gap={1} borderRadius={4}>
-              <Warning size={16} />
-              <Text>
-                <b>Action required:</b> Please review the changes an agent made to your application.  
-              </Text>
-            </Flex> */}
             {energySavingsApplication.status === EPermitApplicationStatus.revisionsRequested && (
               <Flex bg="theme.orange" p={2} borderRadius={4} alignItems={'center'}>
                 <Box>
@@ -231,19 +202,6 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
               )}
             </Flex>
           </Flex>
-          {/* Links commented as per design changes  */}
-          {/* <Flex direction={{ base: "column", md: "row" }} gap={4}>
-            <Link href={t("energySavingsApplication.seeBestPractices_link")} isExternal>
-              {t("energySavingsApplication.seeBestPractices_CTA")}
-              <ArrowSquareOut />
-            </Link>
-            <Show above="md">
-              <Text>{"  |  "}</Text>
-            </Show>
-            <Link href={t("energySavingsApplication.searchKnowledge_link")} isExternal>
-              {t("energySavingsApplication.searchKnowledge_CTA")} <ArrowSquareOut />
-            </Link>
-          </Flex> */}
         </Flex>
         <Flex direction="column" align="flex-end" gap={4} flex={{ base: 0, md: 1 }} maxW={{ base: '100%', md: '25%' }}>
           <Show above="md">

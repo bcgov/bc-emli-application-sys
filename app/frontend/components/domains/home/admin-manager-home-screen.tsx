@@ -21,9 +21,11 @@ import { useTranslation } from 'react-i18next';
 import { IHomeScreenProps } from '.';
 import { BlueTitleBar } from '../../shared/base/blue-title-bar';
 import { HomeScreenBox } from './home-screen-box';
+import { useMst } from '../../../setup/root';
 
 export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
   const { t } = useTranslation();
+  const { permitApplicationStore } = useMst();
 
   return (
     <Flex as="main" direction="column" w="full" bg="greys.white" pb="16">
@@ -48,13 +50,13 @@ export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               title={t('home.viewBlankApplicationsTitle')}
               description=""
               icon={<MagnifyingGlass size={24} />}
-              href="/view-blank-applications"
+              href="/blank-applications"
             />
             <HomeScreenBox
               title={t('home.viewSupportedApplicationsTitle')}
               description=""
               icon={<ClipboardText size={24} />}
-              href="/applications"
+              href="/supported-applications"
             />
             <HomeScreenBox
               title={t('home.configureUsersTitle')}

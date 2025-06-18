@@ -10,6 +10,8 @@ import { ContactCard } from '../../shared/jurisdiction/contact-card';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import SandboxHeader from '../../shared/sandbox/sandbox-header';
 import { useLocation } from 'react-router-dom';
+import { EUserRoles } from '../../../types/enums';
+import { useMst } from '../../../setup/root';
 
 export const SuccessfulSubmissionScreen = observer(() => {
   const { t } = useTranslation();
@@ -21,6 +23,9 @@ export const SuccessfulSubmissionScreen = observer(() => {
   if (!currentPermitApplication?.isFullyLoaded) return <LoadingScreen />;
 
   const { program, number } = currentPermitApplication;
+  const { userStore } = useMst();
+
+  const currentUser = userStore.currentUser;
   return (
     <Container maxW="container.lg">
       <Flex direction="column" align="center" my={24} gap={8}>
@@ -34,7 +39,10 @@ export const SuccessfulSubmissionScreen = observer(() => {
             {t('energySavingsApplication.new.yourReference', { number })}
           </Tag>
         </VStack>
-        <RouterLinkButton to={`/`} variant="primary">
+        <RouterLinkButton
+          to={currentUser.role == EUserRoles.participant ? `/applications` : '/supported-applications'}
+          variant="primary"
+        >
           {t('energySavingsApplication.new.viewAllSubmissions')}
         </RouterLinkButton>
       </Flex>

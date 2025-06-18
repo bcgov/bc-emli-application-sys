@@ -235,7 +235,6 @@ export const PermitApplicationStoreModel = types
       self.audienceTypeIdFilter = id;
     },
   }))
-
   .actions((self) => ({
     getEphemeralPermitApplication(
       requirementTemplate: IRequirementTemplate,

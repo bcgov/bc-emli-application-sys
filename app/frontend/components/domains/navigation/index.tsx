@@ -481,6 +481,8 @@ const AppRoutes = observer(() => {
         >
           <Route path="/applications" element={<EnergySavingsApplicationIndexScreen />} />
           <Route path="/applications/new" element={<NewApplicationScreen />} />
+          <Route path="/blank-applications" element={<NewApplicationScreen />} />
+          <Route path="/supported-applications" element={<EnergySavingsApplicationIndexScreen />} />
           <Route path="/applications/:permitApplicationId/edit" element={<EditPermitApplicationScreen />}>
             <Route path="step-code" element={<StepCodeForm />} />
           </Route>
