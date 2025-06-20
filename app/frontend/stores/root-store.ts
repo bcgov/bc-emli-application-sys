@@ -56,7 +56,7 @@ export const RootStoreModel = types
   })
   .extend(withEnvironment())
   .volatile((self) => ({
-    userChannelConsumer: null,
+    userChannelSubscription: null,
   }))
   .views((self) => ({}))
   .actions((self) => ({
@@ -83,16 +83,22 @@ export const RootStoreModel = types
       }
       protect(self);
     }),
-    subscribeToUserChannel() {
-      if (!self.userChannelConsumer && self.userStore.currentUser) {
-        self.userChannelConsumer = createUserChannelConsumer(
+    subscribeToUserChannel: flow(function* () {
+      if (!self.userChannelSubscription && self.userStore.currentUser) {
+        const { subscription } = yield createUserChannelConsumer(
           self.userStore.currentUser.id,
           self as unknown as IRootStore,
         );
+        unprotect(self);
+        self.userChannelSubscription = subscription;
+        protect(self);
       }
-    },
+    }),
     disconnectUserChannel() {
-      self.userChannelConsumer?.consumer?.disconnect();
+      self.userChannelSubscription?.unsubscribe();
+      unprotect(self);
+      self.userChannelSubscription = null;
+      protect(self);
     },
   }))
   .actions((self) => ({
@@ -123,7 +129,7 @@ export interface IRootStore extends IStateTreeNode {
   notificationStore: INotificationStore;
   collaboratorStore: ICollaboratorStore;
   sandboxStore: ISandboxStore;
-  subscribeToUserChannel: () => void;
+  subscribeToUserChannel: () => Promise<void>;
   disconnectUserChannel: () => void;
   loadLocalPersistedData: () => void;
 }

@@ -18,11 +18,20 @@ Devise.setup do |config|
       ["PUT", %r{^/api/password$}],
       ["GET", %r{^/api/auth/keycloak/callback$}]
     ]
+    # Add revocation requests for logout endpoints
+    jwt.revocation_requests = [
+      ["GET", %r{^/api/logout$}], # Match the actual GET logout route
+      ["DELETE", %r{^/api/logout$}], # Also support DELETE for proper REST
+      ["POST", %r{^/api/logout$}] # Also support POST for compatibility
+    ]
+    # Specify request formats that should receive JWT cookies
+    jwt.request_formats = { user: %i[json html] }
   end
 
   config.jwt_cookie do |jwt_cookie|
-    # Always set the cookie domain if APP_DOMAIN is present
-    jwt_cookie.domain = ".#{ENV["APP_DOMAIN"]}" if ENV["APP_DOMAIN"].present?
+    # Keep cookies scoped to the main application domain for security
+    # Cross-subdomain WebSocket authentication now uses token-based approach
+    jwt_cookie.domain = ENV["APP_DOMAIN"] if ENV["APP_DOMAIN"].present?
     jwt_cookie.secure = ENV["SECURE_JWT_COOKIE"] == "true" || false
   end
 

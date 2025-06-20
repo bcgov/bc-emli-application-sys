@@ -44,6 +44,7 @@ Rails.application.routes.draw do
 
     devise_scope :user do
       get "/validate_token" => "sessions#validate_token"
+      get "/websocket_token" => "sessions#websocket_token"
       delete "/invitation/remove" => "invitations#remove"
       get "/invitations/:invitation_token" => "invitations#show"
       get "/logout" => "sessions#destroy"
