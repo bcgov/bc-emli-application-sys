@@ -3,12 +3,11 @@ import { IRootStore } from '../stores/root-store';
 import { camelizeResponse } from '../utils';
 import { UserPushProcessor } from './processors/user_push_processor';
 
-export const createUserSpecificConsumer = async (userId) => {
+export const createUserSpecificConsumer = async () => {
   // @ts-expect-error - TypeScript can't determine the meta tag exists
   const BASE_WEBSOCKET_URL = document.querySelector("meta[name='action-cable-url']").content;
 
   try {
-    // Fetch JWT token for WebSocket authentication
     const response = await fetch('/api/websocket_token', {
       method: 'GET',
       credentials: 'include',
@@ -19,29 +18,22 @@ export const createUserSpecificConsumer = async (userId) => {
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch WebSocket token, status:', response.status);
-      throw new Error('Failed to fetch WebSocket token');
+      throw new Error(`Failed to fetch WebSocket token: HTTP ${response.status}`);
     }
 
     const data = await response.json();
-    const token = data.token;
-
-    // Add token as query parameter to WebSocket URL
-    const url = new URL(BASE_WEBSOCKET_URL);
-    url.searchParams.set('token', token);
-
-    return createConsumer(url.toString());
+    const finalUrl = `${BASE_WEBSOCKET_URL}?token=${encodeURIComponent(data.token)}`;
+    return createConsumer(finalUrl);
   } catch (error) {
-    console.error('Error creating WebSocket consumer:', error);
-    // Fallback to original URL without token
-    return createConsumer(BASE_WEBSOCKET_URL);
+    console.error('Failed to create authenticated WebSocket consumer:', error);
+    throw new Error('Failed to create WebSocket consumer due to authentication error');
   }
 };
 
 export const createUserChannelConsumer = async (userId: string, rootStore: IRootStore) => {
   const userPushProcessor = new UserPushProcessor(rootStore);
   try {
-    const consumer = await createUserSpecificConsumer(userId);
+    const consumer = await createUserSpecificConsumer();
     const subscription = consumer.subscriptions.create(
       { channel: 'UserChannel', userId },
       {

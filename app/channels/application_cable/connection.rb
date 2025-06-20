@@ -1,3 +1,5 @@
+require "jwt"
+
 module ApplicationCable
   class Connection < ActionCable::Connection::Base
     identified_by :current_user
@@ -25,11 +27,15 @@ module ApplicationCable
       # Decode JWT token manually since Warden may not be available in WebSocket context
       begin
         secret = ENV["DEVISE_JWT_SECRET_KEY"]
-        decoded_token = JWT.decode(token, secret, true, { algorithm: "HS256" })
+        decoded_token =
+          JWT.decode(
+            token,
+            secret,
+            true,
+            { algorithm: "HS256", verify_expiration: true }
+          )
         payload = decoded_token.first
         user_id = payload["sub"]
-
-        logger.info "Decoded JWT payload: #{payload}" if Rails.env.development?
 
         verified_user = User.find(user_id) if user_id
 
