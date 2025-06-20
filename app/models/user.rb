@@ -249,22 +249,25 @@ class User < ApplicationRecord
                     status: 1
                   )
 
-                template_data = template.as_json
-                template_data.merge!(
-                  version_id: version&.id,
-                  version_date: version&.version_date,
-                  user_group_type:
-                    UserGroupType.find_by(id: template.user_group_type_id),
-                  audience_type:
-                    AudienceType.find_by(id: template.audience_type_id),
-                  submission_type:
-                    SubmissionType.find_by(id: template.submission_type_id),
-                  requirements:
-                    template
-                      .requirements
-                      .map { |requirement| { requirement: requirement } }
-                      .compact
-                )
+                if version.present?
+                  template_data = template.as_json
+                  template_data.merge!(
+                    version_id: version.id,
+                    version_date: version.version_date,
+                    user_group_type:
+                      UserGroupType.find_by(id: template.user_group_type_id),
+                    audience_type:
+                      AudienceType.find_by(id: template.audience_type_id),
+                    submission_type:
+                      SubmissionType.find_by(id: template.submission_type_id),
+                    requirements:
+                      template
+                        .requirements
+                        .map { |requirement| { requirement: requirement } }
+                        .compact
+                  )
+                  { template: template_data }
+                end
                 { template: template_data }
               end
         }
