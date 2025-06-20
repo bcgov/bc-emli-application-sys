@@ -1,12 +1,8 @@
 # frozen_string_literal: true
 
-# Add Warden middleware to AnyCable stack to allow accessing
-# Devise current user via `env["warden"].user`.
-#
-# See https://docs.anycable.io/ruby/authentication
-AnyCable::Rails::Rack.middleware.use Warden::Manager do |config|
-  Devise.warden_config = config
-end
+# NOTE: Token-based authentication is used instead of Warden middleware
+# See app/channels/application_cable/connection.rb for authentication logic
+# and https://docs.anycable.io/rails/authentication for details
 
 # In Openshift, we use HA-Redis with Sentinels, configuration is slightly different
 if Rails.env.production? && ENV["IS_DOCKER_BUILD"].blank?

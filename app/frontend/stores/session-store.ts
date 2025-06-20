@@ -28,7 +28,7 @@ export const SessionStoreModel = types
     },
   }))
   .actions((self) => ({
-    handleLogin(response, opts = { redirectToRoot: false }) {
+    async handleLogin(response, opts = { redirectToRoot: false }) {
       // console.log('Login response', response);
       if (response.ok) {
         const user = response.data.data;
@@ -40,7 +40,7 @@ export const SessionStoreModel = types
         // activate persisted data
         self.rootStore.loadLocalPersistedData();
         // connect websocket
-        self.rootStore.subscribeToUserChannel();
+        await self.rootStore.subscribeToUserChannel();
 
         if (opts.redirectToRoot) window.location.replace('/');
 
@@ -57,7 +57,7 @@ export const SessionStoreModel = types
     validateToken: flow(function* () {
       self.isValidating = true;
       const response: any = yield self.environment.api.validateToken(); // now try to validate this with the server
-      self.handleLogin(response);
+      yield self.handleLogin(response);
       self.isValidating = false;
     }),
     logout: flow(function* () {

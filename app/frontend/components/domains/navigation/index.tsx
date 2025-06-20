@@ -289,7 +289,7 @@ const RedirectScreen = lazy(() =>
 const Footer = lazy(() => import('../../shared/base/footer').then((module) => ({ default: module.Footer })));
 
 export const Navigation = observer(() => {
-  const { sessionStore, siteConfigurationStore, subscribeToUserChannel } = useMst();
+  const { sessionStore, siteConfigurationStore } = useMst();
   const { isLoggingOut } = sessionStore;
   const { displaySitewideMessage, sitewideMessage } = siteConfigurationStore;
   const { validateToken, isValidating } = sessionStore;
