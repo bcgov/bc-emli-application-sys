@@ -31,6 +31,8 @@ Devise.setup do |config|
   config.jwt_cookie do |jwt_cookie|
     # Keep cookies scoped to the main application domain for security
     # Cross-subdomain WebSocket authentication now uses token-based approach
+    # Note: Removed leading dot from domain to restrict cookie to single domain
+    # (previously ".#{ENV["APP_DOMAIN"]}" for cross-subdomain sharing)
     jwt_cookie.domain = ENV["APP_DOMAIN"] if ENV["APP_DOMAIN"].present?
     jwt_cookie.secure = ENV["SECURE_JWT_COOKIE"] == "true" || false
   end

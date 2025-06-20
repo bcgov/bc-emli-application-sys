@@ -12,6 +12,7 @@ module ApplicationCable
 
     def find_verified_user
       # Extract JWT token from connection parameters (query string)
+      # 'jid' is a legacy parameter name that may be used by older clients
       token = request.params["token"] || request.params["jid"]
 
       if Rails.env.development?
