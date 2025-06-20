@@ -13,9 +13,7 @@ module ApplicationCable
       token = request.params["token"] || request.params["jid"]
 
       if Rails.env.development?
-        if token
-          logger.info "WebSocket connection attempt with token: #{token&.first(20)}..."
-        end
+        logger.info "WebSocket connection attempt with a token received."
       end
 
       if token.blank?
