@@ -10,42 +10,44 @@ import {
   IconButton,
   useDisclosure,
   VStack,
-} from "@chakra-ui/react"
-import { X } from "@phosphor-icons/react"
-import { observer } from "mobx-react-lite"
-import React, { useEffect } from "react"
-import { useTranslation } from "react-i18next"
-import { ERequirementType, EVisibility } from "../../../types/enums"
+} from '@chakra-ui/react';
+import { X } from '@phosphor-icons/react';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ERequirementType, EUserRoles, EVisibility } from '../../../types/enums';
 import {
   IDenormalizedRequirement,
   IDenormalizedRequirementBlock,
   IRequirementBlockCustomization,
-} from "../../../types/types"
-import { isQuillEmpty } from "../../../utils/utility-functions"
-import { Editor } from "../../shared/editor/editor"
-import { ElectiveTag } from "../../shared/elective-tag"
-import { FirstNationsTag } from "../../shared/first-nations-tag"
-import { RichTextTip } from "../../shared/rich-text-tip"
-import { VisibilityTag } from "../../shared/visibility-tag.tsx"
-import { RequirementFieldDisplay } from "./requirement-field-display"
-import { RequirementsBlockModal } from "./requirements-block-modal"
+} from '../../../types/types';
+import { isQuillEmpty } from '../../../utils/utility-functions';
+import { Editor } from '../../shared/editor/editor';
+import { ElectiveTag } from '../../shared/elective-tag';
+import { FirstNationsTag } from '../../shared/first-nations-tag';
+import { RichTextTip } from '../../shared/rich-text-tip';
+import { VisibilityTag } from '../../shared/visibility-tag.tsx';
+import { RequirementFieldDisplay } from './requirement-field-display';
+import { RequirementsBlockModal } from './requirements-block-modal';
+import { useCurrentUserLicenseAgreements } from '../../../hooks/resources/user-license-agreements';
+import { useMst } from '../../../setup/root';
 
 type TProps = {
-  requirementBlock: IDenormalizedRequirementBlock
-  onRemove?: () => void
-  isCollapsedAll?: boolean
-  renderEdit?: () => JSX.Element
-  requirementBlockCustomization?: IRequirementBlockCustomization
-  hideElectiveField?: (requirementBlockId: string, requirement: IDenormalizedRequirement) => boolean
+  requirementBlock: IDenormalizedRequirementBlock;
+  onRemove?: () => void;
+  isCollapsedAll?: boolean;
+  renderEdit?: () => JSX.Element;
+  requirementBlockCustomization?: IRequirementBlockCustomization;
+  hideElectiveField?: (requirementBlockId: string, requirement: IDenormalizedRequirement) => boolean;
 } & Partial<AccordionProps> &
   (
     | { isEditable?: boolean; showEditWarning?: never }
     | { isEditable: boolean; showEditWarning?: boolean }
     | {
-        isEditable: false
-        showEditWarning?: never
+        isEditable: false;
+        showEditWarning?: never;
       }
-  )
+  );
 
 export const RequirementBlockAccordion = observer(function RequirementBlockAccordion({
   requirementBlock,
@@ -58,54 +60,56 @@ export const RequirementBlockAccordion = observer(function RequirementBlockAccor
   hideElectiveField,
   ...accordionProps
 }: TProps) {
-  const { t } = useTranslation()
-  const { isOpen, onToggle, onClose, onOpen } = useDisclosure({ defaultIsOpen: true })
+  const { t } = useTranslation();
+  const { userStore } = useMst();
+  const currentUser = userStore.currentUser;
+  const { isOpen, onToggle, onClose, onOpen } = useDisclosure({ defaultIsOpen: true });
 
   useEffect(() => {
     if (isCollapsedAll) {
-      onClose()
+      onClose();
     } else {
-      onOpen()
+      onOpen();
     }
-  }, [isCollapsedAll])
+  }, [isCollapsedAll]);
 
   return (
     <Accordion
-      as={"section"}
-      w={"full"}
-      border={"1px solid"}
-      borderColor={"border.light"}
-      borderRadius={"lg"}
+      as={'section'}
+      w={'full'}
+      border={'1px solid'}
+      borderColor={'border.light'}
+      borderRadius={'lg'}
       bg="greys.grey04"
-      _focus={{ bg: "semantic.warningLight", borderColor: "semantic.warning" }}
+      _focus={{ bg: 'semantic.warningLight', borderColor: 'semantic.warning' }}
       allowMultiple
       index={isOpen ? 0 : null}
       {...accordionProps}
     >
       <AccordionItem border="0">
-        <Box as={"h5"} w={"full"} m={0} borderTopRadius="radii.lg">
+        <Box as={'h5'} w={'full'} m={0} borderTopRadius="radii.lg">
           <AccordionButton
             as="div"
             minH="10"
             py={0}
             pl={6}
             pr={3}
-            display={"flex"}
-            justifyContent={"space-between"}
+            display={'flex'}
+            justifyContent={'space-between'}
             onClick={onToggle}
           >
             <HStack spacing={1}>
-              <Box fontWeight={700} fontSize={"base"}>
+              <Box fontWeight={700} fontSize={'base'}>
                 {requirementBlock.displayName}
               </Box>
               {isOpen && onRemove && (
                 <IconButton
-                  color={"text.primary"}
-                  variant={"ghost"}
-                  aria-label={"Remove Requirement Block"}
+                  color={'text.primary'}
+                  variant={'ghost'}
+                  aria-label={'Remove Requirement Block'}
                   onClick={(e) => {
-                    e.stopPropagation()
-                    onRemove()
+                    e.stopPropagation();
+                    onRemove();
                   }}
                   icon={<X size={16} />}
                 />
@@ -114,24 +118,28 @@ export const RequirementBlockAccordion = observer(function RequirementBlockAccor
             <HStack spacing={2}>
               <VisibilityTag visibility={requirementBlock.visibility} />
               <Box mr={2}>{requirementBlock.firstNations && <FirstNationsTag />}</Box>
-              {isOpen && !renderEdit && (
-                <RequirementsBlockModal
-                  forEarlyAccess={requirementBlock.visibility === EVisibility.earlyAccess}
-                  showEditWarning={showEditWarning}
-                  isEditable={isEditable}
-                  requirementBlock={requirementBlock}
-                  triggerButtonProps={{
-                    color: "text.primary",
-                    textDecoration: "none",
-                    _hover: {
-                      textDecoration: "underline",
-                    },
-                  }}
-                />
+              {currentUser.isSystemAdmin && (
+                <>
+                  {isOpen && !renderEdit && (
+                    <RequirementsBlockModal
+                      forEarlyAccess={requirementBlock.visibility === EVisibility.earlyAccess}
+                      showEditWarning={showEditWarning}
+                      isEditable={isEditable}
+                      requirementBlock={requirementBlock}
+                      triggerButtonProps={{
+                        color: 'text.primary',
+                        textDecoration: 'none',
+                        _hover: {
+                          textDecoration: 'underline',
+                        },
+                      }}
+                    />
+                  )}
+                  {renderEdit?.()}
+                </>
               )}
-              {renderEdit?.()}
               <IconButton variant="unstyled" aria-label="Collapse or expand accordion">
-                <AccordionIcon color={"text.primary"} />
+                <AccordionIcon color={'text.primary'} />
               </IconButton>
             </HStack>
           </AccordionButton>
@@ -146,7 +154,7 @@ export const RequirementBlockAccordion = observer(function RequirementBlockAccor
           {!isQuillEmpty(requirementBlock.displayDescription) && (
             <Box
               sx={{
-                ".ql-editor": {
+                '.ql-editor': {
                   p: 0,
                 },
               }}
@@ -167,8 +175,8 @@ export const RequirementBlockAccordion = observer(function RequirementBlockAccor
             </Box>
           )}
           <VStack
-            w={"full"}
-            alignItems={"flex-start"}
+            w={'full'}
+            alignItems={'flex-start'}
             spacing={2}
             px={2}
             mt={
@@ -180,35 +188,35 @@ export const RequirementBlockAccordion = observer(function RequirementBlockAccor
             {requirementBlock.requirements
               .filter((requirement) => {
                 if (!requirement.elective) {
-                  return true
+                  return true;
                 }
 
                 if (!hideElectiveField) {
-                  return true
+                  return true;
                 }
 
                 if (hideElectiveField) {
-                  return !hideElectiveField(requirementBlock.id, requirement)
+                  return !hideElectiveField(requirementBlock.id, requirement);
                 }
               })
               .map((requirement: IDenormalizedRequirement, index) => {
-                const requirementType = requirement.inputType
+                const requirementType = requirement.inputType;
                 return (
                   <Box
                     key={requirement.id}
-                    w={"full"}
-                    borderRadius={"sm"}
+                    w={'full'}
+                    borderRadius={'sm'}
                     pt={index !== 0 ? 1 : 0}
                     pb={5}
-                    pos={"relative"}
+                    pos={'relative'}
                   >
                     <Box
-                      w={"full"}
+                      w={'full'}
                       position="relative"
                       pr="var(--app-permit-fieldset-right-white-space)"
                       sx={{
-                        "& input": {
-                          maxW: "var(--app-permit-input-field-short)",
+                        '& input': {
+                          maxW: 'var(--app-permit-input-field-short)',
                         },
                       }}
                     >
@@ -218,12 +226,12 @@ export const RequirementBlockAccordion = observer(function RequirementBlockAccor
                         helperText={requirement?.hint}
                         unit={
                           requirementType === ERequirementType.number
-                            ? requirement?.inputOptions?.numberUnit ?? null
+                            ? (requirement?.inputOptions?.numberUnit ?? null)
                             : undefined
                         }
                         options={requirement?.inputOptions?.valueOptions?.map((option) => option.label)}
                         selectProps={{
-                          maxW: "339px",
+                          maxW: '339px',
                         }}
                         showAddButton={!!requirement?.inputOptions?.canAddMultipleContacts}
                         required={requirement.required}
@@ -231,11 +239,11 @@ export const RequirementBlockAccordion = observer(function RequirementBlockAccor
                       {requirement?.elective && <ElectiveTag position="absolute" right="0" top="0" />}
                     </Box>
                   </Box>
-                )
+                );
               })}
           </VStack>
         </AccordionPanel>
       </AccordionItem>
     </Accordion>
-  )
-})
+  );
+});

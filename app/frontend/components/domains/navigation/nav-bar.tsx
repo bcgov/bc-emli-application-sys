@@ -91,6 +91,11 @@ function isSuccessfullWithdrawlPath(path: string): boolean {
   return regex.test(path);
 }
 
+function isblankTemplatePath(path: string): boolean {
+  const regex = /^\/blank-template\/([a-f\d-]+)/;
+  return regex.test(path);
+}
+
 function shouldHideSubNavbarForPath(path: string): boolean {
   const matchers: Array<(path: string) => boolean> = [
     (path) => path === '/',
@@ -105,6 +110,7 @@ function shouldHideSubNavbarForPath(path: string): boolean {
     isRejectionPath,
     isSuccessfullSubmissionPath,
     isSuccessfullWithdrawlPath,
+    isblankTemplatePath,
   ];
 
   return matchers.some((matcher) => matcher(path));
@@ -298,9 +304,9 @@ const NavBarMenu = observer(function NavBarMenu() {
   const reviewManagerItems = (
     <MenuGroup>
       <NavMenuItem label={t('home.submissionInboxTitle')} to={'/submission-inbox'} />
-      <NavMenuItem label={t('site.newApplication')} to={`/applications/new`} />
+      <NavMenuItem label={t('site.newApplication')} to={`/new-application`} />
       <NavMenuItem label={t('home.viewBlankApplicationsTitle')} to={`/blank-applications`} />
-      <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/applications'} />
+      <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/supported-applications'} />
       <NavMenuItem label={t('home.configureUsersTitle')} to={'/configure-users'} />
     </MenuGroup>
   );
@@ -308,9 +314,9 @@ const NavBarMenu = observer(function NavBarMenu() {
   const reviewerItems = (
     <MenuGroup>
       <NavMenuItem label={t('home.submissionInboxTitle')} to={`/submission-inbox`} />
-      <NavMenuItem label={t('site.newApplication')} to={`/applications/new`} />
-      <NavMenuItem label={t('home.viewBlankApplicationsTitle')} to={`/view-blank-applications`} />
-      <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/applications'} />
+      <NavMenuItem label={t('site.newApplication')} to={`/new-application`} />
+      <NavMenuItem label={t('home.viewBlankApplicationsTitle')} to={`/blank-applications`} />
+      <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/supported-applications'} />
     </MenuGroup>
   );
 
@@ -398,7 +404,7 @@ const NavBarMenu = observer(function NavBarMenu() {
                           <MenuDivider my={0} borderColor="border.light" />
                         </MenuGroup>
                       </Show>
-                      <MenuItem onClick={(e) => navigate('/applications/new')}>
+                      <MenuItem onClick={(e) => navigate('/new-application')}>
                         <Button as={Box} variant="primary">
                           {t('site.newApplication')}
                         </Button>

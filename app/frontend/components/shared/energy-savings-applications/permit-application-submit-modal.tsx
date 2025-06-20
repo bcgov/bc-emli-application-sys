@@ -62,7 +62,7 @@ export const PermitApplicationSubmitModal = observer(function PermitApplicationS
           {permitApplication.canUserSubmit(currentUser) ? (
             <Flex direction="column" gap={8}>
               <Heading as="h3" color="theme.blueAlt">
-                {currentUser.role === EUserRoles.participant
+                {currentUser.isParticipant
                   ? t('energySavingsApplication.new.ready')
                   : 'Ready to submit on someone’s behalf?'}
               </Heading>
@@ -79,7 +79,7 @@ export const PermitApplicationSubmitModal = observer(function PermitApplicationS
                     <Warning size={24} aria-label={'warning icon'} />
                   </Box>
                   <Text>
-                    {currentUser.role == EUserRoles.participant
+                    {currentUser.isParticipant
                       ? t('energySavingsApplication.new.confirmation')
                       : t('energySavingsApplication.new.confirmationOnBehalf')}
                   </Text>

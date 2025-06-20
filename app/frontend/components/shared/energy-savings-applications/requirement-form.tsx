@@ -32,7 +32,6 @@ interface IRequirementFormProps {
   isEditing?: boolean;
   renderTopButtons?: () => React.ReactNode;
   updateCollaborationAssignmentNodes?: () => void;
-  isBlank?: boolean;
 }
 
 export const RequirementForm = observer(
@@ -45,7 +44,6 @@ export const RequirementForm = observer(
     renderSaveButton,
     isEditing = false,
     updateCollaborationAssignmentNodes,
-    isBlank = false,
   }: IRequirementFormProps) => {
     const {
       jurisdiction,
@@ -299,7 +297,7 @@ export const RequirementForm = observer(
     // formio-component-${requirementJson.key}
     let permitAppOptions = {
       ...defaultOptions,
-      readOnly: isBlank || isScreenedIn || isIneligible ? true : false,
+      readOnly: isScreenedIn || isIneligible ? true : false,
       // ...(isDraft || isScreenedIn ? { readOnly: true } : { readOnly: false }),
     };
     permitAppOptions.componentOptions.simplefile.config['formCustomOptions'] = {

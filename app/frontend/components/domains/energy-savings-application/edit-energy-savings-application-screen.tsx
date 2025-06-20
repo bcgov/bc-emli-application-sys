@@ -32,7 +32,7 @@ import { usePermitApplication } from '../../../hooks/resources/use-permit-applic
 import { useInterval } from '../../../hooks/use-interval';
 import { useMst } from '../../../setup/root';
 import { ICustomEventMap } from '../../../types/dom';
-import { ECollaborationType, ECustomEvents, ERequirementType } from '../../../types/enums';
+import { ECollaborationType, ECustomEvents, EFlashMessageStatus, ERequirementType } from '../../../types/enums';
 import { handleScrollToBottom } from '../../../utils/utility-functions';
 import { CopyableValue } from '../../shared/base/copyable-value';
 import { ErrorScreen } from '../../shared/base/error-screen';
@@ -60,7 +60,7 @@ type TPermitApplicationMetadataForm = {
 };
 
 export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationScreenProps) => {
-  const { userStore } = useMst();
+  const { userStore, uiStore } = useMst();
   const currentUser = userStore.currentUser;
   const { currentPermitApplication, error } = usePermitApplication();
   const { t } = useTranslation();
@@ -88,9 +88,6 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
   } = useDisclosure();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const isBlank = queryParams.get('is_blank') === 'true';
 
   const handlePermitApplicationUpdate = (_event: ICustomEventMap[ECustomEvents.handlePermitApplicationUpdate]) => {
     if (formRef.current) {
@@ -356,11 +353,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 <Heading fontSize="xl" as="h3">
                   {currentPermitApplication.fullAddress}
                 </Heading>
-                <Text noOfLines={1}>
-                  {currentPermitApplication?.nickname !== 'undefined undefined'
-                    ? currentPermitApplication.nickname
-                    : 'Address Not Available'}
-                </Text>
+                <Text noOfLines={1}>{currentPermitApplication?.nickname}</Text>
                 <HStack>
                   <CopyableValue
                     textTransform={'uppercase'}
@@ -497,7 +490,6 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               isEditing={currentPermitApplication?.isDraft || currentPermitApplication?.isRevisionsRequested}
               renderSaveButton={() => !currentPermitApplication?.isIneligible && <SaveButton handleSave={handleSave} />}
               updateCollaborationAssignmentNodes={updateRequirementBlockAssignmentNode}
-              isBlank={isBlank}
             />
           </Flex>
         )}

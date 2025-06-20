@@ -5,6 +5,7 @@ import { IEnergySavingsApplication } from '../../../models/energy-savings-applic
 import { EPermitApplicationStatus } from '../../../types/enums';
 import { useMst } from '../../../setup/root';
 import { EUserRoles } from '../../../types/enums';
+import { useLocation } from 'react-router-dom';
 
 interface IEnergySavingsApplicationStatusTagProps extends TagProps {
   energySavingsApplication: IEnergySavingsApplication;
@@ -19,6 +20,8 @@ export const EnergySavingsApplicationStatusTag = ({
   const { t } = useTranslation();
   const { userStore } = useMst();
   const currentUser = userStore.currentUser;
+  const { pathname } = useLocation();
+  const isSupportedApplication = pathname === '/supported-applications';
 
   const { status, viewedAt } = energySavingsApplication;
 
@@ -58,7 +61,8 @@ export const EnergySavingsApplicationStatusTag = ({
   const getStatusText = (status: EPermitApplicationStatus) => {
     if (
       status === EPermitApplicationStatus.submitted &&
-      [EUserRoles.admin, EUserRoles.adminManager].includes(currentUser.role)
+      [EUserRoles.admin, EUserRoles.adminManager].includes(currentUser.role) &&
+      !isSupportedApplication
     ) {
       return t(`energySavingsApplication.status.unread`);
     }

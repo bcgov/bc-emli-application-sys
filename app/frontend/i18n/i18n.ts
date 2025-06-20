@@ -877,7 +877,6 @@ const options = {
             success: {
               title: 'Your application has been withdrawn.',
               subtitleEmail: 'You will receive a notification email.',
-              returnHome: 'Return to supported applications',
             },
           },
           edit: {
@@ -965,6 +964,7 @@ const options = {
             mac: 'Mac: <1>Cmd</1> + <1>F</1> ',
           },
           updateToNewVersion: 'Update my application',
+          returnHome: 'Return to supported applications',
           reviewOutdatedSubmissionLink: 'View draft applications',
           reviewUpdatedEditLink: 'View template',
           reviewOutdatedTitle: 'Filters applied to show applications that are outdated',
@@ -1082,6 +1082,7 @@ const options = {
           },
           new: {
             fillApplication: "Select an application to fill out on someone's behalf:",
+            selectBlankApplication: 'Select a blank application you would like to view:',
             program: 'Program',
             lastUpdated: 'Last updated:',
             startApplication: 'Start an application',
@@ -1120,6 +1121,7 @@ const options = {
                 href: 'https://www2.gov.bc.ca/gov/content/governments/local-governments/planning-land-use/land-use-regulation/zoning-bylaws/board-of-variance',
               },
             ],
+
             applicationDisclaimerMoreInfo:
               'For more information and specific building drawing requirements and checklists, contact your local jurisdiction.',
             applicationDisclaimerMoreInfo_CTA: 'Find your local jurisdiction',
@@ -2708,7 +2710,8 @@ const options = {
             editPermit: 'Edit permit',
             applications: 'Applications',
             supportedApplications: 'View supported applications',
-            blankApplications: ' View blank applications',
+            blankApplications: 'View blank applications',
+            newApplication: 'Start an application',
             submissionInbox: 'Submissions inbox',
             configuration: 'Configure jurisdiction',
             sucessfulSubmission: 'Application submitted',

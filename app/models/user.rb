@@ -243,11 +243,32 @@ class User < ApplicationRecord
               .where(program_id: program.id)
               .distinct
               .map do |template|
-                { template: template, requirements: template.requirements }
+                version =
+                  TemplateVersion.find_by(
+                    requirement_template_id: template.id,
+                    status: 1
+                  )
+
+                template_data = template.as_json
+                template_data.merge!(
+                  version_id: version&.id,
+                  version_date: version&.version_date,
+                  user_group_type:
+                    UserGroupType.find_by(id: template.user_group_type_id),
+                  audience_type:
+                    AudienceType.find_by(id: template.audience_type_id),
+                  submission_type:
+                    SubmissionType.find_by(id: template.submission_type_id),
+                  requirements:
+                    template
+                      .requirements
+                      .map { |requirement| { requirement: requirement } }
+                      .compact
+                )
+                { template: template_data }
               end
         }
       end
-
     programs_with_requirements
   end
 

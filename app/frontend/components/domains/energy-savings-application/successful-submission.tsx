@@ -40,10 +40,12 @@ export const SuccessfulSubmissionScreen = observer(() => {
           </Tag>
         </VStack>
         <RouterLinkButton
-          to={currentUser.role == EUserRoles.participant ? `/applications` : '/supported-applications'}
+          to={currentUser.isParticipant ? `/applications` : '/supported-applications'}
           variant="primary"
         >
-          {t('energySavingsApplication.new.viewAllSubmissions')}
+          {currentUser.isParticipant
+            ? t('energySavingsApplication.new.viewAllSubmissions')
+            : t('energySavingsApplication.returnHome')}
         </RouterLinkButton>
       </Flex>
     </Container>

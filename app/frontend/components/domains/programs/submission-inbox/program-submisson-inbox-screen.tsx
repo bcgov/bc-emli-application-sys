@@ -66,10 +66,10 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
   // Fetch submission options and program options separately
   const fetchSubmissionOptions = useCallback(async () => {
     try {
-      const result = await permitClassificationStore.submissionOptionTypes();
-      setUserGroupFilter(result[0].value.userGroupType);
-      setAudienceTypeFilter(result[0].value.AudienceType);
-      setSubmissionTypeFilter(result[0].value.SubmissionType);
+      // const result = await permitClassificationStore.submissionOptionTypes();
+      setUserGroupFilter(EPermitClassificationCode.participant);
+      setAudienceTypeFilter(EPermitClassificationCode.external);
+      setSubmissionTypeFilter(EPermitClassificationCode.application);
     } catch (error) {
       console.error('Failed to fetch submission options', error);
     }
