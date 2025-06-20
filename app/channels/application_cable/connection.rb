@@ -28,6 +28,11 @@ module ApplicationCable
       # Decode JWT token manually since Warden may not be available in WebSocket context
       begin
         secret = ENV["DEVISE_JWT_SECRET_KEY"]
+        if secret.blank?
+          logger.error "Missing DEVISE_JWT_SECRET_KEY environment variable"
+          reject_unauthorized_connection
+          return
+        end
         decoded_token =
           JWT.decode(
             token,
