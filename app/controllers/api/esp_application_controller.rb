@@ -40,8 +40,7 @@ class Api::EspApplicationController < Api::ApplicationController
     @submission_type =
       SubmissionType.find_by(code: app_params[:submission_type])
 
-    if @user_group_type.blank? || @audience_type.blank? ||
-         @submission_type.blank?
+    if [@user_group_type, @audience_type, @submission_type].any?(&:blank?)
       render json: {
                error:
                  "Invalid user_group_type, audience_type, or submission_type"
@@ -55,7 +54,7 @@ class Api::EspApplicationController < Api::ApplicationController
 
     @nickname =
       app_params[:nickname] ||
-        "#{@program&.program_name} #{SecureRandom.hex(4)}"
+        "#{@program&.program_name} ##{SecureRandom.hex(4)}"
 
     begin
       requirement =

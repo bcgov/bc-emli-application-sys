@@ -112,7 +112,7 @@ export function handleScrollToBottom() {
 
 export function formatTemplateVersion(versionDate: Date) {
   const timeZonedDate = utcToZonedTime(versionDate, vancouverTimeZone);
-  return `v.${format(timeZonedDate, 'yyyy.MM.dd')}`;
+  return `Version ${format(timeZonedDate, 'yyyy.MM.dd')}`;
 }
 
 export function formatBytes(bytes: number, decimals: number = 2): string {

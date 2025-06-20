@@ -1,40 +1,40 @@
-import { Box, Heading, Stack } from "@chakra-ui/react"
-import { observer } from "mobx-react-lite"
-import React from "react"
-import { useMst } from "../../../setup/root"
+import { Box, Heading, Stack } from '@chakra-ui/react';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { useMst } from '../../../setup/root';
 import {
   IDenormalizedRequirement,
   IDenormalizedRequirementBlock,
   IDenormalizedRequirementTemplateSection,
   IRequirementBlockCustomization,
-} from "../../../types/types"
-import { RequirementBlockAccordion } from "../requirements-library/requirement-block-accordion"
+} from '../../../types/types';
+import { RequirementBlockAccordion } from '../requirements-library/requirement-block-accordion';
 
-interface IProps extends Omit<ISectionDisplayProps, "section"> {
-  sections: IDenormalizedRequirementTemplateSection[]
+interface IProps extends Omit<ISectionDisplayProps, 'section'> {
+  sections: IDenormalizedRequirementTemplateSection[];
 }
 
 export const SectionsDisplay = observer(function SectionsDisplay(props: IProps) {
-  const { sections } = props
+  const { sections } = props;
 
   return (
-    <Stack w={"full"} alignItems={"flex-start"} spacing={16}>
+    <Stack w={'full'} alignItems={'flex-start'} spacing={16}>
       {sections.map((section) => (
         <SectionDisplay key={section.id} section={section} {...props} />
       ))}
     </Stack>
-  )
-})
+  );
+});
 
 interface ISectionDisplayProps {
-  section: IDenormalizedRequirementTemplateSection
-  isCollapsedAll?: boolean
-  setSectionRef: (el: HTMLElement, id: string) => void
-  scrollToId?: string
-  formScrollToId: (recordId: string) => string
-  renderEdit?: (props: { denormalizedRequirementBlock: IDenormalizedRequirementBlock }) => JSX.Element
-  requirementBlockCustomizations?: Record<string, IRequirementBlockCustomization>
-  hideElectiveField?: (requirementBlockId: string, requirement: IDenormalizedRequirement) => boolean
+  section: IDenormalizedRequirementTemplateSection;
+  isCollapsedAll?: boolean;
+  setSectionRef: (el: HTMLElement, id: string) => void;
+  scrollToId?: string;
+  formScrollToId: (recordId: string) => string;
+  renderEdit?: (props: { denormalizedRequirementBlock: IDenormalizedRequirementBlock }) => JSX.Element;
+  requirementBlockCustomizations?: Record<string, IRequirementBlockCustomization>;
+  hideElectiveField?: (requirementBlockId: string, requirement: IDenormalizedRequirement) => boolean;
 }
 
 const SectionDisplay = observer(
@@ -47,17 +47,17 @@ const SectionDisplay = observer(
     requirementBlockCustomizations,
     hideElectiveField,
   }: ISectionDisplayProps) => {
-    const sectionBlocks = section.templateSectionBlocks
-    const sectionName = section.name
+    const sectionBlocks = section.templateSectionBlocks;
+    const sectionName = section.name;
 
-    const { requirementBlockStore } = useMst()
-    const { getIsRequirementBlockEditable } = requirementBlockStore
+    const { requirementBlockStore } = useMst();
+    const { getIsRequirementBlockEditable } = requirementBlockStore;
 
     return (
       <Box
         ref={(el) => setSectionRef(el, section.id)}
-        as={"section"}
-        w={"full"}
+        as={'section'}
+        w={'full'}
         id={formScrollToId?.(section.id)}
         data-section-id={section.id}
       >
@@ -71,7 +71,7 @@ const SectionDisplay = observer(
           pr="var(--app-permit-form-right-white-space)"
           maxWidth="container.lg"
         >
-          <Heading as="h3" variant="yellowline" fontSize="2xl">
+          <Heading as="h3" variant="greenline" fontSize="2xl">
             {sectionName}
           </Heading>
 
@@ -79,7 +79,7 @@ const SectionDisplay = observer(
             (sectionBlock) =>
               sectionBlock.requirementBlock && (
                 <RequirementBlockAccordion
-                  as={"section"}
+                  as={'section'}
                   hideElectiveField={hideElectiveField}
                   id={formScrollToId(sectionBlock.requirementBlock.id)}
                   key={sectionBlock.id}
@@ -93,10 +93,10 @@ const SectionDisplay = observer(
                   }
                   requirementBlockCustomization={requirementBlockCustomizations?.[sectionBlock.requirementBlock.id]}
                 />
-              )
+              ),
           )}
         </Stack>
       </Box>
-    )
-  }
-)
+    );
+  },
+);

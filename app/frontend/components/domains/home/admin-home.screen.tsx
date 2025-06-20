@@ -37,19 +37,19 @@ export const AdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               title={t('home.startApplicationTitle')}
               description=""
               icon={<Pencil size={24} />}
-              href="/applications/new"
+              href="/new-application"
             />
             <HomeScreenBox
               title={t('home.viewBlankApplicationsTitle')}
               description=""
               icon={<MagnifyingGlass size={24} />}
-              href="/view-blank-applications"
+              href="/blank-applications"
             />
             <HomeScreenBox
               title={t('home.viewSupportedApplicationsTitle')}
               description=""
               icon={<ClipboardText size={24} />}
-              href="/applications"
+              href="/supported-applications"
             />
             <HomeScreenBox
               title={t('home.contractorTitle')}

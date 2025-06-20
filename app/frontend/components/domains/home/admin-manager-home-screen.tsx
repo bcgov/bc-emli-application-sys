@@ -44,7 +44,7 @@ export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               title={t('home.startApplicationTitle')}
               description=""
               icon={<Pencil size={24} />}
-              href="/applications/new"
+              href="/new-application"
             />
             <HomeScreenBox
               title={t('home.viewBlankApplicationsTitle')}

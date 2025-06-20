@@ -57,11 +57,18 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
 
   setUserGroupFilter(EPermitClassificationCode.participant);
   setAudienceTypeFilter(
-    currentUser.role === EUserRoles.participant
-      ? EPermitClassificationCode.external
-      : EPermitClassificationCode.internal,
+    currentUser.isParticipant ? EPermitClassificationCode.external : EPermitClassificationCode.internal,
   );
-  setSubmissionTypeFilter(EPermitClassificationCode.application);
+  setSubmissionTypeFilter(
+    currentUser.isParticipant
+      ? EPermitClassificationCode.application
+      : [
+          EPermitClassificationCode.application,
+          EPermitClassificationCode.onboarding,
+          EPermitClassificationCode.invoice,
+          EPermitClassificationCode.supportRequest,
+        ],
+  );
 
   useSearch(permitApplicationStore, [
     requirementTemplateId || '',
@@ -89,12 +96,9 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
             justify="space-between"
             direction={{ base: 'column', md: 'row' }}
           >
-            <RouterLinkButton to="/applications/new" variant="primary" w={{ base: 'full', md: 'fit-content' }}>
+            <RouterLinkButton to="/new-application" variant="primary" w={{ base: 'full', md: 'fit-content' }}>
               {t('energySavingsApplication.start')}
             </RouterLinkButton>
-            {/* <Heading as="h2">
-              {t(`energySavingsApplication.statusGroup.${statusFilterToGroup || EPermitApplicationStatusGroup.draft}`)}
-            </Heading> */}
             <Flex
               align={{ md: 'end' }}
               gap={4}
@@ -138,6 +142,10 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
           {isSearching ? (
             <Flex py="50" w="full">
               <SharedSpinner h={50} w={50} />
+            </Flex>
+          ) : tablePermitApplications.length === 0 ? (
+            <Flex py="50" w="full" justify="center">
+              {t('errors.noResults')}
             </Flex>
           ) : (
             tablePermitApplications.map((pa) => (

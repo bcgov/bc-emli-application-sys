@@ -15,6 +15,7 @@ import { AdminPortalLogin } from '../admin/login';
 import { ProgramsIndexScreen } from '../programs';
 import { ProgramInviteUserScreen } from '../programs/invite-users';
 import RejectApplicationScreen from '../permit-application/application-rejection-reason';
+import { BlankTemplateScreen } from '../requirement-template/screens/blank-template';
 
 const ExternalApiKeysIndexScreen = lazy(() =>
   import('../external-api-key').then((module) => ({ default: module.ExternalApiKeysIndexScreen })),
@@ -411,6 +412,7 @@ const AppRoutes = observer(() => {
     <>
       <Route path="/submission-inbox" element={<ProgramSubmissionInboxScreen />} />
       <Route path="/applications/:permitApplicationId" element={<ReviewPermitApplicationScreen />} />
+      <Route path="/blank-template/:templateVersionId" element={<BlankTemplateScreen />} />
       // view blank applications and view supported applications to go here
       {import.meta.env.DEV && (
         <>
@@ -480,7 +482,7 @@ const AppRoutes = observer(() => {
           element={<ProtectedRoute isAllowed={loggedIn && !mustAcceptEula} redirectPath={mustAcceptEula && '/'} />}
         >
           <Route path="/applications" element={<EnergySavingsApplicationIndexScreen />} />
-          <Route path="/applications/new" element={<NewApplicationScreen />} />
+          <Route path="/new-application" element={<NewApplicationScreen />} />
           <Route path="/blank-applications" element={<NewApplicationScreen />} />
           <Route path="/supported-applications" element={<EnergySavingsApplicationIndexScreen />} />
           <Route path="/applications/:permitApplicationId/edit" element={<EditPermitApplicationScreen />}>

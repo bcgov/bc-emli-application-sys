@@ -4,9 +4,12 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
+import { useMst } from '../../../setup/root';
 
 export const SuccessfulWithdrawalScreen = observer(() => {
   const { t } = useTranslation();
+  const { userStore } = useMst();
+  const currentUser = userStore.currentUser;
 
   return (
     <Container maxW="container.lg">
@@ -29,7 +32,9 @@ export const SuccessfulWithdrawalScreen = observer(() => {
           px={8}
           _hover={{ bg: 'theme.blueButtonHover' }}
         >
-          {t('permitApplication.withdraw.success.returnHome')}
+          {currentUser.isParticipant
+            ? t('energySavingsApplication.new.viewAllSubmissions')
+            : t('energySavingsApplication.returnHome')}
         </RouterLinkButton>
       </Flex>
     </Container>
