@@ -267,9 +267,11 @@ class User < ApplicationRecord
                         .compact
                   )
                   { template: template_data }
+                else
+                  nil
                 end
-                { template: template_data }
               end
+              .compact
         }
       end
     programs_with_requirements
