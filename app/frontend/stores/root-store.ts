@@ -57,6 +57,7 @@ export const RootStoreModel = types
   .extend(withEnvironment())
   .volatile((self) => ({
     userChannelSubscription: null,
+    userChannelConsumer: null,
   }))
   .views((self) => ({}))
   .actions((self) => ({
@@ -85,19 +86,23 @@ export const RootStoreModel = types
     }),
     subscribeToUserChannel: flow(function* () {
       if (!self.userChannelSubscription && self.userStore.currentUser) {
-        const { subscription } = yield createUserChannelConsumer(
+        const { consumer, subscription } = yield createUserChannelConsumer(
           self.userStore.currentUser.id,
           self as unknown as IRootStore,
         );
         unprotect(self);
+        self.userChannelConsumer = consumer;
         self.userChannelSubscription = subscription;
         protect(self);
       }
     }),
     disconnectUserChannel() {
+      // Properly cleanup both subscription and consumer to prevent socket leaks
       self.userChannelSubscription?.unsubscribe();
+      self.userChannelConsumer?.disconnect();
       unprotect(self);
       self.userChannelSubscription = null;
+      self.userChannelConsumer = null;
       protect(self);
     },
   }))
