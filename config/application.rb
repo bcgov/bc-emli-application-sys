@@ -73,8 +73,6 @@ module HousPermitPortal
     # This will enable unique validations on encrypted fields
     config.active_record.encryption.extend_queries = true
 
-    # Remove Warden::JWTAuth::Middleware to prevent conflicts with WebSocket authentication
-    # We handle JWT authentication manually in ActionCable connection.rb
-    config.middleware.delete Warden::JWTAuth::Middleware
+    # JWT WebSocket configuration moved to config/initializers/warden_jwt_websocket_fix.rb
   end
 end
