@@ -33,13 +33,27 @@ class Api::SessionsController < Devise::SessionsController
   end
 
   def websocket_token
+    Rails.logger.info "[WebSocket Auth] Starting websocket_token request"
     authenticate_user!
-    # Generate JWT token for WebSocket authentication
-    encoder = Warden::JWTAuth::UserEncoder.new
-    result = encoder.call(current_user, :user, nil)
-    # Handle the case where encoder returns [token, jti] tuple
-    token = result.is_a?(Array) ? result.first : result
+    Rails.logger.info "[WebSocket Auth] User authenticated: #{current_user&.id}"
 
-    render json: { token: token }, status: :ok
+    # Generate JWT token for WebSocket authentication
+    begin
+      encoder = Warden::JWTAuth::UserEncoder.new
+      Rails.logger.info "[WebSocket Auth] Created JWT encoder"
+      result = encoder.call(current_user, :user, nil)
+      Rails.logger.info "[WebSocket Auth] Encoder result: #{result.class}"
+      # Handle the case where encoder returns [token, jti] tuple
+      token = result.is_a?(Array) ? result.first : result
+      Rails.logger.info "[WebSocket Auth] Final token present: #{token.present?}"
+
+      render json: { token: token }, status: :ok
+    rescue => e
+      Rails.logger.error "[WebSocket Auth] Error generating token: #{e.class}: #{e.message}"
+      render json: {
+               error: "Token generation failed"
+             },
+             status: :internal_server_error
+    end
   end
 end

@@ -5,34 +5,48 @@ module ApplicationCable
     identified_by :current_user
 
     def connect
+      Rails.logger.info "[WebSocket Connection] ApplicationCable::Connection#connect called"
       self.current_user = find_verified_user
+      Rails.logger.info "[WebSocket Connection] Connection established successfully"
     end
 
     private
 
     def find_verified_user
+      Rails.logger.info "[WebSocket Connection] Starting WebSocket authentication"
+
       # Extract JWT token from connection parameters (query string)
       # 'jid' is a legacy parameter name that may be used by older clients
       token = request.params["token"] || request.params["jid"]
 
+      Rails.logger.info "[WebSocket Connection] Token present: #{token.present?}"
+      Rails.logger.info "[WebSocket Connection] Token length: #{token&.length}"
+
       if Rails.env.development?
-        logger.info "WebSocket connection attempt with a token received."
+        Rails.logger.info "WebSocket connection attempt with a token received."
       end
 
       if token.blank?
-        logger.warn "No JWT token provided in WebSocket connection parameters"
+        Rails.logger.warn "[WebSocket Connection] No JWT token provided in WebSocket connection parameters"
+        Rails.logger.warn "No JWT token provided in WebSocket connection parameters"
         reject_unauthorized_connection
         return
       end
 
       # Decode JWT token manually since Warden may not be available in WebSocket context
       begin
+        Rails.logger.info "[WebSocket Connection] Starting JWT decoding"
+
         secret = ENV["DEVISE_JWT_SECRET_KEY"]
         if secret.blank?
-          logger.error "Missing DEVISE_JWT_SECRET_KEY environment variable"
+          Rails.logger.error "[WebSocket Connection] Missing DEVISE_JWT_SECRET_KEY environment variable"
+          Rails.logger.error "Missing DEVISE_JWT_SECRET_KEY environment variable"
           reject_unauthorized_connection
           return
         end
+
+        Rails.logger.info "[WebSocket Connection] JWT secret available, decoding token"
+
         decoded_token =
           JWT.decode(
             token,
@@ -43,25 +57,34 @@ module ApplicationCable
         payload = decoded_token.first
         user_id = payload["sub"]
 
+        Rails.logger.info "[WebSocket Connection] JWT decoded successfully, user_id: #{user_id}"
+
         verified_user = User.find(user_id) if user_id
 
+        Rails.logger.info "[WebSocket Connection] User lookup result: #{verified_user ? "found" : "not found"}"
+
         if Rails.env.development? && verified_user
-          logger.info "WebSocket authentication successful for user: #{verified_user.id}"
+          Rails.logger.info "WebSocket authentication successful for user: #{verified_user.id}"
         end
       rescue JWT::DecodeError => e
-        logger.error "JWT decode error: #{e.class}: #{e.message}"
+        Rails.logger.error "[WebSocket Connection] JWT decode error: #{e.class}: #{e.message}"
+        Rails.logger.error "JWT decode error: #{e.class}: #{e.message}"
         reject_unauthorized_connection
         return
       rescue => e
-        logger.error "WebSocket authentication error: #{e.class}: #{e.message}"
+        Rails.logger.error "[WebSocket Connection] WebSocket authentication error: #{e.class}: #{e.message}"
+        Rails.logger.error "[WebSocket Connection] Backtrace: #{e.backtrace&.first(3)}"
+        Rails.logger.error "WebSocket authentication error: #{e.class}: #{e.message}"
         reject_unauthorized_connection
         return
       end
 
       if verified_user.blank?
-        logger.warn "Invalid JWT token provided in WebSocket connection"
+        Rails.logger.warn "[WebSocket Connection] Invalid JWT token provided in WebSocket connection"
+        Rails.logger.warn "Invalid JWT token provided in WebSocket connection"
         reject_unauthorized_connection
       else
+        Rails.logger.info "[WebSocket Connection] WebSocket authentication successful for user: #{verified_user.id}"
         verified_user
       end
     end
