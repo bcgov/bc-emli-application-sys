@@ -10,7 +10,7 @@ Rails.application.configure do
 
     # Enable detailed ActionCable logging for debugging
     ActionCable.server.config.logger = Rails.logger
-    ActionCable.server.config.log_level = :debug
+    ActionCable.server.logger.level = Logger::DEBUG
 
     Rails.logger.info "ActionCable configured for #{ENV.fetch("ANYCABLE_URL", "/cable")}"
   end
