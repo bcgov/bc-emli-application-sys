@@ -12,7 +12,8 @@ endif
 define arguments
 	"${NAME}" . -n "${NAMESPACE}" -f values.yaml -f "values-${NAMESPACE}.yaml" \
 	--set app.image.tag="${IMAGE_TAG}" \
-	--set sidekiq.image.tag="${IMAGE_TAG}"
+	--set sidekiq.image.tag="${IMAGE_TAG}" \
+	--set anycable-rpc.image.tag="${IMAGE_TAG}"
 endef
 
 define curr-image-tag
