@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+Rails.logger.info "[STARTUP DEBUG] warden_jwt_websocket_fix.rb initializer loading at #{Time.now}"
+
 # Fix WebSocket "Nil JSON web token" error by skipping JWT middleware for /cable requests
 # WebSocket authentication is handled manually in ApplicationCable::Connection
 
@@ -13,15 +15,13 @@ class WebSocketFriendlyJWTAuth
   def call(env)
     is_websocket = websocket_request?(env)
 
-    # Add detailed logging for debugging
     if is_websocket
+      # Add detailed logging for debugging
       Rails.logger.info "[WebSocket Middleware] Skipping JWT auth for WebSocket request: #{env["PATH_INFO"]}"
       Rails.logger.info "[WebSocket Middleware] HTTP_UPGRADE: #{env["HTTP_UPGRADE"]}"
       Rails.logger.info "[WebSocket Middleware] User-Agent: #{env["HTTP_USER_AGENT"]}"
       Rails.logger.info "[WebSocket Middleware] Request Method: #{env["REQUEST_METHOD"]}"
-    end
 
-    if is_websocket
       # Completely bypass Warden for WebSocket requests
       env["warden"] = nil
       Rails.logger.info "[WebSocket Middleware] Bypassing Warden, calling next app"
