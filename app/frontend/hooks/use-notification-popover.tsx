@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useMst } from '../setup/root';
 
 interface PopoverContextProps {
@@ -21,23 +21,58 @@ export const PopoverProvider: React.FC<IPopoverProvider> = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showRead, setShowRead] = useState<boolean>(false);
   const [numberJustRead, setNumberJustRead] = useState<number>(0);
+  const [notificationsShownOnce, setNotificationsShownOnce] = useState<Set<string>>(new Set());
 
   const { notificationStore } = useMst();
-  const { unreadNotificationsCount, markAllAsRead, setPopoverOpen } = notificationStore;
+  const { unreadNotificationsCount, markAllAsRead, setPopoverOpen, notifications } = notificationStore;
+
+  // When popover is open and new notifications arrive, update numberJustRead
+  useEffect(() => {
+    if (isOpen && unreadNotificationsCount > numberJustRead) {
+      setNumberJustRead(unreadNotificationsCount);
+    }
+  }, [isOpen, unreadNotificationsCount, numberJustRead]);
 
   const handleOpen = () => {
     setIsOpen(true);
     setPopoverOpen(true);
-    setNumberJustRead(unreadNotificationsCount);
+
+    // Only show notifications that haven't been shown before
+    const newNotifications = notifications
+      .slice(0, unreadNotificationsCount)
+      .filter((n) => !notificationsShownOnce.has(n.id));
+    setNumberJustRead(newNotifications.length);
+
     if (unreadNotificationsCount > 0) {
       markAllAsRead();
     }
+
+    // Reset showRead when opening to show new notifications in main area
+    setShowRead(false);
   };
 
   const handleClose = () => {
     setIsOpen(false);
     setPopoverOpen(false);
-    setShowRead(false);
+
+    // Mark all notifications as read to clear the red dot
+    if (unreadNotificationsCount > 0) {
+      markAllAsRead();
+    }
+
+    // Mark currently shown notifications as having been shown once
+    const currentlyShown = notifications.slice(0, numberJustRead);
+    const newShownOnce = new Set(notificationsShownOnce);
+    currentlyShown.forEach((n) => newShownOnce.add(n.id));
+    setNotificationsShownOnce(newShownOnce);
+
+    // Clear numberJustRead so next open shows only truly new notifications
+    setNumberJustRead(0);
+
+    // Delay moving notifications to "see more" to avoid flash
+    setTimeout(() => {
+      setShowRead(true);
+    }, 100);
   };
 
   return (

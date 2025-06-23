@@ -112,8 +112,8 @@ module PermitApplicationStatus
     private
 
     def check_ineligible_transition
-      if saved_change_to_status? && status_before_last_save != "ineligible" &&
-           ineligible?
+      if saved_change_to_status? && status_previously_was != "ineligible" &&
+           status == "ineligible"
         handle_ineligible_status
       end
     end

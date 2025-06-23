@@ -44,6 +44,7 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
     getSemanticKey,
     deleteNotification,
     clearAllNotifications,
+    unreadNotificationsCount,
   } = notificationStore;
 
   useEffect(() => {
@@ -53,9 +54,12 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
   const { isOpen, handleOpen, handleClose, numberJustRead, showRead, setShowRead, setNumberJustRead } =
     useNotificationPopover();
 
-  const { t } = useTranslation();
-
+  // Determine which notifications to show:
+  // - If showRead is true, show all notifications
+  // - Otherwise, show only the first numberJustRead notifications (new ones)
   const notificationsToShow = showRead ? notifications : notifications.slice(0, numberJustRead);
+
+  const { t } = useTranslation();
 
   const handleDeleteNotification = (notificationId: string, e: React.MouseEvent) => {
     e.stopPropagation();

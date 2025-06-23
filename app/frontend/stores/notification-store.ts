@@ -282,7 +282,12 @@ export const NotificationStoreModel = types
     }),
     processWebsocketChange: (payload: IUserPushPayload) => {
       self.notifications.unshift(self.convertNotificationToUseDate(payload.data));
-      self.unreadNotificationsCount = self.popoverOpen ? 0 : payload.meta.unreadCount;
+      if (self.popoverOpen) {
+        // If popover is open, increment unread count so new notification appears as unread
+        self.unreadNotificationsCount += 1;
+      } else {
+        self.unreadNotificationsCount = payload.meta.unreadCount;
+      }
       self.totalPages = payload.meta.totalPages;
     },
   }));
