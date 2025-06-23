@@ -18,17 +18,3 @@ if Rails.env.production? && ENV["IS_DOCKER_BUILD"].blank?
     # If needed, custom connection code here to explicitly set the role or other specific settings
   end
 end
-
-# Enable detailed logging for debugging WebSocket authentication issues
-AnyCable.configure do |config|
-  # Enable debug logging in all environments for troubleshooting
-  config.debug = true
-  config.log_level = :debug
-
-  # Log all connection events
-  Rails.logger.info "AnyCable configured with debug logging enabled"
-end
-
-# Add connection logging hooks
-# Note: connection_factory is no longer configurable in AnyCable v1.4+
-# Connection logging should be done within the connection class itself

@@ -12,11 +12,7 @@
 default: &default # Turn on/off access logs ("Started..." and "Finished...")
   access_logs_disabled: false
   # Whether to enable gRPC level logging or not
-  log_grpc: true
-  # Enable debug logging for connection issues
-  debug: true
-  # Log connection events
-  log_level: debug
+  log_grpc: false
   # Use Redis to broadcast messages to AnyCable server
   broadcast_adapter: redis
   # Use the same channel name for WebSocket server, e.g.:

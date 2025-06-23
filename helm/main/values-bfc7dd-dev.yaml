@@ -171,11 +171,6 @@ elasticsearch:
 anycableGo:
   enabled: true
 
-  # Enable debug logging for troubleshooting WebSocket authentication
-  env:
-    anycableDebug: true
-    anycableLogLevel: debug
-
   route:
     enabled: true
     host: dev-hesp-anycable.apps.silver.devops.gov.bc.ca
