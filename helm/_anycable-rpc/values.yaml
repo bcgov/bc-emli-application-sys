@@ -24,6 +24,8 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
+crunchydbSecret: hesp-crunchydb-pguser-postgres
+
 service:
   type: ClusterIP
   port: 50051
