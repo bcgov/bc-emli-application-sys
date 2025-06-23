@@ -43,7 +43,7 @@ module ApplicationCable
         Rails.logger.warn "[WebSocket Connection] No JWT token provided in WebSocket connection parameters"
         Rails.logger.warn "No JWT token provided in WebSocket connection parameters"
         # Provide more specific error message
-        reject_unauthorized_connection("No JWT token provided")
+        reject_unauthorized_connection
         return
       end
 
@@ -55,7 +55,7 @@ module ApplicationCable
         if secret.blank?
           Rails.logger.error "[WebSocket Connection] Missing DEVISE_JWT_SECRET_KEY environment variable"
           Rails.logger.error "Missing DEVISE_JWT_SECRET_KEY environment variable"
-          reject_unauthorized_connection("JWT secret not configured")
+          reject_unauthorized_connection
           return
         end
 
@@ -83,20 +83,20 @@ module ApplicationCable
       rescue JWT::DecodeError => e
         Rails.logger.error "[WebSocket Connection] JWT decode error: #{e.class}: #{e.message}"
         Rails.logger.error "JWT decode error: #{e.class}: #{e.message}"
-        reject_unauthorized_connection("Invalid JWT token: #{e.message}")
+        reject_unauthorized_connection
         return
       rescue => e
         Rails.logger.error "[WebSocket Connection] WebSocket authentication error: #{e.class}: #{e.message}"
         Rails.logger.error "[WebSocket Connection] Backtrace: #{e.backtrace&.first(3)}"
         Rails.logger.error "WebSocket authentication error: #{e.class}: #{e.message}"
-        reject_unauthorized_connection("Authentication error")
+        reject_unauthorized_connection
         return
       end
 
       if verified_user.blank?
         Rails.logger.warn "[WebSocket Connection] Invalid JWT token provided in WebSocket connection"
         Rails.logger.warn "Invalid JWT token provided in WebSocket connection"
-        reject_unauthorized_connection("User not found")
+        reject_unauthorized_connection
       else
         Rails.logger.info "[WebSocket Connection] WebSocket authentication successful for user: #{verified_user.id}"
         verified_user
