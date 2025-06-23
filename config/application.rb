@@ -72,7 +72,5 @@ module HousPermitPortal
       ENV["ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"]
     # This will enable unique validations on encrypted fields
     config.active_record.encryption.extend_queries = true
-
-    # JWT WebSocket configuration moved to config/initializers/warden_jwt_websocket_fix.rb
   end
 end
