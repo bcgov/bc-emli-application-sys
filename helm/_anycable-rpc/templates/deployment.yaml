@@ -52,6 +52,16 @@ spec:
           env:
             - name: DEPLOYMENT_TAG
               value: {{ $deploymentTag | quote }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.crunchydbSecret }}
+                  key: uri
+            - name: DATABASE_OPENSHIFT_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.crunchydbSecret }}
+                  key: host
           {{- $env := merge (.Values.global.env | default dict) (.Values.env | default dict) -}}
             {{- range $k, $v := $env }}
             - name: {{ $k | quote }}
