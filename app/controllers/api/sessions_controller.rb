@@ -13,8 +13,6 @@ class Api::SessionsController < Devise::SessionsController
     authenticate_user!
     if current_user
       warden.authenticate({ scope: :user })
-      Rails.logger.info "Session entry_point: #{session[:entry_point].inspect}"
-
       # Include entry_point from session, if set
       extra_meta = {}
       extra_meta[:entry_point] = session[:entry_point] if session[
@@ -33,23 +31,14 @@ class Api::SessionsController < Devise::SessionsController
   end
 
   def websocket_token
-    Rails.logger.info "[WebSocket Auth] Starting websocket_token request"
     authenticate_user!
-    Rails.logger.info "[WebSocket Auth] User authenticated: #{current_user&.id}"
-
-    # Generate JWT token for WebSocket authentication
     begin
       encoder = Warden::JWTAuth::UserEncoder.new
-      Rails.logger.info "[WebSocket Auth] Created JWT encoder"
       result = encoder.call(current_user, :user, nil)
-      Rails.logger.info "[WebSocket Auth] Encoder result: #{result.class}"
-      # Handle the case where encoder returns [token, jti] tuple
       token = result.is_a?(Array) ? result.first : result
-      Rails.logger.info "[WebSocket Auth] Final token present: #{token.present?}"
-
       render json: { token: token }, status: :ok
-    rescue => e
-      Rails.logger.error "[WebSocket Auth] Error generating token: #{e.class}: #{e.message}"
+    rescue StandardError => e # More specific than bare rescue
+      Rails.logger.error "[WebSocket Auth] Token generation failed: #{e.class}: #{e.message}"
       render json: {
                error: "Token generation failed"
              },

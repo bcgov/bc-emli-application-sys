@@ -7,12 +7,6 @@ Rails.application.configure do
     config.action_cable.url =
       ActionCable.server.config.url =
         ENV.fetch("ANYCABLE_URL", "/cable") if AnyCable::Rails.enabled?
-
-    # Enable detailed ActionCable logging for debugging
-    ActionCable.server.config.logger = Rails.logger
-    ActionCable.server.logger.level = Logger::DEBUG
-
-    Rails.logger.info "ActionCable configured for #{ENV.fetch("ANYCABLE_URL", "/cable")}"
   end
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -64,8 +58,7 @@ Rails.application.configure do
   # Info include generic and useful information about system operation, but avoids logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII). If you
   # want to log everything, set the level to "debug".
-  # Temporarily set to debug for WebSocket authentication troubleshooting
-  config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "debug")
+  config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
 
   # Use a different cache store in production.
   if ENV["IS_DOCKER_BUILD"].blank?
