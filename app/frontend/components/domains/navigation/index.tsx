@@ -16,6 +16,7 @@ import { ProgramsIndexScreen } from '../programs';
 import { ProgramInviteUserScreen } from '../programs/invite-users';
 import RejectApplicationScreen from '../permit-application/application-rejection-reason';
 import { BlankTemplateScreen } from '../requirement-template/screens/blank-template';
+import { ContractorLandingScreen } from '../contractor-landing';
 
 const ExternalApiKeysIndexScreen = lazy(() =>
   import('../external-api-key').then((module) => ({ default: module.ExternalApiKeysIndexScreen })),
@@ -559,6 +560,7 @@ const AppRoutes = observer(() => {
         <Route path="/contact" element={<ContactScreen />} />
         <Route path="/confirmed" element={<EmailConfirmedScreen />} />
         <Route path="/welcome" element={<LandingScreen />} />
+        <Route path="/welcome/contractor" element={<ContractorLandingScreen />} />
         <Route path="/check-eligible" element={<EligibilityCheck />} />
         <Route path="/get-support" element={<SupportScreen />} />
         <Route

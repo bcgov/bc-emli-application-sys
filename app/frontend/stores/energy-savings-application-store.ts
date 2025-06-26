@@ -50,7 +50,7 @@ export const PermitApplicationStoreModel = types
       ]),
       userGroupTypeIdFilter: types.maybeNull(types.string),
       submissionTypeIdFilter: types.maybeNull(types.array(types.string)),
-      audienceTypeIdFilter: types.maybeNull(types.string),
+      audienceTypeIdFilter: types.maybeNull(types.array(types.string)),
       submitterFilter: types.maybeNull(types.string),
       auditUserFilter: types.maybeNull(types.string),
       templateVersionIdFilter: types.maybeNull(types.string),
@@ -228,11 +228,14 @@ export const PermitApplicationStoreModel = types
       self.submissionTypeIdFilter = cast(ids);
     },
 
-    setAudienceTypeFilter(id: string) {
-      if (!id) return;
-      // setQueryParam('audience_type_id', id);
-      // @ts-ignore
-      self.audienceTypeIdFilter = id;
+    setAudienceTypeFilter(id: string | string[]) {
+      if (!id || (Array.isArray(id) && id.length === 0)) return;
+
+      const ids = Array.isArray(id) ? id : [id];
+      const joinedIds = ids.join(',');
+
+      // @ts-ignor"
+      self.audienceTypeIdFilter = cast(ids);
     },
   }))
   .actions((self) => ({

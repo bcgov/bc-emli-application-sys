@@ -18,6 +18,8 @@ export const colors = {
     radioOutline: '#0D6EFD',
     buttonHover: 'linear-gradient(0deg, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0.32) 100%), #234075;',
     blueAltGradient: 'linear-gradient(124.8deg, #142B43 -52.7%, #142B43 -52.68%, #054277 47.38%, #142B43 137.55%)',
+    bannerGradient: 'linear-gradient(180deg, rgba(0, 0, 0, 0) 12.92%, rgba(12, 38, 64, 0.7) 50.36%)',
+    bannerTextShadow: '0px 0px 2px rgba(0, 0, 0, 0.2), 0px 5px 10px rgba(0, 0, 0, 0.2)',
     blueGradient:
       'var(--Gradient-Blue-Background, linear-gradient(125deg, #142B43 -52.7%, #142B43 -52.68%, #054277 47.38%, #142B43 137.55%))',
     blueImageGradient: 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 12.92%, rgba(12, 38, 64, 0.80) 50.36%)',
