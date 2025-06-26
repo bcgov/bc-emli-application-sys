@@ -54,7 +54,7 @@ module Api::Concerns::Search::PermitApplications
           :requirement_template_id,
           :template_version_id,
           :user_group_type_id,
-          :audience_type_id,
+          { audience_type_id: [] },
           { submission_type_id: [] },
           { status: [] }
         ],
@@ -65,8 +65,8 @@ module Api::Concerns::Search::PermitApplications
       UserGroupType.find_by(
         code: permitted_params[:filters][:user_group_type_id]
       )
-    @audience_type =
-      AudienceType.find_by(code: permitted_params[:filters][:audience_type_id])
+    @audience_types =
+      AudienceType.where(code: permitted_params[:filters][:audience_type_id])
     @submission_types =
       SubmissionType.where(
         code: permitted_params[:filters][:submission_type_id]
@@ -104,7 +104,7 @@ module Api::Concerns::Search::PermitApplications
     where.merge!(
       sandbox_id: (current_sandbox&.id unless current_user.system_admin?),
       user_group_type_id: @user_group_type&.id,
-      audience_type_id: @audience_type&.id,
+      audience_type_id: @audience_types.pluck(:id),
       submission_type_id: @submission_types.pluck(:id)
     ).compact!
     filters.to_h.deep_symbolize_keys.compact.merge!(where)

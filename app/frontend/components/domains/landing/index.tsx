@@ -72,10 +72,24 @@ export const LandingScreen = observer(({}: ILandingScreenProps) => {
       >
         {/* Content */}
         <Flex wrap="wrap" gap={4} alignItems="center" direction="column" textAlign="center" p={4}>
-          <Text fontSize="5xl" fontWeight="bold" color="white" zIndex="1">
+          <Text
+            as="h1"
+            fontSize={{ base: '2xl', md: '6xl' }}
+            fontWeight="bold"
+            color="white"
+            textShadow="theme.bannerTextShadow"
+            width="xl"
+          >
             {t('landing.title')}
           </Text>
-          <Text fontSize="md" fontWeight="bold" color="white" whiteSpace="normal" zIndex="1" maxW="600px">
+          <Text
+            fontSize="md"
+            fontWeight="normal"
+            variant="line_height_medium"
+            textShadow="theme.bannerTextShadow"
+            maxW="600px"
+            color="white"
+          >
             {t('landing.intro')}
           </Text>
         </Flex>

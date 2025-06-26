@@ -179,9 +179,9 @@ export const NavBar = observer(function NavBar() {
             {!loggedIn && (
               <Hide below="lg">
                 <Flex direction="column" w="full">
-                  <Text fontSize="2xl" fontWeight="400" color="greys.anotherGrey" whiteSpace="nowrap">
+                  <Heading as="h2" fontWeight="400" color="greys.anotherGrey" whiteSpace="nowrap">
                     {t('site.titleLong')}
-                  </Text>
+                  </Heading>
                 </Flex>
                 <Spacer />
               </Hide>

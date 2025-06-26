@@ -68,8 +68,13 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
     try {
       // const result = await permitClassificationStore.submissionOptionTypes();
       setUserGroupFilter(EPermitClassificationCode.participant);
-      setAudienceTypeFilter(EPermitClassificationCode.external);
-      setSubmissionTypeFilter(EPermitClassificationCode.application);
+      setAudienceTypeFilter([EPermitClassificationCode.external, EPermitClassificationCode.internal]);
+      setSubmissionTypeFilter([
+        EPermitClassificationCode.application,
+        EPermitClassificationCode.onboarding,
+        EPermitClassificationCode.invoice,
+        EPermitClassificationCode.supportRequest,
+      ]);
     } catch (error) {
       console.error('Failed to fetch submission options', error);
     }
