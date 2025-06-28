@@ -146,12 +146,12 @@ export const NavBar = observer(function NavBar() {
           top: '7px',
         }}
       >
-        {t('a11y.skipToMainContent', 'Skip to main content')}
+        {t('a11y.skipToMainContent')}
       </Link>
       <Box
         as="nav"
         role="navigation"
-        aria-label={t('site.mainNavigation', 'Main navigation')}
+        aria-label={t('site.mainNavigation')}
         id="mainNav"
         w="full"
         maxW="100%"
@@ -170,7 +170,7 @@ export const NavBar = observer(function NavBar() {
             <Link
               as={RouterLink}
               to="/"
-              aria-label={t('site.linkHome', 'Go to homepage')}
+              aria-label={t('site.linkHome')}
               display="flex"
               alignItems="center"
               _focus={{
@@ -228,12 +228,7 @@ export const NavBar = observer(function NavBar() {
 
             <HStack gap={2} w="full" justify="flex-end">
               {/* Notifications - Logged in users only */}
-              {loggedIn && (
-                <NotificationsPopover
-                  aria-label={t('notifications.title', 'Notifications')}
-                  color="greys.anotherGrey"
-                />
-              )}
+              {loggedIn && <NotificationsPopover aria-label={t('notification.title')} color="greys.anotherGrey" />}
 
               {/* Desktop Links - Logged in users (lg+) */}
               {loggedIn && (
@@ -344,7 +339,7 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
               }}
             />
           </Text>
-          <Link onClick={handleOpen} aria-label={t('site.reviewNotifications.label', 'Review all notifications')}>
+          <Link onClick={handleOpen} aria-label={t('site.reviewNotificationsLabel')}>
             {t('site.reviewNotifications')}
           </Link>
         </Flex>
@@ -353,7 +348,7 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
   );
 });
 
-// ===== MENU COMPONENT =====
+// ===== MENU COMPONENT ====
 const NavBarMenu = observer(function NavBarMenu() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -412,9 +407,7 @@ const NavBarMenu = observer(function NavBarMenu() {
           p={3}
           mr={3}
           variant={loggedIn && !currentUser?.isSubmitter ? 'primary' : 'primaryInverse'}
-          aria-label={
-            isMenuOpen ? t('site.menu.close', 'Close navigation menu') : t('site.menu.open', 'Open navigation menu')
-          }
+          aria-label={isMenuOpen ? t('site.menuClose') : t('site.menuOpen')}
           aria-expanded={isMenuOpen}
           aria-haspopup="menu"
           aria-controls="main-navigation-menu"
@@ -445,7 +438,7 @@ const NavBarMenu = observer(function NavBarMenu() {
             p={3}
             mr={3}
             variant="primaryInverse"
-            aria-label={isMenuOpen ? t('site.menu.close', 'Close menu') : t('site.menu.open', 'Open menu')}
+            aria-label={isMenuOpen ? t('site.menuClose') : t('site.menuOpen')}
             aria-expanded={isMenuOpen}
             aria-haspopup="menu"
             aria-controls="main-navigation-menu"
@@ -492,11 +485,7 @@ const NavBarMenu = observer(function NavBarMenu() {
                         </MenuGroup>
                       </Show>
                       <MenuItem onClick={() => navigate('/new-application')} role="menuitem">
-                        <Button
-                          as={Box}
-                          variant="primary"
-                          aria-label={t('site.newApplication.label', 'Start a new application')}
-                        >
+                        <Button as={Box} variant="primary" aria-label={t('site.newApplicationLabel')}>
                           {t('site.newApplication')}
                         </Button>
                       </MenuItem>
