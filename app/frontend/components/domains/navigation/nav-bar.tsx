@@ -344,8 +344,8 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
               }}
             />
           </Text>
-          <Link onClick={handleOpen} aria-label={t('site.reviewNotifications.label', 'Review all notifications')}>
-            {t('site.reviewNotifications')}
+          <Link onClick={handleOpen} aria-label={t('site.reviewNotifications.label' as any)}>
+            {t('site.reviewNotifications._' as any)}
           </Link>
         </Flex>
       </Flex>
@@ -378,7 +378,7 @@ const NavBarMenu = observer(function NavBarMenu() {
   const reviewManagerItems = (
     <MenuGroup>
       <NavMenuItem label={t('home.submissionInboxTitle')} to={'/submission-inbox'} />
-      <NavMenuItem label={t('site.newApplication')} to={`/new-application`} />
+      <NavMenuItem label={t('site.newApplication._')} to={`/new-application`} />
       <NavMenuItem label={t('home.viewBlankApplicationsTitle')} to={`/blank-applications`} />
       <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/supported-applications'} />
       <NavMenuItem label={t('home.configureUsersTitle')} to={'/configure-users'} />
@@ -388,7 +388,7 @@ const NavBarMenu = observer(function NavBarMenu() {
   const reviewerItems = (
     <MenuGroup>
       <NavMenuItem label={t('home.submissionInboxTitle')} to={`/submission-inbox`} />
-      <NavMenuItem label={t('site.newApplication')} to={`/new-application`} />
+      <NavMenuItem label={t('site.newApplication._')} to={`/new-application`} />
       <NavMenuItem label={t('home.viewBlankApplicationsTitle')} to={`/blank-applications`} />
       <NavMenuItem label={t('home.viewSupportedApplicationsTitle')} to={'/supported-applications'} />
     </MenuGroup>
@@ -412,9 +412,7 @@ const NavBarMenu = observer(function NavBarMenu() {
           p={3}
           mr={3}
           variant={loggedIn && !currentUser?.isSubmitter ? 'primary' : 'primaryInverse'}
-          aria-label={
-            isMenuOpen ? t('site.menu.close', 'Close navigation menu') : t('site.menu.open', 'Open navigation menu')
-          }
+          aria-label={isMenuOpen ? t('site.menu.close') : t('site.menu.open')}
           aria-expanded={isMenuOpen}
           aria-haspopup="menu"
           aria-controls="main-navigation-menu"
@@ -445,14 +443,14 @@ const NavBarMenu = observer(function NavBarMenu() {
             p={3}
             mr={3}
             variant="primaryInverse"
-            aria-label={isMenuOpen ? t('site.menu.close', 'Close menu') : t('site.menu.open', 'Open menu')}
+            aria-label={isMenuOpen ? t('site.menu.close') : t('site.menu.open')}
             aria-expanded={isMenuOpen}
             aria-haspopup="menu"
             aria-controls="main-navigation-menu"
             leftIcon={<List size={16} weight="bold" />}
             fontSize={{ base: 'lg', lg: 'xl' }}
           >
-            {t('site.menu')}
+            {t('site.menu._')}
           </MenuButton>
         </Hide>
       )}
@@ -492,12 +490,8 @@ const NavBarMenu = observer(function NavBarMenu() {
                         </MenuGroup>
                       </Show>
                       <MenuItem onClick={() => navigate('/new-application')} role="menuitem">
-                        <Button
-                          as={Box}
-                          variant="primary"
-                          aria-label={t('site.newApplication.label', 'Start a new application')}
-                        >
-                          {t('site.newApplication')}
+                        <Button as={Box} variant="primary" aria-label={t('site.newApplication.label')}>
+                          {t('site.newApplication._')}
                         </Button>
                       </MenuItem>
                       <MenuDivider my={0} borderColor="border.light" />

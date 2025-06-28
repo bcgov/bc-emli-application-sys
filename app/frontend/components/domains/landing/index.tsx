@@ -265,7 +265,7 @@ export const LandingScreen = observer(() => {
             lineHeight="36px"
             mb={8}
           >
-            {t('landing.otherWaysTitle', 'Other ways to get started')}
+            {t('landing.otherWaysTitle')}
           </Heading>
           <Flex gap={6} direction={{ base: 'column', lg: 'row' }}>
             {/* Method 1: Get help with your ESP application */}
@@ -278,7 +278,7 @@ export const LandingScreen = observer(() => {
               p={4}
             >
               <Heading as="h3" fontSize="20px" fontWeight="700" color="theme.blueAlt" lineHeight="34px" mb={4}>
-                {t('landing.getHelpTitle', 'Get help with your ESP application')}
+                {t('landing.getHelpTitle')}
               </Heading>
               <Text fontSize="16px" lineHeight="27px" color="theme.blueAlt" mb={4}>
                 <Text as="span" aria-label="Phone number">
@@ -298,7 +298,7 @@ export const LandingScreen = observer(() => {
               p={4}
             >
               <Heading as="h3" fontSize="20px" fontWeight="700" color="theme.blueAlt" lineHeight="34px" mb={4}>
-                {t('landing.energySpecialistTitle', 'Get upgrade advice from an energy specialist')}
+                {t('landing.energySpecialistTitle')}
               </Heading>
               <Link
                 href="https://www.betterhomesbc.ca/energy-coach/"
@@ -332,7 +332,7 @@ export const LandingScreen = observer(() => {
               p={4}
             >
               <Heading as="h3" fontSize="20px" fontWeight="700" color="theme.blueAlt" lineHeight="34px" mb={4}>
-                {t('landing.energyEfficiencyTitle', "Learn more about your home's energy efficiency")}
+                {t('landing.energyEfficiencyTitle')}
               </Heading>
               <Link
                 href="https://www.energystepcode.ca/home-energy-planner/"

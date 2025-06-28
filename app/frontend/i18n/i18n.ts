@@ -16,6 +16,9 @@ const options = {
     /* English translations */
     en: {
       translation: {
+        a11y: {
+          skipToMainContent: 'Skip to main content',
+        },
         auth: {
           login: 'Log in',
           findOut: 'Find out more to register',
@@ -332,6 +335,10 @@ const options = {
           },
           duringApplication: 'During the application, we will ask for:',
           informationReady: 'To make things easier, collect this information before you begin your application.',
+          otherWaysTitle: 'Other ways to get started',
+          getHelpTitle: 'Get help with your ESP application',
+          energySpecialistTitle: 'Get upgrade advice from an energy specialist',
+          energyEfficiencyTitle: "Learn more about your home's energy efficiency",
           otherWays: 'Other ways to get started',
           reqsVary:
             'Permit requirements vary by local jurisdiction and depend on the geography of the surrounding location.',
@@ -2705,13 +2712,25 @@ const options = {
           loggedInWelcome: 'Welcome back!',
           myApplications: 'My applications',
           myPermits: 'My permits',
-          newApplication: 'Start an application',
+          newApplication: {
+            _: 'Start an application',
+            label: 'Start a new application',
+          },
           activePermits: 'Active permits',
           approvedPermits: 'Approved permits',
           myAccount: 'My Account',
           giveFeedback: 'Give feedback',
           error: 'Something went wrong, please try refreshing the page',
-          menu: 'Menu',
+          menu: {
+            _: 'Menu',
+            open: 'Open menu',
+            close: 'Close menu',
+          },
+          mainNavigation: 'Main navigation',
+          reviewNotifications: {
+            _: 'Review notifications',
+            label: 'Review all notifications',
+          },
           somethingWrong: 'Something went wrong',
           pageNotFound: 'Oops, we can’t find that page',
           pageNotFoundInstructions:
