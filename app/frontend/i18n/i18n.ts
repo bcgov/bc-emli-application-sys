@@ -2719,8 +2719,12 @@ const options = {
           giveFeedback: 'Give feedback',
           error: 'Something went wrong, please try refreshing the page',
           menu: 'Menu',
+          menuClose: 'Close menu',
+          menuOpen: 'Open menu',
           mainNavigation: 'Main navigation',
+          newApplicationLabel: 'Start a new application',
           reviewNotifications: 'Review notifications',
+          reviewNotificationsLabel: 'Review all notifications',
           somethingWrong: 'Something went wrong',
           pageNotFound: 'Oops, we can’t find that page',
           pageNotFoundInstructions:
@@ -2741,7 +2745,6 @@ const options = {
           pleaseContact:
             'Please contact your local government for questions related to your energy savings application.',
           forHelp: 'For help with the Building Permit Hub please contact:',
-          reviewNotifications: 'Review notifications',
           breadcrumb: {
             latest: 'Latest',
             profile: 'Edit My account',
