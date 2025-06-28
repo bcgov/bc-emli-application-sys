@@ -348,7 +348,7 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
   );
 });
 
-// ===== MENU COMPONENT =====
+// ===== MENU COMPONENT ====
 const NavBarMenu = observer(function NavBarMenu() {
   const { t } = useTranslation();
   const navigate = useNavigate();
