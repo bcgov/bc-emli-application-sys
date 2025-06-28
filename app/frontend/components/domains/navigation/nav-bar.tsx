@@ -26,7 +26,7 @@ import { observer } from 'mobx-react-lite';
 import * as R from 'ramda';
 import React, { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom';
 import { PopoverProvider, useNotificationPopover } from '../../../hooks/use-notification-popover';
 import { useMst } from '../../../setup/root';
 import { INotification, IPermitNotificationObjectData } from '../../../types/types';
@@ -128,8 +128,30 @@ export const NavBar = observer(function NavBar() {
 
   return (
     <PopoverProvider>
+      {/* Skip Links */}
+      <Link
+        as={RouterLink}
+        to="#main-content"
+        position="absolute"
+        left="-9999px"
+        zIndex={9999}
+        bg="theme.blue"
+        color="white"
+        px={4}
+        py={2}
+        borderRadius="md"
+        textDecoration="none"
+        _focus={{
+          left: '6px',
+          top: '7px',
+        }}
+      >
+        {t('a11y.skipToMainContent', 'Skip to main content')}
+      </Link>
       <Box
         as="nav"
+        role="navigation"
+        aria-label={t('site.mainNavigation', 'Main navigation')}
         id="mainNav"
         w="full"
         maxW="100%"
@@ -142,22 +164,33 @@ export const NavBar = observer(function NavBar() {
         display="flex"
         alignItems="center"
       >
-        <Container maxW="container.lg" h="100%" mx="auto" p={0}>
+        <Container maxW="1170px" h="100%" mx="auto" p={0}>
           <Flex align="center" gap={2} w="full" h="100%">
             {/* Logo */}
-            <Image
-              height="80px"
-              width="auto"
-              maxW="280px"
-              fit="contain"
-              src={'/images/logo.png'}
-              alt={t('site.linkHome')}
-            />
+            <Link
+              as={RouterLink}
+              to="/"
+              aria-label={t('site.linkHome', 'Go to homepage')}
+              display="flex"
+              alignItems="center"
+              _focus={{
+                outline: '2px solid',
+                outlineColor: 'theme.blue',
+                outlineOffset: '2px',
+              }}
+            >
+              <Image height="80px" width="auto" maxW="280px" fit="contain" src={'/images/logo.png'} alt="" />
+            </Link>
 
             {loggedIn && (
-              <Hide below="xl">
+              <Hide below="lg">
                 <Flex direction="column" w="full">
-                  <Text fontSize="2xl" fontWeight="400" color="greys.anotherGrey" whiteSpace="nowrap">
+                  <Text
+                    fontSize={{ base: 'xl', lg: '2xl' }}
+                    fontWeight="400"
+                    color="greys.anotherGrey"
+                    whiteSpace="nowrap"
+                  >
                     {currentUser?.isSuperAdmin ? t('site.adminNavBarTitle') : t('site.titleLong')}
                   </Text>
                   {currentUser?.isReviewStaff && (
@@ -179,7 +212,13 @@ export const NavBar = observer(function NavBar() {
             {!loggedIn && (
               <Hide below="lg">
                 <Flex direction="column" w="full">
-                  <Heading as="h2" fontWeight="400" color="greys.anotherGrey" whiteSpace="nowrap">
+                  <Heading
+                    as="h2"
+                    fontSize={{ base: 'xl', lg: '2xl' }}
+                    fontWeight="400"
+                    color="greys.anotherGrey"
+                    whiteSpace="nowrap"
+                  >
                     {t('site.titleLong')}
                   </Heading>
                 </Flex>
@@ -189,29 +228,58 @@ export const NavBar = observer(function NavBar() {
 
             <HStack gap={2} w="full" justify="flex-end">
               {/* Notifications - Logged in users only */}
-              {loggedIn && <NotificationsPopover aria-label="notifications popover" color="greys.anotherGrey" />}
-
-              {/* Desktop Links - Logged in users (md+) */}
               {loggedIn && (
-                <Hide below="md">
-                  <RouterLinkButton fontSize="xl" variant="tertiary" color="greys.anotherGrey" to={'/'}>
+                <NotificationsPopover
+                  aria-label={t('notifications.title', 'Notifications')}
+                  color="greys.anotherGrey"
+                />
+              )}
+
+              {/* Desktop Links - Logged in users (lg+) */}
+              {loggedIn && (
+                <Hide below="lg">
+                  <RouterLinkButton
+                    fontSize={{ base: 'lg', lg: 'xl' }}
+                    variant="tertiary"
+                    color="greys.anotherGrey"
+                    to={'/'}
+                    aria-current={path === '/' ? 'page' : undefined}
+                  >
                     {t('site.home')}
                   </RouterLinkButton>
                   {!currentUser?.isSuperAdmin && !currentUser?.isAdminManager && !currentUser?.isAdmin && (
-                    <RouterLinkButton fontSize="xl" variant="tertiary" color="greys.anotherGrey" to={'/get-support'}>
+                    <RouterLinkButton
+                      fontSize={{ base: 'lg', lg: 'xl' }}
+                      variant="tertiary"
+                      color="greys.anotherGrey"
+                      to={'/get-support'}
+                      aria-current={path === '/get-support' ? 'page' : undefined}
+                    >
                       {t('site.support.getSupport')}
                     </RouterLinkButton>
                   )}
                 </Hide>
               )}
 
-              {/* Desktop Links - Non-logged in users (md+) */}
+              {/* Desktop Links - Non-logged in users (lg+) */}
               {!loggedIn && (
-                <Hide below="md">
-                  <RouterLinkButton fontSize="xl" variant="tertiary" color="greys.anotherGrey" to={'/get-support'}>
+                <Hide below="lg">
+                  <RouterLinkButton
+                    fontSize={{ base: 'lg', lg: 'xl' }}
+                    variant="tertiary"
+                    color="greys.anotherGrey"
+                    to={'/get-support'}
+                    aria-current={path === '/get-support' ? 'page' : undefined}
+                  >
                     {t('site.support.getSupport')}
                   </RouterLinkButton>
-                  <RouterLinkButton fontSize="xl" variant="tertiary" color="greys.anotherGrey" to="/login">
+                  <RouterLinkButton
+                    fontSize={{ base: 'lg', lg: 'xl' }}
+                    variant="tertiary"
+                    color="greys.anotherGrey"
+                    to="/login"
+                    aria-current={path === '/login' ? 'page' : undefined}
+                  >
                     {t('auth.login')}
                   </RouterLinkButton>
                 </Hide>
@@ -247,6 +315,9 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
 
   return (
     <Flex
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
       direction="column"
       gap={2}
       bg="semantic.warningLight"
@@ -255,7 +326,7 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
       p={4}
     >
       <Flex align="flex-start" gap={2} whiteSpace="normal">
-        <Warning size={24} color="var(--chakra-colors-semantic-warning)" aria-label="warning icon" />
+        <Warning size={24} color="var(--chakra-colors-semantic-warning)" aria-hidden="true" />
         <Flex direction="column" gap={2}>
           <Heading as="h3" fontSize="md">
             {t('ui.actionRequired')}
@@ -273,7 +344,9 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
               }}
             />
           </Text>
-          <Link onClick={handleOpen}>{t('site.reviewNotifications')}</Link>
+          <Link onClick={handleOpen} aria-label={t('site.reviewNotifications.label', 'Review all notifications')}>
+            {t('site.reviewNotifications')}
+          </Link>
         </Flex>
       </Flex>
     </Flex>
@@ -287,6 +360,7 @@ const NavBarMenu = observer(function NavBarMenu() {
   const { sessionStore, userStore } = useMst();
   const { currentUser } = userStore;
   const { logout, loggedIn } = sessionStore;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleClickLogout = async () => {
     await logout();
@@ -329,7 +403,7 @@ const NavBarMenu = observer(function NavBarMenu() {
   // Combine the menu button rendering logic
   const renderMenuButton = () => {
     return (
-      <Hide above="md">
+      <Hide above="lg">
         <MenuButton
           as={IconButton}
           borderRadius="lg"
@@ -338,7 +412,12 @@ const NavBarMenu = observer(function NavBarMenu() {
           p={3}
           mr={3}
           variant={loggedIn && !currentUser?.isSubmitter ? 'primary' : 'primaryInverse'}
-          aria-label="menu dropdown button"
+          aria-label={
+            isMenuOpen ? t('site.menu.close', 'Close navigation menu') : t('site.menu.open', 'Open navigation menu')
+          }
+          aria-expanded={isMenuOpen}
+          aria-haspopup="menu"
+          aria-controls="main-navigation-menu"
           icon={<List size={16} weight="bold" />}
         />
       </Hide>
@@ -346,13 +425,18 @@ const NavBarMenu = observer(function NavBarMenu() {
   };
 
   return (
-    <Menu closeOnSelect={true} placement="bottom-end">
+    <Menu
+      closeOnSelect={true}
+      placement="bottom-end"
+      onOpen={() => setIsMenuOpen(true)}
+      onClose={() => setIsMenuOpen(false)}
+    >
       {/* Unified mobile menu button */}
       {renderMenuButton()}
 
       {/* Desktop Menu Button - Logged in users only */}
       {loggedIn && (
-        <Hide below="md">
+        <Hide below="lg">
           <MenuButton
             as={Button}
             borderRadius="lg"
@@ -361,9 +445,12 @@ const NavBarMenu = observer(function NavBarMenu() {
             p={3}
             mr={3}
             variant="primaryInverse"
-            aria-label="menu dropdown button"
+            aria-label={isMenuOpen ? t('site.menu.close', 'Close menu') : t('site.menu.open', 'Open menu')}
+            aria-expanded={isMenuOpen}
+            aria-haspopup="menu"
+            aria-controls="main-navigation-menu"
             leftIcon={<List size={16} weight="bold" />}
-            fontSize="xl"
+            fontSize={{ base: 'lg', lg: 'xl' }}
           >
             {t('site.menu')}
           </MenuButton>
@@ -373,7 +460,7 @@ const NavBarMenu = observer(function NavBarMenu() {
       {/* ===== MENU DROPDOWN ===== */}
       <Portal>
         <Box color="text.primary">
-          <MenuList zIndex={99} boxShadow="2xl">
+          <MenuList id="main-navigation-menu" role="menu" aria-labelledby="menu-button" zIndex={99} boxShadow="2xl">
             {/* ===== LOGGED IN MENU ===== */}
             {loggedIn && !currentUser?.isUnconfirmed ? (
               <>
@@ -383,8 +470,8 @@ const NavBarMenu = observer(function NavBarMenu() {
                 <MenuGroup title={currentUser.name} noOfLines={1}>
                   <MenuDivider my={0} borderColor="border.light" />
 
-                  {/* Mobile Home Link */}
-                  <Show below="md">
+                  {/* Mobile/Tablet Home Link */}
+                  <Show below="lg">
                     <NavMenuItem label={t('site.home')} to={'/'} />
                   </Show>
 
@@ -398,14 +485,18 @@ const NavBarMenu = observer(function NavBarMenu() {
                   {/* Participants specific items */}
                   {currentUser?.isSubmitter && (
                     <>
-                      <Show below="md">
+                      <Show below="lg">
                         <MenuGroup>
                           <NavMenuItem label={t('site.support.getSupport')} to={'/get-support'} />
                           <MenuDivider my={0} borderColor="border.light" />
                         </MenuGroup>
                       </Show>
-                      <MenuItem onClick={(e) => navigate('/new-application')}>
-                        <Button as={Box} variant="primary">
+                      <MenuItem onClick={() => navigate('/new-application')} role="menuitem">
+                        <Button
+                          as={Box}
+                          variant="primary"
+                          aria-label={t('site.newApplication.label', 'Start a new application')}
+                        >
                           {t('site.newApplication')}
                         </Button>
                       </MenuItem>
@@ -447,19 +538,29 @@ const NavBarMenu = observer(function NavBarMenu() {
 interface INavMenuItemProps extends MenuItemProps {
   label: string;
   to?: string;
-  onClick?: (any) => void;
+  onClick?: (e: any) => void;
 }
 
 const NavMenuItem = ({ label, to, onClick, ...rest }: INavMenuItemProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isCurrentPage = to && location.pathname === to;
 
-  const handleClick = (e) => {
+  const handleClick = (e: any) => {
     if (to) navigate(to);
     if (onClick) onClick(e);
   };
 
   return (
-    <MenuItem py={2} px={3} onClick={handleClick} _hover={{ cursor: 'pointer', bg: 'hover.blue' }} {...rest}>
+    <MenuItem
+      py={2}
+      px={3}
+      onClick={handleClick}
+      _hover={{ cursor: 'pointer', bg: 'hover.blue' }}
+      aria-current={isCurrentPage ? 'page' : undefined}
+      fontWeight={isCurrentPage ? 'bold' : 'normal'}
+      {...rest}
+    >
       {label}
     </MenuItem>
   );
@@ -468,14 +569,16 @@ const NavMenuItem = ({ label, to, onClick, ...rest }: INavMenuItemProps) => {
 interface INavMenuItemCTAProps {
   label: string;
   to?: string;
-  onClick?: (any) => void;
+  onClick?: (e: any) => void;
 }
 
 const NavMenuItemCTA = ({ label, to, onClick }: INavMenuItemCTAProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isCurrentPage = to && location.pathname === to;
 
-  const handleClick = (e) => {
-    navigate(to);
+  const handleClick = (e: any) => {
+    if (to) navigate(to);
     onClick && onClick(e);
   };
 
@@ -492,6 +595,7 @@ const NavMenuItemCTA = ({ label, to, onClick }: INavMenuItemCTAProps) => {
       }}
       display={'flex'}
       justifyContent={'center'}
+      aria-current={isCurrentPage ? 'page' : undefined}
       _hover={{
         bg: 'var(--chakra-colors-theme-blueAlt) !important',
         boxShadow: 'none',

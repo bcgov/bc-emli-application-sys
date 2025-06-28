@@ -1,443 +1,394 @@
-import {
-  Box,
-  BoxProps,
-  Center,
-  Container,
-  Flex,
-  FormControl,
-  FormLabel,
-  HStack,
-  Heading,
-  InputGroup,
-  Link,
-  ListItem,
-  Text,
-  UnorderedList,
-  VStack,
-  Wrap,
-} from '@chakra-ui/react';
-import {
-  ArrowSquareOut,
-  CaretRight,
-  CheckCircle,
-  ClipboardText,
-  FileArrowUp,
-  Info,
-  MapPin,
-} from '@phosphor-icons/react';
+import { Box, Container, Flex, Heading, Link, ListItem, Text, UnorderedList } from '@chakra-ui/react';
+import { ArrowSquareOut, CaretRight } from '@phosphor-icons/react';
 import i18next from 'i18next';
 import { observer } from 'mobx-react-lite';
-import * as R from 'ramda';
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { IJurisdiction } from '../../../models/jurisdiction';
+import { Link as RouterLink } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
 import { colors } from '../../../styles/theme/foundations/colors';
-import { SharedSpinner } from '../../shared/base/shared-spinner';
-import { RouterLink } from '../../shared/navigation/router-link';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
-import { AddressSelect } from '../../shared/select/selectors/address-select';
-import { JurisdictionSelect } from '../../shared/select/selectors/jurisdiction-select';
 
-interface ILandingScreenProps {}
-
-export const LandingScreen = observer(({}: ILandingScreenProps) => {
+export const LandingScreen = observer(() => {
   const { t } = useTranslation();
-  const mailto = 'mailto:' + t('site.contactEmail');
-  const iNeedRef = useRef<HTMLDivElement>(null);
-  const { sessionStore, userStore, siteConfigurationStore } = useMst();
-  const { smallScaleRequirementTemplateId } = siteConfigurationStore;
-  const { loggedIn } = sessionStore;
+  const { userStore } = useMst();
   const { currentUser } = userStore;
-
-  const scrollToJurisdictionSearch = () => {
-    iNeedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
 
   const whoFor = i18next.t('landing.whoFor', { returnObjects: true }) as string[];
   const applyNeeds = i18next.t('landing.applyNeeds', { returnObjects: true }) as string[];
 
   return (
     <Flex direction="column" w="full" bg="greys.white">
+      {/* Hero Section */}
       <Box
-        h={{ base: '360px' }}
+        h="360px"
+        w="full"
         position="relative"
         bgImage={`${colors.theme.blueImageGradient}, url('/images/header-background.png')`}
-        backgroundRepeat="no-repeat"
         bgPosition="center"
-        bgRepeat="no-repeat"
         bgSize="cover"
-        alignContent="center"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        aria-hidden="true"
       >
-        {/* Content */}
-        <Flex wrap="wrap" gap={4} alignItems="center" direction="column" textAlign="center" p={4}>
-          <Text
+        <Flex
+          as="section"
+          aria-labelledby="hero-title"
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          textAlign="center"
+          gap="16px"
+          px={{ base: '24px', md: '32px' }}
+          py="64px"
+          w={{ base: '382px', md: '618px' }}
+          h={{ base: '320px', md: '228px' }}
+          filter={{
+            base: 'none',
+            md: 'drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.1)) drop-shadow(0px 7px 9px rgba(0, 0, 0, 0.07))',
+          }}
+        >
+          <Heading
             as="h1"
-            fontSize={{ base: '2xl', md: '6xl' }}
-            fontWeight="bold"
+            id="hero-title"
+            fontSize="48px"
+            fontWeight="700"
             color="white"
-            textShadow="theme.bannerTextShadow"
-            width="xl"
+            textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px rgba(0,0,0,0.8)`}
+            lineHeight="65px"
+            w="full"
+            h={{ base: '195px', md: '130px' }}
+            display="flex"
+            alignItems="center"
           >
             {t('landing.title')}
-          </Text>
+          </Heading>
           <Text
-            fontSize="md"
-            fontWeight="normal"
-            variant="line_height_medium"
-            textShadow="theme.bannerTextShadow"
-            maxW="600px"
+            fontSize="16px"
             color="white"
+            textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px rgba(0,0,0,0.8)`}
+            lineHeight="27px"
+            w="full"
+            h={{ base: '109px', md: '82px' }}
+            display="flex"
+            alignItems="center"
           >
             {t('landing.intro')}
           </Text>
         </Flex>
       </Box>
 
-      <Container maxW="container.lg" py={16} px={8}>
-        <Flex as="section" direction="column" gap={20}>
-          <Flex gap={6} direction={{ base: 'column', md: 'row' }}>
-            <IconBox icon={<CheckCircle size={32} />}>{t('landing.checkEligiblity')}</IconBox>
-            <IconBox icon={<ClipboardText size={32} />}>{t('landing.completeSteps')}</IconBox>
-            <IconBox icon={<FileArrowUp size={32} />}>{t('landing.easilyUpgrade')}</IconBox>
-          </Flex>
-
-          <Flex gap={10} alignItems="stretch" direction={{ base: 'column', md: 'row' }}>
+      {/* Main Content Section */}
+      <Container as="main" id="main-content" maxW="1170px" py="64px" px="32px">
+        <Flex direction="column" gap={{ base: '64px', md: '80px' }}>
+          {/* Main Cards Section */}
+          <Flex
+            gap={{ base: '24px', lg: '40px' }}
+            direction={{ base: 'column', lg: 'row' }}
+            alignItems="flex-start"
+            w="full"
+            maxW={{ base: 'full', lg: '1106px' }}
+            mx="auto"
+            h={{ base: 'auto', lg: '418px' }}
+            px={{ base: '24px', md: '16px', lg: '0' }}
+          >
+            {/* Who is this for Card */}
             <Flex
               as="section"
+              aria-labelledby="who-for-title"
               direction="column"
-              borderRadius="lg"
-              bg="theme.blueAlt"
-              p={8}
-              gap={6}
-              color="greys.white"
-              flex={1}
-              minW={{ base: '0', md: '50%' }}
+              w={{ base: 'full', lg: '533px' }}
+              h={{ base: 'auto', lg: '418px' }}
+              maxW={{ base: '366px', md: '600px', lg: '533px' }}
+              gap="16px"
+              borderRadius="4px"
             >
-              <Heading as="h2">{t('landing.applyForEnergySaving')}</Heading>
-              <Text>{t('landing.checkEligiblityUsingCard')}</Text>
-              <Flex gap={6} direction={{ base: 'column', md: 'row' }}>
+              <Flex direction="column" gap="8px" w="full">
+                <Box w="36px" h="4px" bg="green.500" role="presentation" aria-hidden="true" />
+                <Heading
+                  as="h2"
+                  id="who-for-title"
+                  fontSize="32px"
+                  fontWeight="700"
+                  color="theme.blueAlt"
+                  lineHeight="54px"
+                  mb={4}
+                >
+                  {t('landing.whoForTitle')}
+                </Heading>
+              </Flex>
+              <Box
+                w="full"
+                h={{ base: 'auto', md: '298px' }}
+                display="flex"
+                alignItems={{ base: 'flex-start', md: 'center' }}
+              >
+                <UnorderedList spacing={1} pl={4} fontSize="16px" lineHeight="27px" color="greys.anotherGrey" mb={4}>
+                  {whoFor.map((str) => (
+                    <ListItem key={str}>{str}</ListItem>
+                  ))}
+                  <ListItem>
+                    Contractors - please visit the{' '}
+                    <Link
+                      as={RouterLink}
+                      to="/welcome/contractor"
+                      textDecoration="underline"
+                      aria-label="Visit the Energy Savings Program contractor portal"
+                      _focus={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}
+                    >
+                      Energy Savings Program contractor portal
+                    </Link>
+                  </ListItem>
+                </UnorderedList>
+              </Box>
+              <Flex alignItems="center" gap="4px">
+                <Link
+                  href={t('landing.iNeedLink')}
+                  isExternal
+                  textDecoration="underline"
+                  fontSize="16px"
+                  color="greys.anotherGrey"
+                  aria-label={`${t('landing.iNeed')} (opens in new window)`}
+                  _focus={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}
+                >
+                  {t('landing.iNeed')}
+                </Link>
+                <ArrowSquareOut size={16} aria-hidden="true" />
+              </Flex>
+            </Flex>
+
+            {/* Apply Card */}
+            <Flex
+              as="section"
+              aria-labelledby="apply-title"
+              direction="column"
+              bg="theme.blueAlt"
+              borderRadius="8px"
+              p="32px"
+              gap="24px"
+              color="white"
+              w={{ base: 'full', lg: '533px' }}
+              h={{ base: 'auto', lg: '418px' }}
+              maxW={{ base: '366px', md: '600px', lg: '533px' }}
+              minH={{ base: 'auto', md: '418px' }}
+              justifyContent={{ base: 'flex-start', md: 'space-between' }}
+            >
+              <Flex direction="column" gap="24px" w={{ base: 'full', md: '469px' }} mx="auto">
+                <Heading as="h2" id="apply-title" fontSize="24px" fontWeight="700" lineHeight="36px">
+                  {t('landing.applyForEnergySaving')}
+                </Heading>
+                <UnorderedList spacing={2} fontSize="16px" lineHeight="27px">
+                  <ListItem>Check your eligibility quickly and easily</ListItem>
+                  <ListItem>Complete the simple step-by-step application</ListItem>
+                  <ListItem>Get approved and start your upgrades!</ListItem>
+                </UnorderedList>
                 <RouterLinkButton
                   to={currentUser ? '/profile' : '/check-eligible'}
                   variant="primaryInverse"
                   icon={<CaretRight size={16} />}
                   iconPosition="right"
+                  w="200px"
+                  h="50px"
+                  minH="40px"
+                  alignSelf="flex-start"
+                  aria-label="Start your Energy Savings Program application"
+                  _focus={{ outline: '2px solid', outlineColor: 'white', outlineOffset: '2px' }}
                 >
-                  {t('landing.goTo', {
-                    location:
-                      !currentUser || currentUser.isSubmitter ? t('landing.permitApp') : t('landing.adminPanel'),
-                  })}
+                  Get started
                 </RouterLinkButton>
               </Flex>
-
-              <Flex mt="auto" direction="column">
-                <Text>{t('landing.continuePrefix')} </Text>
-                <Text fontWeight="bold">
-                  <Link variant="primaryInverse" href="/login">
-                    {t('landing.continueLogin')}
-                  </Link>
-                </Text>
+              <Flex
+                direction="column"
+                w={{ base: 'full', md: '469px' }}
+                mx="auto"
+                mt={{ base: '24px', md: '0' }}
+                fontSize="14px"
+                lineHeight="21px"
+              >
+                <Text>Already started an application?</Text>
+                <Link
+                  href="/login"
+                  color="white !important"
+                  textDecoration="underline"
+                  _hover={{ color: 'gray.200 !important' }}
+                  _focus={{ outline: '2px solid', outlineColor: 'white', outlineOffset: '2px' }}
+                  aria-label="Log in to check your existing application status"
+                >
+                  Log in to check on its status.
+                </Link>
               </Flex>
             </Flex>
-            <VStack as="section" align="flex-start" spacing={4}>
-              <Heading as="h2" variant="greenline" color="theme.blueText">
-                {t('landing.whoForTitle')}
-              </Heading>
-
-              <UnorderedList spacing={1} pl={4}>
-                {whoFor.map((str) => (
-                  <ListItem key={str}>{str}</ListItem>
-                ))}
-              </UnorderedList>
-              <Wrap spacing={2} justify="flex-start">
-                <Text>
-                  <Link href={t('landing.iNeedLink')} isExternal>
-                    {t('landing.iNeed')} <ArrowSquareOut />
-                  </Link>
-                </Text>
-              </Wrap>
-            </VStack>
           </Flex>
         </Flex>
       </Container>
-      <Box bg="greys.grey03">
-        <Container maxW="container.lg" py={10} px={8}>
-          <Heading as="h2" color="theme.blueText">
+
+      {/* What do I need to apply Section */}
+      <Box as="section" aria-labelledby="what-to-apply-title" bg="greys.grey04">
+        <Container maxW="1170px" py="64px" px="32px">
+          <Heading
+            as="h2"
+            id="what-to-apply-title"
+            fontSize="24px"
+            fontWeight="700"
+            color="theme.blueAlt"
+            lineHeight="36px"
+            mb={4}
+          >
             {t('landing.whatToApply')}
           </Heading>
-          <Text py={2}>{t('landing.duringApplication')}</Text>
-          <UnorderedList spacing={1} pl={4}>
+          <Text fontSize="16px" lineHeight="27px" color="greys.anotherGrey" mb={4}>
+            {t('landing.duringApplication')}
+          </Text>
+          <UnorderedList spacing={1} pl={4} color="greys.anotherGrey" mb={4}>
             {applyNeeds.map((str) => (
-              <ListItem key={str}>{str}</ListItem>
+              <ListItem key={str} fontSize="16px" lineHeight="27px">
+                {str}
+              </ListItem>
             ))}
           </UnorderedList>
-          <Text py={2}>{t('landing.informationReady')}</Text>
+          <Text fontSize="16px" lineHeight="27px" color="greys.anotherGrey">
+            {t('landing.informationReady')}
+          </Text>
         </Container>
       </Box>
-      <Box bg="greys.white">
-        <Container maxW="container.lg" py={16} px={8} gap="6">
-          <Heading as="h2" fontSize="md" color="theme.blueText">
-            {t('landing.otherWays')}
-          </Heading>
-          <Flex mt={8} gap={6} direction={{ base: 'column', md: 'row' }}>
-            <BareBox n={'1'}>
-              {t('landing.additionalContent.left')}
-              <br />
-              <RouterLinkButton
-                mt="2"
-                to={t('landing.additionalContent.energyPlannerLink')}
-                variant="primaryInverse"
-                rightIcon={<ArrowSquareOut />}
-              >
-                {t('landing.additionalContent.getStarted')}
-              </RouterLinkButton>
-            </BareBox>
 
-            <BareBox n={'2'}>
-              {t('landing.additionalContent.mid')}
-              <br />
-              <RouterLinkButton
-                mt="2"
-                to={t('landing.additionalContent.energyCoachBookCallLink')}
-                variant="primaryInverse"
-                rightIcon={<ArrowSquareOut />}
+      {/* Other ways to get started Section */}
+      <Box as="section" aria-labelledby="other-ways-title" bg="greys.white">
+        <Container maxW="1170px" py="64px" px="32px">
+          <Heading
+            as="h2"
+            id="other-ways-title"
+            fontSize="24px"
+            fontWeight="700"
+            color="theme.blueAlt"
+            lineHeight="36px"
+            mb={8}
+          >
+            {t('landing.otherWaysTitle', 'Other ways to get started')}
+          </Heading>
+          <Flex gap={6} direction={{ base: 'column', lg: 'row' }}>
+            {/* Method 1: Get help with your ESP application */}
+            <Flex
+              direction="column"
+              maxW={{ base: 'full', lg: '352px' }}
+              flex={1}
+              bg="greys.offWhite"
+              borderRadius="8px"
+              p={4}
+            >
+              <Heading as="h3" fontSize="20px" fontWeight="700" color="theme.blueAlt" lineHeight="34px" mb={4}>
+                {t('landing.getHelpTitle', 'Get help with your ESP application')}
+              </Heading>
+              <Text fontSize="16px" lineHeight="27px" color="theme.blueAlt" mb={4}>
+                <Text as="span" aria-label="Phone number">
+                  Call 1-833-856-0333
+                </Text>
+                , 9 am to 5 pm, Monday to Friday (excluding statutory holidays).
+              </Text>
+            </Flex>
+
+            {/* Method 2: Get upgrade advice from an energy specialist */}
+            <Flex
+              direction="column"
+              maxW={{ base: 'full', lg: '352px' }}
+              flex={1}
+              bg="greys.offWhite"
+              borderRadius="8px"
+              p={4}
+            >
+              <Heading as="h3" fontSize="20px" fontWeight="700" color="theme.blueAlt" lineHeight="34px" mb={4}>
+                {t('landing.energySpecialistTitle', 'Get upgrade advice from an energy specialist')}
+              </Heading>
+              <Link
+                href="https://www.betterhomesbc.ca/energy-coach/"
+                isExternal
+                display="inline-flex"
+                alignItems="center"
+                gap={2}
+                px={4}
+                py={2}
+                border="1px solid"
+                borderColor="border.randomBorderColorforthePublishModal"
+                borderRadius="md"
+                color="greys.anotherGrey"
+                textDecoration="none"
+                _hover={{ bg: 'gray.50' }}
+                _focus={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}
+                aria-label="Book a 60-minute virtual assessment with an energy specialist (opens in new window)"
               >
-                {t('landing.additionalContent.bookACall')}
-              </RouterLinkButton>
-            </BareBox>
+                Book a 60-minute virtual assessment
+                <ArrowSquareOut size={16} aria-hidden="true" />
+              </Link>
+            </Flex>
+
+            {/* Method 3: Learn more about your home's energy efficiency */}
+            <Flex
+              direction="column"
+              maxW={{ base: 'full', lg: '352px' }}
+              flex={1}
+              bg="greys.offWhite"
+              borderRadius="8px"
+              p={4}
+            >
+              <Heading as="h3" fontSize="20px" fontWeight="700" color="theme.blueAlt" lineHeight="34px" mb={4}>
+                {t('landing.energyEfficiencyTitle', "Learn more about your home's energy efficiency")}
+              </Heading>
+              <Link
+                href="https://www.energystepcode.ca/home-energy-planner/"
+                isExternal
+                display="inline-flex"
+                alignItems="center"
+                gap={2}
+                px={4}
+                py={2}
+                border="1px solid"
+                borderColor="border.randomBorderColorforthePublishModal"
+                borderRadius="md"
+                color="greys.anotherGrey"
+                textDecoration="none"
+                _hover={{ bg: 'gray.50' }}
+                _focus={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}
+                aria-label="Use the BC Home Energy Planner to learn about your home's energy efficiency (opens in new window)"
+              >
+                Use the BC Home Energy Planner
+                <ArrowSquareOut size={16} aria-hidden="true" />
+              </Link>
+            </Flex>
           </Flex>
         </Container>
       </Box>
-    </Flex>
-  );
-});
 
-interface IJurisdictionSearchProps {}
-
-const JurisdictionSearch = observer(({}: IJurisdictionSearchProps) => {
-  const { t } = useTranslation();
-  const { geocoderStore, jurisdictionStore } = useMst();
-  const { fetchGeocodedJurisdiction, fetchingJurisdiction } = geocoderStore;
-  const { addJurisdiction } = jurisdictionStore;
-  const formMethods = useForm();
-  const { control, watch, setValue } = formMethods;
-  const [jurisdiction, setJurisdiction] = useState<IJurisdiction>(null);
-  const [manualMode, setManualMode] = useState<boolean>(false);
-
-  const siteWatch = watch('site');
-
-  useEffect(() => {
-    // siteWatch.value may contain an empty string
-    // If this is the case, let through this conditional
-    // in order to let jurisdiction search fail and set manual mode
-    // empty string does not count as isNil but undefined does
-    if (R.isNil(siteWatch?.value)) return;
-    (async () => {
-      const jurisdiction = await fetchGeocodedJurisdiction(siteWatch.value);
-      if (jurisdiction) {
-        setJurisdiction(jurisdiction);
-      } else {
-        setManualMode(true);
-      }
-    })();
-  }, [siteWatch?.value]);
-
-  return (
-    <Flex gap={6} direction={{ base: 'column', md: 'row' }} w="full">
-      <Flex bg="white" p={6} gap={4} borderRadius="md" w="full">
-        <FormProvider {...formMethods}>
-          <form style={{ width: '100%' }}>
-            <Flex direction="column" gap={6}>
-              <Flex direction="column">
-                <Heading as="h2" variant="yellowline" mb={2}>
-                  {t('landing.where')}
-                </Heading>
-                <Text>{t('landing.findYourAuth')}</Text>
-              </Flex>
-
-              <Controller
-                name="site"
-                control={control}
-                render={({ field: { onChange, value } }) => {
-                  return <AddressSelect onChange={onChange} value={value} />;
-                }}
-              />
-
-              {manualMode && (
-                <FormControl w="full" zIndex={1}>
-                  <FormLabel>{t('jurisdiction.index.title')}</FormLabel>
-                  <InputGroup w="full">
-                    <JurisdictionSelect
-                      onChange={(value) => {
-                        if (value) addJurisdiction(value);
-                        setJurisdiction(value);
-                      }}
-                      onFetch={() => setValue('jurisdiction', null)}
-                      selectedOption={{ label: jurisdiction?.reverseQualifiedName, value: jurisdiction }}
-                      menuPortalTarget={document.body}
-                    />
-                  </InputGroup>
-                </FormControl>
-              )}
-            </Flex>
-          </form>
-        </FormProvider>
-      </Flex>
-      <Center
-        bg={jurisdiction ? 'theme.blueAlt' : 'greys.white'}
-        minH={243}
-        w="full"
-        gap={4}
-        borderRadius="md"
-        color={jurisdiction ? 'greys.white' : 'theme.secondary'}
-        _hover={{
-          background: jurisdiction ? 'theme.blue' : null,
-          transition: 'background 100ms ease-in',
-        }}
-      >
-        {jurisdiction ? (
-          <VStack
-            gap={8}
-            className="jumbo-buttons"
-            w="full"
-            height="full"
-            p={6}
-            alignItems="center"
-            justifyContent="center"
+      {/* Are you a contractor Section */}
+      <Box as="section" aria-labelledby="contractor-title" bg="greys.grey04">
+        <Container maxW="1170px" py="64px" px="32px">
+          <Heading
+            as="h2"
+            id="contractor-title"
+            fontSize="24px"
+            fontWeight="700"
+            color="theme.blueAlt"
+            lineHeight="36px"
+            mb={4}
           >
-            <Text textTransform={'uppercase'} fontWeight="light" fontSize="sm">
-              {jurisdiction.qualifier}
-            </Text>
-            <HStack gap={2}>
-              <Text fontSize="2xl" fontWeight="bold" textAlign="center">
-                {jurisdiction?.name}
-              </Text>
-              <Box color="theme.yellow">
-                <CheckCircle size={32} />
-              </Box>
-            </HStack>
-            <RouterLinkButton
-              variant="ghost"
-              color="greys.white"
-              to={`/jurisdictions/${jurisdiction.slug}`}
-              icon={<CaretRight size={16} />}
-              textDecoration={'underline'}
-              _hover={{
-                background: 'none',
-              }}
+            Are you a contractor?
+          </Heading>
+          <Text fontSize="16px" lineHeight="27px" color="greys.anotherGrey" mb={4}>
+            Please visit the{' '}
+            <Link
+              as={RouterLink}
+              to="/welcome/contractor"
+              textDecoration="underline"
+              aria-label="Visit the contractor portal to register or log in"
+              _focus={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}
             >
-              {t('landing.learnRequirements')}
-            </RouterLinkButton>
-          </VStack>
-        ) : (
-          <VStack gap={6} p={6}>
-            <Center h={50}>{fetchingJurisdiction ? <SharedSpinner /> : <MapPin size={40} />}</Center>
-            <Text fontStyle="italic" textAlign="center">
-              {t('landing.reqsVary')}
-            </Text>
-          </VStack>
-        )}
-      </Center>
-    </Flex>
-  );
-});
-
-interface IIconBoxProps extends BoxProps {
-  icon: ReactNode;
-  children: ReactNode;
-}
-
-const IconBox = ({ icon, children, ...rest }: IIconBoxProps) => {
-  return (
-    <Box p={4} borderRadius="lg" bg="theme.blueLight" color="theme.blueText" flex={1} {...rest}>
-      <Flex gap={4} align="center" h="full">
-        <Box>{icon}</Box>
-        <Text fontSize="md" fontWeight="bold">
-          {children}
-        </Text>
-      </Flex>
-    </Box>
-  );
-};
-
-interface IBareBoxProps {
-  n: string;
-  children: ReactNode;
-}
-
-const BareBox: React.FC<IBareBoxProps> = ({ n, children }) => {
-  return (
-    <Box p={4} borderRadius="lg" bg="theme.blueLight" color="theme.blueText" flex={1}>
-      <Flex gap={6} h="full">
-        <Flex
-          alignItems="center"
-          justifyContent="center"
-          bg="theme.blueText"
-          color="white"
-          borderRadius="50%"
-          minWidth="35px"
-          height="35px"
-          fontSize={20}
-          fontWeight="bold"
-        >
-          {n}
-        </Flex>
-        <Text fontSize="md" fontWeight="bold" textAlign="left">
-          {children}
-        </Text>
-      </Flex>
-    </Box>
-  );
-};
-
-const AvailableJurisdictionsMessageBox: React.FC = observer(() => {
-  const { t } = useTranslation();
-  const { jurisdictionStore } = useMst();
-
-  const { tableJurisdictions, searchEnabledJurisdictions, totalPages } = jurisdictionStore;
-
-  useEffect(() => {
-    searchEnabledJurisdictions(12);
-  }, []);
-
-  return (
-    <Flex
-      direction="column"
-      gap={2}
-      bg={'semantic.infoLight'}
-      border="1px solid"
-      borderRadius="lg"
-      borderColor={'semantic.info'}
-      p={4}
-    >
-      <Flex align="flex-start" gap={2}>
-        <Box color={'semantic.info'}>
-          <Info size={24} />
-        </Box>
-        <Flex direction="column" gap={2}>
-          <Text fontWeight="bold">
-            {t('landing.enabledCommunitiesDescription')}{' '}
-            {tableJurisdictions.map((jurisdiction) => (
-              <Text as="span" fontWeight="normal" key={jurisdiction.id} mr={2}>
-                <RouterLink color="black" to={`/jurisdictions/${jurisdiction.slug}`}>
-                  {jurisdiction.qualifiedName}
-                </RouterLink>
-              </Text>
-            ))}
-            <br />
-            {totalPages > 1 ? (
-              <Text as="span" fontWeight="bold">
-                {t('landing.andMore')}
-              </Text>
-            ) : (
-              <Text as="span" fontWeight="normal">
-                {t('landing.moreComingSoon')}
-              </Text>
-            )}
+              contractor portal
+            </Link>{' '}
+            and apply to be a program registered contractor. If you're already registered, you can log in to the portal
+            to submit invoices for reimbursement.
           </Text>
-        </Flex>
-      </Flex>
+        </Container>
+      </Box>
     </Flex>
   );
 });
