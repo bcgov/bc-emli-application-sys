@@ -2712,25 +2712,15 @@ const options = {
           loggedInWelcome: 'Welcome back!',
           myApplications: 'My applications',
           myPermits: 'My permits',
-          newApplication: {
-            _: 'Start an application',
-            label: 'Start a new application',
-          },
+          newApplication: 'Start an application',
           activePermits: 'Active permits',
           approvedPermits: 'Approved permits',
           myAccount: 'My Account',
           giveFeedback: 'Give feedback',
           error: 'Something went wrong, please try refreshing the page',
-          menu: {
-            _: 'Menu',
-            open: 'Open menu',
-            close: 'Close menu',
-          },
+          menu: 'Menu',
           mainNavigation: 'Main navigation',
-          reviewNotifications: {
-            _: 'Review notifications',
-            label: 'Review all notifications',
-          },
+          reviewNotifications: 'Review notifications',
           somethingWrong: 'Something went wrong',
           pageNotFound: 'Oops, we can’t find that page',
           pageNotFoundInstructions:
