@@ -457,10 +457,17 @@ const NavBarMenu = observer(function NavBarMenu() {
             {/* ===== LOGGED IN MENU ===== */}
             {loggedIn && !currentUser?.isUnconfirmed ? (
               <>
-                <Text fontSize="xs" fontStyle="italic" px={3} mb={-1} color="greys.grey01">
-                  {t('site.loggedInWelcome')}
-                </Text>
                 <MenuGroup title={currentUser.name} noOfLines={1}>
+                  {/* Role display for admin users */}
+                  {(currentUser?.isSuperAdmin || currentUser?.isAdmin || currentUser?.isAdminManager) && (
+                    <Box py={2} px={3} fontSize="md" color="inherit">
+                      {currentUser?.isSuperAdmin
+                        ? 'System Admin'
+                        : currentUser?.isAdminManager
+                          ? 'Admin Manager'
+                          : 'Admin'}
+                    </Box>
+                  )}
                   <MenuDivider my={0} borderColor="border.light" />
 
                   {/* Mobile/Tablet Home Link */}
