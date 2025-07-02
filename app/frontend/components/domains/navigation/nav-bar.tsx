@@ -174,9 +174,8 @@ export const NavBar = observer(function NavBar() {
               display="flex"
               alignItems="center"
               _focus={{
-                outline: '2px solid',
-                outlineColor: 'theme.blue',
-                outlineOffset: '2px',
+                outline: 'none',
+                boxShadow: 'none',
               }}
             >
               <Image height="80px" width="auto" maxW="280px" fit="contain" src={'/images/logo.png'} alt="" />
@@ -457,10 +456,15 @@ const NavBarMenu = observer(function NavBarMenu() {
             {/* ===== LOGGED IN MENU ===== */}
             {loggedIn && !currentUser?.isUnconfirmed ? (
               <>
-                <Text fontSize="xs" fontStyle="italic" px={3} mb={-1} color="greys.grey01">
-                  {t('site.loggedInWelcome')}
-                </Text>
                 <MenuGroup title={currentUser.name} noOfLines={1}>
+                  {/* Role display for admin users */}
+                  {(currentUser?.isSuperAdmin || currentUser?.isAdmin || currentUser?.isAdminManager) && (
+                    <Box py={2} px={3} fontSize="md" color="inherit">
+                      {currentUser?.isSuperAdmin && 'System Admin'}
+                      {currentUser?.isAdminManager && 'Admin Manager'}
+                      {currentUser?.isAdmin && 'Admin'}
+                    </Box>
+                  )}
                   <MenuDivider my={0} borderColor="border.light" />
 
                   {/* Mobile/Tablet Home Link */}
