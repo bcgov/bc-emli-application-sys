@@ -174,8 +174,9 @@ export const NavBar = observer(function NavBar() {
               display="flex"
               alignItems="center"
               _focus={{
-                outline: 'none',
-                boxShadow: 'none',
+                outline: '2px solid',
+                outlineColor: 'theme.blue',
+                outlineOffset: '2px',
               }}
             >
               <Image height="80px" width="auto" maxW="280px" fit="contain" src={'/images/logo.png'} alt="" />
@@ -460,9 +461,11 @@ const NavBarMenu = observer(function NavBarMenu() {
                   {/* Role display for admin users */}
                   {(currentUser?.isSuperAdmin || currentUser?.isAdmin || currentUser?.isAdminManager) && (
                     <Box py={2} px={3} fontSize="md" color="inherit">
-                      {currentUser?.isSuperAdmin && 'System Admin'}
-                      {currentUser?.isAdminManager && 'Admin Manager'}
-                      {currentUser?.isAdmin && 'Admin'}
+                      {currentUser?.isSuperAdmin
+                        ? 'System Admin'
+                        : currentUser?.isAdminManager
+                          ? 'Admin Manager'
+                          : 'Admin'}
                     </Box>
                   )}
                   <MenuDivider my={0} borderColor="border.light" />
