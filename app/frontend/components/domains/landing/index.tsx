@@ -55,7 +55,7 @@ export const LandingScreen = observer(() => {
             fontSize="48px"
             fontWeight="700"
             color="greys.white"
-            textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px ${colors.darken[800]}`}
+            textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px ${colors.darken[70]}`}
             lineHeight="65px"
             w="full"
             h={{ base: '195px', md: '130px' }}
@@ -67,7 +67,7 @@ export const LandingScreen = observer(() => {
           <Text
             fontSize="16px"
             color="greys.white"
-            textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px ${colors.darken[800]}`}
+            textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px ${colors.darken[70]}`}
             lineHeight="27px"
             w="full"
             h={{ base: '109px', md: '82px' }}
