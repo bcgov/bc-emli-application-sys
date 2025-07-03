@@ -301,7 +301,6 @@ const options = {
             visitHomeLink: 'https://homeperformance.ca/about-the-network/',
             toJoin:
               'to join as a heat pump, insulation, or windows and doors contractor. After signing the HPCN agreement, return to the Energy Savings Program contractor portal to register with ESP.',
-            duringRegisteration: 'During registration, we will ask for your:',
             duringRegistration: 'During registration, we will ask for your:',
             businessNumber: 'Business licence number',
             healthSafetyContractors: 'Health and safety or electrical contractors',

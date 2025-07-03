@@ -127,7 +127,7 @@ export const ContractorLandingScreen = () => {
                 {t('landing.contractor.toJoin')}
               </Text>
               <Text mt={4} fontWeight="bold">
-                {t('landing.contractor.duringRegisteration')}
+                {t('landing.contractor.duringRegistration')}
               </Text>
               <UnorderedList mt={4}>
                 <ListItem>{t('landing.contractor.businessNumber')}</ListItem>
