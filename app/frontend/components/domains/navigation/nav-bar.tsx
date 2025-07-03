@@ -453,7 +453,7 @@ const NavBarMenu = observer(function NavBarMenu() {
       {/* ===== MENU DROPDOWN ===== */}
       <Portal>
         <Box color="text.primary">
-          <MenuList id="main-navigation-menu" role="menu" aria-labelledby="menu-button" zIndex={99} boxShadow="2xl">
+          <MenuList id="main-navigation-menu" role="menu" aria-label="menu-button" zIndex={99} boxShadow="2xl">
             {/* ===== LOGGED IN MENU ===== */}
             {loggedIn && !currentUser?.isUnconfirmed ? (
               <>
