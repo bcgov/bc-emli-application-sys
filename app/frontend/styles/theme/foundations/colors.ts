@@ -77,6 +77,7 @@ export const colors = {
   },
   darken: {
     60: 'rgba(0, 0, 0, 0.06)',
+    70: 'rgba(0, 0, 0, 0.07)',
     100: 'rgba(0, 0, 0, 0.1)',
   },
   hover: {

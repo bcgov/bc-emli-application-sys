@@ -265,12 +265,7 @@ const options = {
           title: 'Save energy, upgrade your home',
           intro:
             'Everyone deserves a healthy, comfortable and energy efficient home. The Better Homes Energy Savings Program rebates cover up to 100% of the cost of energy-saving home upgrades.',
-          completeSteps: 'Complete the simple step-by-step application online',
-          easilyUpgrade: 'Get your code and get started with your upgrades!',
-          checkEligiblity: 'Check your eligibility quickly and easily',
           applyForEnergySaving: 'Apply for the Energy Savings Program',
-          checkEligiblityUsingCard:
-            'Check your eligibility, create an account using your BC Services Card, and apply online.',
           whoForTitle: 'Who is this for?',
           whoFor: [
             'You live in an eligible home in B.C.',
@@ -281,10 +276,6 @@ const options = {
           ],
           iNeed: 'See full eligibility details on Better Homes.',
           iNeedLink: 'https://www.betterhomesbc.ca/rebates/energy-savings-program/',
-          whyUseTitle: 'Why use this tool?',
-          whyUse:
-            'The Building Permit Hub helps you submit a building permit application through a streamlined and standardized approach across jurisdictions in B.C. This tool connects you with local government and First Nation information to support the building permit submission process.',
-          iNeedLong: 'What do I need for a housing building permit?',
           whatToApply: 'What do I need to apply?',
           applyNeeds: [
             'Information about your home',
@@ -310,7 +301,7 @@ const options = {
             visitHomeLink: 'https://homeperformance.ca/about-the-network/',
             toJoin:
               'to join as a heat pump, insulation, or windows and doors contractor. After signing the HPCN agreement, return to the Energy Savings Program contractor portal to register with ESP.',
-            duringRegisteration: 'During registration, we will ask for your:',
+            duringRegistration: 'During registration, we will ask for your:',
             businessNumber: 'Business licence number',
             healthSafetyContractors: 'Health and safety or electrical contractors',
             alreadyAccount: 'Already have an account?',
@@ -324,7 +315,6 @@ const options = {
               'Submit an invoice',
               'Receive rebate',
             ],
-            duringRegistration: 'During registration, we will ask for your:',
             registrationRequirements: [
               'Business licence number',
               'GST number',
@@ -339,55 +329,62 @@ const options = {
           getHelpTitle: 'Get help with your ESP application',
           energySpecialistTitle: 'Get upgrade advice from an energy specialist',
           energyEfficiencyTitle: "Learn more about your home's energy efficiency",
-          otherWays: 'Other ways to get started',
-          reqsVary:
-            'Permit requirements vary by local jurisdiction and depend on the geography of the surrounding location.',
-          permitImportance:
-            'Building permits are important to ensure your housing is safe, legal and compliant. Building permit requirements vary by local jurisdiction and depend on local servicing, zoning and bylaw requirements (e.g. rural services vs. urban, tree bylaws, etc.).',
-          whereTitle: 'Where',
-          findAuthority: 'Find your local building permitting authority.',
-          locationOr: 'Location or Civic Address',
-          withinXRiver: 'Within x km of a river',
-          withinXForest: 'Within x km of a forest',
-          withinXProtected: 'Within x km of a protected land',
-          whatType: 'What type of housing are you building?',
-          dontSee: "Don't see the type that you're looking for?",
-          whenNotNecessaryQ: 'When is a permit needed?',
-          whenNotNecessaryA:
-            'Permits help ensure that construction and major renovations follow local bylaws, the building code and health and safety standards. You will need the required permits before any stage of a project can start. Projects for the interior of your home or minor repairs may not require a permit depending on your local jurisdiction and geography.',
-          permitConnect:
-            'The B.C government is making housing development projects easier with a new coordinated approach. Visit <1>Permit Connect BC to learn more</1>.',
-          expectQ: 'What can I expect?',
-          expectA:
-            'Once you have provided all the information needed for the permits, your local jurisdiction will be notified and will contact you to discuss if more details are needed. This could be because of how the land is used, the rules for building in that area, how much the area can support, the quality of the soil, and/or any environmental concerns.',
-          createdQ: 'Why was this tool created?',
-          createdA:
-            'The Building Permit Hub will make it faster and simpler for home builders and developers to send in building permits for new housing online. Local jurisdictions can receive the applications and process them faster too. This tool automatically checks if the application follows the rules in the B.C. Building Code, including the Energy Step Code, to help prevent any delays in the application process.',
-          tellUsYourExperience: 'Tell us about your experience with the Building Permit Hub',
-          addressSelectLabel: 'Location or civic address',
-          where: 'Where',
-          findYourAuth: 'Find your local building permit authority.',
-          localJurisdiction: 'Local jurisdiction',
-          learnRequirements: 'Learn about local requirements',
-          cantFind: "Can't find your address?",
-          browseList: 'Browse list of jurisdictions',
-          goTo: 'Get started',
-          continueLogin: 'Log in to check on its status.',
-          continuePrefix: 'Already started an application?',
-          permitApp: 'permit app',
-          adminPanel: 'admin panel',
-          enabledCommunitiesDescription: 'Communities you can submit Building Permit applications in:',
-          moreComingSoon: '(more coming soon)',
-          andMore: '...and more',
-          additionalContent: {
-            left: 'Use the BC Home Energy Planner to find recommended upgrades for your home',
-            mid: 'Speak with an Energy Coach to get help with your application and learn more about rebate programs',
-            midButton: 'Book a call',
-            getStarted: 'Go to Planner',
-            energyPlannerLink: 'https://www.bchomeenergyplanner.ca/',
-            energyCoachBookCallLink: 'https://www.betterbuildingsbc.ca/connect/',
-            bookACall: 'Book a call',
+
+          // Application steps
+          applicationSteps: [
+            'Check your eligibility quickly and easily',
+            'Complete the simple step-by-step application',
+            'Get approved and start your upgrades!',
+          ],
+
+          // Call to action
+          getStarted: 'Get started',
+
+          // Login status
+          alreadyStarted: 'Already started an application?',
+          loginToCheck: 'Log in to check on its status.',
+
+          // Contractor section
+          contractorTitle: 'Are you a contractor?',
+          contractorDescriptionPart1: 'Please visit the',
+          contractorDescriptionPart2:
+            "and apply to be a program registered contractor. If you're already registered, you can log in to the portal to submit invoices for reimbursement.",
+          contractorPortalText: 'contractor portal',
+
+          // Contact info
+          phoneText: 'Call 1-833-856-0333',
+          phoneHours: ', 9 am to 5 pm, Monday to Friday (excluding statutory holidays).',
+
+          // External links
+          energyCoachBooking: 'Book a 60-minute virtual assessment',
+          homeEnergyPlanner: 'Use the BC Home Energy Planner',
+          energySavingsProgramPortal: 'Energy Savings Program contractor portal',
+          contractorPortalLink: 'Contractors - please visit the',
+          energyCoachLink: 'https://www.betterhomesbc.ca/energy-coach/',
+          homeEnergyPlannerLink: 'https://www.energystepcode.ca/home-energy-planner/',
+
+          // Aria labels
+          ariaLabels: {
+            phoneNumber: 'Phone number',
+            visitContractorPortal: 'Visit the Energy Savings Program contractor portal',
+            startApplication: 'Start your Energy Savings Program application',
+            loginToCheckStatus: 'Log in to check your existing application status',
+            bookEnergyAssessment: 'Book a 60-minute virtual assessment with an energy specialist (opens in new window)',
+            useHomePlanner:
+              "Use the BC Home Energy Planner to learn about your home's energy efficiency (opens in new window)",
+            visitContractorPortalRegister: 'Visit the contractor portal to register or log in',
+            opensInNewWindow: '(opens in new window)',
           },
+
+          // Additional content used by support screen
+          additionalContent: {
+            energyCoachBookCallLink: 'https://www.betterbuildingsbc.ca/connect/',
+          },
+
+          // Address select component
+          addressSelectLabel: 'Select your address',
+          cantFind: "Can't find your address?",
+          browseList: 'Browse the list of eligible jurisdictions',
         },
         ui: {
           okay: 'Okay',
