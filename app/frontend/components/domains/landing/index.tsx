@@ -16,6 +16,7 @@ export const LandingScreen = observer(() => {
 
   const whoFor = i18next.t('landing.whoFor', { returnObjects: true }) as string[];
   const applyNeeds = i18next.t('landing.applyNeeds', { returnObjects: true }) as string[];
+  const applicationSteps = i18next.t('landing.applicationSteps', { returnObjects: true }) as string[];
 
   return (
     <Flex direction="column" w="full" bg="greys.white">
@@ -46,7 +47,6 @@ export const LandingScreen = observer(() => {
           h={{ base: '320px', md: '228px' }}
           filter={{
             base: 'none',
-            md: 'drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.1)) drop-shadow(0px 7px 9px rgba(0, 0, 0, 0.07))',
           }}
         >
           <Heading
@@ -54,8 +54,8 @@ export const LandingScreen = observer(() => {
             id="hero-title"
             fontSize="48px"
             fontWeight="700"
-            color="white"
-            textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px rgba(0,0,0,0.8)`}
+            color="greys.white"
+            textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px ${colors.darken[800]}`}
             lineHeight="65px"
             w="full"
             h={{ base: '195px', md: '130px' }}
@@ -66,8 +66,8 @@ export const LandingScreen = observer(() => {
           </Heading>
           <Text
             fontSize="16px"
-            color="white"
-            textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px rgba(0,0,0,0.8)`}
+            color="greys.white"
+            textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px ${colors.darken[800]}`}
             lineHeight="27px"
             w="full"
             h={{ base: '109px', md: '82px' }}
@@ -105,7 +105,7 @@ export const LandingScreen = observer(() => {
               borderRadius="4px"
             >
               <Flex direction="column" gap="8px" w="full">
-                <Box w="36px" h="4px" bg="green.500" role="presentation" aria-hidden="true" />
+                <Box w="36px" h="4px" bg="theme.green" role="presentation" aria-hidden="true" />
                 <Heading
                   as="h2"
                   id="who-for-title"
@@ -129,15 +129,15 @@ export const LandingScreen = observer(() => {
                     <ListItem key={str}>{str}</ListItem>
                   ))}
                   <ListItem>
-                    Contractors - please visit the{' '}
+                    {t('landing.contractorPortalLink')}{' '}
                     <Link
                       as={RouterLink}
                       to="/welcome/contractor"
                       textDecoration="underline"
-                      aria-label="Visit the Energy Savings Program contractor portal"
+                      aria-label={t('landing.ariaLabels.visitContractorPortal')}
                       _focus={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}
                     >
-                      Energy Savings Program contractor portal
+                      {t('landing.energySavingsProgramPortal')}
                     </Link>
                   </ListItem>
                 </UnorderedList>
@@ -149,7 +149,7 @@ export const LandingScreen = observer(() => {
                   textDecoration="underline"
                   fontSize="16px"
                   color="greys.anotherGrey"
-                  aria-label={`${t('landing.iNeed')} (opens in new window)`}
+                  aria-label={`${t('landing.iNeed')} ${t('landing.ariaLabels.opensInNewWindow')}`}
                   _focus={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}
                 >
                   {t('landing.iNeed')}
@@ -167,7 +167,7 @@ export const LandingScreen = observer(() => {
               borderRadius="8px"
               p="32px"
               gap="24px"
-              color="white"
+              color="greys.white"
               w={{ base: 'full', lg: '533px' }}
               h={{ base: 'auto', lg: '418px' }}
               maxW={{ base: '366px', md: '600px', lg: '533px' }}
@@ -179,9 +179,9 @@ export const LandingScreen = observer(() => {
                   {t('landing.applyForEnergySaving')}
                 </Heading>
                 <UnorderedList spacing={2} fontSize="16px" lineHeight="27px">
-                  <ListItem>Check your eligibility quickly and easily</ListItem>
-                  <ListItem>Complete the simple step-by-step application</ListItem>
-                  <ListItem>Get approved and start your upgrades!</ListItem>
+                  {applicationSteps.map((step) => (
+                    <ListItem key={step}>{step}</ListItem>
+                  ))}
                 </UnorderedList>
                 <RouterLinkButton
                   to={currentUser ? '/profile' : '/check-eligible'}
@@ -192,10 +192,10 @@ export const LandingScreen = observer(() => {
                   h="50px"
                   minH="40px"
                   alignSelf="flex-start"
-                  aria-label="Start your Energy Savings Program application"
-                  _focus={{ outline: '2px solid', outlineColor: 'white', outlineOffset: '2px' }}
+                  aria-label={t('landing.ariaLabels.startApplication')}
+                  _focus={{ outline: '2px solid', outlineColor: 'greys.white', outlineOffset: '2px' }}
                 >
-                  Get started
+                  {t('landing.getStarted')}
                 </RouterLinkButton>
               </Flex>
               <Flex
@@ -206,16 +206,16 @@ export const LandingScreen = observer(() => {
                 fontSize="14px"
                 lineHeight="21px"
               >
-                <Text>Already started an application?</Text>
+                <Text>{t('landing.alreadyStarted')}</Text>
                 <Link
                   href="/login"
-                  color="white !important"
+                  color="greys.white !important"
                   textDecoration="underline"
-                  _hover={{ color: 'gray.200 !important' }}
-                  _focus={{ outline: '2px solid', outlineColor: 'white', outlineOffset: '2px' }}
-                  aria-label="Log in to check your existing application status"
+                  _hover={{ color: 'greys.lightGrey !important' }}
+                  _focus={{ outline: '2px solid', outlineColor: 'greys.white', outlineOffset: '2px' }}
+                  aria-label={t('landing.ariaLabels.loginToCheckStatus')}
                 >
-                  Log in to check on its status.
+                  {t('landing.loginToCheck')}
                 </Link>
               </Flex>
             </Flex>
@@ -281,10 +281,10 @@ export const LandingScreen = observer(() => {
                 {t('landing.getHelpTitle')}
               </Heading>
               <Text fontSize="16px" lineHeight="27px" color="theme.blueAlt" mb={4}>
-                <Text as="span" aria-label="Phone number">
-                  Call 1-833-856-0333
+                <Text as="span" aria-label={t('landing.ariaLabels.phoneNumber')}>
+                  {t('landing.phoneText')}
                 </Text>
-                , 9 am to 5 pm, Monday to Friday (excluding statutory holidays).
+                {t('landing.phoneHours')}
               </Text>
             </Flex>
 
@@ -301,7 +301,7 @@ export const LandingScreen = observer(() => {
                 {t('landing.energySpecialistTitle')}
               </Heading>
               <Link
-                href="https://www.betterhomesbc.ca/energy-coach/"
+                href={t('landing.energyCoachLink')}
                 isExternal
                 display="inline-flex"
                 alignItems="center"
@@ -313,11 +313,11 @@ export const LandingScreen = observer(() => {
                 borderRadius="md"
                 color="greys.anotherGrey"
                 textDecoration="none"
-                _hover={{ bg: 'gray.50' }}
+                _hover={{ bg: 'greys.offWhite' }}
                 _focus={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}
-                aria-label="Book a 60-minute virtual assessment with an energy specialist (opens in new window)"
+                aria-label={t('landing.ariaLabels.bookEnergyAssessment')}
               >
-                Book a 60-minute virtual assessment
+                {t('landing.energyCoachBooking')}
                 <ArrowSquareOut size={16} aria-hidden="true" />
               </Link>
             </Flex>
@@ -335,7 +335,7 @@ export const LandingScreen = observer(() => {
                 {t('landing.energyEfficiencyTitle')}
               </Heading>
               <Link
-                href="https://www.energystepcode.ca/home-energy-planner/"
+                href={t('landing.homeEnergyPlannerLink')}
                 isExternal
                 display="inline-flex"
                 alignItems="center"
@@ -347,11 +347,11 @@ export const LandingScreen = observer(() => {
                 borderRadius="md"
                 color="greys.anotherGrey"
                 textDecoration="none"
-                _hover={{ bg: 'gray.50' }}
+                _hover={{ bg: 'greys.offWhite' }}
                 _focus={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}
-                aria-label="Use the BC Home Energy Planner to learn about your home's energy efficiency (opens in new window)"
+                aria-label={t('landing.ariaLabels.useHomePlanner')}
               >
-                Use the BC Home Energy Planner
+                {t('landing.homeEnergyPlanner')}
                 <ArrowSquareOut size={16} aria-hidden="true" />
               </Link>
             </Flex>
@@ -371,21 +371,20 @@ export const LandingScreen = observer(() => {
             lineHeight="36px"
             mb={4}
           >
-            Are you a contractor?
+            {t('landing.contractorTitle')}
           </Heading>
           <Text fontSize="16px" lineHeight="27px" color="greys.anotherGrey" mb={4}>
-            Please visit the{' '}
+            {t('landing.contractorDescriptionPart1')}{' '}
             <Link
               as={RouterLink}
               to="/welcome/contractor"
               textDecoration="underline"
-              aria-label="Visit the contractor portal to register or log in"
+              aria-label={t('landing.ariaLabels.visitContractorPortalRegister')}
               _focus={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}
             >
-              contractor portal
+              {t('landing.contractorPortalText')}
             </Link>{' '}
-            and apply to be a program registered contractor. If you're already registered, you can log in to the portal
-            to submit invoices for reimbursement.
+            {t('landing.contractorDescriptionPart2')}
           </Text>
         </Container>
       </Box>
