@@ -46,15 +46,13 @@ export const HomeScreenBox = observer(
         borderColor="border.homeScreenBorderColor"
         p={8}
         w="full"
-        className="jumbo-buttons"
         position="relative"
         opacity={isDisabled ? 0.75 : 1}
-        pointerEvents={isDisabled ? 'none' : 'auto'}
         transition="border-color 200ms ease-out, background-color 200ms ease-out"
         _hover={{
           borderColor: 'theme.blueAlt',
           backgroundColor: 'theme.BlueLight',
-          cursor: 'pointer',
+          cursor: isDisabled ? 'not-allowed' : 'pointer',
         }}
         {...rest}
       >
@@ -69,19 +67,20 @@ export const HomeScreenBox = observer(
                   {title}
                 </Heading>
               </Flex>
-              {!isDisabled && (
-                <LinkOverlay
-                  as={RouterLinkButton}
-                  to={href}
-                  variant="link"
-                  fontWeight="bold"
-                  fontSize="lg"
-                  textDecoration="none"
-                  color={headingColor || 'theme.blueAlt'}
-                >
-                  {linkText || ''}
-                </LinkOverlay>
-              )}
+              <LinkOverlay
+                as={RouterLinkButton}
+                to={href}
+                variant="link"
+                _active={{
+                  boxShadow: 'none',
+                  outline: 'none',
+                  border: 'none',
+                }}
+                tabIndex={isDisabled ? -1 : 0}
+                aria-disabled={isDisabled}
+              >
+                {linkText || ''}
+              </LinkOverlay>
             </Flex>
             <Text ml={8} fontSize="sm" color="gray.600">
               {description}

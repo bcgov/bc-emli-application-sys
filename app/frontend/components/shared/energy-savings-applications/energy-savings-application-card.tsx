@@ -110,7 +110,8 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
           </Flex>
         </Show>
         <Flex direction="column" gap={2} flex={{ base: 0, md: 5 }} maxW={{ base: '100%', md: '75%' }}>
-          {isSubmissionCollaboration && (
+          {/* commented out for future use */}
+          {/* {isSubmissionCollaboration && (
             <Flex bg="semantic.info" color={'white'} {...calloutBannerContainerProps}>
               <Info size={14} />
               <Text {...calloutBannerTextProps}>
@@ -128,7 +129,7 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
                 />
               </Text>
             </Flex>
-          )}
+          )} */}
           <Flex direction="column" flex={1} gap={2}>
             {energySavingsApplication.status === EPermitApplicationStatus.revisionsRequested && (
               <Flex bg="theme.orange" p={2} borderRadius={4} alignItems={'center'}>
