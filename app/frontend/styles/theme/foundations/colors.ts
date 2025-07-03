@@ -79,7 +79,6 @@ export const colors = {
     60: 'rgba(0, 0, 0, 0.06)',
     70: 'rgba(0, 0, 0, 0.07)',
     100: 'rgba(0, 0, 0, 0.1)',
-    800: 'rgba(0, 0, 0, 0.8)',
   },
   hover: {
     blue: '#DFECF9',
