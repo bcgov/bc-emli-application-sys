@@ -20,6 +20,7 @@ app:
     'APP_DOMAIN': 'test-hesp.apps.silver.devops.gov.bc.ca'
     'ANYCABLE_URL': 'wss://test-hesp-anycable.apps.silver.devops.gov.bc.ca/cable'
     'KEYCLOAK_AUTH_URL': 'https://test.loginproxy.gov.bc.ca/'
+    'VITE_ENABLE_TEMPLATE_FORCE_PUBLISH': 'true'
     'VITE_SITEMINDER_LOGOUT_URL': 'https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi'
     'VITE_BCEID_URL': 'https://www.development.bceid.ca'
     'VITE_BUSINESS_BCEID_REGISTRATION_URL': 'https://www.development.bceid.ca/register/business/getting_started/getting_started.aspx'
