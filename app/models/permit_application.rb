@@ -418,10 +418,10 @@ class PermitApplication < ApplicationRecord
   end
 
   def send_submit_notifications
-    #TODO: this is where we need to adjust to send notifications to specific users when an app is submitted.
+    # Send application submission notifications to submitters and collaborators
+    NotificationService.publish_application_submission_event(self)
 
-    # All submission related emails and in-app notifications are handled by this method
-    # NotificationService.publish_application_submission_event(self)
+    # Send notifications to jurisdiction contacts (commented out for now)
     # confirmed_permit_type_submission_contacts.each do |permit_type_submission_contact|
     #   PermitHubMailer.notify_reviewer_application_received(
     #     permit_type_submission_contact,
@@ -445,15 +445,12 @@ class PermitApplication < ApplicationRecord
 
     #TODO: if we want to implement webhooks were we call an external API when an application is submitted
 
-    Rails.logger.info("submitting webhook start #{in_review?}")
-
     program
       .active_external_api_keys
       .where.not(
         webhook_url: [nil, ""]
       ) # Only send webhooks to keys with a webhook URL
       .each do |external_api_key|
-        Rails.logger.info("#{external_api_key}")
         PermitWebhookJob.perform_async(
           external_api_key.id,
           Constants::Webhooks::Events::Application::APPLICATION_INREVIEW,

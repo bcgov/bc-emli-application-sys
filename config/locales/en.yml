@@ -143,7 +143,7 @@ en:
       update_password_success: 'You have successfully updated your password'
       welcome: 'Welcome to the Building Permit Hub'
       onboarding: 'Welcome to the Building Permit Hub'
-      notify_submitter_application_submitted: 'Your Building Permit Hub application has been submitted'
+      notify_submitter_application_submitted: 'Application %{permit_application_number} has been received'
       notify_new_integration_mapping: 'New API mappings available'
       notify_missing_integration_mapping: 'Missing API mappings'
       notify_reviewer_application_received: 'New application received: %{permit_application_number}'
