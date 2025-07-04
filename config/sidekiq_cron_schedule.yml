@@ -1,5 +1,5 @@
 template_publish:
-  cron: "1 0 * * * America/Vancouver"
+  cron: "1 0 * * * America/Vancouver" # runs Every day at 12:01 AM (00:01) Vancouver time
   class: "TemplatePublishJob"
   queue: default
   active_job: false

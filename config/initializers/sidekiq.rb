@@ -67,4 +67,10 @@ elsif Rails.env.development?
   Sidekiq.configure_server { |config| configure_sidekiq_server(config) }
 
   Sidekiq.configure_client { |config| configure_sidekiq_client(config) }
+
+  # Load cron schedule in development for testing
+  schedule_file = "config/sidekiq_cron_schedule.yml"
+  if File.exist?(schedule_file)
+    Sidekiq::Cron::Job.load_from_hash YAML.load_file(schedule_file)
+  end
 end

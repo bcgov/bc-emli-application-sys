@@ -6,14 +6,17 @@ class TemplateVersioningService
   # returned because earlier versions will be deprecated, even if they were
   # scheduled for publication, as we only care about the latest changes.
   def self.get_versions_publishable_now
-    TemplateVersion
-      .select("DISTINCT ON (requirement_templates.id) template_versions.*")
-      .joins(:requirement_template)
-      .where(
-        "template_versions.status = #{TemplateVersion.statuses[:scheduled]} AND template_versions.version_date <= ?",
-        Date.current
-      )
-      .order("requirement_templates.id, template_versions.version_date DESC")
+    subquery =
+      TemplateVersion
+        .select("DISTINCT ON (requirement_templates.id) template_versions.*")
+        .joins(:requirement_template)
+        .where(
+          "template_versions.status = #{TemplateVersion.statuses[:scheduled]} AND template_versions.version_date <= ?",
+          Date.current
+        )
+        .order("requirement_templates.id, template_versions.version_date DESC")
+
+    TemplateVersion.from("(#{subquery.to_sql}) AS template_versions")
   end
 
   def self.publish_versions_publishable_now!

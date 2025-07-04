@@ -56,9 +56,9 @@ export const RequirementTemplateGrid: React.FC<RequirementTemplateGridProps> = o
                 {/* <YesNoTag boolean={rt.firstNations} /> */}
                 {rt.program?.programName}
               </SearchGridItem>
-              <SearchGridItem>{rt.program?.userGroupType}</SearchGridItem>
-              <SearchGridItem>{rt.program?.audienceType}</SearchGridItem>
-              <SearchGridItem>{rt.program?.submissionType}</SearchGridItem>
+              <SearchGridItem>{rt.userGroupType?.name}</SearchGridItem>
+              <SearchGridItem>{rt.audienceType?.name}</SearchGridItem>
+              <SearchGridItem>{rt.submissionType?.name}</SearchGridItem>
               <SearchGridItem fontWeight="bold">{rt.nickname ?? 'N/A'}</SearchGridItem>
               {/* <SearchGridItem>{rt.description}</SearchGridItem> */}
 
