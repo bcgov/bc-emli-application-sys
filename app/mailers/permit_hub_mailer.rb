@@ -25,7 +25,10 @@ class PermitHubMailer < ApplicationMailer
 
     send_user_mail(
       email: @user.email,
-      template_key: "notify_submitter_application_submitted"
+      template_key: "notify_submitter_application_submitted",
+      subject_i18n_params: {
+        permit_application_number: permit_application.number
+      }
     )
   end
 
@@ -203,11 +206,7 @@ class PermitHubMailer < ApplicationMailer
   def send_user_mail(*args, **kwargs)
     return if @user.discarded? || !@user.confirmed?
 
-    Rails.logger.info "[PermitHubMailer] Attempting to send email to #{@user.email} for template: #{kwargs[:template_key]}"
-
     result = send_mail(*args, **kwargs)
-
-    Rails.logger.info "[PermitHubMailer] Email delivery #{result ? "succeeded" : "failed"} for #{@user.email}, template: #{kwargs[:template_key]}"
 
     result
   end
