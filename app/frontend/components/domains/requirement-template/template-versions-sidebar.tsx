@@ -19,8 +19,7 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
-import { Export, FileCsv } from '@phosphor-icons/react';
-import { Pencil } from '@phosphor-icons/react/dist/ssr';
+import { Export, FileCsv, Pencil } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 import { t } from 'i18next';
 import { observer } from 'mobx-react-lite';
@@ -33,6 +32,7 @@ import { RemoveConfirmationModal } from '../../shared/modals/remove-confirmation
 import { RouterLink } from '../../shared/navigation/router-link';
 import { TemplateStatusTag } from '../../shared/requirement-template/template-status-tag';
 import { VersionTag } from '../../shared/version-tag';
+import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 
 interface IProps {
   requirementTemplate: IRequirementTemplate;
@@ -178,30 +178,31 @@ const VersionCard = observer(function VersionCard({
   const renderTemplateButton = () => {
     if (status === ETemplateVersionStatus.published || status === ETemplateVersionStatus.deprecated) {
       return (
-        <Button as={RouterLink} to={viewRoute} variant={'primary'} size="sm">
+        <RouterLinkButton to={viewRoute} variant={'primary'} size="sm">
           {t('requirementTemplate.versionSidebar.viewTemplateButton')}
-        </Button>
+        </RouterLinkButton>
       );
     } else if (status === ETemplateVersionStatus.draft) {
       return (
-        <Button as={RouterLink} to={viewRoute} variant={'primary'} size="sm" leftIcon={<Pencil />}>
+        <RouterLinkButton to={viewRoute} variant={'primary'} size="sm" leftIcon={<Pencil />}>
           {t('translation:requirementTemplate.versionSidebar.resumeDraftButton')}
-        </Button>
+        </RouterLinkButton>
       );
     } else {
       return (
         <ButtonGroup spacing={4}>
-          <Button as={RouterLink} to={viewRoute} variant={'primary'} size="sm">
+          <RouterLinkButton to={viewRoute} variant={'primary'} size="sm">
             {t('ui.preview')}
-          </Button>
+          </RouterLinkButton>
           <RemoveConfirmationModal
             title={t('requirementTemplate.versionSidebar.unscheduleWarning.title')}
             body={t('requirementTemplate.versionSidebar.unscheduleWarning.body')}
             renderTriggerButton={(props) => {
+              const { variant, ...restProps } = props;
               return (
-                <Button variant={'secondary'} size="sm" {...props}>
+                <RouterLinkButton size="sm" {...restProps}>
                   {t('translation:requirementTemplate.versionSidebar.unscheduleButton')}
-                </Button>
+                </RouterLinkButton>
               );
             }}
             onRemove={onUnschedule}

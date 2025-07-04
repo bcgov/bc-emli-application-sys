@@ -13,12 +13,20 @@ class RequirementTemplateBlueprint < Blueprinter::Base
          :public
 
   # old types
-  association :activity, blueprint: PermitClassificationBlueprint
-  association :permit_type, blueprint: PermitClassificationBlueprint
+  association :activity, blueprint: PermitClassificationBlueprint, view: :base
+  association :permit_type,
+              blueprint: PermitClassificationBlueprint,
+              view: :base
   # new types
-  association :audience_type, blueprint: PermitClassificationBlueprint
-  association :user_group_type, blueprint: PermitClassificationBlueprint
-  association :submission_type, blueprint: PermitClassificationBlueprint
+  association :audience_type,
+              blueprint: PermitClassificationBlueprint,
+              view: :base
+  association :user_group_type,
+              blueprint: PermitClassificationBlueprint,
+              view: :base
+  association :submission_type,
+              blueprint: PermitClassificationBlueprint,
+              view: :base
 
   association :program, blueprint: ProgramBlueprint, view: :base
   association :last_three_deprecated_template_versions,
