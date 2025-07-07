@@ -110,7 +110,13 @@ export const BaseEditRequirementTemplateScreen = observer(function BaseEditRequi
   }, [requirementTemplate?.isFullyLoaded]);
 
   useEffect(() => {
-    console.log('import.meta.env', import.meta.env.VITE_ENABLE_TEMPLATE_FORCE_PUBLISH);
+    console.log('Environment variables:', {
+      VITE_ENABLE_TEMPLATE_FORCE_PUBLISH: import.meta.env.VITE_ENABLE_TEMPLATE_FORCE_PUBLISH,
+      NODE_ENV: import.meta.env.NODE_ENV,
+      MODE: import.meta.env.MODE,
+      DEV: import.meta.env.DEV,
+      PROD: import.meta.env.PROD,
+    });
   }, []);
 
   if (error) return <ErrorScreen error={error} />;
