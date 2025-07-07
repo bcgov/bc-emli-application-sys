@@ -501,11 +501,15 @@ class Api::PermitApplicationsController < Api::ApplicationController
   def destroy
     authorize @permit_application
 
-    # Store application data before transaction
+    # Store application data AND notification data before transaction
     application_data = {
       number: @permit_application.number,
       user: @permit_application.submitter
     }
+
+    # Generate notification data before destruction using model method
+    withdrawal_notification_data =
+      @permit_application.withdrawal_event_notification_data
 
     success =
       ActiveRecord::Base.transaction do
@@ -513,7 +517,12 @@ class Api::PermitApplicationsController < Api::ApplicationController
       end
 
     if success
-      # Send email after successful transaction
+      # Send notifications after successful transaction
+      NotificationService.publish_application_withdrawal_event_with_data(
+        application_data[:user].id,
+        withdrawal_notification_data
+      )
+
       PermitHubMailer.notify_application_withdrawn(
         application_data[:number],
         application_data[:user]

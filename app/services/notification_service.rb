@@ -347,6 +347,14 @@ class NotificationService
     end
   end
 
+  def self.publish_application_withdrawal_event_with_data(
+    user_id,
+    withdrawal_notification_data
+  )
+    notification_user_hash = { user_id => withdrawal_notification_data }
+    NotificationPushJob.perform_async(notification_user_hash)
+  end
+
   def self.delete_user_notification(user_id, notification_id)
     activity = SimpleFeed.user_feed.activity(user_id)
     all_notifications =
