@@ -173,8 +173,17 @@ class TemplateVersion < ApplicationRecord
   end
 
   def reindex_models_if_published
-    requirement_template&.reindex if published?
-    permit_applications&.reindex if published?
-    previous_version&.permit_applications&.reindex if published?
+    return unless published?
+
+    begin
+      requirement_template&.reindex
+      permit_applications&.reindex
+      previous_version&.permit_applications&.reindex
+    rescue Elastic::Transport::Transport::Error => e
+      Rails.logger.error "Failed to reindex models: #{e.message}"
+      # Continue operation gracefully - reindexing will be skipped
+    rescue StandardError => e
+      Rails.logger.error "Unexpected error during reindexing: #{e.message}"
+    end
   end
 end
