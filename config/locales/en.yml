@@ -158,7 +158,7 @@ en:
       notify_new_or_unconfirmed_preview: 'You’re Invited to Preview a Building Permit Template'
       notify_preview: 'You’re Invited to Preview a Building Permit Template'
       notify_batched_integration_mapping: 'New API mappings'
-      notify_application_withdrawn: 'Application %{permit_application_number} withdrawn'
+      notify_application_withdrawn: 'Better Homes Energy Savings Program - %{permit_application_number} withdrawn'
       notify_application_ineligible: 'Application %{permit_application_number} is ineligible'
   arbitrary_message_construct:
     devise:
@@ -720,6 +720,7 @@ en:
       view_notification: '%{program_name} has viewed your application %{number}.'
       ineligible_notification: 'Application %{number} has been marked as ineligible for %{program_name}'
       ineligible_notification_with_reason: 'Application %{number} has been marked as ineligible for the %{program_name}. The reason is: %{reason}'
+      withdrawal_notification: 'Your application %{number} has been withdrawn from the %{program_name}'
     permit_collaboration:
       submission_delegatee_collaboration_notification: 'Collaboration request from %{author_name}. You have been assigned as a designated submitter for permit application %{number}.'
       submission_assignee_collaboration_notification: 'Collaboration request from %{author_name} on requirement “%{requirement_block_name}” for permit application %{number}'
