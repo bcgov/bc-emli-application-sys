@@ -20,6 +20,7 @@ app:
     'APP_DOMAIN': 'dev-hesp.apps.silver.devops.gov.bc.ca'
     'SECURE_JWT_COOKIE': 'true'
     'VITE_ENABLE_TEMPLATE_FORCE_PUBLISH': 'true'
+    'ENABLE_TEMPLATE_FORCE_PUBLISH': 'true'
     'ANYCABLE_URL': 'wss://dev-hesp-anycable.apps.silver.devops.gov.bc.ca/cable'
     'KEYCLOAK_AUTH_URL': 'https://dev.loginproxy.gov.bc.ca/'
     'VITE_SITEMINDER_LOGOUT_URL': 'https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi'
