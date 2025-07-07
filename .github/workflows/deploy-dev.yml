@@ -46,6 +46,7 @@ jobs:
         docker-file: devops/docker/app/Dockerfile
         docker-args: |
           DEPLOYMENT_TIMESTAMP=${{ env.DEPLOYMENT_TIMESTAMP }}
+          VITE_ENABLE_TEMPLATE_FORCE_PUBLISH=true
         metadata-tags: |
           type=ref,event=branch
           type=sha,format=long,prefix=,suffix=

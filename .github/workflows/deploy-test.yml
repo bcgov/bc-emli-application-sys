@@ -53,6 +53,7 @@ jobs:
         docker-file: devops/docker/app/Dockerfile
         docker-args: |
           DEPLOYMENT_TIMESTAMP=${{ env.DEPLOYMENT_TIMESTAMP }}
+          VITE_ENABLE_TEMPLATE_FORCE_PUBLISH=true
         metadata-tags: |
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
@@ -83,6 +84,7 @@ jobs:
         docker-file: devops/docker/app/Dockerfile
         docker-args: |
           DEPLOYMENT_TIMESTAMP=${{ env.DEPLOYMENT_TIMESTAMP }}
+          VITE_ENABLE_TEMPLATE_FORCE_PUBLISH=true
         metadata-tags: |
           type=semver,pattern={{version}}
 
