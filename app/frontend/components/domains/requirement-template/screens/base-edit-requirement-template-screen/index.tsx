@@ -109,6 +109,10 @@ export const BaseEditRequirementTemplateScreen = observer(function BaseEditRequi
     }
   }, [requirementTemplate?.isFullyLoaded]);
 
+  useEffect(() => {
+    console.log('import.meta.env', import.meta.env.VITE_ENABLE_TEMPLATE_FORCE_PUBLISH);
+  }, []);
+
   if (error) return <ErrorScreen error={error} />;
   if (!requirementTemplate?.isFullyLoaded) return <LoadingScreen />;
 
