@@ -127,7 +127,7 @@ class TemplateVersion < ApplicationRecord
       TemplateVersioningService.publish_version!(self, true)
 
     WebsocketBroadcaster.push_update_to_relevant_users(
-      User.super_admin.kept.all.pluck(:id), # only super admins can force publish
+      User.system_admin.kept.all.pluck(:id), # only system admins can force publish
       Constants::Websockets::Events::TemplateVersion::DOMAIN,
       Constants::Websockets::Events::TemplateVersion::TYPES[:update],
       TemplateVersionBlueprint.render_as_hash(updated_template_version)

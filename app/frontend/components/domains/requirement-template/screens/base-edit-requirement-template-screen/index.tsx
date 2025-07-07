@@ -170,9 +170,9 @@ export const BaseEditRequirementTemplateScreen = observer(function BaseEditRequi
             if (updatedRequirementTemplate) {
               const publishedTemplateVersion = updatedRequirementTemplate.publishedTemplateVersion;
 
-              publishedTemplateVersion
-                ? navigate(`/template-versions/${publishedTemplateVersion.id}`)
-                : navigate('/requirement-templates');
+              // publishedTemplateVersion
+              //   ? navigate(`/template-versions/${publishedTemplateVersion.id}`)
+              navigate('/requirement-templates');
             }
           })();
         }
