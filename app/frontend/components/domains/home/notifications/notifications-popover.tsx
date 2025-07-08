@@ -66,7 +66,9 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
     deleteNotification(notificationId);
 
     // Update numberJustRead to reflect the deletion
-    setNumberJustRead((prev) => Math.max(0, prev - 1));
+    if (numberJustRead > 0) {
+      setNumberJustRead(numberJustRead - 1);
+    }
   };
 
   const handleClearAllNotifications = () => {
