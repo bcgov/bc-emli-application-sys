@@ -64,6 +64,11 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
   const handleDeleteNotification = (notificationId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     deleteNotification(notificationId);
+
+    // Update numberJustRead to reflect the deletion
+    if (numberJustRead > 0) {
+      setNumberJustRead(Math.max(0, numberJustRead - 1));
+    }
   };
 
   const handleClearAllNotifications = () => {

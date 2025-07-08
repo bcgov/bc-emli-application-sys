@@ -2634,7 +2634,7 @@ const options = {
           thankYouForResponse: 'Thank you for your response!',
           actionRequired: {
             application_revisions_request:
-              "You have received a request for revisions on application <1 />. Please revise before resubmitting (you won't lose your place in line).",
+              'We need more information to continue processing your application <1 />. Please log in to update your application (your place in the queue is secure).',
           },
           govFeedbackResponseNoReasons: {
             unclear: 'This information is unclear',

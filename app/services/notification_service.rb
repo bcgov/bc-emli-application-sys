@@ -317,6 +317,9 @@ class NotificationService
   end
 
   def self.publish_application_view_event(permit_application)
+    # Temporarily disabled - view notifications
+    return
+
     notification_user_hash = {}
     notification_user_hash[
       permit_application.submitter_id
