@@ -80,7 +80,7 @@ class PermitApplication < ApplicationRecord
 
   #validate :jurisdiction_has_matching_submission_contact
   #validate :pid_or_pin_presence
-  validates :nickname, presence: true
+  validate :name_presence
   validates :number, presence: true
   validates :reference_number, length: { maximum: 300 }, allow_nil: true
   #validate :sandbox_belongs_to_jurisdiction
@@ -811,5 +811,9 @@ class PermitApplication < ApplicationRecord
     unless jurisdiction.sandboxes.include?(sandbox)
       errors.add(:sandbox, "must belong to the jurisdiction")
     end
+  end
+
+  def name_presence
+    errors.add(:base, "Application Name can't be blank") if nickname.blank?
   end
 end

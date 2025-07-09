@@ -5,7 +5,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { IOption } from '../../../../types/types';
 import { SharedSpinner } from '../shared-spinner';
-import { Select as ChakraReactSelect } from 'chakra-react-select';
+import Select from 'react-select';
 
 interface IAsyncDropdownProps<T> extends FlexProps {
   label?: string;
@@ -51,7 +51,7 @@ export const AsyncDropdown = observer(
         control={control}
         rules={{ required: true }}
         render={({ field: { onChange, value } }) => (
-          <ChakraReactSelect
+          <Select
             isClearable={false}
             options={options}
             getOptionLabel={(opt) => opt.label}
@@ -63,7 +63,7 @@ export const AsyncDropdown = observer(
               onChange(selectedValue);
               if (onValueChange) onValueChange(selectedValue);
             }}
-            chakraStyles={{
+            styles={{
               container: (base) => ({
                 ...base,
                 minWidth: '20rem',
@@ -134,4 +134,3 @@ export const AsyncDropdown = observer(
     );
   },
 );
-

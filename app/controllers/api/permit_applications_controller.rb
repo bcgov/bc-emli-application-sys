@@ -91,6 +91,8 @@ class Api::PermitApplicationsController < Api::ApplicationController
       )
     submission_section&.each { |key, value| submission_section[key] = nil }
 
+    update_submitted_for_from_submission_data
+
     is_current_user_submitter =
       current_user.id == @permit_application.submitter_id
 
@@ -229,6 +231,8 @@ class Api::PermitApplicationsController < Api::ApplicationController
       render_error "permit_application.outdated_error", message_opts: {} and
         return
     end
+
+    update_submitted_for_from_submission_data
 
     is_current_user_submitter =
       current_user.id == @permit_application.submitter_id
@@ -565,6 +569,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
       :jurisdiction_id,
       :full_address,
       :nickname,
+      :submitted_for,
       :pin,
       :pid,
       :first_nations,
@@ -634,5 +639,32 @@ class Api::PermitApplicationsController < Api::ApplicationController
         }
       ]
     )
+  end
+
+  def update_submitted_for_from_submission_data
+    # Extract first name and last name dynamically from submission data
+    submission_data = permit_application_params.dig("submission_data", "data")
+    first_name = nil
+    last_name = nil
+
+    submission_data&.each do |section_key, section_data|
+      section_data.each do |field_key, field_value|
+        if field_key.include?("firstName")
+          first_name = field_value
+        elsif field_key.include?("lastName")
+          last_name = field_value
+        end
+      end
+    end
+
+    Rails.logger.info("First Name: #{first_name}, Last Name: #{last_name}")
+
+    # Update submitted_for with first name and last name if present
+    if first_name.present? || last_name.present?
+      submitted_for_name = [first_name, last_name].compact.join(" ").strip
+      if submitted_for_name.present?
+        @permit_application.update(submitted_for: submitted_for_name)
+      end
+    end
   end
 end

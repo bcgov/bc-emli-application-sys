@@ -15,6 +15,7 @@ class PermitApplicationBlueprint < Blueprinter::Base
            :zipfile_url,
            :reference_number,
            :submitted_at,
+           :submitted_for,
            :resubmitted_at,
            :revisions_requested_at,
            :missing_pdfs

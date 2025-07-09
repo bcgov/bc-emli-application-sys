@@ -21,6 +21,7 @@ import { Form, defaultOptions } from '../chefs';
 import { ContactModal } from '../contact/contact-modal';
 import { PreviousSubmissionModal } from '../revisions/previous-submission-modal';
 import { PermitApplicationSubmitModal } from './permit-application-submit-modal';
+import { useMst } from '../../../setup/root';
 
 interface IRequirementFormProps {
   permitApplication?: IEnergySavingsApplication;
@@ -64,6 +65,8 @@ export const RequirementForm = observer(
     const shouldShowDiff = permitApplication?.shouldShowApplicationDiff(isEditing);
     const userShouldSeeDiff = permitApplication?.currentUserShouldSeeApplicationDiff;
     const isSubmitted = permitApplication?.isSubmitted;
+    const { userStore } = useMst();
+    const { currentUser } = userStore;
 
     const pastVersion = isViewingPastRequests ? selectedPastSubmissionVersion : previousSubmissionVersion;
     const isMounted = useMountStatus();
@@ -231,7 +234,12 @@ export const RequirementForm = observer(
     };
 
     const onModalSubmit = async () => {
-      if (await permitApplication.submit({ submissionData: imminentSubmission })) {
+      if (
+        await permitApplication.submit({
+          submissionData: imminentSubmission,
+          nickname: permitApplication.nickname,
+        })
+      ) {
         navigate(`/applications/${permitApplication.id}/successful-submission`, {
           state: {
             message: t('energySavingsApplication.new.sucessfulSubmission'),
@@ -394,12 +402,21 @@ export const RequirementForm = observer(
             key={permitApplication.formFormatKey}
             form={formattedFormJson}
             formReady={formReady}
-            /* Needs cloned submissionData otherwise it's not possible to use data grid as mst props can't be mutated*/
             submission={unsavedSubmissionData}
             onSubmit={onFormSubmit}
             options={permitAppOptions}
             onBlur={onBlur}
-            onChange={onChange}
+            onChange={(changedEvent) => {
+              // Handle address field changes
+              if (changedEvent?.changed?.component?.key?.includes('address')) {
+                const addressValue = changedEvent?.changed?.value;
+                if (!currentUser?.physicalAddress) {
+                  permitApplication.setName(addressValue);
+                }
+              }
+              // Call the original onChange function
+              onChange(changedEvent);
+            }}
             onInitialized={onInitialized}
           />
         </Flex>

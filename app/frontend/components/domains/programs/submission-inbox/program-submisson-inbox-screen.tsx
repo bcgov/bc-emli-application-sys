@@ -237,7 +237,7 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
       <SearchGridItem>
         <Flex>
           <Text fontWeight={700} flex={1}>
-            {permitApplication.submitter.name}
+            {permitApplication.submittedFor ? permitApplication.submittedFor : permitApplication.submitter.name}
           </Text>
         </Flex>
       </SearchGridItem>
