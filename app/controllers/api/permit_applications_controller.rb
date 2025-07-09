@@ -242,6 +242,11 @@ class Api::PermitApplicationsController < Api::ApplicationController
            end
          )
        ) && @permit_application.submit!
+      # Notify admin staff about new submission
+      NotificationService.publish_new_submission_received_event(
+        @permit_application
+      )
+
       render_success @permit_application,
                      nil,
                      {

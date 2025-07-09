@@ -157,6 +157,16 @@ export const NotificationStoreModel = types
             },
           ];
 
+        case ENotificationActionType.newSubmissionReceived: {
+          const data = objectData as IPermitNotificationObjectData;
+          return [
+            {
+              text: t('ui.review'),
+              href: `/applications/${data.permitApplicationId}?review=true`,
+            },
+          ];
+        }
+
         default:
           console.warn(`Unhandled notification type: ${notification.actionType}`);
           return [];

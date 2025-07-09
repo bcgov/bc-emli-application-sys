@@ -402,6 +402,34 @@ class NotificationService
     NotificationPushJob.perform_async(notification_user_hash)
   end
 
+  def self.publish_new_submission_received_event(permit_application)
+    # Only notify admin and admin_manager users who have access to this specific program
+    admin_users =
+      User
+        .where(role: %i[admin admin_manager])
+        .kept
+        .joins(:program_memberships)
+        .where(
+          program_memberships: {
+            program_id: permit_application.program_id,
+            deactivated_at: nil
+          }
+        )
+
+    notification_user_hash = {}
+
+    admin_users.each do |user|
+      # Send in-app notification to admin users for new submissions
+      notification_user_hash[
+        user.id
+      ] = permit_application.new_submission_received_event_notification_data
+    end
+
+    unless notification_user_hash.empty?
+      NotificationPushJob.perform_async(notification_user_hash)
+    end
+  end
+
   # this is just a wrapper around the activity's metadata methods
   # since in the case of a single instance it returns a specific return type (eg. Integer)
   # but in the case of multiple user_ids the activity is a hash object
