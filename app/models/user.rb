@@ -353,7 +353,7 @@ class User < ApplicationRecord
       "action_text" =>
         I18n.t(
           "notification.user.account_update_notification",
-          updated_at: updated_at.strftime("%B %d, %Y at %I:%M %p"),
+          updated_at: I18n.l(updated_at, format: :long),
           changed_fields: format_changed_fields(changed_fields)
         ),
       "object_data" => {
