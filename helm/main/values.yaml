@@ -120,6 +120,13 @@ crunchy-postgres:
   instances:
     name: ha # high availability
     replicas: 1
+    livenessProbe:
+      exec:
+        command: ['pg_isready', '-U', 'postgres']
+      initialDelaySeconds: 10
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 6
     dataVolumeClaimSpec:
       storage: 1Gi
       storageClassName: netapp-block-standard
@@ -149,6 +156,15 @@ crunchy-postgres:
       requests:
         cpu: 1m
         memory: 64Mi
+        livenessProbe:
+          exec:
+            command:
+              - pgbackrest
+              - server-ping
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+          periodSeconds: 10
+          failureThreshold: 6
     sidecars:
       requests:
         cpu: 1m
