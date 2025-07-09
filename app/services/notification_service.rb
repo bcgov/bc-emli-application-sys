@@ -358,6 +358,22 @@ class NotificationService
     NotificationPushJob.perform_async(notification_user_hash)
   end
 
+  def self.publish_application_admin_update_event(permit_application)
+    notification_user_hash = {
+      permit_application.submitter_id =>
+        permit_application.admin_update_event_notification_data
+    }
+
+    PermitHubMailer.notify_application_admin_update(
+      permit_application,
+      permit_application.submitter
+    ).deliver_later
+
+    unless notification_user_hash.empty?
+      NotificationPushJob.perform_async(notification_user_hash)
+    end
+  end
+
   def self.delete_user_notification(user_id, notification_id)
     activity = SimpleFeed.user_feed.activity(user_id)
     all_notifications =

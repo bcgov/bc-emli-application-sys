@@ -18,5 +18,6 @@ module Constants
     APPLICATION_INELIGIBLE = "application_ineligible"
     APPLICATION_WITHDRAWAL = "application_withdrawal"
     ACCOUNT_UPDATE = "account_update"
+    APPLICATION_ADMIN_UPDATE = "application_admin_update"
   end
 end

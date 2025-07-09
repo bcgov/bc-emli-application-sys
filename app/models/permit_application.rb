@@ -594,6 +594,20 @@ class PermitApplication < ApplicationRecord
     }
   end
 
+  def admin_update_event_notification_data
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::APPLICATION_ADMIN_UPDATE,
+      "action_text" =>
+        "#{I18n.t("notification.permit_application.admin_update_notification", number: number, program_name: program_name)}",
+      "object_data" => {
+        "permit_application_id" => id,
+        "permit_application_number" => number
+      }
+    }
+  end
+
   def step_code_requirements
     jurisdiction.permit_type_required_steps.where(permit_type_id:)
   end

@@ -122,6 +122,13 @@ class Api::PermitApplicationsController < Api::ApplicationController
                      }
     elsif @permit_application.submitted? &&
           @permit_application.update(submitted_permit_application_params)
+      # Send notification if admin or admin_manager updated a participant's application
+      if current_user.admin? || current_user.admin_manager?
+        NotificationService.publish_application_admin_update_event(
+          @permit_application
+        )
+      end
+
       render_success @permit_application,
                      ("permit_application.save_success"),
                      {

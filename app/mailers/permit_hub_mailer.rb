@@ -224,4 +224,18 @@ class PermitHubMailer < ApplicationMailer
       }
     )
   end
+
+  def notify_application_admin_update(permit_application, user)
+    @user = user
+    @permit_application = permit_application
+    @program = permit_application.program
+
+    send_user_mail(
+      email: @user.email,
+      template_key: "notify_application_admin_update",
+      subject_i18n_params: {
+        permit_application_number: permit_application.number
+      }
+    )
+  end
 end

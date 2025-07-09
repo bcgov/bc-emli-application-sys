@@ -160,6 +160,7 @@ en:
       notify_batched_integration_mapping: 'New API mappings'
       notify_application_withdrawn: 'Application %{permit_application_number} has been withdrawn'
       notify_application_ineligible: 'Application %{permit_application_number} is ineligible'
+      notify_application_admin_update: 'Application %{permit_application_number} Update Required'
   arbitrary_message_construct:
     devise:
       failure:
@@ -721,6 +722,7 @@ en:
       ineligible_notification: 'Application %{number} has been marked as ineligible for %{program_name}'
       ineligible_notification_with_reason: 'Application %{number} has been marked as ineligible for the %{program_name}. The reason is: %{reason}'
       withdrawal_notification: 'Your application %{number} has been withdrawn from the %{program_name}'
+      admin_update_notification: 'Your %{program_name} application %{number} was updated by an administrator'
     user:
       account_update_notification: 'Your account was updated on %{updated_at}. Changes: %{changed_fields}. If you did not make this change, please contact support immediately.'
     permit_collaboration:
