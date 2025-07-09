@@ -394,6 +394,14 @@ class NotificationService
     { success: false, error: e.message }
   end
 
+  def self.publish_account_update_event(user, changed_fields = [])
+    notification_user_hash = {
+      user.id => user.account_update_notification_data(changed_fields)
+    }
+
+    NotificationPushJob.perform_async(notification_user_hash)
+  end
+
   # this is just a wrapper around the activity's metadata methods
   # since in the case of a single instance it returns a specific return type (eg. Integer)
   # but in the case of multiple user_ids the activity is a hash object
