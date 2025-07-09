@@ -351,9 +351,14 @@ class User < ApplicationRecord
       "id" => SecureRandom.uuid,
       "action_type" => Constants::NotificationActionTypes::ACCOUNT_UPDATE,
       "action_text" =>
-        "#{I18n.t("notification.user.account_update_notification", updated_at: updated_at.strftime("%B %d, %Y at %I:%M %p"), changed_fields: format_changed_fields(changed_fields))}",
+        I18n.t(
+          "notification.user.account_update_notification",
+          updated_at: updated_at.strftime("%B %d, %Y at %I:%M %p"),
+          changed_fields: format_changed_fields(changed_fields)
+        ),
       "object_data" => {
-        "user_id" => id
+        "user_id" => id,
+        "changed_fields" => changed_fields
       }
     }
   end
@@ -361,7 +366,7 @@ class User < ApplicationRecord
   private
 
   def format_changed_fields(changed_fields)
-    return "Your" if changed_fields.empty?
+    return "account details" if changed_fields.empty?
 
     field_names =
       changed_fields.map do |field|
@@ -377,14 +382,7 @@ class User < ApplicationRecord
         end
       end
 
-    case field_names.length
-    when 1
-      "Your #{field_names.first}"
-    when 2
-      "Your #{field_names[0]} and #{field_names[1]}"
-    else
-      "Your #{field_names[0..-2].join(", ")}, and #{field_names[-1]}"
-    end
+    field_names.join(", ")
   end
 
   def destroy_jurisdiction_collaborator

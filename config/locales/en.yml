@@ -722,7 +722,7 @@ en:
       ineligible_notification_with_reason: 'Application %{number} has been marked as ineligible for the %{program_name}. The reason is: %{reason}'
       withdrawal_notification: 'Your application %{number} has been withdrawn from the %{program_name}'
     user:
-      account_update_notification: '%{changed_fields} account details were updated on %{updated_at}. If you did not make this change, please contact support immediately.'
+      account_update_notification: 'Your account was updated on %{updated_at}. Changes: %{changed_fields}. If you did not make this change, please contact support immediately.'
     permit_collaboration:
       submission_delegatee_collaboration_notification: 'Collaboration request from %{author_name}. You have been assigned as a designated submitter for permit application %{number}.'
       submission_assignee_collaboration_notification: 'Collaboration request from %{author_name} on requirement “%{requirement_block_name}” for permit application %{number}'
