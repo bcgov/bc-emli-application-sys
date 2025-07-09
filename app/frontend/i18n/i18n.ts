@@ -481,6 +481,7 @@ const options = {
           autofill: 'Autofill',
           help: 'Help',
           contact: 'Contact',
+          contactSupport: 'Contact Support',
           pleaseSelect: 'Please select',
           checked: 'Checked',
           unchecked: 'Unhecked',
@@ -2634,7 +2635,7 @@ const options = {
           thankYouForResponse: 'Thank you for your response!',
           actionRequired: {
             application_revisions_request:
-              "We need more information to continue processing your application <1 />. Please log in to update your application (your place in the queue is secure).",
+              'We need more information to continue processing your application <1 />. Please log in to update your application (your place in the queue is secure).',
           },
           govFeedbackResponseNoReasons: {
             unclear: 'This information is unclear',

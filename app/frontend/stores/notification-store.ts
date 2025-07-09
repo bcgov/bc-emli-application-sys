@@ -152,7 +152,7 @@ export const NotificationStoreModel = types
         case ENotificationActionType.accountUpdate:
           return [
             {
-              text: 'Contact Support',
+              text: t('ui.contactSupport'),
               href: '/get-support',
             },
           ];
