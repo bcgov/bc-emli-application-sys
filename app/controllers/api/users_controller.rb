@@ -89,6 +89,34 @@ class Api::UsersController < Api::ApplicationController
       should_send_confirmation =
         @user.confirmed_at.blank? && @user.confirmation_sent_at.blank?
       current_user.send_confirmation_instructions if should_send_confirmation
+
+      # Send account update notification only if actual changes were made
+      # Check for changes in user attributes or addresses
+      changed_fields = []
+
+      if current_user.saved_changes?
+        # Check which user fields changed
+        user_changes = current_user.saved_changes.keys
+        changed_fields.concat(
+          user_changes.select { |field| %w[email].include?(field) }
+        )
+      end
+
+      if current_user.mailing_address&.saved_changes?
+        changed_fields << "mailing_address"
+      end
+
+      if current_user.physical_address&.saved_changes?
+        changed_fields << "physical_address"
+      end
+
+      unless changed_fields.empty?
+        NotificationService.publish_account_update_event(
+          current_user,
+          changed_fields
+        )
+      end
+
       render_success(
         current_user,
         (
@@ -292,12 +320,6 @@ class Api::UsersController < Api::ApplicationController
 
     transformed_params.permit(
       :email,
-      :nickname,
-      :first_name,
-      :last_name,
-      :organization,
-      :certified,
-      :reviewed,
       preference_attributes: %i[
         enable_in_app_new_template_version_publish_notification
         enable_in_app_customization_update_notification

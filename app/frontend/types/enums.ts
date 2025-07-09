@@ -505,6 +505,7 @@ export enum ENotificationActionType {
   applicationView = 'application_view',
   applicationIneligible = 'application_ineligible',
   applicationWithdrawal = 'application_withdrawal',
+  accountUpdate = 'account_update',
 }
 
 export enum ECollaboratorableType {

@@ -149,6 +149,14 @@ export const NotificationStoreModel = types
           ];
         }
 
+        case ENotificationActionType.accountUpdate:
+          return [
+            {
+              text: 'Contact Support',
+              href: '/get-support',
+            },
+          ];
+
         default:
           console.warn(`Unhandled notification type: ${notification.actionType}`);
           return [];

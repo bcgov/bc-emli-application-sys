@@ -17,5 +17,6 @@ module Constants
       "scheduled_template_missing_requirements_mapping"
     APPLICATION_INELIGIBLE = "application_ineligible"
     APPLICATION_WITHDRAWAL = "application_withdrawal"
+    ACCOUNT_UPDATE = "account_update"
   end
 end
