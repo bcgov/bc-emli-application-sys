@@ -93,7 +93,7 @@ export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) =>
     if (!currentUser.isParticipant) {
       loadProgramOptions();
     } else {
-      handleCreatePermitApplication({ slug: 'energy-savings-program' });
+      handleCreatePermitApplication({ slug: 'energy-savings-program' }); // Default slug for participant
     }
   }, [loadProgramOptions]);
 

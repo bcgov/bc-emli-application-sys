@@ -54,6 +54,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
     .model('EnergySavingsApplicationModel', {
       id: types.identifier,
       nickname: types.string,
+      submittedFor: types.maybeNull(types.string),
       number: types.string,
       fullAddress: types.maybeNull(types.string), // for now some seeds will not have this
       pin: types.maybeNull(types.string), // for now some seeds will not have this
@@ -563,6 +564,12 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       },
     }))
     .actions((self) => ({
+      setName(name: string) {
+        self.nickname = name;
+      },
+      setSubmittedFor(submittedFor: string) {
+        self.submittedFor = submittedFor;
+      },
       setAssignedUsers(users: IMinimalFrozenUser[]) {
         self.assignedUsers.splice(0, self.assignedUsers.length, ...users);
       },

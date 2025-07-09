@@ -157,14 +157,14 @@ export class Api {
   }
 
   async fetchPermitApplication(id: string, review?: boolean) {
-    return this.client.get<ApiResponse<IPermitApplication>>(`/permit_applications/${id}`, { review });
+    return this.client.get<ApiResponse<IEnergySavingsApplication>>(`/permit_applications/${id}`, { review });
   }
 
   async viewPermitApplication(id) {
-    return this.client.post<ApiResponse<IPermitApplication>>(`/permit_applications/${id}/mark_as_viewed`);
+    return this.client.post<ApiResponse<IEnergySavingsApplication>>(`/permit_applications/${id}/mark_as_viewed`);
   }
   async setPermitApplicationStatus(id, params) {
-    return this.client.post<ApiResponse<IPermitApplication>>(`/permit_applications/${id}/change_status`, params);
+    return this.client.post<ApiResponse<IEnergySavingsApplication>>(`/permit_applications/${id}/change_status`, params);
   }
   async fetchLocalityTypeOptions() {
     return this.client.get<IOptionResponse>(`/jurisdictions/locality_type_options`);
@@ -370,20 +370,21 @@ export class Api {
   }
 
   async updatePermitApplication(id, params, review?: boolean) {
-    return this.client.patch<ApiResponse<IPermitApplication>>(`/permit_applications/${id}`, {
+    console.log('Updating permit application with params:', params);
+    return this.client.patch<ApiResponse<IEnergySavingsApplication>>(`/permit_applications/${id}`, {
       permitApplication: params,
       review,
     });
   }
 
   async updateRevisionRequests(id, params: IRevisionRequestForm) {
-    return this.client.patch<ApiResponse<IPermitApplication>>(`/permit_applications/${id}/revision_requests`, {
+    return this.client.patch<ApiResponse<IEnergySavingsApplication>>(`/permit_applications/${id}/revision_requests`, {
       submissionVersion: params,
     });
   }
 
   async updatePermitApplicationVersion(id) {
-    return this.client.patch<ApiResponse<IPermitApplication>>(`/permit_applications/${id}/update_version`);
+    return this.client.patch<ApiResponse<IEnergySavingsApplication>>(`/permit_applications/${id}/update_version`);
   }
 
   async assignCollaboratorToPermitApplication(
@@ -495,7 +496,7 @@ export class Api {
   }
 
   async submitPermitApplication(id, params) {
-    return this.client.post<ApiResponse<IPermitApplication>>(`/permit_applications/${id}/submit`, {
+    return this.client.post<ApiResponse<IEnergySavingsApplication>>(`/permit_applications/${id}/submit`, {
       permitApplication: params,
     });
   }
