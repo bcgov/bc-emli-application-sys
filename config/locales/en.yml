@@ -721,6 +721,7 @@ en:
       ineligible_notification: 'Application %{number} has been marked as ineligible for %{program_name}'
       ineligible_notification_with_reason: 'Application %{number} has been marked as ineligible for the %{program_name}. The reason is: %{reason}'
       withdrawal_notification: 'Your application %{number} has been withdrawn from the %{program_name}'
+      new_submission_received_notification: 'New application %{number} submitted to %{program_name} on %{submitted_at}'
     user:
       account_update_notification: 'Your account was updated on %{updated_at}. Changes: %{changed_fields}. If you did not make this change, please contact support immediately.'
     permit_collaboration:
