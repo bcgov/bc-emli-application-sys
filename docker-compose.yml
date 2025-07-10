@@ -103,7 +103,7 @@ services:
       - app
 
   postgres:
-    image: postgres:15
+    image: postgres:16
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
