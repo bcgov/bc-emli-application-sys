@@ -197,10 +197,16 @@ class TemplateVersioningService
         end
       end
 
-      # Publish the notification
-      NotificationService.publish_new_template_version_publish_event(
-        template_version
-      )
+      # Notify admin staff about new template publication
+      begin
+        NotificationService.publish_template_published_event(template_version)
+      rescue ActiveRecord::Error,
+             NoMethodError,
+             JSON::ParserError,
+             Redis::BaseError => e
+        Rails.logger.error "Failed to send template publication notification: #{e.message}"
+        # Continue with template publication even if notification fails
+      end
     end
 
     template_version

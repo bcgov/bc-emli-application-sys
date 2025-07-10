@@ -430,6 +430,33 @@ class NotificationService
     end
   end
 
+  def self.publish_template_published_event(template_version)
+    # Only notify admin and admin_manager users who have access to this specific program
+    admin_users =
+      User
+        .where(role: %i[admin admin_manager])
+        .kept
+        .joins(:program_memberships)
+        .where(
+          program_memberships: {
+            program_id: template_version.requirement_template.program_id,
+            deactivated_at: nil
+          }
+        )
+
+    notification_user_hash = {}
+
+    admin_users.each do |user|
+      notification_user_hash[
+        user.id
+      ] = template_version.template_published_notification_data
+    end
+
+    unless notification_user_hash.empty?
+      NotificationPushJob.perform_async(notification_user_hash)
+    end
+  end
+
   # this is just a wrapper around the activity's metadata methods
   # since in the case of a single instance it returns a specific return type (eg. Integer)
   # but in the case of multiple user_ids the activity is a hash object

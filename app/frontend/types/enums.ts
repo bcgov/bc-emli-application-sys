@@ -507,6 +507,7 @@ export enum ENotificationActionType {
   applicationWithdrawal = 'application_withdrawal',
   accountUpdate = 'account_update',
   newSubmissionReceived = 'new_submission_received',
+  templatePublished = 'template_published',
 }
 
 export enum ECollaboratorableType {

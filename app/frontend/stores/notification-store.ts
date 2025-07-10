@@ -167,6 +167,16 @@ export const NotificationStoreModel = types
           ];
         }
 
+        case ENotificationActionType.templatePublished: {
+          const data = objectData as IPermitNotificationObjectData;
+          return [
+            {
+              text: t('ui.viewTemplate'),
+              href: `/blank-template/${data.templateVersionId}`,
+            },
+          ];
+        }
+
         default:
           console.warn(`Unhandled notification type: ${notification.actionType}`);
           return [];
