@@ -292,7 +292,13 @@ class PermitApplication < ApplicationRecord
   # end
 
   def using_current_template_version
-    self.template_version === current_published_template_version
+    current_version = current_published_template_version
+    Rails.logger.debug "Checking template version for permit application #{id}: current=#{template_version.id}, published=#{current_version&.id}"
+
+    result = self.template_version.id == current_version&.id
+    Rails.logger.debug "Template version match result: #{result}"
+
+    result
   end
 
   def current_published_template_version
