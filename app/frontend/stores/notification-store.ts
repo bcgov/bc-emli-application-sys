@@ -141,7 +141,8 @@ export const NotificationStoreModel = types
         case ENotificationActionType.applicationSubmission:
         case ENotificationActionType.applicationRevisionsRequest:
         case ENotificationActionType.applicationView:
-        case ENotificationActionType.applicationIneligible: {
+        case ENotificationActionType.applicationIneligible:
+        case ENotificationActionType.applicationAssignment: {
           const data = objectData as IPermitNotificationObjectData;
           return [
             {

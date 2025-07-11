@@ -20,5 +20,6 @@ module Constants
     ACCOUNT_UPDATE = "account_update"
     NEW_SUBMISSION_RECEIVED = "new_submission_received"
     TEMPLATE_PUBLISHED = "template_published"
+    APPLICATION_ASSIGNMENT = "application_assignment"
   end
 end

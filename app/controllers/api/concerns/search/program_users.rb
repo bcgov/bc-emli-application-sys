@@ -45,6 +45,22 @@ module Api::Concerns::Search::ProgramUsers
       user_ids -= system_admin_ids
     end
 
+    # Filter users based on assignment permissions
+    if Current.user.admin_manager?
+      # Admin managers can assign to admin_managers and admins
+      invalid_user_ids =
+        User
+          .where(id: user_ids)
+          .where.not(role: %w[admin_manager admin])
+          .pluck(:id)
+      user_ids -= invalid_user_ids
+    elsif Current.user.admin?
+      # Admins can only assign to admins
+      invalid_user_ids =
+        User.where(id: user_ids).where.not(role: "admin").pluck(:id)
+      user_ids -= invalid_user_ids
+    end
+
     # Run the search
     @user_search =
       User.search(

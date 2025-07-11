@@ -415,6 +415,7 @@ class NotificationService
             deactivated_at: nil
           }
         )
+        .distinct
 
     notification_user_hash = {}
 
@@ -443,6 +444,7 @@ class NotificationService
             deactivated_at: nil
           }
         )
+        .distinct
 
     notification_user_hash = {}
 
@@ -452,6 +454,21 @@ class NotificationService
       ] = template_version.template_published_notification_data
     end
 
+    unless notification_user_hash.empty?
+      NotificationPushJob.perform_async(notification_user_hash)
+    end
+  end
+
+  def self.publish_application_assignment_event(
+    permit_application,
+    assigned_user
+  )
+    notification_user_hash = {
+      assigned_user.id =>
+        permit_application.application_assignment_event_notification_data
+    }
+
+    # Send in-app notification only (no email required)
     unless notification_user_hash.empty?
       NotificationPushJob.perform_async(notification_user_hash)
     end
