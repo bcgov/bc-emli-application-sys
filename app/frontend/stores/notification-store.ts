@@ -62,6 +62,9 @@ export const NotificationStoreModel = types
 
       switch (notification.actionType) {
         case ENotificationActionType.newTemplateVersionPublish: {
+          // NOTE: This notification type is currently dormant (not sent by backend as of commit e8b3849)
+          // but user preferences and API still support it. See templatePublished for active equivalent.
+          // Infrastructure preserved for potential future reactivation.
           const data = objectData as ITemplateVersionNotificationObjectData;
           const links = [
             {
