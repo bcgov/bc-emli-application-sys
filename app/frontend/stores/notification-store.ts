@@ -62,7 +62,7 @@ export const NotificationStoreModel = types
 
       switch (notification.actionType) {
         case ENotificationActionType.newTemplateVersionPublish: {
-          const data = objectData as IPermitNotificationObjectData;
+          const data = objectData as ITemplateVersionNotificationObjectData;
           const links = [
             {
               text: t('permitApplication.reviewOutdatedSubmissionLink'),
