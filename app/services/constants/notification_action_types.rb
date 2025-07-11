@@ -19,5 +19,6 @@ module Constants
     APPLICATION_WITHDRAWAL = "application_withdrawal"
     ACCOUNT_UPDATE = "account_update"
     NEW_SUBMISSION_RECEIVED = "new_submission_received"
+    TEMPLATE_PUBLISHED = "template_published"
   end
 end

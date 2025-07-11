@@ -606,7 +606,7 @@ class PermitApplication < ApplicationRecord
       "action_type" =>
         Constants::NotificationActionTypes::NEW_SUBMISSION_RECEIVED,
       "action_text" =>
-        "#{I18n.t("notification.permit_application.new_submission_received_notification", number: number, program_name: program_name, submitted_at: I18n.l(submitted_at, format: :short))}",
+        "#{I18n.t("notification.permit_application.new_submission_received_notification", number: number, program_name: program_name, submitted_at: I18n.l(submitted_at, format: :long))}",
       "object_data" => {
         "permit_application_id" => id,
         "permit_application_number" => number

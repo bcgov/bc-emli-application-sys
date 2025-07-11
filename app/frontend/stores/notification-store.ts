@@ -62,7 +62,10 @@ export const NotificationStoreModel = types
 
       switch (notification.actionType) {
         case ENotificationActionType.newTemplateVersionPublish: {
-          const data = objectData as IRequirementTemplateNotificationObjectData;
+          // NOTE: This notification type is currently dormant (not sent by backend as of commit e8b3849)
+          // but user preferences and API still support it. See templatePublished for active equivalent.
+          // Infrastructure preserved for potential future reactivation.
+          const data = objectData as ITemplateVersionNotificationObjectData;
           const links = [
             {
               text: t('permitApplication.reviewOutdatedSubmissionLink'),
@@ -75,10 +78,9 @@ export const NotificationStoreModel = types
           ];
 
           if (currentUser.isManager) {
-            const templateData = objectData as ITemplateVersionNotificationObjectData;
             links.push({
               text: t('permitApplication.reviewUpdatedEditLink'),
-              href: `/digital-building-permits/${templateData.templateVersionId}/edit?compare=true`,
+              href: `/digital-building-permits/${data.templateVersionId}/edit?compare=true`,
             });
           }
           return links;
@@ -163,6 +165,16 @@ export const NotificationStoreModel = types
             {
               text: t('ui.review'),
               href: `/applications/${data.permitApplicationId}?review=true`,
+            },
+          ];
+        }
+
+        case ENotificationActionType.templatePublished: {
+          const data = objectData as ITemplateVersionNotificationObjectData;
+          return [
+            {
+              text: t('ui.viewTemplate'),
+              href: `/blank-template/${data.templateVersionId}`,
             },
           ];
         }

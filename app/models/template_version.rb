@@ -86,6 +86,34 @@ class TemplateVersion < ApplicationRecord
     }
   end
 
+  def template_published_notification_data
+    # Use label if present, fallback to nickname, then description, then a default
+    template_display_name =
+      requirement_template.label.presence ||
+        requirement_template.nickname.presence ||
+        requirement_template.description.presence ||
+        "Template ##{requirement_template.id[0..7]}"
+
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" => Constants::NotificationActionTypes::TEMPLATE_PUBLISHED,
+      "action_text" =>
+        I18n.t(
+          "notification.template_version.template_published_notification",
+          template_name: template_display_name,
+          program_name: requirement_template.program.program_name,
+          published_at: I18n.l(updated_at, format: :long)
+        ),
+      "object_data" => {
+        "template_version_id" => id,
+        "requirement_template_id" => requirement_template_id,
+        "program_id" => requirement_template.program_id,
+        "template_name" => template_display_name,
+        "program_name" => requirement_template.program.program_name
+      }
+    }
+  end
+
   def previous_version
     TemplateVersioningService.previous_published_version(self)
   end

@@ -413,6 +413,7 @@ const options = {
           yes: 'Yes',
           no: 'No',
           show: 'Show',
+          viewTemplate: 'View Template',
           hide: 'Hide',
           setup: 'Setup',
           search: 'Search',

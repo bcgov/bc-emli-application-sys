@@ -713,6 +713,7 @@ en:
     template_version:
       new_version_notification: 'A new version of "%{template_label}" has been published'
       new_customization_notification: '%{jurisdiction_name} has made a modification to the requirements for %{template_label}'
+      template_published_notification: 'New template "%{template_name}" published for %{program_name} on %{published_at}'
     permit_application:
       submission_notification: 'Your application %{number} has been received and is pending review.'
       resubmission_notification: 'Your revised application %{number} has been received by %{jurisdiction_name} and is pending review.'
