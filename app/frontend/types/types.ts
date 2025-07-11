@@ -295,7 +295,11 @@ export interface IRequirementTemplateNotificationObjectData {
 }
 
 export interface ITemplateVersionNotificationObjectData {
-  templateVersionId?: string;
+  templateVersionId: string;
+  requirementTemplateId?: string;
+  programId?: string;
+  templateName?: string;
+  programName?: string;
 }
 
 export interface IPermitCollaborationNotificationObjectData {

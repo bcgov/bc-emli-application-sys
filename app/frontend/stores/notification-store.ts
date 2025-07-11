@@ -62,7 +62,7 @@ export const NotificationStoreModel = types
 
       switch (notification.actionType) {
         case ENotificationActionType.newTemplateVersionPublish: {
-          const data = objectData as IRequirementTemplateNotificationObjectData;
+          const data = objectData as IPermitNotificationObjectData;
           const links = [
             {
               text: t('permitApplication.reviewOutdatedSubmissionLink'),
@@ -75,10 +75,9 @@ export const NotificationStoreModel = types
           ];
 
           if (currentUser.isManager) {
-            const templateData = objectData as ITemplateVersionNotificationObjectData;
             links.push({
               text: t('permitApplication.reviewUpdatedEditLink'),
-              href: `/digital-building-permits/${templateData.templateVersionId}/edit?compare=true`,
+              href: `/digital-building-permits/${data.templateVersionId}/edit?compare=true`,
             });
           }
           return links;
@@ -168,7 +167,7 @@ export const NotificationStoreModel = types
         }
 
         case ENotificationActionType.templatePublished: {
-          const data = objectData as IPermitNotificationObjectData;
+          const data = objectData as ITemplateVersionNotificationObjectData;
           return [
             {
               text: t('ui.viewTemplate'),
