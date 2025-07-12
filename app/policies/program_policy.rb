@@ -32,7 +32,7 @@ class ProgramPolicy < ApplicationPolicy
   end
 
   def search_users?
-    update?
+    user.system_admin? || user.admin_manager? || user.admin?
   end
 
   def search_permit_applications?

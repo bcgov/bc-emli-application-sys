@@ -45,6 +45,10 @@ module Api::Concerns::Search::ProgramUsers
       user_ids -= system_admin_ids
     end
 
+    # Filter users based on assignment permissions
+    user_ids =
+      ApplicationAssignmentPolicy.assignable_user_ids(Current.user, user_ids)
+
     # Run the search
     @user_search =
       User.search(

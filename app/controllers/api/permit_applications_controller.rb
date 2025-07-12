@@ -337,14 +337,24 @@ class Api::PermitApplicationsController < Api::ApplicationController
   end
 
   def assign_user_to_application
-    authorize @permit_application, :assign_user_to_application?
     begin
       user = User.find(application_assignment_params[:user_id])
+      authorize(
+        { permit_application: @permit_application, assigned_user: user },
+        :create?,
+        policy_class: ApplicationAssignmentPolicy
+      )
 
       @application_assignment =
         ApplicationAssignments::AssignmentManagementService.new(
           @permit_application
         ).assign_user_to_application(user)
+
+      # Send assignment notification to the assigned user
+      NotificationService.publish_application_assignment_event(
+        @permit_application,
+        user
+      )
 
       render_success @application_assignment,
                      "permit_application.assign_user_success",
