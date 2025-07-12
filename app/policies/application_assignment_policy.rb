@@ -23,6 +23,21 @@ class ApplicationAssignmentPolicy < ApplicationPolicy
     false
   end
 
+  # Class method to filter user IDs based on assignment permissions
+  def self.assignable_user_ids(current_user, user_ids)
+    return [] unless current_user.admin_manager? || current_user.admin?
+
+    if current_user.admin_manager?
+      # Admin managers can assign to admin_managers and admins
+      User.where(id: user_ids, role: %w[admin_manager admin]).pluck(:id)
+    elsif current_user.admin?
+      # Admins can only assign to admins
+      User.where(id: user_ids, role: "admin").pluck(:id)
+    else
+      []
+    end
+  end
+
   private
 
   attr_reader :permit_application, :assigned_user
