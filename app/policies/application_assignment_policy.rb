@@ -1,6 +1,6 @@
 class ApplicationAssignmentPolicy < ApplicationPolicy
-  def initialize(user, record)
-    @user = user
+  def initialize(user_context, record)
+    super(user_context, record)
     @permit_application = record[:permit_application]
     @assigned_user = record[:assigned_user]
   end
@@ -25,5 +25,5 @@ class ApplicationAssignmentPolicy < ApplicationPolicy
 
   private
 
-  attr_reader :user, :permit_application, :assigned_user
+  attr_reader :permit_application, :assigned_user
 end
