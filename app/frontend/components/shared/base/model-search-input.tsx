@@ -24,7 +24,10 @@ export const ModelSearchInput = observer(function ModelSearchInput<TSearchModel 
 }: IProps<TSearchModel>) {
   const { setQuery, query, search } = searchModel;
   const searchFn = customSearchFn || search;
-  const debouncedSearch = useCallback(debounce(searchFn, debounceTimeInMilliseconds), [searchFn]);
+  const debouncedSearch = useCallback(debounce(searchFn, debounceTimeInMilliseconds), [
+    searchFn,
+    debounceTimeInMilliseconds,
+  ]);
 
   const onSearch = (query: string) => {
     setQuery(query);

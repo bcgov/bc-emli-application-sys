@@ -191,6 +191,13 @@ export const UserStoreModel = types
         // Skip expensive mergeUpdateAll for search-only results (assignment popup)
         if (!opts.skipMerge) {
           self.mergeUpdateAll(response.data.data, 'usersMap');
+        } else {
+          // Lightweight update: only add users not already in usersMap to prevent getUser() failures
+          response.data.data.forEach((user) => {
+            if (!self.usersMap.has(user.id)) {
+              self.usersMap.put(user);
+            }
+          });
         }
 
         // Backend already handles sorting, so no need for client-side sorting

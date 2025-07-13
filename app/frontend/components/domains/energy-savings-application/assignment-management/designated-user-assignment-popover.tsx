@@ -49,11 +49,7 @@ export const DesignatedCollaboratorAssignmentPopover = observer(function Designa
 
   const assignedUserIds = useMemo(() => {
     return permitApplication.assignedUsers?.map((user) => user.id) || [];
-  }, [
-    permitApplication.assignedUsers?.length,
-    permitApplication.assignedUsers?.[0]?.id,
-    permitApplication.assignedUsers,
-  ]);
+  }, [permitApplication.assignedUsers]);
 
   const changeScreen = (screen: TDesignatedSubmitterAssignmentPopoverScreen) => {
     if (!canManage || (!isSubmissionCollaboration && screen === EAssignmentPopoverScreen.collaboratorInvite)) {
