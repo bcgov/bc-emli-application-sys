@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { Plus, X } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ECollaborationType } from '../../../types/enums';
 import { RequestLoadingButton } from '../../shared/request-loading-button';
@@ -40,19 +40,13 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
   const { tableUsers, setTableUsers } = userStore;
   const { t } = useTranslation();
 
+  // Custom search function for performance optimization (avoids store monkey-patching)
+  const optimizedSearch = useCallback(() => {
+    return userStore.searchUsers({ skipMerge: true });
+  }, [userStore]);
+
   useEffect(() => {
-    // Keep original page size of 10 users - only optimize with skipMerge and faster debounce
-    // userStore.setCountPerPage(8); // Removed: keep default 10
-
-    // Override search function to skip expensive merge operations
-    const originalSearch = userStore.search;
-    userStore.search = () => userStore.searchUsers({ skipMerge: true });
-
-    return () => {
-      userStore.setQuery(null);
-      // Restore original search function when assignment popup closes
-      userStore.search = originalSearch;
-    };
+    return () => userStore.setQuery(null);
   }, [userStore]);
 
   const onSelectCreator = (userId: string) => {
@@ -92,6 +86,7 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
             inputProps={{ w: transitionToInvite ? '194px' : '100%', placeholder: 'Find' }}
             setAllUsers={(value) => userStore.setAllUsers(value)}
             debounceTimeInMilliseconds={300}
+            customSearchFn={optimizedSearch}
           />
           {transitionToInvite && (
             <Button variant={'secondary'} leftIcon={<Plus />} size={'sm'} fontSize={'sm'} onClick={transitionToInvite}>

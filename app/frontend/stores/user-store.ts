@@ -162,21 +162,23 @@ export const UserStoreModel = types
     }),
   }))
   .actions((self) => ({
-    searchUsers: flow(function* (opts?: {
-      reset?: boolean;
-      page?: number;
-      countPerPage?: number;
-      skipMerge?: boolean;
-    }) {
-      if (opts?.reset) {
+    searchUsers: flow(function* (
+      opts: {
+        reset?: boolean;
+        page?: number;
+        countPerPage?: number;
+        skipMerge?: boolean;
+      } = {},
+    ) {
+      if (opts.reset) {
         self.resetPages();
       }
 
       const searchParams = {
         query: self.query,
         sort: self.sort,
-        page: opts?.page ?? self.currentPage,
-        perPage: opts?.countPerPage ?? self.countPerPage,
+        page: opts.page ?? self.currentPage,
+        perPage: opts.countPerPage ?? self.countPerPage,
         status: self.status,
         allUsers: self.allUsers,
       };
@@ -187,16 +189,16 @@ export const UserStoreModel = types
 
       if (response.ok) {
         // Skip expensive mergeUpdateAll for search-only results (assignment popup)
-        if (!opts?.skipMerge) {
+        if (!opts.skipMerge) {
           self.mergeUpdateAll(response.data.data, 'usersMap');
         }
 
         // Backend already handles sorting, so no need for client-side sorting
         self.setTableUsers(response.data.data);
-        self.currentPage = opts?.page ?? self.currentPage;
+        self.currentPage = opts.page ?? self.currentPage;
         self.totalPages = response.data.meta.totalPages;
         self.totalCount = response.data.meta.totalCount;
-        self.countPerPage = opts?.countPerPage ?? self.countPerPage;
+        self.countPerPage = opts.countPerPage ?? self.countPerPage;
       }
       return response.ok;
     }),
