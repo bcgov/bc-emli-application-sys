@@ -40,8 +40,9 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
   const { tableUsers, setTableUsers } = userStore;
   const { t } = useTranslation();
 
-  // Custom search function for performance optimization (avoids store monkey-patching)
+  // Custom search function that handles both setAllUsers and skipMerge optimization
   const optimizedSearch = useCallback(() => {
+    userStore.setAllUsers(true);
     return userStore.searchUsers({ skipMerge: true });
   }, [userStore]);
 
@@ -84,7 +85,6 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
             searchModel={userStore as ISearch}
             inputGroupProps={{ w: transitionToInvite ? 'initial' : '100%' }}
             inputProps={{ w: transitionToInvite ? '194px' : '100%', placeholder: 'Find' }}
-            setAllUsers={(value) => userStore.setAllUsers(value)}
             debounceTimeInMilliseconds={300}
             customSearchFn={optimizedSearch}
           />

@@ -11,7 +11,7 @@ interface IProps<TSearchModel extends ISearch> {
   inputProps?: Partial<InputProps>;
   debounceTimeInMilliseconds?: number;
   setAllUsers?: (allUsers: boolean) => void;
-  customSearchFn?: () => Promise<boolean>;
+  customSearchFn?: (opts?: any) => Promise<boolean>;
 }
 
 export const ModelSearchInput = observer(function ModelSearchInput<TSearchModel extends ISearch>({
