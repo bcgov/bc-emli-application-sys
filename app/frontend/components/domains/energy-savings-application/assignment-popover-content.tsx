@@ -142,7 +142,7 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
                       : `Select ${user.firstName} ${user.lastName}`
                   }
                 >
-                  {isAlreadyAssigned ? 'Assigned' : t('ui.select')}
+                  {isAlreadyAssigned ? t('ui.assigned') : t('ui.select')}
                 </RequestLoadingButton>
               </Text>
             );
