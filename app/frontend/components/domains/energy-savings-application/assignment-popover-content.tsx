@@ -14,7 +14,6 @@ import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ECollaborationType } from '../../../types/enums';
-import { ConfirmationModal } from '../../shared/confirmation-modal';
 import { RequestLoadingButton } from '../../shared/request-loading-button';
 import { ModelSearchInput } from '../../shared/base/model-search-input';
 import { ISearch } from '../../../lib/create-search-model';
@@ -22,32 +21,39 @@ import { useMst } from '../../../setup/root';
 
 export const AssignmentPopoverContent = observer(function CollaboratorSearch({
   onSelect,
-  onUnselect,
-  takenuserIds = new Set<string>(),
   onClose,
   getConfirmationModalDisclosureProps,
   transitionToInvite,
   takenCollaboratorStrategy = 'exclude',
   collaborationType,
-  onAssignment,
+  assignedUserIds = [],
 }: {
   onSelect: (userId?: string) => Promise<void>;
-  onUnselect?: (userId?: string) => Promise<void>;
-  takenuserIds?: Set<string>;
   takenCollaboratorStrategy?: 'include' | 'exclude';
   onClose?: () => void;
   getConfirmationModalDisclosureProps?: (userId: string) => Partial<Omit<ReturnType<typeof useDisclosure>, 'onToggle'>>;
   transitionToInvite?: () => void;
   collaborationType: ECollaborationType;
-  onAssignment?: (response: any) => void;
+  assignedUserIds?: string[];
 }) {
   const { userStore } = useMst();
   const { tableUsers, setTableUsers } = userStore;
   const { t } = useTranslation();
 
   useEffect(() => {
-    return () => userStore.setQuery(null);
-  }, []);
+    // Keep original page size of 10 users - only optimize with skipMerge and faster debounce
+    // userStore.setCountPerPage(8); // Removed: keep default 10
+
+    // Override search function to skip expensive merge operations
+    const originalSearch = userStore.search;
+    userStore.search = () => userStore.searchUsers({ skipMerge: true });
+
+    return () => {
+      userStore.setQuery(null);
+      // Restore original search function when assignment popup closes
+      userStore.search = originalSearch;
+    };
+  }, [userStore]);
 
   const onSelectCreator = (userId: string) => {
     return async (onClose?: () => void) => {
@@ -85,6 +91,7 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
             inputGroupProps={{ w: transitionToInvite ? 'initial' : '100%' }}
             inputProps={{ w: transitionToInvite ? '194px' : '100%', placeholder: 'Find' }}
             setAllUsers={(value) => userStore.setAllUsers(value)}
+            debounceTimeInMilliseconds={300}
           />
           {transitionToInvite && (
             <Button variant={'secondary'} leftIcon={<Plus />} size={'sm'} fontSize={'sm'} onClick={transitionToInvite}>
@@ -103,6 +110,8 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
             </Text>
           )}
           {tableUsers?.map((user) => {
+            const isAlreadyAssigned = assignedUserIds.includes(user.id);
+
             return (
               <Text
                 key={user.id}
@@ -111,118 +120,35 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
                 py={'0.375rem'}
                 fontSize={'sm'}
                 fontWeight={'bold'}
-                color={'text.link'}
+                color={isAlreadyAssigned ? 'text.disabled' : 'text.link'}
                 display={'flex'}
                 alignItems={'center'}
                 justifyContent={'space-between'}
                 borderRadius={'sm'}
+                opacity={isAlreadyAssigned ? 0.6 : 1}
                 _hover={{
-                  bg: 'theme.blueLight',
+                  bg: isAlreadyAssigned ? 'transparent' : 'theme.blueLight',
                 }}
               >
-                {`${user.firstName} ${user.lastName}`}
+                <span>{`${user.firstName} ${user.lastName}`}</span>
 
-                {/*  Note: Retaining it for future reference */}
-                {/* <Button
-                  variant={'ghost'}
-                  color={'text.link'}
-                  size={'sm'}
-                  fontWeight={'semibold'}
-                  fontSize={'sm'}
-                  onClick={() => onUnselect?.(collaborator.id)}
-                >
-                  {t('permitCollaboration.popover.collaborations.unassignButton')}
-                </Button> */}
-                {/* <ConfirmationModal
-                    title={t('permitCollaboration.popover.assignment.inviteWarning.title')}
-                    body={t('permitCollaboration.popover.assignment.inviteWarning.body')}
-                    triggerText={t('ui.proceed')}
-                    renderTriggerButton={({ onClick, ...rest }) => (
-                      <Button
-                        variant={'ghost'}
-                        color={'text.link'}
-                        size={'sm'}
-                        fontWeight={'semibold'}
-                        fontSize={'sm'}
-                        onClick={onClick}
-                        {...rest}
-                      >
-                        {t('ui.select')}
-                      </Button>
-                    )}
-                    renderConfirmationButton={({ onClick }) => (
-                      <RequestLoadingButton variant={'primary'} onClick={onClick as () => Promise<any>}>
-                        {t('ui.confirm')}
-                      </RequestLoadingButton>
-                    )}
-                    onConfirm={onSelectCreator(collaborator.id)}
-                    modalControlProps={getConfirmationModalDisclosureProps(collaborator.id)}
-                    modalContentProps={{
-                      maxW: '700px',
-                    }}
-                  /> */}
                 <RequestLoadingButton
                   variant={'ghost'}
-                  color={'text.link'}
+                  color={isAlreadyAssigned ? 'text.disabled' : 'text.link'}
                   size={'sm'}
                   fontWeight={'semibold'}
                   fontSize={'sm'}
+                  isDisabled={isAlreadyAssigned}
                   onClick={() => onSelectCreator(user.id)()}
+                  cursor={isAlreadyAssigned ? 'not-allowed' : 'pointer'}
+                  aria-label={
+                    isAlreadyAssigned
+                      ? `${user.firstName} ${user.lastName} is currently assigned`
+                      : `Select ${user.firstName} ${user.lastName}`
+                  }
                 >
-                  {t('ui.select')}
+                  {isAlreadyAssigned ? 'Assigned' : t('ui.select')}
                 </RequestLoadingButton>
-                {/* {takenuserIds.has(collaborator.id) ? (
-                  <Button
-                    variant={'ghost'}
-                    color={'text.link'}
-                    size={'sm'}
-                    fontWeight={'semibold'}
-                    fontSize={'sm'}
-                    onClick={() => onUnselect?.(collaborator.id)}
-                  >
-                    {t('permitCollaboration.popover.collaborations.unassignButton')}
-                  </Button>
-                ) : collaborationType === ECollaborationType.submission ? (
-                  <ConfirmationModal
-                    title={t('permitCollaboration.popover.assignment.inviteWarning.title')}
-                    body={t('permitCollaboration.popover.assignment.inviteWarning.body')}
-                    triggerText={t('ui.proceed')}
-                    renderTriggerButton={({ onClick, ...rest }) => (
-                      <Button
-                        variant={'ghost'}
-                        color={'text.link'}
-                        size={'sm'}
-                        fontWeight={'semibold'}
-                        fontSize={'sm'}
-                        onClick={onClick}
-                        {...rest}
-                      >
-                        {t('ui.select')}
-                      </Button>
-                    )}
-                    renderConfirmationButton={({ onClick }) => (
-                      <RequestLoadingButton variant={'primary'} onClick={onClick as () => Promise<any>}>
-                        {t('ui.confirm')}
-                      </RequestLoadingButton>
-                    )}
-                    onConfirm={onSelectCreator(collaborator.id)}
-                    modalControlProps={getConfirmationModalDisclosureProps(collaborator.id)}
-                    modalContentProps={{
-                      maxW: '700px',
-                    }}
-                  />
-                ) : (
-                  <RequestLoadingButton
-                    variant={'ghost'}
-                    color={'text.link'}
-                    size={'sm'}
-                    fontWeight={'semibold'}
-                    fontSize={'sm'}
-                    onClick={() => onSelectCreator(collaborator.id)()}
-                  >
-                    {t('ui.select')}
-                  </RequestLoadingButton>
-                )} */}
               </Text>
             );
           })}
