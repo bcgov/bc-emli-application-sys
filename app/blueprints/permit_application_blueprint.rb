@@ -30,7 +30,10 @@ class PermitApplicationBlueprint < Blueprinter::Base
                 blueprint: SubmissionVersionBlueprint,
                 view: :base
     association :submitter, blueprint: UserBlueprint, view: :minimal
-    association :assigned_users, blueprint: UserBlueprint, view: :minimal
+    association :assigned_users,
+                blueprint: UserBlueprint,
+                view: :minimal,
+                name: :assignedUsers
 
     field :indexed_using_current_template_version do |pa, options|
       # Indexed data is used to prevent N extra queries on every search
@@ -58,7 +61,10 @@ class PermitApplicationBlueprint < Blueprinter::Base
     include_view :base
     fields :formatted_compliance_data, :front_end_form_update
     #:form_customizations
-    association :assigned_users, blueprint: UserBlueprint, view: :minimal
+    association :assigned_users,
+                blueprint: UserBlueprint,
+                view: :minimal,
+                name: :assignedUsers
     association :submitter, blueprint: UserBlueprint, view: :minimal
 
     field :is_fully_loaded do |pa, options|

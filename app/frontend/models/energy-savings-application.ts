@@ -637,8 +637,11 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         }
         const { data: applicationAssignment } = response.data;
 
+        // Refresh the application data from the backend to ensure we have the latest assignedUsers
+        // This maintains backend as the source of truth
+        yield self.rootStore.permitApplicationStore.fetchPermitApplication(self.id);
+
         return applicationAssignment;
-        // return self.getApplicationAssignment(applicationAssignment.id);
       }),
       removeCollaboratorCollaborations: flow(function* (
         collaboratorId: string,

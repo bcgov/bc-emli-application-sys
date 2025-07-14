@@ -1,7 +1,7 @@
 import { Avatar, Button, IconButton, Popover, PopoverContent, PopoverTrigger, useDisclosure } from '@chakra-ui/react';
 import { Plus } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IPermitApplication } from '../../../../models/energy-savings-application';
 import { useMst } from '../../../../setup/root';
@@ -46,6 +46,10 @@ export const DesignatedCollaboratorAssignmentPopover = observer(function Designa
   const contentRef = React.useRef<HTMLDivElement>(null);
 
   const canManage = permitApplication.canUserManageCollaborators(currentUser, collaborationType);
+
+  const assignedUserIds = useMemo(() => {
+    return permitApplication.assignedUsers?.map((user) => user.id) || [];
+  }, [permitApplication.assignedUsers]);
 
   const changeScreen = (screen: TDesignatedSubmitterAssignmentPopoverScreen) => {
     if (!canManage || (!isSubmissionCollaboration && screen === EAssignmentPopoverScreen.collaboratorInvite)) {
@@ -174,6 +178,7 @@ export const DesignatedCollaboratorAssignmentPopover = observer(function Designa
             //   response && onClose();
             // }}
             collaborationType={collaborationType}
+            assignedUserIds={assignedUserIds}
           />
         )}
         {canManage && currentScreen === EAssignmentPopoverScreen.collaboratorInvite && isSubmissionCollaboration && (

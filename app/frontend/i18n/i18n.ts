@@ -452,6 +452,7 @@ const options = {
           never: 'never',
           submit: 'Submit',
           select: 'Select',
+          assigned: 'Assigned',
           selected: 'selected',
           notAvailable: 'Not available yet',
           notApplicable: 'Not applicable',

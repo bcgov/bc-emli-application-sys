@@ -17,7 +17,6 @@ import {
 } from '../types/enums';
 import { IEULA } from '../types/types';
 import { convertToDate, toCamelCase } from '../utils/utility-functions';
-import { SortUtil } from '../utils/sort-util';
 
 export const UserStoreModel = types
   .compose(
@@ -163,16 +162,23 @@ export const UserStoreModel = types
     }),
   }))
   .actions((self) => ({
-    searchUsers: flow(function* (opts?: { reset?: boolean; page?: number; countPerPage?: number }) {
-      if (opts?.reset) {
+    searchUsers: flow(function* (
+      opts: {
+        reset?: boolean;
+        page?: number;
+        countPerPage?: number;
+        skipMerge?: boolean;
+      } = {},
+    ) {
+      if (opts.reset) {
         self.resetPages();
       }
 
       const searchParams = {
         query: self.query,
         sort: self.sort,
-        page: opts?.page ?? self.currentPage,
-        perPage: opts?.countPerPage ?? self.countPerPage,
+        page: opts.page ?? self.currentPage,
+        perPage: opts.countPerPage ?? self.countPerPage,
         status: self.status,
         allUsers: self.allUsers,
       };
@@ -182,19 +188,24 @@ export const UserStoreModel = types
         : self.environment.api.fetchAdminUsers(searchParams);
 
       if (response.ok) {
-        self.mergeUpdateAll(response.data.data, 'usersMap');
-
-        self.setTableUsers(response.data.data);
-
-        // Perform local sort if needed
-        if (self.sort) {
-          const modelField = toCamelCase(self.sort.field as string) as keyof IUser;
-          self.setTableUsers(SortUtil.applySortToArray(response.data.data, modelField, self.sort.direction));
+        // Skip expensive mergeUpdateAll for search-only results (assignment popup)
+        if (!opts.skipMerge) {
+          self.mergeUpdateAll(response.data.data, 'usersMap');
+        } else {
+          // Lightweight update: only add users not already in usersMap to prevent getUser() failures
+          response.data.data.forEach((user) => {
+            if (!self.usersMap.has(user.id)) {
+              self.usersMap.put(user);
+            }
+          });
         }
-        self.currentPage = opts?.page ?? self.currentPage;
+
+        // Backend already handles sorting, so no need for client-side sorting
+        self.setTableUsers(response.data.data);
+        self.currentPage = opts.page ?? self.currentPage;
         self.totalPages = response.data.meta.totalPages;
         self.totalCount = response.data.meta.totalCount;
-        self.countPerPage = opts?.countPerPage ?? self.countPerPage;
+        self.countPerPage = opts.countPerPage ?? self.countPerPage;
       }
       return response.ok;
     }),
