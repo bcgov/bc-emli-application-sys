@@ -7,19 +7,14 @@ class ApplicationAssignments::AssignmentManagementService
 
   def assign_user_to_application(user)
     # Check if user is already assigned (idempotency check)
-    already_assigned =
-      ApplicationAssignment.exists?(
+    existing_assignment =
+      ApplicationAssignment.find_by(
         permit_application_id: permit_application.id,
         user_id: user.id
       )
 
-    if already_assigned
+    if existing_assignment
       # Return the existing assignment instead of creating a duplicate
-      existing_assignment =
-        ApplicationAssignment.find_by(
-          permit_application_id: permit_application.id,
-          user_id: user.id
-        )
       return existing_assignment
     end
 
