@@ -6,18 +6,20 @@ class ApplicationAssignments::AssignmentManagementService
   end
 
   def assign_user_to_application(user)
-    # Check current assignments before removal
-    existing_assignments =
-      ApplicationAssignment.where(permit_application_id: permit_application.id)
-
     # Check if user is already assigned (idempotency check)
     already_assigned =
-      existing_assignments.any? { |assignment| assignment.user_id == user.id }
+      ApplicationAssignment.exists?(
+        permit_application_id: permit_application.id,
+        user_id: user.id
+      )
 
     if already_assigned
       # Return the existing assignment instead of creating a duplicate
       existing_assignment =
-        existing_assignments.find { |assignment| assignment.user_id == user.id }
+        ApplicationAssignment.find_by(
+          permit_application_id: permit_application.id,
+          user_id: user.id
+        )
       return existing_assignment
     end
 
