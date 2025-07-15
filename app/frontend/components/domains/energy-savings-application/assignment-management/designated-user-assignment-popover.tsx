@@ -49,7 +49,11 @@ export const DesignatedCollaboratorAssignmentPopover = observer(function Designa
 
   const assignedUserIds = useMemo(() => {
     return permitApplication.assignedUsers?.map((user) => user.id) || [];
-  }, [permitApplication.assignedUsers]);
+  }, [
+    permitApplication.assignedUsers?.length,
+    permitApplication.assignedUsers?.[0]?.id,
+    permitApplication.assignedUsers,
+  ]);
 
   const changeScreen = (screen: TDesignatedSubmitterAssignmentPopoverScreen) => {
     if (!canManage || (!isSubmissionCollaboration && screen === EAssignmentPopoverScreen.collaboratorInvite)) {
@@ -67,8 +71,11 @@ export const DesignatedCollaboratorAssignmentPopover = observer(function Designa
     if (isOpen) {
       changeScreen(INITIAL_SCREEN);
       setOpenAssignmentConfirmationModals(new Set());
+
+      // Refresh assignment data from backend when popup opens
+      permitApplication.rootStore.permitApplicationStore.fetchPermitApplication(permitApplication.id);
     }
-  }, [isOpen]);
+  }, [isOpen, permitApplication]);
 
   const onPopoverClose = () => {
     if (openAssignmentConfirmationModals.size > 0 || createConfirmationModalDisclosureProps.isOpen) {

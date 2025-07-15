@@ -224,6 +224,9 @@ export const UserStoreModel = types
       self.allUsers = allUsers;
       self.searchUsers({ reset: true });
     },
+    searchUsersOptimized: flow(function* (opts = {}) {
+      return yield self.searchUsers({ ...opts, skipMerge: true });
+    }),
   }));
 
 export interface IUserStore extends Instance<typeof UserStoreModel> {}

@@ -11,7 +11,6 @@ interface IProps<TSearchModel extends ISearch> {
   inputProps?: Partial<InputProps>;
   debounceTimeInMilliseconds?: number;
   setAllUsers?: (allUsers: boolean) => void;
-  customSearchFn?: (opts?: any) => Promise<boolean>;
 }
 
 export const ModelSearchInput = observer(function ModelSearchInput<TSearchModel extends ISearch>({
@@ -20,14 +19,9 @@ export const ModelSearchInput = observer(function ModelSearchInput<TSearchModel 
   inputProps,
   debounceTimeInMilliseconds = 500,
   setAllUsers,
-  customSearchFn,
 }: IProps<TSearchModel>) {
   const { setQuery, query, search } = searchModel;
-  const searchFn = customSearchFn || search;
-  const debouncedSearch = useCallback(debounce(searchFn, debounceTimeInMilliseconds), [
-    searchFn,
-    debounceTimeInMilliseconds,
-  ]);
+  const debouncedSearch = useCallback(debounce(search, debounceTimeInMilliseconds), [search]);
 
   const onSearch = (query: string) => {
     setQuery(query);
