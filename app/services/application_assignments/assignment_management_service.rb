@@ -18,7 +18,7 @@ class ApplicationAssignments::AssignmentManagementService
       return existing_assignment
     end
 
-    # Remove existing assignment for this permit_application and create new one
+    # Remove any existing assignment for this permit_application before creating a new one
     ApplicationAssignment.transaction do
       ApplicationAssignment.where(
         permit_application_id: permit_application.id
