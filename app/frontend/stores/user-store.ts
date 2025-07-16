@@ -224,8 +224,8 @@ export const UserStoreModel = types
       self.allUsers = allUsers;
       self.searchUsers({ reset: true });
     },
-    searchUsersOptimized: flow(function* (opts = {}) {
-      return yield self.searchUsers({ ...opts, skipMerge: true });
+    searchUsersOptimized: flow(function* () {
+      return yield self.searchUsers();
     }),
   }));
 
