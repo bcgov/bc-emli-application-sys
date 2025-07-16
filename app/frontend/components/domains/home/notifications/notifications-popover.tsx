@@ -45,35 +45,40 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
     deleteNotification,
     clearAllNotifications,
     unreadNotificationsCount,
+    totalCount,
   } = notificationStore;
 
   useEffect(() => {
     initialFetch();
   }, [initialFetch]);
 
-  const { isOpen, handleOpen, handleClose, numberJustRead, showRead, setShowRead, setNumberJustRead } =
+  const { isOpen, handleOpen, handleClose, newNotificationCount, showRead, setShowRead, setNewNotificationCount } =
     useNotificationPopover();
 
   // Determine which notifications to show:
   // - If showRead is true, show all notifications
-  // - Otherwise, show only the first numberJustRead notifications (new ones)
-  const notificationsToShow = showRead ? notifications : notifications.slice(0, numberJustRead);
+  // - Otherwise, show only the first newNotificationCount notifications (new ones)
+  const notificationsToShow = showRead ? notifications : notifications.slice(0, newNotificationCount);
 
   const { t } = useTranslation();
+
+  // Fallback to notifications.length when totalCount is null (initial render)
+  const shouldShowBadges = totalCount > 0 || notifications.length > 0;
+  const displayedTotalCount = totalCount || notifications.length;
 
   const handleDeleteNotification = (notificationId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     deleteNotification(notificationId);
 
-    // Update numberJustRead to reflect the deletion
-    if (numberJustRead > 0) {
-      setNumberJustRead(numberJustRead - 1);
+    // Update newNotificationCount to reflect the deletion
+    if (newNotificationCount > 0) {
+      setNewNotificationCount(newNotificationCount - 1);
     }
   };
 
   const handleClearAllNotifications = () => {
     clearAllNotifications();
-    setNumberJustRead(0);
+    setNewNotificationCount(0);
   };
 
   return (
@@ -112,16 +117,33 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
                 <Heading as="h3" fontSize="lg" mb={0}>
                   {t('notification.title')}
                 </Heading>
-                {/* Use numberJustRead for the popover header badge */}
-                {numberJustRead > 0 && (
-                  <Badge fontWeight="normal" textTransform="lowercase">
-                    {t('notification.nUnread', { n: numberJustRead })}
-                  </Badge>
+                {/* Show total count and unread count */}
+                {shouldShowBadges && (
+                  <Flex gap={2}>
+                    <Badge
+                      fontWeight="normal"
+                      textTransform="lowercase"
+                      variant="outline"
+                      aria-label={t('notification.nTotal', { count: displayedTotalCount })}
+                    >
+                      {t('notification.nTotal', { count: displayedTotalCount })}
+                    </Badge>
+                    {newNotificationCount > 0 && (
+                      <Badge
+                        fontWeight="normal"
+                        textTransform="lowercase"
+                        colorScheme="blue"
+                        aria-label={t('notification.nUnread', { n: newNotificationCount })}
+                      >
+                        {t('notification.nUnread', { n: newNotificationCount })}
+                      </Badge>
+                    )}
+                  </Flex>
                 )}
               </Flex>
             </Flex>
           </PopoverHeader>
-          <PopoverBody p={4} maxH="50vh" overflow="auto">
+          <PopoverBody p={4} maxH="70vh" overflow="auto">
             <Flex direction="column" gap={4}>
               {R.isEmpty(notificationsToShow) ? (
                 <Text color="greys.grey01">{t('notification.noUnread')}</Text>
@@ -167,7 +189,7 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
           <PopoverFooter border={0} padding={2} display="flex" justifyContent="space-between" alignItems="center">
             {/* "See more" button container */}
             {notifications.length > 0 &&
-            ((!showRead && notifications.length > numberJustRead) ||
+            ((!showRead && notifications.length > newNotificationCount) ||
               (showRead && notificationStore.page < notificationStore.totalPages)) ? (
               <Button
                 variant="ghost"

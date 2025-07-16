@@ -522,6 +522,8 @@ const options = {
         },
         notification: {
           title: 'Notifications',
+          nTotal: '{{count}} notification',
+          nTotal_other: '{{count}} notifications',
           nUnread: '{{ n }} new',
           noUnread: 'No unread notifications',
           clearAll: 'Clear All',
