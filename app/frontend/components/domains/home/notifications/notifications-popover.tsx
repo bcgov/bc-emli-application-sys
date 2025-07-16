@@ -45,6 +45,7 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
     deleteNotification,
     clearAllNotifications,
     unreadNotificationsCount,
+    totalCount,
   } = notificationStore;
 
   useEffect(() => {
@@ -112,16 +113,23 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
                 <Heading as="h3" fontSize="lg" mb={0}>
                   {t('notification.title')}
                 </Heading>
-                {/* Use numberJustRead for the popover header badge */}
-                {numberJustRead > 0 && (
-                  <Badge fontWeight="normal" textTransform="lowercase">
-                    {t('notification.nUnread', { n: numberJustRead })}
-                  </Badge>
+                {/* Show total count and unread count */}
+                {(totalCount > 0 || notifications.length > 0) && (
+                  <Flex gap={2}>
+                    <Badge fontWeight="normal" textTransform="lowercase" variant="outline">
+                      {t('notification.nTotal', { count: totalCount || notifications.length })}
+                    </Badge>
+                    {numberJustRead > 0 && (
+                      <Badge fontWeight="normal" textTransform="lowercase" colorScheme="blue">
+                        {t('notification.nUnread', { n: numberJustRead })}
+                      </Badge>
+                    )}
+                  </Flex>
                 )}
               </Flex>
             </Flex>
           </PopoverHeader>
-          <PopoverBody p={4} maxH="50vh" overflow="auto">
+          <PopoverBody p={4} maxH="70vh" overflow="auto">
             <Flex direction="column" gap={4}>
               {R.isEmpty(notificationsToShow) ? (
                 <Text color="greys.grey01">{t('notification.noUnread')}</Text>

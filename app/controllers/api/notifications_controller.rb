@@ -13,6 +13,7 @@ class Api::NotificationsController < Api::ApplicationController
                      blueprint: NotificationBlueprint,
                      meta: {
                        total_pages: @notification_feed[:total_pages],
+                       total_count: @notification_feed[:total_count],
                        unread_count: nf.unread_count,
                        last_read_at: nf.last_read
                      }

@@ -5,7 +5,8 @@ class NotificationService
   end
 
   def self.total_page_count(total_count)
-    (total_count.to_f / (ENV["NOTIFICATION_FEED_PER_PAGE"] || 5) || 5).ceil
+    page_size = (ENV["NOTIFICATION_FEED_PER_PAGE"] || 50).to_i
+    (total_count.to_f / page_size).ceil
   end
 
   def self.user_feed_for(user_id, page)
@@ -25,11 +26,13 @@ class NotificationService
         end
         .compact
 
+    total_count = activity_metadata(user_id, uf, :total_count)
+
     {
       feed_items: feed_items,
       feed_object: uf,
-      total_pages:
-        total_page_count(activity_metadata(user_id, uf, :total_count)),
+      total_pages: total_page_count(total_count),
+      total_count: total_count,
       unread_count: activity_metadata(user_id, uf, :unread_count)
     }
   end

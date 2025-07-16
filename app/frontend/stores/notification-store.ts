@@ -21,6 +21,7 @@ export const NotificationStoreModel = types
     notifications: types.array(types.frozen<INotification>()),
     page: types.maybeNull(types.number),
     totalPages: types.maybeNull(types.number),
+    totalCount: types.maybeNull(types.number),
     isLoaded: types.maybeNull(types.boolean),
     unreadNotificationsCount: types.optional(types.number, 0),
     popoverOpen: types.optional(types.boolean, false),
@@ -216,13 +217,14 @@ export const NotificationStoreModel = types
         const {
           data: {
             data,
-            meta: { unreadCount, totalPages },
+            meta: { unreadCount, totalPages, totalCount = 0 },
           },
         } = response;
 
         self.unreadNotificationsCount = unreadCount;
         opts.reset ? self.setNotifications(data) : self.concatToNotifications(data);
         self.totalPages = totalPages;
+        self.totalCount = totalCount;
         self.page = self.nextPage;
         self.isLoaded = true;
       } else {
@@ -299,6 +301,7 @@ export const NotificationStoreModel = types
         if (response.ok) {
           self.notifications.clear();
           self.unreadNotificationsCount = 0;
+          self.totalCount = 0;
         } else {
           console.error('[Error] clearAllNotifications: API call failed', response);
         }
