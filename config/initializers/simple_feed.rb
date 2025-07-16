@@ -47,5 +47,5 @@ SimpleFeed.define(:user_feed) do |f|
   page_size = (ENV["NOTIFICATION_FEED_PER_PAGE"] || 50).to_i
   f.per_page = page_size
   f.batch_size = page_size * 3
-  f.max_size = 100
+  f.max_size = page_size * 3
 end
