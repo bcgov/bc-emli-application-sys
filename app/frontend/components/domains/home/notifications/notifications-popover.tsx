@@ -62,6 +62,10 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
 
   const { t } = useTranslation();
 
+  // Use robust fallback pattern that handles React timing issues
+  const shouldShowBadges = totalCount > 0 || notifications.length > 0;
+  const displayedTotalCount = totalCount || notifications.length;
+
   const handleDeleteNotification = (notificationId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     deleteNotification(notificationId);
@@ -114,10 +118,10 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
                   {t('notification.title')}
                 </Heading>
                 {/* Show total count and unread count */}
-                {(totalCount > 0 || notifications.length > 0) && (
+                {shouldShowBadges && (
                   <Flex gap={2}>
                     <Badge fontWeight="normal" textTransform="lowercase" variant="outline">
-                      {t('notification.nTotal', { count: totalCount || notifications.length })}
+                      {t('notification.nTotal', { count: displayedTotalCount })}
                     </Badge>
                     {numberJustRead > 0 && (
                       <Badge fontWeight="normal" textTransform="lowercase" colorScheme="blue">
