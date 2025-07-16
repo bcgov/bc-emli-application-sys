@@ -17,12 +17,12 @@ class ApplicationAssignments::AssignmentManagementService
       if existing_assignment
         # Return the existing assignment instead of creating a duplicate
         return existing_assignment
+      else
+        # Remove any existing assignment for this permit_application before creating a new one
+        ApplicationAssignment.where(
+          permit_application_id: permit_application.id
+        ).destroy_all
       end
-
-      # Remove any existing assignment for this permit_application before creating a new one
-      ApplicationAssignment.where(
-        permit_application_id: permit_application.id
-      ).destroy_all
       ApplicationAssignment.create!(
         user_id: user.id,
         permit_application_id: permit_application.id
