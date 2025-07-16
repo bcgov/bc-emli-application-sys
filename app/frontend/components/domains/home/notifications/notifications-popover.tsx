@@ -62,7 +62,7 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
 
   const { t } = useTranslation();
 
-  // Use robust fallback pattern that handles React timing issues
+  // Fallback to notifications.length when totalCount is null (initial render)
   const shouldShowBadges = totalCount > 0 || notifications.length > 0;
   const displayedTotalCount = totalCount || notifications.length;
 
