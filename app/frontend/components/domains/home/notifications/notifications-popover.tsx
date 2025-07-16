@@ -52,13 +52,13 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
     initialFetch();
   }, [initialFetch]);
 
-  const { isOpen, handleOpen, handleClose, numberJustRead, showRead, setShowRead, setNumberJustRead } =
+  const { isOpen, handleOpen, handleClose, newNotificationCount, showRead, setShowRead, setNewNotificationCount } =
     useNotificationPopover();
 
   // Determine which notifications to show:
   // - If showRead is true, show all notifications
-  // - Otherwise, show only the first numberJustRead notifications (new ones)
-  const notificationsToShow = showRead ? notifications : notifications.slice(0, numberJustRead);
+  // - Otherwise, show only the first newNotificationCount notifications (new ones)
+  const notificationsToShow = showRead ? notifications : notifications.slice(0, newNotificationCount);
 
   const { t } = useTranslation();
 
@@ -70,15 +70,15 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
     e.stopPropagation();
     deleteNotification(notificationId);
 
-    // Update numberJustRead to reflect the deletion
-    if (numberJustRead > 0) {
-      setNumberJustRead(numberJustRead - 1);
+    // Update newNotificationCount to reflect the deletion
+    if (newNotificationCount > 0) {
+      setNewNotificationCount(newNotificationCount - 1);
     }
   };
 
   const handleClearAllNotifications = () => {
     clearAllNotifications();
-    setNumberJustRead(0);
+    setNewNotificationCount(0);
   };
 
   return (
@@ -120,12 +120,22 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
                 {/* Show total count and unread count */}
                 {shouldShowBadges && (
                   <Flex gap={2}>
-                    <Badge fontWeight="normal" textTransform="lowercase" variant="outline">
+                    <Badge
+                      fontWeight="normal"
+                      textTransform="lowercase"
+                      variant="outline"
+                      aria-label={t('notification.nTotal', { count: displayedTotalCount })}
+                    >
                       {t('notification.nTotal', { count: displayedTotalCount })}
                     </Badge>
-                    {numberJustRead > 0 && (
-                      <Badge fontWeight="normal" textTransform="lowercase" colorScheme="blue">
-                        {t('notification.nUnread', { n: numberJustRead })}
+                    {newNotificationCount > 0 && (
+                      <Badge
+                        fontWeight="normal"
+                        textTransform="lowercase"
+                        colorScheme="blue"
+                        aria-label={t('notification.nUnread', { n: newNotificationCount })}
+                      >
+                        {t('notification.nUnread', { n: newNotificationCount })}
                       </Badge>
                     )}
                   </Flex>
@@ -179,7 +189,7 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
           <PopoverFooter border={0} padding={2} display="flex" justifyContent="space-between" alignItems="center">
             {/* "See more" button container */}
             {notifications.length > 0 &&
-            ((!showRead && notifications.length > numberJustRead) ||
+            ((!showRead && notifications.length > newNotificationCount) ||
               (showRead && notificationStore.page < notificationStore.totalPages)) ? (
               <Button
                 variant="ghost"

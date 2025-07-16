@@ -5,10 +5,10 @@ interface PopoverContextProps {
   isOpen: boolean;
   handleOpen: () => void;
   handleClose: () => void;
-  numberJustRead: number;
+  newNotificationCount: number;
   showRead: boolean;
   setShowRead: (boolean) => void;
-  setNumberJustRead: (n: number) => void;
+  setNewNotificationCount: (n: number) => void;
 }
 
 const PopoverContext = createContext<PopoverContextProps | undefined>(undefined);
@@ -20,18 +20,18 @@ interface IPopoverProvider {
 export const PopoverProvider: React.FC<IPopoverProvider> = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showRead, setShowRead] = useState<boolean>(false);
-  const [numberJustRead, setNumberJustRead] = useState<number>(0);
+  const [newNotificationCount, setNewNotificationCount] = useState<number>(0);
   const [notificationsShownOnce, setNotificationsShownOnce] = useState<Set<string>>(new Set());
 
   const { notificationStore } = useMst();
   const { unreadNotificationsCount, markAllAsRead, setPopoverOpen, notifications } = notificationStore;
 
-  // When popover is open and new notifications arrive, update numberJustRead
+  // When popover is open and new notifications arrive, update newNotificationCount
   useEffect(() => {
-    if (isOpen && unreadNotificationsCount > numberJustRead) {
-      setNumberJustRead(unreadNotificationsCount);
+    if (isOpen && unreadNotificationsCount > newNotificationCount) {
+      setNewNotificationCount(unreadNotificationsCount);
     }
-  }, [isOpen, unreadNotificationsCount, numberJustRead]);
+  }, [isOpen, unreadNotificationsCount, newNotificationCount]);
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -41,7 +41,7 @@ export const PopoverProvider: React.FC<IPopoverProvider> = ({ children }) => {
     const newNotifications = notifications
       .slice(0, unreadNotificationsCount)
       .filter((n) => !notificationsShownOnce.has(n.id));
-    setNumberJustRead(newNotifications.length);
+    setNewNotificationCount(newNotifications.length);
 
     if (unreadNotificationsCount > 0) {
       markAllAsRead();
@@ -61,13 +61,13 @@ export const PopoverProvider: React.FC<IPopoverProvider> = ({ children }) => {
     }
 
     // Mark currently shown notifications as having been shown once
-    const currentlyShown = notifications.slice(0, numberJustRead);
+    const currentlyShown = notifications.slice(0, newNotificationCount);
     const newShownOnce = new Set(notificationsShownOnce);
     currentlyShown.forEach((n) => newShownOnce.add(n.id));
     setNotificationsShownOnce(newShownOnce);
 
-    // Clear numberJustRead so next open shows only truly new notifications
-    setNumberJustRead(0);
+    // Clear newNotificationCount so next open shows only truly new notifications
+    setNewNotificationCount(0);
 
     // Delay moving notifications to "see more" to avoid flash
     setTimeout(() => {
@@ -77,7 +77,7 @@ export const PopoverProvider: React.FC<IPopoverProvider> = ({ children }) => {
 
   return (
     <PopoverContext.Provider
-      value={{ isOpen, handleOpen, handleClose, numberJustRead, showRead, setShowRead, setNumberJustRead }}
+      value={{ isOpen, handleOpen, handleClose, newNotificationCount, showRead, setShowRead, setNewNotificationCount }}
     >
       {children}
     </PopoverContext.Provider>
