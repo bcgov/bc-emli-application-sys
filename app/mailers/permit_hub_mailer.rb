@@ -224,4 +224,26 @@ class PermitHubMailer < ApplicationMailer
       }
     )
   end
+
+  def notify_admin_updated_participant_app(
+    permit_application,
+    participant_email
+  )
+    @permit_application = permit_application
+    @program = permit_application.program
+    @participant_email = participant_email
+
+    # Extract participant name from submission data
+    name_data = permit_application.extract_participant_name_from_submission_data
+    @participant_first_name = name_data[:first_name]
+    @participant_last_name = name_data[:last_name]
+
+    send_mail(
+      email: participant_email,
+      template_key: "notify_admin_updated_participant_app",
+      subject_i18n_params: {
+        permit_application_number: permit_application.number
+      }
+    )
+  end
 end

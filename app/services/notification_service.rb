@@ -477,6 +477,19 @@ class NotificationService
     end
   end
 
+  def self.publish_admin_updated_participant_app_event(permit_application)
+    # Only send email to the participant's email address (no in-app notification)
+    # since there's no link between the application and a user in the user table
+    participant_email = permit_application.extract_email_from_submission_data
+
+    if participant_email.present?
+      PermitHubMailer.notify_admin_updated_participant_app(
+        permit_application,
+        participant_email
+      ).deliver_now
+    end
+  end
+
   # this is just a wrapper around the activity's metadata methods
   # since in the case of a single instance it returns a specific return type (eg. Integer)
   # but in the case of multiple user_ids the activity is a hash object

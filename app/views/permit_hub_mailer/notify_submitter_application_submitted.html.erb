@@ -1,9 +1,11 @@
-<h1><%= @permit_application.resubmitted? ? "Your permit application has been resubmitted." : "Your Better Homes Energy Savings Program application has been received." %></h1>
-
 <p>Hello <%= @user.first_name %> <%= @user.last_name %>,</p>
 
+<% if @permit_application.resubmitted? %>
+<p>Your permit application has been resubmitted.</p>
+<% end %>
+
 <p>
-  <%= @permit_application.resubmitted? ? "Thank you for revising your permit application. Your revised application has been received and is pending review." : "We’ve received your application to the Better Homes Energy Savings Program." %>
+  <%= @permit_application.resubmitted? ? "Thank you for revising your permit application. Your revised application has been received and is pending review." : "We've received your application to the Better Homes Energy Savings Program." %>
 <br>Your application number: <%= @permit_application.number %></p>
 <!-- Button Start -->
 <div style="margin: 24px 0; text-align: left;">

@@ -104,6 +104,8 @@ class PermitApplication < ApplicationRecord
 
   after_commit :reindex_jurisdiction_permit_application_size
   after_commit :send_submitted_webhook, if: :saved_change_to_status?
+  after_commit :notify_admin_updated_participant_app,
+               if: :saved_change_to_status?
   after_commit :notify_user_reference_number_updated,
                if: :saved_change_to_reference_number?
 
@@ -628,8 +630,97 @@ class PermitApplication < ApplicationRecord
     }
   end
 
+  def admin_updated_participant_app_event_notification_data
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::ADMIN_UPDATED_PARTICIPANT_APP,
+      "action_text" => "Admin updated participant application #{number}",
+      "object_data" => {
+        "permit_application_id" => id,
+        "permit_application_number" => number
+      }
+    }
+  end
+
+  def extract_email_from_submission_data
+    return nil unless submission_versions.any?
+
+    # Get the latest submission version data
+    latest_data = submission_versions.last.submission_data
+    return nil unless latest_data&.dig("data")
+
+    # Search through all sections and fields for email
+    latest_data
+      .dig("data")
+      .each do |section_key, section_data|
+        next unless section_data.is_a?(Hash)
+
+        section_data.each do |field_key, field_value|
+          # Look for field keys that contain 'email'
+          if field_key.include?("email") && field_value.is_a?(String) &&
+               field_value.include?("@")
+            return field_value
+          end
+        end
+      end
+
+    nil
+  end
+
+  def extract_participant_name_from_submission_data
+    return { first_name: nil, last_name: nil } unless submission_versions.any?
+
+    # Get the latest submission version data
+    latest_data = submission_versions.last.submission_data
+    return { first_name: nil, last_name: nil } unless latest_data&.dig("data")
+
+    first_name = nil
+    last_name = nil
+
+    # Search through all sections and fields for first and last name
+    latest_data
+      .dig("data")
+      .each do |section_key, section_data|
+        next unless section_data.is_a?(Hash)
+
+        section_data.each do |field_key, field_value|
+          if field_key.include?("firstName") && field_value.is_a?(String) &&
+               field_value.present?
+            first_name = field_value
+          elsif field_key.include?("lastName") && field_value.is_a?(String) &&
+                field_value.present?
+            last_name = field_value
+          end
+        end
+      end
+
+    { first_name: first_name, last_name: last_name }
+  end
+
   def step_code_requirements
     jurisdiction.permit_type_required_steps.where(permit_type_id:)
+  end
+
+  def notify_admin_updated_participant_app
+    # Only trigger when status actually changed
+    return unless saved_change_to_status?
+
+    # Check if this is a status change from "update needed" to "submitted"
+    previous_status = status_previously_was
+    current_status = status
+
+    # Only trigger for internal applications
+    return unless audience_type&.name&.downcase == "internal"
+
+    # Check if moving from revision/update needed states to submitted states
+    update_needed_states = %w[revisions_requested update_needed]
+    return unless update_needed_states.include?(previous_status)
+
+    submitted_states = %w[newly_submitted resubmitted]
+    return unless submitted_states.include?(current_status)
+
+    NotificationService.publish_admin_updated_participant_app_event(self)
   end
 
   def energy_step_code_required?
