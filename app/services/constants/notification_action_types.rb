@@ -21,5 +21,6 @@ module Constants
     NEW_SUBMISSION_RECEIVED = "new_submission_received"
     TEMPLATE_PUBLISHED = "template_published"
     APPLICATION_ASSIGNMENT = "application_assignment"
+    ADMIN_UPDATED_PARTICIPANT_APP = "admin_updated_participant_app"
   end
 end
