@@ -18,37 +18,86 @@ module VirusScannable
     scope :virus_scan_failed, -> { where(virus_scan_status: :scan_error) }
   end
 
-  # Perform immediate virus scan (synchronous)
-  def scan_for_virus_now!
-    return false unless file_attachment_present?
+  # Immediate synchronous virus scan (called by FileUploader)
+  def perform_immediate_virus_scan!
+    unless file_attachment_present?
+      return { status: :skipped, message: "No file attached" }
+    end
+    if virus_scan_status.present? && !virus_scan_status.in?(["scan_error"])
+      return { status: :skipped, message: "Already scanned" }
+    end
 
-    update!(virus_scan_status: :scanning, virus_scan_started_at: Time.current)
+    Rails.logger.info "Performing immediate virus scan for #{self.class.name}##{id}"
 
-    file_path = download_file_for_scan
-    scan_result = ClamAvService.scan_file(file_path)
+    begin
+      # Download file for scanning
+      temp_file_path = download_file_for_immediate_scan
 
-    update_scan_results(scan_result)
+      # Perform virus scan
+      scan_result = ClamAvService.scan_file(temp_file_path)
 
-    # Clean up temporary file
-    File.delete(file_path) if File.exist?(file_path)
+      # Update database immediately
+      update_immediate_scan_results(scan_result)
 
-    clean?
-  rescue => e
-    Rails.logger.error "Immediate virus scan failed: #{e.message}"
-    update!(
-      virus_scan_status: :scan_error,
-      virus_scan_message: "Scan failed: #{e.message}",
-      virus_scan_completed_at: Time.current
-    )
-    false
+      Rails.logger.info "Immediate virus scan completed for #{self.class.name}##{id}: #{scan_result[:message]}"
+      scan_result
+    rescue => e
+      Rails.logger.error "Immediate virus scan failed for #{self.class.name}##{id}: #{e.message}"
+
+      error_result = { status: :error, message: "Scan failed: #{e.message}" }
+      update_immediate_scan_results(error_result)
+      error_result
+    ensure
+      # Clean up temp file
+      if temp_file_path && File.exist?(temp_file_path)
+        File.delete(temp_file_path)
+      end
+    end
   end
 
-  # Schedule background virus scan
-  def schedule_virus_scan
-    return unless file_attachment_present?
+  private
 
-    update!(virus_scan_status: :pending, virus_scan_started_at: Time.current)
-    VirusScanJob.perform_later(self.class.name, id)
+  def download_file_for_immediate_scan
+    temp_dir = ENV.fetch("VIRUS_SCAN_TEMP_DIR", "/tmp/virus_scan")
+    FileUtils.mkdir_p(temp_dir) unless Dir.exist?(temp_dir)
+
+    temp_file_name = "#{SecureRandom.uuid}_immediate_#{file.original_filename}"
+    temp_file_path = File.join(temp_dir, temp_file_name)
+
+    File.open(temp_file_path, "wb") do |f|
+      file.download do |chunk|
+        f.write(chunk.is_a?(String) ? chunk : chunk.to_s)
+      end
+    end
+
+    temp_file_path
+  end
+
+  def update_immediate_scan_results(scan_result)
+    case scan_result[:status]
+    when :clean
+      update!(
+        virus_scan_status: :clean,
+        virus_scan_message: scan_result[:message],
+        virus_scan_started_at: Time.current,
+        virus_scan_completed_at: Time.current
+      )
+    when :infected
+      update!(
+        virus_scan_status: :infected,
+        virus_scan_message: scan_result[:message],
+        virus_name: scan_result[:virus_name],
+        virus_scan_started_at: Time.current,
+        virus_scan_completed_at: Time.current
+      )
+    when :error
+      update!(
+        virus_scan_status: :scan_error,
+        virus_scan_message: scan_result[:message],
+        virus_scan_started_at: Time.current,
+        virus_scan_completed_at: Time.current
+      )
+    end
   end
 
   # Check if file attachment is present and accessible
@@ -85,41 +134,4 @@ module VirusScannable
   end
 
   private
-
-  def download_file_for_scan
-    # Create a temporary file for scanning
-    temp_dir = ENV.fetch("VIRUS_SCAN_TEMP_DIR", "/tmp/virus_scan")
-    FileUtils.mkdir_p(temp_dir) unless Dir.exist?(temp_dir)
-
-    temp_file =
-      File.join(temp_dir, "#{SecureRandom.uuid}_#{file.original_filename}")
-
-    # Download file from storage to temporary location
-    file.download { |chunk| File.open(temp_file, "ab") { |f| f.write(chunk) } }
-
-    temp_file
-  end
-
-  def update_scan_results(scan_result)
-    case scan_result[:status]
-    when :clean
-      update!(
-        virus_scan_status: :clean,
-        virus_scan_message: scan_result[:message],
-        virus_scan_completed_at: Time.current
-      )
-    when :infected
-      update!(
-        virus_scan_status: :infected,
-        virus_scan_message: scan_result[:message],
-        virus_scan_completed_at: Time.current
-      )
-    when :error
-      update!(
-        virus_scan_status: :scan_error,
-        virus_scan_message: scan_result[:message],
-        virus_scan_completed_at: Time.current
-      )
-    end
-  end
 end

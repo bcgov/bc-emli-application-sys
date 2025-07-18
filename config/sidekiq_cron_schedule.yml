@@ -16,8 +16,9 @@ send_batched_integration_mapping_notifications:
   queue: default
   active_job: false
 
-process_pending_virus_scans:
-  cron: "*/15 * * * * America/Vancouver" # Runs every 15 minutes
-  class: "ProcessPendingVirusScanJob"
+cleanup_stuck_scans:
+  cron: "0 */6 * * * America/Vancouver" # Runs every 6 hours
+  class: "CleanupStuckScansJob"
   queue: default
   active_job: true
+

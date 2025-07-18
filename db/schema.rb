@@ -823,6 +823,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_15_200000) do
     t.text "virus_scan_message"
     t.datetime "virus_scan_started_at"
     t.datetime "virus_scan_completed_at"
+    t.string "virus_name"
     t.index ["permit_application_id"],
             name: "index_step_codes_on_permit_application_id"
     t.index ["virus_scan_completed_at"],
@@ -1038,8 +1039,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_15_200000) do
     t.string "omniauth_email"
     t.string "omniauth_username"
     t.boolean "reviewed", default: false, null: false
-    t.string "INSERT INTO public.users (id", limit: 50
-    t.string "reviewed) VALUES", limit: 50
     t.index ["confirmation_token"],
             name: "index_users_on_confirmation_token",
             unique: true

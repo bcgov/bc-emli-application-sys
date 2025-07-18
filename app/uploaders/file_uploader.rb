@@ -8,11 +8,11 @@ class FileUploader < Shrine
     validate_max_size Constants::Sizes::FILE_UPLOAD_MAX_SIZE * 1024 * 1024 # 100 MB to start
     # Could be images, excel files, bims, we do not have an exhaustive list right now.
 
-    # Immediate virus scanning validation - blocks infected files
+    # Immediate virus scanning validation with database storage
     next unless file # Skip if no file attached
     next unless ClamAvService.enabled? # Skip if virus scanning disabled
 
-    Rails.logger.info "Performing immediate virus scan during upload validation"
+    Rails.logger.info "Performing immediate virus scan with database storage for: #{file.original_filename}"
 
     begin
       # Create temporary file for scanning
@@ -22,8 +22,23 @@ class FileUploader < Shrine
       temp_file.write(file.read)
       temp_file.close
 
-      # Perform quick virus scan
-      scan_result = ClamAvService.scan_file(temp_file.path)
+      # Perform virus scan with timeout handling
+      scan_result = nil
+      upload_timeout = ENV.fetch("UPLOAD_VIRUS_SCAN_TIMEOUT", "45").to_i
+
+      Timeout.timeout(upload_timeout) do
+        scan_result = ClamAvService.scan_file(temp_file.path)
+      end
+
+      # Store results globally for access during promotion
+      Thread.current[:virus_scan_result] = {
+        status: scan_result[:status],
+        message: scan_result[:message],
+        virus_name: scan_result[:virus_name],
+        scanned_at: Time.current,
+        file_size: file.size,
+        original_filename: file.original_filename
+      }
 
       if scan_result[:status] == :infected
         virus_name =
@@ -36,11 +51,8 @@ class FileUploader < Shrine
           )
 
         Rails.logger.warn "Upload blocked - virus detected: #{virus_name} in file #{file.original_filename}"
-
-        # Add validation error that will be shown to user
         errors << error_message
       elsif scan_result[:status] == :error
-        # Handle scan errors
         Rails.logger.error "Virus scan error: #{scan_result[:message]}"
 
         if Rails.env.production?
@@ -52,34 +64,87 @@ class FileUploader < Shrine
                             )
         end
       else
-        Rails.logger.info "File passed virus scan validation: #{file.original_filename}"
+        Rails.logger.info "File passed immediate virus scan: #{file.original_filename} (#{scan_result[:message]})"
+      end
+    rescue Timeout::Error => e
+      Rails.logger.error "Virus scan timeout during upload: #{e.message}"
+
+      Thread.current[:virus_scan_result] = {
+        status: :error,
+        message: "Scan timeout - will retry in background",
+        scanned_at: Time.current,
+        file_size: file.size,
+        original_filename: file.original_filename
+      }
+
+      if Rails.env.production?
+        error_message = I18n.t("file_upload.virus_scan.scan_timeout_production")
+        errors << error_message
+      else
+        Rails.logger.warn I18n.t(
+                            "file_upload.virus_scan.scan_timeout_development"
+                          )
       end
     rescue => e
       Rails.logger.error "Virus scan validation failed: #{e.message}"
 
-      # Decide whether to block or allow on scan error
+      Thread.current[:virus_scan_result] = {
+        status: :error,
+        message: "Scan failed: #{e.message}",
+        scanned_at: Time.current,
+        file_size: file.size,
+        original_filename: file.original_filename
+      }
+
       if Rails.env.production?
-        # In production, block upload if scan fails for security
         error_message = I18n.t("file_upload.virus_scan.scan_error_production")
         errors << error_message
       else
-        # In development, allow upload but log warning
         Rails.logger.warn I18n.t(
                             "file_upload.virus_scan.scan_error_development"
                           )
       end
     ensure
-      # Clean up temporary file
       temp_file&.close
       temp_file&.unlink
     end
   end
 
-  # Add virus scanning hook
+  # Store immediate virus scan results in database after promotion
   Attacher.promote_block do |attacher|
-    # Trigger virus scan after file promotion
-    if attacher.record.respond_to?(:schedule_virus_scan)
-      attacher.record.schedule_virus_scan
+    # Store virus scan results immediately in database
+    if attacher.record.respond_to?(:virus_scan_status) &&
+         Thread.current[:virus_scan_result]
+      scan_result = Thread.current[:virus_scan_result]
+
+      Rails.logger.info "Storing immediate virus scan results for #{attacher.record.class.name}##{attacher.record.id}"
+
+      begin
+        # Use update_columns to avoid callbacks and potential infinite loops
+        attacher.record.update_columns(
+          virus_scan_status:
+            (
+              if scan_result[:status] == :clean
+                2
+              else
+                (scan_result[:status] == :infected ? 3 : 4)
+              end
+            ),
+          virus_scan_message: scan_result[:message],
+          virus_name: scan_result[:virus_name],
+          virus_scan_started_at: scan_result[:scanned_at],
+          virus_scan_completed_at: scan_result[:scanned_at],
+          updated_at: Time.current
+        )
+
+        Rails.logger.info "Successfully stored virus scan results: #{scan_result[:status]} for #{attacher.record.class.name}##{attacher.record.id}"
+      rescue => e
+        Rails.logger.error "Failed to store virus scan results: #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
+      ensure
+        # Clean up thread local variable
+        Thread.current[:virus_scan_result] = nil
+      end
     end
   end
 
