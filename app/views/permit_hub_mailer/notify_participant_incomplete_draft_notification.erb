@@ -1,0 +1,24 @@
+<p>Hello <%= @user.first_name %> <%= @user.last_name %>,</p>
+
+<p>This is a reminder that your application to the Better Homes Energy Savings Program is still in draft. You can go to your application by clicking the button below:</p>
+
+<!-- Button Start -->
+<div style="margin: 24px 0; text-align: left;">
+  <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse: separate !important;">
+    <tr>
+      <td align="center" bgcolor="#013366" role="presentation"
+          style="background:#013366; border:1px solid #013366; border-radius:4px; cursor:auto; mso-padding-alt:6px 12px;" valign="middle">
+        <a href="<%= FrontendUrlHelper.frontend_url("/applications/#{@permit_application.id}/edit") %>"
+           style="display:inline-block; color:#ffffff !important; font-family:'BC Sans', 'Segoe UI', Arial, sans-serif; font-size:16px; font-weight:400; line-height:27px; margin:0; text-decoration:none !important; padding:6px 12px; mso-padding-alt:0px; border-radius:4px; mso-line-height-rule:exactly;"
+           target="_blank">
+          View Application
+        </a>
+      </td>
+    </tr>
+  </table>
+</div>
+<!-- Button End -->
+
+<p>If you have any questions, please call us at 1-833-856-0333 or email us at <a href="mailto:BetterHomesESP@clearesult.com">BetterHomesESP@clearesult.com</a>.</p>
+
+<p>Thank you,<br>Energy Savings Program Support</p>

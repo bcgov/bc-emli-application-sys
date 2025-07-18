@@ -490,6 +490,23 @@ class NotificationService
     end
   end
 
+  def self.publish_participant_incomplete_draft_notification_event(
+    permit_application
+  )
+    notification_user_hash = {
+      permit_application.submitter_id =>
+        permit_application.participant_incomplete_draft_notification_event_notification_data
+    }
+
+    PermitHubMailer.notify_participant_incomplete_draft_notification(
+      permit_application
+    )&.deliver_later
+
+    unless notification_user_hash.empty?
+      NotificationPushJob.perform_async(notification_user_hash)
+    end
+  end
+
   # this is just a wrapper around the activity's metadata methods
   # since in the case of a single instance it returns a specific return type (eg. Integer)
   # but in the case of multiple user_ids the activity is a hash object

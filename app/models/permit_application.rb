@@ -108,6 +108,11 @@ class PermitApplication < ApplicationRecord
                if: :saved_change_to_status?
   after_commit :notify_user_reference_number_updated,
                if: :saved_change_to_reference_number?
+  after_commit :schedule_incomplete_draft_notification,
+               on: :create,
+               if: :new_draft?
+  after_commit :cancel_incomplete_draft_notification,
+               if: :status_changed_from_draft?
 
   scope :with_submitter_role,
         -> { joins(:submitter).where(users: { role: "submitter" }) }
@@ -643,6 +648,20 @@ class PermitApplication < ApplicationRecord
     }
   end
 
+  def participant_incomplete_draft_notification_event_notification_data
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::PARTICIPANT_INCOMPLETE_DRAFT_NOTIFICATION,
+      "action_text" =>
+        "#{I18n.t("notification.permit_application.participant_incomplete_draft_notification", number: number, program_name: program_name)}",
+      "object_data" => {
+        "permit_application_id" => id,
+        "permit_application_number" => number
+      }
+    }
+  end
+
   def extract_email_from_submission_data
     return nil unless submission_versions.any?
 
@@ -816,7 +835,7 @@ class PermitApplication < ApplicationRecord
 
   def assign_default_nickname
     self.nickname =
-      "#{jurisdiction_qualified_name}: #{full_address || pid || pin || id}" if self.nickname.blank?
+      "#{jurisdiction&.qualified_name}: #{full_address || pid || pin || id}" if self.nickname.blank?
   end
 
   def assign_unique_number
@@ -940,5 +959,26 @@ class PermitApplication < ApplicationRecord
 
   def name_presence
     errors.add(:base, "Application Name can't be blank") if nickname.blank?
+  end
+
+  private
+
+  def schedule_incomplete_draft_notification
+    # Schedule job to run in 24 hours
+    ParticipantIncompleteDraftNotificationJob.perform_in(24.hours, id)
+  end
+
+  def cancel_incomplete_draft_notification
+    # Cancel scheduled job if status changed from draft to submitted
+    # Note: This is a simplified approach - in production, you might want to store
+    # the job ID and cancel it specifically, but Sidekiq doesn't have built-in
+    # job cancellation by content. The job itself has safety checks.
+    Rails.logger.info(
+      "Application #{id} status changed from draft - job will be skipped by safety check"
+    )
+  end
+
+  def status_changed_from_draft?
+    saved_change_to_status? && status_previously_was == "new_draft"
   end
 end
