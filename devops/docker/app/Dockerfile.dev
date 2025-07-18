@@ -13,8 +13,30 @@ ENV RAILS_ENV="development" \
 
 # Install packages needed for both building and running the application
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential curl git libpq-dev libvips node-gyp pkg-config python postgresql-client libproj-dev libgeos-dev proj-bin netcat xvfb libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libnss3 libxss1 libx11-xcb1 libxtst6 wget gnupg2 chromium && \
+    apt-get install --no-install-recommends -y build-essential curl git libpq-dev libvips node-gyp pkg-config python postgresql-client libproj-dev libgeos-dev proj-bin netcat xvfb libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libnss3 libxss1 libx11-xcb1 libxtst6 wget gnupg2 chromium clamav clamav-daemon clamav-freshclam && \
     rm -rf /var/lib/apt/lists/*
+
+# Configure ClamAV
+RUN mkdir -p /var/run/clamav /var/log/clamav /tmp/virus_scan && \
+    chown clamav:clamav /var/run/clamav /var/log/clamav /tmp/virus_scan && \
+    chmod 755 /tmp/virus_scan && \
+    # Configure clamd to listen on TCP socket and disable local socket
+    sed -i 's/^#TCPSocket 3310/TCPSocket 3310/' /etc/clamav/clamd.conf && \
+    sed -i 's/^#TCPAddr 127.0.0.1/TCPAddr 127.0.0.1/' /etc/clamav/clamd.conf && \
+    sed -i 's/^LocalSocket /#LocalSocket /' /etc/clamav/clamd.conf && \
+    sed -i 's/^LocalSocketGroup /#LocalSocketGroup /' /etc/clamav/clamd.conf && \
+    sed -i 's/^LocalSocketMode /#LocalSocketMode /' /etc/clamav/clamd.conf && \
+    # Add TCP socket configuration explicitly
+    echo "TCPSocket 3310" >> /etc/clamav/clamd.conf && \
+    echo "TCPAddr 127.0.0.1" >> /etc/clamav/clamd.conf && \
+    # Disable PidFile that could cause conflicts
+    sed -i 's/^PidFile /#PidFile /' /etc/clamav/clamd.conf && \
+    # Configure freshclam for virus database updates
+    sed -i 's/^# DatabaseMirror db.local.clamav.net/DatabaseMirror db.local.clamav.net/' /etc/clamav/freshclam.conf && \
+    sed -i 's/^# DatabaseMirror database.clamav.net/DatabaseMirror database.clamav.net/' /etc/clamav/freshclam.conf
+
+# Update virus database (this might take a while on first build)
+RUN freshclam || echo "FreshClam update failed, will retry at runtime"
 
 # Install Ruby gems
 COPY Gemfile Gemfile.lock ./

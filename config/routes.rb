@@ -283,6 +283,11 @@ Rails.application.routes.draw do
         patch :reactivate
       end
     end
+
+    # Virus scan status API
+    get "virus_scan_status/:model/:id", to: "virus_scan_status#show"
+    post "virus_scan_status/:model/:id/rescan", to: "virus_scan_status#rescan"
+    get "virus_scan_status/bulk", to: "virus_scan_status#bulk"
   end
 
   scope module: :external_api, path: :external_api do

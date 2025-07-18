@@ -2,7 +2,7 @@
 
 #  Dummy shared ENV vars
 x-env-vars: &default-env-vars
-  BROWSER: true # so that launchy does not error out - @TODO: figure out local emails in docker compose environment
+  BROWSER: "true" # so that launchy does not error out - @TODO: figure out local emails in docker compose environment
   RAILS_ENV: development
   REDIS_URL: redis://redis:6379/0
   ANYCABLE_REDIS_URL: redis://redis:6379/1
@@ -27,6 +27,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - virus_scan_tmp:/tmp/virus_scan
     ports:
       - '3000:3000'
     depends_on:
@@ -36,7 +37,12 @@ services:
       - vite
     environment:
       VITE_RUBY_HOST: vite
-      IS_APP_SERVER: true
+      IS_APP_SERVER: "true"
+      CLAMAV_ENABLED: "true"
+      CLAMAV_HOST: "127.0.0.1"
+      CLAMAV_PORT: "3310"
+      CLAMAV_TIMEOUT: "30"
+      VIRUS_SCAN_TEMP_DIR: "/tmp/virus_scan"
       <<: *default-env-vars
     command: >
       bash -c "bundle exec rails s -b '0.0.0.0' -p 3000"
@@ -65,7 +71,13 @@ services:
     env_file: .env.docker_compose
     volumes:
       - .:/app
+      - virus_scan_tmp:/tmp/virus_scan
     environment:
+      CLAMAV_ENABLED: "true"
+      CLAMAV_HOST: "127.0.0.1"
+      CLAMAV_PORT: "3310"
+      CLAMAV_TIMEOUT: "30"
+      VIRUS_SCAN_TEMP_DIR: "/tmp/virus_scan"
       <<: *default-env-vars
     command: 'bundle exec sidekiq'
     depends_on:
@@ -125,12 +137,54 @@ services:
       - xpack.security.transport.ssl.enabled=false
       - xpack.security.http.ssl.enabled=false
       - cluster.routing.allocation.disk.threshold_enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"  # Limit heap to 512MB for development
     ports:
       - '9200:9200'
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
 
+  # MinIO for local S3-compatible storage
+  minio:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # ClamAV for virus scanning
+  # Note: ClamAV is now installed directly in the app container
+  # No separate service needed
+
+  # MinIO client for bucket setup
+  minio-setup:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 10;
+      /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadmin123;
+      /usr/bin/mc mb myminio/uploads || true;
+      /usr/bin/mc policy set public myminio/uploads || true;
+      /usr/bin/mc cors set /tmp/cors.json myminio/uploads || true;
+      echo 'MinIO bucket setup complete';
+      "
+    volumes:
+      - ./docker/minio/cors.json:/tmp/cors.json:ro
+
 volumes:
   postgres_data:
   redis_data:
   elasticsearch_data:
+  minio_data:
+  virus_scan_tmp:
