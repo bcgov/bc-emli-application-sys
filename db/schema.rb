@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_08_145646) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_15_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -819,8 +819,15 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_08_145646) do
     t.string "plan_author"
     t.string "plan_version"
     t.string "plan_date"
+    t.integer "virus_scan_status", default: 0, null: false
+    t.text "virus_scan_message"
+    t.datetime "virus_scan_started_at"
+    t.datetime "virus_scan_completed_at"
     t.index ["permit_application_id"],
             name: "index_step_codes_on_permit_application_id"
+    t.index ["virus_scan_completed_at"],
+            name: "index_step_codes_on_virus_scan_completed_at"
+    t.index ["virus_scan_status"], name: "index_step_codes_on_virus_scan_status"
   end
 
   create_table "submission_versions",
@@ -849,10 +856,19 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_08_145646) do
     t.jsonb "compliance_data", default: {}, null: false
     t.string "data_key"
     t.uuid "submission_version_id"
+    t.integer "virus_scan_status", default: 0, null: false
+    t.text "virus_scan_message"
+    t.datetime "virus_scan_started_at"
+    t.datetime "virus_scan_completed_at"
+    t.string "virus_name"
     t.index ["permit_application_id"],
             name: "index_supporting_documents_on_permit_application_id"
     t.index ["submission_version_id"],
             name: "index_supporting_documents_on_submission_version_id"
+    t.index ["virus_scan_completed_at"],
+            name: "index_supporting_documents_on_virus_scan_completed_at"
+    t.index ["virus_scan_status"],
+            name: "index_supporting_documents_on_virus_scan_status"
   end
 
   create_table "taggings",
@@ -1022,6 +1038,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_08_145646) do
     t.string "omniauth_email"
     t.string "omniauth_username"
     t.boolean "reviewed", default: false, null: false
+    t.string "INSERT INTO public.users (id", limit: 50
+    t.string "reviewed) VALUES", limit: 50
     t.index ["confirmation_token"],
             name: "index_users_on_confirmation_token",
             unique: true

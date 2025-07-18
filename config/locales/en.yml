@@ -749,3 +749,9 @@ en:
     requirement_summary_csv_headers: 'Field Name,Is Elective,Used By (Number of Jurisdictions),Reason: Bylaw Count, Reason: Zoning count,Reason: Policy Count'
     step_code_summary_csv_headers: 'Jurisdiction,Permit type,Enabled/disabled,Energy step code level,Zero carbon level'
     application_metrics_csv_headers: 'Jurisdiction,Permit type,Work type,First Nations,In draft,In inbox,Average days before first submit,Average days before latest submit'
+  file_upload:
+    virus_scan:
+      virus_detected: 'File upload blocked: Virus detected (%{virus_name}). Please scan your file with antivirus software before uploading.'
+      scan_error_production: 'File upload temporarily unavailable due to security scanning issues. Please try again later.'
+      scan_error_development: 'File upload allowed despite scan error in development mode.'
+      unknown_virus: 'Unknown virus'

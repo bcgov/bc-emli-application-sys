@@ -28,6 +28,11 @@ SHRINE_USE_S3 =
       ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"].blank?
   )
 
+Rails.logger.info "Shrine S3 enabled: #{SHRINE_USE_S3}"
+if SHRINE_USE_S3
+  Rails.logger.info "Storage endpoint: #{ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"]}"
+end
+
 if SHRINE_USE_S3
   s3_options = {
     bucket: ENV["BCGOV_OBJECT_STORAGE_BUCKET"],
@@ -37,6 +42,7 @@ if SHRINE_USE_S3
     secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
     force_path_style: true
   }
+
   Shrine.storages = {
     cache:
       Shrine::Storage::S3.new(public: false, prefix: "cache", **s3_options),
@@ -92,7 +98,24 @@ class Shrine::Storage::S3
     obj = object(id)
 
     #chunking handled by uppy
-    signed_url = obj.presigned_url(:put, options)
+    # Use public endpoint for presigned URLs if available
+    if ENV["BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT"].present?
+      # Create a temporary S3 client with public endpoint for presigned URLs
+      public_client =
+        Aws::S3::Client.new(
+          endpoint: ENV["BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT"],
+          region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "no-region-needed",
+          access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
+          secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
+          force_path_style: true
+        )
+      public_resource = Aws::S3::Resource.new(client: public_client)
+      public_obj = public_resource.bucket(bucket.name).object(obj.key)
+      signed_url = public_obj.presigned_url(:put, options)
+    else
+      signed_url = obj.presigned_url(:put, options)
+    end
+
     url = Shrine.storages[:cache].url(id, public: false, expires_in: 3600)
     # When any of these options are specified, the corresponding request
     # headers must be included in the upload request.
