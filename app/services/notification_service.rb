@@ -331,7 +331,7 @@ class NotificationService
     if preference.enable_email_application_view_notification
       PermitHubMailer.notify_application_viewed(
         permit_application
-      ).deliver_later
+      )&.deliver_later
     end
     if preference.enable_in_app_application_view_notification
       NotificationPushJob.perform_async(notification_user_hash)
@@ -346,7 +346,7 @@ class NotificationService
 
     PermitHubMailer.notify_application_ineligible(
       permit_application
-    ).deliver_later
+    )&.deliver_later
 
     unless notification_user_hash.empty?
       NotificationPushJob.perform_async(notification_user_hash)
@@ -486,7 +486,7 @@ class NotificationService
       PermitHubMailer.notify_admin_updated_participant_app(
         permit_application,
         participant_email
-      ).deliver_now
+      )&.deliver_later
     end
   end
 
