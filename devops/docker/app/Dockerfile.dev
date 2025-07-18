@@ -13,48 +13,31 @@ ENV RAILS_ENV="development" \
 
 # Install packages needed for both building and running the application
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential curl git libpq-dev libvips node-gyp pkg-config python postgresql-client libproj-dev libgeos-dev proj-bin netcat xvfb libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libnss3 libxss1 libx11-xcb1 libxtst6 wget gnupg2 chromium clamav clamav-daemon clamav-freshclam && \
+    apt-get install --no-install-recommends -y build-essential curl git libpq-dev libvips node-gyp pkg-config python postgresql-client libproj-dev libgeos-dev proj-bin netcat xvfb libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libnss3 libxss1 libx11-xcb1 libxtst6 wget gnupg2 chromium && \
     rm -rf /var/lib/apt/lists/*
 
-# Configure ClamAV
-RUN mkdir -p /var/run/clamav /var/log/clamav /tmp/virus_scan && \
-    chown clamav:clamav /var/run/clamav /var/log/clamav /tmp/virus_scan && \
-    chmod 755 /tmp/virus_scan && \
-    # Configure clamd to listen on TCP socket and disable local socket
-    sed -i 's/^#TCPSocket 3310/TCPSocket 3310/' /etc/clamav/clamd.conf && \
-    sed -i 's/^#TCPAddr 127.0.0.1/TCPAddr 127.0.0.1/' /etc/clamav/clamd.conf && \
-    sed -i 's/^LocalSocket /#LocalSocket /' /etc/clamav/clamd.conf && \
-    sed -i 's/^LocalSocketGroup /#LocalSocketGroup /' /etc/clamav/clamd.conf && \
-    sed -i 's/^LocalSocketMode /#LocalSocketMode /' /etc/clamav/clamd.conf && \
-    # Add TCP socket configuration explicitly
-    echo "TCPSocket 3310" >> /etc/clamav/clamd.conf && \
-    echo "TCPAddr 127.0.0.1" >> /etc/clamav/clamd.conf && \
-    # Disable PidFile that could cause conflicts
-    sed -i 's/^PidFile /#PidFile /' /etc/clamav/clamd.conf && \
-    # Configure freshclam for virus database updates
-    sed -i 's/^# DatabaseMirror db.local.clamav.net/DatabaseMirror db.local.clamav.net/' /etc/clamav/freshclam.conf && \
-    sed -i 's/^# DatabaseMirror database.clamav.net/DatabaseMirror database.clamav.net/' /etc/clamav/freshclam.conf
+# Create virus scan temp directory for ClamAV service communication
+RUN mkdir -p /tmp/virus_scan && \
+    chmod 755 /tmp/virus_scan
 
-# Update virus database (this might take a while on first build)
-RUN freshclam || echo "FreshClam update failed, will retry at runtime"
-
-# Install Ruby gems
-COPY Gemfile Gemfile.lock ./
-RUN gem install bundler:2.5.4 && \
-    bundle install
-
-# Install Node.js
+# Install Node.js first (smaller layer, changes less frequently)
 ARG NODE_VERSION=20.15.0
 RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
     cd /tmp/node-build-master && ./install.sh && \
     /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
     rm -rf /tmp/node-build-master
 
-COPY . .
+# Install Ruby gems (separate layer for better caching)
+COPY Gemfile Gemfile.lock ./
+RUN gem install bundler:2.5.4 && \
+    bundle install
 
-# in dev mode npm install AFTER copying so that we overwrite with the right architecture npm modules (and still allow users who want to run this locally to do so)
+# Install Node dependencies (before copying app code for better caching)
 COPY package.json package-lock.json ./
 RUN npm install --legacy-peer-deps --maxsockets=50
+
+# Copy application code (this layer changes most frequently)
+COPY . .
 
 
 RUN bundle exec bootsnap precompile app/ lib/

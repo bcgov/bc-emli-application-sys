@@ -3,6 +3,7 @@ require "sidekiq-unique-jobs"
 
 # Shared configuration for all environments
 SHARED_QUEUES = %w[
+  virus_scan
   file_processing
   webhooks
   websocket
@@ -21,7 +22,7 @@ end
 def configure_sidekiq_server(config, redis_cfg = nil, concurrency = nil)
   config.redis = redis_cfg if redis_cfg
   config.queues = SHARED_QUEUES
-  config.concurrency = concurrency if concurrency
+  config.concurrency = concurrency || 10 # Default to 10 workers for better throughput
 
   config.client_middleware do |chain|
     chain.add SidekiqUniqueJobs::Middleware::Client

@@ -35,11 +35,12 @@ services:
       - redis
       - elasticsearch
       - vite
+      - clamav
     environment:
       VITE_RUBY_HOST: vite
       IS_APP_SERVER: "true"
       CLAMAV_ENABLED: "true"
-      CLAMAV_HOST: "127.0.0.1"
+      CLAMAV_HOST: "clamav"
       CLAMAV_PORT: "3310"
       CLAMAV_TIMEOUT: "30"
       VIRUS_SCAN_TEMP_DIR: "/tmp/virus_scan"
@@ -74,7 +75,7 @@ services:
       - virus_scan_tmp:/tmp/virus_scan
     environment:
       CLAMAV_ENABLED: "true"
-      CLAMAV_HOST: "127.0.0.1"
+      CLAMAV_HOST: "clamav"
       CLAMAV_PORT: "3310"
       CLAMAV_TIMEOUT: "30"
       VIRUS_SCAN_TEMP_DIR: "/tmp/virus_scan"
@@ -82,6 +83,7 @@ services:
     command: 'bundle exec sidekiq'
     depends_on:
       - app
+      - clamav
 
   anycable-rpc:
     image: hous-permit-portal-dev:latest
@@ -162,25 +164,20 @@ services:
       retries: 3
 
   # ClamAV for virus scanning
-  # Note: ClamAV is now installed directly in the app container
-  # No separate service needed
-
-  # MinIO client for bucket setup
-  minio-setup:
-    image: minio/mc:latest
-    depends_on:
-      - minio
-    entrypoint: >
-      /bin/sh -c "
-      sleep 10;
-      /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadmin123;
-      /usr/bin/mc mb myminio/uploads || true;
-      /usr/bin/mc policy set public myminio/uploads || true;
-      /usr/bin/mc cors set /tmp/cors.json myminio/uploads || true;
-      echo 'MinIO bucket setup complete';
-      "
+  clamav:
+    build: ./docker/clamav
+    ports:
+      - '3310:3310'
     volumes:
-      - ./docker/minio/cors.json:/tmp/cors.json:ro
+      - clamav_db:/var/lib/clamav
+      - virus_scan_tmp:/tmp/virus_scan
+    healthcheck:
+      test: ['CMD', '/usr/local/bin/health-check.sh']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
 
 volumes:
   postgres_data:
@@ -188,3 +185,4 @@ volumes:
   elasticsearch_data:
   minio_data:
   virus_scan_tmp:
+  clamav_db:

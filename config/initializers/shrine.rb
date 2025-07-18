@@ -43,6 +43,39 @@ if SHRINE_USE_S3
     force_path_style: true
   }
 
+  # Create bucket if using local MinIO (development)
+  if Rails.env.development? &&
+       ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"]&.include?("minio")
+    begin
+      s3_client = Aws::S3::Client.new(s3_options.except(:bucket))
+      bucket_name = s3_options[:bucket]
+
+      unless s3_client.list_buckets.buckets.any? { |b| b.name == bucket_name }
+        s3_client.create_bucket(bucket: bucket_name)
+        Rails.logger.info "Created MinIO bucket: #{bucket_name}"
+
+        # Set public read policy for uploads
+        s3_client.put_bucket_policy(
+          bucket: bucket_name,
+          policy: {
+            "Version" => "2012-10-17",
+            "Statement" => [
+              {
+                "Effect" => "Allow",
+                "Principal" => "*",
+                "Action" => "s3:GetObject",
+                "Resource" => "arn:aws:s3:::#{bucket_name}/*"
+              }
+            ]
+          }.to_json
+        )
+        Rails.logger.info "Set public read policy for bucket: #{bucket_name}"
+      end
+    rescue => e
+      Rails.logger.warn "Could not create/configure MinIO bucket: #{e.message}"
+    end
+  end
+
   Shrine.storages = {
     cache:
       Shrine::Storage::S3.new(public: false, prefix: "cache", **s3_options),
@@ -84,7 +117,14 @@ Shrine.plugin :presign_endpoint,
                     # transfer_encoding: "chunked",
                   }
                 }
-Shrine.plugin :uppy_s3_multipart if SHRINE_USE_S3
+if SHRINE_USE_S3
+  Shrine.plugin :uppy_s3_multipart,
+                options: {
+                  endpoint:
+                    ENV["BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT"] ||
+                      ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"]
+                }
+end
 
 class Shrine::Storage::S3
   #https://github.com/transloadit/uppy/blob/960362b373666b18a6970f3778ee1440176975af/packages/%40uppy/companion/src/server/controllers/s3.js#L105
@@ -116,7 +156,7 @@ class Shrine::Storage::S3
       signed_url = obj.presigned_url(:put, options)
     end
 
-    url = Shrine.storages[:cache].url(id, public: false, expires_in: 3600)
+    url = signed_url
     # When any of these options are specified, the corresponding request
     # headers must be included in the upload request.
     headers = {}

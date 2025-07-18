@@ -22,27 +22,27 @@ This document provides simplified flows for the virus scanning functionality imp
 **High-Level Flow:**
 
 ```
-User Upload → Immediate Scan → Clean? → Yes: Save + Background Scan
+User Upload → Immediate Scan → Clean? → Yes: Save + Store Results in DB
                                     → No: Block Upload
 ```
 
 **Components:**
 
-- **ClamAV**: Virus scanning engine
-- **FileUploader**: Handles uploads with validation
-- **Background Jobs**: Processes scans asynchronously
-- **Database**: Tracks scan status
+- **ClamAV**: Virus scanning engine (dedicated service)
+- **FileUploader**: Handles uploads with immediate validation & scanning
+- **Database**: Stores scan results directly during upload
 - **API**: Provides status endpoints
+- **No Background Jobs**: All processing is synchronous
 
 ## 📤 File Upload Flow
 
-### Simple Upload Process
+### Immediate Scanning Process
 
 ```
 1. User selects file
-2. System scans file immediately
-3. If CLEAN → Save file + start background scan
-4. If INFECTED → Block upload + show error
+2. System scans file immediately during upload validation
+3. If CLEAN → Save file + store scan results in database
+4. If INFECTED → Block upload immediately + show error
 5. If SCAN ERROR → Block (production) or Allow (development)
 ```
 
@@ -51,14 +51,14 @@ User Upload → Immediate Scan → Clean? → Yes: Save + Background Scan
 ```
 File Upload
     ↓
-Virus Scan
+Immediate Virus Scan (Synchronous)
     ↓
 ┌─────────────┬─────────────┬─────────────┐
 │    CLEAN    │  INFECTED   │    ERROR    │
 │             │             │             │
-│ ✅ Save     │ ❌ Block    │ Prod: Block │
-│ Schedule    │ Show Error  │ Dev: Allow  │
-│ Background  │ Message     │ Log Warning │
+│ ✅ Save +   │ ❌ Block    │ Prod: Block │
+│ Store in DB │ Show Error  │ Dev: Allow  │
+│ Complete    │ Message     │ Log Warning │
 └─────────────┴─────────────┴─────────────┘
 ```
 
@@ -66,13 +66,13 @@ Virus Scan
 
 **✅ Success Flow:**
 
-1. File uploads successfully
-2. Background scan validates
-3. File ready for use
+1. File uploads and scans immediately (1-2 seconds)
+2. Scan results stored directly in database
+3. File ready for immediate use
 
 **❌ Virus Detected:**
 
-- Upload immediately blocked
+- Upload blocked immediately during validation
 - Clear error message: "Virus detected: [virus_name]"
 - User instructed to scan file before retry
 
@@ -80,38 +80,38 @@ Virus Scan
 
 - Production: Upload blocked for security
 - Development: Upload allowed with warning
-- System retries scan in background
+- Error logged for monitoring
 
-## ⚙️ Background Processing
+## ⚙️ Immediate Processing
 
-### Simple Background Flow
-
-```
-File Saved → Queue Background Job → Download File → Scan → Update Status
-```
-
-### Job Processing Steps
+### Synchronous Scanning Flow
 
 ```
-1.  Find uploaded file
-2.  Set status to "scanning"
-3.  Download file to temp location
-4.  Send to ClamAV for thorough scan
-5.  Update database with result
-6.  Clean up temp file
+File Upload → Validate → Scan with ClamAV → Store Results → Complete Upload
 ```
 
-### Automatic Cleanup
-
-**Every 15 minutes**, system automatically:
+### Processing Steps
 
 ```
-Check for files with status:
-├── "pending" (not yet scanned)
-├── "scanning" (stuck for >1 hour)
-└── null (missing status)
+1.  User uploads file via FileUploader
+2.  File validation runs (including virus scan)
+3.  Create temp file for ClamAV scanning
+4.  Send to ClamAV daemon for immediate scan
+5.  Store results directly in database
+6.  Complete upload or block if infected
+7.  Clean up temp file
+```
 
-→ Queue them for scanning
+### Memory Optimization
+
+**No background processing needed:**
+
+```
+✅ Immediate scanning during upload
+✅ Direct database storage
+✅ No job queues or workers
+✅ No memory overhead from polling
+✅ No stuck job cleanup needed
 ```
 
 ### Status Progression
@@ -453,7 +453,7 @@ docker-compose exec clamav clamd --version
 
 ```bash
 # Set environment variable
-export CLAMAV_ENABLED=false
+export CLAMAV_ENABLED=true
 
 # Or update docker-compose.yml and restart
 docker-compose restart app

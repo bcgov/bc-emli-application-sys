@@ -5,9 +5,8 @@ class SupportingDocument < ApplicationRecord
   include FileUploader.Attachment(:file)
   include VirusScannable
 
-  # Trigger virus scan after file upload
-  after_commit :schedule_virus_scan_on_create, on: :create
-  after_commit :schedule_virus_scan_on_update, on: :update, if: :file_changed?
+  # Virus scanning is now handled immediately during upload validation
+  # No background job scheduling needed
 
   validate :validate_submission_version_data_key
 
@@ -156,15 +155,5 @@ class SupportingDocument < ApplicationRecord
 
   def file_changed?
     file_data_changed?
-  end
-
-  def schedule_virus_scan_on_create
-    return unless file.present?
-    schedule_virus_scan
-  end
-
-  def schedule_virus_scan_on_update
-    return unless file.present?
-    schedule_virus_scan
   end
 end

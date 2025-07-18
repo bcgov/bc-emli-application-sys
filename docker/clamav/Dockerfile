@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -y \
 # Create necessary directories with proper permissions
 RUN mkdir -p /var/lib/clamav /var/log/clamav /var/run/clamav /var/lib/clamav/tmp && \
     chown -R clamav:clamav /var/lib/clamav /var/log/clamav /var/run/clamav && \
-    chmod 755 /var/lib/clamav /var/lib/clamav/tmp
+    chmod 755 /var/lib/clamav /var/lib/clamav/tmp && \
+    chmod 775 /var/lib/clamav
 
 # Copy configuration files
 COPY clamd.conf /etc/clamav/clamd.conf

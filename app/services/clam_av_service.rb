@@ -34,6 +34,18 @@ class ClamAvService
     new.scan_file(file_path)
   end
 
+  def self.health_check
+    unless enabled?
+      return { status: "disabled", message: "ClamAV scanning is disabled" }
+    end
+
+    if ping
+      { status: "healthy", message: "ClamAV daemon is running" }
+    else
+      { status: "unhealthy", message: "ClamAV daemon is not responding" }
+    end
+  end
+
   def scan_file(file_path)
     unless File.exist?(file_path)
       return { status: :error, message: "File not found: #{file_path}" }
@@ -59,11 +71,16 @@ class ClamAvService
   def scan_with_clamav(file_path)
     socket = TCPSocket.new(CLAMAV_HOST, CLAMAV_PORT)
 
+    # Optimize socket for better performance
+    socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
+    socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, 1)
+
     # Use INSTREAM command to send file data
     socket.write("zINSTREAM\0")
 
+    # Read file in larger chunks for better performance
     File.open(file_path, "rb") do |file|
-      while chunk = file.read(8192)
+      while chunk = file.read(65_536) # 64KB chunks
         size = [chunk.size].pack("N")
         socket.write(size)
         socket.write(chunk)
