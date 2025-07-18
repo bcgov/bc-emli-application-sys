@@ -6,17 +6,15 @@ import {
   Divider,
   Flex,
   Heading,
-  InputGroup,
   InputRightElement,
-  Select,
   Tag,
   TagLabel,
   Text,
 } from '@chakra-ui/react';
-import { Info, Warning } from '@phosphor-icons/react';
+import { Warning } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React, { useMemo, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
@@ -25,6 +23,8 @@ import { TextFormControl } from '../../shared/form/input-form-control';
 import CustomAlert, { InformationAlert } from '../../shared/base/custom-alert';
 import { useCurrentUserLicenseAgreements } from '../../../hooks/resources/user-license-agreements';
 import { format } from 'date-fns';
+import { AddressSelect } from '../../shared/select/selectors/address-select';
+import { GeocoderAddressBlock } from '../../shared/select/selectors/geocoder-address-block';
 
 interface IProfileScreenProps {}
 
@@ -78,16 +78,21 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
     defaultValues: getDefaults(),
   });
   const [formValues, setFormValues] = useState(getDefaults());
-  const { handleSubmit, reset, formState } = formMethods;
+  const { handleSubmit, reset, formState, setValue, trigger } = formMethods;
   const { isSubmitting, errors } = formState;
 
   const navigate = useNavigate();
   const onSubmit = async (formData) => {
+    formMethods.reset();
     await updateProfile(formData);
     setIsEditingEmail(false);
     reset(getDefaults());
     navigate('/');
   };
+
+  useMemo(() => {
+    reset();
+  }, [formValues]);
 
   const handleResendConfirmationEmail = async () => {
     await currentUser.resendConfirmation();
@@ -145,31 +150,34 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                   onChange={(e) => setFormValues({ ...formValues, lastName: e.target.value })}
                 />
               </Flex>
-              {currentUser.isParticipant && !currentUser.isBasicBCEID ? (
-                <>
-                  <PhysicalAddressBlock formValues={formValues} />
-                  <Checkbox isChecked={sameAddressChecked} onChange={handleCheckboxChange}>
-                    {t('user.sameAddress')}
-                  </Checkbox>
-                  <InformationAlert
-                    description={t('user.changeBcsc.info')}
-                    descLinkHref={t('user.changeBcsc.link')}
-                    descLinkText={t('user.changeBcsc.linkText')}
-                  />
-                </>
-              ) : null}
-              {currentUser.isParticipant && !currentUser.isBasicBCEID && !sameAddressChecked ? (
-                <MailingAddressBlock
-                  sameAddressChecked={sameAddressChecked}
-                  formValues={formValues}
-                  setFormValues={setFormValues}
-                />
-              ) : null}
               {currentUser.isParticipant && currentUser.isBasicBCEID ? (
                 <InformationAlert
                   description={t('user.changeBasic.info')}
                   descLinkHref={t('user.changeBasic.link')}
                   descLinkText={t('user.changeBasic.linkText')}
+                />
+              ) : null}
+              <PhysicalAddressBlock
+                formValues={formValues}
+                isDisabled={false}
+                setFormValues={setFormValues}
+                formMethods={formMethods}
+              />
+              <Checkbox isChecked={sameAddressChecked} onChange={handleCheckboxChange}>
+                {t('user.sameAddress')}
+              </Checkbox>
+              {currentUser.isParticipant && !currentUser.isBasicBCEID ? (
+                <InformationAlert
+                  description={t('user.changeBcsc.info')}
+                  descLinkHref={t('user.changeBcsc.link')}
+                  descLinkText={t('user.changeBcsc.linkText')}
+                />
+              ) : null}
+              {currentUser.isParticipant && !sameAddressChecked ? (
+                <MailingAddressBlock
+                  sameAddressChecked={sameAddressChecked}
+                  formValues={formValues}
+                  setFormValues={setFormValues}
                 />
               ) : null}
               {currentUser.isUnconfirmed && !currentUser.confirmationSentAt ? (
@@ -353,46 +361,55 @@ function Section({ children }) {
   );
 }
 
-const PhysicalAddressBlock = ({ formValues }) => {
+const PhysicalAddressBlock = ({ formValues, setFormValues, isDisabled, formMethods }) => {
   const { t } = useTranslation();
 
   return (
     <>
+      <GeocoderAddressBlock
+        onChange={(e) => {
+          if (e) {
+            const updatedValues = {
+              ...formValues,
+              address: e.street,
+              city: e.city,
+              region: e.region,
+            };
+            setFormValues(updatedValues);
+          }
+        }}
+      />
       <TextFormControl
-        disabled={true}
+        _readOnly={true}
         label={t('user.address')}
         fieldName="streetAddressAttributes.streetAddress"
         value={formValues.address}
-        showOptional={false}
+        required={true}
+        requiredErrorMessage="Address field cannot be empty"
       />
       <TextFormControl
-        disabled={true}
+        _readOnly={true}
         label={t('user.city')}
         fieldName="streetAddressAttributes.locality"
         value={formValues.city}
-        required={false}
-        showOptional={false}
+        required={true}
+        requiredErrorMessage="City field cannot be empty"
       />
       <TextFormControl
-        disabled={true}
+        _readOnly={true}
         label={t('user.province')}
         fieldName="streetAddressAttributes.region"
-        value={formValues.province}
-        showOptional={false}
+        value={formValues.region}
+        required={true}
+        requiredErrorMessage="Province field cannot be empty"
       />
       <TextFormControl
-        disabled={true}
-        label={t('user.postalCode')}
         fieldName="streetAddressAttributes.postalCode"
+        label={t('user.postalCode')}
+        showOptional={false}
+        required={true}
+        requiredErrorMessage="Postal code field cannot be empty"
         value={formValues.postalCode}
-        showOptional={false}
-      />
-      <TextFormControl
-        disabled={true}
-        label={t('user.country')}
-        fieldName="streetAddressAttributes.country"
-        value={formValues.country}
-        showOptional={false}
       />
     </>
   );
@@ -432,13 +449,6 @@ const MailingAddressBlock = ({ formValues, setFormValues, sameAddressChecked }) 
         fieldName="mailingAddressAttributes.postalCode"
         value={sameAddressChecked ? formValues.postalCode : formValues.postalAddressPostalcode}
         onChange={(e) => setFormValues({ ...formValues, postalAddressPostalcode: e.target.value })}
-        showOptional={false}
-      />
-      <TextFormControl
-        label={t('user.country')}
-        fieldName="mailingAddressAttributes.country"
-        value={sameAddressChecked ? formValues.country : formValues.postalAddressCountry}
-        onChange={(e) => setFormValues({ ...formValues, postalAddressCountry: e.target.value })}
         showOptional={false}
       />
     </>

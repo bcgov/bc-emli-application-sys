@@ -2114,7 +2114,7 @@ const options = {
             linkText: '',
           },
           changeBasic: {
-            info: 'The information above is from your Basic BCeID account. To change your Basic BCeID account information, click ',
+            info: 'The information above is from your Basic BCeID account. To change your Basic BCeID information, click ',
             link: 'https://www.bceid.ca/aboutbceid/faqs.aspx',
             linkText: 'here',
           },

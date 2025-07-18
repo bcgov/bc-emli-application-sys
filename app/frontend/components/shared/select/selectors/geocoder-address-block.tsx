@@ -10,6 +10,7 @@ import { useMst } from '../../../../setup/root';
 import { IOption } from '../../../../types/types';
 import { RouterLink } from '../../navigation/router-link';
 import { AsyncSelect, TAsyncSelectProps } from '../async-select';
+import { TextFormControl } from '../../form/input-form-control';
 
 type TSitesSelectProps = {
   onChange: (option: IOption) => void;
@@ -19,7 +20,7 @@ type TSitesSelectProps = {
 
 // Please be advised that this is expected to be used within a form context!
 
-export const AddressSelect = observer(function ({
+export const GeocoderAddressBlock = observer(function ({
   onChange,
   value,
   stylesToMerge,

@@ -39,9 +39,14 @@ class Wrappers::Geocoder < Wrappers::Base
           %w[CIVIC_NUMBER BLOCK].include?(f["properties"]["matchPrecision"])
         end
         .map do |site|
+          addressParts =
+            site["properties"]["fullAddress"].split(",").map(&:strip)
           {
             label: site["properties"]["fullAddress"],
-            value: site["properties"]["siteID"]
+            value: site["properties"]["siteID"],
+            street: addressParts[0],
+            city: addressParts[1],
+            region: addressParts[2]
           }
         end
     )
