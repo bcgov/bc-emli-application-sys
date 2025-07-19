@@ -827,6 +827,10 @@ class PermitApplication < ApplicationRecord
     end
   end
 
+  def new_draft?
+    status == "new_draft"
+  end
+
   private
 
   def update_collaboration_assignments
