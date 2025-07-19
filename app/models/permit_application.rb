@@ -965,8 +965,6 @@ class PermitApplication < ApplicationRecord
     errors.add(:base, "Application Name can't be blank") if nickname.blank?
   end
 
-  private
-
   def schedule_incomplete_draft_notification
     # Schedule job to run in 24 hours
     ParticipantIncompleteDraftNotificationJob.perform_in(24.hours, id)
