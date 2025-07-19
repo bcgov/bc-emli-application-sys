@@ -60,7 +60,7 @@ class PermitApplication < ApplicationRecord
   belongs_to :template_version
   belongs_to :sandbox, optional: true
 
-  # The front end form update provides a json paylioad of items we want to force update on the front-end since form io maintains its own state and does not 'rerender' if we send the form data back
+  # The front end form update provides a json payload of items we want to force update on the front-end since form io maintains its own state and does not 'rerender' if we send the form data back
   attr_accessor :front_end_form_update
   has_one :step_code
   has_many :submission_versions, dependent: :destroy
@@ -138,7 +138,7 @@ class PermitApplication < ApplicationRecord
     return [] if permissions.blank?
 
     supporting_documents.select do |s|
-      return false if s.data_key.blank?
+      next false if s.data_key.blank?
 
       rb_id = s.data_key[/RB([a-zA-Z0-9\-]+)/, 1]
 
@@ -350,7 +350,7 @@ class PermitApplication < ApplicationRecord
   end
 
   def number_prefix
-    jurisdiction.prefix
+    jurisdiction&.prefix
   end
 
   def notifiable_users
@@ -400,6 +400,7 @@ class PermitApplication < ApplicationRecord
 
   def days_ago_submitted
     # Calculate the difference in days between the current date and the submitted_at date
+    return 0 unless submitted_at
     (Date.current - submitted_at.to_date).to_i
   end
 
@@ -420,7 +421,7 @@ class PermitApplication < ApplicationRecord
   end
 
   def permit_type_and_activity
-    "#{activity.name} - #{permit_type.name}".strip
+    "#{activity&.name} - #{permit_type&.name}".strip
   end
 
   def confirmed_permit_type_submission_contacts
@@ -718,6 +719,7 @@ class PermitApplication < ApplicationRecord
   end
 
   def step_code_requirements
+    return [] unless jurisdiction
     jurisdiction.permit_type_required_steps.where(permit_type_id:)
   end
 
@@ -779,14 +781,12 @@ class PermitApplication < ApplicationRecord
         .group(
           "jurisdictions.id",
           "requirement_templates.id",
-          "jurisdictions.name",
-          "requirement_templates.id"
+          "jurisdictions.name"
         )
         .select(
           "jurisdictions.id AS jurisdiction_id",
           "requirement_templates.id AS requirement_template_id",
           "jurisdictions.name AS jurisdiction_name",
-          "requirement_templates.id AS requirement_template_id",
           "COUNT(CASE WHEN permit_applications.status IN (0, 3) THEN 1 END) AS draft_count",
           "COUNT(CASE WHEN permit_applications.status IN (1, 4) THEN 1 END) AS submitted_count",
           "AVG(
@@ -843,10 +843,9 @@ class PermitApplication < ApplicationRecord
   end
 
   def assign_unique_number
-    #Rails.logger.info("program #{program.inspect}")
     last_number =
       program
-        .permit_applications #.where("number LIKE ?", "#{number_prefix}-%")
+        .permit_applications
         .order(Arel.sql("LENGTH(number) DESC"), number: :desc)
         .limit(1)
         .pluck(:number)
