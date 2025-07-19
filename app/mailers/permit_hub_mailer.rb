@@ -246,4 +246,18 @@ class PermitHubMailer < ApplicationMailer
       }
     )
   end
+
+  def notify_participant_incomplete_draft_notification(permit_application)
+    @user = permit_application.submitter
+    @permit_application = permit_application
+    @program = permit_application.program
+
+    send_user_mail(
+      email: @user.email,
+      template_key: "notify_participant_incomplete_draft_notification",
+      subject_i18n_params: {
+        permit_application_number: permit_application.number
+      }
+    )
+  end
 end

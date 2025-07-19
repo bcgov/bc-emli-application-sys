@@ -161,6 +161,7 @@ en:
       notify_application_withdrawn: 'Application %{permit_application_number} has been withdrawn'
       notify_application_ineligible: 'Application %{permit_application_number} is ineligible'
       notify_admin_updated_participant_app: 'Your application has been updated'
+      notify_participant_incomplete_draft_notification: 'Reminder: Your recently created application'
   arbitrary_message_construct:
     devise:
       failure:
@@ -725,6 +726,7 @@ en:
       withdrawal_notification: 'Your application %{number} has been withdrawn from the %{program_name}'
       new_submission_received_notification: 'New application %{number} submitted to %{program_name} on %{submitted_at}'
       assignment_notification: 'Application %{number} from %{program_name} has been assigned to you'
+      participant_incomplete_draft_notification: 'This is a reminder that your application to the %{program_name} is still in draft. You can complete your application by viewing it here'
     user:
       account_update_notification: 'Your account was updated on %{updated_at}. Changes: %{changed_fields}. If you did not make this change, please contact support immediately.'
     permit_collaboration:

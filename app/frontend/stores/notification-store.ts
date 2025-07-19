@@ -143,11 +143,12 @@ export const NotificationStoreModel = types
         case ENotificationActionType.applicationRevisionsRequest:
         case ENotificationActionType.applicationView:
         case ENotificationActionType.applicationIneligible:
-        case ENotificationActionType.applicationAssignment: {
+        case ENotificationActionType.applicationAssignment:
+        case ENotificationActionType.participantIncompleteDraftNotification: {
           const data = objectData as IPermitNotificationObjectData;
           return [
             {
-              text: t('ui.show'),
+              text: t('ui.view'),
               href: getApplicationLink(data.permitApplicationId, true),
             },
           ];

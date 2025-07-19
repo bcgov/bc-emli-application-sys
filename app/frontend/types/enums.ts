@@ -507,6 +507,7 @@ export enum ENotificationActionType {
   applicationWithdrawal = 'application_withdrawal',
   applicationAssignment = 'application_assignment',
   adminUpdatedParticipantApp = 'admin_updated_participant_app',
+  participantIncompleteDraftNotification = 'participant_incomplete_draft_notification',
   accountUpdate = 'account_update',
   newSubmissionReceived = 'new_submission_received',
   templatePublished = 'template_published',
