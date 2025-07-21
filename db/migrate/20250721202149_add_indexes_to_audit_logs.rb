@@ -17,4 +17,18 @@ class AddIndexesToAuditLogs < ActiveRecord::Migration[7.1]
               name: "idx_audit_logs_user_created",
               where: "user_id IS NOT NULL"
   end
+
+  def down
+    # Remove table-specific queries index
+    remove_index :audit_logs, name: "idx_audit_logs_table_created"
+
+    # Remove action-specific queries index
+    remove_index :audit_logs, name: "idx_audit_logs_action"
+
+    # Remove chronological queries index
+    remove_index :audit_logs, name: "idx_audit_logs_created_at"
+
+    # Remove user activity queries index
+    remove_index :audit_logs, name: "idx_audit_logs_user_created"
+  end
 end
