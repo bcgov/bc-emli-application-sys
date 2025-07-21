@@ -1,7 +1,15 @@
 module Auditable
   extend ActiveSupport::Concern
 
-  EXCLUDED_COLUMNS = %w[id user_id created_at updated_at sign_in_count current_sign_in_at last_sign_in_at]
+  EXCLUDED_COLUMNS = %w[
+    id
+    user_id
+    created_at
+    updated_at
+    sign_in_count
+    current_sign_in_at
+    last_sign_in_at
+  ]
 
   included do
     after_create :audit_create
@@ -13,30 +21,32 @@ module Auditable
   private
 
   def store_previous_values
-    @previous_values = changes.except(*EXCLUDED_COLUMNS).transform_values(&:first) # 🔥 Capture before-update values
+    @previous_values =
+      changes.except(*EXCLUDED_COLUMNS).transform_values(&:first) # 🔥 Capture before-update values
     # puts "DEBUG: Stored previous values: #{@previous_values.inspect}"  # Debugging
   end
 
   def audit_create
-    filtered_data_after = self.attributes.except(*EXCLUDED_COLUMNS)  # 🔥 Remove unwanted fields
+    filtered_data_after = self.attributes.except(*EXCLUDED_COLUMNS) # 🔥 Remove unwanted fields
 
     AuditLog.create!(
       table_name: self.class.table_name,
       action: "create",
       data_before: nil,
-      data_after: filtered_data_after  # 🔹 Only store relevant fields
+      data_after: filtered_data_after, # 🔹 Only store relevant fields
+      user_id: current_audit_user&.id
     )
   end
 
   def audit_update
-    data_before = @previous_values || {}  # 🔹 Use captured values
-    data_after = data_before.keys.index_with { |key| self[key] }  # 🔹 Capture new values
+    data_before = @previous_values || {} # 🔹 Use captured values
+    data_after = data_before.keys.index_with { |key| self[key] } # 🔹 Capture new values
 
     # puts "DEBUG: audit_update is running for #{self.class.name} (ID: #{self.id})"
     # puts "DEBUG: previous_values = #{data_before.inspect}"
     # puts "DEBUG: data_after = #{data_after.inspect}"
 
-    return if data_before.blank? || data_before == data_after  # Avoid logging if no meaningful changes
+    return if data_before.blank? || data_before == data_after # Avoid logging if no meaningful changes
 
     # puts "DEBUG: Creating audit log for #{self.class.name}"
 
@@ -44,7 +54,8 @@ module Auditable
       table_name: self.class.table_name,
       action: "edit",
       data_before: data_before,
-      data_after: data_after
+      data_after: data_after,
+      user_id: current_audit_user&.id
     )
   end
 
@@ -53,14 +64,25 @@ module Auditable
       table_name: self.class.table_name,
       action: "delete",
       data_before: attributes.except(*EXCLUDED_COLUMNS),
-      data_after: nil
+      data_after: nil,
+      user_id: current_audit_user&.id
     )
   end
 
   def attributes_before_change
     changes
-      .except(*EXCLUDED_COLUMNS)  # 🔹 Remove excluded columns like timestamps
-      .transform_values { |change| change[0] }  # 🔥 Explicitly get the first element (old value)
+      .except(*EXCLUDED_COLUMNS) # 🔹 Remove excluded columns like timestamps
+      .transform_values { |change| change[0] } # 🔥 Explicitly get the first element (old value)
   end
 
+  def current_audit_user
+    # Try multiple ways to get the current user
+    if defined?(Current) && Current.respond_to?(:user)
+      Current.user
+    elsif defined?(RequestStore) && RequestStore[:current_user]
+      RequestStore[:current_user]
+    elsif Thread.current[:current_user]
+      Thread.current[:current_user]
+    end
+  end
 end

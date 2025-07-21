@@ -4,6 +4,7 @@ class PermitApplication < ApplicationRecord
   include StepCodeFieldExtraction
   include ZipfileUploader.Attachment(:zipfile)
   include PermitApplicationStatus
+  include Auditable
 
   # SEARCH_INCLUDES = %i[
   #   permit_type

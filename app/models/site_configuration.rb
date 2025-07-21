@@ -1,4 +1,6 @@
 class SiteConfiguration < ApplicationRecord
+  include Auditable
+
   # Ensures that only one SiteConfiguration record can be created
   before_create :ensure_single_record
   validate :validate_help_link_items

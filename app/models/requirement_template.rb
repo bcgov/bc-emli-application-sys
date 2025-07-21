@@ -86,6 +86,7 @@ class RequirementTemplate < ApplicationRecord
   after_commit :refresh_search_index, if: :saved_change_to_discarded_at
 
   include Discard::Model
+  include Auditable
 
   accepts_nested_attributes_for :requirement_template_sections,
                                 allow_destroy: true

@@ -1,4 +1,6 @@
 class RevisionRequest < ApplicationRecord
+  include Auditable
+
   belongs_to :submission_version
   belongs_to :user
   belongs_to :revision_reason,
