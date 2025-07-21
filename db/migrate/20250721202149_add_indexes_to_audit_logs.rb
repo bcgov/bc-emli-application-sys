@@ -5,6 +5,9 @@ class AddIndexesToAuditLogs < ActiveRecord::Migration[7.1]
               %i[table_name created_at],
               name: "idx_audit_logs_table_created"
 
+    # For action-specific queries
+    add_index :audit_logs, :action, name: "idx_audit_logs_action"
+
     # For chronological queries (most common query pattern)
     add_index :audit_logs, :created_at, name: "idx_audit_logs_created_at"
 

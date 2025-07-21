@@ -7,6 +7,7 @@ class AuditLog < ApplicationRecord
   # Basic scopes that use our indexes
   scope :by_user, ->(user) { where(user: user) }
   scope :by_table, ->(table_name) { where(table_name: table_name) }
+  scope :by_action, ->(action) { where(action: action) }
   scope :recent, -> { order(created_at: :desc) }
 
   # Advanced scopes that leverage composite indexes
