@@ -76,13 +76,7 @@ module Auditable
   end
 
   def current_audit_user
-    # Try multiple ways to get the current user
-    if defined?(Current) && Current.respond_to?(:user)
-      Current.user
-    elsif defined?(RequestStore) && RequestStore[:current_user]
-      RequestStore[:current_user]
-    elsif Thread.current[:current_user]
-      Thread.current[:current_user]
-    end
+    # Use the application's Current.user pattern (set in BaseControllerMethods#store_currents)
+    Current.user if defined?(Current)
   end
 end
