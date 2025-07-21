@@ -350,7 +350,7 @@ class PermitApplication < ApplicationRecord
   end
 
   def number_prefix
-    jurisdiction&.prefix
+    jurisdiction&.prefix || ""
   end
 
   def notifiable_users
@@ -400,7 +400,7 @@ class PermitApplication < ApplicationRecord
 
   def days_ago_submitted
     # Calculate the difference in days between the current date and the submitted_at date
-    return 0 unless submitted_at
+    return nil unless submitted_at
     (Date.current - submitted_at.to_date).to_i
   end
 
@@ -421,7 +421,8 @@ class PermitApplication < ApplicationRecord
   end
 
   def permit_type_and_activity
-    "#{activity&.name} - #{permit_type&.name}".strip
+    return "" unless activity && permit_type
+    "#{activity.name} - #{permit_type.name}".strip
   end
 
   def confirmed_permit_type_submission_contacts
