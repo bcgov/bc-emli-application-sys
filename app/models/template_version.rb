@@ -1,5 +1,7 @@
 class TemplateVersion < ApplicationRecord
   include TraverseDataJson
+  include Auditable
+
   belongs_to :requirement_template
   belongs_to :deprecated_by, class_name: "User", optional: true
 

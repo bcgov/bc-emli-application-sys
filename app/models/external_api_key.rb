@@ -1,5 +1,6 @@
 class ExternalApiKey < ApplicationRecord
   include ValidateUrlAttributes
+  include Auditable
 
   has_many :integration_mapping_notifications,
            as: :notifiable,

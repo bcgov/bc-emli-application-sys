@@ -1,4 +1,6 @@
 class ProgramMembership < ApplicationRecord
+  include Auditable
+
   searchkick
   belongs_to :user
   belongs_to :program
