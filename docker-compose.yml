@@ -2,7 +2,7 @@
 
 #  Dummy shared ENV vars
 x-env-vars: &default-env-vars
-  BROWSER: true # so that launchy does not error out - @TODO: figure out local emails in docker compose environment
+  BROWSER: "true" # so that launchy does not error out - @TODO: figure out local emails in docker compose environment
   RAILS_ENV: development
   REDIS_URL: redis://redis:6379/0
   ANYCABLE_REDIS_URL: redis://redis:6379/1
@@ -34,9 +34,10 @@ services:
       - redis
       - elasticsearch
       - vite
+      - minio
     environment:
       VITE_RUBY_HOST: vite
-      IS_APP_SERVER: true
+      IS_APP_SERVER: "true"
       <<: *default-env-vars
     command: >
       bash -c "bundle exec rails s -b '0.0.0.0' -p 3000"
@@ -130,7 +131,20 @@ services:
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
 
+  minio:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
 volumes:
   postgres_data:
   redis_data:
   elasticsearch_data:
+  minio_data:

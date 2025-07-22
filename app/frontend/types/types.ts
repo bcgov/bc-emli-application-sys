@@ -343,7 +343,18 @@ export type TSocketEventData =
 
 export interface IEnergySavingsApplicationSupportingDocumentsUpdate {
   id: string;
-  supportingDocuments: IEnergySavingsApplication['supportingDocuments'];
+  supportingDocuments: IDownloadableFile[];
+  allSubmissionVersionCompletedSupportingDocuments?: IDownloadableFile[];
+  missingPdfs: string[];
+  zipfileSize: null | number;
+  zipfileName: null | string;
+  zipfileUrl: null | string;
+}
+
+export interface IPermitApplicationSupportingDocumentsUpdate {
+  id: string;
+  supportingDocuments: IDownloadableFile[];
+  allSubmissionVersionCompletedSupportingDocuments?: IDownloadableFile[];
   missingPdfs: string[];
   zipfileSize: null | number;
   zipfileName: null | string;

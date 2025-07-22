@@ -868,6 +868,9 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       handleSocketSupportingDocsUpdate: (data: IPermitApplicationSupportingDocumentsUpdate) => {
         self.missingPdfs = cast(data.missingPdfs);
         self.supportingDocuments = data.supportingDocuments;
+        self.allSubmissionVersionCompletedSupportingDocuments =
+          data.allSubmissionVersionCompletedSupportingDocuments ||
+          self.allSubmissionVersionCompletedSupportingDocuments;
         self.zipfileSize = data.zipfileSize;
         self.zipfileName = data.zipfileName;
         self.zipfileUrl = data.zipfileUrl;
@@ -889,6 +892,9 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       handleSocketSupportingDocsUpdate: (data: IPermitApplicationSupportingDocumentsUpdate) => {
         self.missingPdfs = cast(data.missingPdfs);
         self.supportingDocuments = data.supportingDocuments;
+        self.allSubmissionVersionCompletedSupportingDocuments =
+          data.allSubmissionVersionCompletedSupportingDocuments ||
+          self.allSubmissionVersionCompletedSupportingDocuments;
         self.zipfileSize = data.zipfileSize;
         self.zipfileName = data.zipfileName;
         self.zipfileUrl = data.zipfileUrl;
