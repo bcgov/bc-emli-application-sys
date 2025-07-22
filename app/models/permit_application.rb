@@ -351,7 +351,7 @@ class PermitApplication < ApplicationRecord
   end
 
   def number_prefix
-    jurisdiction&.prefix || ""
+    jurisdiction&.prefix
   end
 
   def notifiable_users
@@ -369,13 +369,13 @@ class PermitApplication < ApplicationRecord
     if submitted?
       relevant_collaborators =
         relevant_collaborators +
-          jurisdiction.review_managers if jurisdiction.review_managers.present?
+          jurisdiction.review_managers if jurisdiction&.review_managers&.present?
       relevant_collaborators =
         relevant_collaborators +
-          jurisdiction.regional_review_managers if jurisdiction.regional_review_managers.present?
+          jurisdiction.regional_review_managers if jurisdiction&.regional_review_managers&.present?
       relevant_collaborators =
         relevant_collaborators +
-          jurisdiction.reviewers if jurisdiction.reviewers.present?
+          jurisdiction.reviewers if jurisdiction&.reviewers&.present?
     end
 
     relevant_collaborators
@@ -721,6 +721,7 @@ class PermitApplication < ApplicationRecord
   end
 
   def step_code_requirements
+    return [] unless jurisdiction
     return [] unless jurisdiction
     jurisdiction.permit_type_required_steps.where(permit_type_id:)
   end
