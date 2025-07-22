@@ -168,6 +168,7 @@ export const UserStoreModel = types
         page?: number;
         countPerPage?: number;
         skipMerge?: boolean;
+        filter_for_assignment?: string;
       } = {},
     ) {
       if (opts.reset) {
@@ -181,6 +182,7 @@ export const UserStoreModel = types
         perPage: opts.countPerPage ?? self.countPerPage,
         status: self.status,
         allUsers: self.allUsers,
+        filter_for_assignment: opts.filter_for_assignment,
       };
 
       const response = yield self.rootStore.programStore.currentProgram?.id
