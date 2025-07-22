@@ -43,7 +43,7 @@ export const AssignmentPopoverContent = observer(function CollaboratorSearch({
   // Custom search function that handles both setAllUsers and skipMerge optimization
   const optimizedSearch = useCallback(() => {
     userStore.setAllUsers(true);
-    return userStore.searchUsers({ skipMerge: true, filterForAssignment: 'true' });
+    return userStore.searchUsers({ skipMerge: true, filterForAssignment: true });
   }, [userStore]);
 
   useEffect(() => {

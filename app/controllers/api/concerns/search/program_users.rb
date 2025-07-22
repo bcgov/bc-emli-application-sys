@@ -46,7 +46,7 @@ module Api::Concerns::Search::ProgramUsers
     end
 
     # Filter users based on assignment permissions (only when assigning users)
-    if params[:filter_for_assignment] == "true"
+    if params[:filter_for_assignment]
       user_ids =
         ApplicationAssignmentPolicy.assignable_user_ids(Current.user, user_ids)
     end
