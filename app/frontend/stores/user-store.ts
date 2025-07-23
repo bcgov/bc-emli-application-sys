@@ -182,7 +182,7 @@ export const UserStoreModel = types
         perPage: opts.countPerPage ?? self.countPerPage,
         status: self.status,
         allUsers: self.allUsers,
-        filter_for_assignment: opts.filterForAssignment ? 'true' : undefined,
+        filter_for_assignment: opts.filterForAssignment,
       };
 
       const response = yield self.rootStore.programStore.currentProgram?.id
