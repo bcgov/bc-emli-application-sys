@@ -157,12 +157,16 @@ class Api::ProgramsController < Api::ApplicationController
         )
     end
 
+    # Recalculate total_pages based on filtered results for consistency
+    per_page = (params[:per_page] || 25).to_i
+    total_pages = (authorized_results.size / per_page.to_f).ceil
+
     render_success authorized_results,
                    nil,
                    {
                      meta: {
-                       total_pages: @user_search.total_pages,
-                       total_count: @user_search.total_count,
+                       total_pages: total_pages,
+                       total_count: authorized_results.size,
                        current_page: @user_search.current_page
                      },
                      blueprint: UserBlueprint,
