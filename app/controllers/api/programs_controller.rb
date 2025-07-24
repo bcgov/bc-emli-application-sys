@@ -162,7 +162,7 @@ class Api::ProgramsController < Api::ApplicationController
                    {
                      meta: {
                        total_pages: @user_search.total_pages,
-                       total_count: authorized_results.count,
+                       total_count: authorized_results.size,
                        current_page: @user_search.current_page
                      },
                      blueprint: UserBlueprint,
