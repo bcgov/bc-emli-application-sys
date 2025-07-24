@@ -230,6 +230,10 @@ Rails.application.routes.draw do
       get "active_programs", on: :collection, to: "users#active_programs"
     end
 
+    resources :audit_logs, only: %i[index] do
+      get "filter_options", on: :collection
+    end
+
     resources :users, only: %i[destroy update] do
       patch "restore", on: :member
       patch "accept_eula", on: :member

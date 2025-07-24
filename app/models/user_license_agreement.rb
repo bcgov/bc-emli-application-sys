@@ -1,4 +1,6 @@
 class UserLicenseAgreement < ApplicationRecord
+  include Auditable
+
   belongs_to :user
   belongs_to :agreement, class_name: "EndUserLicenseAgreement"
 

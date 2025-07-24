@@ -457,7 +457,7 @@ const NavBarMenu = observer(function NavBarMenu() {
             {/* ===== LOGGED IN MENU ===== */}
             {loggedIn && !currentUser?.isUnconfirmed ? (
               <>
-                <MenuGroup title={currentUser.name} noOfLines={1}>
+                <MenuGroup title={currentUser?.name} noOfLines={1}>
                   {/* Role display for admin users */}
                   {(currentUser?.isSuperAdmin || currentUser?.isAdmin || currentUser?.isAdminManager) && (
                     <Box py={2} px={3} fontSize="md" color="inherit">
