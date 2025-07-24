@@ -30,11 +30,11 @@ export const SessionStoreModel = types
   .actions((self) => ({
     async handleLogin(response, opts = { redirectToRoot: false }) {
       // console.log('Login response', response);
-      if (response.ok) {
+      if (response.ok && response.data?.data) {
         const user = response.data.data;
         const meta = response.data.meta;
 
-        self.entryPoint = meta.entryPoint;
+        self.entryPoint = meta?.entryPoint;
         self.loggedIn = true;
         self.rootStore.userStore.setCurrentUser(user);
         // activate persisted data

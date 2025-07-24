@@ -2775,6 +2775,7 @@ const options = {
             digitalBuildingPermits: 'Digital building permits',
             contact: 'Contact us',
             configurationManagement: 'Configuration management',
+            auditLog: 'Audit log',
             energyStep: 'Energy Step Code requirements',
             submissionsInboxSetup: 'Submissions inbox setup',
             confirmed: 'E-mail confirmed',
@@ -2802,6 +2803,46 @@ const options = {
           baseMessage: `This field has Auto-Compliance capability`,
           defaultValueMessage: `Auto-Compliance found the default value to be "{{defaultValue}}".`,
           failedValueMessage: `Auto-Compliance was unable fill this field, please check with your local jurisdiction if this is required.`,
+        },
+        auditLog: {
+          title: 'Audit Log',
+          audit_log: 'Audit Log',
+          export_csv: 'Export as .csv',
+
+          // Table columns
+          who: 'Who',
+          action: 'Action',
+          where: 'Where',
+          details: 'Details',
+          timestamp: 'Timestamp (PST)',
+
+          // Filtering
+          filter: 'Filter',
+          filter_by_action: 'Filter by Action',
+          filter_by_user: 'Filter by User',
+          filter_by_table: 'Filter by Table',
+          filter_by_date: 'Filter by Date',
+          date_range: 'Date Range',
+          clear_filters: 'Clear All Filters',
+
+          // Record operations (from backend translations)
+          created_record: 'Record created',
+          created_with_field: 'Created with {{field}}: {{value}}',
+          updated_record: 'Record updated',
+          changed_field: 'Changed {{field}} from {{from}} to {{to}}',
+          deleted_record: 'Record deleted',
+          removed_field: 'Removed {{field}}: {{value}}',
+
+          // Login tracking
+          user_logged_in: 'User logged in',
+          login_from_ip: 'Login from IP: {{ip}}',
+          login_count: 'Total logins: {{count}}',
+
+          // UI messages
+          total_items: '{{count}} total items',
+          no_data: 'No audit logs found',
+          unknown_user: 'Unknown User',
+          system_action: 'System Action',
         },
       },
     },
