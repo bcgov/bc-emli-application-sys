@@ -254,7 +254,7 @@ export const AuditLogScreen = observer(() => {
             {t(`${i18nPrefix}.unknown_user`)}
           </Text>
           <Text fontSize="sm" color="gray.400">
-            {t(`${i18nPrefix}.system_action`)}
+            {t(`${i18nPrefix}.unknown_email`)}
           </Text>
         </Box>
       );
@@ -289,6 +289,13 @@ export const AuditLogScreen = observer(() => {
         {action.charAt(0).toUpperCase() + action.slice(1)}
       </Tag>
     );
+  };
+
+  const formatTableName = (tableName: string) => {
+    if (tableName === 'permit_applications') {
+      return t(`${i18nPrefix}.applications`);
+    }
+    return tableName;
   };
 
   const formatDetails = (log: AuditLogEntry) => {
@@ -441,7 +448,7 @@ export const AuditLogScreen = observer(() => {
                         size="sm"
                         value={filters.action_filter}
                         onChange={(e) => handleFilterChange('action_filter', e.target.value)}
-                        placeholder="All actions"
+                        placeholder={t(`${i18nPrefix}.all_actions`)}
                       >
                         {filterOptions.actions.map((action) => (
                           <option key={action} value={action}>
@@ -457,7 +464,7 @@ export const AuditLogScreen = observer(() => {
                         size="sm"
                         value={filters.user_filter}
                         onChange={(e) => handleFilterChange('user_filter', e.target.value)}
-                        placeholder="All users"
+                        placeholder={t(`${i18nPrefix}.all_users`)}
                       >
                         {filterOptions.users.map((user) => (
                           <option key={user} value={user}>
@@ -473,7 +480,7 @@ export const AuditLogScreen = observer(() => {
                         size="sm"
                         value={filters.table_filter}
                         onChange={(e) => handleFilterChange('table_filter', e.target.value)}
-                        placeholder="All tables"
+                        placeholder={t(`${i18nPrefix}.all_tables`)}
                       >
                         {filterOptions.tables.map((table) => (
                           <option key={table} value={table}>
@@ -491,14 +498,14 @@ export const AuditLogScreen = observer(() => {
                           type="date"
                           value={filters.date_from}
                           onChange={(e) => handleFilterChange('date_from', e.target.value)}
-                          placeholder="From date"
+                          placeholder={t(`${i18nPrefix}.from_date`)}
                         />
                         <Input
                           size="sm"
                           type="date"
                           value={filters.date_to}
                           onChange={(e) => handleFilterChange('date_to', e.target.value)}
-                          placeholder="To date"
+                          placeholder={t(`${i18nPrefix}.to_date`)}
                         />
                       </Flex>
                     </FormControl>
@@ -534,7 +541,7 @@ export const AuditLogScreen = observer(() => {
                     {renderTableCell(formatAction(log.action), '80px')}
                     {renderTableCell(
                       <Text fontSize="sm" fontWeight="medium" color="gray.700" wordBreak="break-word">
-                        {log.table_name}
+                        {formatTableName(log.table_name)}
                       </Text>,
                       '140px',
                     )}
@@ -564,9 +571,6 @@ export const AuditLogScreen = observer(() => {
                 handleCountPerPageChange={handlePerPageChange}
                 totalCount={pagination.total_count}
               />
-              <Text fontSize="sm" color="gray.600">
-                {pagination.total_count} {t(`${i18nPrefix}.total_items`)}
-              </Text>
             </Flex>
 
             <Paginator
