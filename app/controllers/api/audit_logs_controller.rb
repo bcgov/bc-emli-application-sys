@@ -5,7 +5,13 @@ class Api::AuditLogsController < Api::ApplicationController
     authorize :audit_log, :index?
 
     actions = policy_scope(AuditLog).distinct.pluck(:action).compact.sort
-    tables = policy_scope(AuditLog).distinct.pluck(:table_name).compact.sort
+    tables =
+      policy_scope(AuditLog)
+        .distinct
+        .pluck(:table_name)
+        .compact
+        .sort
+        .map { |table| display_table_name(table) }
     users =
       policy_scope(AuditLog)
         .joins(:user)
@@ -46,8 +52,9 @@ class Api::AuditLogsController < Api::ApplicationController
     end
 
     if params[:table_filter].present?
-      audit_logs_query =
-        audit_logs_query.where(table_name: params[:table_filter])
+      # Convert display name back to actual table name for querying
+      actual_table_name = reverse_display_table_name(params[:table_filter])
+      audit_logs_query = audit_logs_query.where(table_name: actual_table_name)
     end
 
     if params[:date_from].present?
@@ -133,6 +140,24 @@ class Api::AuditLogsController < Api::ApplicationController
           details
         ]
       end
+    end
+  end
+
+  def display_table_name(table_name)
+    case table_name
+    when "permit_applications"
+      I18n.t("audit_log.applications", default: "applications")
+    else
+      table_name
+    end
+  end
+
+  def reverse_display_table_name(display_name)
+    case display_name
+    when I18n.t("audit_log.applications", default: "applications")
+      "permit_applications"
+    else
+      display_name
     end
   end
 end

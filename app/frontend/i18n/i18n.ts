@@ -2824,6 +2824,14 @@ const options = {
           filter_by_date: 'Filter by Date',
           date_range: 'Date Range',
           clear_filters: 'Clear All Filters',
+          all_actions: 'All actions',
+          all_users: 'All users',
+          all_tables: 'All tables',
+          from_date: 'From date',
+          to_date: 'To date',
+
+          // Table name displays
+          applications: 'applications',
 
           // Record operations (from backend translations)
           created_record: 'Record created',
@@ -2842,7 +2850,7 @@ const options = {
           total_items: '{{count}} total items',
           no_data: 'No audit logs found',
           unknown_user: 'Unknown User',
-          system_action: 'System Action',
+          unknown_email: 'Unknown email',
         },
       },
     },

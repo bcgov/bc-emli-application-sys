@@ -759,3 +759,4 @@ en:
     user_logged_in: 'User logged in'
     login_from_ip: 'Login from IP: %{ip}'
     login_count: 'Total logins: %{count}'
+    applications: 'applications'
