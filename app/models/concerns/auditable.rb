@@ -52,7 +52,7 @@ module Auditable
     )
   rescue ActiveRecord::InvalidForeignKey,
          ActiveModel::UnknownAttributeError => e
-    Rails.logger.warn "Audit log creation failed: #{e.message}"
+    Rails.logger.warn "Audit log creation failed (#{e.class}): #{e.message}"
     AuditLog.create!(
       table_name: self.class.table_name,
       action: action,
