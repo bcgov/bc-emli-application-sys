@@ -38,6 +38,11 @@ module Api::Concerns::Search::ProgramUsers
     # Extract user_ids for search
     user_ids = memberships.map(&:user_id)
 
+    # Filter out participants and contractors per search_program_membership_users policy
+    participant_contractor_ids =
+      User.where(id: user_ids, role: %w[participant contractor]).pluck(:id)
+    user_ids -= participant_contractor_ids
+
     # Filter out system_admin users if current user is an admin_manager
     if Current.user.admin_manager?
       system_admin_ids =
