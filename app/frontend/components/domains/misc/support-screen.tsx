@@ -1,78 +1,146 @@
-import { Box, Container, Flex, Heading, Link, Text, VStack } from "@chakra-ui/react"
-import { ArrowSquareOut } from "@phosphor-icons/react"
-import i18next from "i18next"
-import React from "react"
-import { useTranslation } from "react-i18next"
-import { RouterLinkButton } from "../../shared/navigation/router-link-button"
-import { SubNavBar } from "../navigation/sub-nav-bar"
+import { Box, Container, Flex, Heading, Link, Text, VStack } from '@chakra-ui/react';
+import { ArrowSquareOut } from '@phosphor-icons/react';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { RouterLinkButton } from '../../shared/navigation/router-link-button';
+import { SubNavBar } from '../navigation/sub-nav-bar';
+
+// Shared styles
+const textStyles = {
+  fontSize: '16px',
+  lineHeight: '27px',
+  color: 'text.primary',
+};
+
+const buttonHoverStyles = {
+  bg: 'greys.grey03',
+};
 
 export const SupportScreen = () => {
-  const { t } = useTranslation()
-  const mailto = `mailto:${t("site.contactEmail")}`
-  // const breadCrumb = [
-  //   {
-  //     href: "/get-support",
-  //     title: t("site.support.getSupport"),
-  //   },
-  // ]
+  const { t } = useTranslation();
 
-  const contactTeamInstructions = i18next.t("site.contactTeamInstructions", {
-    returnObjects: true,
-  }) as string[]
+  const { mailto, breadCrumb } = useMemo(
+    () => ({
+      mailto: `mailto:${t('site.contactEmail')}`,
+      breadCrumb: [
+        {
+          href: '/get-support',
+          title: t('site.support.getSupport'),
+        },
+      ],
+    }),
+    [t],
+  );
 
   return (
     <>
-      {/* <SubNavBar staticBreadCrumbs={breadCrumb} borderBottom={"none"} /> */}
-      <Container maxW="container.lg" p={8} gap={4}>
-        {/* Heading */}
-        <Heading as="h1" color="theme.blueAlt">
-          {t("site.support.getSupport")}
-        </Heading>
+      <SubNavBar staticBreadCrumbs={breadCrumb} borderBottom={'none'} />
+      <Container maxW="1170px" px={8} pt={16} pb={20}>
+        {/* Heading Section */}
+        <VStack align="flex-start" spacing={4} mb={16}>
+          <Heading as="h1" color="theme.blueAlt" fontSize="36px" fontWeight="700" lineHeight="49px">
+            {t('site.support.getSupport')}
+          </Heading>
+          <Text {...textStyles}>
+            {t('site.support.contactAt')}{' '}
+            <Link href={mailto} isExternal color="text.primary" aria-label={t('site.support.emailAriaLabel')}>
+              {t('site.support.contactTeamCTA')}
+            </Link>{' '}
+            {t('site.support.contactUs')}
+          </Text>
+        </VStack>
 
-        {/* Contact Information */}
-        <Text>
-          {t("site.support.contactAt")}
-          <Link href={mailto} isExternal ml={1}>
-            {t("site.support.contactTeamCTA")}
-          </Link>{" "}
-          {t("site.support.contactUs")}
-        </Text>
-
-        <Flex direction={{ base: "column", md: "row" }} mt={20} gap={8}>
-          <Flex direction="column" gap={4} flex={1}>
-            {/* Secondary Heading */}
-            <Heading as="h2" variant="greenline" color="theme.blueAlt">
-              {t("site.support.hereToHelp")}
+        {/* Two Column Layout */}
+        <Flex direction={{ base: 'column', lg: 'row' }} gap={10} align="flex-start">
+          {/* Left Column */}
+          <VStack as="main" align="flex-start" spacing={4} flex="1" maxW={{ base: '100%', lg: '715px' }}>
+            {/* Section 1: Get help with application */}
+            <Heading as="h2" {...textStyles} fontWeight="700">
+              {t('site.support.applicationHelpTitle')}
             </Heading>
-
-            <Text>
-              <strong>{t("site.support.speakWithEnergyCoach")}</strong>
-            </Text>
-            <Text>{t("site.support.anyQuestions")}</Text>
-            <RouterLinkButton
-              to={t("landing.additionalContent.energyCoachBookCallLink")}
-              variant="secondary"
-              rightIcon={<ArrowSquareOut size={16} />}
-            >
-              {t("site.support.bookACall")}
-            </RouterLinkButton>
-          </Flex>
-          {/* Instructions Section */}
-          <VStack as="section" borderRadius="md" width="350px" bg="theme.blueLightBg" maxWidth="full" p={8}>
             <Box>
-              <Text as="h2" color="theme.blueAlt" fontWeight="bold" lineHeight="normal">
-                {t("site.support.learnMore")}
+              <Text {...textStyles} mb={0}>
+                {t('site.support.applicationHelpDescription')}
               </Text>
-              <Text mt={4}>
-                {t("site.support.offers")}{" "}
-                <Link href={t("landing.iNeedLink")} isExternal>
-                  {t("site.support.betterHomes")} <ArrowSquareOut />
-                </Link>
+              <Text {...textStyles} mt={0} pt={0}>
+                {t('site.support.applicationHelpContactPrefix')}{' '}
+                <Link href={mailto} isExternal color="text.primary">
+                  {t('site.support.contactTeamCTA')}
+                </Link>{' '}
+                {t('site.support.applicationHelpContactSuffix')}
               </Text>
             </Box>
+
+            {/* Section 2: Get personalized upgrade advice */}
+            <Heading as="h3" {...textStyles} mt={4} fontWeight="700">
+              {t('site.support.personalizedAdviceTitle')}
+            </Heading>
+            <Text {...textStyles}>{t('site.support.personalizedAdviceDescription')}</Text>
+
+            {/* Button */}
+            <RouterLinkButton
+              to={t('landing.additionalContent.energyCoachBookCallLink')}
+              variant="secondary"
+              size="md"
+              px={3}
+              py={1.5}
+              fontSize="16px"
+              lineHeight="22px"
+              border="1px"
+              borderColor="border.randomBorderColorforthePublishModal"
+              bg="white"
+              color="text.primary"
+              _hover={buttonHoverStyles}
+              aria-label={t('site.support.bookAssessmentAriaLabel')}
+              mt={2}
+            >
+              {t('site.support.bookAssessmentButton')}
+            </RouterLinkButton>
           </VStack>
+
+          {/* Right Column - Learn More Card */}
+          <Box
+            as="aside"
+            bg="greys.offWhite"
+            borderRadius="8px"
+            p={8}
+            w={{ base: '100%', lg: '351px' }}
+            h="fit-content"
+            flexShrink={0}
+            role="complementary"
+            aria-labelledby="learn-more-heading"
+          >
+            <Heading
+              as="h2"
+              id="learn-more-heading"
+              color="theme.blueAlt"
+              fontSize="20px"
+              fontWeight="700"
+              lineHeight="34px"
+              mb={4}
+            >
+              {t('site.support.learnMoreTitle')}
+            </Heading>
+            <VStack align="flex-start" spacing={4}>
+              <Text {...textStyles}>{t('site.support.learnMoreDescription')}</Text>
+              <Flex align="center" gap={1}>
+                <Link
+                  href={t('landing.iNeedLink')}
+                  isExternal
+                  color="text.primary"
+                  textDecoration="underline"
+                  fontSize="16px"
+                  lineHeight="22px"
+                  aria-label={t('site.support.betterHomesLinkAriaLabel')}
+                >
+                  {t('site.support.betterHomesLinkText')}
+                </Link>
+                <ArrowSquareOut size={16} color="greys.anotherGrey" aria-hidden="true" />
+              </Flex>
+            </VStack>
+          </Box>
         </Flex>
       </Container>
     </>
-  )
-}
+  );
+};

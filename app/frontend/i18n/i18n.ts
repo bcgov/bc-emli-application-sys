@@ -2659,15 +2659,32 @@ const options = {
             contactAt: 'Contact us at',
             contactTeamCTA: 'betterhomesesp@clearresult.com',
             contactUs: 'or 1-833-856-0333 from 9 am - 5 pm, Monday - Friday (excluding statutory holidays).',
-            hereToHelp: 'We’re here to help',
+            hereToHelp: "We're here to help",
             speakWithEnergyCoach: 'Speak with an Energy Coach',
             anyQuestions:
               'Do you have questions about the program or home upgrade opportunities? Energy Coaches can help you understand home energy upgrades and rebates. Request a call from an Energy Coach for help or to register for the Savings Program by phone. Calls take about 20 minutes.',
             bookACall: 'Book a call',
             learnMore: 'Learn more about the Energy Savings Program',
             offers:
-              'The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It’s part the Province of B.C.’s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on',
+              "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It's part the Province of B.C.'s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
             betterHomes: 'Better Homes',
+            emailAriaLabel: 'Email us at betterhomesesp@clearresult.com',
+            applicationHelpTitle: 'Get help with your Energy Savings Program application',
+            applicationHelpDescription:
+              'Do you have questions about your application, the program or home upgrade opportunities? We can help you understand home energy upgrades and rebates. Calls usually take about 20 minutes.',
+            applicationHelpContactPrefix: 'Contact us at',
+            applicationHelpContactSuffix:
+              'or 1-833-856-0333 from 9 am - 5 pm, Monday - Friday (excluding statutory holidays).',
+            personalizedAdviceTitle: 'Get personalized upgrade advice',
+            personalizedAdviceDescription:
+              "For the highest level of support, an energy specialist can do a virtual walk-through of your home to provide advice on what upgrades are right for you. They'll also help you apply for ESP. Virtual assessments take about 60 minutes.",
+            bookAssessmentAriaLabel: 'Book a virtual energy assessment with a specialist (opens in new window)',
+            bookAssessmentButton: 'Book a virtual assessment',
+            learnMoreTitle: 'Learn more about the Energy Savings Program',
+            learnMoreDescription:
+              "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It's part of the Province of B.C.'s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
+            betterHomesLinkAriaLabel: 'Learn more about Better Homes Energy Savings Program (opens in new window)',
+            betterHomesLinkText: 'Better Homes.',
           },
           territorialAcknowledgement:
             'The B.C. Public Service acknowledges the territories of First Nations around B.C. and is grateful to carry out our work on these lands. We acknowledge thse rights, interests, priorities, and concerns of all Indigenous Peoples - First Nations, Métis, and Inuit - respecting and acknowledging their distinct cultures, histories, rights, laws, and governments.',
