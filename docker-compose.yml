@@ -12,6 +12,7 @@ x-env-vars: &default-env-vars
   CACHE_DEV_REDIS_URL: redis://redis:6379/4
   DEVISE_JWT_SECRET_KEY: supersecret
   DATABASE_URL: postgres://postgres:password@postgres:5432/app_development
+  CLAMAV_ENABLED: "false"
   ELASTICSEARCH_URL: http://elasticsearch:9200
 
 services:
@@ -35,11 +36,9 @@ services:
       - redis
       - elasticsearch
       - vite
-      - clamav
     environment:
       VITE_RUBY_HOST: vite
       IS_APP_SERVER: "true"
-      CLAMAV_ENABLED: "true"
       CLAMAV_HOST: "clamav"
       CLAMAV_PORT: "3310"
       CLAMAV_TIMEOUT: "30"
@@ -74,7 +73,6 @@ services:
       - .:/app
       - virus_scan_tmp:/tmp/virus_scan
     environment:
-      CLAMAV_ENABLED: "true"
       CLAMAV_HOST: "clamav"
       CLAMAV_PORT: "3310"
       CLAMAV_TIMEOUT: "30"
@@ -83,7 +81,6 @@ services:
     command: 'bundle exec sidekiq'
     depends_on:
       - app
-      - clamav
 
   anycable-rpc:
     image: hous-permit-portal-dev:latest
@@ -145,44 +142,44 @@ services:
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
 
-  # MinIO for local S3-compatible storage
-  minio:
-    image: minio/minio:latest
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin123
-    ports:
-      - '9000:9000'
-      - '9001:9001'
-    volumes:
-      - minio_data:/data
-    command: server /data --console-address ":9001"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
+  # MinIO for local S3-compatible storage (commented out for AWS S3 usage)
+  # minio:
+  #   image: minio/minio:latest
+  #   environment:
+  #     MINIO_ROOT_USER: minioadmin
+  #     MINIO_ROOT_PASSWORD: minioadmin123
+  #   ports:
+  #     - '9000:9000'
+  #     - '9001:9001'
+  #   volumes:
+  #     - minio_data:/data
+  #   command: server /data --console-address ":9001"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+  #     interval: 30s
+  #     timeout: 20s
+  #     retries: 3
 
   # ClamAV for virus scanning
-  clamav:
-    build: ./docker/clamav
-    ports:
-      - '3310:3310'
-    volumes:
-      - clamav_db:/var/lib/clamav
-      - virus_scan_tmp:/tmp/virus_scan
-    healthcheck:
-      test: ['CMD', '/usr/local/bin/health-check.sh']
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: unless-stopped
+  # clamav:
+  #   build: ./docker/clamav
+  #   ports:
+  #     - '3310:3310'
+  #   volumes:
+  #     - clamav_db:/var/lib/clamav
+  #     - virus_scan_tmp:/tmp/virus_scan
+  #   healthcheck:
+  #     test: ['CMD', '/usr/local/bin/health-check.sh']
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #   restart: unless-stopped
 
 
 volumes:
   postgres_data:
   redis_data:
   elasticsearch_data:
-  minio_data:
+  # minio_data:
   virus_scan_tmp:
   clamav_db:

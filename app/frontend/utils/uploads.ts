@@ -7,45 +7,47 @@ import { getCsrfToken } from './utility-functions';
 const sleep = (delay: number) => new Promise((resolve) => setTimeout(resolve, delay));
 
 export const uploadFile = async (file: File, fileName: string, progressCallback?: (event: ProgressEvent) => void) => {
+  // Use direct upload with presigned URLs
+  console.log('Using direct upload with presigned URLs');
+  return await directUpload(file, fileName, progressCallback);
+};
+
+// Direct upload function using presigned URLs
+export const directUpload = async (file: File, fileName: string, progressCallback?: (event: ProgressEvent) => void) => {
   try {
-    const numberOfParts = Math.ceil(file.size / FILE_UPLOAD_CHUNK_SIZE_IN_BYTES);
+    // Step 1: Request presigned URL
+    const presignResponse = await requestPresignedUrl(file, fileName);
 
-    let presignedData: any;
-    // Step 1: Request a pre-signed URL from your Shrine.rb backend
-    if (numberOfParts == 1) {
-      const response = await requestPresignedUrl(file, fileName);
-      if (!response.ok) {
-        throw new Error('Error on upload.');
-      }
-      presignedData = await response.json();
-      await uploadFileOneChunk(presignedData.signed_url, presignedData.headers, file);
-      return presignedData;
-    } else if (numberOfParts > MAX_NUMBER_OF_PARTS) {
-      throw new Error(`Chunk max exceeded`);
-    } else {
-      const initiateResponse = await requestMultipart(file, fileName);
-      const startMultipartResponse = await initiateResponse.json();
-      const { uploadId, key, headers } = startMultipartResponse;
-      const partNumbers = Array.from({ length: numberOfParts }, (_, i) => i + 1);
-      const getSignedUrls = await getMultipartSignedUrls(uploadId, key, partNumbers);
-      const { presignedUrls } = await getSignedUrls.json();
-
-      // Step 2: Upload the file directly to the storage service using the pre-signed URL
-      // Dell ECS S3 does not support POST object, we need to use PUT and chunked transfer encoding
-      const parts = await uploadFileInChunks(presignedUrls, headers, file, numberOfParts, progressCallback);
-      //if there is an error along the way, it will throw and an error
-      const completeResponse = await completeMultipart(uploadId, key, parts);
-      const parsedCompleteResponse = await completeResponse.json();
-      const { location } = parsedCompleteResponse;
-      import.meta.env.DEV &&
-        console.log('[DEV]', initiateResponse.headers, completeResponse.headers, {
-          url: location,
-          headers: headers,
-          key: key,
-        });
-      return { url: location, headers: headers, key: key };
+    if (!presignResponse.ok) {
+      throw new Error('Failed to get presigned URL');
     }
+
+    const presignData = await presignResponse.json();
+
+    // Step 2: Upload directly to S3 using the presigned URL
+    await uploadFileOneChunk(presignData.url, presignData.headers, file);
+
+    // Step 3: Call progress callback to indicate completion
+    if (progressCallback) {
+      progressCallback(new ProgressEvent('progress', { lengthComputable: true, loaded: 1, total: 1 }));
+    }
+
+    // Return the response in the same format as expected by the frontend
+    return {
+      id: presignData.key,
+      key: presignData.key,
+      storage: 'cache',
+      metadata: {
+        filename: fileName,
+        size: file.size,
+        mime_type: file.type,
+      },
+      url: presignData.url,
+      headers: presignData.headers,
+      signed_url: presignData.signed_url,
+    };
   } catch (error) {
+    console.error('Direct upload failed:', error);
     throw error;
   }
 };
@@ -55,7 +57,7 @@ export const requestPresignedUrl = async (file: File, fileName: string) => {
     const params = new URLSearchParams({
       filename: fileName,
       type: file.type,
-      size: file.size,
+      size: file.size.toString(),
       // checksum: file.checksum,
     });
 
@@ -135,7 +137,7 @@ export const getMultipartSignedUrls = async (uploadId: string, key: string, part
   try {
     const params = new URLSearchParams({
       key: key,
-      partNumbers: partNumbers,
+      partNumbers: partNumbers.join(','),
     });
     return fetch(`/api/storage/s3/multipart/${uploadId}/batch?${params.toString()}`, {
       method: 'GET',

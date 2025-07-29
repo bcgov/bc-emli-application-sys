@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_15_200000) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_28_190120) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -63,6 +63,32 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_15_200000) do
     t.jsonb "data_after"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id"
+    t.index ["action"], name: "idx_audit_logs_action"
+    t.index ["created_at"], name: "idx_audit_logs_created_at"
+    t.index %w[table_name created_at], name: "idx_audit_logs_table_created"
+    t.index %w[user_id created_at],
+            name: "idx_audit_logs_user_created",
+            where: "(user_id IS NOT NULL)"
+    t.index ["user_id"], name: "index_audit_logs_on_user_id"
+  end
+
+  create_table "aws_credentials",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.string "name", null: false
+    t.text "access_key_id", null: false
+    t.text "secret_access_key", null: false
+    t.text "session_token"
+    t.datetime "expires_at", null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "encryption_key_id"
+    t.index ["active"], name: "index_aws_credentials_on_active"
+    t.index ["expires_at"], name: "index_aws_credentials_on_expires_at"
+    t.index ["name"], name: "index_aws_credentials_on_name", unique: true
   end
 
   create_table "collaborators",
@@ -823,7 +849,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_15_200000) do
     t.text "virus_scan_message"
     t.datetime "virus_scan_started_at"
     t.datetime "virus_scan_completed_at"
-    t.string "virus_name"
     t.index ["permit_application_id"],
             name: "index_step_codes_on_permit_application_id"
     t.index ["virus_scan_completed_at"],
@@ -1062,6 +1087,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_15_200000) do
   add_foreign_key "allowlisted_jwts", "users", on_delete: :cascade
   add_foreign_key "application_assignments", "permit_applications"
   add_foreign_key "application_assignments", "users"
+  add_foreign_key "audit_logs", "users"
   add_foreign_key "collaborators", "users"
   add_foreign_key "early_access_previews", "users", column: "previewer_id"
   add_foreign_key "external_api_keys", "jurisdictions"

@@ -22,3 +22,9 @@ cleanup_stuck_scans:
   queue: default
   active_job: true
 
+aws_credential_refresh:
+  cron: "0 0 */2 * * America/Vancouver" # Runs every 2 days at midnight Vancouver time
+  class: "AwsCredentialRefreshJob"
+  queue: default
+  active_job: true
+

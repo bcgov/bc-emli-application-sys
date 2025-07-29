@@ -14,6 +14,21 @@ class FileUploader < Shrine
 
     Rails.logger.info "Performing immediate virus scan with database storage for: #{file.original_filename}"
 
+    # Check if ClamAV service is reachable before proceeding
+    unless ClamAvService.ping
+      Rails.logger.error "ClamAV service is not reachable, skipping virus scan for development"
+      if Rails.env.development?
+        Rails.logger.warn "Skipping virus scan in development due to ClamAV unavailability"
+        next
+      else
+        errors << I18n.t(
+          "file_upload.virus_scan.service_unavailable",
+          default: "Virus scanning service unavailable"
+        )
+        next
+      end
+    end
+
     begin
       # Create temporary file for scanning
       temp_file =
