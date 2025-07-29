@@ -26,6 +26,8 @@ const AdminInviteScreen = lazy(() =>
   import('../users/admin-invite-screen').then((module) => ({ default: module.AdminInviteScreen })),
 );
 
+const AuditLogScreen = lazy(() => import('../audit-log').then((module) => ({ default: module.AuditLogScreen })));
+
 const ExternalApiKeyModalSubRoute = lazy(() =>
   import('../external-api-key/external-api-key-modal-sub-route').then((module) => ({
     default: module.ExternalApiKeyModalSubRoute,
@@ -395,6 +397,7 @@ const AppRoutes = observer(() => {
       <Route path="/configuration-management/landing-setup" element={<LandingSetupScreen />} />
       <Route path="/configuration-management/users" element={<AdminUserIndexScreen />} />
       <Route path="/configuration-management/users/invite" element={<AdminInviteScreen />} />
+      <Route path="/audit-log" element={<AuditLogScreen />} />
       <Route path="/reporting" element={<ReportingScreen />} />
       <Route path="/reporting/export-template-summary" element={<ExportTemplateSummaryScreen />} />
       <Route path="/early-access" element={<EarlyAccessScreen />} />
@@ -406,6 +409,7 @@ const AppRoutes = observer(() => {
       <Route path="/configure-users" element={<ProgramsIndexScreen />} />
       <Route path="/configure-users/:programId/users" element={<ProgramUserIndexScreen />} />
       <Route path="/configure-users/:programId/invite" element={<ProgramInviteUserScreen />} />
+      <Route path="/audit-log" element={<AuditLogScreen />} />
     </>
   );
 
@@ -462,7 +466,7 @@ const AppRoutes = observer(() => {
   );
 
   //const mustAcceptEula = loggedIn && !currentUser.eulaAccepted && !currentUser.isSuperAdmin;
-  const mustAcceptEula = loggedIn && !currentUser.eulaAccepted;
+  const mustAcceptEula = loggedIn && currentUser && !currentUser.eulaAccepted;
   return (
     <>
       <Routes location={background || location}>
@@ -470,7 +474,7 @@ const AppRoutes = observer(() => {
           // Onboarding step 1: EULA
           <Route path="/" element={<EULAScreen />} />
         )}
-        {loggedIn && currentUser.eulaAccepted && !currentUser.isReviewed && (
+        {loggedIn && currentUser && currentUser.eulaAccepted && !currentUser.isReviewed && (
           // Onboarding step 2: confirm email
           <Route path="/" element={<ProfileScreen />} />
         )}
@@ -507,7 +511,9 @@ const AppRoutes = observer(() => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={loggedIn && !mustAcceptEula && (currentUser.isAdminManager || currentUser.isSuperAdmin)}
+              isAllowed={
+                loggedIn && !mustAcceptEula && currentUser && (currentUser.isAdminManager || currentUser.isSuperAdmin)
+              }
               redirectPath={(mustAcceptEula && '/') || (loggedIn && '/not-found')}
             />
           }
@@ -517,7 +523,10 @@ const AppRoutes = observer(() => {
 
         <Route
           element={
-            <ProtectedRoute isAllowed={loggedIn && currentUser.isSuperAdmin} redirectPath={loggedIn && '/not-found'} />
+            <ProtectedRoute
+              isAllowed={loggedIn && currentUser && currentUser.isSuperAdmin}
+              redirectPath={loggedIn && '/not-found'}
+            />
           }
         >
           {superAdminOnlyRoutes}
@@ -526,7 +535,9 @@ const AppRoutes = observer(() => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={loggedIn && !mustAcceptEula && (currentUser.isAdminManager || currentUser.isAdmin)}
+              isAllowed={
+                loggedIn && !mustAcceptEula && currentUser && (currentUser.isAdminManager || currentUser.isAdmin)
+              }
               redirectPath={(mustAcceptEula && '/') || (loggedIn && '/not-found')}
             />
           }
@@ -537,7 +548,9 @@ const AppRoutes = observer(() => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={loggedIn && !mustAcceptEula && currentUser.isReviewStaff && !currentUser.isReviewer}
+              isAllowed={
+                loggedIn && !mustAcceptEula && currentUser && currentUser.isReviewStaff && !currentUser.isReviewer
+              }
               redirectPath={(mustAcceptEula && '/') || (loggedIn && '/not-found')}
             />
           }

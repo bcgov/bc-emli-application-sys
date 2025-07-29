@@ -755,3 +755,15 @@ en:
       scan_error_production: 'File upload temporarily unavailable due to security scanning issues. Please try again later.'
       scan_error_development: 'File upload allowed despite scan error in development mode.'
       unknown_virus: 'Unknown virus'
+  audit_log:
+    created_record: 'Record created'
+    created_with_field: 'Created with %{field}: %{value}'
+    updated_record: 'Record updated'
+    changed_field: 'Changed %{field} from %{from} to %{to}'
+    deleted_record: 'Record deleted'
+    removed_field: 'Removed %{field}: %{value}'
+    user_logged_in: 'User logged in'
+    login_from_ip: 'Login from IP: %{ip}'
+    login_count: 'Total logins: %{count}'
+    applications: 'applications'
+
