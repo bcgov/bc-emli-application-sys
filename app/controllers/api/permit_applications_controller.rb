@@ -202,6 +202,19 @@ class Api::PermitApplicationsController < Api::ApplicationController
     authorize @permit_application
     success = @permit_application.update(supporting_document_params)
     if success
+      # Send websocket update to refresh supporting documents immediately
+      WebsocketBroadcaster.push_update_to_relevant_users(
+        @permit_application.notifiable_users.pluck(:id),
+        Constants::Websockets::Events::PermitApplication::DOMAIN,
+        Constants::Websockets::Events::PermitApplication::TYPES[
+          :update_supporting_documents
+        ],
+        PermitApplicationBlueprint.render_as_hash(
+          @permit_application.reload,
+          { view: :supporting_docs_update, current_user: current_user }
+        )
+      )
+
       regex_pattern =
         "(#{supporting_document_params["supporting_documents_attributes"].map { |spd| spd.dig("file", "id") }.compact.join("|")})$"
       render_success @permit_application.supporting_documents.file_ids_with_regex(
@@ -411,9 +424,8 @@ class Api::PermitApplicationsController < Api::ApplicationController
 
   def generate_missing_pdfs
     authorize @permit_application
-    # Commented out because we are not generating any PDF's right now. Maybe later
-    # ZipfileJob.perform_async(@permit_application.id)
-    # head :ok
+    ZipfileJob.perform_async(@permit_application.id)
+    head :ok
   end
 
   def finalize_revision_requests

@@ -415,7 +415,7 @@ export const PermitApplicationStoreModel = types
           document.dispatchEvent(event);
           break;
         case EPermitApplicationSocketEventTypes.updateSupportingDocuments:
-          payloadData = payload.data as IEnergySavingsApplicationSupportingDocumentsUpdate;
+          payloadData = payload.data as IPermitApplicationSupportingDocumentsUpdate;
 
           self.permitApplicationMap.get(payloadData?.id)?.handleSocketSupportingDocsUpdate(payloadData);
           break;

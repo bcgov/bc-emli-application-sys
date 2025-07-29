@@ -28,19 +28,125 @@ SHRINE_USE_S3 =
       ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"].blank?
   )
 
+Rails.logger.info "Shrine S3 enabled: #{SHRINE_USE_S3}"
 if SHRINE_USE_S3
+  Rails.logger.info "Storage endpoint: #{ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"]}"
+end
+
+if SHRINE_USE_S3
+  # Dynamic credentials provider that fetches from database
+  def get_aws_credentials
+    db_credentials = AwsCredential.current_s3_credentials if defined?(
+      AwsCredential
+    )
+
+    if db_credentials && !Rails.env.test?
+      Rails.logger.info "Using AWS credentials from database (expires: #{db_credentials[:expires_at]})"
+      {
+        access_key_id: db_credentials[:access_key_id],
+        secret_access_key: db_credentials[:secret_access_key],
+        session_token: db_credentials[:session_token]
+      }
+    else
+      Rails.logger.info "Using AWS credentials from environment variables"
+      {
+        access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
+        secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
+        session_token: nil
+      }
+    end
+  end
+
+  credentials = get_aws_credentials
+
   s3_options = {
     bucket: ENV["BCGOV_OBJECT_STORAGE_BUCKET"],
     endpoint: ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"],
-    region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "no-region-needed", # We are using Object Storage which does not require this, put in a dummy variable.  For dev testing will need a region.
-    access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
-    secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
+    region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "no-region-needed",
+    access_key_id: credentials[:access_key_id],
+    secret_access_key: credentials[:secret_access_key],
+    session_token: credentials[:session_token],
     force_path_style: true
-  }
+  }.compact
+
+  # Create bucket if using local MinIO (development)
+  if Rails.env.development? &&
+       ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"]&.include?("minio")
+    begin
+      s3_client = Aws::S3::Client.new(s3_options.except(:bucket))
+      bucket_name = s3_options[:bucket]
+
+      unless s3_client.list_buckets.buckets.any? { |b| b.name == bucket_name }
+        s3_client.create_bucket(bucket: bucket_name)
+        Rails.logger.info "Created MinIO bucket: #{bucket_name}"
+
+        # Set public read policy for uploads
+        s3_client.put_bucket_policy(
+          bucket: bucket_name,
+          policy: {
+            "Version" => "2012-10-17",
+            "Statement" => [
+              {
+                "Effect" => "Allow",
+                "Principal" => "*",
+                "Action" => "s3:GetObject",
+                "Resource" => "arn:aws:s3:::#{bucket_name}/*"
+              }
+            ]
+          }.to_json
+        )
+        Rails.logger.info "Set public read policy for bucket: #{bucket_name}"
+      end
+    rescue => e
+      Rails.logger.warn "Could not create/configure MinIO bucket: #{e.message}"
+    end
+  end
+
+  # Create custom S3 storage class that can refresh credentials dynamically
+  class DynamicS3Storage < Shrine::Storage::S3
+    def initialize(**options)
+      super(**options)
+    end
+
+    # Reset client to force credential refresh
+    def refresh_client!
+      @client = nil
+      Rails.logger.info "S3 client refreshed"
+    end
+
+    private
+
+    # Override the client method to provide fresh credentials
+    def client
+      @client ||=
+        begin
+          # Get fresh credentials from database
+          if defined?(AwsCredential) && !Rails.env.test?
+            db_credentials = AwsCredential.current_s3_credentials
+            if db_credentials
+              Rails.logger.debug "Refreshing S3 client with database credentials"
+              Aws::S3::Client.new(
+                endpoint: @options[:endpoint],
+                region: @options[:region],
+                access_key_id: db_credentials[:access_key_id],
+                secret_access_key: db_credentials[:secret_access_key],
+                session_token: db_credentials[:session_token],
+                force_path_style: @options[:force_path_style]
+              )
+            else
+              Rails.logger.warn "No database credentials available, using environment"
+              super
+            end
+          else
+            super
+          end
+        end
+    end
+  end
+
   Shrine.storages = {
-    cache:
-      Shrine::Storage::S3.new(public: false, prefix: "cache", **s3_options),
-    store: Shrine::Storage::S3.new(public: false, **s3_options)
+    cache: DynamicS3Storage.new(public: false, prefix: "cache", **s3_options),
+    store: DynamicS3Storage.new(public: false, **s3_options)
   }
 else
   Shrine.storages = {
@@ -78,7 +184,14 @@ Shrine.plugin :presign_endpoint,
                     # transfer_encoding: "chunked",
                   }
                 }
-Shrine.plugin :uppy_s3_multipart if SHRINE_USE_S3
+if SHRINE_USE_S3
+  Shrine.plugin :uppy_s3_multipart,
+                options: {
+                  endpoint:
+                    ENV["BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT"] ||
+                      ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"]
+                }
+end
 
 class Shrine::Storage::S3
   #https://github.com/transloadit/uppy/blob/960362b373666b18a6970f3778ee1440176975af/packages/%40uppy/companion/src/server/controllers/s3.js#L105
@@ -92,8 +205,25 @@ class Shrine::Storage::S3
     obj = object(id)
 
     #chunking handled by uppy
-    signed_url = obj.presigned_url(:put, options)
-    url = Shrine.storages[:cache].url(id, public: false, expires_in: 3600)
+    # Use public endpoint for presigned URLs if available
+    if ENV["BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT"].present?
+      # Create a temporary S3 client with public endpoint for presigned URLs
+      public_client =
+        Aws::S3::Client.new(
+          endpoint: ENV["BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT"],
+          region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "no-region-needed",
+          access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
+          secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
+          force_path_style: true
+        )
+      public_resource = Aws::S3::Resource.new(client: public_client)
+      public_obj = public_resource.bucket(bucket.name).object(obj.key)
+      signed_url = public_obj.presigned_url(:put, options)
+    else
+      signed_url = obj.presigned_url(:put, options)
+    end
+
+    url = signed_url
     # When any of these options are specified, the corresponding request
     # headers must be included in the upload request.
     headers = {}

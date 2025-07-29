@@ -3,6 +3,10 @@ class SupportingDocument < ApplicationRecord
   belongs_to :submission_version, optional: true
 
   include FileUploader.Attachment(:file)
+  include VirusScannable
+
+  # Virus scanning is now handled immediately during upload validation
+  # No background job scheduling needed
 
   validate :validate_submission_version_data_key
 
@@ -145,5 +149,11 @@ class SupportingDocument < ApplicationRecord
         "activerecord.errors.models.supporting_document.attributes.data_key.submission_version_data_key"
       )
     )
+  end
+
+  private
+
+  def file_changed?
+    file_data_changed?
   end
 end

@@ -1,22 +1,22 @@
-import { Button, Flex, FormControl, FormLabel, HStack, Heading, IconButton, VStack } from "@chakra-ui/react"
-import { Plus, X } from "@phosphor-icons/react"
-import { t } from "i18next"
-import React, { useState } from "react"
-import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form"
-import { useParams } from "react-router-dom"
-import { useMst } from "../../../setup/root"
-import { uploadFile } from "../../../utils/uploads"
-import { FileFormControl, NumberFormControl } from "../../shared/form/input-form-control"
-import { CompliancePathSelect } from "./compliance-path-select"
+import { Button, Flex, FormControl, FormLabel, HStack, Heading, IconButton, VStack } from '@chakra-ui/react';
+import { Plus, X } from '@phosphor-icons/react';
+import { t } from 'i18next';
+import React, { useState } from 'react';
+import { Controller, FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
+import { useMst } from '../../../setup/root';
+import { uploadFile } from '../../../utils/uploads';
+import { FileFormControl, NumberFormControl } from '../../shared/form/input-form-control';
+import { CompliancePathSelect } from './compliance-path-select';
 
 export const H2KImport = function StepCodeH2kImport() {
   const {
     stepCodeStore: { createStepCode },
-  } = useMst()
-  const { permitApplicationId } = useParams()
+  } = useMst();
+  const { permitApplicationId } = useParams();
 
-  const [isUploading, setIsUploading] = useState<Record<number, boolean>>({})
-  const areAllUploaded = Object.values(isUploading).every((loading) => loading === false)
+  const [isUploading, setIsUploading] = useState<Record<number, boolean>>({});
+  const areAllUploaded = Object.values(isUploading).every((loading) => loading === false);
 
   const dataEntryAttributes = {
     districtEnergyEf: null,
@@ -25,71 +25,78 @@ export const H2KImport = function StepCodeH2kImport() {
     otherGhgConsumption: null,
     h2kFile: null,
     h2kLocal: null,
-  }
+  };
 
   const formMethods = useForm({
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
       permitApplicationId,
       preConstructionChecklistAttributes: { compliancePath: null },
       dataEntriesAttributes: [dataEntryAttributes],
     },
-  })
+  });
 
-  const { control, handleSubmit, setValue, setError, clearErrors, formState } = formMethods
-  const { isValid, isSubmitting } = formState
+  const { control, handleSubmit, setValue, setError, clearErrors, formState } = formMethods;
+  const { isValid, isSubmitting } = formState;
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "dataEntriesAttributes",
-  })
+    name: 'dataEntriesAttributes',
+  });
 
   const handleAddData = () => {
-    append(dataEntryAttributes)
-  }
+    append(dataEntryAttributes);
+  };
 
   const handleRemoveData = (index) => {
-    remove(index)
-  }
+    remove(index);
+  };
 
   const onSubmit = async (values) => {
-    await createStepCode(values)
+    await createStepCode(values);
     // setStep(2)
     // navigate(`${stepCode.id}/checklists/${stepCode.preConstructionChecklist.id}`)
-  }
+  };
 
   const onUploadFile = async (event, index) => {
-    const file = event.target.files[0]
+    const file = event.target.files[0];
     try {
-      setIsUploading({ ...isUploading, [index]: true })
-      const presignedData = await uploadFile(file, file.name)
+      setIsUploading({ ...isUploading, [index]: true });
+      // Show console message for large files
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB
+        console.log(
+          `🔄 Uploading large file: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB) - This may take a few moments`,
+        );
+      }
+      const presignedData = await uploadFile(file, file.name);
 
       setValue(
         `dataEntriesAttributes.${index}.h2kFile`,
         {
-          id: presignedData?.key.replace(/^cache\//, ""),
-          storage: "cache",
+          id: presignedData?.key.replace(/^cache\//, ''),
+          storage: 'cache',
           metadata: {
             filename: file.name,
             size: file.size,
             mime_type: file.type,
-            content_disposition: presignedData?.headers?.["Content-Disposition"],
+            content_disposition: presignedData?.headers?.['Content-Disposition'],
           },
         },
-        { shouldValidate: true }
-      )
+        { shouldValidate: true },
+      );
 
-      clearErrors(`dataEntriesAttributes.${index}.h2kLocal`)
+      clearErrors(`dataEntriesAttributes.${index}.h2kLocal`);
     } catch (e) {
-      setError(`dataEntriesAttributes.${index}.h2kLocal`, { type: "manual", message: "Failed to upload file." })
+      setError(`dataEntriesAttributes.${index}.h2kLocal`, { type: 'manual', message: 'Failed to upload file.' });
     } finally {
-      setIsUploading({ ...isUploading, [index]: false })
+      setIsUploading({ ...isUploading, [index]: false });
     }
-  }
+  };
 
   return (
     <Flex direction="column" w="full" p={6} gap={6} borderWidth={1} borderColor="border.light" rounded="base">
       <Heading as="h4" fontSize="lg">
-        {t("stepCode.import.title")}
+        {t('stepCode.import.title')}
       </Heading>
       <FormProvider {...formMethods}>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -101,10 +108,10 @@ export const H2KImport = function StepCodeH2kImport() {
               render={({ field: { onChange, value } }) => {
                 return (
                   <FormControl>
-                    <FormLabel>{t("stepCode.import.compliancePath.label")}</FormLabel>
+                    <FormLabel>{t('stepCode.import.compliancePath.label')}</FormLabel>
                     <CompliancePathSelect onChange={onChange} value={value} />
                   </FormControl>
-                )
+                );
               }}
             />
             {fields.map((field, index) => (
@@ -112,11 +119,11 @@ export const H2KImport = function StepCodeH2kImport() {
                 <HStack w="full" align="start">
                   <FileFormControl
                     inputProps={{ key: field.id, borderWidth: 0, p: 0 }}
-                    label={t("stepCode.import.selectFile")}
+                    label={t('stepCode.import.selectFile')}
                     fieldName={`dataEntriesAttributes.${index}.h2kLocal`}
                     required
                     onChange={(e) => {
-                      onUploadFile(e, index)
+                      onUploadFile(e, index);
                     }}
                   />
 
@@ -136,12 +143,12 @@ export const H2KImport = function StepCodeH2kImport() {
                   <HStack w="full">
                     <NumberFormControl
                       key={field.id}
-                      label={t("stepCode.import.districtEnergyEF")}
+                      label={t('stepCode.import.districtEnergyEF')}
                       fieldName={`dataEntriesAttributes.${index}.districtEnergyEf`}
                     />
                     <NumberFormControl
                       inputProps={{ key: field.id }}
-                      label={t("stepCode.import.districtEnergyConsumption")}
+                      label={t('stepCode.import.districtEnergyConsumption')}
                       fieldName={`dataEntriesAttributes.${index}.districtEnergyConsumption`}
                     />
                   </HStack>
@@ -149,12 +156,12 @@ export const H2KImport = function StepCodeH2kImport() {
                 <HStack w="full">
                   <NumberFormControl
                     inputProps={{ key: field.id }}
-                    label={t("stepCode.import.otherGhgEf")}
+                    label={t('stepCode.import.otherGhgEf')}
                     fieldName={`dataEntriesAttributes.${index}.otherGhgEf`}
                   />
                   <NumberFormControl
                     inputProps={{ key: field.id }}
-                    label={t("stepCode.import.otherGhgConsumption")}
+                    label={t('stepCode.import.otherGhgConsumption')}
                     fieldName={`dataEntriesAttributes.${index}.otherGhgConsumption`}
                   />
                 </HStack>
@@ -162,7 +169,7 @@ export const H2KImport = function StepCodeH2kImport() {
             ))}
 
             <Button onClick={handleAddData} leftIcon={<Plus />} w="full">
-              {t("stepCode.import.addData")}
+              {t('stepCode.import.addData')}
             </Button>
 
             <Button
@@ -172,11 +179,11 @@ export const H2KImport = function StepCodeH2kImport() {
               isDisabled={!isValid || isSubmitting || !areAllUploaded}
               isLoading={isSubmitting}
             >
-              {t("stepCode.import.create")}
+              {t('stepCode.import.create')}
             </Button>
           </VStack>
         </form>
       </FormProvider>
     </Flex>
-  )
-}
+  );
+};
