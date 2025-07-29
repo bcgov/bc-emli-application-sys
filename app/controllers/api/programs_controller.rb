@@ -149,12 +149,11 @@ class Api::ProgramsController < Api::ApplicationController
     # Check if `all_users` is passed true
     if ActiveModel::Type::Boolean.new.cast(params[:all_users])
       authorized_results = @user_search.results
+      total_count = @user_search.total_count
     else
-      authorized_results =
-        apply_search_authorization(
-          @user_search.results,
-          "search_program_membership_users"
-        )
+      # Authorization filtering (participants/contractors) moved to perform_user_search in program_users.rb to fix pagination
+      authorized_results = @user_search.results
+      total_count = @user_search.total_count
     end
 
     render_success authorized_results,
@@ -162,7 +161,7 @@ class Api::ProgramsController < Api::ApplicationController
                    {
                      meta: {
                        total_pages: @user_search.total_pages,
-                       total_count: @user_search.total_count,
+                       total_count: total_count,
                        current_page: @user_search.current_page
                      },
                      blueprint: UserBlueprint,

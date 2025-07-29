@@ -99,11 +99,12 @@ export const LoginForm = ({ handleSubmit }) => {
       </form>
       <Box>
         <HStack>
-          <Text>
+          <Text whiteSpace="pre-line">
+            {t('auth.adminPortalLoginInfo.trouble.beforeLink')}
             <Link href={t('auth.adminPortalLoginInfo.trouble.link')} color="text.primary" isExternal>
-              {t('auth.adminPortalLoginInfo.trouble.linkText')}{' '}
+              {t('auth.adminPortalLoginInfo.trouble.linkText')}
             </Link>
-            {t('auth.adminPortalLoginInfo.trouble.text')}
+            {t('auth.adminPortalLoginInfo.trouble.afterLink')}
           </Text>
         </HStack>
       </Box>

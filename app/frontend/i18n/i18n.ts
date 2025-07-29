@@ -37,9 +37,11 @@ const options = {
             login: 'You must authenticate with an IDIR account to use this system.',
             button: 'Log in with IDIR account',
             trouble: {
-              link: 'https://www.bceid.ca/clp/account_recovery.aspx',
-              linkText: 'Click here',
-              text: ' if you are having trouble logging in using IDIR.',
+              beforeLink: 'IDIR users who have registered for MFA may reset their password via ',
+              linkText: 'Self Service Password Reset',
+              afterLink:
+                '\n\nIf you are not MFA registered, or require additional assistance, please contact your IDIR security administrator or the OCIO IT Service Desk at:\nPhone: 250-387-7000\nEmail: 77000@gov.bc.ca',
+              link: 'https://passwordreset.microsoftonline.com/',
             },
             noAccount: {
               text: 'Don’t have an IDIR account?',
@@ -483,6 +485,7 @@ const options = {
           autofill: 'Autofill',
           help: 'Help',
           contact: 'Contact',
+          openHelpDrawer: 'Open help drawer',
           contactSupport: 'Contact Support',
           pleaseSelect: 'Please select',
           checked: 'Checked',
@@ -2653,24 +2656,68 @@ const options = {
             phoneHoursNote: '(excluding statutory holidays).',
             emailTitle: 'Email',
             emailAddress: 'betterhomesep@clearesult.com',
+            groundOrientedTitle: 'Ground-oriented home types',
+            groundOrientedEmail: 'BetterHomesESP@clearesult.com',
+            groundOrientedEmailAriaLabel: 'Email us about ground-oriented home types at BetterHomesESP@clearesult.com',
+            multiUnitTitle: 'Multi-unit home types',
+            multiUnitEmail: 'ESPcondoapartment@CLEAResult.com',
+            multiUnitEmailAriaLabel: 'Email us about multi-unit home types at ESPcondoapartment@CLEAResult.com',
+            singleFamilyHome: 'Single family home',
+            secondarySuite: 'Secondary suite in a single family home',
+            duplexTriplex: 'Duplex, triplex, 4-5 unit multiplex',
+            rowTownhome: 'Row or side-by-side townhome',
+            manufacturedHome: 'Manufactured / mobile home',
+            apartmentCondo: 'Apartment, condo and mixed unit buildings',
+            stackedTownhouse: 'Stacked townhouse building',
+            multiplexes: 'Multiplexes with 6 or more units',
           },
           support: {
             getSupport: 'Get support',
             contactAt: 'Contact us at',
             contactTeamCTA: 'betterhomesesp@clearresult.com',
             contactUs: 'or 1-833-856-0333 from 9 am - 5 pm, Monday - Friday (excluding statutory holidays).',
-            hereToHelp: 'We’re here to help',
+            hereToHelp: "We're here to help",
             speakWithEnergyCoach: 'Speak with an Energy Coach',
             anyQuestions:
               'Do you have questions about the program or home upgrade opportunities? Energy Coaches can help you understand home energy upgrades and rebates. Request a call from an Energy Coach for help or to register for the Savings Program by phone. Calls take about 20 minutes.',
             bookACall: 'Book a call',
             learnMore: 'Learn more about the Energy Savings Program',
             offers:
-              'The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It’s part the Province of B.C.’s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on',
+              "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It's part the Province of B.C.'s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
             betterHomes: 'Better Homes',
+            emailAriaLabel: 'Email us at betterhomesesp@clearresult.com',
+            applicationHelpTitle: 'Get help with your Energy Savings Program application',
+            applicationHelpDescription:
+              'Do you have questions about your application, the program or home upgrade opportunities? We can help you understand home energy upgrades and rebates. Calls usually take about 20 minutes.',
+            applicationHelpContactPrefix: 'Contact us at',
+            applicationHelpContactSuffix:
+              'or 1-833-856-0333 from 9 am - 5 pm, Monday - Friday (excluding statutory holidays).',
+            personalizedAdviceTitle: 'Get personalized upgrade advice',
+            personalizedAdviceDescription:
+              "For the highest level of support, an energy specialist can do a virtual walk-through of your home to provide advice on what upgrades are right for you. They'll also help you apply for ESP. Virtual assessments take about 60 minutes.",
+            bookAssessmentAriaLabel: 'Book a virtual energy assessment with a specialist (opens in new window)',
+            bookAssessmentButton: 'Book a virtual assessment',
+            learnMoreTitle: 'Learn more about the Energy Savings Program',
+            learnMoreDescription:
+              "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It's part of the Province of B.C.'s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
+            betterHomesLinkAriaLabel: 'Learn more about Better Homes Energy Savings Program (opens in new window)',
+            betterHomesLinkText: 'Better Homes.',
+            contactInfo:
+              'Contact us at 1-833-856-0333 from 9 am - 5 pm, Monday - Friday (excluding statutory holidays).',
+            applicationHelpTitleShort: 'Get help with your Energy Savings Program application',
+            applicationHelpDescriptionShort:
+              'Do you have questions about your application, the program or home upgrade opportunities? We can help you understand home energy upgrades and rebates by email, or you can schedule a call with an Energy Savings Program Specialist.',
+            groundOrientedEmail: 'BetterHomesESP@CLEAResult.com',
+            multiUnitEmail: 'ESPcondoapartment@CLEAResult.com',
+            groundOrientedLabel: 'Ground-oriented home types:',
+            multiUnitLabel: 'Condo, apartment and other multi-unit home types:',
+            learnMoreTitleShort: 'Learn more about the Energy Savings Program',
+            learnMoreDescriptionShort:
+              "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It's part of the Province of B.C.'s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
+            betterHomesLinkTextShort: 'Better Homes',
           },
           territorialAcknowledgement:
-            'The B.C. Public Service acknowledges the territories of First Nations around B.C. and is grateful to carry out our work on these lands. We acknowledge thse rights, interests, priorities, and concerns of all Indigenous Peoples - First Nations, Métis, and Inuit - respecting and acknowledging their distinct cultures, histories, rights, laws, and governments.',
+            'The B.C. Public Service acknowledges the territories of First Nations around B.C. and is grateful to carry out our work on these lands. We acknowledge these rights, interests, priorities, and concerns of all Indigenous Peoples - First Nations, Métis, and Inuit - respecting and acknowledging their distinct cultures, histories, rights, laws, and governments.',
           // privacyAndTermsPrefix: "This site is protected by reCAPTCHA and the Google",
           // midText: "and",
           // privacyText: "Privacy Policy",
@@ -2775,6 +2822,7 @@ const options = {
             digitalBuildingPermits: 'Digital building permits',
             contact: 'Contact us',
             configurationManagement: 'Configuration management',
+            auditLog: 'Audit log',
             energyStep: 'Energy Step Code requirements',
             submissionsInboxSetup: 'Submissions inbox setup',
             confirmed: 'E-mail confirmed',
@@ -2802,6 +2850,54 @@ const options = {
           baseMessage: `This field has Auto-Compliance capability`,
           defaultValueMessage: `Auto-Compliance found the default value to be "{{defaultValue}}".`,
           failedValueMessage: `Auto-Compliance was unable fill this field, please check with your local jurisdiction if this is required.`,
+        },
+        auditLog: {
+          title: 'Audit Log',
+          audit_log: 'Audit Log',
+          export_csv: 'Export as .csv',
+
+          // Table columns
+          who: 'Who',
+          action: 'Action',
+          where: 'Where',
+          details: 'Details',
+          timestamp: 'Timestamp (PST)',
+
+          // Filtering
+          filter: 'Filter',
+          filter_by_action: 'Filter by Action',
+          filter_by_user: 'Filter by User',
+          filter_by_table: 'Filter by Table',
+          filter_by_date: 'Filter by Date',
+          date_range: 'Date Range',
+          clear_filters: 'Clear All Filters',
+          all_actions: 'All actions',
+          all_users: 'All users',
+          all_tables: 'All tables',
+          from_date: 'From date',
+          to_date: 'To date',
+
+          // Table name displays
+          applications: 'applications',
+
+          // Record operations (from backend translations)
+          created_record: 'Record created',
+          created_with_field: 'Created with {{field}}: {{value}}',
+          updated_record: 'Record updated',
+          changed_field: 'Changed {{field}} from {{from}} to {{to}}',
+          deleted_record: 'Record deleted',
+          removed_field: 'Removed {{field}}: {{value}}',
+
+          // Login tracking
+          user_logged_in: 'User logged in',
+          login_from_ip: 'Login from IP: {{ip}}',
+          login_count: 'Total logins: {{count}}',
+
+          // UI messages
+          total_items: '{{count}} total items',
+          no_data: 'No audit logs found',
+          unknown_user: 'Unknown User',
+          unknown_email: 'Unknown email',
         },
       },
     },
