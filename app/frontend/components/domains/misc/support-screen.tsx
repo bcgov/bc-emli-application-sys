@@ -1,4 +1,4 @@
-import { Box, Container, Flex, Heading, Link, Text, VStack } from '@chakra-ui/react';
+import { Box, Container, Flex, Heading, Link, Text, UnorderedList, ListItem, VStack } from '@chakra-ui/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -28,20 +28,20 @@ export const SupportScreen = () => {
 
           <Text sx={baseTextSx}>{t('site.support.applicationHelpDescriptionShort')}</Text>
 
-          <Box as="ul" sx={{ listStyleType: 'disc' }}>
-            <Text as="li" sx={baseTextSx}>
+          <UnorderedList sx={{ listStyleType: 'disc' }}>
+            <ListItem sx={baseTextSx}>
               {t('site.support.groundOrientedLabel')}{' '}
               <Link href={`mailto:${t('site.support.groundOrientedEmail')}`} isExternal color="text.primary">
                 {t('site.support.groundOrientedEmail')}
               </Link>
-            </Text>
-            <Text as="li" sx={baseTextSx}>
+            </ListItem>
+            <ListItem sx={baseTextSx}>
               {t('site.support.multiUnitLabel')}{' '}
               <Link href={`mailto:${t('site.support.multiUnitEmail')}`} isExternal color="text.primary">
                 {t('site.support.multiUnitEmail')}
               </Link>
-            </Text>
-          </Box>
+            </ListItem>
+          </UnorderedList>
         </VStack>
 
         {/* Right Column - Learn More Card */}
