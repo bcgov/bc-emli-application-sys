@@ -2,9 +2,17 @@
 class VirusScanStatusController < ApplicationController
   before_action :authenticate_user! # Adjust authentication as needed
 
+  # Whitelist of allowed models that support virus scanning
+  ALLOWED_MODELS = {
+    "supporting_document" => SupportingDocument,
+    "step_code" => StepCode
+  }.freeze
+
   # GET /api/virus_scan_status/:model/:id
   def show
-    model_class = params[:model].classify.constantize
+    model_class = get_allowed_model_class(params[:model])
+    return unless model_class
+
     record = model_class.find(params[:id])
 
     unless record.respond_to?(:virus_scan_status)
@@ -28,13 +36,13 @@ class VirusScanStatusController < ApplicationController
            }
   rescue ActiveRecord::RecordNotFound
     render json: { error: "Record not found" }, status: :not_found
-  rescue NameError
-    render json: { error: "Invalid model type" }, status: :unprocessable_entity
   end
 
   # POST /api/virus_scan_status/:model/:id/rescan
   def rescan
-    model_class = params[:model].classify.constantize
+    model_class = get_allowed_model_class(params[:model])
+    return unless model_class
+
     record = model_class.find(params[:id])
 
     unless record.respond_to?(:schedule_virus_scan)
@@ -61,13 +69,13 @@ class VirusScanStatusController < ApplicationController
            }
   rescue ActiveRecord::RecordNotFound
     render json: { error: "Record not found" }, status: :not_found
-  rescue NameError
-    render json: { error: "Invalid model type" }, status: :unprocessable_entity
   end
 
   # GET /api/virus_scan_status/bulk?model=supporting_document&ids[]=1&ids[]=2
   def bulk
-    model_class = params[:model].classify.constantize
+    model_class = get_allowed_model_class(params[:model])
+    return unless model_class
+
     ids = params[:ids] || []
 
     records = model_class.where(id: ids)
@@ -88,7 +96,21 @@ class VirusScanStatusController < ApplicationController
       end
 
     render json: { results: results }
-  rescue NameError
-    render json: { error: "Invalid model type" }, status: :unprocessable_entity
+  end
+
+  private
+
+  def get_allowed_model_class(model_param)
+    model_class = ALLOWED_MODELS[model_param&.downcase]
+
+    unless model_class
+      render json: {
+               error: "Invalid or unsupported model type"
+             },
+             status: :unprocessable_entity
+      return nil
+    end
+
+    model_class
   end
 end
