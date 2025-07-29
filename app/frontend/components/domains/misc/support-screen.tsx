@@ -7,7 +7,7 @@ import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 export const SupportScreen = () => {
   const { t } = useTranslation();
 
-  const mailto = `mailto:${t('site.contactEmail')}`;
+  const mailto = `mailto:${t('site.support.contactTeamCTA')}`;
 
   const baseTextSx = { fontSize: '16px', lineHeight: '27px', color: 'text.primary' };
 
