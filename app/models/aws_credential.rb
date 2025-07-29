@@ -52,13 +52,13 @@ class AwsCredential < ApplicationRecord
     return nil unless value
     key = encryption_key
 
-    # Use PostgreSQL's pgp_sym_encrypt function
+    # Use PostgreSQL's pgp_sym_encrypt function with \x prefix for trigger compatibility
     result =
       self
         .class
         .connection
         .execute(
-          "SELECT encode(pgp_sym_encrypt(#{self.class.connection.quote(value)}, #{self.class.connection.quote(key)}), 'hex') as encrypted"
+          "SELECT '\\x' || encode(pgp_sym_encrypt(#{self.class.connection.quote(value)}, #{self.class.connection.quote(key)}), 'hex') as encrypted"
         )
         .first
 
@@ -69,13 +69,23 @@ class AwsCredential < ApplicationRecord
     return nil unless encrypted_value
     key = encryption_key
 
+    # Remove \x prefix if present before decoding
+    hex_value =
+      (
+        if encrypted_value.start_with?('\\x')
+          encrypted_value[2..-1]
+        else
+          encrypted_value
+        end
+      )
+
     # Use PostgreSQL's pgp_sym_decrypt function
     result =
       self
         .class
         .connection
         .execute(
-          "SELECT pgp_sym_decrypt(decode(#{self.class.connection.quote(encrypted_value)}, 'hex'), #{self.class.connection.quote(key)}) as decrypted"
+          "SELECT pgp_sym_decrypt(decode(#{self.class.connection.quote(hex_value)}, 'hex'), #{self.class.connection.quote(key)}) as decrypted"
         )
         .first
 
