@@ -2702,6 +2702,19 @@ const options = {
               "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It's part of the Province of B.C.'s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
             betterHomesLinkAriaLabel: 'Learn more about Better Homes Energy Savings Program (opens in new window)',
             betterHomesLinkText: 'Better Homes.',
+            contactInfo:
+              'Contact us at 1-833-856-0333 from 9 am - 5 pm, Monday - Friday (excluding statutory holidays).',
+            applicationHelpTitleShort: 'Get help with your Energy Savings Program application',
+            applicationHelpDescriptionShort:
+              'Do you have questions about your application, the program or home upgrade opportunities? We can help you understand home energy upgrades and rebates by email, or you can schedule a call with an Energy Savings Program Specialist.',
+            groundOrientedEmail: 'BetterHomesESP@CLEAResult.com',
+            multiUnitEmail: 'ESPcondoapartment@CLEAResult.com',
+            groundOrientedLabel: 'Ground-oriented home types:',
+            multiUnitLabel: 'Condo, apartment and other multi-unit home types:',
+            learnMoreTitleShort: 'Learn more about the Energy Savings Program',
+            learnMoreDescriptionShort:
+              "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It's part of the Province of B.C.'s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
+            betterHomesLinkTextShort: 'Better Homes',
           },
           territorialAcknowledgement:
             'The B.C. Public Service acknowledges the territories of First Nations around B.C. and is grateful to carry out our work on these lands. We acknowledge these rights, interests, priorities, and concerns of all Indigenous Peoples - First Nations, Métis, and Inuit - respecting and acknowledging their distinct cultures, histories, rights, laws, and governments.',
