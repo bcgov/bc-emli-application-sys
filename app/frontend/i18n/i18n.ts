@@ -37,9 +37,11 @@ const options = {
             login: 'You must authenticate with an IDIR account to use this system.',
             button: 'Log in with IDIR account',
             trouble: {
-              link: 'https://www.bceid.ca/clp/account_recovery.aspx',
-              linkText: 'Click here',
-              text: ' if you are having trouble logging in using IDIR.',
+              beforeLink: 'IDIR users who have registered for MFA may reset their password via ',
+              linkText: 'Self Service Password Reset',
+              afterLink:
+                '\n\nIf you are not MFA registered, or require additional assistance, please contact your IDIR security administrator or the OCIO IT Service Desk at:\nPhone: 250-387-7000\nEmail: 77000@gov.bc.ca',
+              link: 'https://passwordreset.microsoftonline.com/',
             },
             noAccount: {
               text: 'Don’t have an IDIR account?',
