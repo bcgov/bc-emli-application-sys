@@ -2655,9 +2655,8 @@ const options = {
             emailTitle: 'Email',
             emailAddress: 'betterhomesep@clearesult.com',
             groundOrientedTitle: 'Ground-oriented home types',
-            groundOrientedEmail: 'BetterHomesESP@clearresultCLEAResult.com',
-            groundOrientedEmailAriaLabel:
-              'Email us about ground-oriented home types at BetterHomesESP@clearresultCLEAResult.com',
+            groundOrientedEmail: 'BetterHomesESP@clearesult.com',
+            groundOrientedEmailAriaLabel: 'Email us about ground-oriented home types at BetterHomesESP@clearesult.com',
             multiUnitTitle: 'Multi-unit home types',
             multiUnitEmail: 'ESPcondoapartment@CLEAResult.com',
             multiUnitEmailAriaLabel: 'Email us about multi-unit home types at ESPcondoapartment@CLEAResult.com',
@@ -2703,7 +2702,7 @@ const options = {
             betterHomesLinkText: 'Better Homes.',
           },
           territorialAcknowledgement:
-            'The B.C. Public Service acknowledges the territories of First Nations around B.C. and is grateful to carry out our work on these lands. We acknowledge thse rights, interests, priorities, and concerns of all Indigenous Peoples - First Nations, Métis, and Inuit - respecting and acknowledging their distinct cultures, histories, rights, laws, and governments.',
+            'The B.C. Public Service acknowledges the territories of First Nations around B.C. and is grateful to carry out our work on these lands. We acknowledge these rights, interests, priorities, and concerns of all Indigenous Peoples - First Nations, Métis, and Inuit - respecting and acknowledging their distinct cultures, histories, rights, laws, and governments.',
           // privacyAndTermsPrefix: "This site is protected by reCAPTCHA and the Google",
           // midText: "and",
           // privacyText: "Privacy Policy",
