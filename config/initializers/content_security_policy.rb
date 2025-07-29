@@ -14,7 +14,7 @@ Rails.application.configure do
     # policy.img_src     :self, :https, :data       # Allow images from self, HTTPS, and embedded data URIs
     # policy.object_src  :none                      # Disallow Flash/Java plugins entirely
 
-    policy.script_src :self, :https # Only allow scripts from self and HTTPS (will be overridden in dev)
+    policy.script_src :self, :https, :unsafe_eval # Only allow scripts from self and HTTPS and webpacked eval (will be overridden in dev)
     policy.style_src :self, :https # Only allow styles from self and HTTPS
     policy.connect_src :self, :https # Only allow fetch/WebSocket/XHR to self and HTTPS (overridden in dev)
 
