@@ -14,7 +14,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { Envelope, Phone } from '@phosphor-icons/react';
-import React, { Ref, useRef, useMemo } from 'react';
+import React, { Ref, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface IProps {
@@ -22,50 +22,26 @@ interface IProps {
   renderTriggerButton?: (props: ButtonProps & { ref: Ref<HTMLElement> }) => JSX.Element;
 }
 
-// Shared styles for better performance
-const iconBoxStyles = {
-  bg: 'theme.darkBlue',
-  w: 8,
-  h: 8,
-  borderRadius: 'full',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-} as const;
-
-const textStyles = {
-  fontSize: '16px',
-  lineHeight: '27px',
-  color: 'greys.homeScreenGrey',
-} as const;
-
-const linkStyles = {
-  ...textStyles,
-  textDecoration: 'underline',
-  mb: 2,
-  display: 'block',
-} as const;
-
-const listStyles = {
-  as: 'ul' as const,
-  listStyleType: 'disc',
-  pl: 4,
-  color: 'greys.homeScreenGrey',
-};
-
 export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) {
   const { t } = useTranslation();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef<HTMLButtonElement>(null);
 
-  // Memoize email hrefs to avoid recreating on each render
-  const emailHrefs = useMemo(
-    () => ({
-      groundOriented: `mailto:${t('site.helpDrawer.groundOrientedEmail')}`,
-      multiUnit: `mailto:${t('site.helpDrawer.multiUnitEmail')}`,
-    }),
-    [t],
-  );
+  const groundOrientedEmailHref = `mailto:${t('site.helpDrawer.groundOrientedEmail')}`;
+  const multiUnitEmailHref = `mailto:${t('site.helpDrawer.multiUnitEmail')}`;
+
+  const baseTextSx = { fontSize: '16px', lineHeight: '27px', color: 'greys.homeScreenGrey' };
+  const iconBoxSx = {
+    bg: 'theme.darkBlue',
+    w: 8,
+    h: 8,
+    borderRadius: 'full',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  };
+  const linkSx = { ...baseTextSx, textDecoration: 'underline', mb: 2, display: 'block' };
+  const listBoxSx = { as: 'ul', listStyleType: 'disc', pl: 4, color: 'greys.homeScreenGrey' };
 
   return (
     <>
@@ -106,80 +82,74 @@ export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) 
             <Flex direction="column" gap={6}>
               {/* Telephone Section */}
               <Flex direction="row" alignItems="flex-start" gap={2}>
-                <Box as="span" {...iconBoxStyles}>
+                <Box as="span" sx={iconBoxSx}>
                   <Phone size={16} color="white" />
                 </Box>
                 <Box flex={1}>
-                  <Text fontWeight="bold" {...textStyles} mb={0}>
+                  <Text fontWeight="bold" sx={baseTextSx} mb={0}>
                     {t('site.helpDrawer.phoneTitle')}
                   </Text>
-                  <Text {...textStyles} color="greys.anotherGrey" mb={0}>
+                  <Text sx={{ ...baseTextSx, color: 'greys.anotherGrey' }} mb={0}>
                     {t('auth.bcServiceCardInfo.energyCoach.phoneNumber')}
                   </Text>
-                  <Text {...textStyles} color="greys.anotherGrey" mb={0}>
+                  <Text sx={{ ...baseTextSx, color: 'greys.anotherGrey' }} mb={0}>
                     {t('site.helpDrawer.phoneHours')}
                   </Text>
-                  <Text {...textStyles} color="greys.anotherGrey">
-                    {t('site.helpDrawer.phoneHoursNote')}
-                  </Text>
+                  <Text sx={{ ...baseTextSx, color: 'greys.anotherGrey' }}>{t('site.helpDrawer.phoneHoursNote')}</Text>
                 </Box>
               </Flex>
 
               {/* Email Section - Ground-oriented home types */}
               <Flex direction="row" alignItems="flex-start" gap={2}>
-                <Box as="span" {...iconBoxStyles}>
+                <Box as="span" sx={iconBoxSx}>
                   <Envelope size={16} color="white" />
                 </Box>
                 <Box flex={1}>
-                  <Text fontWeight="bold" {...textStyles} mb={0}>
+                  <Text fontWeight="bold" sx={baseTextSx} mb={0}>
                     {t('site.helpDrawer.emailTitle')}
                   </Text>
-                  <Text {...textStyles} mb={0}>
+                  <Text sx={baseTextSx} mb={0}>
                     {t('site.helpDrawer.groundOrientedTitle')}
                   </Text>
                   <Link
-                    href={emailHrefs.groundOriented}
-                    {...linkStyles}
+                    href={groundOrientedEmailHref}
+                    sx={linkSx}
                     aria-label={t('site.helpDrawer.groundOrientedEmailAriaLabel')}
                   >
                     {t('site.helpDrawer.groundOrientedEmail')}
                   </Link>
-                  <Box {...listStyles} mb={6}>
-                    <Text as="li" {...textStyles}>
+                  <Box sx={{ ...listBoxSx, mb: 6 }}>
+                    <Text as="li" sx={baseTextSx}>
                       {t('site.helpDrawer.singleFamilyHome')}
                     </Text>
-                    <Text as="li" {...textStyles}>
+                    <Text as="li" sx={baseTextSx}>
                       {t('site.helpDrawer.secondarySuite')}
                     </Text>
-                    <Text as="li" {...textStyles}>
+                    <Text as="li" sx={baseTextSx}>
                       {t('site.helpDrawer.duplexTriplex')}
                     </Text>
-                    <Text as="li" {...textStyles}>
+                    <Text as="li" sx={baseTextSx}>
                       {t('site.helpDrawer.rowTownhome')}
                     </Text>
-                    <Text as="li" {...textStyles}>
+                    <Text as="li" sx={baseTextSx}>
                       {t('site.helpDrawer.manufacturedHome')}
                     </Text>
                   </Box>
 
-                  <Text {...textStyles} mt={4} mb={0}>
+                  <Text sx={baseTextSx} mt={4} mb={0}>
                     {t('site.helpDrawer.multiUnitTitle')}
                   </Text>
-                  <Link
-                    href={emailHrefs.multiUnit}
-                    {...linkStyles}
-                    aria-label={t('site.helpDrawer.multiUnitEmailAriaLabel')}
-                  >
+                  <Link href={multiUnitEmailHref} sx={linkSx} aria-label={t('site.helpDrawer.multiUnitEmailAriaLabel')}>
                     {t('site.helpDrawer.multiUnitEmail')}
                   </Link>
-                  <Box {...listStyles}>
-                    <Text as="li" {...textStyles}>
+                  <Box sx={listBoxSx}>
+                    <Text as="li" sx={baseTextSx}>
                       {t('site.helpDrawer.apartmentCondo')}
                     </Text>
-                    <Text as="li" {...textStyles}>
+                    <Text as="li" sx={baseTextSx}>
                       {t('site.helpDrawer.stackedTownhouse')}
                     </Text>
-                    <Text as="li" {...textStyles}>
+                    <Text as="li" sx={baseTextSx}>
                       {t('site.helpDrawer.multiplexes')}
                     </Text>
                   </Box>
