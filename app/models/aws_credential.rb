@@ -58,7 +58,7 @@ class AwsCredential < ApplicationRecord
         .class
         .connection
         .execute(
-          "SELECT '\\x' || encode(pgp_sym_encrypt(#{self.class.connection.quote(value)}, #{self.class.connection.quote(key)}), 'hex') as encrypted"
+          "SELECT '\\\\x' || encode(pgp_sym_encrypt(#{self.class.connection.quote(value)}, #{self.class.connection.quote(key)}), 'hex') as encrypted"
         )
         .first
 
@@ -69,11 +69,11 @@ class AwsCredential < ApplicationRecord
     return nil unless encrypted_value
     key = encryption_key
 
-    # Remove \x prefix if present before decoding
+    # Remove \\x prefix if present before decoding
     hex_value =
       (
-        if encrypted_value.start_with?('\\x')
-          encrypted_value[2..-1]
+        if encrypted_value.start_with?('\\\\x')
+          encrypted_value[3..-1]
         else
           encrypted_value
         end
