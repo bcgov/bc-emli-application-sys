@@ -26,12 +26,18 @@ class OmniauthUserResolver
   }
 
   def resolve_user
+    Rails.logger.info "Entry Point: #{@entry_point}"
     accept_invitation_with_omniauth if invited_user.present?
 
     if existing_user
       self.user = update_user
     else
-      self.user = invited_user # || create_user
+      #it's a new user, however only Basic BCeID/BCSC can create own accounts, others must be invited
+      if @entry_point == "isParticipant"
+        self.user = create_user
+      else
+        self.user = invited_user
+      end
     end
 
     self.error_key = error_message_key unless user&.valid? && user&.persisted?
