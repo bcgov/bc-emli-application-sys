@@ -1,16 +1,16 @@
-import { Image, Page, Text, View } from "@react-pdf/renderer"
-import { format } from "date-fns"
-import { t } from "i18next"
-import React from "react"
-import { IPermitApplication } from "../../../../../models/energy-savings-application"
-import { theme } from "../../../../../styles/theme"
-import { Divider } from "../../../../domains/step-code/checklist/pdf-content/shared/divider"
-import { page } from "../shared/styles/page"
+import { Image, Page, Text, View } from '@react-pdf/renderer';
+import { format } from 'date-fns';
+import { t } from 'i18next';
+import React from 'react';
+import { IPermitApplication } from '../../../../../models/energy-savings-application';
+import { theme } from '../../../../../styles/theme';
+import { Divider } from '../../../../domains/step-code/checklist/pdf-content/shared/divider';
+import { page } from '../shared/styles/page';
 
 interface IProps {
-  permitApplication: IPermitApplication
-  subTitle: string
-  assetDirectoryPath?: string
+  permitApplication: IPermitApplication;
+  subTitle: string;
+  assetDirectoryPath?: string;
 }
 
 export const CoverPage = function PermitApplicationPDFCoverPage({
@@ -18,15 +18,15 @@ export const CoverPage = function PermitApplicationPDFCoverPage({
   subTitle,
   assetDirectoryPath,
 }: IProps) {
-  const logoUrl = `${import.meta.env.SSR ? assetDirectoryPath : ""}/images/logo.png`
+  const logoUrl = `${import.meta.env.SSR ? assetDirectoryPath : ''}/images/logo.png`;
   return (
     <Page size="LETTER" style={page}>
-      <View style={{ alignItems: "stretch", gap: 42, width: "100%" }}>
-        <View style={{ alignItems: "center", gap: 6 }}>
+      <View style={{ alignItems: 'stretch', gap: 42, width: '100%' }}>
+        <View style={{ alignItems: 'center', gap: 6 }}>
           <Image src={logoUrl} style={{ width: 109.2, height: 42 }} />
-          <Text style={{ fontWeight: 700, fontSize: 13.5 }}>{t("site.title")}</Text>
+          <Text style={{ fontWeight: 700, fontSize: 13.5 }}>{t('site.title')}</Text>
         </View>
-        <Text style={{ fontWeight: 700, fontSize: 12, textAlign: "center" }}>{subTitle}</Text>
+        <Text style={{ fontWeight: 700, fontSize: 12, textAlign: 'center' }}>{subTitle}</Text>
         <View
           style={{
             borderWidth: 1,
@@ -45,13 +45,12 @@ export const CoverPage = function PermitApplicationPDFCoverPage({
           >
             <View style={{ gap: 6, fontSize: 12 }}>
               <Text style={{ fontWeight: 700 }}>{permitApplication.fullAddress}</Text>
-              <Text>{permitApplication.jurisdiction.name}</Text>
             </View>
           </View>
         </View>
         <View
           style={{
-            alignItems: "stretch",
+            alignItems: 'stretch',
             gap: 7.5,
             borderRadius: 6,
             borderWidth: 1,
@@ -61,25 +60,28 @@ export const CoverPage = function PermitApplicationPDFCoverPage({
             paddingBottom: 7.5,
           }}
         >
-          <Row label={t("permitApplication.pdf.id")} value={permitApplication.number} />
+          <Row label={t('permitApplication.pdf.id')} value={permitApplication.number} />
           <Row
-            label={t("permitApplication.pdf.submissionDate")}
-            value={format(permitApplication.submittedAt, "yyyy-MM-dd")}
+            label={t('permitApplication.pdf.submissionDate')}
+            value={format(permitApplication.submittedAt, 'yyyy-MM-dd')}
           />
           <Row
-            label={t("permitApplication.pdf.applicant")}
-            value={`${permitApplication.submitter.firstName} ${permitApplication.submitter.lastName}`}
+            label={t('permitApplication.pdf.applicant')}
+            value={
+              `${permitApplication.submitter?.firstName || ''} ${permitApplication.submitter?.lastName || ''}`.trim() ||
+              'Unknown'
+            }
           />
           <Row
-            label={t("permitApplication.pdf.permitType")}
-            value={`${permitApplication.permitType.name} | ${permitApplication.activity.name}`}
+            label={t('permitApplication.pdf.permitType')}
+            value={`${permitApplication.permitType?.name || 'Unknown'} | ${permitApplication.activity?.name || 'Unknown'}`}
             isLast
           />
         </View>
       </View>
     </Page>
-  )
-}
+  );
+};
 
 function Row({ label, value, isLast = false }) {
   return (
@@ -91,10 +93,10 @@ function Row({ label, value, isLast = false }) {
           paddingRight: 12,
         }}
       >
-        <Text style={{ fontWeight: 700, textTransform: "uppercase" }}>{label}</Text>
+        <Text style={{ fontWeight: 700, textTransform: 'uppercase' }}>{label}</Text>
         <Text>{value}</Text>
       </View>
       {!isLast && <Divider style={{ borderColor: theme.colors.greys.grey01, marginTop: 0, marginBottom: 0 }} />}
     </>
-  )
+  );
 }

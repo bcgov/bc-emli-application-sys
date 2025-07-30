@@ -24,11 +24,17 @@ class PdfGenerationJob
     generation_directory_path = Rails.root.join("tmp/files")
     asset_directory_path = Rails.root.join("public")
 
-    # Check if the directory exists, and if not, create it
+    # Ensure the directory exists and has correct permissions
     unless File.directory?(generation_directory_path)
       FileUtils.mkdir_p(generation_directory_path)
-      puts "Directory created: #{generation_directory_path}"
     end
+
+    # Ensure directory is writable
+    unless File.writable?(generation_directory_path)
+      FileUtils.chmod(0755, generation_directory_path)
+    end
+
+    puts "Directory ensured: #{generation_directory_path}"
 
     submission_version_with_missing_pdfs =
       permit_application.submission_versions.select(&:missing_pdfs?)
