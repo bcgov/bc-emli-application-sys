@@ -53,12 +53,16 @@ class AwsCredential < ApplicationRecord
     key = encryption_key
 
     # Use PostgreSQL's pgp_sym_encrypt function with \x prefix for trigger compatibility
+    # The E prefix tells PostgreSQL to interpret escape sequences
+    escaped_value = self.class.connection.quote(value)
+    escaped_key = self.class.connection.quote(key)
+
     result =
       self
         .class
         .connection
         .execute(
-          "SELECT '\\\\x' || encode(pgp_sym_encrypt(#{self.class.connection.quote(value)}, #{self.class.connection.quote(key)}), 'hex') as encrypted"
+          "SELECT lower(encode(pgp_sym_encrypt(#{escaped_value}, #{escaped_key}), 'hex')) as encrypted"
         )
         .first
 
@@ -69,23 +73,35 @@ class AwsCredential < ApplicationRecord
     return nil unless encrypted_value
     key = encryption_key
 
-    # Remove \\x prefix if present before decoding
+    # Handle different possible formats for backward compatibility
     hex_value =
-      (
-        if encrypted_value.start_with?('\\\\x')
-          encrypted_value[3..-1]
-        else
-          encrypted_value
-        end
-      )
+      if encrypted_value.start_with?('\\\\x')
+        # Database stored \\x (double backslash)
+        encrypted_value[3..-1]
+      elsif encrypted_value.start_with?('\\x')
+        # Database stored \x (single backslash)
+        encrypted_value[2..-1]
+      else
+        # Legacy format without prefix
+        encrypted_value
+      end
 
-    # Use PostgreSQL's pgp_sym_decrypt function
+    # Validate that we have only hex characters
+    unless hex_value.match?(/^[0-9a-f]+$/i)
+      Rails.logger.error "Invalid hex format for decryption. Original: #{encrypted_value[0..20]}..., Extracted: #{hex_value[0..20]}..."
+      return nil
+    end
+
+    # Use direct SQL with proper escaping
+    escaped_hex = self.class.connection.quote(hex_value)
+    escaped_key = self.class.connection.quote(key)
+
     result =
       self
         .class
         .connection
         .execute(
-          "SELECT pgp_sym_decrypt(decode(#{self.class.connection.quote(hex_value)}, 'hex'), #{self.class.connection.quote(key)}) as decrypted"
+          "SELECT pgp_sym_decrypt(decode(#{escaped_hex}, 'hex'), #{escaped_key}) as decrypted"
         )
         .first
 
