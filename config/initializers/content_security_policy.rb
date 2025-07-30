@@ -16,6 +16,8 @@ Rails.application.configure do
       policy.style_src :self, :https, :unsafe_eval, :unsafe_inline, vite_host
       policy.connect_src :self, :https, vite_host, reactotron_ws, cable_ws
     else
+      cable_ws = ENV["ANYCABLE_URL"]
+
       # create nonces
       config.content_security_policy_nonce_generator = ->(request) do
         SecureRandom.base64(16)
@@ -25,32 +27,17 @@ Rails.application.configure do
       # Base policy: only allow resources from same origin and HTTPS
       policy.default_src :self, :https
 
-      # Uncomment and customize these as needed:
+      # Uncomment and customize these if needed:
       # policy.font_src    :self, :https, :data       # Allow fonts from self, HTTPS, and embedded data URIs
       # policy.img_src     :self, :https, :data       # Allow images from self, HTTPS, and embedded data URIs
       # policy.object_src  :none                      # Disallow Flash/Java plugins entirely
 
-      policy.script_src :self, :https, :unsafe_eval # Only allow scripts from self and HTTPS and webpacked eval (will be overridden in dev)
-      policy.style_src :self, :https # Only allow styles from self and HTTPS
-      policy.connect_src :self, :https # Only allow fetch/WebSocket/XHR to self and HTTPS (overridden in dev)
+      # Only allow scripts from self and HTTPS and webpacked eval (will be overridden in dev)
+      policy.script_src :self, :https, :unsafe_eval
+      # Only allow styles from self and HTTPS
+      policy.style_src :self, :https
+      # Only allow fetch/WebSocket/XHR to self and HTTPS (overridden in dev)
+      policy.connect_src :self, :https, cable_ws
     end
   end
 end
-
-# You may need to enable this in production as well depending on your setup.
-#    policy.script_src *policy.script_src, :blob if Rails.env.test?
-
-#     policy.style_src   :self, :https
-# Allow @vite/client to hot reload style changes in development
-#    policy.style_src *policy.style_src, :unsafe_inline if Rails.env.development?
-
-#     # Specify URI for violation reports
-#     # policy.report_uri "/csp-violation-report-endpoint"
-
-#
-#   # Generate session nonces for permitted importmap, inline scripts, and inline styles.
-#   config.content_security_policy_nonce_generator = ->(request) { request.session.id.to_s }
-#   config.content_security_policy_nonce_directives = %w(script-src style-src)
-#
-#   # Report violations without enforcing the policy.
-#   # config.content_security_policy_report_only = true
