@@ -77,17 +77,28 @@ class PdfGenerationJob
         should_checklist_pdf_be_generated =
           submission_version.missing_step_code_checklist_pdf?
 
+        permit_app_data =
+          camelize_response(
+            PermitApplicationBlueprint.render_as_json(
+              permit_application,
+              view: :pdf_generation,
+              form_json: submission_version.form_json,
+              submission_data: submission_version.formatted_submission_data,
+              submitted_at: submission_version.created_at
+            )
+          )
+
+        puts "=== PDF Data Generation Debug ==="
+        puts "Permit application data keys: #{permit_app_data&.keys&.join(", ")}"
+        puts "Permit application ID: #{permit_app_data&.dig("id")}"
+        puts "Permit application number: #{permit_app_data&.dig("number")}"
+        puts "Submitter data: #{permit_app_data&.dig("submitter")&.inspect}"
+        puts "Has step code checklist: #{submission_version.has_step_code_checklist?}"
+        puts "Should generate permit app PDF: #{should_permit_application_pdf_be_generated}"
+        puts "Should generate checklist PDF: #{should_checklist_pdf_be_generated}"
+
         pdf_json_data = {
-          permitApplication:
-            camelize_response(
-              PermitApplicationBlueprint.render_as_json(
-                permit_application,
-                view: :pdf_generation,
-                form_json: submission_version.form_json,
-                submission_data: submission_version.formatted_submission_data,
-                submitted_at: submission_version.created_at
-              )
-            ),
+          permitApplication: permit_app_data,
           checklist:
             submission_version.has_step_code_checklist? &&
               camelize_response(submission_version.step_code_checklist_json),
@@ -103,6 +114,9 @@ class PdfGenerationJob
             assetDirectoryPath: asset_directory_path.to_s
           }
         }.to_json
+
+        puts "Meta generationPaths: #{JSON.parse(pdf_json_data)["meta"]["generationPaths"].inspect}"
+        puts "=== End PDF Data Debug ==="
 
         {
           submission_version: submission_version,
@@ -135,6 +149,38 @@ class PdfGenerationJob
 
     File.open(json_filename, "w") { |file| file.write(pdf_json_data) }
 
+    puts "=== Node.js Execution Debug ==="
+    puts "JSON filename: #{json_filename}"
+    puts "JSON file exists: #{File.exist?(json_filename)}"
+    puts "JSON file size: #{File.exist?(json_filename) ? File.size(json_filename) : "N/A"} bytes"
+    puts "Working directory: #{Rails.root}"
+    puts "Command: npm run #{NodeScripts::GENERATE_PDF_SCRIPT_NAME} #{json_filename}"
+    puts "Expected output files:"
+    puts "- Permit application PDF: #{should_permit_application_pdf_be_generated ? "#{generation_directory_path}/#{application_filename}" : "Not generating"}"
+    puts "- Step code checklist PDF: #{should_checklist_pdf_be_generated ? "#{generation_directory_path}/#{step_code_filename}" : "Not generating"}"
+    puts "JSON content preview (first 500 chars): #{pdf_json_data[0..500]}..."
+    puts "Files in directory before execution: #{Dir.entries(generation_directory_path).join(", ")}"
+
+    # Check Node.js environment
+    puts "=== Node.js Environment Check ==="
+    node_version =
+      begin
+        `node --version 2>&1`.strip
+      rescue StandardError
+        "Not available"
+      end
+    npm_version =
+      begin
+        `npm --version 2>&1`.strip
+      rescue StandardError
+        "Not available"
+      end
+    puts "Node.js version: #{node_version}"
+    puts "NPM version: #{npm_version}"
+    puts "Package.json exists: #{File.exist?(Rails.root.join("package.json"))}"
+    puts "SSR script exists: #{File.exist?(Rails.root.join("public/vite-ssr/ssr.js"))}"
+    puts "=== End Environment Check ==="
+
     # Run Node.js script as a child process, passing JSON data as an argument
     stdout, stderr, status =
       Open3.popen3(
@@ -145,33 +191,70 @@ class PdfGenerationJob
         chdir: Rails.root.to_s
       ) do |stdin, stdout, stderr, wait_thr|
         # Read and print the standard output continuously until the process exits
-        stdout.each_line { |line| puts line }
+        stdout_content = ""
+        stderr_content = ""
 
-        stderr.each_line { |line| puts line }
+        stdout.each_line do |line|
+          puts "STDOUT: #{line}"
+          stdout_content += line
+        end
+
+        stderr.each_line do |line|
+          puts "STDERR: #{line}"
+          stderr_content += line
+        end
 
         # Wait for the process to exit and get the exit status
         exit_status = wait_thr.value
+
+        puts "Node.js process exit status: #{exit_status.exitstatus}"
+        puts "Node.js process success: #{exit_status.success?}"
+        puts "STDOUT length: #{stdout_content.length}"
+        puts "STDERR length: #{stderr_content.length}"
 
         File.delete(json_filename)
 
         # Check for errors or handle output based on the exit status
         if exit_status.success?
+          puts "=== File Verification After Node.js ==="
+
           pdfs = []
           if should_permit_application_pdf_be_generated
+            permit_pdf_path =
+              "#{generation_directory_path}/#{application_filename}"
+            puts "Checking for permit application PDF: #{permit_pdf_path}"
+            puts "File exists: #{File.exist?(permit_pdf_path)}"
+            puts "File size: #{File.exist?(permit_pdf_path) ? File.size(permit_pdf_path) : "N/A"} bytes"
+
             pdfs << {
               fname: application_filename,
               key: PermitApplication::PERMIT_APP_PDF_DATA_KEY
             }
           end
           if should_checklist_pdf_be_generated
+            checklist_pdf_path =
+              "#{generation_directory_path}/#{step_code_filename}"
+            puts "Checking for step code checklist PDF: #{checklist_pdf_path}"
+            puts "Files in directory: #{Dir.entries(generation_directory_path).join(", ")}"
+
             pdfs << {
               fname: step_code_filename,
               key: PermitApplication::CHECKLIST_PDF_DATA_KEY
             }
           end
 
+          puts "Files in tmp/files directory: #{Dir.entries(generation_directory_path).join(", ")}"
+          puts "=== End File Verification ==="
+
           pdfs.each do |pdf|
             path = "#{generation_directory_path}/#{pdf[:fname]}"
+            puts "Opening PDF file: #{path}"
+            puts "File exists before open: #{File.exist?(path)}"
+
+            unless File.exist?(path)
+              raise "PDF file was not created by Node.js script: #{path}"
+            end
+
             file = File.open(path)
             doc =
               submission_version
@@ -188,7 +271,17 @@ class PdfGenerationJob
             File.delete(path)
           end
         else
-          err = "Pdf generation process failed: #{exit_status}"
+          puts "=== Node.js Process Failed ==="
+          puts "Exit status: #{exit_status.exitstatus}"
+          puts "Exit status success: #{exit_status.success?}"
+          puts "Signal: #{exit_status.termsig}"
+          puts "STDOUT content: #{stdout_content}"
+          puts "STDERR content: #{stderr_content}"
+          puts "Files in directory after failed execution: #{Dir.entries(generation_directory_path).join(", ")}"
+          puts "=== End Failed Process Debug ==="
+
+          err =
+            "Pdf generation process failed: #{exit_status} - Exit code: #{exit_status.exitstatus}"
           Rails.logger.error err
 
           # this will raise an error and retry the job
