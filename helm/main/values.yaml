@@ -89,7 +89,8 @@ sidekiq:
       cpu: 300m
       memory: 256Mi
 
-  env: {}
+  env:
+    'ELASTICSEARCH_URL': 'http://hesp-elasticsearch:9200'
 
 anycable-rpc:
   enabled: false
@@ -104,7 +105,8 @@ anycable-rpc:
       cpu: 300m
       memory: 256Mi
 
-  env: {}
+  env:
+    'ELASTICSEARCH_URL': 'http://hesp-elasticsearch:9200'
 
 # See https://github.com/bcgov/crunchy-postgres/blob/main/charts/crunchy-postgres/values.yaml
 crunchy-postgres:
