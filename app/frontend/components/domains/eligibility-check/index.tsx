@@ -1,4 +1,4 @@
-import { Box, Container, Flex, FormControl, Heading, Image, Text, VStack } from '@chakra-ui/react';
+import { Box, Container, Flex, FormControl, Heading, Image, Text, VStack, VisuallyHidden } from '@chakra-ui/react';
 import { Warning } from '@phosphor-icons/react/dist/ssr';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -179,7 +179,13 @@ export const EligibilityCheck = observer(() => {
         <VStack spacing={{ base: 4, md: 12 }} align="flex-start">
           <Flex direction={{ base: 'column', md: 'row' }} gap={{ base: 6, md: 12 }}>
             <Box position="relative">
-              <Image src="/images/eligibility-place-holder.png" alt="" objectFit="cover" width="100%" height="100%" />
+              <Image
+                src="/images/eligibility-place-holder.png"
+                alt="Couple reviewing home energy program information on tablet"
+                objectFit="cover"
+                width="100%"
+                height="100%"
+              />
             </Box>
             <VStack align="flex-start" flex={1} spacing={4} p={{ base: 6, md: 0 }}>
               <Heading as="h2" color="theme.blueAlt">
@@ -199,9 +205,7 @@ export const EligibilityCheck = observer(() => {
             <Box as="form" w="100%" role="form" aria-label="Eligibility Check Form">
               {/* Home Type Question */}
               <FormControl as="fieldset" mb={4}>
-                <Box as="legend" className="sr-only">
-                  {t('auth.checkEligibility.homeQuestion')}
-                </Box>
+                <VisuallyHidden as="legend">{t('auth.checkEligibility.homeQuestion')}</VisuallyHidden>
                 <QuestionCard
                   question={t('auth.checkEligibility.homeQuestion')}
                   answers={t('auth.checkEligibility.kindOfHomes', { returnObjects: true })}
@@ -224,9 +228,7 @@ export const EligibilityCheck = observer(() => {
               )}
               {/*Property Assessed Value Question */}
               <FormControl as="fieldset" mb={4}>
-                <Box as="legend" className="sr-only">
-                  {t('auth.checkEligibility.propertyAssesmentQuestion')}
-                </Box>
+                <VisuallyHidden as="legend">{t('auth.checkEligibility.propertyAssesmentQuestion')}</VisuallyHidden>
                 <QuestionCard
                   question={t('auth.checkEligibility.propertyAssesmentQuestion')}
                   answers={currentAssessedValues}
@@ -268,9 +270,7 @@ export const EligibilityCheck = observer(() => {
                 )}
               {/* Payment Bills Question */}
               <FormControl as="fieldset" mb={4}>
-                <Box as="legend" className="sr-only">
-                  {t('auth.checkEligibility.paymentQuestion')}
-                </Box>
+                <VisuallyHidden as="legend">{t('auth.checkEligibility.paymentQuestion')}</VisuallyHidden>
                 <QuestionCard
                   question={t('auth.checkEligibility.paymentQuestion')}
                   answers={paymentValues}
@@ -289,9 +289,7 @@ export const EligibilityCheck = observer(() => {
                 )}
               {/* Total People Question */}
               <FormControl as="fieldset" mb={4}>
-                <Box as="legend" className="sr-only">
-                  {t('auth.checkEligibility.totalPeople')}
-                </Box>
+                <VisuallyHidden as="legend">{t('auth.checkEligibility.totalPeople')}</VisuallyHidden>
                 <QuestionCard
                   question={t('auth.checkEligibility.totalPeople')}
                   answers={t('auth.checkEligibility.peopleNumber', { returnObjects: true })}
@@ -303,9 +301,7 @@ export const EligibilityCheck = observer(() => {
                 <>
                   {/* Annual Household Question */}
                   <FormControl as="fieldset" mb={4}>
-                    <Box as="legend" className="sr-only">
-                      {t('auth.checkEligibility.annualHouseholdQuestion')}
-                    </Box>
+                    <VisuallyHidden as="legend">{t('auth.checkEligibility.annualHouseholdQuestion')}</VisuallyHidden>
                     <QuestionCard
                       question={t('auth.checkEligibility.annualHouseholdQuestion')}
                       answers={selectedHouseholdValues}
