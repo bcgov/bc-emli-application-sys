@@ -24,17 +24,42 @@ class PdfGenerationJob
     generation_directory_path = Rails.root.join("tmp/files")
     asset_directory_path = Rails.root.join("public")
 
+    puts "=== Directory Creation Debug ==="
+    puts "Target directory: #{generation_directory_path}"
+    puts "Rails root: #{Rails.root}"
+    puts "Directory exists before creation: #{File.directory?(generation_directory_path)}"
+    puts "Parent directory (/app/tmp) exists: #{File.directory?(Rails.root.join("tmp"))}"
+    puts "Parent directory permissions: #{File.directory?(Rails.root.join("tmp")) ? File.stat(Rails.root.join("tmp")).mode.to_s(8) : "N/A"}"
+
     # Ensure the directory exists and has correct permissions
     unless File.directory?(generation_directory_path)
-      FileUtils.mkdir_p(generation_directory_path)
+      puts "Creating directory: #{generation_directory_path}"
+      begin
+        FileUtils.mkdir_p(generation_directory_path)
+        puts "mkdir_p completed without error"
+      rescue => e
+        puts "ERROR during mkdir_p: #{e.class}: #{e.message}"
+        raise e
+      end
     end
 
+    puts "Directory exists after creation attempt: #{File.directory?(generation_directory_path)}"
+
     # Ensure directory is writable
-    unless File.writable?(generation_directory_path)
-      FileUtils.chmod(0755, generation_directory_path)
+    if File.directory?(generation_directory_path)
+      unless File.writable?(generation_directory_path)
+        puts "Directory not writable, setting permissions"
+        FileUtils.chmod(0755, generation_directory_path)
+      end
+      puts "Directory is writable: #{File.writable?(generation_directory_path)}"
+      puts "Directory permissions: #{File.stat(generation_directory_path).mode.to_s(8)}"
+    else
+      puts "ERROR: Directory still does not exist after creation attempt!"
+      raise "Failed to create directory: #{generation_directory_path}"
     end
 
     puts "Directory ensured: #{generation_directory_path}"
+    puts "=== End Directory Debug ==="
 
     submission_version_with_missing_pdfs =
       permit_application.submission_versions.select(&:missing_pdfs?)
