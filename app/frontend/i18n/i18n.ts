@@ -148,24 +148,38 @@ const options = {
             BCAssessmentLink: 'https://www.bcassessment.ca/',
             homeQuestion: 'What kind of home do you live in? *',
             kindOfHomes: [
-              'Single family home (detached dwelling)',
+              'Single family home',
               'Secondary suite in a single-family home',
-              'Duplex, triplex, row or townhome',
+              'Duplex, triplex, 4–5 unit multiplex',
+              'Row or side-by-side townhome',
               'Manufactured / mobile home',
-              'Condominium or apartment',
+              'Apartment building (6 storeys or less)',
+              'Stacked townhouse building',
+              'Multiplex with 6 or more units',
               'Other',
-              'Unsure',
             ],
             propertyAssesmentQuestion: 'What is your property’s total assessed value? *',
             assesmentText: 'You can find the assessed value of your property on',
             BCAssessment: 'BC Assessment.',
             assesedValues: ['$1,230,000 or lower', 'Over $1,230,000', 'Unsure'],
+            assesedValuesMultiUnit: ['$772,000 or lower', 'Over $772,000', 'Unsure'],
 
             paymentQuestion: 'Do you or a family member pay your own electricity and heating bills? *',
             paymentTextPrefix:
               'Common utility providers include BC Hydro, FortisBC, Pacific Northern Gas, City of New Westminster, City of Penticton, City of Grand Forks, Nelson Hydro, and District of Summerland.',
             paymentTextSuffix: 'Answer yes if you pay for your own wood, oil, or propane to heat your home.',
             paymentOption: ['Yes', 'No', 'Unsure'],
+
+            // Option value keys for consistent comparisons
+            optionValues: {
+              homeTypeOther: 'Other',
+              propertyValueHighSingle: 'Over $1,230,000',
+              propertyValueHighMulti: 'Over $772,000',
+              propertyValueUnsure: 'Unsure',
+              paymentYes: 'Yes',
+              paymentNo: 'No',
+              paymentUnsure: 'Unsure',
+            },
             totalPeople: 'How many people live in your home? *',
             peopleTextPrefix:
               'Include all adults and children. Include all roommates and tenants who live in the same individually metered suite or home.',
@@ -237,6 +251,12 @@ const options = {
               notEligible: "You're not eligible to apply",
               loginWithAccount: 'Log in to apply now',
               condoEligible: 'Condominiums and apartments are currently not eligible.',
+              multiUnitNotEligible:
+                'Multi-unit households valued over $772,000 are not currently eligible for Energy Savings Program rebates.',
+              multiUnitUnsure:
+                'This information is necessary to determine your rebate eligibility. It can be difficult to determine property value for some types of multi-unit buildings. Program administrators help when you apply.',
+              propertyValueWarning:
+                "Your property's assessed value determines your rebate eligibility. Households valued over $1,230,000 are only eligible for some Energy Savings Program rebates.",
               currentlyEligibleHome: 'Home types currently eligible for the Energy Savings Program are:',
               typesOfhome: [
                 'Single-family homes or secondary suites in a single-family home',
