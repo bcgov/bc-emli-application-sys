@@ -37,7 +37,7 @@ Rails.application.configure do
       # Only allow styles from self and HTTPS
       policy.style_src :self, :https
       # Only allow fetch/WebSocket/XHR to self and HTTPS (overridden in dev)
-      policy.connect_src :self, :https, cable_ws
+      policy.connect_src :self, :https, cable_ws if cable_ws.present?
     end
   end
 end

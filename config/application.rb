@@ -63,8 +63,12 @@ module HousPermitPortal
     # bytes key) and 20 bytes for the salt.
 
     # You can auto generate this in the console with: bin/rails db:encryption:init
-    # NOTE: Encryption keys are now managed dynamically via EncryptionKey model
-    # Configuration is loaded in config/initializers/encryption_keys.rb
+    config.active_record.encryption.primary_key =
+      ENV["ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY"]
+    config.active_record.encryption.deterministic_key =
+      ENV["ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY"]
+    config.active_record.encryption.key_derivation_salt =
+      ENV["ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"]
 
     # This will enable unique validations on encrypted fields
     config.active_record.encryption.extend_queries = true
