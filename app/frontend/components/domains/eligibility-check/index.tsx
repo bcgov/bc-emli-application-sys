@@ -57,7 +57,7 @@ export const EligibilityCheck = observer(() => {
       const homeTypeIndex = eligibleHomes.indexOf(homeType);
       return homeTypeIndex >= MULTI_UNIT_START_INDEX && homeTypeIndex <= MULTI_UNIT_END_INDEX;
     },
-    [eligibleHomes, MULTI_UNIT_START_INDEX, MULTI_UNIT_END_INDEX],
+    [eligibleHomes],
   );
 
   // Helper function to render alerts consistently
