@@ -31,6 +31,18 @@ export const ApplicationFields = function ApplicationFields({
 }: {
   permitApplication: IPermitApplication;
 }) {
+  // Debug: Log component processing
+  if (import.meta.env.SSR) {
+    console.log(
+      `Processing ${permitApplication.formattedFormJson?.components?.length || 0} top-level components for PDF`,
+    );
+    permitApplication.formattedFormJson?.components?.forEach((c, index) => {
+      console.log(
+        `Component ${index + 1}: ${c.type} - "${c.title || c.label || c.key}" (${c.components?.length || 0} children)`,
+      );
+    });
+  }
+
   return (
     <Page size="LETTER" style={page}>
       <View style={{ overflow: 'hidden' }}>
@@ -38,7 +50,7 @@ export const ApplicationFields = function ApplicationFields({
           <FormComponent key={c.id} component={c} permitApplication={permitApplication} />
         )) || (
           <Text style={{ fontSize: 12, color: theme.colors.text.secondary, textAlign: 'center', marginTop: 50 }}>
-            {t('permitApplication.pdf.noFormData')}
+            No form data available
           </Text>
         )}
       </View>
@@ -58,10 +70,19 @@ const FormComponent = function ApplicationPDFFormComponent({
   component,
   dataPath,
 }: IFormComponentProps) {
+  // Debug: Log each component being processed
+  if (import.meta.env.SSR) {
+    console.log(`Processing component: ${component.type} - "${component.title || component.label || component.key}"`);
+  }
+
   const extractFields = (component) => {
     if (component.input) {
-      const { isVisible } = extractFieldInfo(component);
-      return isVisible && component;
+      // Always return component if it has a label, regardless of data
+      const hasLabel = component.label && component.label.trim() !== '';
+      if (import.meta.env.SSR) {
+        console.log(`  Input field: "${component.label}" (${component.key}) - ${hasLabel ? 'INCLUDED' : 'EXCLUDED'}`);
+      }
+      return hasLabel ? component : null;
     } else if (component.components || component.columns) {
       return R.map(extractFields, component.components || [component.columns[0]]);
     }
@@ -77,7 +98,8 @@ const FormComponent = function ApplicationPDFFormComponent({
         const options = R.path([dataPath, component.key], permitApplication.submissionData?.data || {});
         const label = component.label;
         const values: any = Object.keys(options ?? {}).filter((key) => !!options[key]);
-        return { options, values, label, isVisible: !R.isEmpty(values) && !R.isNil(label) };
+        // Show checklist if it has a label, even if no options are selected
+        return { options, values, label, isVisible: !R.isNil(label) && label.trim() !== '' };
       }
       case EComponentType.datagrid: {
         return { value: null, label: null };
@@ -85,7 +107,8 @@ const FormComponent = function ApplicationPDFFormComponent({
       default:
         const label = component.label;
         const value = R.path([...dataPath, component.key], permitApplication.submissionData?.data || {});
-        return { value, label, isVisible: !R.isNil(value) && !R.isNil(label) };
+        // Show field if it has a label, regardless of value (including empty, null, 0, false)
+        return { value, label, isVisible: !R.isNil(label) && label.trim() !== '' };
     }
   };
 
@@ -94,8 +117,15 @@ const FormComponent = function ApplicationPDFFormComponent({
       dataPath = [component.key];
       const { components, columns } = component;
       const componentFields = fields(components || columns);
-      const isValid = !R.isEmpty(component.title.trim()) && componentFields.length > 0;
-      if (!isValid) return null;
+
+      if (import.meta.env.SSR) {
+        console.log(
+          `  Container "${component.title}" has ${componentFields.length} fields, ${components?.length || 0} total components`,
+        );
+      }
+
+      // ALWAYS show container if it has components, regardless of title or field data
+      if (!components && !columns) return null;
       const firstChild: any = R.head(components);
       const additionalChildren: any = R.tail(components);
 
@@ -175,10 +205,9 @@ const FormComponent = function ApplicationPDFFormComponent({
       );
     }
     case EComponentType.fieldset:
-      const numFields = fields(component.components).length;
-
+      // Always show fieldset if it exists, regardless of field data
       return (
-        numFields > 0 && (
+        component.components && (
           <View
             style={{
               borderWidth: 1,
@@ -227,17 +256,19 @@ const FormComponent = function ApplicationPDFFormComponent({
         </>
       );
     case EComponentType.file: {
-      const { value, label, isVisible } = extractFieldInfo(component);
-
-      return isVisible ? <FileField value={value} label={label} /> : null;
+      const { value, label } = extractFieldInfo(component);
+      // ALWAYS render if has label
+      return label ? <FileField value={value} label={label} /> : null;
     }
     case EComponentType.checklist: {
-      const { options, values, label, isVisible } = extractFieldInfo(component);
-      return isVisible ? <ChecklistField options={options} label={label} /> : null;
+      const { options, label } = extractFieldInfo(component);
+      // ALWAYS render if has label
+      return label ? <ChecklistField options={options} label={label} /> : null;
     }
     case EComponentType.checkbox: {
-      const { value, label, isVisible } = extractFieldInfo(component);
-      return isVisible ? <CheckboxField value={value} label={label} /> : null;
+      const { value, label } = extractFieldInfo(component);
+      // ALWAYS render if has label
+      return label ? <CheckboxField value={value} label={label} /> : null;
     }
     case EComponentType.select:
     case EComponentType.text:
@@ -246,8 +277,12 @@ const FormComponent = function ApplicationPDFFormComponent({
     case EComponentType.phone:
     case EComponentType.date:
     case EComponentType.email: {
-      const { value, label, isVisible } = extractFieldInfo(component);
-      return isVisible ? <InputField value={value} label={label} type={component.type} /> : null;
+      const { value, label } = extractFieldInfo(component);
+      // ALWAYS render if has label
+      if (import.meta.env.SSR) {
+        console.log(`  Rendering ${component.type} field: "${label}" = "${value}"`);
+      }
+      return label ? <InputField value={value} label={label} /> : null;
     }
     default:
       import.meta.env.DEV && console.log('[DEV]: missing component', component);
@@ -297,6 +332,8 @@ const PanelHeader = function ApplicationPDFPanelHeader({ component }) {
 };
 
 const ChecklistField = function ApplicationPDFPanelChecklistField({ options, label }) {
+  const hasOptions = options && typeof options === 'object' && Object.keys(options).length > 0;
+
   return (
     <View style={{ gap: 4, paddingTop: 4 }} wrap={false}>
       <Text
@@ -310,9 +347,15 @@ const ChecklistField = function ApplicationPDFPanelChecklistField({ options, lab
         {label}
       </Text>
       <View style={{ gap: 8 }}>
-        {Object.keys(options).map((key) => {
-          return <Checkbox key={key} isChecked={options[key]} label={key} />;
-        })}
+        {hasOptions ? (
+          Object.keys(options).map((key) => {
+            return <Checkbox key={key} isChecked={!!options[key]} label={key} />;
+          })
+        ) : (
+          <Text style={{ fontSize: 10, color: theme.colors.text.secondary, fontStyle: 'italic' }}>
+            No options selected
+          </Text>
+        )}
       </View>
     </View>
   );
@@ -321,7 +364,7 @@ const ChecklistField = function ApplicationPDFPanelChecklistField({ options, lab
 const CheckboxField = function ApplicationPDFPanelCheckboxField({ value, label }) {
   return (
     <View style={{ gap: 4, paddingTop: 4 }} wrap={false}>
-      <Checkbox isChecked={value} label={label} />
+      <Checkbox isChecked={!!value} label={label} />
     </View>
   );
 };
@@ -344,8 +387,11 @@ function Checkbox({ isChecked, label }) {
   );
 }
 
-const InputField = function ApplicationPDFInputField({ value, label, type }) {
-  return <RequirementField label={label} value={value} />;
+const InputField = function ApplicationPDFInputField({ value, label }) {
+  // Show actual value or a placeholder for empty values
+  const displayValue = value !== null && value !== undefined && value !== '' ? value : 'Not provided';
+
+  return <RequirementField label={label} value={displayValue} />;
 };
 
 const FileField = function ApplicationPDFFileField({ value, label }: { value: Record<string, any>[]; label: string }) {

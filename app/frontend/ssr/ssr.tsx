@@ -81,6 +81,76 @@ const generatePdfs = async (filePath) => {
       console.log('✅ All critical data validated successfully');
     }
 
+    // Step 3.6: Log data extraction debugging info
+    console.log('Step 3.6: Analyzing form data for PDF rendering...');
+    if (pdfData.permitApplication.formattedFormJson?.components) {
+      console.log(`Total form components: ${pdfData.permitApplication.formattedFormJson.components.length}`);
+
+      // Count how many fields have actual data
+      let fieldsWithData = 0;
+      let fieldsWithoutData = 0;
+
+      const analyzeComponent = (component, path = []) => {
+        if (component.input && component.key) {
+          const dataPath = [...path, component.key];
+          const value = pdfData.permitApplication.submissionData?.data;
+          let actualValue = value;
+
+          // Navigate through the data path
+          for (const segment of dataPath) {
+            if (actualValue && typeof actualValue === 'object') {
+              actualValue = actualValue[segment];
+            } else {
+              actualValue = undefined;
+              break;
+            }
+          }
+
+          if (actualValue !== null && actualValue !== undefined && actualValue !== '') {
+            fieldsWithData++;
+          } else {
+            fieldsWithoutData++;
+          }
+        }
+
+        // Recursively check child components
+        if (component.components) {
+          component.components.forEach((child) =>
+            analyzeComponent(child, component.key ? [...path, component.key] : path),
+          );
+        }
+
+        if (component.columns) {
+          component.columns.forEach((column) => {
+            if (column.components) {
+              column.components.forEach((child) =>
+                analyzeComponent(child, component.key ? [...path, component.key] : path),
+              );
+            }
+          });
+        }
+      };
+
+      pdfData.permitApplication.formattedFormJson.components.forEach((component) => analyzeComponent(component));
+
+      console.log(`Fields with data: ${fieldsWithData}`);
+      console.log(`Fields without data: ${fieldsWithoutData}`);
+      console.log(
+        `Data coverage: ${fieldsWithData > 0 ? Math.round((fieldsWithData / (fieldsWithData + fieldsWithoutData)) * 100) : 0}%`,
+      );
+
+      // Sample the first few data entries to understand structure
+      console.log('Sample submission data structure:');
+      const sampleData = pdfData.permitApplication.submissionData?.data;
+      if (sampleData) {
+        const keys = Object.keys(sampleData).slice(0, 5);
+        keys.forEach((key) => {
+          const value = sampleData[key];
+          console.log(`  "${key}": ${typeof value} = ${JSON.stringify(value).substring(0, 100)}...`);
+        });
+      }
+    }
+
     const permitApplicationPDFPath = pdfData.meta.generationPaths.permitApplication;
     const assetDirectoryPath = pdfData.meta.assetDirectoryPath;
     console.log(`Output path: ${permitApplicationPDFPath}`);
