@@ -1,52 +1,56 @@
-import { Page, Text, View } from "@react-pdf/renderer"
-import { t } from "i18next"
-import * as R from "ramda"
-import React from "react"
-import { IPermitApplication } from "../../../../../models/energy-savings-application"
-import { theme } from "../../../../../styles/theme"
-import { generateUUID } from "../../../../../utils/utility-functions"
-import { Footer } from "../shared/footer"
-import { page } from "../shared/styles/page"
+import { Page, Text, View } from '@react-pdf/renderer';
+import { t } from 'i18next';
+import * as R from 'ramda';
+import React from 'react';
+import { IPermitApplication } from '../../../../../models/energy-savings-application';
+import { theme } from '../../../../../styles/theme';
+import { generateUUID } from '../../../../../utils/utility-functions';
+import { Footer } from '../shared/footer';
+import { page } from '../shared/styles/page';
 
 enum EComponentType {
-  checkbox = "checkbox",
-  container = "container",
-  datagrid = "datagrid",
-  date = "date",
-  fieldset = "fieldset",
-  columns = "columns",
-  file = "simplefile",
-  number = "number",
-  panel = "panel",
-  select = "select",
-  checklist = "selectboxes",
-  email = "simpleemail",
-  phone = "simplephonenumber",
-  text = "simpletextfield",
-  textarea = "textarea",
+  checkbox = 'checkbox',
+  container = 'container',
+  datagrid = 'datagrid',
+  date = 'date',
+  fieldset = 'fieldset',
+  columns = 'columns',
+  file = 'simplefile',
+  number = 'number',
+  panel = 'panel',
+  select = 'select',
+  checklist = 'selectboxes',
+  email = 'simpleemail',
+  phone = 'simplephonenumber',
+  text = 'simpletextfield',
+  textarea = 'textarea',
 }
 
 export const ApplicationFields = function ApplicationFields({
   permitApplication,
 }: {
-  permitApplication: IPermitApplication
+  permitApplication: IPermitApplication;
 }) {
   return (
     <Page size="LETTER" style={page}>
-      <View style={{ overflow: "hidden" }}>
-        {permitApplication.formattedFormJson.components.map((c) => (
+      <View style={{ overflow: 'hidden' }}>
+        {permitApplication.formattedFormJson?.components?.map((c) => (
           <FormComponent key={c.id} component={c} permitApplication={permitApplication} />
-        ))}
+        )) || (
+          <Text style={{ fontSize: 12, color: theme.colors.text.secondary, textAlign: 'center', marginTop: 50 }}>
+            {t('permitApplication.pdf.noFormData')}
+          </Text>
+        )}
       </View>
       <Footer permitApplication={permitApplication} />
     </Page>
-  )
-}
+  );
+};
 
 interface IFormComponentProps {
-  permitApplication: IPermitApplication
-  component: any
-  dataPath?: string[]
+  permitApplication: IPermitApplication;
+  component: any;
+  dataPath?: string[];
 }
 
 const FormComponent = function ApplicationPDFFormComponent({
@@ -56,44 +60,44 @@ const FormComponent = function ApplicationPDFFormComponent({
 }: IFormComponentProps) {
   const extractFields = (component) => {
     if (component.input) {
-      const { isVisible } = extractFieldInfo(component)
-      return isVisible && component
+      const { isVisible } = extractFieldInfo(component);
+      return isVisible && component;
     } else if (component.components || component.columns) {
-      return R.map(extractFields, component.components || [component.columns[0]])
+      return R.map(extractFields, component.components || [component.columns[0]]);
     }
-  }
+  };
 
   const fields = (components: any[]) => {
-    return R.flatten(R.map(extractFields, components)).filter((outNull) => outNull)
-  }
+    return R.flatten(R.map(extractFields, components)).filter((outNull) => outNull);
+  };
 
   const extractFieldInfo = (component) => {
     switch (component.type) {
       case EComponentType.checklist: {
-        const options = R.path([dataPath, component.key], permitApplication.submissionData.data)
-        const label = component.label
-        const values: any = Object.keys(options ?? {}).filter((key) => !!options[key])
-        return { options, values, label, isVisible: !R.isEmpty(values) && !R.isNil(label) }
+        const options = R.path([dataPath, component.key], permitApplication.submissionData?.data || {});
+        const label = component.label;
+        const values: any = Object.keys(options ?? {}).filter((key) => !!options[key]);
+        return { options, values, label, isVisible: !R.isEmpty(values) && !R.isNil(label) };
       }
       case EComponentType.datagrid: {
-        return { value: null, label: null }
+        return { value: null, label: null };
       }
       default:
-        const label = component.label
-        const value = R.path([...dataPath, component.key], permitApplication.submissionData.data)
-        return { value, label, isVisible: !R.isNil(value) && !R.isNil(label) }
+        const label = component.label;
+        const value = R.path([...dataPath, component.key], permitApplication.submissionData?.data || {});
+        return { value, label, isVisible: !R.isNil(value) && !R.isNil(label) };
     }
-  }
+  };
 
   switch (component.type) {
     case EComponentType.container: {
-      dataPath = [component.key]
-      const { components, columns } = component
-      const componentFields = fields(components || columns)
-      const isValid = !R.isEmpty(component.title.trim()) && componentFields.length > 0
-      if (!isValid) return null
-      const firstChild: any = R.head(components)
-      const additionalChildren: any = R.tail(components)
+      dataPath = [component.key];
+      const { components, columns } = component;
+      const componentFields = fields(components || columns);
+      const isValid = !R.isEmpty(component.title.trim()) && componentFields.length > 0;
+      if (!isValid) return null;
+      const firstChild: any = R.head(components);
+      const additionalChildren: any = R.tail(components);
 
       return (
         <View>
@@ -110,7 +114,7 @@ const FormComponent = function ApplicationPDFFormComponent({
             />
           ))}
         </View>
-      )
+      );
     }
     case EComponentType.panel: {
       return (
@@ -118,7 +122,7 @@ const FormComponent = function ApplicationPDFFormComponent({
           style={{
             borderColor: theme.colors.border.light,
             marginBottom: 24,
-            width: "100%",
+            width: '100%',
           }}
         >
           <PanelHeader component={component} />
@@ -147,12 +151,13 @@ const FormComponent = function ApplicationPDFFormComponent({
             </View>
           )}
         </View>
-      )
+      );
     }
     case EComponentType.datagrid: {
-      const values: any[] = (R.path([...dataPath, component.key], permitApplication.submissionData.data) ?? []) as any[]
+      const values: any[] = (R.path([...dataPath, component.key], permitApplication.submissionData?.data || {}) ??
+        []) as any[];
 
-      const dataGridChildComponent = component?.components?.[0]
+      const dataGridChildComponent = component?.components?.[0];
 
       return (
         <>
@@ -167,10 +172,10 @@ const FormComponent = function ApplicationPDFFormComponent({
               />
             ))}
         </>
-      )
+      );
     }
     case EComponentType.fieldset:
-      const numFields = fields(component.components).length
+      const numFields = fields(component.components).length;
 
       return (
         numFields > 0 && (
@@ -195,12 +200,12 @@ const FormComponent = function ApplicationPDFFormComponent({
             ))}
           </View>
         )
-      )
+      );
     case EComponentType.columns:
       return (
         <>
           {component.columns && (
-            <View style={{ flexDirection: "row", gap: 20, width: "100%" }}>
+            <View style={{ flexDirection: 'row', gap: 20, width: '100%' }}>
               {component.columns.map((column, index) => {
                 return column.components
                   .map((child) => {
@@ -213,26 +218,26 @@ const FormComponent = function ApplicationPDFFormComponent({
                           permitApplication={permitApplication}
                         />
                       </View>
-                    )
+                    );
                   })
-                  .flat()
+                  .flat();
               })}
             </View>
           )}
         </>
-      )
+      );
     case EComponentType.file: {
-      const { value, label, isVisible } = extractFieldInfo(component)
+      const { value, label, isVisible } = extractFieldInfo(component);
 
-      return isVisible ? <FileField value={value} label={label} /> : null
+      return isVisible ? <FileField value={value} label={label} /> : null;
     }
     case EComponentType.checklist: {
-      const { options, values, label, isVisible } = extractFieldInfo(component)
-      return isVisible ? <ChecklistField options={options} label={label} /> : null
+      const { options, values, label, isVisible } = extractFieldInfo(component);
+      return isVisible ? <ChecklistField options={options} label={label} /> : null;
     }
     case EComponentType.checkbox: {
-      const { value, label, isVisible } = extractFieldInfo(component)
-      return isVisible ? <CheckboxField value={value} label={label} /> : null
+      const { value, label, isVisible } = extractFieldInfo(component);
+      return isVisible ? <CheckboxField value={value} label={label} /> : null;
     }
     case EComponentType.select:
     case EComponentType.text:
@@ -241,14 +246,14 @@ const FormComponent = function ApplicationPDFFormComponent({
     case EComponentType.phone:
     case EComponentType.date:
     case EComponentType.email: {
-      const { value, label, isVisible } = extractFieldInfo(component)
-      return isVisible ? <InputField value={value} label={label} type={component.type} /> : null
+      const { value, label, isVisible } = extractFieldInfo(component);
+      return isVisible ? <InputField value={value} label={label} type={component.type} /> : null;
     }
     default:
-      import.meta.env.DEV && console.log("[DEV]: missing component", component)
-      return null
+      import.meta.env.DEV && console.log('[DEV]: missing component', component);
+      return null;
   }
-}
+};
 
 const ContainerHeader = function ApplicationPDFContainerHeader({ component }) {
   return (
@@ -263,8 +268,8 @@ const ContainerHeader = function ApplicationPDFContainerHeader({ component }) {
       />
       <Text style={{ fontSize: 20, fontWeight: 700 }}>{component.title}</Text>
     </View>
-  )
-}
+  );
+};
 
 const PanelHeader = function ApplicationPDFPanelHeader({ component }) {
   return (
@@ -282,14 +287,14 @@ const PanelHeader = function ApplicationPDFPanelHeader({ component }) {
         borderBottomWidth: 0,
         borderColor: theme.colors.border.light,
         backgroundColor: theme.colors.greys.grey04,
-        width: "100%",
+        width: '100%',
       }}
       fixed
     >
       <Text style={{ fontSize: 12, fontWeight: 700 }}>{component.title}</Text>
     </View>
-  )
-}
+  );
+};
 
 const ChecklistField = function ApplicationPDFPanelChecklistField({ options, label }) {
   return (
@@ -306,24 +311,24 @@ const ChecklistField = function ApplicationPDFPanelChecklistField({ options, lab
       </Text>
       <View style={{ gap: 8 }}>
         {Object.keys(options).map((key) => {
-          return <Checkbox key={key} isChecked={options[key]} label={key} />
+          return <Checkbox key={key} isChecked={options[key]} label={key} />;
         })}
       </View>
     </View>
-  )
-}
+  );
+};
 
 const CheckboxField = function ApplicationPDFPanelCheckboxField({ value, label }) {
   return (
     <View style={{ gap: 4, paddingTop: 4 }} wrap={false}>
       <Checkbox isChecked={value} label={label} />
     </View>
-  )
-}
+  );
+};
 
 function Checkbox({ isChecked, label }) {
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
       <View
         style={{
           width: 8,
@@ -336,23 +341,23 @@ function Checkbox({ isChecked, label }) {
 
       <Text style={{ fontSize: 12, color: theme.colors.text.primary }}>{label}</Text>
     </View>
-  )
+  );
 }
 
 const InputField = function ApplicationPDFInputField({ value, label, type }) {
-  return <RequirementField label={label} value={value} />
-}
+  return <RequirementField label={label} value={value} />;
+};
 
 const FileField = function ApplicationPDFFileField({ value, label }: { value: Record<string, any>[]; label: string }) {
-  const fileExists = value && !R.isEmpty(value)
+  const fileExists = value && !R.isEmpty(value);
 
   return (
     <RequirementField
       label={label}
-      value={fileExists ? R.pluck("originalName", value).join(", ") : t("permitApplication.pdf.fileNotAdded")}
+      value={fileExists ? R.pluck('originalName', value).join(', ') : t('permitApplication.pdf.fileNotAdded')}
     />
-  )
-}
+  );
+};
 
 function RequirementField({ label, value }) {
   return (
@@ -360,21 +365,21 @@ function RequirementField({ label, value }) {
       <Label label={label} />
       <Input value={value} />
     </View>
-  )
+  );
 }
 
 function Label({ label }) {
   return (
     <Text style={{ fontSize: 12, color: theme.colors.text.primary, paddingBottom: 4, marginBottom: 4 }}>{label}</Text>
-  )
+  );
 }
 
 function Input({ value }) {
   return (
     <View
       style={{
-        flexDirection: "row",
-        alignItems: "center",
+        flexDirection: 'row',
+        alignItems: 'center',
         minHeight: 28,
         borderColor: theme.colors.border.light,
         borderRadius: 4,
@@ -389,5 +394,5 @@ function Input({ value }) {
     >
       <Text>{value}</Text>
     </View>
-  )
+  );
 }

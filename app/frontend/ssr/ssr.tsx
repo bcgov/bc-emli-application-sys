@@ -57,6 +57,30 @@ const generatePdfs = async (filePath) => {
     );
     console.log(`Formatted form JSON created`);
 
+    // Step 3.5: Validate critical data for PDF rendering
+    console.log('Step 3.5: Validating permit application data...');
+    const validationErrors = [];
+
+    if (!pdfData.permitApplication.jurisdiction) {
+      validationErrors.push('jurisdiction is null/undefined');
+    }
+    if (!pdfData.permitApplication.submitter) {
+      validationErrors.push('submitter is null/undefined');
+    }
+    if (!pdfData.permitApplication.submissionData) {
+      validationErrors.push('submissionData is null/undefined');
+    }
+    if (!pdfData.permitApplication.formattedFormJson?.components) {
+      validationErrors.push('formattedFormJson.components is null/undefined');
+    }
+
+    if (validationErrors.length > 0) {
+      console.log(`⚠️  Data validation warnings: ${validationErrors.join(', ')}`);
+      console.log('Proceeding with PDF generation using fallback values...');
+    } else {
+      console.log('✅ All critical data validated successfully');
+    }
+
     const permitApplicationPDFPath = pdfData.meta.generationPaths.permitApplication;
     const assetDirectoryPath = pdfData.meta.assetDirectoryPath;
     console.log(`Output path: ${permitApplicationPDFPath}`);
