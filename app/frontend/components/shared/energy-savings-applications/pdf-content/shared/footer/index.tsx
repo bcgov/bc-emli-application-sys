@@ -33,10 +33,6 @@ export const Footer = ({ permitApplication }: { permitApplication: IPermitApplic
             }
           />
           <Field
-            label={t('permitApplication.pdf.jurisdiction')}
-            value={permitApplication.jurisdiction?.name || 'N/A'}
-          />
-          <Field
             label={t('permitApplication.pdf.page', { pageNumber: pageNumber, totalPages: totalPages })}
             value={t('site.titleLong')}
           />

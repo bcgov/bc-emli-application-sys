@@ -24,17 +24,17 @@ export const CoverPage = function PermitApplicationPDFCoverPage({
       <View style={{ alignItems: 'stretch', gap: 42, width: '100%' }}>
         <View style={{ alignItems: 'center', gap: 6 }}>
           <Image src={logoUrl} style={{ width: 109.2, height: 42 }} />
-          <Text style={{ fontWeight: 700, fontSize: 13.5 }}>{t('site.title')}</Text>
+          <Text style={{ fontWeight: 700, fontSize: 13.5, marginTop: 20 }}>{t('site.title')}</Text>
         </View>
-        <Text style={{ fontWeight: 700, fontSize: 12, textAlign: 'center' }}>{subTitle}</Text>
-        <View
+        {/* <Text style={{ fontWeight: 700, fontSize: 12, textAlign: 'center' }}>{subTitle}</Text> */}
+        {/* <View
           style={{
             borderWidth: 1,
             borderColor: theme.colors.greys.grey01,
             borderRadius: 6,
           }}
-        >
-          <View
+        > */}
+        {/* <View
             style={{
               borderLeftWidth: 6,
               borderColor: theme.colors.theme.yellow,
@@ -46,8 +46,8 @@ export const CoverPage = function PermitApplicationPDFCoverPage({
             <View style={{ gap: 6, fontSize: 12 }}>
               <Text style={{ fontWeight: 700 }}>{permitApplication.fullAddress}</Text>
             </View>
-          </View>
-        </View>
+          </View> */}
+        {/* </View> */}
         <View
           style={{
             alignItems: 'stretch',
@@ -71,11 +71,6 @@ export const CoverPage = function PermitApplicationPDFCoverPage({
               `${permitApplication.submitter?.firstName || ''} ${permitApplication.submitter?.lastName || ''}`.trim() ||
               'Unknown'
             }
-          />
-          <Row
-            label={t('permitApplication.pdf.permitType')}
-            value={`${permitApplication.permitType?.name || 'Unknown'} | ${permitApplication.activity?.name || 'Unknown'}`}
-            isLast
           />
         </View>
       </View>

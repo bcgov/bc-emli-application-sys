@@ -44,12 +44,72 @@ class AwsCredentialRefreshService
     end
   end
 
-  # Alternative method if role assumption is not available
+  # Alternative method if role assumption is not available - uses STS session token
   def refresh_with_existing_credentials!
-    Rails.logger.info "Refreshing credentials using existing environment variables"
+    Rails.logger.info "Refreshing credentials using STS session token with existing environment credentials"
 
     begin
-      # Calculate expiration time (2 days from now)
+      # Try to get temporary credentials with session token first
+      if refresh_with_sts_session_token!
+        Rails.logger.info "Successfully obtained temporary credentials with STS session token"
+        return true
+      else
+        Rails.logger.warn "STS session token failed, falling back to environment credentials"
+        return refresh_with_environment_fallback!
+      end
+    rescue => e
+      Rails.logger.error "Failed to refresh with STS, trying environment fallback: #{e.message}"
+      return refresh_with_environment_fallback!
+    end
+  end
+
+  # Get temporary credentials using STS GetSessionToken
+  def refresh_with_sts_session_token!
+    Rails.logger.info "Getting temporary credentials using STS GetSessionToken"
+
+    begin
+      # Create STS client with current environment credentials
+      sts_client =
+        Aws::STS::Client.new(
+          access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
+          secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
+          region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1"
+        )
+
+      # Get session token - maximum duration for IAM users is 12 hours
+      # For temporary credentials, it's up to 36 hours, but 12 hours is safer
+      response =
+        sts_client.get_session_token(
+          {
+            duration_seconds: 12.hours.to_i # 12 hours - AWS maximum for IAM users
+          }
+        )
+
+      credentials = response.credentials
+
+      # Store new temporary credentials with actual AWS expiry time
+      AwsCredential.update_s3_credentials!(
+        access_key_id: credentials.access_key_id,
+        secret_access_key: credentials.secret_access_key,
+        session_token: credentials.session_token,
+        expires_at: credentials.expiration # Use actual AWS expiration time
+      )
+
+      Rails.logger.info "Temporary AWS credentials obtained via STS, expires at #{credentials.expiration}"
+      Rails.logger.info "Credentials valid for #{((credentials.expiration - Time.current) / 1.hour).round(1)} hours"
+      true
+    rescue => e
+      Rails.logger.error "Failed to get STS session token: #{e.message}"
+      false
+    end
+  end
+
+  # Fallback to environment credentials with extended expiration (original behavior)
+  def refresh_with_environment_fallback!
+    Rails.logger.info "Using environment credentials fallback with extended expiration"
+
+    begin
+      # Calculate expiration time (2 days from now) - original behavior
       expires_at = Time.current + duration_seconds.seconds
 
       # Store current environment credentials in database with extended expiration
@@ -60,7 +120,7 @@ class AwsCredentialRefreshService
         expires_at: expires_at
       )
 
-      Rails.logger.info "AWS credentials stored from environment, expires at #{expires_at}"
+      Rails.logger.info "AWS credentials stored from environment fallback, expires at #{expires_at}"
       true
     rescue => e
       Rails.logger.error "Failed to store AWS credentials from environment: #{e.message}"

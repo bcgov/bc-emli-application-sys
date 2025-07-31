@@ -23,7 +23,7 @@ cleanup_stuck_scans:
   active_job: true
 
 aws_credential_refresh:
-  cron: "0 0 */2 * * America/Vancouver" # Runs every 2 days at midnight Vancouver time
+  cron: "0 */8 * * * America/Vancouver" # Runs every 8 hours to prevent 12-hour credential expiry gaps
   class: "AwsCredentialRefreshJob"
   queue: default
   active_job: true
