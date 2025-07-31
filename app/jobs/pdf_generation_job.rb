@@ -561,12 +561,22 @@ class PdfGenerationJob
 
         # Sort reasons by confidence score and display
         puts "FAILURE ANALYSIS COMPLETE - #{failure_reasons.count} potential causes identified:"
+
+        # Ensure we have confidence scores for all reasons
+        default_scores = [50] * failure_reasons.count
+        actual_scores = confidence_scores.values.presence || default_scores
+
+        # Handle mismatched array lengths (more reasons than scores)
+        if actual_scores.length < failure_reasons.length
+          puts "Warning: #{failure_reasons.length} reasons but only #{actual_scores.length} confidence scores"
+          actual_scores +=
+            [50] * (failure_reasons.length - actual_scores.length)
+        end
+
         sorted_reasons =
           failure_reasons
-            .zip(
-              confidence_scores.values.presence || [50] * failure_reasons.count
-            )
-            .sort_by { |_, confidence| -confidence }
+            .zip(actual_scores)
+            .sort_by { |_, confidence| -(confidence || 50) }
 
         sorted_reasons.each_with_index do |(reason, confidence), index|
           confidence_text =
