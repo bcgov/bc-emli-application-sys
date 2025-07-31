@@ -158,6 +158,44 @@ class PdfGenerationJob
 
     File.open(json_filename, "w") { |file| file.write(pdf_json_data) }
 
+    # Verify JSON file was written correctly
+    puts "=== JSON File Verification ==="
+    if File.exist?(json_filename)
+      json_content = File.read(json_filename)
+      puts "JSON file written successfully"
+      puts "JSON file readable: #{!json_content.empty?}"
+
+      begin
+        parsed_verification = JSON.parse(json_content)
+        puts "JSON is valid and parseable"
+        puts "Parsed keys: #{parsed_verification.keys.join(", ")}"
+
+        # Check critical data points
+        permit_app = parsed_verification["permitApplication"]
+        if permit_app
+          puts "Permit application data present: ✓"
+          puts "Permit app ID: #{permit_app["id"]}"
+          puts "Form JSON present: #{permit_app["formJson"].present?}"
+          puts "Submission data present: #{permit_app["submissionData"].present?}"
+        else
+          puts "ERROR: No permit application data in JSON!"
+        end
+
+        meta = parsed_verification["meta"]
+        if meta && meta["generationPaths"]
+          puts "Generation paths present: ✓"
+          puts "Permit app path: #{meta["generationPaths"]["permitApplication"]}"
+        else
+          puts "ERROR: No generation paths in JSON!"
+        end
+      rescue JSON::ParserError => e
+        puts "ERROR: JSON is not valid - #{e.message}"
+      end
+    else
+      puts "ERROR: JSON file was not created!"
+    end
+    puts "=== End JSON Verification ==="
+
     puts "=== Node.js Execution Debug ==="
     puts "JSON filename: #{json_filename}"
     puts "JSON file exists: #{File.exist?(json_filename)}"
@@ -205,6 +243,40 @@ class PdfGenerationJob
     puts "SSR script exists: #{File.exist?(Rails.root.join("public/vite-ssr/ssr.js"))}"
     puts "=== End Environment Check ==="
 
+    # Try direct Node.js execution for detailed debugging
+    puts "=== Direct Node.js Execution Test ==="
+    direct_node_command = "node public/vite-ssr/ssr.js #{json_filename}"
+    puts "Direct Node.js command: #{direct_node_command}"
+    puts "Executing from directory: #{Rails.root}"
+
+    begin
+      direct_result =
+        Open3.popen3(
+          direct_node_command,
+          chdir: Rails.root.to_s
+        ) do |stdin, stdout, stderr, wait_thr|
+          stdout_direct = stdout.read
+          stderr_direct = stderr.read
+          exit_status_direct = wait_thr.value
+
+          puts "Direct Node.js STDOUT: #{stdout_direct.empty? ? "(empty)" : stdout_direct}"
+          puts "Direct Node.js STDERR: #{stderr_direct.empty? ? "(empty)" : stderr_direct}"
+          puts "Direct Node.js exit status: #{exit_status_direct.exitstatus}"
+
+          # Check files immediately after direct execution
+          files_after_direct =
+            begin
+              Dir.entries(generation_directory_path)
+            rescue StandardError
+              ["ERROR"]
+            end
+          puts "Files after direct Node.js: #{files_after_direct.join(", ")}"
+        end
+    rescue => e
+      puts "Error during direct Node.js execution: #{e.message}"
+    end
+    puts "=== End Direct Test ==="
+
     # Run Node.js script as a child process, passing JSON data as an argument
     stdout, stderr, status =
       Open3.popen3(
@@ -237,6 +309,13 @@ class PdfGenerationJob
         puts "Process PID: #{exit_status.pid}"
         puts "STDOUT length: #{stdout_content.length}"
         puts "STDERR length: #{stderr_content.length}"
+
+        # Show the actual output content
+        puts "=== STDOUT Content ==="
+        puts stdout_content.empty? ? "(no stdout output)" : stdout_content
+        puts "=== STDERR Content ==="
+        puts stderr_content.empty? ? "(no stderr output)" : stderr_content
+        puts "=== End Output Content ==="
 
         # Check directory immediately after process completes
         immediate_files =
