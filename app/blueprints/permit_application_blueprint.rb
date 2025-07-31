@@ -114,6 +114,10 @@ class PermitApplicationBlueprint < Blueprinter::Base
       options[:form_json].present? ? options[:form_json] : pa.form_json
     end
 
+    field :form_customizations do |pa, options|
+      pa.form_customizations || {}
+    end
+
     field :submitted_at do |pa, options|
       options[:submitted_at].present? ? options[:submitted_at] : pa.submitted_at
     end
