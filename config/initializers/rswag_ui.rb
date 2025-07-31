@@ -14,3 +14,14 @@ Rswag::Ui.configure do |c|
   # c.basic_auth_enabled = true
   # c.basic_auth_credentials 'username', 'password'
 end
+
+# need to relax CSP for the Swagger UI path as it injects styles and scripts to work properly
+Rails.application.config.to_prepare do
+  Rswag::Ui::ApiController.class_eval do
+    content_security_policy do |policy|
+      # Allow unsafe inline scripts & styles just for Swagger
+      policy.script_src :self, :https, :unsafe_inline
+      policy.style_src :self, :https, :unsafe_inline
+    end
+  end
+end
