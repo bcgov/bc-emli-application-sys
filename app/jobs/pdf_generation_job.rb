@@ -116,6 +116,15 @@ class PdfGenerationJob
         }.to_json
 
         puts "Meta generationPaths: #{JSON.parse(pdf_json_data)["meta"]["generationPaths"].inspect}"
+
+        # Additional JSON data debugging
+        parsed_json = JSON.parse(pdf_json_data)
+        puts "JSON structure keys: #{parsed_json.keys.join(", ")}"
+        puts "Permit application keys: #{parsed_json["permitApplication"]&.keys&.join(", ")}"
+        puts "Form customizations present: #{parsed_json["permitApplication"]&.dig("formCustomizations").present?}"
+        puts "Form customizations content: #{parsed_json["permitApplication"]&.dig("formCustomizations")&.inspect}"
+        puts "Form JSON present: #{parsed_json["permitApplication"]&.dig("formJson").present?}"
+        puts "Submission data present: #{parsed_json["permitApplication"]&.dig("submissionData").present?}"
         puts "=== End PDF Data Debug ==="
 
         {
@@ -160,6 +169,21 @@ class PdfGenerationJob
     puts "- Step code checklist PDF: #{should_checklist_pdf_be_generated ? "#{generation_directory_path}/#{step_code_filename}" : "Not generating"}"
     puts "JSON content preview (first 500 chars): #{pdf_json_data[0..500]}..."
     puts "Files in directory before execution: #{Dir.entries(generation_directory_path).join(", ")}"
+
+    # Debug the exact paths that will be generated
+    parsed_json = JSON.parse(pdf_json_data)
+    generation_paths = parsed_json.dig("meta", "generationPaths")
+    if generation_paths
+      puts "=== Expected Output Paths ==="
+      generation_paths.each do |key, path|
+        next unless path
+        puts "#{key}: #{path}"
+        puts "  - Directory exists: #{File.directory?(File.dirname(path))}"
+        puts "  - Directory writable: #{File.writable?(File.dirname(path))}"
+        puts "  - Path absolute: #{File.absolute_path?(path)}"
+      end
+      puts "=== End Expected Paths ==="
+    end
 
     # Check Node.js environment
     puts "=== Node.js Environment Check ==="
@@ -207,35 +231,110 @@ class PdfGenerationJob
         # Wait for the process to exit and get the exit status
         exit_status = wait_thr.value
 
+        puts "=== Node.js Process Results ==="
         puts "Node.js process exit status: #{exit_status.exitstatus}"
         puts "Node.js process success: #{exit_status.success?}"
+        puts "Process PID: #{exit_status.pid}"
         puts "STDOUT length: #{stdout_content.length}"
         puts "STDERR length: #{stderr_content.length}"
+
+        # Check directory immediately after process completes
+        immediate_files =
+          begin
+            Dir.entries(generation_directory_path)
+          rescue StandardError
+            ["ERROR_READING_DIR"]
+          end
+        puts "Files immediately after Node.js execution: #{immediate_files.join(", ")}"
+
+        # Look for any new files that weren't there before
+        puts "Checking for any PDF files created..."
+        pdf_files_after = immediate_files.select { |f| f.end_with?(".pdf") }
+        puts "PDF files after execution: #{pdf_files_after.join(", ")}"
+        puts "=== End Process Results ==="
 
         File.delete(json_filename)
 
         # Check for errors or handle output based on the exit status
         if exit_status.success?
           puts "=== File Verification After Node.js ==="
+          puts "Node.js script completed successfully, now checking for generated files..."
+
+          # Enhanced directory debugging
+          puts "Generation directory: #{generation_directory_path}"
+          puts "Directory exists: #{File.directory?(generation_directory_path)}"
+          puts "Directory readable: #{File.readable?(generation_directory_path)}"
+          puts "Directory writable: #{File.writable?(generation_directory_path)}"
+
+          all_files =
+            begin
+              Dir.entries(generation_directory_path)
+            rescue StandardError
+              ["ERROR_READING_DIR"]
+            end
+          puts "All files in directory: #{all_files.join(", ")}"
+
+          # Check for any PDF files
+          pdf_files = all_files.select { |f| f.end_with?(".pdf") }
+          puts "PDF files found: #{pdf_files.join(", ")}"
+
+          # Check for any files with our application ID
+          app_id_files =
+            all_files.select do |f|
+              f.include?(submission_version.permit_application_id)
+            end
+          puts "Files containing application ID: #{app_id_files.join(", ")}"
 
           pdfs = []
           if should_permit_application_pdf_be_generated
             permit_pdf_path =
               "#{generation_directory_path}/#{application_filename}"
-            puts "Checking for permit application PDF: #{permit_pdf_path}"
+            puts "=== Permit Application PDF Check ==="
+            puts "Expected path: #{permit_pdf_path}"
+            puts "Expected filename: #{application_filename}"
             puts "File exists: #{File.exist?(permit_pdf_path)}"
-            puts "File size: #{File.exist?(permit_pdf_path) ? File.size(permit_pdf_path) : "N/A"} bytes"
+
+            if File.exist?(permit_pdf_path)
+              file_stat = File.stat(permit_pdf_path)
+              puts "File size: #{file_stat.size} bytes"
+              puts "File modified: #{file_stat.mtime}"
+              puts "File permissions: #{file_stat.mode.to_s(8)}"
+            else
+              puts "File does NOT exist at expected path"
+              # Check for similar files
+              similar_files =
+                all_files.select { |f| f.include?("permit_application") }
+              puts "Similar permit application files: #{similar_files.join(", ")}"
+            end
 
             pdfs << {
               fname: application_filename,
               key: PermitApplication::PERMIT_APP_PDF_DATA_KEY
             }
           end
+
           if should_checklist_pdf_be_generated
             checklist_pdf_path =
               "#{generation_directory_path}/#{step_code_filename}"
-            puts "Checking for step code checklist PDF: #{checklist_pdf_path}"
-            puts "Files in directory: #{Dir.entries(generation_directory_path).join(", ")}"
+            puts "=== Step Code Checklist PDF Check ==="
+            puts "Expected path: #{checklist_pdf_path}"
+            puts "Expected filename: #{step_code_filename}"
+            puts "File exists: #{File.exist?(checklist_pdf_path)}"
+
+            if File.exist?(checklist_pdf_path)
+              file_stat = File.stat(checklist_pdf_path)
+              puts "File size: #{file_stat.size} bytes"
+              puts "File modified: #{file_stat.mtime}"
+              puts "File permissions: #{file_stat.mode.to_s(8)}"
+            else
+              puts "File does NOT exist at expected path"
+              # Check for similar files
+              similar_files =
+                all_files.select do |f|
+                  f.include?("step_code") || f.include?("checklist")
+                end
+              puts "Similar checklist files: #{similar_files.join(", ")}"
+            end
 
             pdfs << {
               fname: step_code_filename,
@@ -243,13 +342,35 @@ class PdfGenerationJob
             }
           end
 
-          puts "Files in tmp/files directory: #{Dir.entries(generation_directory_path).join(", ")}"
+          puts "=== Final Directory State ==="
+          final_files =
+            begin
+              Dir.entries(generation_directory_path)
+            rescue StandardError
+              ["ERROR_READING_DIR"]
+            end
+          puts "Final files in directory: #{final_files.join(", ")}"
           puts "=== End File Verification ==="
 
           pdfs.each do |pdf|
             path = "#{generation_directory_path}/#{pdf[:fname]}"
-            puts "Opening PDF file: #{path}"
-            puts "File exists before open: #{File.exist?(path)}"
+            puts "=== Processing PDF: #{pdf[:fname]} ==="
+            puts "Full path: #{path}"
+            puts "File exists: #{File.exist?(path)}"
+
+            if File.exist?(path)
+              puts "File size: #{File.size(path)} bytes"
+            else
+              puts "ERROR: File does not exist!"
+              puts "Directory contents at failure:"
+              failure_files =
+                begin
+                  Dir.entries(generation_directory_path)
+                rescue StandardError
+                  ["ERROR_READING_DIR"]
+                end
+              puts failure_files.join(", ")
+            end
 
             unless File.exist?(path)
               raise "PDF file was not created by Node.js script: #{path}"
