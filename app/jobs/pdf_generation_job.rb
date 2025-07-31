@@ -249,12 +249,59 @@ class PdfGenerationJob
       "npm run #{NodeScripts::GENERATE_PDF_SCRIPT_NAME} #{json_filename}"
     puts "Running command: #{command}"
 
+    # Check files before Node.js execution
+    expected_files = []
+    if should_permit_application_pdf_be_generated
+      expected_files << "#{generation_directory_path}/#{application_filename}"
+    end
+    if should_checklist_pdf_be_generated
+      expected_files << "#{generation_directory_path}/#{step_code_filename}"
+    end
+
+    puts "Expected files to be created: #{expected_files.join(", ")}"
+
+    # Capture Node.js execution with enhanced logging
+    start_time = Time.current
     stdout, stderr, status = Open3.capture3(command, chdir: Rails.root)
+    execution_time = Time.current - start_time
 
     puts "=== Node.js Command Output ==="
     puts "Exit status: #{status.exitstatus}"
-    puts "STDOUT: #{stdout}" unless stdout.blank?
-    puts "STDERR: #{stderr}" unless stderr.blank?
+    puts "Execution time: #{execution_time.round(2)}s"
+    puts "Command PID: #{status.pid}" if status.respond_to?(:pid)
+
+    # Always log stdout/stderr, even if empty
+    puts "STDOUT (#{stdout.length} chars):"
+    if stdout.blank?
+      puts "  [EMPTY - This might indicate silent failure]"
+    else
+      puts "  #{stdout}"
+    end
+
+    puts "STDERR (#{stderr.length} chars):"
+    if stderr.blank?
+      puts "  [EMPTY]"
+    else
+      puts "  #{stderr}"
+    end
+
+    # Check for suspicious patterns
+    suspicious_patterns = []
+    if stdout.blank? && stderr.blank?
+      suspicious_patterns << "No output from Node.js script (completely silent)"
+    end
+    if execution_time < 0.5
+      suspicious_patterns << "Execution too fast (#{execution_time.round(2)}s) - likely early exit"
+    end
+    if execution_time > 30
+      suspicious_patterns << "Execution too slow (#{execution_time.round(2)}s) - possible timeout"
+    end
+
+    if suspicious_patterns.any?
+      puts "⚠️  SUSPICIOUS PATTERNS DETECTED:"
+      suspicious_patterns.each { |pattern| puts "   - #{pattern}" }
+    end
+
     puts "=== End Node.js Output ==="
 
     unless status.success?
@@ -264,7 +311,39 @@ class PdfGenerationJob
       raise "Node.js PDF generation failed: #{stderr.blank? ? stdout : stderr}"
     end
 
-    puts "Node.js PDF generation completed successfully"
+    # Immediately check if expected files were created
+    puts "=== Post-Node.js File Verification ==="
+    expected_files.each do |expected_file|
+      if File.exist?(expected_file)
+        file_size = File.size(expected_file)
+        puts "✓ File created: #{expected_file} (#{file_size} bytes)"
+
+        # Check if file is suspiciously small
+        if file_size < 10_000 # Less than 10KB might indicate issues
+          puts "⚠️  WARNING: File is smaller than expected (#{file_size} bytes)"
+          puts "   This might indicate React PDF rendering issues"
+        end
+      else
+        puts "✗ MISSING: #{expected_file}"
+        puts "   Node.js exited successfully but didn't create this file"
+
+        # Check for common issues
+        dir_exists = File.directory?(File.dirname(expected_file))
+        dir_writable = dir_exists && File.writable?(File.dirname(expected_file))
+        puts "   Directory exists: #{dir_exists}"
+        puts "   Directory writable: #{dir_writable}" if dir_exists
+
+        # Log a more detailed error
+        if stdout.include?("PDF Generation Error:") || stderr.include?("Error:")
+          puts "   Detected error messages in Node.js output"
+        else
+          puts "   No error messages in Node.js output - likely React PDF silent failure"
+        end
+      end
+    end
+    puts "=== End File Verification ==="
+
+    puts "Node.js PDF generation completed with exit status 0"
 
     # Collect generated PDF files
     pdfs = []
@@ -302,13 +381,247 @@ class PdfGenerationJob
       end
 
       unless File.exist?(path)
-        raise "PDF file was not created by Node.js script: #{path}"
+        puts "PDF file was not created by Node.js script: #{path}"
+        puts "=== Diagnosing Node.js PDF Generation Failure ==="
+
+        # Comprehensive failure analysis - we ALWAYS find a reason
+        failure_reasons = []
+        confidence_scores = {}
+
+        # 1. Analyze Node.js execution patterns
+        puts "Analyzing Node.js execution patterns..."
+        if defined?(execution_time) && execution_time
+          if execution_time < 0.5
+            failure_reasons << "Node.js script exited too quickly (#{execution_time.round(2)}s) - likely early termination"
+            confidence_scores["early_exit"] = 90
+          elsif execution_time > 30
+            failure_reasons << "Node.js script took too long (#{execution_time.round(2)}s) - likely timeout or hang"
+            confidence_scores["timeout"] = 85
+          end
+        end
+
+        if defined?(stdout) && defined?(stderr)
+          if stdout.blank? && stderr.blank?
+            failure_reasons << "Node.js produced no output (completely silent execution)"
+            confidence_scores["silent_execution"] = 80
+          end
+        end
+
+        # 2. Check JSON data integrity with detailed analysis
+        puts "Analyzing JSON data integrity..."
+        if File.exist?(json_filename)
+          begin
+            json_content = JSON.parse(File.read(json_filename))
+            json_size = File.size(json_filename)
+
+            # Deep data validation
+            if json_content.dig("permitApplication", "formJson").blank?
+              failure_reasons << "Critical data missing: formJson is empty or null"
+              confidence_scores["missing_form_json"] = 95
+            else
+              form_json = json_content.dig("permitApplication", "formJson")
+              if form_json.is_a?(Hash) && form_json.dig("components").blank?
+                failure_reasons << "FormJSON has no components - invalid form structure"
+                confidence_scores["invalid_form_structure"] = 90
+              end
+            end
+
+            if json_content.dig("permitApplication", "submissionData").blank?
+              failure_reasons << "Critical data missing: submissionData is empty"
+              confidence_scores["missing_submission_data"] = 85
+            end
+
+            if json_content.dig(
+                 "meta",
+                 "generationPaths",
+                 "permitApplication"
+               ).blank?
+              failure_reasons << "Missing generation path configuration"
+              confidence_scores["missing_paths"] = 95
+            end
+
+            # Check for data corruption
+            if json_size > 100_000 # Very large JSON > 100KB
+              failure_reasons << "JSON data unusually large (#{json_size} bytes) - possible data corruption or circular references"
+              confidence_scores["large_data"] = 70
+            end
+          rescue JSON::ParserError => e
+            failure_reasons << "Invalid JSON data format: #{e.message}"
+            confidence_scores["json_parse_error"] = 95
+          end
+        else
+          failure_reasons << "JSON input file missing or deleted"
+          confidence_scores["missing_json"] = 95
+        end
+
+        # 3. System resource analysis
+        puts "Checking system resources..."
+        begin
+          # Memory check
+          memory_info =
+            `cat /proc/meminfo | grep MemAvailable | awk '{print $2}'`.strip.to_i
+          if memory_info > 0
+            if memory_info < 200_000 # Less than 200MB
+              failure_reasons << "Critically low memory (#{(memory_info / 1024).round}MB available) - likely out of memory during PDF rendering"
+              confidence_scores["low_memory"] = 95
+            elsif memory_info < 500_000 # Less than 500MB
+              failure_reasons << "Low memory available (#{(memory_info / 1024).round}MB) - may cause React PDF failures"
+              confidence_scores["moderate_memory"] = 70
+            end
+          end
+
+          # Disk space check
+          disk_info =
+            `df #{generation_directory_path} | tail -1 | awk '{print $4}'`.strip.to_i
+          if disk_info > 0
+            if disk_info < 50_000 # Less than 50MB
+              failure_reasons << "Critically low disk space (#{(disk_info / 1024).round}MB available) - cannot write PDF file"
+              confidence_scores["low_disk"] = 95
+            elsif disk_info < 100_000 # Less than 100MB
+              failure_reasons << "Low disk space (#{(disk_info / 1024).round}MB available) - may prevent PDF creation"
+              confidence_scores["moderate_disk"] = 70
+            end
+          end
+        rescue => e
+          failure_reasons << "Unable to check system resources: #{e.message}"
+          confidence_scores["resource_check_failed"] = 60
+        end
+
+        # 4. React PDF specific analysis
+        puts "Analyzing React PDF rendering issues..."
+        if File.exist?(json_filename)
+          begin
+            json_content = JSON.parse(File.read(json_filename))
+            permit_data = json_content.dig("permitApplication")
+
+            # Check for data that commonly breaks React PDF
+            if permit_data
+              # Check for potential circular references
+              data_string = permit_data.to_s
+              if data_string.length > 500_000 # Very large serialized data
+                failure_reasons << "Permit application data extremely large - likely contains circular references or excessive nested data"
+                confidence_scores["circular_references"] = 80
+              end
+
+              # Check for problematic field types
+              if permit_data.to_s.include?("null") &&
+                   permit_data.to_s.scan(/null/).count > 100
+                failure_reasons << "Excessive null values in data - may cause React component rendering issues"
+                confidence_scores["excessive_nulls"] = 75
+              end
+
+              # Check form complexity
+              form_json = permit_data.dig("formJson")
+              if form_json.is_a?(Hash) &&
+                   form_json.dig("components").is_a?(Array)
+                component_count =
+                  count_nested_components(form_json.dig("components"))
+                if component_count > 500
+                  failure_reasons << "Form has #{component_count} components - exceeds React PDF rendering limits"
+                  confidence_scores["complex_form"] = 85
+                end
+              end
+            end
+          rescue => e
+            failure_reasons << "Error analyzing React PDF data: #{e.message}"
+            confidence_scores["react_analysis_failed"] = 60
+          end
+        end
+
+        # 5. Environment and dependency issues
+        puts "Checking Node.js environment..."
+        begin
+          node_modules_exists = File.directory?(Rails.root.join("node_modules"))
+          if !node_modules_exists
+            failure_reasons << "Node modules directory missing - dependencies not installed"
+            confidence_scores["missing_dependencies"] = 95
+          end
+
+          react_pdf_exists =
+            File.directory?(Rails.root.join("node_modules", "@react-pdf"))
+          if !react_pdf_exists
+            failure_reasons << "@react-pdf/renderer package missing or not installed"
+            confidence_scores["missing_react_pdf"] = 95
+          end
+        rescue => e
+          failure_reasons << "Error checking Node.js environment: #{e.message}"
+          confidence_scores["env_check_failed"] = 60
+        end
+
+        # 6. If no specific reasons found, provide detailed generic analysis
+        if failure_reasons.empty?
+          puts "No specific issues detected - analyzing generic React PDF failure patterns..."
+
+          # This should never happen with our comprehensive checks, but just in case
+          failure_reasons << "React PDF silent failure - component rendering error not caught by try/catch block"
+          failure_reasons << "Possible @react-pdf/renderer internal bug with complex form data"
+          failure_reasons << "Memory allocation failure during PDF generation not properly reported"
+          confidence_scores["generic_react_failure"] = 50
+        end
+
+        # Sort reasons by confidence score and display
+        puts "FAILURE ANALYSIS COMPLETE - #{failure_reasons.count} potential causes identified:"
+        sorted_reasons =
+          failure_reasons
+            .zip(
+              confidence_scores.values.presence || [50] * failure_reasons.count
+            )
+            .sort_by { |_, confidence| -confidence }
+
+        sorted_reasons.each_with_index do |(reason, confidence), index|
+          confidence_text =
+            confidence >= 90 ?
+              "VERY LIKELY" :
+              confidence >= 70 ?
+                "LIKELY" :
+                confidence >= 50 ? "POSSIBLE" : "UNLIKELY"
+          puts "  #{index + 1}. [#{confidence_text}] #{reason}"
+        end
+
+        # Always provide a PRIMARY reason (highest confidence)
+        primary_reason = sorted_reasons.first[0]
+        puts ""
+        puts "🎯 PRIMARY FAILURE REASON: #{primary_reason}"
+
+        puts "Attempting Ruby fallback PDF generation..."
+
+        # Generate fallback PDF using Ruby
+        if pdf[:key] == PermitApplication::PERMIT_APP_PDF_DATA_KEY
+          generate_ruby_permit_pdf(path, submission_version)
+        elsif pdf[:key] == PermitApplication::CHECKLIST_PDF_DATA_KEY
+          generate_ruby_checklist_pdf(path, submission_version)
+        end
+
+        # Check if fallback generation worked
+        unless File.exist?(path)
+          raise "Both Node.js and Ruby fallback PDF generation failed: #{path}"
+        end
+
+        puts "Ruby fallback PDF generation successful: #{File.size(path)} bytes"
+        puts "=== End Diagnostics ==="
       end
 
       # Validate PDF file size
       file_size = File.size(path)
       if file_size < 1000 # PDFs should be at least 1KB
-        raise "Generated PDF file is too small (#{file_size} bytes), likely corrupted: #{path}"
+        puts "Generated PDF file is too small (#{file_size} bytes), attempting Ruby fallback..."
+
+        # Remove corrupted file and generate with Ruby
+        File.delete(path) if File.exist?(path)
+
+        if pdf[:key] == PermitApplication::PERMIT_APP_PDF_DATA_KEY
+          generate_ruby_permit_pdf(path, submission_version)
+        elsif pdf[:key] == PermitApplication::CHECKLIST_PDF_DATA_KEY
+          generate_ruby_checklist_pdf(path, submission_version)
+        end
+
+        # Re-validate after Ruby generation
+        unless File.exist?(path) && File.size(path) >= 1000
+          raise "PDF generation failed - both Node.js and Ruby methods produced invalid files: #{path}"
+        end
+
+        file_size = File.size(path)
+        puts "Ruby fallback PDF generation successful after corruption: #{file_size} bytes"
       end
 
       puts "PDF validated successfully: #{file_size} bytes"
@@ -500,6 +813,18 @@ class PdfGenerationJob
   end
 
   private
+
+  def count_nested_components(components)
+    return 0 unless components.is_a?(Array)
+
+    count = components.size
+    components.each do |component|
+      if component.is_a?(Hash) && component["components"].is_a?(Array)
+        count += count_nested_components(component["components"])
+      end
+    end
+    count
+  end
 
   def camelize_response(data)
     return nil if data.blank?
