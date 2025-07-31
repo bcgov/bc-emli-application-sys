@@ -8,12 +8,13 @@ class ZipfileJob
 
     Rails.logger.info "ZipfileJob starting for permit application: #{permit_application_id}"
 
-    # Simple deduplication - skip if recent zip exists (last 5 minutes)
-    if permit_application.zipfile_data.present? &&
-         permit_application.updated_at > 5.minutes.ago
-      Rails.logger.info "Recent zip exists (created #{permit_application.updated_at}), skipping generation"
-      return
-    end
+    # Temporarily disabled deduplication to test Ruby PDF generation
+    # TODO: Re-enable after testing
+    # if permit_application.zipfile_data.present? &&
+    #      permit_application.updated_at > 5.minutes.ago
+    #   Rails.logger.info "Recent zip exists (created #{permit_application.updated_at}), skipping generation"
+    #   return
+    # end
 
     # Try to generate PDFs, but don't fail the entire job if PDF generation fails
     begin

@@ -243,287 +243,280 @@ class PdfGenerationJob
     puts "SSR script exists: #{File.exist?(Rails.root.join("public/vite-ssr/ssr.js"))}"
     puts "=== End Environment Check ==="
 
-    # Try direct Node.js execution for detailed debugging
-    puts "=== Direct Node.js Execution Test ==="
-    direct_node_command = "node public/vite-ssr/ssr.js #{json_filename}"
-    puts "Direct Node.js command: #{direct_node_command}"
-    puts "Executing from directory: #{Rails.root}"
+    # Execute Node.js PDF generation
+    puts "=== Executing Node.js PDF Generation ==="
+    command =
+      "npm run #{NodeScripts::GENERATE_PDF_SCRIPT_NAME} #{json_filename}"
+    puts "Running command: #{command}"
 
-    begin
-      direct_result =
-        Open3.popen3(
-          direct_node_command,
-          chdir: Rails.root.to_s
-        ) do |stdin, stdout, stderr, wait_thr|
-          stdout_direct = stdout.read
-          stderr_direct = stderr.read
-          exit_status_direct = wait_thr.value
+    stdout, stderr, status = Open3.capture3(command, chdir: Rails.root)
 
-          puts "Direct Node.js STDOUT: #{stdout_direct.empty? ? "(empty)" : stdout_direct}"
-          puts "Direct Node.js STDERR: #{stderr_direct.empty? ? "(empty)" : stderr_direct}"
-          puts "Direct Node.js exit status: #{exit_status_direct.exitstatus}"
+    puts "=== Node.js Command Output ==="
+    puts "Exit status: #{status.exitstatus}"
+    puts "STDOUT: #{stdout}" unless stdout.blank?
+    puts "STDERR: #{stderr}" unless stderr.blank?
+    puts "=== End Node.js Output ==="
 
-          # Check files immediately after direct execution
-          files_after_direct =
-            begin
-              Dir.entries(generation_directory_path)
-            rescue StandardError
-              ["ERROR"]
-            end
-          puts "Files after direct Node.js: #{files_after_direct.join(", ")}"
-        end
-    rescue => e
-      puts "Error during direct Node.js execution: #{e.message}"
+    unless status.success?
+      puts "ERROR: Node.js PDF generation failed with exit code #{status.exitstatus}"
+      puts "STDOUT: #{stdout}"
+      puts "STDERR: #{stderr}"
+      raise "Node.js PDF generation failed: #{stderr.blank? ? stdout : stderr}"
     end
-    puts "=== End Direct Test ==="
 
-    # Run Node.js script as a child process, passing JSON data as an argument
-    stdout, stderr, status =
-      Open3.popen3(
-        "npm",
-        "run",
-        NodeScripts::GENERATE_PDF_SCRIPT_NAME,
-        json_filename,
-        chdir: Rails.root.to_s
-      ) do |stdin, stdout, stderr, wait_thr|
-        # Read and print the standard output continuously until the process exits
-        stdout_content = ""
-        stderr_content = ""
+    puts "Node.js PDF generation completed successfully"
 
-        stdout.each_line do |line|
-          puts "STDOUT: #{line}"
-          stdout_content += line
-        end
+    # Collect generated PDF files
+    pdfs = []
+    if should_permit_application_pdf_be_generated
+      pdfs << {
+        fname: application_filename,
+        key: PermitApplication::PERMIT_APP_PDF_DATA_KEY
+      }
+    end
 
-        stderr.each_line do |line|
-          puts "STDERR: #{line}"
-          stderr_content += line
-        end
+    if should_checklist_pdf_be_generated
+      pdfs << {
+        fname: step_code_filename,
+        key: PermitApplication::CHECKLIST_PDF_DATA_KEY
+      }
+    end
 
-        # Wait for the process to exit and get the exit status
-        exit_status = wait_thr.value
+    # Wait a moment for file system to sync (prevents timing issues)
+    sleep(0.5)
 
-        puts "=== Node.js Process Results ==="
-        puts "Node.js process exit status: #{exit_status.exitstatus}"
-        puts "Node.js process success: #{exit_status.success?}"
-        puts "Process PID: #{exit_status.pid}"
-        puts "STDOUT length: #{stdout_content.length}"
-        puts "STDERR length: #{stderr_content.length}"
+    # Process the generated PDFs
+    pdfs.each do |pdf|
+      path = "#{generation_directory_path}/#{pdf[:fname]}"
+      puts "Processing PDF: #{path}"
+      puts "File exists: #{File.exist?(path)}"
+      puts "File size: #{File.exist?(path) ? File.size(path) : "N/A"} bytes"
 
-        # Show the actual output content
-        puts "=== STDOUT Content ==="
-        puts stdout_content.empty? ? "(no stdout output)" : stdout_content
-        puts "=== STDERR Content ==="
-        puts stderr_content.empty? ? "(no stderr output)" : stderr_content
-        puts "=== End Output Content ==="
-
-        # Check directory immediately after process completes
-        immediate_files =
-          begin
-            Dir.entries(generation_directory_path)
-          rescue StandardError
-            ["ERROR_READING_DIR"]
-          end
-        puts "Files immediately after Node.js execution: #{immediate_files.join(", ")}"
-
-        # Look for any new files that weren't there before
-        puts "Checking for any PDF files created..."
-        pdf_files_after = immediate_files.select { |f| f.end_with?(".pdf") }
-        puts "PDF files after execution: #{pdf_files_after.join(", ")}"
-        puts "=== End Process Results ==="
-
-        File.delete(json_filename)
-
-        # Check for errors or handle output based on the exit status
-        if exit_status.success?
-          puts "=== File Verification After Node.js ==="
-          puts "Node.js script completed successfully, now checking for generated files..."
-
-          # Enhanced directory debugging
-          puts "Generation directory: #{generation_directory_path}"
-          puts "Directory exists: #{File.directory?(generation_directory_path)}"
-          puts "Directory readable: #{File.readable?(generation_directory_path)}"
-          puts "Directory writable: #{File.writable?(generation_directory_path)}"
-
-          all_files =
-            begin
-              Dir.entries(generation_directory_path)
-            rescue StandardError
-              ["ERROR_READING_DIR"]
-            end
-          puts "All files in directory: #{all_files.join(", ")}"
-
-          # Check for any PDF files
-          pdf_files = all_files.select { |f| f.end_with?(".pdf") }
-          puts "PDF files found: #{pdf_files.join(", ")}"
-
-          # Check for any files with our application ID
-          app_id_files =
-            all_files.select do |f|
-              f.include?(submission_version.permit_application_id)
-            end
-          puts "Files containing application ID: #{app_id_files.join(", ")}"
-
-          pdfs = []
-          if should_permit_application_pdf_be_generated
-            permit_pdf_path =
-              "#{generation_directory_path}/#{application_filename}"
-            puts "=== Permit Application PDF Check ==="
-            puts "Expected path: #{permit_pdf_path}"
-            puts "Expected filename: #{application_filename}"
-            puts "File exists: #{File.exist?(permit_pdf_path)}"
-
-            if File.exist?(permit_pdf_path)
-              file_stat = File.stat(permit_pdf_path)
-              puts "File size: #{file_stat.size} bytes"
-              puts "File modified: #{file_stat.mtime}"
-              puts "File permissions: #{file_stat.mode.to_s(8)}"
-            else
-              puts "File does NOT exist at expected path"
-              # Check for similar files
-              similar_files =
-                all_files.select { |f| f.include?("permit_application") }
-              puts "Similar permit application files: #{similar_files.join(", ")}"
-            end
-
-            pdfs << {
-              fname: application_filename,
-              key: PermitApplication::PERMIT_APP_PDF_DATA_KEY
-            }
-          end
-
-          if should_checklist_pdf_be_generated
-            checklist_pdf_path =
-              "#{generation_directory_path}/#{step_code_filename}"
-            puts "=== Step Code Checklist PDF Check ==="
-            puts "Expected path: #{checklist_pdf_path}"
-            puts "Expected filename: #{step_code_filename}"
-            puts "File exists: #{File.exist?(checklist_pdf_path)}"
-
-            if File.exist?(checklist_pdf_path)
-              file_stat = File.stat(checklist_pdf_path)
-              puts "File size: #{file_stat.size} bytes"
-              puts "File modified: #{file_stat.mtime}"
-              puts "File permissions: #{file_stat.mode.to_s(8)}"
-            else
-              puts "File does NOT exist at expected path"
-              # Check for similar files
-              similar_files =
-                all_files.select do |f|
-                  f.include?("step_code") || f.include?("checklist")
-                end
-              puts "Similar checklist files: #{similar_files.join(", ")}"
-            end
-
-            pdfs << {
-              fname: step_code_filename,
-              key: PermitApplication::CHECKLIST_PDF_DATA_KEY
-            }
-          end
-
-          puts "=== Final Directory State ==="
-          final_files =
-            begin
-              Dir.entries(generation_directory_path)
-            rescue StandardError
-              ["ERROR_READING_DIR"]
-            end
-          puts "Final files in directory: #{final_files.join(", ")}"
-          puts "=== End File Verification ==="
-
-          pdfs.each do |pdf|
-            path = "#{generation_directory_path}/#{pdf[:fname]}"
-            puts "=== Processing PDF: #{pdf[:fname]} ==="
-            puts "Full path: #{path}"
-            puts "File exists: #{File.exist?(path)}"
-
-            if File.exist?(path)
-              puts "File size: #{File.size(path)} bytes"
-            else
-              puts "ERROR: File does not exist!"
-              puts "Directory contents at failure:"
-              failure_files =
-                begin
-                  Dir.entries(generation_directory_path)
-                rescue StandardError
-                  ["ERROR_READING_DIR"]
-                end
-              puts failure_files.join(", ")
-            end
-
-            unless File.exist?(path)
-              raise "PDF file was not created by Node.js script: #{path}"
-            end
-
-            file = File.open(path)
-            doc =
-              submission_version
-                .supporting_documents
-                .where(
-                  permit_application_id:
-                    submission_version.permit_application_id,
-                  data_key: pdf[:key]
-                )
-                .first_or_initialize
-
-            doc.update(file:) if doc.file.blank?
-
-            File.delete(path)
-          end
-        else
-          puts "=== Node.js Process Failed ==="
-          puts "Exit status: #{exit_status.exitstatus}"
-          puts "Exit status success: #{exit_status.success?}"
-          puts "Signal: #{exit_status.termsig}"
-          puts "STDOUT content: #{stdout_content}"
-          puts "STDERR content: #{stderr_content}"
-          puts "Files in directory after failed execution: #{Dir.entries(generation_directory_path).join(", ")}"
-          puts "=== End Failed Process Debug ==="
-
-          err =
-            "Pdf generation process failed: #{exit_status} - Exit code: #{exit_status.exitstatus}"
-          Rails.logger.error err
-
-          # this will raise an error and retry the job
-          raise err
-        end
+      # Check if file exists with retry for timing issues
+      retries = 0
+      max_retries = 3
+      while !File.exist?(path) && retries < max_retries
+        puts "PDF file not found, waiting and retrying... (attempt #{retries + 1}/#{max_retries})"
+        sleep(1)
+        retries += 1
       end
+
+      unless File.exist?(path)
+        raise "PDF file was not created by Node.js script: #{path}"
+      end
+
+      # Validate PDF file size
+      file_size = File.size(path)
+      if file_size < 1000 # PDFs should be at least 1KB
+        raise "Generated PDF file is too small (#{file_size} bytes), likely corrupted: #{path}"
+      end
+
+      puts "PDF validated successfully: #{file_size} bytes"
+
+      File.open(path) do |file|
+        doc =
+          submission_version
+            .supporting_documents
+            .where(
+              permit_application_id: submission_version.permit_application_id,
+              data_key: pdf[:key]
+            )
+            .first_or_initialize
+
+        doc.update(file:) if doc.file.blank?
+      end
+
+      # Delete the temporary file after it's been saved
+      File.delete(path) if File.exist?(path)
+    end
+
+    # Clean up JSON file after processing
+    File.delete(json_filename) if File.exist?(json_filename)
   end
 
-  SUBMISSION_DATA_PREFIX = "formSubmissionData"
-  FORMIO_SECTION_REGEX =
-    /^section[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-  SECTION_COMPLETION = "section-completion-key"
+  # Ruby-based PDF generation methods
+  def generate_ruby_permit_pdf(output_path, submission_version)
+    permit_application = submission_version.permit_application
+
+    content = []
+    content << "BC ENERGY STEP CODE"
+    content << "=" * 50
+    content << "PERMIT APPLICATION"
+    content << "=" * 50
+    content << ""
+    content << "Application ID: #{permit_application.number}"
+    content << "Address: #{permit_application.full_address}"
+    content << "Submission Date: #{submission_version.created_at&.strftime("%Y-%m-%d")}"
+    content << "Applicant: #{applicant_name(permit_application)}"
+    content << "Status: #{permit_application.status&.humanize}"
+    content << ""
+    content << "FORM DATA"
+    content << "=" * 30
+
+    # Add form data
+    if submission_version.formatted_submission_data.present?
+      flatten_form_data(
+        submission_version.formatted_submission_data
+      ).each do |key, value|
+        next if value.blank?
+        content << "#{key}: #{value}"
+      end
+    end
+
+    content << ""
+    content << "Generated on: #{Time.current.strftime("%Y-%m-%d %H:%M:%S")}"
+
+    # Create basic PDF structure
+    pdf_content = create_basic_pdf_structure(content.join("\n"))
+    File.write(output_path, pdf_content)
+
+    puts "Ruby permit PDF created: #{File.size(output_path)} bytes"
+  end
+
+  def generate_ruby_checklist_pdf(output_path, submission_version)
+    permit_application = submission_version.permit_application
+
+    content = []
+    content << "BC ENERGY STEP CODE"
+    content << "=" * 50
+    content << "STEP CODE CHECKLIST"
+    content << "=" * 50
+    content << ""
+    content << "Application ID: #{permit_application.number}"
+    content << "Address: #{permit_application.full_address}"
+    content << ""
+
+    if submission_version.has_step_code_checklist?
+      content << "CHECKLIST DATA"
+      content << "=" * 30
+      checklist_data = submission_version.step_code_checklist_json
+      if checklist_data.present?
+        flatten_form_data(checklist_data).each do |key, value|
+          next if value.blank?
+          content << "#{key}: #{value}"
+        end
+      end
+    else
+      content << "No step code checklist required for this application."
+    end
+
+    content << ""
+    content << "Generated on: #{Time.current.strftime("%Y-%m-%d %H:%M:%S")}"
+
+    # Create basic PDF structure
+    pdf_content = create_basic_pdf_structure(content.join("\n"))
+    File.write(output_path, pdf_content)
+
+    puts "Ruby checklist PDF created: #{File.size(output_path)} bytes"
+  end
+
+  def create_basic_pdf_structure(text_content)
+    # Create a minimal but valid PDF structure
+    clean_text = text_content.gsub(/[^\x20-\x7E\n]/, "").strip
+
+    pdf_header = "%PDF-1.4\n"
+
+    catalog = "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n"
+
+    pages = "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n"
+
+    page =
+      "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n"
+
+    font =
+      "4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>\nendobj\n"
+
+    # Split text into lines and limit line length, escape parentheses
+    lines =
+      clean_text
+        .split("\n")
+        .map { |line| line[0..80].gsub(/[()\\]/, '\\\\\\&') }
+
+    content_stream = "BT\n/F1 10 Tf\n72 720 Td\n"
+    lines.each_with_index do |line, index|
+      content_stream += "0 -12 Td\n" if index > 0
+      content_stream += "(#{line}) Tj\n"
+    end
+    content_stream += "ET"
+
+    content_length = content_stream.length
+    content_obj =
+      "5 0 obj\n<< /Length #{content_length} >>\nstream\n#{content_stream}\nendstream\nendobj\n"
+
+    # Calculate correct offsets for xref table
+    objects = [pdf_header, catalog, pages, page, font, content_obj]
+    offsets = []
+    current_pos = 0
+
+    objects.each_with_index do |obj, i|
+      if i == 0
+        offsets << 0 # Header doesn't count
+      else
+        offsets << current_pos
+      end
+      current_pos += obj.length
+    end
+
+    xref_position = current_pos
+
+    xref = "xref\n0 6\n0000000000 65535 f \n"
+    (1..5).each { |i| xref += sprintf("%010d 00000 n \n", offsets[i]) }
+
+    trailer =
+      "trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n#{xref_position}\n%%EOF"
+
+    objects.join("") + xref + trailer
+  end
+
+  def applicant_name(permit_application)
+    submitter = permit_application.submitter
+    if submitter
+      "#{submitter.first_name} #{submitter.last_name}".strip
+    else
+      "Unknown"
+    end
+  end
+
+  def flatten_form_data(data, prefix = "")
+    result = {}
+    return result unless data.is_a?(Hash)
+
+    data.each do |key, value|
+      next if key == "section-completion-key"
+
+      full_key = prefix.empty? ? key.humanize : "#{prefix} > #{key.humanize}"
+
+      case value
+      when Hash
+        result.merge!(flatten_form_data(value, full_key))
+      when Array
+        result[full_key] = value.join(", ") unless value.empty?
+      else
+        result[full_key] = value unless value.blank?
+      end
+    end
+
+    result
+  end
+
+  private
 
   def camelize_response(data)
-    camelize_hash(data)
-  end
+    return nil if data.blank?
+    return data unless data.respond_to?(:each_pair)
 
-  def camelize_hash(obj)
-    case obj
-    when Hash
-      obj.each_with_object({}) do |(k, v), result|
-        camelized_key = camelize_key(k)
-        result[camelized_key] = camelize_hash(v)
+    camelized = {}
+    data.each_pair do |key, value|
+      camel_key = key.to_s.camelize(:lower)
+      camelized[camel_key] = case value
+      when Hash
+        camelize_response(value)
+      when Array
+        value.map { |v| v.is_a?(Hash) ? camelize_response(v) : v }
+      else
+        value
       end
-    when Array
-      obj.map { |v| camelize_hash(v) }
-    else
-      obj
     end
-  end
-
-  def camelize_key(key)
-    if key == SECTION_COMPLETION || key.start_with?(SUBMISSION_DATA_PREFIX)
-      return key
-    end
-
-    return key if key.match?(FORMIO_SECTION_REGEX)
-
-    key
-      .split("_")
-      .map
-      .with_index { |word, index| index.zero? ? word : word.capitalize }
-      .join
+    camelized
   end
 end

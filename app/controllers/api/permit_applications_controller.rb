@@ -425,13 +425,14 @@ class Api::PermitApplicationsController < Api::ApplicationController
   def generate_missing_pdfs
     authorize @permit_application
 
-    # Simple check to avoid unnecessary work
-    if @permit_application.zipfile_data.present? &&
-         @permit_application.updated_at > 2.minutes.ago
-      Rails.logger.info "Recent zip exists for permit #{@permit_application.id}, not queuing new job"
-      render_success nil, "permit_application.zip_recently_generated"
-      return
-    end
+    # Temporarily disabled deduplication to test Ruby PDF generation
+    # TODO: Re-enable after testing
+    # if @permit_application.zipfile_data.present? &&
+    #      @permit_application.updated_at > 2.minutes.ago
+    #   Rails.logger.info "Recent zip exists for permit #{@permit_application.id}, not queuing new job"
+    #   render json: { success: true, message: "Recent zip file already exists" }, status: :ok
+    #   return
+    # end
 
     Rails.logger.info "Queuing ZipfileJob for permit #{@permit_application.id}"
     ZipfileJob.perform_async(@permit_application.id)
