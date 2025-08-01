@@ -8,11 +8,11 @@ class FileUploader < Shrine
     validate_max_size Constants::Sizes::FILE_UPLOAD_MAX_SIZE * 1024 * 1024 # 100 MB to start
     # Could be images, excel files, bims, we do not have an exhaustive list right now.
 
-    # Immediate virus scanning validation with database storage
+    # Immediate virus scanning validation
     next unless file # Skip if no file attached
     next unless ClamAvService.enabled? # Skip if virus scanning disabled
 
-    Rails.logger.info "Performing immediate virus scan with database storage for: #{file.original_filename}"
+    Rails.logger.info "Performing immediate virus scan for: #{file.original_filename}"
 
     # Check if ClamAV service is reachable before proceeding
     unless ClamAvService.ping
@@ -66,6 +66,18 @@ class FileUploader < Shrine
           )
 
         Rails.logger.warn "Upload blocked - virus detected: #{virus_name} in file #{file.original_filename}"
+
+        # Immediately delete infected file from S3 cache
+        if file.respond_to?(:storage) && file.storage.is_a?(Shrine::Storage::S3)
+          begin
+            Rails.logger.warn "Deleting infected file from S3 cache: #{file.id}"
+            file.delete
+            Rails.logger.info "Successfully deleted infected file from S3 cache: #{file.id}"
+          rescue => delete_error
+            Rails.logger.error "Failed to delete infected file from S3 cache: #{delete_error.message}"
+          end
+        end
+
         errors << error_message
       elsif scan_result[:status] == :error
         Rails.logger.error "Virus scan error: #{scan_result[:message]}"
@@ -124,8 +136,6 @@ class FileUploader < Shrine
       temp_file&.unlink
     end
   end
-
-  # Store immediate virus scan results in database after promotion
   Attacher.promote_block do |attacher|
     # Store virus scan results immediately in database
     if attacher.record.respond_to?(:virus_scan_status) &&

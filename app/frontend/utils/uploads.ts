@@ -7,8 +7,12 @@ import { getCsrfToken } from './utility-functions';
 const sleep = (delay: number) => new Promise((resolve) => setTimeout(resolve, delay));
 
 export const uploadFile = async (file: File, fileName: string, progressCallback?: (event: ProgressEvent) => void) => {
-  // Use direct upload with presigned URLs
-  console.log('Using direct upload with presigned URLs');
+  // Step 1: Pre-upload virus scanning
+  console.log('Performing virus scan before upload...');
+  await virusScanFile(file, fileName);
+
+  // Step 2: If virus scan passes, proceed with S3 upload
+  console.log('Virus scan passed, proceeding with S3 upload...');
   return await directUpload(file, fileName, progressCallback);
 };
 
@@ -266,5 +270,42 @@ export const persistFileUpload = async (
     };
   } catch (error) {
     throw error;
+  }
+};
+
+// Virus scanning function - scans file before S3 upload
+export const virusScanFile = async (file: File, fileName: string): Promise<void> => {
+  try {
+    console.log(`Scanning file for viruses: ${fileName}`);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch('/api/storage/s3/virus_scan', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRF-Token': getCsrfToken(),
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      const errorMessage = errorData?.message || errorData?.error || 'Virus scan failed';
+      throw new Error(`Virus scan failed: ${errorMessage}`);
+    }
+
+    const scanResult = await response.json();
+
+    if (!scanResult.clean) {
+      const virusName = scanResult.virus_name || 'Unknown virus';
+      const message = scanResult.message || `Virus detected: ${virusName}`;
+      throw new Error(`Upload blocked: ${message}`);
+    }
+
+    console.log(`File passed virus scan: ${fileName}`);
+  } catch (error) {
+    console.error('Virus scan error:', error);
+    throw error; // Re-throw to stop the upload process
   }
 };
