@@ -256,6 +256,7 @@ Rails.application.routes.draw do
     post "tags/search", to: "tags#index", as: :tags_search
 
     get "storage/s3" => "storage#upload" # use a storage controller instead of shrine mount since we want api authentication before being able to access
+    post "storage/s3/virus_scan" => "storage#virus_scan" # Pre-upload virus scanning
     get "storage/s3/download" => "storage#download"
     delete "storage/s3/delete" => "storage#delete"
 
