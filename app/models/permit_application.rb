@@ -312,6 +312,7 @@ class PermitApplication < ApplicationRecord
   def current_published_template_version
     # this will eventually be different, if there is a new version it should notify the user
     RequirementTemplate.published_requirement_template_version(
+      program_id,
       user_group_type_id,
       audience_type_id,
       submission_type_id
