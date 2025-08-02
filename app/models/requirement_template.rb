@@ -219,12 +219,14 @@ class RequirementTemplate < ApplicationRecord
   end
 
   def self.published_requirement_template_version(
+    program_id,
     user_group_type_id,
     audience_type_id,
     submission_type_id
   )
     requirement_template =
-      find_by(
+      joins(:published_template_version).find_by(
+        program_id: program_id,
         user_group_type_id: user_group_type_id,
         audience_type_id: audience_type_id,
         submission_type_id: submission_type_id
