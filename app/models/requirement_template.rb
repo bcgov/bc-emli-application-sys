@@ -224,17 +224,31 @@ class RequirementTemplate < ApplicationRecord
     audience_type_id,
     submission_type_id
   )
+    # Parameter validation - prevents nil query issues
+    if [
+         program_id,
+         user_group_type_id,
+         audience_type_id,
+         submission_type_id
+       ].any?(&:blank?)
+      return nil
+    end
+
     requirement_template =
-      joins(:published_template_version).find_by(
-        program_id: program_id,
-        user_group_type_id: user_group_type_id,
-        audience_type_id: audience_type_id,
-        submission_type_id: submission_type_id
-      )
+      joins(:published_template_version)
+        .where(
+          program_id: program_id,
+          user_group_type_id: user_group_type_id,
+          audience_type_id: audience_type_id,
+          submission_type_id: submission_type_id
+        )
+        .order(:created_at)
+        .first
+
     published_version = requirement_template&.published_template_version
     published_version
-  rescue NoMethodError => e
-    Rails.logger.error "Error in published_requirement_template_version: #{e.message}"
+  rescue StandardError => e
+    Rails.logger.error "Template version lookup failed: #{e.message}, program_id: #{program_id}, classifications: [#{user_group_type_id}, #{audience_type_id}, #{submission_type_id}]"
   end
 
   def search_data
