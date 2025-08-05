@@ -1,0 +1,38 @@
+name: Build and Publish ClamAV Image
+
+on:
+  push:
+    branches:
+    - dev
+    paths:
+    - .github/workflows/publish-clamav.yml
+    - clamav/**
+
+env:
+  GITHUB_REGISTRY: ghcr.io
+  IMAGE_NAME: bcgov-c/clamav
+
+jobs:
+  build-push-clamav:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: hmarr/debug-action@f7318c783045ac39ed9bb497e22ce835fdafbfe6
+    - uses: actions/checkout@8edcb1bdb4e267140fa742c62e395cd74f332709
+
+    - name: Build and Push
+      uses: egose/actions/docker-build-push@46d589997e49cae4a8a3d06644ae8b04351a30f2
+      with:
+        registry-url: ${{ env.GITHUB_REGISTRY }}
+        registry-username: ${{ github.actor }}
+        registry-password: ${{ secrets.GITHUB_TOKEN }}
+        image-name: bcgov/hesp-clamav
+        docker-context: clamav
+        docker-file: clamav/Dockerfile
+        metadata-tags: |
+          type=ref,event=branch
+          type=sha,format=long,prefix=,suffix=
