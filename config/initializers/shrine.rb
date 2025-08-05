@@ -34,7 +34,7 @@ if SHRINE_USE_S3
 end
 
 if SHRINE_USE_S3
-  # Dynamic credentials provider that fetches from database
+  # Dynamic credentials provider that fetches from database only
   def get_aws_credentials
     db_credentials = AwsCredential.current_s3_credentials if defined?(
       AwsCredential
@@ -47,13 +47,20 @@ if SHRINE_USE_S3
         secret_access_key: db_credentials[:secret_access_key],
         session_token: db_credentials[:session_token]
       }
-    else
-      Rails.logger.info "Using AWS credentials from environment variables"
+    elsif ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"].present? &&
+          ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"].present?
+      Rails.logger.warn "No database credentials found, falling back to environment variables"
+      Rails.logger.info "Run AwsCredentialRefreshService.new.refresh_credentials! to store credentials in database"
       {
         access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
         secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
         session_token: nil
       }
+    else
+      Rails.logger.error "No valid AWS credentials found in database or environment! File uploads will fail."
+      Rails.logger.error "Run AwsCredentialRefreshService.new.refresh_credentials! to initialize."
+      # Return empty credentials that will cause S3 operations to fail gracefully
+      { access_key_id: nil, secret_access_key: nil, session_token: nil }
     end
   end
 
@@ -116,11 +123,11 @@ if SHRINE_USE_S3
 
     private
 
-    # Override the client method to provide fresh credentials
+    # Override the client method to provide fresh credentials from database only
     def client
       @client ||=
         begin
-          # Get fresh credentials from database
+          # Get fresh credentials from database or environment
           if defined?(AwsCredential) && !Rails.env.test?
             db_credentials = AwsCredential.current_s3_credentials
             if db_credentials
@@ -133,9 +140,21 @@ if SHRINE_USE_S3
                 session_token: db_credentials[:session_token],
                 force_path_style: @options[:force_path_style]
               )
+            elsif ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"].present? &&
+                  ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"].present?
+              Rails.logger.debug "Refreshing S3 client with environment credentials"
+              Aws::S3::Client.new(
+                endpoint: @options[:endpoint],
+                region: @options[:region],
+                access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
+                secret_access_key:
+                  ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
+                session_token: nil,
+                force_path_style: @options[:force_path_style]
+              )
             else
-              Rails.logger.warn "No database credentials available, using environment"
-              super
+              Rails.logger.error "No database or environment credentials available! S3 operations will fail."
+              raise "No valid AWS credentials found in database or environment. Run credential refresh job."
             end
           else
             super

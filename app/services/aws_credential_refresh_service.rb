@@ -1,129 +1,186 @@
 class AwsCredentialRefreshService
   include ActiveModel::Model
 
-  attr_accessor :role_arn, :session_name, :duration_seconds
-
-  def initialize(attributes = {})
-    @role_arn = attributes[:role_arn] || ENV["AWS_ROLE_ARN"]
-    @session_name =
-      attributes[:session_name] || "s3-access-#{Time.current.to_i}"
-    @duration_seconds = attributes[:duration_seconds] || 2.days.to_i # 2 days in seconds
-    super
-  end
-
   def refresh_credentials!
     Rails.logger.info "Starting AWS credential refresh process"
+
+    # Check if current credentials are still valid and not expiring soon
+    if credentials_still_valid?
+      Rails.logger.info "Current credentials are still valid, skipping refresh"
+      return true
+    end
 
     # First, deactivate any expired credentials
     AwsCredential.deactivate_expired!
 
-    # If no role ARN is configured, use fallback method
-    if role_arn.blank?
-      Rails.logger.info "No AWS role ARN configured, using existing credentials fallback"
-      return refresh_with_existing_credentials!
-    end
-
-    begin
-      # Use current environment credentials to assume role and get new temporary credentials
-      new_credentials = assume_role_with_kms_access
-
-      # Store new credentials in database
-      AwsCredential.update_s3_credentials!(
-        access_key_id: new_credentials.access_key_id,
-        secret_access_key: new_credentials.secret_access_key,
-        session_token: new_credentials.session_token,
-        expires_at: new_credentials.expiration
-      )
-
-      Rails.logger.info "AWS credentials refreshed successfully, expires at #{new_credentials.expiration}"
-      true
-    rescue => e
-      Rails.logger.error "Failed to refresh AWS credentials: #{e.message}"
-      Rails.logger.error e.backtrace.join("\n")
-      false
-    end
+    # Use rotated credentials from environment (updated by Lambda rotation)
+    refresh_with_rotated_credentials!
   end
 
-  # Alternative method if role assumption is not available - uses STS session token
-  def refresh_with_existing_credentials!
-    Rails.logger.info "Refreshing credentials using STS session token with existing environment credentials"
+  # Fetch rotated credentials from AWS Secrets Manager (where Lambda stores them)
+  def refresh_with_rotated_credentials!
+    Rails.logger.info "Fetching rotated credentials from AWS Secrets Manager"
 
     begin
-      # Try to get temporary credentials with session token first
-      if refresh_with_sts_session_token!
-        Rails.logger.info "Successfully obtained temporary credentials with STS session token"
+      # First try to get current credentials from Parameter Store
+      rotated_creds = fetch_rotated_credentials_from_parameter_store
+
+      if rotated_creds
+        # Lambda rotation creates new keys every 2 days and deletes old ones after 4 days
+        # We expire database credentials every 3 days to ensure frequent refreshes
+        expires_at = Time.current + 3.days
+
+        AwsCredential.update_s3_credentials!(
+          access_key_id: rotated_creds[:access_key_id],
+          secret_access_key: rotated_creds[:secret_access_key],
+          session_token: nil,
+          expires_at: expires_at
+        )
+
+        Rails.logger.info "Rotated AWS credentials fetched and stored, expires at #{expires_at}"
         return true
       else
-        Rails.logger.warn "STS session token failed, falling back to environment credentials"
+        # Fallback to environment if Parameter Store fails
+        Rails.logger.warn "Failed to fetch from Parameter Store, using environment fallback"
         return refresh_with_environment_fallback!
       end
     rescue => e
-      Rails.logger.error "Failed to refresh with STS, trying environment fallback: #{e.message}"
-      return refresh_with_environment_fallback!
+      Rails.logger.error "Failed to fetch rotated credentials: #{e.message}"
+      # Fallback to environment credentials
+      refresh_with_environment_fallback!
     end
   end
 
-  # Get temporary credentials using STS GetSessionToken
-  def refresh_with_sts_session_token!
-    Rails.logger.info "Getting temporary credentials using STS GetSessionToken"
+  # Fallback to environment credentials
+  def refresh_with_environment_fallback!
+    Rails.logger.info "Using environment credentials as fallback"
 
     begin
-      # Create STS client with current environment credentials
-      sts_client =
-        Aws::STS::Client.new(
-          access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
-          secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
-          region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1"
-        )
+      expires_at = Time.current + 24.hours # Shorter expiration for fallback
 
-      # Get session token - maximum duration for IAM users is 12 hours
-      # For temporary credentials, it's up to 36 hours, but 12 hours is safer
-      response =
-        sts_client.get_session_token(
-          {
-            duration_seconds: 12.hours.to_i # 12 hours - AWS maximum for IAM users
-          }
-        )
-
-      credentials = response.credentials
-
-      # Store new temporary credentials with actual AWS expiry time
       AwsCredential.update_s3_credentials!(
-        access_key_id: credentials.access_key_id,
-        secret_access_key: credentials.secret_access_key,
-        session_token: credentials.session_token,
-        expires_at: credentials.expiration # Use actual AWS expiration time
+        access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
+        secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
+        session_token: nil,
+        expires_at: expires_at
       )
 
-      Rails.logger.info "Temporary AWS credentials obtained via STS, expires at #{credentials.expiration}"
-      Rails.logger.info "Credentials valid for #{((credentials.expiration - Time.current) / 1.hour).round(1)} hours"
+      Rails.logger.info "Environment credentials stored as fallback, expires at #{expires_at}"
       true
     rescue => e
-      Rails.logger.error "Failed to get STS session token: #{e.message}"
+      Rails.logger.error "Failed to store environment credentials: #{e.message}"
       false
     end
   end
 
-  # Fallback to environment credentials with extended expiration (original behavior)
-  def refresh_with_environment_fallback!
-    Rails.logger.info "Using environment credentials fallback with extended expiration"
+  # Fetch current (non-pending_deletion) credentials from Parameter Store
+  def fetch_rotated_credentials_from_parameter_store
+    # Use the actual parameter path structure
+    base_path = ENV["AWS_PARAMETER_BASE_PATH"]
 
     begin
-      # Calculate expiration time (2 days from now) - original behavior
-      expires_at = Time.current + duration_seconds.seconds
+      # Use current environment credentials to access Parameter Store
+      ssm_client =
+        Aws::SSM::Client.new(
+          region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1",
+          access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
+          secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"]
+        )
 
-      # Store current environment credentials in database with extended expiration
-      AwsCredential.update_s3_credentials!(
-        access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
-        secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
-        session_token: nil, # Environment credentials typically don't have session tokens
-        expires_at: expires_at
-      )
+      # Get the current (active) access key ID - avoid pending_deletion
+      access_key_param =
+        ssm_client.get_parameter(
+          name: "#{base_path}/current/access_key_id",
+          with_decryption: true
+        )
 
-      Rails.logger.info "AWS credentials stored from environment fallback, expires at #{expires_at}"
-      true
+      # Get the current (active) secret access key
+      secret_key_param =
+        ssm_client.get_parameter(
+          name: "#{base_path}/current/secret_access_key",
+          with_decryption: true
+        )
+
+      Rails.logger.info "Successfully fetched current credentials from Parameter Store: #{base_path}"
+
+      {
+        access_key_id: access_key_param.parameter.value,
+        secret_access_key: secret_key_param.parameter.value
+      }
+    rescue Aws::SSM::Errors::ParameterNotFound => e
+      Rails.logger.error "Parameter not found: #{e.message}. Expected parameters at #{base_path}/current/"
+      nil
     rescue => e
-      Rails.logger.error "Failed to store AWS credentials from environment: #{e.message}"
+      Rails.logger.error "Failed to fetch from Parameter Store: #{e.message}"
+      nil
+    end
+  end
+
+  # Check if we're currently using a key marked as pending_deletion
+  def using_pending_deletion_key?(current_creds)
+    base_path =
+      "/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys"
+
+    begin
+      ssm_client =
+        Aws::SSM::Client.new(
+          region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1",
+          access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
+          secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"]
+        )
+
+      # Check if there's a pending_deletion key and if we're using it
+      pending_key_param =
+        ssm_client.get_parameter(
+          name: "#{base_path}/pending_deletion/access_key_id",
+          with_decryption: true
+        )
+
+      pending_key_id = pending_key_param.parameter.value
+      current_key_id = current_creds[:access_key_id]
+
+      is_pending = (current_key_id == pending_key_id)
+
+      if is_pending
+        Rails.logger.warn "Current key #{current_key_id[0..8]}... is marked as pending_deletion"
+      end
+
+      is_pending
+    rescue Aws::SSM::Errors::ParameterNotFound
+      # No pending_deletion key exists, we're good
+      false
+    rescue => e
+      Rails.logger.error "Failed to check pending_deletion status: #{e.message}"
+      false
+    end
+  end
+
+  # Check if current credentials are still valid and not pending deletion
+  def credentials_still_valid?
+    current_creds = AwsCredential.current_s3_credentials
+    return false unless current_creds
+
+    # Check if we're using a pending_deletion key (proactive rotation)
+    if using_pending_deletion_key?(current_creds)
+      Rails.logger.info "Currently using pending_deletion key, rotating to current key"
+      return false
+    end
+
+    # Check if credentials expire within the next 2 hours (safety buffer)
+    expiry_buffer = 2.hours
+    expires_soon = current_creds[:expires_at] < (Time.current + expiry_buffer)
+
+    if expires_soon
+      Rails.logger.info "Credentials expire at #{current_creds[:expires_at]}, refreshing proactively"
+      return false
+    end
+
+    # Test if credentials actually work
+    if test_credentials(current_creds)
+      Rails.logger.info "Credentials valid until #{current_creds[:expires_at]} (#{time_until_expiry(current_creds[:expires_at])} remaining)"
+      true
+    else
+      Rails.logger.warn "Credentials failed validation test, need refresh"
       false
     end
   end
@@ -154,43 +211,14 @@ class AwsCredentialRefreshService
 
   private
 
-  def assume_role_with_kms_access
-    # Create STS client with current credentials
-    sts_client =
-      Aws::STS::Client.new(
-        access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
-        secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
-        region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1"
-      )
-
-    # Assume role to get new temporary credentials with KMS access
-    response =
-      sts_client.assume_role(
-        {
-          role_arn: role_arn,
-          role_session_name: session_name,
-          duration_seconds: duration_seconds,
-          policy: kms_access_policy.to_json
-        }
-      )
-
-    response.credentials
-  end
-
-  def kms_access_policy
-    # Simplified policy for basic S3 access - KMS permissions removed as they're not needed
-    {
-      "Version" => "2012-10-17",
-      "Statement" => [
-        {
-          "Effect" => "Allow",
-          "Action" => ["s3:*"],
-          "Resource" => [
-            "arn:aws:s3:::#{ENV["BCGOV_OBJECT_STORAGE_BUCKET"]}",
-            "arn:aws:s3:::#{ENV["BCGOV_OBJECT_STORAGE_BUCKET"]}/*"
-          ]
-        }
-      ]
-    }
+  def time_until_expiry(expires_at)
+    time_diff = expires_at - Time.current
+    if time_diff > 1.day
+      "#{(time_diff / 1.day).round(1)} days"
+    elsif time_diff > 1.hour
+      "#{(time_diff / 1.hour).round(1)} hours"
+    else
+      "#{(time_diff / 1.minute).round} minutes"
+    end
   end
 end
