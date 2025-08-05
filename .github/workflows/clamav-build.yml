@@ -1,0 +1,73 @@
+name: Build and Push ClamAV Container
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - docker/clamav/**
+      - .github/workflows/clamav-build.yml
+  pull_request:
+    paths:
+      - docker/clamav/**
+      - .github/workflows/clamav-build.yml
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: bcgov/hesp-clamav
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./docker/clamav
+          file: ./docker/clamav/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+      - name: Test ClamAV container
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Testing ClamAV container..."
+          docker run --rm -d --name clamav-test ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
+          sleep 30
+          docker exec clamav-test /usr/local/bin/health-check.sh
+          docker stop clamav-test

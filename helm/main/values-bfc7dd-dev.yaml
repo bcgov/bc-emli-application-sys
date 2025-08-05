@@ -15,6 +15,10 @@ app:
     requests:
       cpu: 300m
       memory: 512Mi
+  
+  virusScanVolume:
+    enabled: true
+    claimName: hesp-clamav-virus-scan-temp
 
   env:
     'APP_DOMAIN': 'dev-hesp.apps.silver.devops.gov.bc.ca'
@@ -36,7 +40,7 @@ app:
     # AWS Parameter Store path for credential rotation
     'AWS_PARAMETER_BASE_PATH': '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
     # ClamAV Configuration - Disabled for now
-    'CLAMAV_ENABLED': 'false'
+    'CLAMAV_ENABLED': 'true'
     'CLAMAV_HOST': 'clamav'
     'CLAMAV_PORT': '3310'
     'CLAMAV_TIMEOUT': '30'
@@ -70,7 +74,7 @@ sidekiq:
     # AWS Parameter Store path for credential rotation
     'AWS_PARAMETER_BASE_PATH': '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
     # ClamAV Configuration - Disabled for now
-    'CLAMAV_ENABLED': 'false'
+    'CLAMAV_ENABLED': 'true'
     'CLAMAV_HOST': 'clamav'
     'CLAMAV_PORT': '3310'
     'CLAMAV_TIMEOUT': '30'
@@ -219,3 +223,21 @@ anycableGo:
     requests:
       cpu: 50m
       memory: 256Mi
+
+# ClamAV Configuration for Dev
+clamav:
+  enabled: true
+  
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      cpu: 200m
+      memory: 1Gi
+  
+  persistence:
+    size: 1Gi
+  
+  virusScanTempVolume:
+    size: 512Mi

@@ -1,0 +1,109 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/bcgov/hesp-clamav
+  tag: latest
+  pullPolicy: IfNotPresent
+
+priorityClassName: ""
+
+imagePullSecrets: []
+
+nameOverride: hesp-clamav
+fullnameOverride: hesp-clamav
+
+podSecurityContext:
+securityContext:
+
+service:
+  type: ClusterIP
+  port: 3310
+  targetPort: 3310
+
+# ClamAV requires substantial memory for virus definitions
+resources:
+  requests:
+    cpu: 80m
+    memory: 2Gi
+  limits:
+    cpu: 500m
+    memory: 3Gi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Health checks with appropriate timeouts for ClamAV startup
+startupProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  failureThreshold: 3
+  timeoutSeconds: 600
+
+livenessProbe:
+  initialDelaySeconds: 300
+  periodSeconds: 10
+  failureThreshold: 3
+  timeoutSeconds: 600
+
+readinessProbe:
+  initialDelaySeconds: 90
+  periodSeconds: 10
+  failureThreshold: 3
+  timeoutSeconds: 600
+
+hpa:
+  enabled: false
+  maxReplicas: 5
+  # average CPU usage utilization percentage per pod (1-100)
+  cpu: 80
+  # average Memory usage utilization percentage per pod (1-100)
+  # memory: 80
+  # average http_requests utilization per pod (value as a string)
+  # requests: 1k
+
+podDisruptionBudget:
+  enabled: false
+  # minAvailable: 1
+  # maxUnavailable: 1
+
+## Clamav data dir persistence
+persistentVolume:
+  ## If true, a Persistent Volume Claim is created, otherwise it uses an emptyDir
+  ##
+  enabled: true
+
+  ## Persistent Volume Claim annotations
+  ##
+  annotations: {}
+
+  ## Persistent Volume access modes
+  ## Must match those of existing PV or dynamic provisioner
+  ## Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+  accessModes:
+  - ReadWriteOnce
+
+  ## Persistent Volume Size
+  ##
+  size: 500Mi
+
+  ## Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+
+# Temp directory for virus scanning (shared with app containers)
+virusScanTempVolume:
+  enabled: true
+  storageClass: netapp-file-standard
+  accessMode: ReadWriteMany
+  size: 1Gi
+
+env:
+  CLAMAV_LOG_LEVEL: INFO

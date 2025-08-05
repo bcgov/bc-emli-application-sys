@@ -196,7 +196,9 @@ class AwsCredentialRefreshService
           access_key_id: test_creds[:access_key_id],
           secret_access_key: test_creds[:secret_access_key],
           session_token: test_creds[:session_token],
-          region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1"
+          region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1",
+          endpoint: ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"],
+          force_path_style: true
         )
 
       # Test by listing bucket (minimal operation)

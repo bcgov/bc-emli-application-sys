@@ -1,0 +1,41 @@
+{{- if .Values.persistentVolume.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "clamav.fullname" . }}-data
+  labels:
+    {{- include "clamav.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  {{- range .Values.persistentVolume.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  {{- if .Values.persistentVolume.storageClass }}
+  {{- if (eq "-" .Values.persistentVolume.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: "{{ .Values.persistentVolume.storageClass }}"
+  {{- end }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistentVolume.size | quote }}
+---
+{{- end }}
+{{- if .Values.virusScanTempVolume.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "clamav.fullname" . }}-virus-scan-temp
+  labels:
+    {{- include "clamav.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.virusScanTempVolume.accessMode }}
+  {{- if .Values.virusScanTempVolume.storageClass }}
+  storageClassName: {{ .Values.virusScanTempVolume.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.virusScanTempVolume.size }}
+{{- end }}
