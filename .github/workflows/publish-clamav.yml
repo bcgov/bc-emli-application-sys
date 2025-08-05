@@ -10,7 +10,6 @@ on:
 
 env:
   GITHUB_REGISTRY: ghcr.io
-  IMAGE_NAME: bcgov-c/clamav
 
 jobs:
   build-push-clamav:
