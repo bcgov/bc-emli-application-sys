@@ -3,7 +3,7 @@ name: Build and Publish ClamAV Image
 on:
   push:
     branches:
-    - dev
+    - main
     paths:
     - .github/workflows/publish-clamav.yml
     - clamav/**
