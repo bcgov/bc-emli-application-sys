@@ -351,3 +351,32 @@ anycableGo:
     requests:
       cpu: 20m
       memory: 128Mi
+
+# ClamAV antivirus service
+clamav:
+  enabled: false
+  image:
+    repository: ghcr.io/bcgov/hesp-clamav
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  nameOverride: hesp-clamav
+  fullnameOverride: hesp-clamav
+  
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 2Gi
+  
+  persistence:
+    enabled: true
+    storageClass: netapp-block-standard
+    size: 2Gi
+  
+  virusScanTempVolume:
+    enabled: true
+    storageClass: netapp-file-standard
+    size: 1Gi
