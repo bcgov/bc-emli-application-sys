@@ -379,4 +379,4 @@ clamav:
   virusScanTempVolume:
     enabled: true
     storageClass: netapp-file-standard
-    size: 1Gi
+    size: 256Mi
