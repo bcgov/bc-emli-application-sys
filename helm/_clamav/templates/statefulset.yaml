@@ -80,7 +80,9 @@ spec:
           startupProbe:
             exec:
               command:
-              - /usr/local/bin/clamdcheck.sh
+              - /bin/sh
+              - -c
+              - 'echo PING | nc -w 5 localhost 3310 | grep -q PONG'
             initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
             failureThreshold: {{ .Values.startupProbe.failureThreshold }}
             periodSeconds: {{ .Values.startupProbe.periodSeconds }}
@@ -88,7 +90,9 @@ spec:
           livenessProbe:
             exec:
               command:
-              - /usr/local/bin/clamdcheck.sh
+              - /bin/sh
+              - -c
+              - 'echo PING | nc -w 5 localhost 3310 | grep -q PONG'
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
@@ -96,7 +100,9 @@ spec:
           readinessProbe:
             exec:
               command:
-              - /usr/local/bin/clamdcheck.sh
+              - /bin/sh
+              - -c
+              - 'echo PING | nc -w 5 localhost 3310 | grep -q PONG'
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
