@@ -1,7 +1,6 @@
 class Api::StorageController < Api::ApplicationController
   skip_after_action :verify_authorized
   skip_after_action :verify_policy_scoped
-  skip_before_action :verify_authenticity_token, only: [:virus_scan]
 
   def upload
     #https://shrinerb.com/docs/plugins/presign_endpoint#calling-from-a-controller
