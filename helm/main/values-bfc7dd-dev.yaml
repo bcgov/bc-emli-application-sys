@@ -237,7 +237,7 @@ clamav:
       memory: 1Gi
   
   persistence:
-    size: 1Gi
+    size: 512Mi
   
   virusScanTempVolume:
     size: 128Mi
