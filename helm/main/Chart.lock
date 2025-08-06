@@ -20,5 +20,8 @@ dependencies:
 - name: anycable-go
   repository: https://helm.anycable.io/
   version: 0.5.11
-digest: sha256:8588a66e40967b78365f5fa4af1e5d8189940b16a8f3afe7c8a5dd5b153074fc
-generated: "2025-03-10T20:58:34.397590493-07:00"
+- name: clamav
+  repository: file://../_clamav
+  version: 0.1.0
+digest: sha256:f4f9ee37a103b61cdce6b9a5a24c7e4bc8ce9e46423a6e4c45d91fd3b5af219c
+generated: "2025-08-01T14:57:54.701609051-07:00"

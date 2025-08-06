@@ -34,9 +34,9 @@ app:
     'BCGOV_OBJECT_STORAGE_BUCKET': 'hesp-dev-cacentral1-bucket'
     # AWS Parameter Store path for credential rotation
     'AWS_PARAMETER_BASE_PATH': '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
-    # ClamAV Configuration - Disabled for now
-    'CLAMAV_ENABLED': 'false'
-    'CLAMAV_HOST': 'clamav'
+    # ClamAV Configuration - Enabled for test
+    'CLAMAV_ENABLED': 'true'
+    'CLAMAV_HOST': 'hesp-clamav'
     'CLAMAV_PORT': '3310'
     'CLAMAV_TIMEOUT': '30'
     'VIRUS_SCAN_TEMP_DIR': '/tmp/virus_scan'
@@ -68,9 +68,9 @@ sidekiq:
     'BCGOV_OBJECT_STORAGE_BUCKET': 'hesp-dev-cacentral1-bucket'
     # AWS Parameter Store path for credential rotation
     'AWS_PARAMETER_BASE_PATH': '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
-    # ClamAV Configuration - Disabled for now
-    'CLAMAV_ENABLED': 'false'
-    'CLAMAV_HOST': 'clamav'
+    # ClamAV Configuration - Enabled for test
+    'CLAMAV_ENABLED': 'true'
+    'CLAMAV_HOST': 'hesp-clamav'
     'CLAMAV_PORT': '3310'
     'CLAMAV_TIMEOUT': '30'
     'VIRUS_SCAN_TEMP_DIR': '/tmp/virus_scan'
@@ -215,3 +215,21 @@ anycableGo:
     requests:
       cpu: 50m
       memory: 256Mi
+
+# ClamAV Configuration for Test
+clamav:
+  enabled: true
+  
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 300m
+      memory: 1.5Gi
+  
+  persistence:
+    size: 2Gi
+  
+  virusScanTempVolume:
+    size: 1Gi

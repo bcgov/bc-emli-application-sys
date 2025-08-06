@@ -45,6 +45,13 @@ sidekiq:
   env:
     'APP_DOMAIN': 'hesp.apps.silver.devops.gov.bc.ca'
     'FROM_EMAIL': 'no-reply@gov.bc.ca'
+    # ClamAV Configuration - Enabled for production
+    'CLAMAV_ENABLED': 'true'
+    'CLAMAV_HOST': 'hesp-clamav'
+    'CLAMAV_PORT': '3310'
+    'CLAMAV_TIMEOUT': '30'
+    'VIRUS_SCAN_TEMP_DIR': '/tmp/virus_scan'
+    'UPLOAD_VIRUS_SCAN_TIMEOUT': '45'
 
 anycable-rpc:
   enabled: true
@@ -178,3 +185,22 @@ anycableGo:
     requests:
       cpu: 50m
       memory: 256Mi
+
+# ClamAV Configuration for Production
+clamav:
+  enabled: true
+  
+  resources:
+    requests:
+      cpu: 200m
+      memory: 1Gi
+    limits:
+      cpu: 500m
+      memory: 2Gi
+  
+  persistence:
+    size: 5Gi
+  
+  virusScanTempVolume:
+    size: 2Gi
+

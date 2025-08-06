@@ -7,6 +7,93 @@ class Api::StorageController < Api::ApplicationController
     set_rack_response FileUploader.presign_response(:cache, request.env)
   end
 
+  def virus_scan
+    # Pre-upload virus scanning endpoint
+    unless ClamAvService.enabled?
+      render json: {
+               clean: true,
+               message: "Virus scanning disabled"
+             },
+             status: :ok
+      return
+    end
+
+    unless params[:file].present?
+      render json: { error: "File required for scanning" }, status: :bad_request
+      return
+    end
+
+    uploaded_file = params[:file]
+    temp_file = nil
+
+    begin
+      # Create temporary file from uploaded content
+      temp_file =
+        Tempfile.new(
+          [
+            "virus_scan",
+            File.extname(uploaded_file.original_filename || ".tmp")
+          ]
+        )
+      temp_file.binmode
+
+      # Copy file content to temp file
+      uploaded_file.rewind
+      IO.copy_stream(uploaded_file, temp_file)
+      temp_file.close
+
+      # Perform virus scan
+      scan_result = ClamAvService.scan_file(temp_file.path)
+
+      if scan_result[:status] == :infected
+        virus_name = scan_result[:virus_name] || "Unknown virus"
+        Rails.logger.warn "Pre-upload virus detected: #{virus_name} in file #{uploaded_file.original_filename}"
+
+        render json: {
+                 clean: false,
+                 virus_detected: true,
+                 virus_name: virus_name,
+                 message: "Virus detected: #{virus_name}. File upload blocked."
+               },
+               status: :unprocessable_entity
+      elsif scan_result[:status] == :error
+        Rails.logger.error "Virus scan error: #{scan_result[:message]}"
+
+        if Rails.env.production?
+          render json: {
+                   clean: false,
+                   scan_error: true,
+                   message:
+                     "File security scan failed. Please try again or contact support."
+                 },
+                 status: :unprocessable_entity
+        else
+          Rails.logger.warn "Allowing upload in development despite scan error"
+          render json: {
+                   clean: true,
+                   message:
+                     "File passed virus scan (development mode with scan error)"
+                 },
+                 status: :ok
+        end
+      else
+        Rails.logger.info "File passed pre-upload virus scan: #{uploaded_file.original_filename}"
+        render json: { clean: true, message: "File is clean" }, status: :ok
+      end
+    rescue => e
+      Rails.logger.error "Virus scan endpoint error: #{e.message}"
+      render json: {
+               clean: false,
+               scan_error: true,
+               message: "Scan failed: #{e.message}"
+             },
+             status: :internal_server_error
+    ensure
+      temp_file&.close
+      temp_file&.unlink
+    end
+  end
+
   AUTHORIZED_S3_MODELS = {
     "SupportingDocument" => SupportingDocument,
     "StepCode" => StepCode

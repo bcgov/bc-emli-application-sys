@@ -34,3 +34,7 @@ dependencies:
     version: '0.5.11'
     repository: https://helm.anycable.io/
     condition: anycableGo.enabled
+  - name: clamav
+    version: '0.1.0'
+    repository: 'file://../_clamav'
+    condition: clamav.enabled
