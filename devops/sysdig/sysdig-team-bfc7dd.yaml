@@ -1,0 +1,17 @@
+apiVersion: ops.gov.bc.ca/v1alpha1
+kind: SysdigTeam
+metadata:
+  name: bfc7dd-sysdigteam
+  namespace: bfc7dd-tools
+spec:
+  team:
+    description: Sysdig Team for managing the HESP project set
+    users:
+      - name: darrel.siegle@dxcas.com
+        role: ROLE_TEAM_EDIT
+      - name: navdeep.kaur@dxcas.com
+        role: ROLE_TEAM_STANDARD
+      - name: jeremy.watts@dxcas.com
+        role: ROLE_TEAM_STANDARD
+      - name: brett.auger@gov.bc.ca
+        role: ROLE_TEAM_READ
