@@ -354,7 +354,7 @@ anycableGo:
 
 # ClamAV antivirus service
 clamav:
-  enabled: false
+  enabled: true
   image:
     repository: ghcr.io/bcgov/hesp-clamav
     tag: latest

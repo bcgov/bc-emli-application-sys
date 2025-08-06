@@ -240,4 +240,5 @@ clamav:
     size: 512Mi
   
   virusScanTempVolume:
-    size: 128Mi
+    enabled: true
+    size: 32Mi
