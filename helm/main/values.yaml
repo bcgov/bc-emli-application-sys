@@ -357,7 +357,7 @@ clamav:
   enabled: true
   image:
     repository: ghcr.io/bcgov/hesp-clamav
-    tag: latest
+    tag: main
     pullPolicy: IfNotPresent
 
   nameOverride: hesp-clamav
@@ -366,9 +366,9 @@ clamav:
   persistence:
     enabled: true
     storageClass: netapp-block-standard
-    size: 2Gi
+    size: 512Mi
 
   virusScanTempVolume:
     enabled: true
     storageClass: netapp-file-standard
-    size: 256Mi
+    size: 512Mi

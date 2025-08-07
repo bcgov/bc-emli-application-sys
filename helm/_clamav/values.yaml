@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/bcgov/hesp-clamav
-  tag: main
+  tag: latest
   pullPolicy: IfNotPresent
 
 priorityClassName: ''
@@ -37,7 +37,7 @@ affinity: {}
 
 # Health checks with appropriate timeouts for ClamAV startup
 startupProbe:
-  initialDelaySeconds: 60
+  initialDelaySeconds: 180
   periodSeconds: 30
   failureThreshold: 3
   timeoutSeconds: 600
@@ -49,7 +49,7 @@ livenessProbe:
   timeoutSeconds: 600
 
 readinessProbe:
-  initialDelaySeconds: 90
+  initialDelaySeconds: 210
   periodSeconds: 10
   failureThreshold: 3
   timeoutSeconds: 600
@@ -87,7 +87,7 @@ persistentVolume:
 
   ## Persistent Volume Size
   ##
-  size: 1Gi
+  size: 512Mi
 
   ## Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
@@ -103,7 +103,7 @@ virusScanTempVolume:
   enabled: true
   storageClass: netapp-file-standard
   accessMode: ReadWriteMany
-  size: 1Gi
+  size: 512Mi
 
 env:
   CLAMAV_LOG_LEVEL: INFO
