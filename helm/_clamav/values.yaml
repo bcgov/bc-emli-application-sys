@@ -5,7 +5,7 @@ image:
   tag: main
   pullPolicy: IfNotPresent
 
-priorityClassName: ""
+priorityClassName: ''
 
 imagePullSecrets: []
 
@@ -23,11 +23,11 @@ service:
 # ClamAV requires substantial memory for virus definitions
 resources:
   requests:
-    cpu: 80m
-    memory: 2Gi
+    cpu: 100m
+    memory: 1Gi
   limits:
-    cpu: 500m
-    memory: 3Gi
+    cpu: 200m
+    memory: 2Gi
 
 nodeSelector: {}
 
@@ -83,7 +83,7 @@ persistentVolume:
   ## Must match those of existing PV or dynamic provisioner
   ## Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
 
   ## Persistent Volume Size
   ##

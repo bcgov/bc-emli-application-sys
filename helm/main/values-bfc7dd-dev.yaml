@@ -15,7 +15,7 @@ app:
     requests:
       cpu: 300m
       memory: 512Mi
-  
+
   virusScanVolume:
     enabled: true
     claimName: hesp-clamav-virus-scan-temp
@@ -32,7 +32,7 @@ app:
     'VITE_BUSINESS_BCEID_REGISTRATION_URL': 'https://www.development.bceid.ca/register/business/getting_started/getting_started.aspx'
     'VITE_KEYCLOAK_LOGOUT_URL': 'https://dev.loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/logout'
     'VITE_POST_LOGOUT_REDIRECT_URL': 'https://dev-hesp.apps.silver.devops.gov.bc.ca'
-    # File Upload Configuration 
+    # File Upload Configuration
     'BCGOV_OBJECT_STORAGE_REGION': 'ca-central-1'
     'BCGOV_OBJECT_STORAGE_ENDPOINT': 'https://s3.ca-central-1.amazonaws.com'
     'BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT': 'https://s3.ca-central-1.amazonaws.com'
@@ -66,7 +66,7 @@ sidekiq:
   env:
     'APP_DOMAIN': 'dev-hesp.apps.silver.devops.gov.bc.ca'
     'FROM_EMAIL': 'no-reply@gov.bc.ca'
-    # File Upload Configuration 
+    # File Upload Configuration
     'BCGOV_OBJECT_STORAGE_REGION': 'ca-central-1'
     'BCGOV_OBJECT_STORAGE_ENDPOINT': 'https://s3.ca-central-1.amazonaws.com'
     'BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT': 'https://s3.ca-central-1.amazonaws.com'
@@ -97,7 +97,7 @@ anycable-rpc:
       memory: 128Mi
 
   env:
-    # File Upload Configuration 
+    # File Upload Configuration
     'BCGOV_OBJECT_STORAGE_REGION': 'ca-central-1'
     'BCGOV_OBJECT_STORAGE_ENDPOINT': 'https://s3.ca-central-1.amazonaws.com'
     'BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT': 'https://s3.ca-central-1.amazonaws.com'
@@ -227,7 +227,7 @@ anycableGo:
 # ClamAV Configuration for Dev
 clamav:
   enabled: true
-  
+
   resources:
     requests:
       cpu: 50m
@@ -235,10 +235,10 @@ clamav:
     limits:
       cpu: 200m
       memory: 1Gi
-  
+
   persistence:
     size: 512Mi
-  
+
   virusScanTempVolume:
     enabled: true
-    size: 32Mi
+    size: 1Gi

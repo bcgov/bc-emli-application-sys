@@ -82,7 +82,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - 'echo PING | nc -w 5 localhost 3310 | grep -q PONG'
+              - 'echo PING | nc -w 5 127.0.0.1 3310 | grep -q PONG'
             initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
             failureThreshold: {{ .Values.startupProbe.failureThreshold }}
             periodSeconds: {{ .Values.startupProbe.periodSeconds }}
@@ -92,7 +92,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - 'echo PING | nc -w 5 localhost 3310 | grep -q PONG'
+              - 'echo PING | nc -w 5 127.0.0.1 3310 | grep -q PONG'
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
@@ -102,7 +102,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - 'echo PING | nc -w 5 localhost 3310 | grep -q PONG'
+              - 'echo PING | nc -w 5 127.0.0.1 3310 | grep -q PONG'
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
