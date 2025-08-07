@@ -162,7 +162,7 @@ services:
 
   # ClamAV for virus scanning
   clamav:
-    build: ./docker/clamav
+    build: ./clamav
     ports:
       - '3310:3310'
 
