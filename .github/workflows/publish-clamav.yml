@@ -29,7 +29,7 @@ jobs:
         registry-url: ${{ env.GITHUB_REGISTRY }}
         registry-username: ${{ github.actor }}
         registry-password: ${{ secrets.GITHUB_TOKEN }}
-        image-name: bcgov/hesp-clamav
+        image-name: bcgov/hesp-clamav:latest
         docker-context: clamav
         docker-file: clamav/Dockerfile
         metadata-tags: |
