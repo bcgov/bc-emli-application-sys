@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/bcgov/hesp-clamav
-  tag: latest
+  tag: main
   pullPolicy: IfNotPresent
 
 priorityClassName: ""
@@ -87,7 +87,7 @@ persistentVolume:
 
   ## Persistent Volume Size
   ##
-  size: 500Mi
+  size: 1Gi
 
   ## Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
