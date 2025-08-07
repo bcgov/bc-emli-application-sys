@@ -41,7 +41,7 @@ app:
     'AWS_PARAMETER_BASE_PATH': '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
     # ClamAV Configuration - Disabled for now
     'CLAMAV_ENABLED': 'true'
-    'CLAMAV_HOST': 'clamav'
+    'CLAMAV_HOST': 'hesp-clamav'
     'CLAMAV_PORT': '3310'
     'CLAMAV_TIMEOUT': '30'
     'VIRUS_SCAN_TEMP_DIR': '/tmp/virus_scan'
@@ -75,7 +75,7 @@ sidekiq:
     'AWS_PARAMETER_BASE_PATH': '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
     # ClamAV Configuration - Disabled for now
     'CLAMAV_ENABLED': 'true'
-    'CLAMAV_HOST': 'clamav'
+    'CLAMAV_HOST': 'hesp-clamav'
     'CLAMAV_PORT': '3310'
     'CLAMAV_TIMEOUT': '30'
     'VIRUS_SCAN_TEMP_DIR': '/tmp/virus_scan'
