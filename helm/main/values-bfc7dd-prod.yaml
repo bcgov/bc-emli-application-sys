@@ -138,7 +138,7 @@ redis:
     replicaCount: 1
     persistence:
       enabled: true
-      size: 500Mi
+      size: 128Mi
     resources:
       requests:
         memory: 128Mi
@@ -159,7 +159,7 @@ elasticsearch:
       enabled: true
       accessModes:
         - ReadWriteOnce
-      size: 500Mi
+      size: 256Mi
   data:
     replicaCount: 1
     heapSize: 1024m
@@ -171,7 +171,7 @@ elasticsearch:
       enabled: true
       accessModes:
         - ReadWriteOnce
-      size: 1Gi
+      size: 256Mi
 
 # See https://github.com/anycable/anycable-helm/blob/master/anycable-go/values.yaml
 anycableGo:
@@ -189,3 +189,18 @@ anycableGo:
 # ClamAV Configuration for Production
 clamav:
   enabled: true
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 1Gi
+    limits:
+      cpu: 200m
+      memory: 2Gi
+
+  persistence:
+    size: 256Mi
+
+  virusScanTempVolume:
+    enabled: true
+    size: 512Mi
