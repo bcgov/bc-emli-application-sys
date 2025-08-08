@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - .github/workflows/publish-clamav.yml
-      - ./devops/docker/clamav/**
+      - /devops/docker/clamav/**
 
 env:
   GITHUB_REGISTRY: ghcr.io
@@ -31,7 +31,7 @@ jobs:
           registry-password: ${{ secrets.GITHUB_TOKEN }}
           image-name: bcgov/hesp-clamav
           docker-context: clamav
-          docker-file: devops/docker/clamav/Dockerfile
+          docker-file: /devops/docker/clamav/Dockerfile
           metadata-tags: |
             type=ref,event=branch
             type=sha,format=long,prefix=,suffix=
