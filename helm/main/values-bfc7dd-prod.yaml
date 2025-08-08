@@ -189,18 +189,3 @@ anycableGo:
 # ClamAV Configuration for Production
 clamav:
   enabled: true
-
-  resources:
-    requests:
-      cpu: 50m
-      memory: 256Mi
-    limits:
-      cpu: 200m
-      memory: 1Gi
-
-  persistence:
-    size: 512Mi
-
-  virusScanTempVolume:
-    enabled: true
-    size: 512Mi

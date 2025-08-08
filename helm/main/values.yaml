@@ -352,9 +352,18 @@ anycableGo:
       cpu: 20m
       memory: 128Mi
 
-# ClamAV antivirus service
+# ClamAV antivirus service, default settings
 clamav:
   enabled: true
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 1Gi
+    limits:
+      cpu: 200m
+      memory: 2Gi
+
   image:
     repository: ghcr.io/bcgov/hesp-clamav
     tag: main
