@@ -37,7 +37,7 @@ affinity: {}
 
 # Health checks with appropriate timeouts for ClamAV startup
 startupProbe:
-  initialDelaySeconds: 180
+  initialDelaySeconds: 240
   periodSeconds: 30
   failureThreshold: 3
   timeoutSeconds: 600
@@ -49,7 +49,7 @@ livenessProbe:
   timeoutSeconds: 600
 
 readinessProbe:
-  initialDelaySeconds: 210
+  initialDelaySeconds: 240
   periodSeconds: 10
   failureThreshold: 3
   timeoutSeconds: 600
