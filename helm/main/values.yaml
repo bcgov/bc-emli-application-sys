@@ -250,7 +250,7 @@ redis:
       enabled: false
     persistence:
       enabled: true
-      size: 500Mi
+      size: 128Mi
     resources:
       requests:
         memory: 128Mi
@@ -303,7 +303,7 @@ elasticsearch:
       enabled: true
       accessModes:
         - ReadWriteOnce
-      size: 1Gi
+      size: 256Mi
     podSecurityContext:
       enabled: false
     containerSecurityContext:
@@ -355,14 +355,6 @@ anycableGo:
 # ClamAV antivirus service, default settings
 clamav:
   enabled: true
-
-  resources:
-    requests:
-      cpu: 100m
-      memory: 1Gi
-    limits:
-      cpu: 200m
-      memory: 2Gi
 
   image:
     repository: ghcr.io/bcgov/hesp-clamav
