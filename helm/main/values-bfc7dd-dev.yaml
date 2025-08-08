@@ -224,6 +224,6 @@ anycableGo:
       cpu: 50m
       memory: 256Mi
 
-# ClamAV Configuration for Dev - turned off in favor of specific action
+# ClamAV Configuration for Dev
 clamav:
-  enabled: false
+  enabled: true
