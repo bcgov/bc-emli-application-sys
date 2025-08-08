@@ -375,7 +375,7 @@ clamav:
   persistence:
     enabled: true
     storageClass: netapp-block-standard
-    size: 512Mi
+    size: 256Mi
 
   virusScanTempVolume:
     enabled: true
