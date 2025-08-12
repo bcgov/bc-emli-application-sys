@@ -13,15 +13,16 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
     render_success authorized_results,
                    nil,
                    {
-                     meta: {
-                       total_pages:
-                         (
-                           authorized_results.count.to_f /
-                             @permit_application_search.per_page
-                         ).ceil,
-                       total_count: authorized_results.count,
-                       current_page: @permit_application_search.current_page
-                     },
+                     meta: page_meta(@permit_application_search),
+                     #  meta: {
+                     #    total_pages:
+                     #      (
+                     #        authorized_results.count.to_f /
+                     #          @permit_application_search.per_page
+                     #      ).ceil,
+                     #    total_count: authorized_results.count,
+                     #    current_page: @permit_application_search.current_page
+                     #  },
                      blueprint: PermitApplicationBlueprint,
                      blueprint_opts: {
                        view: :external_api

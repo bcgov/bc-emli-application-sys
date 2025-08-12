@@ -40,7 +40,30 @@ RSpec.describe "external_api/v1/applications",
       let(:constraints) { nil }
       consumes "application/json"
       produces "application/json"
-      parameter name: :constraints, in: :body, required: false
+      #parameter name: :constraints, in: :body, required: true
+
+      # pagination as query params
+      parameter name: :page,
+                in: :query,
+                schema: {
+                  type: :integer,
+                  default: 1,
+                  minimum: 1
+                },
+                description: "Page number"
+
+      parameter name: :per_page,
+                in: :query,
+                schema: {
+                  type: :integer,
+                  default: 25,
+                  minimum: 1,
+                  maximum: 100
+                },
+                description: "Page size"
+
+      let(:page) { 1 }
+      let(:per_page) { 25 }
 
       response(200, "Successful") do
         schema type: :object,
