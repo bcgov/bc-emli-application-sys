@@ -4,7 +4,7 @@ class Api::StorageController < Api::ApplicationController
 
   def upload
     #https://shrinerb.com/docs/plugins/presign_endpoint#calling-from-a-controller
-    set_rack_response FileUploader.presign_response(:cache, request.env)
+    set_rack_response Shrine.presign_response(:cache, request.env)
   end
 
   def virus_scan

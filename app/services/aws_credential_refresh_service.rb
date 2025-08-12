@@ -13,7 +13,7 @@ class AwsCredentialRefreshService
     # First, deactivate any expired credentials
     AwsCredential.deactivate_expired!
 
-    # Use rotated credentials from environment (updated by Lambda rotation)
+    # Use rotated credentials from Parameter Store (managed by Lambda rotation)
     refresh_with_rotated_credentials!
   end
 
@@ -40,14 +40,14 @@ class AwsCredentialRefreshService
         Rails.logger.info "Rotated AWS credentials fetched and stored, expires at #{expires_at}"
         return true
       else
-        # Fallback to environment if Parameter Store fails
-        Rails.logger.warn "Failed to fetch from Parameter Store, using environment fallback"
-        return refresh_with_environment_fallback!
+        # No fallback - Parameter Store is required
+        Rails.logger.error "Failed to fetch from Parameter Store, no fallback available"
+        return false
       end
     rescue => e
       Rails.logger.error "Failed to fetch rotated credentials: #{e.message}"
-      # Fallback to environment credentials
-      refresh_with_environment_fallback!
+      Rails.logger.error "Ensure Lambda rotation is working and Parameter Store contains current/* keys"
+      false
     end
   end
 
@@ -75,40 +75,76 @@ class AwsCredentialRefreshService
 
   # Fetch current (non-pending_deletion) credentials from Parameter Store
   def fetch_rotated_credentials_from_parameter_store
-    # Use the actual parameter path structure
+    # Use the actual parameter path structure - Lambda stores JSON at base path
     base_path = ENV["AWS_PARAMETER_BASE_PATH"]
 
     begin
-      # Use current environment credentials to access Parameter Store
-      ssm_client =
-        Aws::SSM::Client.new(
-          region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1",
-          access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
-          secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"]
-        )
+      # Use IAM role or environment credentials to access Parameter Store
+      ssm_client_options = {
+        region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1"
+      }
 
-      # Get the current (active) access key ID - avoid pending_deletion
-      access_key_param =
-        ssm_client.get_parameter(
-          name: "#{base_path}/current/access_key_id",
-          with_decryption: true
-        )
+      # Check if we should assume an IAM role
+      if ENV["AWS_ROLE_ARN"].present?
+        Rails.logger.info "Attempting to assume IAM role: #{ENV["AWS_ROLE_ARN"]}"
 
-      # Get the current (active) secret access key
-      secret_key_param =
-        ssm_client.get_parameter(
-          name: "#{base_path}/current/secret_access_key",
-          with_decryption: true
-        )
+        begin
+          # Try role assumption (works in dev/test/prod with SAML federation)
+          sts_client =
+            Aws::STS::Client.new(region: ENV["AWS_REGION"] || "ca-central-1")
+          assumed_role =
+            sts_client.assume_role(
+              role_arn: ENV["AWS_ROLE_ARN"],
+              role_session_name: "bcgov-credential-refresh-#{Time.current.to_i}"
+            )
+
+          ssm_client_options.merge!(
+            access_key_id: assumed_role.credentials.access_key_id,
+            secret_access_key: assumed_role.credentials.secret_access_key,
+            session_token: assumed_role.credentials.session_token
+          )
+          Rails.logger.info "✅ Successfully assumed role: #{ENV["AWS_ROLE_ARN"]}"
+        rescue Aws::STS::Errors::AccessDenied => e
+          Rails.logger.warn "⚠️ Role assumption failed (expected in local dev): #{e.message}"
+          Rails.logger.info "📋 Falling back to direct credentials for Parameter Store access"
+          # Continue with direct credentials (environment or container role)
+        end
+      else
+        Rails.logger.info "Using container's default IAM role for Parameter Store access"
+        # AWS SDK automatically detects and uses:
+        # - ECS task role
+        # - EC2 instance profile
+        # - OpenShift ServiceAccount with IAM role annotation
+        # - Container credentials endpoint
+      end
+
+      ssm_client = Aws::SSM::Client.new(ssm_client_options)
+
+      # Lambda stores credentials as JSON at the base path
+      credentials_param =
+        ssm_client.get_parameter(name: base_path, with_decryption: true)
+
+      # Parse the JSON structure
+      credentials_json = JSON.parse(credentials_param.parameter.value)
+      current_creds = credentials_json["current"]
+
+      unless current_creds && current_creds["AccessKeyID"] &&
+               current_creds["SecretAccessKey"]
+        Rails.logger.error "Invalid credential structure in Parameter Store"
+        return nil
+      end
 
       Rails.logger.info "Successfully fetched current credentials from Parameter Store: #{base_path}"
 
       {
-        access_key_id: access_key_param.parameter.value,
-        secret_access_key: secret_key_param.parameter.value
+        access_key_id: current_creds["AccessKeyID"],
+        secret_access_key: current_creds["SecretAccessKey"]
       }
     rescue Aws::SSM::Errors::ParameterNotFound => e
-      Rails.logger.error "Parameter not found: #{e.message}. Expected parameters at #{base_path}/current/"
+      Rails.logger.error "Parameter not found: #{e.message}. Expected parameter at #{base_path}"
+      nil
+    rescue JSON::ParserError => e
+      Rails.logger.error "Failed to parse credentials JSON: #{e.message}"
       nil
     rescue => e
       Rails.logger.error "Failed to fetch from Parameter Store: #{e.message}"
@@ -118,25 +154,54 @@ class AwsCredentialRefreshService
 
   # Check if we're currently using a key marked as pending_deletion
   def using_pending_deletion_key?(current_creds)
-    base_path =
-      "/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys"
+    base_path = ENV["AWS_PARAMETER_BASE_PATH"]
 
     begin
-      ssm_client =
-        Aws::SSM::Client.new(
-          region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1",
-          access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
-          secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"]
-        )
+      ssm_client_options = {
+        region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1"
+      }
 
-      # Check if there's a pending_deletion key and if we're using it
-      pending_key_param =
-        ssm_client.get_parameter(
-          name: "#{base_path}/pending_deletion/access_key_id",
-          with_decryption: true
-        )
+      # Check if we should assume an IAM role
+      if ENV["AWS_ROLE_ARN"].present?
+        Rails.logger.info "Assuming IAM role: #{ENV["AWS_ROLE_ARN"]}"
 
-      pending_key_id = pending_key_param.parameter.value
+        # Use current credentials (user creds or container role) to assume the target role
+        sts_client =
+          Aws::STS::Client.new(region: ENV["AWS_REGION"] || "ca-central-1")
+        assumed_role =
+          sts_client.assume_role(
+            role_arn: ENV["AWS_ROLE_ARN"],
+            role_session_name: "bcgov-credential-refresh-#{Time.current.to_i}"
+          )
+
+        ssm_client_options.merge!(
+          access_key_id: assumed_role.credentials.access_key_id,
+          secret_access_key: assumed_role.credentials.secret_access_key,
+          session_token: assumed_role.credentials.session_token
+        )
+      else
+        Rails.logger.info "Using container's default IAM role for Parameter Store access"
+        # AWS SDK automatically detects and uses:
+        # - ECS task role
+        # - EC2 instance profile
+        # - OpenShift ServiceAccount with IAM role annotation
+        # - Container credentials endpoint
+      end
+
+      ssm_client = Aws::SSM::Client.new(ssm_client_options)
+
+      # Get the JSON credentials from Parameter Store
+      credentials_param =
+        ssm_client.get_parameter(name: base_path, with_decryption: true)
+
+      # Parse the JSON structure
+      credentials_json = JSON.parse(credentials_param.parameter.value)
+      pending_creds = credentials_json["pending_deletion"]
+
+      # If no pending_deletion section exists, we're good
+      return false unless pending_creds && pending_creds["AccessKeyID"]
+
+      pending_key_id = pending_creds["AccessKeyID"]
       current_key_id = current_creds[:access_key_id]
 
       is_pending = (current_key_id == pending_key_id)
@@ -147,7 +212,10 @@ class AwsCredentialRefreshService
 
       is_pending
     rescue Aws::SSM::Errors::ParameterNotFound
-      # No pending_deletion key exists, we're good
+      # No parameter exists, we're good
+      false
+    rescue JSON::ParserError => e
+      Rails.logger.error "Failed to parse credentials JSON for pending check: #{e.message}"
       false
     rescue => e
       Rails.logger.error "Failed to check pending_deletion status: #{e.message}"
@@ -161,9 +229,14 @@ class AwsCredentialRefreshService
     return false unless current_creds
 
     # Check if we're using a pending_deletion key (proactive rotation)
-    if using_pending_deletion_key?(current_creds)
-      Rails.logger.info "Currently using pending_deletion key, rotating to current key"
-      return false
+    # Skip this check if we can't access Parameter Store (non-critical)
+    begin
+      if using_pending_deletion_key?(current_creds)
+        Rails.logger.info "Currently using pending_deletion key, rotating to current key"
+        return false
+      end
+    rescue => e
+      Rails.logger.warn "Could not check pending_deletion status: #{e.message} (continuing anyway)"
     end
 
     # Check if credentials expire within the next 2 hours (safety buffer)
