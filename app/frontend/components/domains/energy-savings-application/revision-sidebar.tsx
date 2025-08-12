@@ -189,31 +189,34 @@ export const RevisionSideBar = observer(
 
       return (
         <Flex gap={4}>
-          {/* First ConfirmationModal for "Send" */}
-          <ConfirmationModal
-            isSubmit={true}
-            promptHeader={t('energySavingsApplication.show.revision.confirmHeader')}
-            promptMessage={t('energySavingsApplication.show.revision.confirmMessage')}
-            renderTrigger={(onOpen) => (
-              <Button
-                variant="primary"
-                border={0}
-                rightIcon={<PaperPlaneTilt />}
-                onClick={onOpen}
-                isDisabled={permitApplication.isRevisionsRequested || fields?.length == 0}
-                sx={{
-                  _disabled: {
-                    bg: 'greys.grey80',
-                    color: 'greys.grey05',
-                    cursor: 'not-allowed',
-                  },
-                }}
-              >
-                {t('energySavingsApplication.show.revision.send')}
-              </Button>
+          {/* Hide "Send to submitter" button for internal applications and external applications with admin pathway */}
+          {permitApplication?.audienceType?.code !== 'internal' &&
+            !(permitApplication?.audienceType?.code === 'external' && updatePerformedBy === 'staff') && (
+              <ConfirmationModal
+                isSubmit={true}
+                promptHeader={t('energySavingsApplication.show.revision.confirmHeader')}
+                promptMessage={t('energySavingsApplication.show.revision.confirmMessage')}
+                renderTrigger={(onOpen) => (
+                  <Button
+                    variant="primary"
+                    border={0}
+                    rightIcon={<PaperPlaneTilt />}
+                    onClick={onOpen}
+                    isDisabled={permitApplication.isRevisionsRequested || fields?.length == 0}
+                    sx={{
+                      _disabled: {
+                        bg: 'greys.grey80',
+                        color: 'greys.grey05',
+                        cursor: 'not-allowed',
+                      },
+                    }}
+                  >
+                    {t('energySavingsApplication.show.revision.send')}
+                  </Button>
+                )}
+                onConfirm={onFinalizeRevisions}
+              />
             )}
-            onConfirm={onFinalizeRevisions}
-          />
 
           {/* Cancel button triggers remove updates modal */}
           {onCancel && (
@@ -231,7 +234,7 @@ export const RevisionSideBar = observer(
                 <Button
                   variant="whiteButton"
                   onClick={() => {
-                    permitApplication.setRevisionMode(false);
+                    onCancel ? onCancel() : permitApplication.setRevisionMode(false);
                   }}
                 >
                   {t('ui.cancel')}
@@ -364,6 +367,8 @@ export const RevisionSideBar = observer(
             onSave={handleSubmit(onSaveRevision)}
             isRevisionsRequested={permitApplication.isRevisionsRequested}
             disableInput={forSubmitter || isViewingPastRequests}
+            updatePerformedBy={updatePerformedBy}
+            permitApplication={permitApplication}
           />
         )}
         {sendRevisionContainerRef && tabIndex == 0 && (

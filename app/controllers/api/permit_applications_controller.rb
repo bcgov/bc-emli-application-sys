@@ -83,13 +83,16 @@ class Api::PermitApplicationsController < Api::ApplicationController
     authorize @permit_application
 
     # always reset the submission section keys until actual submission
-    submission_section =
-      permit_application_params.dig(
-        "submission_data",
-        "data",
-        "section-completion-key"
-      )
-    submission_section&.each { |key, value| submission_section[key] = nil }
+    # Skip this reset for admin users doing Save Edits (they want to preserve signed status)
+    unless current_user.review_staff? && @permit_application.submitted?
+      submission_section =
+        permit_application_params.dig(
+          "submission_data",
+          "data",
+          "section-completion-key"
+        )
+      submission_section&.each { |key, value| submission_section[key] = nil }
+    end
 
     update_submitted_for_from_submission_data
 
@@ -250,15 +253,17 @@ class Api::PermitApplicationsController < Api::ApplicationController
     is_current_user_submitter =
       current_user.id == @permit_application.submitter_id
 
-    if @permit_application.update(
-         (
-           if is_current_user_submitter
-             permit_application_params
-           else
-             submission_collaborator_permit_application_params
-           end
-         )
-       ) && @permit_application.submit!
+    params_to_use =
+      if is_current_user_submitter
+        permit_application_params
+      else
+        submission_collaborator_permit_application_params
+      end
+    update_success = @permit_application.update(params_to_use)
+
+    submit_success = @permit_application.submit! if update_success
+
+    if update_success && submit_success
       # Notify admin staff about new submission
       NotificationService.publish_new_submission_received_event(
         @permit_application
@@ -471,6 +476,15 @@ class Api::PermitApplicationsController < Api::ApplicationController
 
     # Remove revision requests explicitly
     if latest_version.revision_requests.destroy_all
+      # Restore original form data from submission version (true rollback!)
+      original_data = latest_version.submission_data
+      @permit_application.update!(submission_data: original_data)
+
+      # Transition back to original submitted state
+      if @permit_application.may_cancel_revision_requests?
+        @permit_application.cancel_revision_requests!
+      end
+
       render_success @permit_application,
                      "permit_application.remove_success",
                      { blueprint: PermitApplicationBlueprint }
@@ -659,7 +673,15 @@ class Api::PermitApplicationsController < Api::ApplicationController
   end
 
   def submitted_permit_application_params # params for submitters
-    params.require(:permit_application).permit(:reference_number)
+    if current_user.review_staff? # Allow admins to update submission_data on submitted applications
+      params.require(:permit_application).permit(
+        :reference_number,
+        submission_data: {
+        }
+      )
+    else
+      params.require(:permit_application).permit(:reference_number)
+    end
   end
 
   def revision_request_params # params for submitters

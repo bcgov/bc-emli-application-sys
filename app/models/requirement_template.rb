@@ -240,7 +240,8 @@ class RequirementTemplate < ApplicationRecord
           program_id: program_id,
           user_group_type_id: user_group_type_id,
           audience_type_id: audience_type_id,
-          submission_type_id: submission_type_id
+          submission_type_id: submission_type_id,
+          discarded_at: nil
         )
         .order(:created_at)
         .first

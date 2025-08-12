@@ -236,7 +236,12 @@ export const PermitApplicationModel = types.snapshotProcessor(
         const changedMarkedFormJson = combineChangeMarkers(diffColoredFormJson, self.isSubmitted, changedKeys);
         const revisionModeFormJson =
           self.revisionMode || self.isRevisionsRequested
-            ? combineRevisionButtons(changedMarkedFormJson, self.isSubmitted, revisionRequestsToUse)
+            ? combineRevisionButtons(
+                changedMarkedFormJson,
+                revisionRequestsToUse,
+                self.rootStore.userStore.currentUser?.role,
+                self.revisionMode || self.isRevisionsRequested,
+              )
             : diffColoredFormJson;
         return revisionModeFormJson;
       },

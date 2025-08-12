@@ -1009,6 +1009,7 @@ const options = {
               reasonFor: 'Reason for revision',
               comment: 'Comment (Optional)',
               useButton: 'Use this reason',
+              updateField: 'Update Field',
               maxCharacters: 'Maximum 350 characters',
               send: 'Send to submitter',
               confirmHeader: 'Send this list of revisions to the submitter?',
@@ -1267,8 +1268,22 @@ const options = {
             updatesTracker: 'Updates tracker',
             updatePathway: 'Update pathway',
             performedBy: 'Update performed by',
+            updatePathwayOptions: {
+              participantOption: 'Participant (send request to them)',
+              adminOption: "Admin (on participant's behalf)",
+            },
             applicant: 'Applicant',
             staff: 'Staff',
+            saveEdits: 'Save Edits',
+            saveConfirmation: {
+              title: 'Are you ready to save the updates you have made to this application ?',
+              description:
+                "The updates you have made on this application will be used to assess the submitter's eligibility.",
+              confirm: 'Confirm',
+              back: 'Back',
+            },
+            adminSaveSuccess: 'Application has been successfully updated and resubmitted.',
+            adminSaveError: 'There was an error saving the application updates. Please try again.',
             requestedRevisions: 'Requested revisions',
             pleaseFix: 'Please fix the requested revisions and re-submit your application',
             onlySpecified:
@@ -1289,7 +1304,12 @@ const options = {
               reason: 'Reason',
               reasonCode: 'Reason code',
               revisionRequest: 'Request update',
-              reasonFor: 'Reason for update',
+              reasonFor: 'Reason for revision',
+              reasonForUpdate: 'Reason for update',
+              originalAnswer: 'Original answer',
+              noOriginalAnswer: 'No original answer provided',
+              updateFieldButton: 'Update field',
+              removeButton: 'Remove',
               comment: 'Comment (Optional)',
               useButton: 'Use this reason',
               maxCharacters: 'Maximum 350 characters',
@@ -1297,7 +1317,7 @@ const options = {
               confirmHeader: 'Send this list of update requests to the applicant?',
               originallySubmitted: 'Previously submitted',
               confirmMessage:
-                'The applicant will receive an notification and email about the changes you’ve requested.',
+                "The applicant will receive an notification and email about the changes you've requested.",
               cancelRequest: 'Are you sure you want to cancel?',
               noNotification:
                 'No notifications will be sent to the applicant and you will lose any current revisions you may have added.',

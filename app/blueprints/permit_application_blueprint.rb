@@ -39,6 +39,12 @@ class PermitApplicationBlueprint < Blueprinter::Base
       # Indexed data is used to prevent N extra queries on every search
       pa.indexed_using_current_template_version
     end
+
+    association :audience_type,
+                blueprint: PermitClassificationBlueprint,
+                view: :base do |pa, options|
+      pa.template_version&.requirement_template&.audience_type
+    end
   end
 
   view :jurisdiction_review_inbox do

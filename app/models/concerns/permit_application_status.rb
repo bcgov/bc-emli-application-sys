@@ -45,10 +45,19 @@ module PermitApplicationStatus
       end
 
       event :finalize_revision_requests do
-        transitions from: %i[newly_submitted resubmitted],
+        transitions from: %i[newly_submitted resubmitted revisions_requested],
                     to: :revisions_requested,
                     guard: :can_finalize_requests?,
                     after: :handle_finalize_revision_requests
+      end
+
+      event :cancel_revision_requests do
+        transitions from: :revisions_requested,
+                    to: :newly_submitted,
+                    guard: :was_originally_newly_submitted?
+        transitions from: :revisions_requested,
+                    to: :resubmitted,
+                    guard: :was_originally_resubmitted?
       end
     end
 
@@ -72,6 +81,16 @@ module PermitApplicationStatus
 
     def can_finalize_requests?
       latest_submission_version.revision_requests.any?
+    end
+
+    def was_originally_newly_submitted?
+      # Check if this application was never resubmitted before
+      submission_versions.count == 1
+    end
+
+    def was_originally_resubmitted?
+      # Check if this application was resubmitted before
+      submission_versions.count > 1
     end
 
     def handle_finalize_revision_requests

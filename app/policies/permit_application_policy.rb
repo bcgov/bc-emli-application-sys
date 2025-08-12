@@ -64,15 +64,23 @@ class PermitApplicationPolicy < ApplicationPolicy
   end
 
   def submit?
-    #TODO: this is where we handle who can submit what, this needs to be re-worked
-    # to allow admins/psr's the ability to submit in place of a Partiticipant
-    Rails.logger.info("#{user.inspect}")
-    record.draft? ? record.submitter == user : user.admin_manager?
-    if record.draft?
-      record.submission_requirement_block_edit_permissions(user_id: user.id) ==
-        :all
+    if record.revisions_requested?
+      # Revisions requested state (Save Edits workflow):
+      # Allow original submitter OR admin users from same program (for "on behalf" submissions)
+      is_submitter = record.submitter == user
+      is_admin = user.admin_manager? || user.admin?
+      is_admin_in_program =
+        is_admin &&
+          user.program_memberships.active.exists?(program_id: record.program_id)
+      is_submitter || is_admin_in_program
+    elsif record.draft?
+      # Draft applications: Only users with full submission permissions can submit
+      permissions =
+        record.submission_requirement_block_edit_permissions(user_id: user.id)
+      permissions == :all
     else
-      user.admin_manager? || user.participant? # user.jurisdictions.find(record.jurisdiction_id)
+      # All other states: Only admin users can submit
+      user.admin_manager? || user.admin?
     end
   end
 

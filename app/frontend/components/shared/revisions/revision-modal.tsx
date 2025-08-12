@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Divider,
   Flex,
@@ -15,6 +16,7 @@ import {
   ModalOverlay,
   Select,
   Spacer,
+  Text,
   Textarea,
   useDisclosure,
 } from '@chakra-ui/react';
@@ -37,6 +39,8 @@ export interface IRevisionModalProps extends Partial<ReturnType<typeof useDisclo
   onSave: () => Promise<void>;
   isRevisionsRequested?: boolean;
   disableInput?: boolean;
+  updatePerformedBy?: string;
+  permitApplication?: any;
 }
 
 export const RevisionModal: React.FC<IRevisionModalProps> = ({
@@ -51,6 +55,8 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
   onSave,
   isRevisionsRequested,
   disableInput,
+  updatePerformedBy,
+  permitApplication,
 }) => {
   const { t } = useTranslation();
   const [reasonCode, setReasonCode] = useState<string>(
@@ -62,6 +68,7 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
 
   const { userStore, siteConfigurationStore } = useMst();
   const { currentUser } = userStore;
+
   const { revisionReasonOptions } = siteConfigurationStore;
 
   const className = `formio-component-${requirementJson?.key}`;
@@ -97,10 +104,29 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
       append(newItem);
     }
 
-    onSave().then(() => {
-      elements?.[0]?.classList?.add('revision-requested');
-      handleClose();
-    });
+    // For admin updates, need to save locally to trigger form updates and Save Edits button
+    // For send to submitter workflow, save immediately to server
+    if (updatePerformedBy === 'staff') {
+      // Set revision mode to enable field editing for admin workflows
+      if (permitApplication) {
+        permitApplication.setRevisionMode(true);
+      }
+
+      // Call onSave to update local state (latestRevisionRequests) but for admin workflow
+      // this won't save to server, just updates the local model
+      onSave().then(() => {
+        if (elements?.[0]) {
+          elements[0].classList.add('revision-requested');
+        }
+        handleClose();
+      });
+    } else {
+      // Standard revision request workflow - save immediately
+      onSave().then(() => {
+        elements?.[0]?.classList?.add('revision-requested');
+        handleClose();
+      });
+    }
   };
 
   const handleDelete = () => {
@@ -108,6 +134,7 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
       update(index, { _destroy: true, id: revisionRequest.id });
     }
 
+    // Standard revision request workflow - save immediately
     onSave().then(() => {
       elements?.[0]?.classList?.remove('revision-requested');
       handleClose();
@@ -123,14 +150,16 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
   const selectedLabel = revisionReasonOptions.find((opt) => opt.value === reasonCode)?.label;
 
   return (
-    <Modal onClose={handleClose} isOpen={isOpen} size="lg">
+    <Modal onClose={handleClose} isOpen={isOpen} size="sm">
       <ModalOverlay />
 
-      <ModalContent mt={48}>
+      <ModalContent mt={48} maxW="348px" minH="485px">
         <ModalHeader textAlign="center">
           <ModalCloseButton fontSize="11px" />
           <Heading as="h3" fontSize="xl" color="theme.blueAlt">
-            {t('energySavingsApplication.show.revision.revisionRequest')}
+            {updatePerformedBy === 'staff'
+              ? t('permitApplication.show.revision.updateField')
+              : t('energySavingsApplication.show.revision.revisionRequest')}
           </Heading>
         </ModalHeader>
         <ModalBody>
@@ -173,7 +202,32 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
 
             <Divider />
 
-            {/* <SingleRequirementForm requirementJson={requirementForm} submissionJson={requirementSubmission} /> */}
+            {(currentUser?.role === 'admin' || currentUser?.role === 'admin_manager') && (
+              <FormControl>
+                <FormLabel>{t('energySavingsApplication.show.revision.originalAnswer')}</FormLabel>
+                <Box p={3} bg="gray.50" borderRadius="md" border="1px solid" borderColor="gray.200">
+                  <Text color="gray.700" fontWeight="normal">
+                    {(() => {
+                      // Extract the field value from the nested data structure
+                      const fieldKey = requirementJson?.key;
+
+                      if (typeof requirementSubmission === 'string') {
+                        return requirementSubmission;
+                      }
+
+                      if (requirementSubmission?.data && fieldKey) {
+                        const fieldValue = requirementSubmission.data[fieldKey];
+                        if (fieldValue !== undefined && fieldValue !== null && fieldValue !== '') {
+                          return String(fieldValue);
+                        }
+                      }
+
+                      return t('energySavingsApplication.show.revision.noOriginalAnswer');
+                    })()}
+                  </Text>
+                </Box>
+              </FormControl>
+            )}
           </Flex>
           <ModalFooter>
             <Flex width="full" justify="center" gap={4}>
@@ -186,24 +240,14 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
               ) : (
                 <>
                   <Button onClick={handleUpsert} variant="primary" isDisabled={!reasonCode || isRevisionsRequested}>
-                    {t('permitApplication.show.revision.useButton')}
+                    {updatePerformedBy === 'staff'
+                      ? t('permitApplication.show.revision.updateField')
+                      : t('permitApplication.show.revision.useButton')}
                   </Button>
 
-                  <Button variant="secondary" onClick={onClose}>
-                    {t('ui.cancel')}
+                  <Button variant="outline" onClick={handleDelete} isDisabled={isRevisionsRequested}>
+                    {updatePerformedBy === 'staff' ? t('ui.remove') : t('ui.delete')}
                   </Button>
-                  <Spacer />
-                  {revisionRequest && (
-                    <Button
-                      color="semantic.error"
-                      leftIcon={<Trash />}
-                      variant="link"
-                      onClick={handleDelete}
-                      isDisabled={isRevisionsRequested}
-                    >
-                      {t('ui.delete')}
-                    </Button>
-                  )}
                 </>
               )}
             </Flex>
