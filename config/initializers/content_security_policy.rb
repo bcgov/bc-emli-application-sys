@@ -5,9 +5,17 @@
 # https://guides.rubyonrails.org/security.html#content-security-policy-header
 
 Rails.application.configure do
-  # Disable CSP entirely in development
-  unless Rails.env.development?
-    config.content_security_policy do |policy|
+  config.content_security_policy do |policy|
+    # DEV-only: Loosen restrictions to support local tooling like Vite, Reactotron, and ActionCable
+    if Rails.env.development?
+      vite_host = "ws://localhost:3036" # Vite dev server WebSocket
+      reactotron_ws = "ws://localhost:9090" # Reactotron debugging WebSocket
+      cable_ws = "ws://localhost:8080" # ActionCable WebSocket (or any custom WS server)
+
+      policy.script_src :self, :https, :unsafe_eval, :unsafe_inline, vite_host
+      policy.style_src :self, :https, :unsafe_eval, :unsafe_inline, vite_host
+      policy.connect_src :self, :https, vite_host, reactotron_ws, cable_ws
+    else
       cable_ws = ENV["ANYCABLE_URL"]
 
       # create nonces
