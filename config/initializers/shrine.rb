@@ -34,49 +34,12 @@ if SHRINE_USE_S3
 end
 
 if SHRINE_USE_S3
-  # Simple credentials provider - database only, cron job handles refresh
-  def get_aws_credentials
-    # Check if we can access the database and AwsCredential model during initialization
-    begin
-      db_credentials = AwsCredential.current_s3_credentials if defined?(
-        AwsCredential
-      ) && ActiveRecord::Base.connected?
-    rescue => e
-      Rails.logger.debug "Cannot access database during initialization: #{e.message}"
-      db_credentials = nil
-    end
-
-    if db_credentials && !Rails.env.test?
-      Rails.logger.info "Using AWS credentials from database (expires: #{db_credentials[:expires_at]})"
-      {
-        access_key_id: db_credentials[:access_key_id],
-        secret_access_key: db_credentials[:secret_access_key],
-        session_token: db_credentials[:session_token]
-      }
-    else
-      # During initialization, this is expected - log at debug level instead of error
-      if Rails.application.initialized?
-        Rails.logger.error "No database credentials found! S3 operations will fail."
-        Rails.logger.error "Check cron job 'aws_credential_refresh' is running."
-        Rails.logger.error "Manual fix: Run AwsCredentialRefreshService.new.refresh_credentials!"
-        Rails.logger.error "Ensure Parameter Store has credentials at: #{ENV["AWS_PARAMETER_BASE_PATH"]}/current/*"
-      else
-        Rails.logger.debug "Database credentials not available during initialization - this is expected"
-      end
-      # Return empty credentials - this will cause graceful failure with clear error messages
-      { access_key_id: nil, secret_access_key: nil, session_token: nil }
-    end
-  end
-
-  credentials = get_aws_credentials
-
   s3_options = {
     bucket: ENV["BCGOV_OBJECT_STORAGE_BUCKET"],
     endpoint: ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"],
-    region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "no-region-needed",
-    access_key_id: credentials[:access_key_id],
-    secret_access_key: credentials[:secret_access_key],
-    session_token: credentials[:session_token],
+    region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1",
+    access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
+    secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
     force_path_style: true
   }.compact
 
@@ -113,80 +76,10 @@ if SHRINE_USE_S3
     end
   end
 
-  # Simplified S3 storage class - database credentials only, cron job handles refresh
-  class DynamicS3Storage < Shrine::Storage::S3
-    def initialize(**options)
-      # Don't pass credentials to parent - we'll handle them dynamically
-      super(
-        **options.except(:access_key_id, :secret_access_key, :session_token)
-      )
-      @client = nil
-      @dynamic_options = options
-    end
-
-    # Reset client to force credential refresh (called by cron job)
-    def refresh_client!
-      @client = nil
-      Rails.logger.info "S3 client refreshed - will use latest database credentials"
-    end
-
-    # Override object method to ensure it uses our dynamic client
-    def object(id)
-      resource = Aws::S3::Resource.new(client: client)
-      resource.bucket(bucket.name).object(object_key(id))
-    end
-
-    private
-
-    # Simple client method - only uses database credentials
-    def client
-      @client ||=
-        begin
-          if defined?(AwsCredential) && !Rails.env.test?
-            # Handle database connection issues during initialization
-            begin
-              db_credentials =
-                AwsCredential.current_s3_credentials if ActiveRecord::Base.connected?
-            rescue => e
-              Rails.logger.debug "Cannot access database for S3 credentials: #{e.message}"
-              db_credentials = nil
-            end
-
-            if db_credentials
-              Rails.logger.debug "Using S3 client with database credentials (expires: #{db_credentials[:expires_at]})"
-              Aws::S3::Client.new(
-                endpoint: @dynamic_options[:endpoint],
-                region: @dynamic_options[:region],
-                access_key_id: db_credentials[:access_key_id],
-                secret_access_key: db_credentials[:secret_access_key],
-                session_token: db_credentials[:session_token],
-                force_path_style: @dynamic_options[:force_path_style]
-              )
-            else
-              Rails.logger.error "No database credentials available! S3 operations will fail."
-              Rails.logger.error "Check cron job 'aws_credential_refresh' is running and Parameter Store access is working."
-              Rails.logger.error "Manual fix: Run AwsCredentialRefreshService.new.refresh_credentials!"
-
-              # Return a client with nil credentials instead of raising - this will trigger the proper AWS error
-              Aws::S3::Client.new(
-                endpoint: @dynamic_options[:endpoint],
-                region: @dynamic_options[:region],
-                access_key_id: nil,
-                secret_access_key: nil,
-                session_token: nil,
-                force_path_style: @dynamic_options[:force_path_style]
-              )
-            end
-          else
-            super
-          end
-        end
-    end
-  end
-
   Shrine.storages = {
-    cache: DynamicS3Storage.new(public: false, prefix: "cache", **s3_options),
-    store: DynamicS3Storage.new(public: false, **s3_options)
+    cache:
+      Shrine::Storage::S3.new(public: false, prefix: "cache", **s3_options),
+    store: Shrine::Storage::S3.new(public: false, **s3_options)
   }
 else
   Shrine.storages = {
@@ -249,37 +142,14 @@ class Shrine::Storage::S3
     # Use public endpoint for presigned URLs if available
     if ENV["BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT"].present?
       # Create a temporary S3 client with public endpoint for presigned URLs
-      # Get dynamic credentials from database
-      begin
-        db_credentials = AwsCredential.current_s3_credentials if defined?(
-          AwsCredential
-        ) && ActiveRecord::Base.connected?
-      rescue => e
-        Rails.logger.debug "Cannot access database for presigned URL credentials: #{e.message}"
-        db_credentials = nil
-      end
-
-      if db_credentials
-        public_client =
-          Aws::S3::Client.new(
-            endpoint: ENV["BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT"],
-            region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "no-region-needed",
-            access_key_id: db_credentials[:access_key_id],
-            secret_access_key: db_credentials[:secret_access_key],
-            session_token: db_credentials[:session_token],
-            force_path_style: true
-          )
-      else
-        # Fallback to environment variables if database credentials unavailable
-        public_client =
-          Aws::S3::Client.new(
-            endpoint: ENV["BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT"],
-            region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "no-region-needed",
-            access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
-            secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
-            force_path_style: true
-          )
-      end
+      public_client =
+        Aws::S3::Client.new(
+          endpoint: ENV["BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT"],
+          region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1",
+          access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
+          secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
+          force_path_style: true
+        )
       public_resource = Aws::S3::Resource.new(client: public_client)
       public_obj = public_resource.bucket(bucket.name).object(obj.key)
       signed_url = public_obj.presigned_url(:put, options)

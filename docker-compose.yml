@@ -11,7 +11,7 @@ x-env-vars: &default-env-vars
   SIMPLE_FEED_DEV_REDIS_URL: redis://redis:6379/3
   CACHE_DEV_REDIS_URL: redis://redis:6379/4
   DEVISE_JWT_SECRET_KEY: supersecret
-  DATABASE_URL: postgres://postgres:password@postgres:5432/app_development
+  DATABASE_URL: postgres://postgres:password@postgres:5432/test-local-db
   CLAMAV_ENABLED: "true"
   ELASTICSEARCH_URL: http://elasticsearch:9200
 

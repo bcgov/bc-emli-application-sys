@@ -7,6 +7,10 @@ global:
 app:
   enabled: true
 
+  # External Secrets Operator configuration
+  externalSecrets:
+    enabled: true
+
   image:
     # repository: artifacts.developer.gov.bc.ca/bbfc-prod/hesp-prod
     repository: ghcr.io/bcgov/hesp-app
@@ -32,7 +36,6 @@ app:
     'BCGOV_OBJECT_STORAGE_BUCKET': 'hesp-prod-cacentral1-bucket'
     # AWS Parameter Store path for credential rotation
     'AWS_PARAMETER_BASE_PATH': '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
-    'AWS_ROLE_ARN': 'arn:aws:iam::588738584323:role/BCGOV_WORKLOAD_developer'
     'AWS_REGION': 'ca-central-1'
     'AWS_DEFAULT_REGION': 'ca-central-1'
 
@@ -62,7 +65,6 @@ sidekiq:
     'BCGOV_OBJECT_STORAGE_BUCKET': 'hesp-prod-cacentral1-bucket'
     # AWS Parameter Store path for credential rotation
     'AWS_PARAMETER_BASE_PATH': '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
-    'AWS_ROLE_ARN': 'arn:aws:iam::588738584323:role/BCGOV_WORKLOAD_developer'
     'AWS_REGION': 'ca-central-1'
     'AWS_DEFAULT_REGION': 'ca-central-1'
     # ClamAV Configuration - Enabled for production
@@ -96,7 +98,6 @@ anycable-rpc:
     'BCGOV_OBJECT_STORAGE_BUCKET': 'hesp-prod-cacentral1-bucket'
     # AWS Parameter Store path for credential rotation
     'AWS_PARAMETER_BASE_PATH': '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
-    'AWS_ROLE_ARN': 'arn:aws:iam::588738584323:role/BCGOV_WORKLOAD_developer'
     'AWS_REGION': 'ca-central-1'
     'AWS_DEFAULT_REGION': 'ca-central-1'
 

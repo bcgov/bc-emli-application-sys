@@ -1,0 +1,12 @@
+# Application-specific configuration
+app:
+  namespace: "bc-emli-application-sys"
+  awsRegion: "ca-central-1"
+  
+  # AWS Parameter Store configuration
+  parameterStore:
+    iamUsername: "BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf"
+    refreshInterval: "2m"
+    
+  # Bootstrap credentials secret name (must be created manually)
+  bootstrapSecret: "aws-bootstrap-credentials"

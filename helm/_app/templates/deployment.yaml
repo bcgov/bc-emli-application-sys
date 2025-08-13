@@ -38,7 +38,6 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "_.fullname" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -81,6 +80,20 @@ spec:
             - secretRef:
                 name: {{ . }}
             {{- end }}
+          {{- end }}
+          # ESO-managed S3 credentials from Parameter Store
+          {{- if .Values.externalSecrets.enabled }}
+            # ESO-managed S3 credentials from Parameter Store
+            - name: BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: s3-access-keys
+                  key: access-key-id
+            - name: BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: s3-access-keys
+                  key: secret-access-key
           {{- end }}
           ports:
             - name: http
