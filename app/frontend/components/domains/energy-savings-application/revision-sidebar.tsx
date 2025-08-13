@@ -135,6 +135,13 @@ export const RevisionSideBar = observer(
       const ok = await permitApplication.finalizeRevisionRequests();
       if (ok) {
         setIsSubmitted(true);
+
+        // Check pathway to determine next action
+        if (updatePerformedBy === 'applicant') {
+          // Participant pathway: redirect to submissions inbox
+          navigate('/submission-inbox');
+        }
+        // Staff pathway: stay on screen (no navigation needed)
       }
     };
 

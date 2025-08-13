@@ -232,10 +232,9 @@ const convertToRevisionMarker = (requirement: IFormIORequirement) => {
 };
 export const combineRevisionButtons = (
   formJson: IFormJson,
-  isInReview: boolean,
   revisionRequests?: IRevisionRequest[],
   role?: string,
-  status?: string,
+  isInRevisionMode?: boolean,
 ): IFormJson => {
   const revisionRequestRequirementKeys = revisionRequests?.map((rr) => rr.requirementJson?.key) || [];
   formJson.components.forEach((section: IFormIOSection) => {
@@ -245,11 +244,24 @@ export const combineRevisionButtons = (
         if (isNonRequirementKey(requirement.key)) continue;
         if (section.id === COMPLETTION_SECTION_ID) continue;
 
-        // Make only the requirement with revisionsRequested editable
-        requirement.disabled =
-          role === 'participant' ? !revisionRequestRequirementKeys.includes(requirement.key) : true;
+        // Standard revision request logic
+        if (role === 'participant') {
+          // Participant can only edit fields with revision requests
+          requirement.disabled = !revisionRequestRequirementKeys.includes(requirement.key);
+        } else {
+          // Admin/staff: Don't automatically enable fields here
+          // Let component-level processing in RequirementForm handle editability based on pathway
+          // This prevents premature field editing before "Update Field" is clicked
+        }
 
-        if (revisionRequestRequirementKeys.includes(requirement.key) || isInReview) {
+        // Show revision buttons in two scenarios:
+        // 1. Fields with existing revision requests (for participants to see what needs updating)
+        // 2. Admin users in revision mode (to create new revision requests)
+        const shouldShowRevisionButton =
+          revisionRequestRequirementKeys.includes(requirement.key) ||
+          (isInRevisionMode && (role === 'admin' || role === 'admin_manager'));
+
+        if (shouldShowRevisionButton) {
           const revisionButton = convertToRevisionButton(requirement);
           // Insert the revision button before the current requirement
           block.components.splice(i, 0, revisionButton);
@@ -270,12 +282,7 @@ export const combineRevisionButtons = (
   return formJson;
 };
 
-export const combineChangeMarkers = (
-  formJson: IFormJson,
-  isInReview: boolean,
-  changedKeys: string[],
-  role?: string,
-): IFormJson => {
+export const combineChangeMarkers = (formJson: IFormJson, isInReview: boolean, changedKeys: string[]): IFormJson => {
   formJson.components.forEach((section: IFormIOSection) => {
     section.components.forEach((block: IFormIOBlock) => {
       for (let i = 0; i < block.components.length; i++) {
@@ -315,6 +322,26 @@ export const traverseFormIORequirements = (
       });
     });
   });
+};
+
+export const processFieldsForReadOnly = (formJson: IFormJson, shouldMakeReadOnly: boolean) => {
+  traverseFormIORequirements(formJson, (requirement) => {
+    // Skip revision buttons - they should remain clickable
+    if (requirement.key?.includes('-revision-button')) {
+      return;
+    }
+
+    // Skip submit buttons
+    if (requirement.key === 'submit' || requirement.type === 'button') {
+      return;
+    }
+
+    // Make form fields read-only but keep buttons interactive
+    if (shouldMakeReadOnly) {
+      requirement.disabled = true;
+    }
+  });
+  return formJson;
 };
 
 export const processFieldsForEphemeral = (formJson: IFormJson) => {

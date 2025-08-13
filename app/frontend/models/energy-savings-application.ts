@@ -496,42 +496,21 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         return self.getCollaborationAssigneesByBlockIdMap(collaborationType)[requirementBlockId] ?? [];
       },
       canUserSubmit(user: IUser) {
-        // TODO: REMOVE DEBUG LOGGING - Added for Save Edits authorization debugging
-        console.group('🔍 [DEBUG] canUserSubmit check');
-        console.log('Application ID:', self.id);
-        console.log('Application Status:', self.status);
-        console.log('Is Revisions Requested:', self.isRevisionsRequested);
-        console.log('Current User ID:', user.id);
-        console.log('Current User Role:', user.role);
-        console.log('User isAdmin:', user.isAdmin);
-        console.log('User isAdminManager:', user.isAdminManager);
-        console.log('Submitter ID:', self.submitter?.id);
-        console.log('Submitter Email:', self.submitter?.email);
-
         if (self.submitter.id === user.id) {
-          console.log('✅ ALLOWED: User is original submitter');
-          console.groupEnd();
           return true;
         }
 
         const delegateePermitCollaboration = self.getCollaborationDelegatee(ECollaborationType.submission);
-        console.log('Delegatee Collaboration:', delegateePermitCollaboration?.collaborator?.user?.id);
 
         if (delegateePermitCollaboration?.collaborator?.user?.id == user.id) {
-          console.log('✅ ALLOWED: User is designated delegatee');
-          console.groupEnd();
           return true;
         }
 
         // Allow admin users to submit applications in revisions_requested state (Save Edits workflow)
         if (self.isRevisionsRequested && (user.isAdmin || user.isAdminManager)) {
-          console.log('✅ ALLOWED: Admin user submitting revisions_requested application');
-          console.groupEnd();
           return true;
         }
 
-        console.log('❌ DENIED: User cannot submit this application');
-        console.groupEnd();
         return false;
       },
       canUserManageCollaborators(user: IUser, collaborationType: ECollaborationType) {
