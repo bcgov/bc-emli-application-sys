@@ -637,7 +637,7 @@ en:
         message: 'No participant application was found for the progam'
       participant_application_not_published:
         title: 'Error'
-        message: "The particpant application hasn't been published"
+        message: "The participant application hasn't been published"
   services:
     auto_compliance_configuration:
       digital_seal_validator:

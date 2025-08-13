@@ -371,10 +371,11 @@ export class Api {
 
   async updatePermitApplication(id, params, review?: boolean) {
     console.log('Updating permit application with params:', params);
-    return this.client.patch<ApiResponse<IEnergySavingsApplication>>(`/permit_applications/${id}`, {
-      permitApplication: params,
+    const payload = {
+      permit_application: params,
       review,
-    });
+    };
+    return this.client.patch<ApiResponse<IEnergySavingsApplication>>(`/permit_applications/${id}`, payload);
   }
 
   async updateRevisionRequests(id, params: IRevisionRequestForm) {
@@ -497,7 +498,7 @@ export class Api {
 
   async submitPermitApplication(id, params) {
     return this.client.post<ApiResponse<IEnergySavingsApplication>>(`/permit_applications/${id}/submit`, {
-      permitApplication: params,
+      permit_application: params,
     });
   }
 

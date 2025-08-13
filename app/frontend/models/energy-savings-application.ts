@@ -259,20 +259,14 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
           );
         }
         const status = self.isSubmitted;
-        const changedMarkedFormJson = combineChangeMarkers(
-          diffColoredFormJson,
-          status,
-          changedKeys,
-          self.rootStore.userStore.currentUser?.role,
-        );
+        const changedMarkedFormJson = combineChangeMarkers(diffColoredFormJson, status, changedKeys);
         const revisionModeFormJson =
           self.revisionMode || self.isRevisionsRequested
             ? combineRevisionButtons(
                 changedMarkedFormJson,
-                status,
                 revisionRequestsToUse,
                 self.rootStore.userStore.currentUser?.role,
-                self.status,
+                self.revisionMode || self.isRevisionsRequested,
               )
             : diffColoredFormJson;
         return revisionModeFormJson;
@@ -508,7 +502,16 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
 
         const delegateePermitCollaboration = self.getCollaborationDelegatee(ECollaborationType.submission);
 
-        return delegateePermitCollaboration?.collaborator?.user?.id == user.id;
+        if (delegateePermitCollaboration?.collaborator?.user?.id == user.id) {
+          return true;
+        }
+
+        // Allow admin users to submit applications in revisions_requested state (Save Edits workflow)
+        if (self.isRevisionsRequested && (user.isAdmin || user.isAdminManager)) {
+          return true;
+        }
+
+        return false;
       },
       canUserManageCollaborators(user: IUser, collaborationType: ECollaborationType) {
         if (collaborationType === ECollaborationType.review) {

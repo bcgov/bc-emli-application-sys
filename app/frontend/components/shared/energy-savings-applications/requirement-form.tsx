@@ -1,10 +1,10 @@
-import { Box, Button, Center, Flex, Link, Text, useDisclosure } from '@chakra-ui/react';
+import { Box, Button, Center, Flex, Link, Text, useDisclosure, VStack } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 
 import { ArrowSquareOut } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 import * as R from 'ramda';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMountStatus } from '../../../hooks/use-mount-status';
@@ -33,6 +33,8 @@ interface IRequirementFormProps {
   isEditing?: boolean;
   renderTopButtons?: () => React.ReactNode;
   updateCollaborationAssignmentNodes?: () => void;
+  performedBy?: string;
+  saveEditsCompleted?: boolean;
 }
 
 export const RequirementForm = observer(
@@ -45,6 +47,8 @@ export const RequirementForm = observer(
     renderSaveButton,
     isEditing = false,
     updateCollaborationAssignmentNodes,
+    performedBy,
+    saveEditsCompleted = false,
   }: IRequirementFormProps) => {
     const {
       jurisdiction,
@@ -303,10 +307,82 @@ export const RequirementForm = observer(
       setFirstComponentKey(firstComponent.key);
     };
     // formio-component-${requirementJson.key}
-    let permitAppOptions = {
+    const isAdminUser = currentUser?.role === 'admin' || currentUser?.role === 'admin_manager';
+    // Trust the parent component's isEditing logic - it already handles pathway context
+    const shouldAllowAdminEditing = isAdminUser && isEditing;
+
+    // Process form JSON to handle field editability based on pathway
+    const processedFormJson = useMemo(() => {
+      if (!formattedFormJson) return formattedFormJson;
+
+      const clonedFormJson = JSON.parse(JSON.stringify(formattedFormJson));
+
+      // Set individual field disabled states based on isEditing (pathway-aware)
+      clonedFormJson.components?.forEach((section: any) => {
+        section.components?.forEach((block: any) => {
+          block.components?.forEach((requirement: any) => {
+            // Handle submit-related components first
+            if (
+              requirement.key === 'submit' ||
+              requirement.key?.includes('acknowledge') ||
+              requirement.key?.includes('signature')
+            ) {
+              // Simple logic using React state instead of complex MobX/backend checks
+              const isRealParticipant = currentUser?.role === 'participant';
+              const isDraftApp = permitApplication?.status === 'draft' || permitApplication?.status === 'new_draft';
+              const isStaffPathway = performedBy === 'staff';
+
+              // Enable submit for:
+              // 1. Real participant users
+              // 2. Draft applications (new creation)
+              // 3. Staff pathway AFTER Save Edits button clicked (simple React state)
+              const staffCanSubmit = isDraftApp || (isStaffPathway && saveEditsCompleted);
+
+              requirement.disabled = !(staffCanSubmit || isRealParticipant);
+              return;
+            }
+
+            // Skip revision buttons - they should always be clickable
+            if (requirement.key?.includes('-revision-button')) {
+              requirement.disabled = false;
+              return;
+            }
+
+            // Skip other buttons (but not submit) - let them use default behavior
+            if (requirement.type === 'button') {
+              return;
+            }
+
+            // Set field disabled state - fields only editable after pencil workflow
+            // Everyone (including admin staff pathway) must click pencil → "Update Field" first
+
+            // Check if field has been unlocked via pencil workflow (has revision request)
+            const revisionRequests = permitApplication?.latestRevisionRequests || [];
+            const hasRevisionRequestInLatest = revisionRequests.some(
+              (rr) => rr.requirementJson?.key === requirement.key,
+            );
+
+            // Field is editable if:
+            // 1. Real participant user (always can edit), OR
+            // 2. Draft application (new app creation), OR
+            // 3. Has revision request (pencil workflow completed) AND isEditing (correct pathway)
+            const isRealParticipant = currentUser?.role === 'participant';
+            const isDraftApplication =
+              permitApplication?.status === 'draft' || permitApplication?.status === 'new_draft';
+            const adminCanEdit = hasRevisionRequestInLatest && isEditing;
+
+            requirement.disabled = !(isRealParticipant || isDraftApplication || adminCanEdit);
+          });
+        });
+      });
+
+      return clonedFormJson;
+    }, [formattedFormJson, isEditing, saveEditsCompleted]);
+
+    const permitAppOptions = {
       ...defaultOptions,
+      // Only use readOnly for application state, not pathway control
       readOnly: isScreenedIn || isIneligible ? true : false,
-      // ...(isDraft || isScreenedIn ? { readOnly: true } : { readOnly: false }),
     };
     permitAppOptions.componentOptions.simplefile.config['formCustomOptions'] = {
       persistFileUploadAction: 'PATCH',
@@ -400,7 +476,7 @@ export const RequirementForm = observer(
           </Box>
           <Form
             key={permitApplication.formFormatKey}
-            form={formattedFormJson}
+            form={processedFormJson}
             formReady={formReady}
             submission={unsavedSubmissionData}
             onSubmit={onFormSubmit}

@@ -487,7 +487,12 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               onCompletedBlocksChange={setCompletedBlocks}
               triggerSave={handleSave}
               showHelpButton
-              isEditing={currentPermitApplication?.isDraft || currentPermitApplication?.isRevisionsRequested}
+              isEditing={
+                currentPermitApplication?.isDraft ||
+                currentPermitApplication?.isRevisionsRequested ||
+                currentUser?.role === 'admin' ||
+                currentUser?.role === 'admin_manager'
+              }
               renderSaveButton={() => !currentPermitApplication?.isIneligible && <SaveButton handleSave={handleSave} />}
               updateCollaborationAssignmentNodes={updateRequirementBlockAssignmentNode}
             />

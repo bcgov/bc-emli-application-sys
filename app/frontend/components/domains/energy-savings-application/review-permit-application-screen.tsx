@@ -1,11 +1,12 @@
 import { Box, Button, Divider, Flex, HStack, Heading, Spacer, Stack, Text, useDisclosure } from '@chakra-ui/react';
 import { CaretDown, CaretRight, CaretUp, CheckCircle, Info, NotePencil, Prohibit } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useController, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
+import { useMst } from '../../../setup/root';
 import { ECollaborationType, EPermitApplicationStatus } from '../../../types/enums';
 import { CopyableValue } from '../../shared/base/copyable-value';
 import { ErrorScreen } from '../../shared/base/error-screen';
@@ -31,6 +32,8 @@ interface IReferenceNumberForm {
 }
 
 export const ReviewPermitApplicationScreen = observer(() => {
+  const { userStore } = useMst();
+  const currentUser = userStore.currentUser;
   const { currentPermitApplication, error } = usePermitApplication({ review: true });
   const { t } = useTranslation();
   const formRef = useRef(null);
@@ -52,12 +55,15 @@ export const ReviewPermitApplicationScreen = observer(() => {
 
   const [completedBlocks, setCompletedBlocks] = useState({});
   const [performedBy, setPerformedBy] = useState(null);
+  const [originalStatus, setOriginalStatus] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isScreenIn, onOpen: onScreenIn, onClose: onScreenInclose } = useDisclosure();
   const { isOpen: isContactsOpen, onOpen: onContactsOpen, onClose: onContactsClose } = useDisclosure();
   const { isOpen: isUpdatePathwayOpen, onOpen: onUpdatePathwayOpen, onClose: onUpdatePathwayClose } = useDisclosure();
 
   const [hideRevisionList, setHideRevisionList] = useState(false);
+  const [hasUnsavedEdits, setHasUnsavedEdits] = useState(false);
+  const [saveEditsCompleted, setSaveEditsCompleted] = useState(false);
 
   const sendRevisionContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -87,6 +93,74 @@ export const ReviewPermitApplicationScreen = observer(() => {
       setRevisionMode(true);
     }
   }, [currentPermitApplication?.revisionMode, currentPermitApplication?.status]);
+
+  // Monitor for staged revision requests (Save Edits workflow)
+  useEffect(() => {
+    if (currentPermitApplication?.latestRevisionRequests?.length > 0) {
+      setHasUnsavedEdits(true);
+    } else {
+      setHasUnsavedEdits(false);
+    }
+  }, [currentPermitApplication?.latestRevisionRequests?.length]);
+
+  // Handle revision mode cancellation
+  const handleRevisionCancel = async () => {
+    try {
+      // Clear revision requests created by admin Save Edits
+      const ok = await currentPermitApplication.removeRevisionRequests();
+
+      if (ok) {
+        // Navigate back to application view (forces reload and consent modal flow)
+        navigate(0);
+      }
+    } catch (error) {
+      console.error('Error canceling revision requests:', error);
+      // Fallback: just exit revision mode
+      setRevisionMode(false);
+    }
+  };
+
+  // Handle Save Edits workflow
+  const handleSaveEdits = useCallback(async () => {
+    // First: Capture and save current form data
+    const formio = formRef.current;
+    const submissionData = formio?.data;
+
+    // Save the form data to the application
+    // Ensure proper nested structure: submission_data.data = formData
+    const updateOk = await currentPermitApplication.update({
+      submission_data: {
+        data: submissionData,
+      },
+      nickname: currentPermitApplication.nickname,
+    });
+
+    if (!updateOk) {
+      return;
+    }
+
+    // Finalize revision requests (should change status to revisions_requested)
+    const finalizeOk = await currentPermitApplication.finalizeRevisionRequests();
+
+    if (finalizeOk) {
+      // Enable the submit button immediately via React state
+      setSaveEditsCompleted(true);
+
+      // Check pathway to determine next action
+      if (performedBy === 'applicant') {
+        // Participant pathway: redirect to submissions inbox
+        navigate('/applications');
+      } else {
+        // Staff pathway: scroll to submit button to guide user
+        setTimeout(() => {
+          const submitButton = document.querySelector('button[type="submit"]') as HTMLButtonElement;
+          if (submitButton) {
+            submitButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100); // Brief delay to ensure button is enabled first
+      }
+    }
+  }, [currentPermitApplication, formRef, performedBy, navigate, setSaveEditsCompleted]);
 
   if (error) return <ErrorScreen error={error} />;
   if (!currentPermitApplication?.isFullyLoaded) return <LoadingScreen />;
@@ -179,9 +253,25 @@ export const ReviewPermitApplicationScreen = observer(() => {
               {t('permitApplication.show.contactsSummary')}
             </Button> */}
             <SubmissionDownloadModal permitApplication={currentPermitApplication} review />
-            <Button rightIcon={<CaretRight />} onClick={() => navigate(`/submission-inbox`)}>
+            <Button variant="primary" rightIcon={<CaretRight />} onClick={() => navigate(`/submission-inbox`)}>
               {t('ui.backToInbox')}
             </Button>
+            {revisionMode &&
+              // Show for internal applications (always admin-on-behalf)
+              (currentPermitApplication?.audienceType?.code === 'internal' ||
+                // Show for external applications when admin selected "on behalf" pathway
+                (currentPermitApplication?.audienceType?.code === 'external' && performedBy === 'staff')) && (
+                <Button
+                  bg="white"
+                  color="text.primary"
+                  border="1px solid"
+                  borderColor="border.light"
+                  isDisabled={!hasUnsavedEdits}
+                  onClick={handleSaveEdits}
+                >
+                  {t('energySavingsApplication.show.saveEdits')}
+                </Button>
+              )}
           </Stack>
         </Flex>
         {revisionMode && (
@@ -226,7 +316,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
         {revisionMode && !hideRevisionList ? (
           <RevisionSideBar
             permitApplication={currentPermitApplication}
-            onCancel={() => setRevisionMode(false)}
+            onCancel={handleRevisionCancel}
             sendRevisionContainerRef={sendRevisionContainerRef}
             updatePerformedBy={performedBy}
           />
@@ -240,6 +330,8 @@ export const ReviewPermitApplicationScreen = observer(() => {
               permitApplication={currentPermitApplication}
               onCompletedBlocksChange={setCompletedBlocks}
               showHelpButton
+              performedBy={performedBy}
+              saveEditsCompleted={saveEditsCompleted}
               renderTopButtons={() => {
                 return (
                   !revisionMode && (
@@ -296,6 +388,10 @@ export const ReviewPermitApplicationScreen = observer(() => {
                   )
                 );
               }}
+              isEditing={
+                currentPermitApplication?.status === 'draft' ||
+                ((currentUser?.role === 'admin' || currentUser?.role === 'admin_manager') && revisionMode)
+              }
               updateCollaborationAssignmentNodes={updateRequirementBlockAssignmentNode}
             />
           </Flex>
@@ -315,9 +411,10 @@ export const ReviewPermitApplicationScreen = observer(() => {
           isOpen={isUpdatePathwayOpen}
           onClose={onUpdatePathwayClose}
           setRevisionMode={setRevisionMode}
-          setPerformedBy={(performedByValue) => {
+          setPerformedBy={(performedByValue: string) => {
             setPerformedBy(performedByValue);
           }}
+          permitApplication={currentPermitApplication}
         />
       )}
       {isScreenIn && (
