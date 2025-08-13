@@ -40,7 +40,6 @@ logVolume:
 
 crunchydbSecret: hesp-crunchydb-pguser-postgres
 
-serviceAccountName:
 envSecretName:
 env: {}
 
