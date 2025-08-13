@@ -7,10 +7,6 @@ global:
 app:
   enabled: true
 
-  # External Secrets Operator configuration
-  externalSecrets:
-    enabled: true
-
   image:
     # repository: artifacts.developer.gov.bc.ca/bbfc-dev/hesp-dev
     repository: ghcr.io/bcgov/hesp-app
