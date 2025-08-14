@@ -12,6 +12,7 @@ import {
   Tag,
   TagLabel,
   Text,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { Info, Warning } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
@@ -25,6 +26,7 @@ import { TextFormControl } from '../../shared/form/input-form-control';
 import CustomAlert, { InformationAlert } from '../../shared/base/custom-alert';
 import { useCurrentUserLicenseAgreements } from '../../../hooks/resources/user-license-agreements';
 import { format } from 'date-fns';
+import { EulaViewModal } from '../../shared/modals/eula-view-modal';
 
 interface IProfileScreenProps {}
 
@@ -35,15 +37,16 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
   const currentPath = location.pathname;
 
   const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const { isOpen: isEulaModalOpen, onOpen: onEulaModalOpen, onClose: onEulaModalClose } = useDisclosure();
 
   const { userStore } = useMst();
   const { currentUser, updateProfile } = userStore;
 
   const { error, licenseAgreements, isLoading, currentEula } = useCurrentUserLicenseAgreements();
-  let acceptedLicenseAgreement = null;
-  useMemo(() => {
-    acceptedLicenseAgreement = licenseAgreements?.find((la) => la.agreement?.id === currentEula?.id);
-  }, [isLoading]);
+
+  const acceptedLicenseAgreement = useMemo(() => {
+    return licenseAgreements?.find((la) => la.agreement?.id === currentEula?.id);
+  }, [licenseAgreements, currentEula]);
 
   const [sameAddressChecked, setSameAddressChecked] = useState(currentUser.isSameAddress);
 
@@ -324,7 +327,9 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                   </Text>
                 </Flex>
                 <Flex>
-                  <Button variant="secondary"> {t('ui.view')}</Button>
+                  <Button variant="secondary" onClick={onEulaModalOpen}>
+                    {t('ui.view')}
+                  </Button>
                 </Flex>
               </Flex>
             </Section>
@@ -332,15 +337,18 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
               <Button variant="primary" type="submit" isLoading={isSubmitting} loadingText={t('ui.loading')}>
                 {currentPath === '/profile' ? <>{t('ui.save')}</> : <>{t('ui.createAccount')}</>}
               </Button>
-              {currentUser.isUnconfirmed && (
-                <Button variant="secondary" isDisabled={isSubmitting} onClick={() => navigate(-1)}>
-                  {t('ui.cancel')}
-                </Button>
-              )}
+              <Button
+                variant="secondary"
+                isDisabled={isSubmitting}
+                onClick={() => (currentPath === '/profile' ? navigate('/') : navigate(-1))}
+              >
+                {t('ui.cancel')}
+              </Button>
             </Flex>
           </Flex>
         </form>
       </FormProvider>
+      <EulaViewModal isOpen={isEulaModalOpen} onClose={onEulaModalClose} />
     </Container>
   );
 });
