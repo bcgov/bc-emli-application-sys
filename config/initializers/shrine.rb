@@ -134,7 +134,8 @@ if SHRINE_USE_S3
     def upload(io, id, shrine_metadata: {}, **upload_options)
       super
     rescue Aws::S3::Errors::InvalidAccessKeyId,
-           Aws::S3::Errors::SignatureDoesNotMatch => e
+           Aws::S3::Errors::SignatureDoesNotMatch,
+           Aws::Errors::MissingCredentialsError => e
       Rails.logger.error "S3 credential error during upload: #{e.message}"
 
       # More aggressive recovery
@@ -159,6 +160,42 @@ if SHRINE_USE_S3
       end
     end
 
+    # Override download method to handle credential errors
+    def download(id, **download_options)
+      super
+    rescue Aws::S3::Errors::InvalidAccessKeyId,
+           Aws::S3::Errors::SignatureDoesNotMatch,
+           Aws::Errors::MissingCredentialsError => e
+      Rails.logger.error "S3 credential error during download: #{e.message}"
+      @client = nil
+      Rails.cache.delete("aws_credentials/s3")
+      begin
+        AwsCredentialRefreshService.new.refresh_credentials!
+        super
+      rescue => retry_error
+        Rails.logger.error "Download retry failed after credential refresh: #{retry_error.message}"
+        raise retry_error
+      end
+    end
+
+    # Override exists? method to handle credential errors
+    def exists?(id)
+      super
+    rescue Aws::S3::Errors::InvalidAccessKeyId,
+           Aws::S3::Errors::SignatureDoesNotMatch,
+           Aws::Errors::MissingCredentialsError => e
+      Rails.logger.error "S3 credential error during exists check: #{e.message}"
+      @client = nil
+      Rails.cache.delete("aws_credentials/s3")
+      begin
+        AwsCredentialRefreshService.new.refresh_credentials!
+        super
+      rescue => retry_error
+        Rails.logger.error "Exists check retry failed after credential refresh: #{retry_error.message}"
+        false # Return false on error rather than raising
+      end
+    end
+
     # Override object method to ensure it uses our dynamic client
     def object(id)
       resource = Aws::S3::Resource.new(client: client)
@@ -169,75 +206,126 @@ if SHRINE_USE_S3
 
     # Enhanced client method with real-time validation
     def client
-      @client ||=
+      # Always check for fresh credentials if client is nil or credentials are invalid
+      @client = create_s3_client if @client.nil? || credentials_invalid?
+      @client
+    end
+
+    # Check if current client has invalid credentials
+    def credentials_invalid?
+      return false unless @client
+      return false unless defined?(AwsCredential) && !Rails.env.test?
+
+      begin
+        db_credentials = AwsCredential.current_s3_credentials
+        return true unless db_credentials
+
+        # Check if credentials expire within 2 minutes
+        if db_credentials[:expires_at] < (Time.current + 2.minutes)
+          Rails.logger.info "Credentials expire soon, invalidating client"
+          return true
+        end
+
+        # Quick validation - check if current client credentials match database
+        current_key =
+          begin
+            @client.config.credentials.access_key_id
+          rescue StandardError
+            nil
+          end
+        db_key = db_credentials[:access_key_id]
+
+        if current_key != db_key
+          Rails.logger.info "Client credentials don't match database, invalidating"
+          return true
+        end
+
+        false
+      rescue => e
+        Rails.logger.debug "Error checking credential validity: #{e.message}"
+        true # Assume invalid on error
+      end
+    end
+
+    # Create a new S3 client with current credentials
+    def create_s3_client
+      if defined?(AwsCredential) && !Rails.env.test?
+        # Handle database connection issues during initialization
         begin
-          if defined?(AwsCredential) && !Rails.env.test?
-            # Handle database connection issues during initialization
+          db_credentials =
+            AwsCredential.current_s3_credentials if ActiveRecord::Base.connected?
+        rescue => e
+          Rails.logger.debug "Cannot access database for S3 credentials: #{e.message}"
+          db_credentials = nil
+        end
+
+        if db_credentials
+          # Check if credentials expire within 2 minutes (immediate refresh needed)
+          if db_credentials[:expires_at] < (Time.current + 2.minutes)
+            Rails.logger.warn "Credentials expire very soon (#{db_credentials[:expires_at]}), attempting immediate refresh"
             begin
-              db_credentials =
-                AwsCredential.current_s3_credentials if ActiveRecord::Base.connected?
+              AwsCredentialRefreshService.new.refresh_credentials!
+              # Get refreshed credentials
+              db_credentials = AwsCredential.current_s3_credentials
             rescue => e
-              Rails.logger.debug "Cannot access database for S3 credentials: #{e.message}"
-              db_credentials = nil
+              Rails.logger.error "Emergency credential refresh failed: #{e.message}"
             end
+          end
 
-            if db_credentials
-              # Check if credentials expire within 2 minutes (immediate refresh needed)
-              if db_credentials[:expires_at] < (Time.current + 2.minutes)
-                Rails.logger.warn "Credentials expire very soon (#{db_credentials[:expires_at]}), attempting immediate refresh"
-                begin
-                  AwsCredentialRefreshService.new.refresh_credentials!
-                  # Get refreshed credentials
-                  db_credentials = AwsCredential.current_s3_credentials
-                rescue => e
-                  Rails.logger.error "Emergency credential refresh failed: #{e.message}"
-                end
-              end
-
-              if db_credentials
-                Rails.logger.debug "Using S3 client with database credentials (expires: #{db_credentials[:expires_at]})"
-                Aws::S3::Client.new(
-                  endpoint: @dynamic_options[:endpoint],
-                  region: @dynamic_options[:region],
-                  access_key_id: db_credentials[:access_key_id],
-                  secret_access_key: db_credentials[:secret_access_key],
-                  session_token: db_credentials[:session_token],
-                  force_path_style: @dynamic_options[:force_path_style]
-                )
-              else
-                Rails.logger.error "No database credentials available after refresh attempt!"
-                Rails.logger.error "Check cron job 'aws_credential_refresh' is running and Parameter Store access is working."
-                Rails.logger.error "Manual fix: Run AwsCredentialRefreshService.new.refresh_credentials!"
-
-                # Return a client with nil credentials instead of raising - this will trigger the proper AWS error
-                Aws::S3::Client.new(
-                  endpoint: @dynamic_options[:endpoint],
-                  region: @dynamic_options[:region],
-                  access_key_id: nil,
-                  secret_access_key: nil,
-                  session_token: nil,
-                  force_path_style: @dynamic_options[:force_path_style]
-                )
-              end
-            else
-              Rails.logger.error "No database credentials available! S3 operations will fail."
-              Rails.logger.error "Check cron job 'aws_credential_refresh' is running and Parameter Store access is working."
-              Rails.logger.error "Manual fix: Run AwsCredentialRefreshService.new.refresh_credentials!"
-
-              # Return a client with nil credentials instead of raising - this will trigger the proper AWS error
+          if db_credentials && db_credentials[:access_key_id].present?
+            Rails.logger.debug "Creating S3 client with database credentials (expires: #{db_credentials[:expires_at]})"
+            return(
               Aws::S3::Client.new(
                 endpoint: @dynamic_options[:endpoint],
                 region: @dynamic_options[:region],
-                access_key_id: nil,
-                secret_access_key: nil,
-                session_token: nil,
+                access_key_id: db_credentials[:access_key_id],
+                secret_access_key: db_credentials[:secret_access_key],
+                session_token: db_credentials[:session_token],
                 force_path_style: @dynamic_options[:force_path_style]
               )
-            end
-          else
-            super
+            )
           end
         end
+
+        # If we reach here, try to refresh credentials
+        Rails.logger.warn "No valid database credentials, attempting refresh"
+        begin
+          AwsCredentialRefreshService.new.refresh_credentials!
+          db_credentials = AwsCredential.current_s3_credentials
+
+          if db_credentials && db_credentials[:access_key_id].present?
+            Rails.logger.info "Successfully refreshed credentials, creating client"
+            return(
+              Aws::S3::Client.new(
+                endpoint: @dynamic_options[:endpoint],
+                region: @dynamic_options[:region],
+                access_key_id: db_credentials[:access_key_id],
+                secret_access_key: db_credentials[:secret_access_key],
+                session_token: db_credentials[:session_token],
+                force_path_style: @dynamic_options[:force_path_style]
+              )
+            )
+          end
+        rescue => e
+          Rails.logger.error "Credential refresh failed: #{e.message}"
+        end
+
+        Rails.logger.error "No database credentials available! S3 operations will fail."
+        Rails.logger.error "Check cron job 'aws_credential_refresh' is running and Parameter Store access is working."
+        Rails.logger.error "Manual fix: Run AwsCredentialRefreshService.new.refresh_credentials!"
+
+        # Return a client with nil credentials - this will trigger proper AWS error
+        Aws::S3::Client.new(
+          endpoint: @dynamic_options[:endpoint],
+          region: @dynamic_options[:region],
+          access_key_id: nil,
+          secret_access_key: nil,
+          session_token: nil,
+          force_path_style: @dynamic_options[:force_path_style]
+        )
+      else
+        super
+      end
     end
   end
 
