@@ -136,14 +136,25 @@ if SHRINE_USE_S3
     rescue Aws::S3::Errors::InvalidAccessKeyId,
            Aws::S3::Errors::SignatureDoesNotMatch => e
       Rails.logger.error "S3 credential error during upload: #{e.message}"
-      # Invalidate client and try once more with fresh credentials
+
+      # More aggressive recovery
       @client = nil
       Rails.cache.delete("aws_credentials/s3")
+
+      # Force immediate refresh instead of just queuing
       begin
-        AwsCredentialRefreshService.new.refresh_credentials!
-        super
+        service = AwsCredentialRefreshService.new
+        if service.refresh_credentials!
+          Rails.logger.info "Immediate credential refresh successful, retrying upload"
+          # Force new client creation with fresh credentials
+          @client = nil
+          super # Retry upload
+        else
+          Rails.logger.error "Immediate refresh failed, upload will fail"
+          raise e
+        end
       rescue => retry_error
-        Rails.logger.error "Upload retry failed after credential refresh: #{retry_error.message}"
+        Rails.logger.error "All recovery attempts failed: #{retry_error.message}"
         raise retry_error
       end
     end

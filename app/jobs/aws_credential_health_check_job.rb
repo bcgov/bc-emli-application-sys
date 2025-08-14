@@ -38,9 +38,11 @@ class AwsCredentialHealthCheckJob < ApplicationJob
           :using_pending_deletion_key?,
           current_creds
         )
-        health_status[:needs_refresh] = true if health_status[
-          :using_pending_key
-        ]
+        if health_status[:using_pending_key]
+          Rails.cache.delete("aws_credentials/s3")
+          Rails.logger.warn "Cache invalidated due to pending deletion key"
+          health_status[:needs_refresh] = true
+        end
       rescue => e
         Rails.logger.debug "Could not check pending key status: #{e.message}"
       end

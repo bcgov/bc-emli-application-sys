@@ -182,6 +182,10 @@ class AwsCredentialRefreshService
 
         if is_pending
           Rails.logger.warn "Current key #{current_key_id[0..8]}... is marked as pending_deletion"
+
+          # Immediate cache invalidation
+          Rails.cache.delete("aws_credentials/s3")
+          Rails.logger.warn "Cache invalidated due to pending deletion detection"
         end
 
         return is_pending
