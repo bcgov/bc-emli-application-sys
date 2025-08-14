@@ -85,6 +85,10 @@ class Api::UsersController < Api::ApplicationController
     current_user.unconfirmed_email = nil if current_user.email &&
       profile_params[:email] == current_user.email
 
+    # Ensure reviewed is set to true if it is nil or false, this gets them past the Create Profile step.
+    current_user["reviewed"] = true if current_user["reviewed"].nil? ||
+      current_user["reviewed"] == false
+
     if current_user.update(profile_params)
       should_send_confirmation =
         @user.confirmed_at.blank? && @user.confirmation_sent_at.blank?
