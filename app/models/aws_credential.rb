@@ -125,7 +125,7 @@ class AwsCredential < ApplicationRecord
     def current_s3_credentials
       Rails
         .cache
-        .fetch("aws_credentials/s3", expires_in: 1.minute) do
+        .fetch("aws_credentials/s3", expires_in: smart_cache_ttl) do
           credential =
             active
               .where(name: "s3_access")
@@ -150,7 +150,8 @@ class AwsCredential < ApplicationRecord
           if pending_deletion_check_available? &&
                !Thread.current[:aws_credential_refresh_in_progress] &&
                using_pending_deletion_key?(cred_hash)
-            Rails.logger.warn "Database credential is marked as pending_deletion, forcing refresh"
+            Rails.logger.warn "Database credential is marked as pending_deletion, invalidating cache and forcing refresh"
+            Rails.cache.delete("aws_credentials/s3")
             return nil
           end
 
@@ -194,6 +195,24 @@ class AwsCredential < ApplicationRecord
     end
 
     private
+
+    def smart_cache_ttl
+      # Shorter cache during potential rotation periods
+      if likely_rotation_period?
+        30.seconds # Aggressive during rotation windows
+      else
+        1.minute # Normal operations
+      end
+    end
+
+    def likely_rotation_period?
+      last_update = active.where(name: "s3_access").maximum(:updated_at)
+      return false unless last_update
+
+      # Assume rotations every 2 days, be aggressive 6 hours before expected rotation
+      time_since_update = Time.current - last_update
+      time_since_update > 1.75.days
+    end
 
     def pending_deletion_check_available?
       ENV["AWS_PARAMETER_BASE_PATH"].present? &&
