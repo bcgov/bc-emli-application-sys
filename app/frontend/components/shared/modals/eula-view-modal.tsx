@@ -37,7 +37,7 @@ export const EulaViewModal: React.FC<IEulaViewModalProps> = ({ isOpen, onClose }
     } finally {
       setIsLoading(false);
     }
-  }, [userStore]);
+  }, [userStore, t]);
 
   useEffect(() => {
     if (isOpen) {

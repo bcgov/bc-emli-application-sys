@@ -337,7 +337,11 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
               <Button variant="primary" type="submit" isLoading={isSubmitting} loadingText={t('ui.loading')}>
                 {currentPath === '/profile' ? <>{t('ui.save')}</> : <>{t('ui.createAccount')}</>}
               </Button>
-              <Button variant="secondary" isDisabled={isSubmitting} onClick={() => navigate('/')}>
+              <Button
+                variant="secondary"
+                isDisabled={isSubmitting}
+                onClick={() => (currentPath === '/profile' ? navigate('/') : navigate(-1))}
+              >
                 {t('ui.cancel')}
               </Button>
             </Flex>
