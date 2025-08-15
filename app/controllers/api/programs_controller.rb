@@ -69,7 +69,7 @@ class Api::ProgramsController < Api::ApplicationController
   end
 
   def update_external_api_enabled
-    authorize @program, :update_external_api_enabled?
+    authorize @program, :manage_external_api?
 
     desired_enabled = update_external_api_enabled_params
 

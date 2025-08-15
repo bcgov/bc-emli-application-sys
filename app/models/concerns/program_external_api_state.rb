@@ -70,6 +70,10 @@ module ProgramExternalApiState
       j_on?
     end
 
+    def external_api_disabled?
+      g_off? || j_off?
+    end
+
     def external_api_just_enabled?
       saved_change_to_external_api_state? && j_on?
     end

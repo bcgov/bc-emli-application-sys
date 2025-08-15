@@ -27,8 +27,12 @@ class ProgramPolicy < ApplicationPolicy
     user.system_admin? || user.admin_manager?
   end
 
+  def manage_external_api?
+    user.system_admin?
+  end
+
   def update_external_api_enabled?
-    user.system_admin? && !record.g_off?
+    user.system_admin? && record.external_api_disabled?
   end
 
   def search_users?
