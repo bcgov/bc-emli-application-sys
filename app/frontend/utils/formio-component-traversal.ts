@@ -70,11 +70,9 @@ export const combineComplianceHints = (
   //currently better than doing on on the requirement_json service as we will likley modify items in the long run
   const fileComponents = findFileComponents(updatedJson.components);
   fileComponents.forEach((fileComponent) => {
-    if (fileComponent.multiple) {
-      //TODO: For multiple files do something else.  We haven't had a use case or enabled mutiple file uploads yet.
-    } else {
-      fileComponent['fileKey'] = fileComponent.key;
-    }
+    // Enable multiple file uploads for all file components
+    fileComponent.multiple = true;
+    fileComponent['fileKey'] = fileComponent.key;
   });
 
   //jurisdicition-form customizations
