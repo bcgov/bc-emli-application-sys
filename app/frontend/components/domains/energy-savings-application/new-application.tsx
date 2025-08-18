@@ -19,6 +19,7 @@ export type TCreateEnergyApplicationFormData = {
   audience_type: string;
   submission_type: string;
   slug: string;
+  template_version_id?: string;
 };
 
 export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) => {
@@ -56,6 +57,7 @@ export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) =>
           ? template.submissionType.code
           : EPermitClassificationCode.application,
         slug: slug,
+        ...(template?.versionId && { template_version_id: template.versionId }),
       };
 
       if (isBlank) {
@@ -176,7 +178,7 @@ export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) =>
                                   </Text>
 
                                   <Text fontSize="sm" ml={2}>
-                                    {new Date(template.updatedAt).toLocaleDateString('en-US')}
+                                    {new Date(template.versionDate).toLocaleDateString('en-US')}
                                   </Text>
                                 </Flex>
                                 <VersionTag versionDate={template.versionDate} w="fit-content" />

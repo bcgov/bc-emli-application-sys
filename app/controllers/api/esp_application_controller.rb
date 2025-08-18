@@ -56,32 +56,60 @@ class Api::EspApplicationController < Api::ApplicationController
       app_params[:nickname] ||
         "#{@program&.program_name} ##{SecureRandom.hex(4)}"
 
-    begin
-      requirement =
-        RequirementTemplate.find_by!(
-          program_id: @program&.id,
-          user_group_type_id: @user_group_type&.id,
-          audience_type_id: @audience_type&.id,
-          submission_type_id: @submission_type&.id
-        )
-    rescue ActiveRecord::RecordNotFound
-      render_error(
-        "application_controller.participant_application_not_found",
-        status: :not_found
-      ) and return
-    end
+    # If specific template version ID is provided, use it directly
+    if app_params[:template_version_id].present?
+      begin
+        @template =
+          TemplateVersion.find_by!(
+            id: app_params[:template_version_id],
+            status: :published
+          )
+        # Verify the template belongs to the correct program and matches the criteria
+        requirement = @template.requirement_template
+        unless requirement.program_id == @program&.id &&
+                 requirement.user_group_type_id == @user_group_type&.id &&
+                 requirement.audience_type_id == @audience_type&.id &&
+                 requirement.submission_type_id == @submission_type&.id
+          render_error(
+            "application_controller.template_version_mismatch",
+            status: :bad_request
+          ) and return
+        end
+      rescue ActiveRecord::RecordNotFound
+        render_error(
+          "application_controller.template_version_not_found",
+          status: :not_found
+        ) and return
+      end
+    else
+      # Fallback to old behavior: find template by criteria
+      begin
+        requirement =
+          RequirementTemplate.find_by!(
+            program_id: @program&.id,
+            user_group_type_id: @user_group_type&.id,
+            audience_type_id: @audience_type&.id,
+            submission_type_id: @submission_type&.id
+          )
+      rescue ActiveRecord::RecordNotFound
+        render_error(
+          "application_controller.participant_application_not_found",
+          status: :not_found
+        ) and return
+      end
 
-    begin
-      @template =
-        TemplateVersion.find_by!(
-          requirement_template_id: requirement.id,
-          status: 1
-        )
-    rescue ActiveRecord::RecordNotFound
-      render_error(
-        "application_controller.participant_application_not_published",
-        status: :not_found
-      ) and return
+      begin
+        @template =
+          TemplateVersion.find_by!(
+            requirement_template_id: requirement.id,
+            status: :published
+          )
+      rescue ActiveRecord::RecordNotFound
+        render_error(
+          "application_controller.participant_application_not_published",
+          status: :not_found
+        ) and return
+      end
     end
   end
 end

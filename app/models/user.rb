@@ -238,15 +238,17 @@ class User < ApplicationRecord
       active_programs.map do |program|
         {
           program: program,
+          program_name: program.program_name,
           requirement_templates:
             RequirementTemplate
+              .kept
               .where(program_id: program.id)
               .distinct
               .map do |template|
                 version =
                   TemplateVersion.find_by(
                     requirement_template_id: template.id,
-                    status: 1
+                    status: :published
                   )
 
                 if version.present?
