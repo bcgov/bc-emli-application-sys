@@ -467,12 +467,12 @@ export const RequirementForm = observer(
           )}
 
           <Box bg="greys.grey03" p={3} borderRadius="sm">
-            <Text fontStyle="italic">
-              {t('site.foippaWarning')}
-              <Link href={'mailto:' + t('site.contactEmail')} isExternal>
-                {t('site.contactEmail')}
-              </Link>
-            </Text>
+            <Trans
+              i18nKey="site.foippaWarning"
+              components={{
+                link: <Link href={`mailto:${t('site.contactEmail')}`}>{t('site.contactEmail')}</Link>,
+              }}
+            />
           </Box>
           <Form
             key={permitApplication.formFormatKey}

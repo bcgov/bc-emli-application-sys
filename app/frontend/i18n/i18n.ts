@@ -1254,6 +1254,7 @@ const options = {
               'A new version of the permit is available. Please ask author or designated submitter to review and acknowledge changes to proceed.',
             contactsSummary: 'Contacts summary',
             downloadApplication: 'Download application',
+            viewApplicationFiles: 'View application files',
             fetchingMissingPdf: 'Fetching {{missingPdf}}...',
             missingPdfLabels: {
               permitApplication: 'permit application pdf',
@@ -1261,7 +1262,9 @@ const options = {
             },
             contactSummaryHeading: 'List of all contacts on this application',
             downloadHeading: 'Download application',
+            viewFilesHeading: 'View files',
             downloadPrompt: 'Choose specific files or entire package:',
+            viewFilesPrompt: 'Choose specific files to view:',
             downloadZip: 'Download attached files',
             downloadForm: 'Download application form',
             downloadStepCode: 'Download step code checklist',
@@ -2833,7 +2836,7 @@ const options = {
           accessibility: 'Accessibility',
           copyright: 'Copyright',
           foippaWarning:
-            'We are collecting your personal information under section 26(c) & (e) of the Freedom of Information and Protection of Privacy Act. We are collecting this information to process your application to the CleanBC Better Homes Energy Savings Program, and for program planning and evaluation. The Ministry of Energy and Climate Solutions administers this program. If you have questions about the collection of your information, please contact us at betterhomesbc@gov.bc.ca. ',
+            'We are collecting your personal information under section 26(c) & (e) of the Freedom of Information and Protection of Privacy Act. We are collecting this information to process your application to the CleanBC Better Homes Energy Savings Program, and for program planning and evaluation. The Ministry of Energy and Climate Solutions administers this program. If you have questions about the collection of your information, please contact us at <link/>. ',
           pleaseContact:
             'Please contact your local government for questions related to your energy savings application.',
           forHelp: 'For help with the Building Permit Hub please contact:',
