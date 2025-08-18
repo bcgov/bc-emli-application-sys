@@ -16,9 +16,6 @@ app:
       cpu: 300m
       memory: 512Mi
 
-  virusScanVolume:
-    enabled: true
-    claimName: hesp-clamav-virus-scan-temp
 
   env:
     'APP_DOMAIN': 'dev-hesp.apps.silver.devops.gov.bc.ca'
@@ -36,7 +33,8 @@ app:
     'BCGOV_OBJECT_STORAGE_REGION': 'ca-central-1'
     'BCGOV_OBJECT_STORAGE_ENDPOINT': 'https://s3.ca-central-1.amazonaws.com'
     'BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT': 'https://s3.ca-central-1.amazonaws.com'
-    'BCGOV_OBJECT_STORAGE_BUCKET': 'hesp-dev-cacentral1-bucket'
+    # 'BCGOV_OBJECT_STORAGE_BUCKET': 'hesp-dev-cacentral1-bucket'
+    'BCGOV_OBJECT_STORAGE_BUCKET': 'hesp-prod-cacentral1-bucket' #Use production bucket for testing on dev
     # AWS Parameter Store path for credential rotation
     'AWS_PARAMETER_BASE_PATH': '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
     'AWS_REGION': 'ca-central-1'

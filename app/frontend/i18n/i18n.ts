@@ -299,6 +299,8 @@ const options = {
           iNeed: 'See full eligibility details on Better Homes.',
           iNeedLink: 'https://www.betterhomesbc.ca/rebates/energy-savings-program/',
           whatToApply: 'What do I need to apply?',
+          beforeApply: 'Before you apply, you will need to log in with your BC Services Card account.',
+          useServiceCard: 'Learn more about how to use BC Services Card account.',
           applyNeeds: [
             'Information about your home',
             'The account numbers on your energy utility bills',
@@ -349,7 +351,7 @@ const options = {
           informationReady: 'To make things easier, collect this information before you begin your application.',
           otherWaysTitle: 'Other ways to get started',
           getHelpTitle: 'Get help with your ESP application',
-          energySpecialistTitle: 'Get upgrade advice from an energy specialist',
+          energySpecialistTitle: ' Get upgrade advice from an Energy Savings Program Specialist',
           energyEfficiencyTitle: "Learn more about your home's energy efficiency",
 
           // Application steps
@@ -378,11 +380,12 @@ const options = {
           phoneHours: ', 9 am to 5 pm, Monday to Friday (excluding statutory holidays).',
 
           // External links
-          energyCoachBooking: 'Book a 60-minute virtual assessment',
+          energyCoachBooking: 'Book a call',
           homeEnergyPlanner: 'Use the BC Home Energy Planner',
           energySavingsProgramPortal: 'Energy Savings Program contractor portal',
+          serviceCardLink: 'https://id.gov.bc.ca/account/',
           contractorPortalLink: 'Contractors - please visit the',
-          energyCoachLink: 'https://www.betterhomesbc.ca/energy-coach/',
+          energyCoachLink: 'https://submit.digital.gov.bc.ca/app/form/submit?f=a216ecd7-c840-457a-9f8f-b350f334849b',
           homeEnergyPlannerLink: 'https://www.energystepcode.ca/home-energy-planner/',
 
           // Aria labels

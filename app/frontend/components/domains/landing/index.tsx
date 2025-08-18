@@ -237,12 +237,22 @@ export const LandingScreen = observer(() => {
           >
             {t('landing.whatToApply')}
           </Heading>
-          <Text fontSize="16px" lineHeight="27px" color="greys.anotherGrey" mb={4}>
+          {t('landing.beforeApply')}{' '}
+          <Link
+            as={RouterLink}
+            to={t('landing.serviceCardLink')}
+            textDecoration="underline"
+            aria-label={t('landing.ariaLabels.visitContractorPortal')}
+            _focus={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}
+          >
+            {t('landing.useServiceCard')}
+          </Link>
+          <Text fontSize="16px" color="greys.anotherGrey" mb={2} mt={6}>
             {t('landing.duringApplication')}
           </Text>
           <UnorderedList spacing={1} pl={4} color="greys.anotherGrey" mb={4}>
             {applyNeeds.map((str) => (
-              <ListItem key={str} fontSize="16px" lineHeight="27px">
+              <ListItem key={str} fontSize="16px">
                 {str}
               </ListItem>
             ))}
@@ -305,6 +315,7 @@ export const LandingScreen = observer(() => {
                 isExternal
                 display="inline-flex"
                 alignItems="center"
+                justifyContent="center"
                 gap={2}
                 px={4}
                 py={2}
@@ -318,7 +329,6 @@ export const LandingScreen = observer(() => {
                 aria-label={t('landing.ariaLabels.bookEnergyAssessment')}
               >
                 {t('landing.energyCoachBooking')}
-                <ArrowSquareOut size={16} aria-hidden="true" />
               </Link>
             </Flex>
 
