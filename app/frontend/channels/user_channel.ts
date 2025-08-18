@@ -34,7 +34,8 @@ export const createUserSpecificConsumer = async () => {
     }
 
     const finalUrl = `${BASE_WEBSOCKET_URL}?token=${encodeURIComponent(data.token)}`;
-    return createConsumer(finalUrl);
+    const consumer = createConsumer(finalUrl);
+    return consumer;
   } catch (error) {
     console.error('[WebSocket] Failed to create authenticated consumer:', error);
     throw new Error('Failed to create WebSocket consumer due to authentication error');

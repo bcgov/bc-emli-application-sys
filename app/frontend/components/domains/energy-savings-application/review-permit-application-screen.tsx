@@ -363,7 +363,10 @@ export const ReviewPermitApplicationScreen = observer(() => {
                         px={14}
                         onClick={onScreenIn}
                         borderColor="green"
-                        isDisabled={currentPermitApplication?.status === EPermitApplicationStatus.ineligible}
+                        isDisabled={
+                          currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
+                          currentPermitApplication?.status === EPermitApplicationStatus.inReview
+                        }
                       >
                         {t('permitApplication.show.screenIn')}
                       </Button>
@@ -380,7 +383,10 @@ export const ReviewPermitApplicationScreen = observer(() => {
                         px={14}
                         onClick={onOpen}
                         borderColor="red"
-                        isDisabled={currentPermitApplication?.status === EPermitApplicationStatus.inReview}
+                        isDisabled={
+                          currentPermitApplication?.status === EPermitApplicationStatus.inReview ||
+                          currentPermitApplication?.status === EPermitApplicationStatus.ineligible
+                        }
                       >
                         {t('permitApplication.show.inEligible')}
                       </Button>

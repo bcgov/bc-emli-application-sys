@@ -15,58 +15,115 @@ import {
   Text,
   VStack,
   useDisclosure,
-} from "@chakra-ui/react"
-import { Download, FileArrowDown, FileZip, Gear } from "@phosphor-icons/react"
-import { format } from "date-fns"
-import { observer } from "mobx-react-lite"
-import React, { useEffect } from "react"
-import { useTranslation } from "react-i18next"
-import { datefnsAppDateFormat } from "../../../constants"
-import { IPermitApplication } from "../../../models/energy-savings-application"
-import { useMst } from "../../../setup/root"
-import { formatBytes } from "../../../utils/utility-functions"
-import { SharedSpinner } from "../../shared/base/shared-spinner"
-import { LoadingIcon } from "../../shared/loading-icon"
+  useToast,
+} from '@chakra-ui/react';
+import { Download, FileArrowDown, Gear, Eye } from '@phosphor-icons/react';
+import { format } from 'date-fns';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { datefnsAppDateFormat } from '../../../constants';
+import { IPermitApplication } from '../../../models/energy-savings-application';
+import { useMst } from '../../../setup/root';
+import { formatBytes } from '../../../utils/utility-functions';
+import { SharedSpinner } from '../../shared/base/shared-spinner';
+import { LoadingIcon } from '../../shared/loading-icon';
+import { createCable } from '@anycable/web';
+import { createUserSpecificConsumer } from '../../../channels/user_channel';
 
 export interface ISubmissionDownloadModalProps {
-  permitApplication: IPermitApplication
-  renderTrigger?: (onOpen: () => void) => React.ReactNode
-  review?: boolean
+  permitApplication: IPermitApplication;
+  renderTrigger?: (onOpen: () => void) => React.ReactNode;
+  review?: boolean;
 }
 
 export const SubmissionDownloadModal = observer(
   ({ permitApplication, renderTrigger, review }: ISubmissionDownloadModalProps) => {
-    const { t } = useTranslation()
-    const { permitApplicationStore } = useMst()
-    const { allSubmissionVersionCompletedSupportingDocuments, zipfileUrl, zipfileName, stepCode } = permitApplication
-    const checklist = stepCode?.preConstructionChecklist
+    const { t } = useTranslation();
+    const { permitApplicationStore } = useMst();
+    const { allSubmissionVersionCompletedSupportingDocuments, stepCode } = permitApplication;
+    const checklist = stepCode?.preConstructionChecklist;
 
-    const { isOpen, onOpen, onClose } = useDisclosure()
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+    const toast = useToast();
 
     useEffect(() => {
-      if (!isOpen) return
+      if (!isOpen) return;
 
       if (!permitApplication?.isFullyLoaded) {
-        permitApplicationStore.fetchPermitApplication(permitApplication?.id, review)
+        permitApplicationStore.fetchPermitApplication(permitApplication?.id, review);
       }
-    }, [permitApplication?.isFullyLoaded, isOpen])
+
+      return () => {};
+    }, [isOpen]);
+
+    // Separate useEffect for WebSocket connection that only depends on modal being open
+    useEffect(() => {
+      if (!isOpen || !permitApplication?.id) return;
+
+      let modalSubscription: any = null;
+
+      const setupModalWebSocket = async () => {
+        try {
+          const consumer = await createUserSpecificConsumer();
+          modalSubscription = consumer.subscriptions.create(
+            { channel: 'UserChannel' },
+            {
+              connected() {
+                console.log('[Modal WebSocket] Connected successfully');
+              },
+              disconnected() {},
+
+              received(data: any) {
+                if (data.domain === 'permit_application' && data.eventType === 'update_supporting_documents') {
+                  if (data.data?.id === permitApplication.id) {
+                    if (data.data.missingPdfs !== undefined) {
+                      permitApplication.missingPdfs = data.data.missingPdfs || [];
+                    }
+                    if (data.data.zipfileUrl) {
+                      permitApplication.zipfileUrl = data.data.zipfileUrl;
+                      permitApplication.zipfileName = data.data.zipfileName;
+                      permitApplication.zipfileSize = data.data.zipfileSize;
+                    }
+                  }
+                }
+              },
+              rejected() {},
+            },
+          );
+        } catch (error) {
+          // WebSocket setup failed
+        }
+      };
+
+      setupModalWebSocket();
+
+      // Cleanup when modal closes
+      return () => {
+        if (modalSubscription) {
+          modalSubscription.unsubscribe();
+        }
+      };
+    }, [isOpen, permitApplication?.id]);
 
     useEffect(() => {
-      const fetch = async () => await checklist.load()
-      checklist && !checklist.isLoaded && fetch()
-    }, [checklist?.isLoaded])
+      const fetch = async () => await checklist.load();
+      checklist && !checklist.isLoaded && fetch();
+    }, [checklist?.isLoaded]);
 
     useEffect(() => {
       if (!permitApplication?.isFullyLoaded) {
-        return
+        return;
       }
 
-      if (!permitApplication.isSubmitted || !permitApplication.missingPdfs.length) {
-        return
+      // Allow PDF generation for any application status as long as there are missing PDFs
+      if (!permitApplication.missingPdfs.length) {
+        return;
       }
 
-      permitApplication.generateMissingPdfs()
-    }, [permitApplication?.isFullyLoaded, permitApplication?.missingPdfs, checklist?.isLoaded])
+      permitApplication.generateMissingPdfs();
+    }, [permitApplication?.isFullyLoaded, permitApplication?.missingPdfs, checklist?.isLoaded]);
 
     return (
       <>
@@ -74,28 +131,28 @@ export const SubmissionDownloadModal = observer(
           renderTrigger(onOpen)
         ) : (
           <Button variant="primary" onClick={onOpen} leftIcon={<Download />}>
-            {t("permitApplication.show.downloadApplication")}
+            {t('permitApplication.show.downloadApplication')}
           </Button>
         )}
 
         <Modal onClose={onClose} isOpen={isOpen} size="md" scrollBehavior="inside">
           <ModalOverlay />
-          <ModalContent maxW={"container.md"}>
+          <ModalContent maxW={'container.md'}>
             {!permitApplication?.isFullyLoaded ? (
               <SharedSpinner />
             ) : (
               <>
                 <ModalHeader>
                   <VStack w="full" align="start">
-                    <Heading as="h1" fontSize="2xl" textTransform={"capitalize"}>
-                      {t("permitApplication.show.downloadHeading")}
+                    <Heading as="h1" fontSize="2xl" textTransform={'capitalize'}>
+                      {t('permitApplication.show.downloadHeading')}
                       <br />
                       <Text as="span" fontSize="lg" color="text.secondary">
                         {permitApplication.number}
                       </Text>
                     </Heading>
                     <Text fontSize="md" fontWeight="normal">
-                      {t("permitApplication.show.downloadPrompt")}
+                      {t('permitApplication.show.downloadPrompt')}
                     </Text>
                   </VStack>
                   <ModalCloseButton fontSize="11px" />
@@ -103,38 +160,52 @@ export const SubmissionDownloadModal = observer(
                 <ModalBody>
                   <Flex direction="column" gap={3} borderRadius="lg" borderWidth={1} borderColor="border.light" p={4}>
                     <VStack align="flex-start" w="full" spacing={3}>
-                      {permitApplication.missingPdfs.map((pdfKey) => (
+                      {/* {permitApplication.zipfileUrl && (
+                        <FileDownloadLink
+                          key={permitApplication.zipfileUrl}
+                          downloadUrl={permitApplication.zipfileUrl}
+                          viewUrl={permitApplication.zipfileUrl}
+                          name={permitApplication.zipfileName || 'Application.zip'}
+                          size={permitApplication.zipfileSize || 0}
+                          createdAt={new Date()}
+                        />
+                      )} */}
+                      {pdfUrl && (
+                        <FileDownloadLink
+                          key={pdfUrl}
+                          downloadUrl={pdfUrl}
+                          viewUrl={pdfUrl}
+                          name={'PermitApplication.pdf'}
+                          size={0}
+                          createdAt={new Date()}
+                        />
+                      )}
+                      {(permitApplication.missingPdfs || []).map((pdfKey) => (
                         <MissingPdf key={pdfKey} pdfKey={pdfKey} />
                       ))}
                       {allSubmissionVersionCompletedSupportingDocuments.map((doc) => (
                         <FileDownloadLink
                           key={doc.fileUrl}
-                          url={doc.fileUrl}
+                          downloadUrl={doc.fileUrl}
+                          viewUrl={doc.viewUrl}
                           name={doc.fileName}
                           size={doc.fileSize}
                           createdAt={doc.createdAt}
                         />
                       ))}
+                      {(permitApplication.missingPdfs || []).length === 0 &&
+                        allSubmissionVersionCompletedSupportingDocuments.length === 0 && (
+                          <Text color="greys.grey01" fontSize="sm" textAlign="center" w="full" py={4}>
+                            {t('permitApplication.show.noDocumentsAvailable')}
+                          </Text>
+                        )}
                     </VStack>
                   </Flex>
                 </ModalBody>
                 <ModalFooter>
                   <Flex gap={2} w="full" wrap="wrap">
-                    <Button
-                      variant="primary"
-                      as={Link}
-                      flex={1}
-                      href={zipfileUrl}
-                      download={zipfileName}
-                      textDecoration="none"
-                      leftIcon={<FileZip />}
-                      isDisabled={!zipfileUrl}
-                      _hover={{ textDecoration: "none" }}
-                    >
-                      {t("permitApplication.show.downloadZip")}
-                    </Button>
-                    <Button variant="secondary" onClick={onClose}>
-                      {t("ui.neverMind")}
+                    <Button variant="secondary" onClick={onClose} flex={1}>
+                      {t('ui.neverMind')}
                     </Button>
                   </Flex>
                 </ModalFooter>
@@ -143,25 +214,67 @@ export const SubmissionDownloadModal = observer(
           </ModalContent>
         </Modal>
       </>
-    )
-  }
-)
+    );
+  },
+);
 
-const FileDownloadLink = function ApplicationFileDownloadLink({ url, name, size, createdAt }) {
+interface FileDownloadLinkProps {
+  downloadUrl: string;
+  viewUrl: string;
+  name: string;
+  size: number;
+  createdAt: Date;
+}
+
+const FileDownloadLink = function ApplicationFileDownloadLink({
+  downloadUrl,
+  viewUrl,
+  name,
+  size,
+  createdAt,
+}: FileDownloadLinkProps) {
+  const { t } = useTranslation();
+
+  const handleViewInBrowser = () => {
+    // Use the viewUrl which has response-content-disposition=inline for browser viewing
+    window.open(viewUrl, '_blank');
+  };
+
+  const isPdf = /\.pdf$/i.test(name);
+
   return (
     <HStack w="full" align="center">
       <Stack flex={1} spacing={2}>
-        <Button
-          as={Link}
-          href={url}
-          download={name}
-          variant="link"
-          leftIcon={<FileArrowDown size={16} />}
-          whiteSpace="normal"
-        >
+        <Text fontWeight="medium" fontSize="sm">
           {name}
-        </Button>
-        <Text color="greys.grey01" fontSize="xs" ml={8}>
+        </Text>
+        <HStack spacing={2}>
+          {isPdf && (
+            <Button
+              as={Link}
+              href={downloadUrl}
+              download={name}
+              variant="ghost"
+              size="xs"
+              leftIcon={<FileArrowDown size={14} />}
+              colorScheme="blue"
+            >
+              {t('ui.download')}
+            </Button>
+          )}
+          {!isPdf && (
+            <Button
+              variant="ghost"
+              size="xs"
+              leftIcon={<Eye size={14} />}
+              colorScheme="blue"
+              onClick={handleViewInBrowser}
+            >
+              View
+            </Button>
+          )}
+        </HStack>
+        <Text color="greys.grey01" fontSize="xs">
           {formatBytes(size)}
         </Text>
       </Stack>
@@ -170,31 +283,31 @@ const FileDownloadLink = function ApplicationFileDownloadLink({ url, name, size,
         {format(createdAt, datefnsAppDateFormat)}
       </Text>
     </HStack>
-  )
-}
+  );
+};
 
-function MissingPdf({ pdfKey }: { pdfKey: "permit_application_pdf" }) {
-  const { t } = useTranslation()
+function MissingPdf({ pdfKey }: { pdfKey: 'permit_application_pdf' }) {
+  const { t } = useTranslation();
 
   const getMissingPdfLabel = () => {
-    if (pdfKey.startsWith("permit_application_pdf")) {
-      return t("permitApplication.show.missingPdfLabels.permitApplication")
+    if (pdfKey.startsWith('permit_application_pdf')) {
+      return t('permitApplication.show.missingPdfLabels.permitApplication');
     }
 
-    if (pdfKey.startsWith("step_code_checklist_pdf")) {
-      return t("permitApplication.show.missingPdfLabels.stepCode")
+    if (pdfKey.startsWith('step_code_checklist_pdf')) {
+      return t('permitApplication.show.missingPdfLabels.stepCode');
     }
-  }
+  };
   return (
     <Flex w="full" align="center" justify="space-between" pl={1}>
       <HStack spacing={3}>
         <FileArrowDown size={16} />
-        <Text as={"span"} color={"semantic.error"}>
-          {t("permitApplication.show.fetchingMissingPdf", { missingPdf: getMissingPdfLabel() || pdfKey })}
+        <Text as={'span'} color={'semantic.error'}>
+          {t('permitApplication.show.fetchingMissingPdf', { missingPdf: getMissingPdfLabel() || pdfKey })}
         </Text>
       </HStack>
 
       <LoadingIcon icon={<Gear />} />
     </Flex>
-  )
+  );
 }

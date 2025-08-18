@@ -769,4 +769,9 @@ en:
     login_from_ip: 'Login from IP: %{ip}'
     login_count: 'Total logins: %{count}'
     applications: 'applications'
+  ui:
+    download: 'Download'
+    viewInBrowser: 'View in Browser'
+    viewBrowser: 'View in Browser'
+    neverMind: 'Never Mind'
 

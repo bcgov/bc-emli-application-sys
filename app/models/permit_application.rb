@@ -323,6 +323,7 @@ class PermitApplication < ApplicationRecord
     if submitted?
       form_customizations_snapshot
     else
+      return nil unless jurisdiction
       jurisdiction
         .jurisdiction_template_version_customizations
         .find_by(template_version: template_version, sandbox_id: sandbox_id)
@@ -428,6 +429,7 @@ class PermitApplication < ApplicationRecord
   end
 
   def confirmed_permit_type_submission_contacts
+    return [] unless jurisdiction
     jurisdiction
       .permit_type_submission_contacts
       .where(permit_type: permit_type)
@@ -477,8 +479,6 @@ class PermitApplication < ApplicationRecord
   end
 
   def missing_pdfs
-    return [] unless submitted?
-
     missing_pdfs = []
 
     submission_versions.each do |submission_version|
@@ -723,7 +723,6 @@ class PermitApplication < ApplicationRecord
 
   def step_code_requirements
     return [] unless jurisdiction
-    return [] unless jurisdiction
     jurisdiction.permit_type_required_steps.where(permit_type_id:)
   end
 
@@ -894,6 +893,7 @@ class PermitApplication < ApplicationRecord
 
   def take_form_customizations_snapshot_if_submitted
     return unless status_changed? && submitted?
+    return unless jurisdiction
 
     current_customizations =
       jurisdiction

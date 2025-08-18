@@ -259,8 +259,10 @@ export interface ITemplateCustomization {
 
 export interface IDownloadableFile {
   fileUrl: string;
+  viewUrl: string;
   fileName: string;
   fileSize: number;
+  createdAt: Date;
 }
 
 export interface IEULA {
