@@ -36,16 +36,42 @@ class ZipfileJob
       Rails.logger.info "Zip file created successfully"
 
       # Broadcast update to users
+      # Convert snake_case keys to camelCase to match frontend expectations
+      blueprint_data =
+        PermitApplicationBlueprint
+          .render_as_hash(
+            permit_application.reload,
+            { view: :supporting_docs_update }
+          )
+          .deep_transform_keys { |key| key.to_s.camelize(:lower) }
+
+      # Get all users who can view this permit application (broader than just notifiable users)
+      # Include: submitter, admins, admin managers, system admins who might be viewing the modal
+      viewable_user_ids = []
+
+      # Always include notifiable users (submitter, delegated submitters, reviewers)
+      viewable_user_ids += permit_application.notifiable_users.pluck(:id)
+
+      # Also include admin users who might be viewing the application
+      admin_users = User.where(role: %i[admin admin_manager system_admin])
+      viewable_user_ids += admin_users.pluck(:id)
+
+      # Remove duplicates
+      viewable_user_ids = viewable_user_ids.uniq
+
+      Rails.logger.info "Broadcasting ZIP update to #{viewable_user_ids.length} users: #{viewable_user_ids}"
+
       WebsocketBroadcaster.push_update_to_relevant_users(
-        permit_application.notifiable_users.pluck(:id),
+        viewable_user_ids,
         Constants::Websockets::Events::PermitApplication::DOMAIN,
         Constants::Websockets::Events::PermitApplication::TYPES[
           :update_supporting_documents
         ],
-        PermitApplicationBlueprint.render_as_hash(
-          permit_application.reload,
-          { view: :supporting_docs_update }
-        )
+        # PermitApplicationBlueprint.render_as_hash(
+        #   permit_application.reload,
+        #   { view: :supporting_docs_update }
+        # )
+        blueprint_data
       )
     rescue => zip_error
       Rails.logger.error "Zip creation also failed: #{zip_error.message}"
