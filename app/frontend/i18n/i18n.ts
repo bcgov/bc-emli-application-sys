@@ -2833,7 +2833,7 @@ const options = {
           accessibility: 'Accessibility',
           copyright: 'Copyright',
           foippaWarning:
-            'We are collecting your personal information under section 26(c) & (e) of the Freedom of Information and Protection of Privacy Act. We are collecting this information to process your application to the CleanBC Better Homes Energy Savings Program, and for program planning and evaluation. The Ministry of Energy and Climate Solutions administers this program. If you have questions about the collection of your information, please contact us at betterhomesbc@gov.bc.ca. ',
+            'We are collecting your personal information under section 26(c) & (e) of the Freedom of Information and Protection of Privacy Act. We are collecting this information to process your application to the CleanBC Better Homes Energy Savings Program, and for program planning and evaluation. The Ministry of Energy and Climate Solutions administers this program. If you have questions about the collection of your information, please contact us at <link/>. ',
           pleaseContact:
             'Please contact your local government for questions related to your energy savings application.',
           forHelp: 'For help with the Building Permit Hub please contact:',
