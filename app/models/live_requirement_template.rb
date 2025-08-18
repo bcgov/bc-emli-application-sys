@@ -1,6 +1,6 @@
 class LiveRequirementTemplate < RequirementTemplate
   # validate :unique_classification_for_undiscarded
-  validate :unqiue_external_application_for_participant
+  validate :unique_application_for_participant
   validate :unique_external_onboarding_for_contractor
   validate :support_request_internal_only
 
@@ -50,11 +50,12 @@ class LiveRequirementTemplate < RequirementTemplate
     end
   end
 
-  def unqiue_external_application_for_participant
+  def unique_application_for_participant
     return unless discarded_at.nil?
 
-    # Only run this validation if the current object's types match the restricted combo
-    unless types_match?(aud: :external, group: :participant, sub: :application)
+    # Only run this validation if the current object is for participant applications
+    unless user_group_type&.code&.to_sym == :participant &&
+             submission_type&.code&.to_sym == :application
       return
     end
 
@@ -69,10 +70,12 @@ class LiveRequirementTemplate < RequirementTemplate
     existing = existing.where.not(id: id) if id.present?
 
     if existing.exists?
+      audience_name = audience_type&.name&.downcase || "unspecified audience"
       errors.add(
         :base,
         I18n.t(
-          "activerecord.errors.models.requirement_template.nonunique_participant_application"
+          "activerecord.errors.models.requirement_template.nonunique_participant_application_per_audience",
+          audience_name: audience_name
         )
       )
     end

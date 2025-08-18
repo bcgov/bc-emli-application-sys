@@ -73,7 +73,7 @@ en:
           duplicate_energy_step_code: 'Multiple "Energy step code" requirements found. Please ensure there is only one "Energy step code" requirement in the template'
           duplicate_step_code_package: 'Multiple "Design package energy step code files" found. Please ensure there is only one "Design package energy step code file" when there is an "Energy step code" requirement'
           nonunique_classification: 'There can only be one requirement template per permit type, activity, and First Nations combination'
-          nonunique_participant_application: 'There can only be one requirement template for each external participant application combination'
+          nonunique_participant_application_per_audience: 'Program already has a participant %{audience_name} application template'
           nonunique_contractor_onboarding: 'There can only be one requirement template for each external contractor onboarding combination.'
           support_request_internal_only: 'Requirement templates with a submission type of "Support Request" can only be Internal'
           attributes:
@@ -638,6 +638,12 @@ en:
       participant_application_not_published:
         title: 'Error'
         message: "The participant application hasn't been published"
+      template_version_not_found:
+        title: 'Error'
+        message: 'The specified template version could not be found'
+      template_version_mismatch:
+        title: 'Error'
+        message: 'The template version does not match the expected criteria'
   services:
     auto_compliance_configuration:
       digital_seal_validator:
@@ -753,7 +759,7 @@ en:
     virus_scan:
       virus_detected: 'File upload failed: The file appears to be corrupted or contains suspicious content. Please try a different file or contact support if you believe this is an error.'
       scan_error_production: 'File upload temporarily unavailable due to security scanning issues. Please try again later.'
-      scan_error_development: 'File upload allowed despite scan error in development mode.'  
+      scan_error_development: 'File upload allowed despite scan error in development mode.'
       service_unavailable: 'Virus scanning service unavailable'
       scan_timeout_production: 'File upload failed due to timeout. Please try again or contact support.'
       scan_timeout_development: 'File upload timeout in development mode.'
@@ -769,4 +775,3 @@ en:
     login_from_ip: 'Login from IP: %{ip}'
     login_count: 'Total logins: %{count}'
     applications: 'applications'
-
