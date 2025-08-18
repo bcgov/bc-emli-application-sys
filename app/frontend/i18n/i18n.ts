@@ -1254,6 +1254,7 @@ const options = {
               'A new version of the permit is available. Please ask author or designated submitter to review and acknowledge changes to proceed.',
             contactsSummary: 'Contacts summary',
             downloadApplication: 'Download application',
+            viewApplicationFiles: 'View application files',
             fetchingMissingPdf: 'Fetching {{missingPdf}}...',
             missingPdfLabels: {
               permitApplication: 'permit application pdf',
@@ -1261,7 +1262,9 @@ const options = {
             },
             contactSummaryHeading: 'List of all contacts on this application',
             downloadHeading: 'Download application',
+            viewFilesHeading: 'View files',
             downloadPrompt: 'Choose specific files or entire package:',
+            viewFilesPrompt: 'Choose specific files to view:',
             downloadZip: 'Download attached files',
             downloadForm: 'Download application form',
             downloadStepCode: 'Download step code checklist',

@@ -16,7 +16,7 @@ import {
   VStack,
   useDisclosure,
 } from '@chakra-ui/react';
-import { Download, FileArrowDown, FileZip, Gear } from '@phosphor-icons/react';
+import { Download, FileArrowDown, FileZip, Gear, Eye } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
@@ -125,7 +125,7 @@ export const SubmissionDownloadModal = observer(
           renderTrigger(onOpen)
         ) : (
           <Button variant="primary" onClick={onOpen} leftIcon={<Download />}>
-            {t('permitApplication.show.downloadApplication')}
+            {t('energySavingsApplication.show.viewApplicationFiles')}
           </Button>
         )}
 
@@ -139,14 +139,14 @@ export const SubmissionDownloadModal = observer(
                 <ModalHeader>
                   <VStack w="full" align="start">
                     <Heading as="h1" fontSize="2xl" textTransform={'capitalize'}>
-                      {t('permitApplication.show.downloadHeading')}
+                      {t('energySavingsApplication.show.viewFilesHeading')}
                       <br />
                       <Text as="span" fontSize="lg" color="text.secondary">
                         {permitApplication.number}
                       </Text>
                     </Heading>
                     <Text fontSize="md" fontWeight="normal">
-                      {t('permitApplication.show.downloadPrompt')}
+                      {t('energySavingsApplication.show.viewFilesPrompt')}
                     </Text>
                   </VStack>
                   <ModalCloseButton fontSize="11px" />
@@ -158,9 +158,9 @@ export const SubmissionDownloadModal = observer(
                         <MissingPdf key={pdfKey} pdfKey={pdfKey} />
                       ))}
                       {allSubmissionVersionCompletedSupportingDocuments.map((doc) => (
-                        <FileDownloadLink
-                          key={doc.fileUrl}
-                          url={doc.fileUrl}
+                        <FileViewLink
+                          key={doc.viewUrl}
+                          url={doc.viewUrl}
                           name={doc.fileName}
                           size={doc.fileSize}
                           createdAt={doc.createdAt}
@@ -171,21 +171,8 @@ export const SubmissionDownloadModal = observer(
                 </ModalBody>
                 <ModalFooter>
                   <Flex gap={2} w="full" wrap="wrap">
-                    <Button
-                      variant="primary"
-                      as={Link}
-                      flex={1}
-                      href={zipfileUrl}
-                      download={zipfileName}
-                      textDecoration="none"
-                      leftIcon={<FileZip />}
-                      isDisabled={!zipfileUrl}
-                      _hover={{ textDecoration: 'none' }}
-                    >
-                      {t('permitApplication.show.downloadZip')}
-                    </Button>
                     <Button variant="secondary" onClick={onClose}>
-                      {t('ui.neverMind')}
+                      {t('ui.close')}
                     </Button>
                   </Flex>
                 </ModalFooter>
@@ -208,6 +195,33 @@ const FileDownloadLink = function ApplicationFileDownloadLink({ url, name, size,
           download={name}
           variant="link"
           leftIcon={<FileArrowDown size={16} />}
+          whiteSpace="normal"
+        >
+          {name}
+        </Button>
+        <Text color="greys.grey01" fontSize="xs" ml={8}>
+          {formatBytes(size)}
+        </Text>
+      </Stack>
+
+      <Text color="greys.grey01" textAlign="right" fontSize="xs">
+        {format(createdAt, datefnsAppDateFormat)}
+      </Text>
+    </HStack>
+  );
+};
+
+const FileViewLink = function ApplicationFileViewLink({ url, name, size, createdAt }) {
+  return (
+    <HStack w="full" align="center">
+      <Stack flex={1} spacing={2}>
+        <Button
+          as={Link}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="link"
+          leftIcon={<Eye size={16} />}
           whiteSpace="normal"
         >
           {name}

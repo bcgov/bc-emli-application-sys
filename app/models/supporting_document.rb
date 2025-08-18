@@ -132,6 +132,15 @@ class SupportingDocument < ApplicationRecord
     )
   end
 
+  def view_url
+    file&.url(
+      public: false,
+      expires_in: 3600,
+      response_content_disposition:
+        "inline; filename=\"#{file.original_filename}\""
+    )
+  end
+
   STATIC_DOCUMENT_DATA_KEYS = [
     APPLICATION_PDF_DATA_KEY,
     CHECKLIST_PDF_DATA_KEY
