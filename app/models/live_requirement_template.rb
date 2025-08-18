@@ -70,7 +70,7 @@ class LiveRequirementTemplate < RequirementTemplate
     existing = existing.where.not(id: id) if id.present?
 
     if existing.exists?
-      audience_name = audience_type&.name&.downcase || "unknown"
+      audience_name = audience_type&.name&.downcase || "unspecified audience"
       errors.add(
         :base,
         I18n.t(
