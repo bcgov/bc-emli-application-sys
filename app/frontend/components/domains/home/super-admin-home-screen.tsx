@@ -48,6 +48,7 @@ export const SuperAdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               h="full"
               bg="greys.grey10"
               headingColor="greys.homeScreenGrey"
+              isDisabled={true}
             />
             <HomeScreenBox
               title={t('home.earlyAccess.title')}
@@ -58,6 +59,7 @@ export const SuperAdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               h="full"
               bg="greys.grey10"
               headingColor="greys.homeScreenGrey"
+              isDisabled={true}
             />
           </Flex>
         </Flex>
