@@ -48,6 +48,7 @@ export const HomeScreenBox = observer(
         w="full"
         position="relative"
         opacity={isDisabled ? 0.75 : 1}
+        tabIndex={isDisabled ? -1 : 0}
         transition="border-color 200ms ease-out, background-color 200ms ease-out"
         _hover={{
           borderColor: 'theme.blueAlt',
@@ -76,7 +77,7 @@ export const HomeScreenBox = observer(
                   outline: 'none',
                   border: 'none',
                 }}
-                tabIndex={isDisabled ? -1 : 0}
+                tabIndex={-1}
                 aria-disabled={isDisabled}
               >
                 {linkText || ''}
