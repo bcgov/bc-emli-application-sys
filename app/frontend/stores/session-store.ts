@@ -62,9 +62,7 @@ export const SessionStoreModel = types
     }),
     logout: flow(function* () {
       self.isLoggingOut = true;
-
-      // Capture before resetAuth (if reset clears session fields)
-      const isAdmin = Boolean(self.entryPoint); // or check roles if you prefer
+      const isAdmin = Boolean(self.entryPoint);
 
       try {
         const response: any = yield self.environment.api.logout();
@@ -73,16 +71,18 @@ export const SessionStoreModel = types
         const origin = window.location.origin;
         const finalRedirect = `${origin}${isAdmin ? '/admin' : '/'}`;
 
-        // Build Keycloak logout: <kc-logout>?redirect_uri=<finalRedirect>
-        const kc = new URL(import.meta.env.VITE_KEYCLOAK_LOGOUT_URL);
+        const kcLogoutUrl = (import.meta as any)?.env?.VITE_KEYCLOAK_LOGOUT_URL || process.env.VITE_KEYCLOAK_LOGOUT_URL;
+
+        const smLogoutUrl =
+          (import.meta as any)?.env?.VITE_SITEMINDER_LOGOUT_URL || process.env.VITE_SITEMINDER_LOGOUT_URL;
+
+        const kc = new URL(kcLogoutUrl);
         kc.searchParams.set('redirect_uri', finalRedirect);
 
-        // Build Siteminder logout: <sm-logout>?retnow=1&returl=<kc-logout>
-        const sm = new URL(import.meta.env.VITE_SITEMINDER_LOGOUT_URL);
+        const sm = new URL(smLogoutUrl);
         sm.searchParams.set('retnow', '1');
         sm.searchParams.set('returl', kc.toString());
 
-        // Go!
         window.location.href = sm.toString();
       }
     }),
