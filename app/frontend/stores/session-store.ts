@@ -69,7 +69,7 @@ export const SessionStoreModel = types
       const origin = window.location.origin;
       const finalRedirect = `${origin}${self.entryPoint ? '/admin' : '/'}`;
       // logout of siteminder / keycloak as well
-      window.location.href = `${import.meta.env.VITE_SITEMINDER_LOGOUT_URL}?retnow=1&returl=${finalRedirect}?redirect_uri=${import.meta.env.VITE_POST_LOGOUT_REDIRECT_URL}`;
+      window.location.href = finalRedirect; //`${import.meta.env.VITE_SITEMINDER_LOGOUT_URL}?retnow=1&returl=${finalRedirect}?redirect_uri=${import.meta.env.VITE_POST_LOGOUT_REDIRECT_URL}`;
     }),
     setTokenExpired(isExpired: boolean) {
       self.tokenExpired = isExpired;
