@@ -129,10 +129,10 @@ export const LandingScreen = observer(() => {
                     <ListItem key={str}>{str}</ListItem>
                   ))}
                   <ListItem>
-                    {t('landing.contractorPortalLink')}{' '}
+                    {t('landing.contractorPortalLinkText')}{' '}
                     <Link
                       as={RouterLink}
-                      to="/welcome/contractor"
+                      to={t('landing.contractorPortalLink')}
                       textDecoration="underline"
                       aria-label={t('landing.ariaLabels.visitContractorPortal')}
                       _focus={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}
@@ -283,6 +283,7 @@ export const LandingScreen = observer(() => {
               direction="column"
               maxW={{ base: 'full', lg: '352px' }}
               flex={1}
+              textAlign={'center'}
               bg="greys.offWhite"
               borderRadius="8px"
               p={4}
@@ -305,6 +306,7 @@ export const LandingScreen = observer(() => {
               flex={1}
               bg="greys.offWhite"
               borderRadius="8px"
+              textAlign={'center'}
               p={4}
             >
               <Heading as="h3" fontSize="20px" fontWeight="700" color="theme.blueAlt" lineHeight="34px" mb={4}>
@@ -339,6 +341,7 @@ export const LandingScreen = observer(() => {
               flex={1}
               bg="greys.offWhite"
               borderRadius="8px"
+              textAlign={'center'}
               p={4}
             >
               <Heading as="h3" fontSize="20px" fontWeight="700" color="theme.blueAlt" lineHeight="34px" mb={4}>
@@ -357,6 +360,7 @@ export const LandingScreen = observer(() => {
                 borderRadius="md"
                 color="greys.anotherGrey"
                 textDecoration="none"
+                justifyContent="center"
                 _hover={{ bg: 'greys.offWhite' }}
                 _focus={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}
                 aria-label={t('landing.ariaLabels.useHomePlanner')}
@@ -387,7 +391,8 @@ export const LandingScreen = observer(() => {
             {t('landing.contractorDescriptionPart1')}{' '}
             <Link
               as={RouterLink}
-              to="/welcome/contractor"
+              to={t('landing.contractorPortalLink')}
+              isExternal
               textDecoration="underline"
               aria-label={t('landing.ariaLabels.visitContractorPortalRegister')}
               _focus={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}

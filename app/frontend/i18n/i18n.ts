@@ -374,6 +374,7 @@ const options = {
           contractorDescriptionPart2:
             "and apply to be a program registered contractor. If you're already registered, you can log in to the portal to submit invoices for reimbursement.",
           contractorPortalText: 'contractor portal',
+          contractorPortalLink: 'https://esp.clearesult.ca/contractor/',
 
           // Contact info
           phoneText: 'Call 1-833-856-0333',
@@ -384,7 +385,8 @@ const options = {
           homeEnergyPlanner: 'Use the BC Home Energy Planner',
           energySavingsProgramPortal: 'Energy Savings Program contractor portal',
           serviceCardLink: 'https://id.gov.bc.ca/account/',
-          contractorPortalLink: 'Contractors - please visit the',
+          contractorPortalLinkText: 'Contractors - please visit the',
+
           energyCoachLink: 'https://submit.digital.gov.bc.ca/app/form/submit?f=a216ecd7-c840-457a-9f8f-b350f334849b',
           homeEnergyPlannerLink: 'https://www.energystepcode.ca/home-energy-planner/',
 
