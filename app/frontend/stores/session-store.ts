@@ -62,28 +62,25 @@ export const SessionStoreModel = types
     }),
     logout: flow(function* () {
       self.isLoggingOut = true;
-      const isAdmin = Boolean(self.entryPoint);
+      const isAdmin = Boolean(self.entryPoint); // capture before any reset if needed
 
       try {
         const response: any = yield self.environment.api.logout();
         if (response.ok) self.resetAuth();
       } finally {
+        const { KEYCLOAK_LOGOUT_URL, SITEMINDER_LOGOUT_URL } = self.environment.config;
+
         const origin = window.location.origin;
         const finalRedirect = `${origin}${isAdmin ? '/admin' : '/'}`;
 
-        const kcLogoutUrl = (import.meta as any)?.env?.VITE_KEYCLOAK_LOGOUT_URL || process.env.VITE_KEYCLOAK_LOGOUT_URL;
-
-        const smLogoutUrl =
-          (import.meta as any)?.env?.VITE_SITEMINDER_LOGOUT_URL || process.env.VITE_SITEMINDER_LOGOUT_URL;
-
-        const kc = new URL(kcLogoutUrl);
+        const kc = new URL(KEYCLOAK_LOGOUT_URL);
         kc.searchParams.set('redirect_uri', finalRedirect);
 
-        const sm = new URL(smLogoutUrl);
+        const sm = new URL(SITEMINDER_LOGOUT_URL);
         sm.searchParams.set('retnow', '1');
         sm.searchParams.set('returl', kc.toString());
 
-        window.location.href = sm.toString();
+        window.location.assign(sm.toString());
       }
     }),
     setTokenExpired(isExpired: boolean) {
