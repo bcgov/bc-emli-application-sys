@@ -2775,7 +2775,7 @@ const options = {
           contact: 'Contact us',
           betterHomes: 'Better Homes',
           disclaimer: 'Disclaimer',
-          dataAndPrivacy: 'Privacy',
+          dataAndPrivacy: 'Data and privacy',
           footerLinks: {
             betterHomes: 'https://www.betterhomesbc.ca/',
             disclaimer: 'https://www2.gov.bc.ca/gov/content/home/disclaimer',

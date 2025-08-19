@@ -13,8 +13,9 @@ interface IHomeScreenBoxProps extends BoxProps {
   title: string;
   description: string;
   linkText?: string;
-  markForSandbox?: boolean;
-  disableForSandbox?: boolean;
+  // markForSandbox?: boolean;
+  // disableForSandbox?: boolean;
+  isDisabled?: boolean;
   headingColor?: string;
 }
 
@@ -25,8 +26,9 @@ export const HomeScreenBox = observer(
     description,
     href,
     linkText,
-    markForSandbox,
-    disableForSandbox,
+    // markForSandbox,
+    // disableForSandbox,
+    isDisabled,
     headingColor,
     ...rest
   }: IHomeScreenBoxProps) => {
@@ -35,8 +37,8 @@ export const HomeScreenBox = observer(
     const { sandboxStore } = useMst();
     const { isSandboxActive } = sandboxStore;
 
-    const isDisabled = disableForSandbox && isSandboxActive;
-    const isMarked = markForSandbox;
+    //const isDisabled = disableForSandbox && isSandboxActive;
+    const isMarked = false; //markForSandbox;
 
     return (
       <LinkBox
@@ -48,6 +50,7 @@ export const HomeScreenBox = observer(
         w="full"
         position="relative"
         opacity={isDisabled ? 0.75 : 1}
+        tabIndex={isDisabled ? -1 : 0}
         transition="border-color 200ms ease-out, background-color 200ms ease-out"
         _hover={{
           borderColor: 'theme.blueAlt',
@@ -76,7 +79,7 @@ export const HomeScreenBox = observer(
                   outline: 'none',
                   border: 'none',
                 }}
-                tabIndex={isDisabled ? -1 : 0}
+                tabIndex={-1}
                 aria-disabled={isDisabled}
               >
                 {linkText || ''}
@@ -86,11 +89,11 @@ export const HomeScreenBox = observer(
               {description}
             </Text>
           </Flex>
-          {isDisabled && (
+          {/* {isDisabled && (
             <Text fontWeight="bold" color="greys.grey01" maxW={100}>
               {t('sandbox.disabledFor')}
             </Text>
-          )}
+          )} */}
         </Flex>
       </LinkBox>
     );

@@ -85,7 +85,7 @@ export const Footer = observer(() => {
           </Flex>
           <Show above="md">
             <Box py={14} bg="greys.grey03" w="full">
-              <Container maxW="container.lg">
+              <Container maxW="container.xl">
                 <Flex direction={{ base: 'column', md: 'row' }} gap={12}>
                   <Flex direction={'row'} align="center" justify="center" wrap="wrap" gap={8}>
                     <RouterLink to={t('site.footerLinks.betterHomes')} color="text.secondary">
