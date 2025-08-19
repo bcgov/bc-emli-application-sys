@@ -8,13 +8,11 @@ import { RootStoreContext } from './root-store-context';
 
 const initialState = {};
 
-// const environment = (() => {
-//   const env = new Environment()
-//   env.api = new Api()
-//   return env
-// })()
-
-const environment = new Environment();
+const environment = (() => {
+  const env = new Environment();
+  env.api = new Api();
+  return env;
+})();
 
 export const setupRootStore = () => {
   const rootStore = RootStoreModel.create(initialState, environment);
