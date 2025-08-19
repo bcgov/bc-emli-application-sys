@@ -62,12 +62,29 @@ export const SessionStoreModel = types
     }),
     logout: flow(function* () {
       self.isLoggingOut = true;
-      const response: any = yield self.environment.api.logout();
-      if (response.ok) {
-        self.resetAuth();
+
+      // Capture before resetAuth (if reset clears session fields)
+      const isAdmin = Boolean(self.entryPoint); // or check roles if you prefer
+
+      try {
+        const response: any = yield self.environment.api.logout();
+        if (response.ok) self.resetAuth();
+      } finally {
+        const origin = window.location.origin;
+        const finalRedirect = `${origin}${isAdmin ? '/admin' : '/'}`;
+
+        // Build Keycloak logout: <kc-logout>?redirect_uri=<finalRedirect>
+        const kc = new URL(import.meta.env.VITE_KEYCLOAK_LOGOUT_URL);
+        kc.searchParams.set('redirect_uri', finalRedirect);
+
+        // Build Siteminder logout: <sm-logout>?retnow=1&returl=<kc-logout>
+        const sm = new URL(import.meta.env.VITE_SITEMINDER_LOGOUT_URL);
+        sm.searchParams.set('retnow', '1');
+        sm.searchParams.set('returl', kc.toString());
+
+        // Go!
+        window.location.href = sm.toString();
       }
-      // logout of siteminder / keycloak as well
-      window.location.href = `${import.meta.env.VITE_SITEMINDER_LOGOUT_URL}?retnow=1&returl=${import.meta.env.VITE_KEYCLOAK_LOGOUT_URL}?redirect_uri=${import.meta.env.VITE_POST_LOGOUT_REDIRECT_URL}`;
     }),
     setTokenExpired(isExpired: boolean) {
       self.tokenExpired = isExpired;
