@@ -322,7 +322,7 @@ export const RequirementForm = observer(
       const isDraftApplication = permitApplication?.status === 'draft' || permitApplication?.status === 'new_draft';
       const isRevisionsRequested = permitApplication?.status === 'revisions_requested';
       const revisionRequests = permitApplication?.latestRevisionRequests || [];
-      const revisionRequestKeys = new Set(revisionRequests.map((rr) => rr.requirementJson?.key));
+      const revisionRequestKeys = new Set(revisionRequests.map((rr) => rr.requirementJson?.key).filter(Boolean));
 
       // Set individual field disabled states based on isEditing (pathway-aware)
       clonedFormJson.components?.forEach((section: any) => {
