@@ -55,7 +55,35 @@ class PermitApplicationPolicy < ApplicationPolicy
   end
 
   def upload_supporting_document?
-    record.draft? && record.submitter == user
+    case record.status
+    when "new_draft"
+      # Only submitter can upload during creation
+      record.submitter == user
+    when "newly_submitted", "resubmitted"
+      # Admin editing phase: submitter OR admin (same program) can upload
+      is_admin_in_program =
+        (user.admin_manager? || user.admin?) &&
+          user.program_memberships.active.exists?(program_id: record.program_id)
+      record.submitter == user || is_admin_in_program
+    when "revisions_requested"
+      # Upload permissions based on chosen pathway
+      performed_by =
+        record.latest_submission_version&.revision_requests&.first&.performed_by
+
+      if performed_by == "staff"
+        # Admin "on behalf": editing complete, no uploads
+        false
+      elsif performed_by == "applicant"
+        # "Send to submitter": only participant can upload
+        record.submitter == user
+      else
+        # Fallback: only submitter
+        record.submitter == user
+      end
+    else
+      # No uploads for other states
+      false
+    end
   end
 
   def destroy?

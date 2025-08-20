@@ -317,28 +317,38 @@ export const RequirementForm = observer(
 
       const clonedFormJson = JSON.parse(JSON.stringify(formattedFormJson));
 
+      // Calculate shared variables once outside loops for performance
+      const isRealParticipant = currentUser?.role === 'participant';
+      const isDraftApplication = permitApplication?.status === 'draft' || permitApplication?.status === 'new_draft';
+      const isRevisionsRequested = permitApplication?.status === 'revisions_requested';
+      const revisionRequests = permitApplication?.latestRevisionRequests || [];
+      const revisionRequestKeys = new Set(revisionRequests.map((rr) => rr.requirementJson?.key).filter(Boolean));
+
       // Set individual field disabled states based on isEditing (pathway-aware)
       clonedFormJson.components?.forEach((section: any) => {
         section.components?.forEach((block: any) => {
           block.components?.forEach((requirement: any) => {
+            // Check if field has revision request (per-field calculation)
+            const hasRevisionRequestInLatest = revisionRequestKeys.has(requirement.key);
+
             // Handle submit-related components first
             if (
               requirement.key === 'submit' ||
               requirement.key?.includes('acknowledge') ||
               requirement.key?.includes('signature')
             ) {
-              // Simple logic using React state instead of complex MobX/backend checks
-              const isRealParticipant = currentUser?.role === 'participant';
-              const isDraftApp = permitApplication?.status === 'draft' || permitApplication?.status === 'new_draft';
               const isStaffPathway = performedBy === 'staff';
 
               // Enable submit for:
-              // 1. Real participant users
-              // 2. Draft applications (new creation)
-              // 3. Staff pathway AFTER Save Edits button clicked (simple React state)
-              const staffCanSubmit = isDraftApp || (isStaffPathway && saveEditsCompleted);
+              // 1. Draft applications (creation phase)
+              // 2. Participants during revisions (ANY field has revision requests)
+              // 3. Staff pathway AFTER Save Edits clicked
+              const hasAnyRevisionRequests = revisionRequests.length > 0;
+              const participantCanSubmit =
+                isRealParticipant && (isDraftApplication || (isRevisionsRequested && hasAnyRevisionRequests));
+              const staffCanSubmit = isDraftApplication || (isStaffPathway && saveEditsCompleted);
 
-              requirement.disabled = !(staffCanSubmit || isRealParticipant);
+              requirement.disabled = !(participantCanSubmit || staffCanSubmit);
               return;
             }
 
@@ -356,22 +366,18 @@ export const RequirementForm = observer(
             // Set field disabled state - fields only editable after pencil workflow
             // Everyone (including admin staff pathway) must click pencil → "Update Field" first
 
-            // Check if field has been unlocked via pencil workflow (has revision request)
-            const revisionRequests = permitApplication?.latestRevisionRequests || [];
-            const hasRevisionRequestInLatest = revisionRequests.some(
-              (rr) => rr.requirementJson?.key === requirement.key,
-            );
+            // Field editability processing (hasRevisionRequestInLatest calculated above)
 
-            // Field is editable if:
-            // 1. Real participant user (always can edit), OR
-            // 2. Draft application (new app creation), OR
-            // 3. Has revision request (pencil workflow completed) AND isEditing (correct pathway)
-            const isRealParticipant = currentUser?.role === 'participant';
-            const isDraftApplication =
-              permitApplication?.status === 'draft' || permitApplication?.status === 'new_draft';
-            const adminCanEdit = hasRevisionRequestInLatest && isEditing;
+            // Field editability logic:
+            // 1. Draft applications: All users can edit all fields (creation phase)
+            // 2. Participants: Only flagged fields during revisions
+            // 3. Admins: Only on "staff" pathway (not "send to submitter")
+            const participantCanEdit =
+              isRealParticipant && (isDraftApplication || (isRevisionsRequested && hasRevisionRequestInLatest));
+            const adminCanEdit =
+              isDraftApplication || (hasRevisionRequestInLatest && isEditing && performedBy === 'staff');
 
-            requirement.disabled = !(isRealParticipant || isDraftApplication || adminCanEdit);
+            requirement.disabled = !(participantCanEdit || adminCanEdit);
           });
         });
       });

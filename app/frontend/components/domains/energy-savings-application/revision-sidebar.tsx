@@ -17,6 +17,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { CaretRight, ChatDots, PaperPlaneTilt } from '@phosphor-icons/react';
+import { format } from 'date-fns';
 import { observer } from 'mobx-react-lite';
 import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -405,7 +406,7 @@ interface IRevisionRequestListItemProps {
 const RevisionRequestListItem = ({ revisionRequest }: IRevisionRequestListItemProps) => {
   const { t } = useTranslation();
 
-  const { requirementJson, reasonCode, comment, user } = revisionRequest;
+  const { requirementJson, reasonCode, comment, user, createdAt, submissionJson } = revisionRequest;
 
   const clickHandleView = () => {
     document.dispatchEvent(new CustomEvent('openRequestRevision', { detail: { key: requirementJson.key } }));
@@ -415,7 +416,7 @@ const RevisionRequestListItem = ({ revisionRequest }: IRevisionRequestListItemPr
     <ListItem mb={4} w="full">
       <ScrollLink to={`formio-component-${requirementJson.key}`}>{requirementJson.label}</ScrollLink>
       <Flex fontStyle="italic">
-        {t('energySavingsApplication.show.revision.reasonCode')}: {reasonCode}
+        {t('energySavingsApplication.show.revision.reason')}: {reasonCode}
       </Flex>
       <Flex gap={2} fontStyle="italic" alignItems="center" flexWrap="nowrap" w="full">
         <Box width={6} height={6}>
@@ -427,9 +428,33 @@ const RevisionRequestListItem = ({ revisionRequest }: IRevisionRequestListItemPr
           {t('ui.view')}
         </Button>
       </Flex>
+      {/* Original answer display */}
+      <Box mt={1} fontStyle="italic">
+        <Text>
+          {t('energySavingsApplication.show.revision.originalAnswer')}:&nbsp;
+          {(() => {
+            const fieldKey = requirementJson?.key;
+            const reqSubmission = submissionJson as any;
+            if (typeof reqSubmission === 'string') return reqSubmission;
+            if (reqSubmission?.data && fieldKey) {
+              const fieldValue = reqSubmission.data[fieldKey];
+              if (fieldValue !== undefined && fieldValue !== null && fieldValue !== '') {
+                return String(fieldValue);
+              }
+            }
+            return t('energySavingsApplication.show.revision.noOriginalAnswer');
+          })()}
+        </Text>
+      </Box>
       {user && (
         <Text fontStyle={'italic'}>
-          {t('ui.modifiedBy')}: {user.firstName} {user.lastName}
+          {t('ui.editedBy')}: {user.firstName} {user.lastName}
+        </Text>
+      )}
+      {createdAt && (
+        <Text fontStyle={'italic'}>
+          {/* Using YYYY-MM-DD */}
+          {t('ui.dateEdited')}: {format(new Date(createdAt), 'yyyy-MM-dd')}
         </Text>
       )}
     </ListItem>
