@@ -235,6 +235,7 @@ export const RevisionSideBar = observer(
                   isSubmit={false}
                   promptHeader={t('energySavingsApplication.show.revision.cancelRequest')}
                   promptMessage={t('energySavingsApplication.show.revision.noNotification')}
+                  cancelText={t('ui.cancelRequest')}
                   onConfirm={() => {
                     onRevisionsRemoval();
                   }}

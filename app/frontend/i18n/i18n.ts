@@ -459,6 +459,7 @@ const options = {
           resume: 'Resume',
           continue: 'Continue application',
           cancel: 'Cancel',
+          cancelRequest: 'Cancel request',
           remove: 'Remove',
           createAccount: 'Create account',
           save: 'Save changes',
