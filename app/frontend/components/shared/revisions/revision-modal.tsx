@@ -165,7 +165,14 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
         <ModalBody>
           <Flex direction="column" gap={4}>
             <FormControl>
-              <FormLabel>{t('energySavingsApplication.show.revision.reasonFor')}</FormLabel>
+              <FormLabel>
+                {updatePerformedBy === 'staff'
+                  ? t('energySavingsApplication.show.revision.reasonForUpdate')
+                  : t('energySavingsApplication.show.revision.reasonFor')}
+                <Text as="span" color="red.500" ml={1}>
+                  *
+                </Text>
+              </FormLabel>
               {isRevisionsRequested ? (
                 <Textarea disabled={true}>{selectedLabel}</Textarea>
               ) : (
