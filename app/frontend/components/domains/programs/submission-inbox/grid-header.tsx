@@ -97,7 +97,9 @@ export const GridHeaders = observer(function GridHeaders() {
                   px={4}
                 >
                   <Text textAlign="left">{getSortColumnHeader(castField)}</Text>
-                  <SortIcon<EPermitApplicationSortFields> field={castField} currentSort={sort} />
+                  {EPermitApplicationReviewerSortFields[key] !== EPermitApplicationReviewerSortFields.actions && (
+                    <SortIcon<EPermitApplicationSortFields> field={castField} currentSort={sort} />
+                  )}
                 </Flex>
               </GridHeader>
             );

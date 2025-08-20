@@ -71,6 +71,7 @@ export const NewProgramScreen = observer(() => {
       if (programId) {
         await updateProgram(programId, formData);
         createdProgram = { programId };
+        navigate(-1);
       } else {
         createdProgram = await createProgram(formData);
         if (createdProgram) {

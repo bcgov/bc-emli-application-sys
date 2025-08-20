@@ -59,7 +59,7 @@ const options = {
             learnMore: 'Learn more about BC Services Card',
             learnMoreLink: 'https://id.gov.bc.ca/account/',
             loginHelp: 'and how to set up an account.',
-            noSmartPhone: 'Don’t have a smart phone or can’t use the mobile app?',
+            noSmartPhone: 'Don’t have a smartphone or don’t want to use the mobile app?',
             noBCServicesCard: 'Don’t have a BC Services Card?',
             phoneService: 'You can use a token. They are free and you can pick one up at any Service BC office.',
             bceidLogin: 'Log in with Basic BCeID',
@@ -623,7 +623,7 @@ const options = {
             nextStep: 'Next step is to invite users',
           },
           edit: {
-            editProgram: 'Edit Program',
+            editProgram: 'Edit program',
           },
           fields: {
             programName: 'Name',
@@ -2115,7 +2115,7 @@ const options = {
           },
           menuItems: {
             changeUserRole: 'Change role',
-            inboxAccess: 'Application access',
+            inboxAccess: 'Submission inbox access',
             removeUser: 'Remove user',
             reinviteUser: 'Re-invite',
             revokeUserInvite: 'Revoke invite',

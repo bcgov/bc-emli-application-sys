@@ -54,7 +54,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
   };
 
   const formMethods = useForm<TCreateRequirementTemplateFormData>({
-    mode: 'onChange',
+    mode: 'all',
     defaultValues: {
       description: '',
       firstNations: false,
@@ -71,15 +71,9 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
   const navigate = useNavigate();
   const { handleSubmit, formState, control } = formMethods;
 
-  // const firstNationsChecked = useWatch({
-  //   control,
-  //   name: 'firstNations',
-  //   defaultValue: false,
-  // });
+  const { isSubmitting, isValid } = formState;
 
-  const { isSubmitting } = formState;
-
-  const onSubmit = async (formData) => {
+  const onSubmit = async (formData: TCreateRequirementTemplateFormData) => {
     formData.type = type;
 
     const createdRequirementTemplate = copyExisting
@@ -133,7 +127,14 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
               direction="column"
             >
               <Text>{t('requirementTemplate.new.applicationName')}</Text>
-              <TextFormControl mt={2} fieldName={'nickname'} required />
+              <Controller
+                name="nickname"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <TextFormControl mt={2} fieldName="nickname" required value={field.value} onChange={field.onChange} />
+                )}
+              />
             </Flex>
           </VStack>
 
@@ -172,7 +173,20 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
             width="100%"
             direction="column"
           >
-            <TextFormControl label={t('requirementTemplate.fields.description')} fieldName={'description'} required />
+            <Controller
+              name="description"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextFormControl
+                  label={t('requirementTemplate.fields.description')}
+                  fieldName="description"
+                  required
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
             <Text fontSize="sm" color="border.base" mt={4}>
               {t('requirementTemplate.new.descriptionHelpText')}
             </Text>
@@ -183,7 +197,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
             <Button
               variant="primary"
               type="submit"
-              isDisabled={!formState.isValid || isSubmitting}
+              isDisabled={!isValid || isSubmitting}
               isLoading={isSubmitting}
               loadingText={t('ui.loading')}
             >

@@ -1,6 +1,7 @@
 export const Text = {
   baseStyle: {
     mb: 0,
+    lineHeight: '1.7',
   },
 
   variants: {

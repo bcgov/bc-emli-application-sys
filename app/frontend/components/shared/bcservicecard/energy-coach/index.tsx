@@ -33,7 +33,7 @@ export function EnergyCoachInfoBlock() {
           <ListItem>{p}</ListItem>
         ))}
       </UnorderedList>
-      <Flex direction="row" align="center" gap={2}>
+      <Flex direction="row" align="center" gap={2} mt={2} mb={2}>
         <Phone size={16} />
         <Text flex={1}>{t('auth.bcServiceCardInfo.energyCoach.phoneNumber')}</Text>
       </Flex>

@@ -36,7 +36,6 @@ export const RoleTag = ({ role }: IRoleTagProps) => {
       border="1px solid"
       borderColor={borderColor}
       backgroundColor={color}
-      textTransform="capitalize"
       textAlign="center"
     >
       {t(`user.roles.${role}`)}
