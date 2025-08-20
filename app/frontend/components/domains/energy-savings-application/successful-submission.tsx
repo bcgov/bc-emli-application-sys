@@ -1,5 +1,5 @@
 import { Container, Divider, Flex, Heading, Icon, Image, Tag, Text, VStack } from '@chakra-ui/react';
-import { CheckCircle, WarningCircle } from '@phosphor-icons/react';
+import { CheckCircle } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
@@ -29,7 +29,7 @@ export const SuccessfulSubmissionScreen = observer(() => {
   return (
     <Container maxW="container.lg">
       <Flex direction="column" align="center" my={24} gap={8}>
-        <Icon as={WarningCircle} boxSize="14" color="orange.400" />
+        <Icon as={CheckCircle} boxSize="14" color="theme.darkGreen" />
 
         <VStack>
           <Heading as="h1" color="theme.blueAlt">

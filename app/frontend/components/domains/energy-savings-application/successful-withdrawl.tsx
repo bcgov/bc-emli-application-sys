@@ -1,5 +1,5 @@
 import { Container, Flex, Heading, Icon, Text, VStack } from '@chakra-ui/react';
-import { CheckCircle } from '@phosphor-icons/react';
+import { CheckCircle, WarningCircle } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +14,7 @@ export const SuccessfulWithdrawalScreen = observer(() => {
   return (
     <Container maxW="container.lg">
       <Flex direction="column" align="center" my={24} gap={8}>
-        <Icon as={CheckCircle} boxSize={12} color="theme.darkGreen" />
+        <Icon as={WarningCircle} boxSize={12} color="orange.400" />
 
         <VStack spacing={4}>
           <Heading as="h2" fontSize="32px" fontWeight="700" color="theme.blueAlt" textAlign="center">
