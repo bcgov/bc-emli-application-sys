@@ -17,7 +17,7 @@ app:
       memory: 512Mi
 
   env:
-    'APP_DOMAIN': 'hesp.apps.silver.devops.gov.bc.ca'
+    'APP_DOMAIN': 'bcenergysavingsprogram.ca'
     'ANYCABLE_URL': 'wss://hesp-anycable.apps.silver.devops.gov.bc.ca/cable'
     'KEYCLOAK_AUTH_URL': 'https://loginproxy.gov.bc.ca/'
     'VITE_SITEMINDER_LOGOUT_URL': 'https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi'
@@ -110,7 +110,7 @@ crunchy-postgres:
   instances:
     replicas: 1
     dataVolumeClaimSpec:
-      storage: 1Gi
+      storage: 2Gi
     requests:
       cpu: 10m
       memory: 256Mi
