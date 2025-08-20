@@ -322,15 +322,14 @@ export const RequirementForm = observer(
       const isDraftApplication = permitApplication?.status === 'draft' || permitApplication?.status === 'new_draft';
       const isRevisionsRequested = permitApplication?.status === 'revisions_requested';
       const revisionRequests = permitApplication?.latestRevisionRequests || [];
+      const revisionRequestKeys = new Set(revisionRequests.map((rr) => rr.requirementJson?.key));
 
       // Set individual field disabled states based on isEditing (pathway-aware)
       clonedFormJson.components?.forEach((section: any) => {
         section.components?.forEach((block: any) => {
           block.components?.forEach((requirement: any) => {
             // Check if field has revision request (per-field calculation)
-            const hasRevisionRequestInLatest = revisionRequests.some(
-              (rr) => rr.requirementJson?.key === requirement.key,
-            );
+            const hasRevisionRequestInLatest = revisionRequestKeys.has(requirement.key);
 
             // Handle submit-related components first
             if (

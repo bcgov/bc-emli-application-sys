@@ -67,9 +67,8 @@ class PermitApplicationPolicy < ApplicationPolicy
       record.submitter == user || is_admin_in_program
     when "revisions_requested"
       # Upload permissions based on chosen pathway
-      latest_revision_requests =
-        record.latest_submission_version&.revision_requests
-      performed_by = latest_revision_requests&.first&.performed_by
+      performed_by =
+        record.latest_submission_version&.revision_requests&.first&.performed_by
 
       if performed_by == "staff"
         # Admin "on behalf": editing complete, no uploads
