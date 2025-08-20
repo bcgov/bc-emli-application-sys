@@ -955,7 +955,7 @@ const options = {
             confirm: 'Withdraw application',
             success: {
               title: 'Your application has been withdrawn.',
-              subtitleEmail: 'You will receive a notification email.',
+              subtitleEmail: 'You will receive a confirmation email.',
             },
           },
           edit: {
@@ -1045,6 +1045,7 @@ const options = {
           },
           updateToNewVersion: 'Update my application',
           returnHome: 'Return to supported applications',
+          returnToMain: 'Return to home',
           reviewOutdatedSubmissionLink: 'View draft applications',
           reviewUpdatedEditLink: 'View template',
           reviewOutdatedTitle: 'Filters applied to show applications that are outdated',
@@ -1219,7 +1220,7 @@ const options = {
               'I confirm that the information provided is accurate to the best of my knowledge. The applicant has given consent for me to submit this application on their behalf.',
             confirmation:
               'By submitting this application you confirm that the information you provided was completed to the best of your knowledge and ability',
-            yourReference: 'Share the application ID: #{{ number }}',
+            yourReference: 'Application ID is: #{{ number }}',
             noContactsAvailable:
               'This jurisdiction is not ready to accept applications through this tool yet. Please check with your local jurisdiction.',
             whatsNext:
@@ -2104,7 +2105,7 @@ const options = {
             createdAt: 'Date added',
             lastSignInAt: 'Last signed in',
             action: 'Action',
-            submissionInbox: 'Submission Inbox',
+            submissionInbox: 'Submission inbox',
             addedBy: 'Added by',
             status: 'Status',
           },

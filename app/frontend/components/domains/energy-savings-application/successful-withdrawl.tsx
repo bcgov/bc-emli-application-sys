@@ -33,7 +33,7 @@ export const SuccessfulWithdrawalScreen = observer(() => {
           _hover={{ bg: 'theme.blueButtonHover' }}
         >
           {currentUser.isParticipant
-            ? t('energySavingsApplication.new.viewAllSubmissions')
+            ? t('energySavingsApplication.returnToMain')
             : t('energySavingsApplication.returnHome')}
         </RouterLinkButton>
       </Flex>
