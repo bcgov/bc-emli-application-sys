@@ -494,6 +494,8 @@ const options = {
           toTop: 'Go to top',
           confirm: 'Confirm',
           modifiedBy: 'Modified by',
+          editedBy: 'Edited by',
+          dateEdited: 'Date edited',
           searchAddresses: 'Search addresses',
           typeToSearch: 'Begin typing to search',
           close: 'Close',
