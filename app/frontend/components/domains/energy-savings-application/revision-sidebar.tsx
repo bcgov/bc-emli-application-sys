@@ -295,7 +295,9 @@ export const RevisionSideBar = observer(
           >
             <TabList borderBottom="1px solid" borderColor="border.dark" mt={4}>
               <Tab ml={4} _selected={selectedTabStyles}>
-                {t('energySavingsApplication.show.revision.newRevision')}
+                {updatePerformedBy === 'staff'
+                  ? t('energySavingsApplication.show.revision.newUpdate')
+                  : t('energySavingsApplication.show.revision.newRevision')}
               </Tab>
               <Tab ml={4} _selected={selectedTabStyles}>
                 {t('energySavingsApplication.show.revision.pastRequests')}
@@ -308,7 +310,9 @@ export const RevisionSideBar = observer(
                     <Text fontStyle="italic">
                       {forSubmitter
                         ? t('energySavingsApplication.show.locateRevisions')
-                        : t('energySavingsApplication.show.clickQuestion')}
+                        : updatePerformedBy === 'staff'
+                          ? t('energySavingsApplication.show.clickQuestionUpdate')
+                          : t('energySavingsApplication.show.clickQuestion')}
                     </Text>
                   </Center>
                   <OrderedList pb={50} mt={4} ml={0}>
