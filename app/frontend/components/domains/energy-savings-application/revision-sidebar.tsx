@@ -24,6 +24,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMountStatus } from '../../../hooks/use-mount-status';
+import { useMst } from '../../../setup/root';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { IRevisionRequestsAttributes } from '../../../types/api-request';
 import { IFormIORequirement, IRevisionRequest, ISubmissionVersion } from '../../../types/types';
@@ -405,8 +406,15 @@ interface IRevisionRequestListItemProps {
 
 const RevisionRequestListItem = ({ revisionRequest }: IRevisionRequestListItemProps) => {
   const { t } = useTranslation();
+  const { siteConfigurationStore } = useMst();
 
   const { requirementJson, reasonCode, comment, user, createdAt, submissionJson } = revisionRequest;
+
+  // Get the reason description from the site configuration
+  const reasonDescription = useMemo(() => {
+    const reasonOption = siteConfigurationStore.revisionReasonOptions.find((option) => option.value === reasonCode);
+    return reasonOption?.label || reasonCode; // Fallback to code if description not found
+  }, [reasonCode, siteConfigurationStore.revisionReasonOptions]);
 
   const clickHandleView = () => {
     document.dispatchEvent(new CustomEvent('openRequestRevision', { detail: { key: requirementJson.key } }));
@@ -416,7 +424,7 @@ const RevisionRequestListItem = ({ revisionRequest }: IRevisionRequestListItemPr
     <ListItem mb={4} w="full">
       <ScrollLink to={`formio-component-${requirementJson.key}`}>{requirementJson.label}</ScrollLink>
       <Flex fontStyle="italic">
-        {t('energySavingsApplication.show.revision.reason')}: {reasonCode}
+        {t('energySavingsApplication.show.revision.reason')}: {reasonDescription}
       </Flex>
       <Flex gap={2} fontStyle="italic" alignItems="center" flexWrap="nowrap" w="full">
         <Box width={6} height={6}>
