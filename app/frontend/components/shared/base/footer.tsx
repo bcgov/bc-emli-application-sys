@@ -83,37 +83,51 @@ export const Footer = observer(() => {
               <Text>{t('site.territorialAcknowledgement')}</Text>
             </Container>
           </Flex>
-          <Show above="md">
-            <Box py={14} bg="greys.grey03" w="full">
-              <Container maxW="container.xl">
-                <Flex direction={{ base: 'column', md: 'row' }} gap={12}>
-                  <Flex direction={'row'} align="center" justify="center" wrap="wrap" gap={8}>
-                    <RouterLink to={t('site.footerLinks.betterHomes')} color="text.secondary">
-                      {t('site.betterHomes')}
-                    </RouterLink>
+          <Box py={14} bg="greys.grey03" w="full">
+            <Container maxW="container.xl">
+              <Flex direction={{ base: 'column', md: 'row' }} gap={12}>
+                <Flex
+                  direction={{ base: 'column', md: 'row' }}
+                  align="center"
+                  justify="center"
+                  wrap="wrap"
+                  gap={{ base: 4, md: 8 }}
+                >
+                  <RouterLink to={t('site.footerLinks.betterHomes')} color="text.secondary">
+                    {t('site.betterHomes')}
+                  </RouterLink>
+                  <Show above="md">
                     <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                    <RouterLink to={t('site.footerLinks.disclaimer')} color="text.secondary">
-                      {t('site.disclaimer')}
-                    </RouterLink>
+                  </Show>
+                  <RouterLink to={t('site.footerLinks.disclaimer')} color="text.secondary">
+                    {t('site.disclaimer')}
+                  </RouterLink>
+                  <Show above="md">
                     <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                    <RouterLink to={t('site.footerLinks.accessibility')} color="text.secondary">
-                      {t('site.accessibility')}
-                    </RouterLink>
+                  </Show>
+                  <RouterLink to={t('site.footerLinks.accessibility')} color="text.secondary">
+                    {t('site.accessibility')}
+                  </RouterLink>
+                  <Show above="md">
                     <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                    <RouterLink to={t('site.footerLinks.copyright')} color="text.secondary">
-                      {t('site.copyright')}
-                    </RouterLink>
+                  </Show>
+                  <RouterLink to={t('site.footerLinks.copyright')} color="text.secondary">
+                    {t('site.copyright')}
+                  </RouterLink>
+                  <Show above="md">
                     <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                    <RouterLink to={t('site.footerLinks.dataAndPrivacy')} color="text.secondary">
-                      {t('site.dataAndPrivacy')}
-                    </RouterLink>
+                  </Show>
+                  <RouterLink to={t('site.footerLinks.dataAndPrivacy')} color="text.secondary">
+                    {t('site.dataAndPrivacy')}
+                  </RouterLink>
+                  <Show above="md">
                     <Divider orientation="vertical" h="25px" mx={4} borderColor="text.secondary" />
-                    <div>{`${version} (${formatUTCDate(deploymentTimestamp)})`}</div>
-                  </Flex>
+                  </Show>
+                  <Text color="text.secondary">{`${version} (${formatUTCDate(deploymentTimestamp)})`}</Text>
                 </Flex>
-              </Container>
-            </Box>
-          </Show>
+              </Flex>
+            </Container>
+          </Box>
         </Flex>
       )}
     </>

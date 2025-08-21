@@ -17,6 +17,10 @@ export const Link = {
     _visited: {
       color: 'text.link',
     },
+
+    _focus: {
+      outline: 'none',
+    },
   },
   variants: {
     primaryInverse: {

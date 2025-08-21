@@ -9,13 +9,13 @@ export const SiteConfigurationManagementScreen = observer(function SiteConfigura
   const i18nPrefix = 'siteConfiguration';
 
   return (
-    <Container maxW="container.lg" py={8} px={{ base: 8, xl: 0 }} flexGrow={1}>
-      <VStack spacing={8} align="start">
+    <Container maxW="container.lg" py={8} px={{ base: 8, xl: 0 }} flexGrow={1} minH="100vh">
+      <VStack spacing={8} align="start" h="full">
         <Heading mb={0} fontSize="3xl" color="theme.blueAlt">
           {t(`${i18nPrefix}.title`)}
         </Heading>
 
-        <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+        <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={6} flex="1" w="full">
           <GridItem>
             <HomeScreenBox
               title={t(`${i18nPrefix}.sitewideMessage.title`)}

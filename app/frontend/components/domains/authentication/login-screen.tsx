@@ -1,4 +1,17 @@
-import { Box, Button, Divider, Container, Flex, HStack, Heading, Link, Text, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Divider,
+  Container,
+  Flex,
+  HStack,
+  Heading,
+  Hide,
+  Link,
+  Show,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
 import { ArrowSquareOut, Phone } from '@phosphor-icons/react';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +36,7 @@ export const LoginScreen = () => {
   return (
     <>
       <CenterContainer h="full">
-        <Flex direction={{ base: 'column', md: 'row' }} gap={10}>
+        <Flex as="main" id="main-content" tabIndex={-1} direction={{ base: 'column', md: 'row' }} gap={10}>
           <Flex
             direction="column"
             gap={6}
@@ -41,6 +54,7 @@ export const LoginScreen = () => {
               </Heading>
               <Text fontSize="md">{t('auth.bcServiceCardInfo.prompt')}</Text>
             </VStack>
+
             <form action="/api/auth/keycloak" method="post" onSubmit={handleSubmit}>
               <input type="hidden" name="kc_idp_hint" value="bcsc" />
               <input
@@ -53,7 +67,9 @@ export const LoginScreen = () => {
               </Button>
             </form>
             <Box>
-              <Text fontWeight="bold">{t('auth.noAccount')}</Text>
+              <Text fontSize="md" fontWeight="bold">
+                {t('auth.noAccount')}
+              </Text>
               <HStack>
                 <Text>
                   <Link href={t('auth.bcServiceCardInfo.learnMoreLink')} color="text.primary" isExternal>
@@ -64,7 +80,9 @@ export const LoginScreen = () => {
               </HStack>
             </Box>
             <Box>
-              <Text fontWeight="bold">{t('auth.bcServiceCardInfo.noSmartPhone')}</Text>
+              <Text fontSize="md" fontWeight="bold">
+                {t('auth.bcServiceCardInfo.noSmartPhone')}
+              </Text>
               <Text>
                 {t('auth.bcServiceCardInfo.phoneService')}{' '}
                 <Link href={t('auth.bcServiceCardInfo.learnMoreTokensLink')} color="text.primary" isExternal>
@@ -76,11 +94,20 @@ export const LoginScreen = () => {
 
             <Flex direction="row" align="center" gap={2}>
               <Phone size={16} />
-              <Text flex={1}>{t('auth.phoneNumber')}</Text>
+              <Show below="md">
+                <Link href={`tel:${t('auth.phoneNumber')}`} flex={1}>
+                  {t('auth.phoneNumber')}
+                </Link>
+              </Show>
+              <Hide below="md">
+                <Text flex={1}>{t('auth.phoneNumber')}</Text>
+              </Hide>
             </Flex>
             <Text>{t('auth.phoneNumberHours')}</Text>
             <Box>
-              <Text fontWeight="bold">{t('auth.bcServiceCardInfo.noBCServicesCard')}</Text>
+              <Text fontSize="md" fontWeight="bold">
+                {t('auth.bcServiceCardInfo.noBCServicesCard')}
+              </Text>
               <form ref={authFormRef} id="authForm" action="/api/auth/keycloak" method="post" onSubmit={handleSubmit}>
                 <input type="hidden" name="kc_idp_hint" value="bceidbasic" />
                 <input

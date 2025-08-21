@@ -1,6 +1,6 @@
 import { t } from 'i18next';
 import React from 'react';
-import { Button, Flex, Heading, Link, ListItem, Text, UnorderedList } from '@chakra-ui/react';
+import { Button, Flex, Heading, Hide, Link, ListItem, Show, Text, UnorderedList } from '@chakra-ui/react';
 import { ArrowSquareOut, CaretRight, Phone } from '@phosphor-icons/react';
 import { RouterLinkButton } from '../navigation/router-link-button';
 
@@ -35,7 +35,14 @@ export function EnergyCoachInfoBlock() {
       </UnorderedList>
       <Flex direction="row" align="center" gap={2} mt={2} mb={2}>
         <Phone size={16} />
-        <Text flex={1}>{t('auth.bcServiceCardInfo.energyCoach.phoneNumber')}</Text>
+        <Show below="md">
+          <Link href={`tel:${t('auth.bcServiceCardInfo.energyCoach.phoneNumber')}`} flex={1}>
+            {t('auth.bcServiceCardInfo.energyCoach.phoneNumber')}
+          </Link>
+        </Show>
+        <Hide below="md">
+          <Text flex={1}>{t('auth.bcServiceCardInfo.energyCoach.phoneNumber')}</Text>
+        </Hide>
       </Flex>
       <Text flex={1}>{t('auth.bcServiceCardInfo.energyCoach.phoneNumberHours')}</Text>
     </Flex>
