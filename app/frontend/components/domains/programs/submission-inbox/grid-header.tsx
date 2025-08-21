@@ -1,12 +1,11 @@
 import { Box, Checkbox, Flex, GridItem, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMst } from '../../../../setup/root';
 import {
   EPermitApplicationReviewerSortFields,
   EPermitApplicationSortFields,
-  EPermitApplicationStatus,
   EPermitApplicationStatusGroup,
 } from '../../../../types/enums';
 import { ModelSearchInput } from '../../../shared/base/model-search-input';
@@ -18,9 +17,8 @@ export const GridHeaders = observer(function GridHeaders() {
   const { permitApplicationStore, userStore } = useMst();
   const { t } = useTranslation();
   const getSortColumnHeader = permitApplicationStore?.getSortColumnHeader;
-  const { search } = permitApplicationStore;
+  const { search, setAssignedUserIdFilter, assignedUserIdFilter } = permitApplicationStore;
   const currentUserId = userStore.currentUser?.id;
-  const [assignedToMeOnly, setAssignedToMeOnly] = useState(false);
 
   const { toggleSort, sort } = permitApplicationStore;
 
@@ -59,16 +57,16 @@ export const GridHeaders = observer(function GridHeaders() {
               >
                 <Checkbox
                   colorScheme="gray"
-                  isChecked={assignedToMeOnly}
+                  isChecked={!!assignedUserIdFilter}
                   onChange={(e) => {
                     const checked = e.target.checked;
-                    setAssignedToMeOnly(checked);
 
                     if (checked && currentUserId) {
-                      search({ assignedUserId: currentUserId });
+                      setAssignedUserIdFilter(currentUserId);
                     } else {
-                      search();
+                      setAssignedUserIdFilter(null);
                     }
+                    search();
                   }}
                 >
                   {t('energySavingsApplication.submissionInbox.assignedTo')}
