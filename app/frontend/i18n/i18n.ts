@@ -19,6 +19,12 @@ const options = {
         a11y: {
           skipToMainContent: 'Skip to main content',
         },
+        fieldValue: {
+          complexObject: 'Complex data (object)',
+          unnamedFile: 'Unnamed file',
+          fileCount_one: '{{count}} file',
+          fileCount_other: '{{count}} files',
+        },
         auth: {
           login: 'Log in',
           findOut: 'Find out more to register',

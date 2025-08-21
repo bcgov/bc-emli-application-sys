@@ -27,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { useMst } from '../../../setup/root';
 import { IFormIORequirement, IRevisionRequest } from '../../../types/types';
 import { singleRequirementFormJson } from '../../../utils/formio-helpers';
+import { formatFieldValue } from '../../../utils/field-value-formatter';
 import { IRevisionRequestForm } from '../../domains/energy-savings-application/revision-sidebar';
 import { SingleRequirementForm } from '../energy-savings-applications/single-requirement-form';
 
@@ -215,7 +216,6 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
                 <Box p={3} bg="gray.50" borderRadius="md" border="1px solid" borderColor="gray.200">
                   <Text color="gray.700" fontWeight="normal">
                     {(() => {
-                      // Extract the field value from the nested data structure
                       const fieldKey = requirementJson?.key;
 
                       if (typeof requirementSubmission === 'string') {
@@ -224,9 +224,7 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
 
                       if (requirementSubmission?.data && fieldKey) {
                         const fieldValue = requirementSubmission.data[fieldKey];
-                        if (fieldValue !== undefined && fieldValue !== null && fieldValue !== '') {
-                          return String(fieldValue);
-                        }
+                        return formatFieldValue(fieldValue, t);
                       }
 
                       return t('energySavingsApplication.show.revision.noOriginalAnswer');
