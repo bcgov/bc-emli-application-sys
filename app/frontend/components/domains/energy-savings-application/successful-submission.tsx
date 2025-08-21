@@ -18,6 +18,7 @@ export const SuccessfulSubmissionScreen = observer(() => {
   const { currentPermitApplication, error } = usePermitApplication();
   const location = useLocation();
   const message = location.state?.message;
+  const performedBy = location.state?.performedBy;
 
   if (error) return <ErrorScreen error={error} />;
   if (!currentPermitApplication?.isFullyLoaded) return <LoadingScreen />;
@@ -40,12 +41,20 @@ export const SuccessfulSubmissionScreen = observer(() => {
           </Tag>
         </VStack>
         <RouterLinkButton
-          to={currentUser.isParticipant ? `/applications` : '/supported-applications'}
+          to={
+            currentUser.isParticipant
+              ? `/applications`
+              : performedBy === 'staff'
+                ? '/submission-inbox'
+                : '/supported-applications'
+          }
           variant="primary"
         >
           {currentUser.isParticipant
             ? t('energySavingsApplication.new.viewAllSubmissions')
-            : t('energySavingsApplication.returnHome')}
+            : performedBy === 'staff'
+              ? t('ui.backToInbox')
+              : t('energySavingsApplication.returnHome')}
         </RouterLinkButton>
       </Flex>
     </Container>
