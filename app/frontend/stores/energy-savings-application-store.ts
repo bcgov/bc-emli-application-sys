@@ -26,6 +26,7 @@ import {
   IEnergySavingsApplicationSearchFilters,
   IEnergySavingsApplicationSupportingDocumentsUpdate,
   IMinimalFrozenUser,
+  IPermitApplicationSupportingDocumentsUpdate,
   IUserPushPayload,
   TSearchParams,
 } from '../types/types';
@@ -55,6 +56,7 @@ export const PermitApplicationStoreModel = types
       auditUserFilter: types.maybeNull(types.string),
       templateVersionIdFilter: types.maybeNull(types.string),
       requirementTemplateIdFilter: types.maybeNull(types.string),
+      assignedUserIdFilter: types.maybeNull(types.string),
     }),
     createSearchModel<EPermitApplicationSortFields>('searchPermitApplications', 'setPermitApplicationFilters'),
   )
@@ -237,6 +239,10 @@ export const PermitApplicationStoreModel = types
       // @ts-ignor"
       self.audienceTypeIdFilter = cast(ids);
     },
+    setAssignedUserIdFilter(userId: string | null) {
+      // @ts-ignore
+      self.assignedUserIdFilter = userId;
+    },
   }))
   .actions((self) => ({
     getEphemeralPermitApplication(
@@ -328,12 +334,7 @@ export const PermitApplicationStoreModel = types
       }
       self.permitApplicationMap.delete(id);
     },
-    searchPermitApplications: flow(function* (opts?: {
-      reset?: boolean;
-      page?: number;
-      countPerPage?: number;
-      assignedUserId?: string;
-    }) {
+    searchPermitApplications: flow(function* (opts?: { reset?: boolean; page?: number; countPerPage?: number }) {
       if (opts?.reset) {
         self.resetPages();
       }
@@ -361,9 +362,9 @@ export const PermitApplicationStoreModel = types
       if (response.ok) {
         const permitApplications = response.data.data;
 
-        // Filter based on assignedUserId if provided
-        const filteredApplications = opts?.assignedUserId
-          ? permitApplications.filter((app) => app.assignedUsers?.some((user) => user.id === opts.assignedUserId))
+        // Filter based on assignedUserId if set in the store
+        const filteredApplications = self.assignedUserIdFilter
+          ? permitApplications.filter((app) => app.assignedUsers?.some((user) => user.id === self.assignedUserIdFilter))
           : permitApplications;
 
         self.mergeUpdateAll(permitApplications, 'permitApplicationMap');
