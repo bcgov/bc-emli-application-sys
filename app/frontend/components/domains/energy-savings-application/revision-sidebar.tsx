@@ -415,11 +415,8 @@ const RevisionRequestListItem = ({ revisionRequest }: IRevisionRequestListItemPr
 
   const { requirementJson, reasonCode, comment, user, createdAt, submissionJson } = revisionRequest;
 
-  // Get the reason description from the site configuration
-  const reasonDescription = useMemo(() => {
-    const reasonOption = siteConfigurationStore.revisionReasonOptions.find((option) => option.value === reasonCode);
-    return reasonOption?.label || reasonCode; // Fallback to code if description not found
-  }, [reasonCode, siteConfigurationStore.revisionReasonOptions]);
+  const reasonDescription =
+    siteConfigurationStore.revisionReasonOptions.find((option) => option.value === reasonCode)?.label || reasonCode;
 
   const clickHandleView = () => {
     document.dispatchEvent(new CustomEvent('openRequestRevision', { detail: { key: requirementJson.key } }));
