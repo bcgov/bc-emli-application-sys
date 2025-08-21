@@ -230,7 +230,7 @@ export const RevisionSideBar = observer(
           {/* Cancel button triggers remove updates modal */}
           {onCancel && (
             <>
-              {fields.length > 0 && !permitApplication.isRevisionsRequested ? (
+              {fields.length > 0 || permitApplication.isRevisionsRequested ? (
                 <ConfirmationModal
                   isSubmit={false}
                   promptHeader={t('energySavingsApplication.show.revision.cancelRequest')}
