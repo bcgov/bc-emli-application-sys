@@ -19,6 +19,7 @@ interface IConfirmationModalProps {
   promptMessage?: string;
   promptHeader?: string;
   renderTrigger?: (onOpen: () => void) => ReactNode;
+  cancelText?: string; // Custom cancel button text
 }
 
 export const ConfirmationModal = ({
@@ -27,6 +28,7 @@ export const ConfirmationModal = ({
   promptMessage,
   promptHeader,
   renderTrigger,
+  cancelText,
 }: IConfirmationModalProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { t } = useTranslation();
@@ -46,7 +48,7 @@ export const ConfirmationModal = ({
         renderTrigger(onOpen)
       ) : (
         <Button onClick={onOpen} variant="whiteButton">
-          {isSubmit ? t('ui.confirm') : t('ui.cancel')}
+          {isSubmit ? t('ui.confirm') : cancelText || t('ui.cancel')}
         </Button>
       )}
       <Modal isOpen={isOpen} onClose={onClose} size="lg">

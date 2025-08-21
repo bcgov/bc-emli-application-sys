@@ -247,6 +247,7 @@ export const RequirementForm = observer(
         navigate(`/applications/${permitApplication.id}/successful-submission`, {
           state: {
             message: t('energySavingsApplication.new.sucessfulSubmission'),
+            performedBy,
           },
         });
       }

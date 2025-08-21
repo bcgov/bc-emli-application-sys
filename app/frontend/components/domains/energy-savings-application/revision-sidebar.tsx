@@ -24,6 +24,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMountStatus } from '../../../hooks/use-mount-status';
+import { useMst } from '../../../setup/root';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { IRevisionRequestsAttributes } from '../../../types/api-request';
 import { IFormIORequirement, IRevisionRequest, ISubmissionVersion } from '../../../types/types';
@@ -234,6 +235,7 @@ export const RevisionSideBar = observer(
                   isSubmit={false}
                   promptHeader={t('energySavingsApplication.show.revision.cancelRequest')}
                   promptMessage={t('energySavingsApplication.show.revision.noNotification')}
+                  cancelText={t('ui.cancelRequest')}
                   onConfirm={() => {
                     onRevisionsRemoval();
                   }}
@@ -294,7 +296,9 @@ export const RevisionSideBar = observer(
           >
             <TabList borderBottom="1px solid" borderColor="border.dark" mt={4}>
               <Tab ml={4} _selected={selectedTabStyles}>
-                {t('energySavingsApplication.show.revision.newRevision')}
+                {updatePerformedBy === 'staff'
+                  ? t('energySavingsApplication.show.revision.newUpdate')
+                  : t('energySavingsApplication.show.revision.newRevision')}
               </Tab>
               <Tab ml={4} _selected={selectedTabStyles}>
                 {t('energySavingsApplication.show.revision.pastRequests')}
@@ -307,7 +311,9 @@ export const RevisionSideBar = observer(
                     <Text fontStyle="italic">
                       {forSubmitter
                         ? t('energySavingsApplication.show.locateRevisions')
-                        : t('energySavingsApplication.show.clickQuestion')}
+                        : updatePerformedBy === 'staff'
+                          ? t('energySavingsApplication.show.clickQuestionUpdate')
+                          : t('energySavingsApplication.show.clickQuestion')}
                     </Text>
                   </Center>
                   <OrderedList pb={50} mt={4} ml={0}>
@@ -405,8 +411,12 @@ interface IRevisionRequestListItemProps {
 
 const RevisionRequestListItem = ({ revisionRequest }: IRevisionRequestListItemProps) => {
   const { t } = useTranslation();
+  const { siteConfigurationStore } = useMst();
 
   const { requirementJson, reasonCode, comment, user, createdAt, submissionJson } = revisionRequest;
+
+  const reasonDescription =
+    siteConfigurationStore.revisionReasonOptions.find((option) => option.value === reasonCode)?.label || reasonCode;
 
   const clickHandleView = () => {
     document.dispatchEvent(new CustomEvent('openRequestRevision', { detail: { key: requirementJson.key } }));
@@ -416,7 +426,7 @@ const RevisionRequestListItem = ({ revisionRequest }: IRevisionRequestListItemPr
     <ListItem mb={4} w="full">
       <ScrollLink to={`formio-component-${requirementJson.key}`}>{requirementJson.label}</ScrollLink>
       <Flex fontStyle="italic">
-        {t('energySavingsApplication.show.revision.reason')}: {reasonCode}
+        {t('energySavingsApplication.show.revision.reason')}: {reasonDescription}
       </Flex>
       <Flex gap={2} fontStyle="italic" alignItems="center" flexWrap="nowrap" w="full">
         <Box width={6} height={6}>
