@@ -22,7 +22,7 @@ import {
 import { Bell, BellRinging, CaretDown, CaretRight, X } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import * as R from 'ramda';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNotificationPopover } from '../../../../hooks/use-notification-popover';
 import { useMst } from '../../../../setup/root';
@@ -34,6 +34,7 @@ interface INotificationsPopoverProps extends IconButtonProps {}
 export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observer(function NotificationsPopover({
   ...rest
 }) {
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const { notificationStore } = useMst();
   const {
     notifications,
@@ -81,11 +82,20 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
     setNewNotificationCount(0);
   };
 
+  const handleCloseWithFocus = () => {
+    handleClose();
+    // Ensure focus returns to the trigger button
+    setTimeout(() => {
+      triggerRef.current?.focus();
+    }, 0);
+  };
+
   return (
-    <Popover isOpen={isOpen} onOpen={handleOpen} onClose={handleClose}>
+    <Popover isOpen={isOpen} onOpen={handleOpen} onClose={handleCloseWithFocus} returnFocusOnClose={true}>
       <PopoverTrigger>
         <Box position="relative">
           <IconButton
+            ref={triggerRef}
             variant="ghost"
             icon={anyUnread ? <BellRinging size={24} /> : <Bell size={24} />}
             aria-label="open notifications"

@@ -10,8 +10,8 @@ export const SupportScreen = () => {
   return (
     <Container maxW="1170px" px={8} pt={16} pb={20}>
       {/* Heading Section */}
-      <VStack align="flex-start" spacing={4} mb={8}>
-        <Heading as="h1" color="theme.blueAlt" fontSize="36px" fontWeight="700" lineHeight="49px">
+      <VStack align="flex-start" mb={8}>
+        <Heading as="h1" color="theme.blueAlt" fontSize="36px" fontWeight="700">
           {t('site.support.getSupport')}
         </Heading>
         <Text sx={baseTextSx}>{t('site.support.contactInfo')}</Text>
@@ -20,11 +20,19 @@ export const SupportScreen = () => {
       {/* Two Column Layout */}
       <Flex direction={{ base: 'column', lg: 'row' }} gap={10} align="flex-start">
         {/* Left Column */}
-        <VStack as="main" align="flex-start" spacing={4} flex="1" maxW={{ base: '100%', lg: '715px' }}>
+        <VStack
+          as="main"
+          id="main-content"
+          tabIndex={-1}
+          align="flex-start"
+          spacing={4}
+          flex="1"
+          maxW={{ base: '100%', lg: '715px' }}
+        >
           {/* Section 1: Get help with application */}
-          <Heading as="h2" sx={baseTextSx} fontWeight="700">
+          <Text fontSize="md" fontWeight="bold">
             {t('site.support.applicationHelpTitleShort')}
-          </Heading>
+          </Text>
 
           <Text sx={baseTextSx}>{t('site.support.applicationHelpDescriptionShort')}</Text>
 
@@ -56,17 +64,16 @@ export const SupportScreen = () => {
           role="complementary"
           aria-labelledby="learn-more-heading"
         >
-          <Heading
-            as="h2"
+          <Text
             id="learn-more-heading"
             color="theme.blueAlt"
             fontSize="20px"
-            fontWeight="700"
+            fontWeight="bold"
             lineHeight="34px"
             mb={4}
           >
             {t('site.support.learnMoreTitleShort')}
-          </Heading>
+          </Text>
           <VStack align="flex-start" spacing={4}>
             <Text sx={baseTextSx}>
               {t('site.support.learnMoreDescriptionShort')}{' '}
@@ -77,7 +84,6 @@ export const SupportScreen = () => {
                 textDecoration="underline"
                 fontSize="16px"
                 lineHeight="22px"
-                aria-label={t('site.support.betterHomesLinkAriaLabel')}
               >
                 {t('site.support.betterHomesLinkTextShort')}
               </Link>

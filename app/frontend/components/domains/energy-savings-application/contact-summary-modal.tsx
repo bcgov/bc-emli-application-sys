@@ -3,6 +3,7 @@ import {
   Flex,
   GridItem,
   Heading,
+  Hide,
   Link,
   Modal,
   ModalBody,
@@ -10,26 +11,27 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Show,
   Text,
   useDisclosure,
-} from "@chakra-ui/react"
-import { t } from "i18next"
-import React from "react"
-import { useTranslation } from "react-i18next"
-import { IPermitApplication } from "../../../models/energy-savings-application"
-import { EContactSortFields } from "../../../types/enums"
-import { GridHeader } from "../../shared/grid/grid-header"
-import { SearchGrid } from "../../shared/grid/search-grid"
-import { SearchGridItem } from "../../shared/grid/search-grid-item"
+} from '@chakra-ui/react';
+import { t } from 'i18next';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { IPermitApplication } from '../../../models/energy-savings-application';
+import { EContactSortFields } from '../../../types/enums';
+import { GridHeader } from '../../shared/grid/grid-header';
+import { SearchGrid } from '../../shared/grid/search-grid';
+import { SearchGridItem } from '../../shared/grid/search-grid-item';
 
 export interface IContactSummaryModalProps extends ReturnType<typeof useDisclosure> {
-  permitApplication: IPermitApplication
+  permitApplication: IPermitApplication;
 }
 
 export const ContactSummaryModal = ({ isOpen, onOpen, onClose, permitApplication }) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
-  const { contacts } = permitApplication
+  const { contacts } = permitApplication;
 
   return (
     <Modal onClose={onClose} isOpen={isOpen} size="5xl">
@@ -93,26 +95,26 @@ export const ContactSummaryModal = ({ isOpen, onOpen, onClose, permitApplication
       </ModalContent>
     </Modal>
   );
-}
+};
 
 function EnergyAdvisor({ checklist }) {
-  const { completedBy, completedByEmail, completedByPhone, completedByAddress } = checklist
-  if (!(completedBy || completedByEmail || completedByPhone || completedByAddress)) return <></>
+  const { completedBy, completedByEmail, completedByPhone, completedByAddress } = checklist;
+  if (!(completedBy || completedByEmail || completedByPhone || completedByAddress)) return <></>;
 
   return (
     <Contact
-      title={t("stepCodeChecklist.edit.completedBy.energyAdvisor")}
+      title={t('stepCodeChecklist.edit.completedBy.energyAdvisor')}
       name={completedBy}
       email={completedByEmail}
       phone={completedByPhone}
       address={completedByAddress}
     />
-  )
+  );
 }
 
 function Contact({ title, name, email, phone, address }) {
   return (
-    <Box className={"contact-index-grid-row"} role={"row"} display={"contents"}>
+    <Box className={'contact-index-grid-row'} role={'row'} display={'contents'}>
       <SearchGridItem fontWeight="bold">{title}</SearchGridItem>
       <SearchGridItem>{name}</SearchGridItem>
       <SearchGridItem>
@@ -121,11 +123,16 @@ function Contact({ title, name, email, phone, address }) {
         </Link>
       </SearchGridItem>
       <SearchGridItem>
-        <Link href={`tel:${phone}`} isExternal>
-          {phone}
-        </Link>
+        <Show below="md">
+          <Link href={`tel:${phone}`} isExternal>
+            {phone}
+          </Link>
+        </Show>
+        <Hide below="md">
+          <Text>{phone}</Text>
+        </Hide>
       </SearchGridItem>
       <SearchGridItem>{address}</SearchGridItem>
     </Box>
-  )
+  );
 }

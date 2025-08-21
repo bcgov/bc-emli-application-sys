@@ -61,7 +61,7 @@ const options = {
             loginHelp: 'and how to set up an account.',
             noSmartPhone: 'Don’t have a smartphone or don’t want to use the mobile app?',
             noBCServicesCard: 'Don’t have a BC Services Card?',
-            phoneService: 'You can use a token. They are free and you can pick one up at any Service BC office.',
+            phoneService: 'You can use the BC Token. They are free and you can pick one up at any Service BC office.',
             bceidLogin: 'Log in with Basic BCeID',
             serviceCardTokens: 'Learn more about BC Tokens.',
             learnMoreTokensLink: 'https://id.gov.bc.ca/account/token-setup-instruction',
@@ -314,13 +314,14 @@ const options = {
             itWorks: 'How it works',
             itWorksDesc:
               'Based on your customer’s household income, the Better Homes Energy Savings Program (ESP) offers rebates to make energy-saving home upgrades more affordable. Program participants work with registered contractors to complete eligible upgrades. Rebates that cover 60-100% of upgrade costs are paid directly to registered contractors and passed onto their customers.',
-            learnMore: 'Learn more about ESP for homeowners.',
+            learnMore: 'Learn more about the Energy Savings Program (ESP) for homeowners.',
             learnMoreLink: 'https://www.betterhomesbc.ca/rebates/energy-savings-program/',
             registeredContractor: 'Become a registered contractor',
             needId: 'You will need a Business BCeID to create an account.',
             typeOfContractors: 'Heat pump, insulation, or windows and doors contractors',
             notMember: 'Not a HPCN member?',
-            hpcnMember: 'You must be a HPCN member to be an ESP program-registered contractor.',
+            hpcnMember:
+              'You must be a HPCN member to be an Energy Savings Program (ESP) program-registered contractor.',
             visitHome: 'Visit the Home Performance Contractor Network',
             visitHomeLink: 'https://homeperformance.ca/about-the-network/',
             toJoin:
@@ -350,7 +351,7 @@ const options = {
           duringApplication: 'During the application, we will ask for:',
           informationReady: 'To make things easier, collect this information before you begin your application.',
           otherWaysTitle: 'Other ways to get started',
-          getHelpTitle: 'Get help with your ESP application',
+          getHelpTitle: 'Get help with your Energy Savings Program (ESP) application',
           energySpecialistTitle: ' Get upgrade advice from an Energy Savings Program Specialist',
           energyEfficiencyTitle: "Learn more about your home's energy efficiency",
 
@@ -2544,7 +2545,7 @@ const options = {
           title: 'Site configuration management',
           adminUserIndex: {
             title: 'Users',
-            description: 'View and manage administrative users',
+            description: 'View and manage system administrative users',
           },
           landingPageSetup: {
             title: 'Landing page setup',
@@ -2579,7 +2580,7 @@ const options = {
             },
           },
           helpDrawerSetup: {
-            title: 'Help drawer links',
+            title: 'Help drawer setup',
             description: 'This function will be launched soon.',
             settings: 'Links',
             fields: {

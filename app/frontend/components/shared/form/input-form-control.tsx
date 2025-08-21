@@ -12,32 +12,32 @@ import {
   InputRightElement,
   Text,
   Textarea,
-} from "@chakra-ui/react"
-import { Phone } from "@phosphor-icons/react"
-import { t } from "i18next"
-import * as R from "ramda"
-import React from "react"
-import { useController, useFormContext } from "react-hook-form"
-import { useTranslation } from "react-i18next"
-import { DatePicker, IDatePickerProps } from "../date-picker"
-import { fieldArrayCompatibleErrorMessage } from "./form-helpers"
+} from '@chakra-ui/react';
+import { Phone } from '@phosphor-icons/react';
+import { t } from 'i18next';
+import * as R from 'ramda';
+import React from 'react';
+import { useController, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { DatePicker, IDatePickerProps } from '../date-picker';
+import { fieldArrayCompatibleErrorMessage } from './form-helpers';
 
 interface IInputFormControlProps<TInputProps = Partial<InputProps>> extends FormControlProps {
-  label?: string
-  fieldName?: string
-  required?: boolean
-  validate?: any
-  maxLength?: number
-  hint?: string[] | string
-  leftElement?: JSX.Element
-  rightElement?: JSX.Element
-  inputProps?: TInputProps
-  key?: string
-  LabelInfo?: () => JSX.Element
-  showOptional?: boolean
-  value?: string
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
-  disabled?: boolean
+  label?: string;
+  fieldName?: string;
+  required?: boolean;
+  validate?: any;
+  maxLength?: number;
+  hint?: string[] | string;
+  leftElement?: JSX.Element;
+  rightElement?: JSX.Element;
+  inputProps?: TInputProps;
+  key?: string;
+  LabelInfo?: () => JSX.Element;
+  showOptional?: boolean;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
 }
 
 export const TextFormControl = (props: IInputFormControlProps) => {
@@ -46,7 +46,7 @@ export const TextFormControl = (props: IInputFormControlProps) => {
       {...(R.mergeDeepRight(
         {
           inputProps: {
-            type: "text",
+            type: 'text',
             placeholder: props._placeholder,
             value: props.value,
             onChange: props.onChange,
@@ -54,48 +54,50 @@ export const TextFormControl = (props: IInputFormControlProps) => {
           },
           validate: {
             satisfiesLength: (str) =>
-              (!props.required && !str) || (str?.length >= 1 && str?.length < 128) || t("ui.invalidInput"),
+              (!props.required && !str) || (str?.length >= 1 && str?.length < 128) || t('ui.invalidInput'),
           },
         },
-        props
+        props,
       ) as IInputFormControlProps)}
     />
-  )
-}
+  );
+};
 
 export const UrlFormControl = (props: IInputFormControlProps) => {
   return (
     <InputFormControl
       {...R.mergeDeepRight(
         {
-          inputProps: { type: "url" },
+          inputProps: { type: 'url' },
         },
-        props
+        props,
       )}
     />
-  )
-}
+  );
+};
 
 export const NumberFormControl = (props: IInputFormControlProps) => {
   return (
     <InputFormControl
-      {...(R.mergeDeepRight({ inputProps: { type: "number", step: 0.01 } }, props) as IInputFormControlProps)}
+      {...(R.mergeDeepRight({ inputProps: { type: 'number', step: 0.01 } }, props) as IInputFormControlProps)}
     />
-  )
-}
+  );
+};
 
 export const PhoneFormControl = (props: IInputFormControlProps) => {
   return (
     <InputFormControl
-      {...R.mergeDeepRight({ inputProps: { type: "text", maxLength: 10 } }, props)}
+      {...R.mergeDeepRight({ inputProps: { type: 'text', maxLength: 10 } }, props)}
       leftElement={<Phone />}
     />
-  )
-}
+  );
+};
 
 export const FileFormControl = (props: IInputFormControlProps) => {
-  return <InputFormControl {...(R.mergeDeepRight({ inputProps: { type: "file" } }, props) as IInputFormControlProps)} />
-}
+  return (
+    <InputFormControl {...(R.mergeDeepRight({ inputProps: { type: 'file' } }, props) as IInputFormControlProps)} />
+  );
+};
 
 export const DatePickerFormControl = ({
   label,
@@ -110,21 +112,21 @@ export const DatePickerFormControl = ({
   showOptional = true,
   ...rest
 }: IInputFormControlProps<Partial<IDatePickerProps>>) => {
-  const { control, formState } = useFormContext()
-  const { errors } = formState
-  const { t } = useTranslation()
-  const errorMessage = (fieldName && fieldArrayCompatibleErrorMessage(fieldName, errors)) || null
+  const { control, formState } = useFormContext();
+  const { errors } = formState;
+  const { t } = useTranslation();
+  const errorMessage = (fieldName && fieldArrayCompatibleErrorMessage(fieldName, errors)) || null;
   const { field } = useController({
     name: fieldName,
     control,
     rules: {
-      required: required && t("ui.isRequired", { field: label }),
+      required: required && t('ui.isRequired', { field: label }),
       validate,
     },
-  })
-  const { value, onChange } = field
+  });
+  const { value, onChange } = field;
 
-  const id = `${fieldName}-form-control-label`
+  const id = `${fieldName}-form-control-label`;
   return (
     <FormControl isInvalid={!!errorMessage} {...rest}>
       {label && (
@@ -132,7 +134,7 @@ export const DatePickerFormControl = ({
           <FormLabel id={id}>{label} </FormLabel>
           {!required && showOptional && (
             <Text ml={-2} mb={2}>
-              {t("ui.optional")}
+              {t('ui.optional')}
             </Text>
           )}
         </HStack>
@@ -143,11 +145,11 @@ export const DatePickerFormControl = ({
           selected={value}
           onChange={onChange}
           containerProps={{
-            zIndex: "dropdown",
-            w: "full",
+            zIndex: 'dropdown',
+            w: 'full',
             sx: {
-              ".react-datepicker-wrapper": { w: "full" },
-              ".react-datepicker__input-container": { w: "full" },
+              '.react-datepicker-wrapper': { w: 'full' },
+              '.react-datepicker__input-container': { w: 'full' },
             },
           }}
           ariaLabelledBy={id}
@@ -159,8 +161,8 @@ export const DatePickerFormControl = ({
         {rightElement && <InputRightElement pointerEvents="none">{rightElement}</InputRightElement>}
       </InputGroup>
     </FormControl>
-  )
-}
+  );
+};
 export const TextAreaFormControl = (props: IInputFormControlProps) => {
   return (
     <InputFormControl
@@ -169,14 +171,14 @@ export const TextAreaFormControl = (props: IInputFormControlProps) => {
           inputProps: { as: Textarea }, // Use Chakra's Textarea instead of Input
           validate: {
             satisfiesLength: (str) =>
-              (!props.required && !str) || (str?.length >= 1 && str?.length < 512) || "Input is invalid", // Use a default error message or use translation as needed
+              (!props.required && !str) || (str?.length >= 1 && str?.length < 512) || 'Input is invalid', // Use a default error message or use translation as needed
           },
         },
-        props
+        props,
       ) as IInputFormControlProps)}
     />
-  )
-}
+  );
+};
 
 const InputFormControl = ({
   label,
@@ -192,13 +194,17 @@ const InputFormControl = ({
   showOptional = true,
   ...rest
 }: IInputFormControlProps) => {
-  const { register, formState } = useFormContext()
-  const { errors } = formState
-  const { t } = useTranslation()
-  const errorMessage = (fieldName && fieldArrayCompatibleErrorMessage(fieldName, errors)) || null
+  const { register, formState } = useFormContext();
+  const { errors } = formState;
+  const { t } = useTranslation();
+  const errorMessage = (fieldName && fieldArrayCompatibleErrorMessage(fieldName, errors)) || null;
   const registerProps = fieldName
-    ? { ...register(fieldName, { required: required && t("ui.isRequired", { field: label }), validate }) }
-    : {}
+    ? { ...register(fieldName, { required: required && t('ui.isRequired', { field: label }), validate }) }
+    : {};
+
+  const inputId = `${fieldName || 'input'}-field`;
+  const errorId = `${fieldName || 'input'}-error`;
+  const hintId = `${fieldName || 'input'}-hint`;
 
   return (
     <FormControl isInvalid={!!errorMessage} {...rest}>
@@ -215,10 +221,17 @@ const InputFormControl = ({
       )}
 
       <InputGroup w="full" display="flex" flexDirection="column">
-        <Input bg="greys.white" {...registerProps} {...inputProps} />
-        {errorMessage && <FormErrorMessage>{errorMessage}</FormErrorMessage>}
+        <Input
+          id={inputId}
+          bg="greys.white"
+          aria-required={required}
+          aria-describedby={`${errorMessage ? errorId : ''} ${hint ? hintId : ''}`.trim()}
+          {...registerProps}
+          {...inputProps}
+        />
+        {errorMessage && <FormErrorMessage id={errorId}>{errorMessage}</FormErrorMessage>}
         {hint && (
-          <FormHelperText mt={1} color="border.base">
+          <FormHelperText id={hintId} mt={1} color="border.base">
             {hint}
           </FormHelperText>
         )}
@@ -227,4 +240,4 @@ const InputFormControl = ({
       </InputGroup>
     </FormControl>
   );
-}
+};

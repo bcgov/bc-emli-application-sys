@@ -34,6 +34,7 @@ export const ContractorLandingScreen = () => {
         as="header"
         h={{ base: '660px', md: '534px' }}
         position="relative"
+        bg={colors.theme.darkBlue}
         bgImage={`${colors.theme.bannerGradient}, url('/images/contractor-header-background.png')`}
         backgroundRepeat="no-repeat"
         bgPosition="center"
@@ -41,12 +42,11 @@ export const ContractorLandingScreen = () => {
         aria-label={t('landing.contractor.title')}
       >
         <Flex direction="column" justify="center" h="100%" px={{ base: 10, md: 16 }} maxW="7xl" mx="auto" mt={4}>
-          <Text as="h1" fontSize="6xl" fontWeight="bold" color="white" tabIndex={0} textShadow="theme.bannerTextShadow">
+          <Heading as="h1" fontSize="6xl" fontWeight="bold" color="white" textShadow="theme.bannerTextShadow">
             {t('landing.contractor.title')}
-          </Text>
-          <Text as="h2" fontSize="6xl" textShadow="theme.bannerTextShadow" fontWeight="bold" color="white" tabIndex={0}>
+            <br />
             {t('landing.contractor.titleDesc')}
-          </Text>
+          </Heading>
           <Text fontSize="md" color="white" mt={4} mb={4} fontWeight="bold" textShadow="theme.bannerTextShadow">
             {t('landing.contractor.description')}
           </Text>
@@ -62,6 +62,7 @@ export const ContractorLandingScreen = () => {
             </RouterLinkButton>
             <Link
               variant="primaryInverse"
+              href="#main-content"
               aria-label={t('auth.findOut')}
               w={{ base: '100%', md: 'auto' }}
               display="flex"
@@ -74,112 +75,114 @@ export const ContractorLandingScreen = () => {
         </Flex>
       </Box>
 
-      {/* How it works */}
-      <Container as="section" maxW="container.lg" py={10}>
-        <Heading as="h1" mb={6} color="theme.blueAlt" tabIndex={0}>
-          {t('landing.contractor.itWorks')}
-        </Heading>
-        <Text mb={6} variant="line_height_medium">
-          {t('landing.contractor.itWorksDesc')}
-        </Text>
-        <Link
-          href={t('landing.contractor.learnMoreLink')}
-          isExternal
-          aria-label={`${t('landing.contractor.learnMore')} (opens in a new tab)`}
-        >
-          {t('landing.contractor.learnMore')} <ArrowSquareOut aria-hidden="true" />
-        </Link>
-        {/* Stepper for desktop */}
-        <Stepper steps={flow} orientation="horizontal" />
-        {/* Stepper for mobile */}
-        <Stepper steps={flow} orientation="vertical" />
-      </Container>
+      <Box as="main" id="main-content" tabIndex={-1}>
+        {/* How it works */}
+        <Container as="section" maxW="container.lg" py={10}>
+          <Heading as="h2" mb={6} color="theme.blueAlt">
+            {t('landing.contractor.itWorks')}
+          </Heading>
+          <Text mb={6} variant="line_height_medium">
+            {t('landing.contractor.itWorksDesc')}
+          </Text>
+          <Link
+            href={t('landing.contractor.learnMoreLink')}
+            isExternal
+            aria-label={`${t('landing.contractor.learnMore')} (opens in a new tab)`}
+          >
+            {t('landing.contractor.learnMore')} <ArrowSquareOut aria-hidden="true" />
+          </Link>
+          {/* Stepper for desktop */}
+          <Stepper steps={flow} orientation="horizontal" />
+          {/* Stepper for mobile */}
+          <Stepper steps={flow} orientation="vertical" />
+        </Container>
 
-      {/* Registration Section */}
-      <Container as="section" maxW="container.lg" py={8}>
-        <Heading as="h2" mb={4} color="theme.blueAlt" tabIndex={0}>
-          {t('landing.contractor.registeredContractor')}
-        </Heading>
-        <Text>{t('landing.contractor.needId')}</Text>
-        <Accordion allowToggle mt={4} borderRadius="md">
-          <AccordionItem border="1px solid" borderColor="greys.lightGrey">
-            <h3>
-              <AccordionButton bg="greys.grey20" p={4}>
-                <Box flex="1" textAlign="left" fontWeight="bold">
-                  {t('landing.contractor.typeOfContractors')}
-                </Box>
-                <AccordionIcon />
-              </AccordionButton>
-            </h3>
-            <AccordionPanel pb={4} gap={4}>
-              <Text mb={2} fontWeight="bold" mt={4}>
-                {t('landing.contractor.notMember')}
-              </Text>
-              <Text mb={2} variant="line_height_medium">
-                {t('landing.contractor.hpcnMember')}{' '}
-                <Link
-                  href={t('landing.contractor.visitHomeLink')}
-                  isExternal
-                  aria-label={`${t('landing.contractor.visitHome')} (opens in a new tab)`}
-                >
-                  {t('landing.contractor.visitHome')}
-                </Link>{' '}
-                {t('landing.contractor.toJoin')}
-              </Text>
-              <Text mt={4} fontWeight="bold">
-                {t('landing.contractor.duringRegistration')}
-              </Text>
-              <UnorderedList mt={4}>
-                <ListItem>{t('landing.contractor.businessNumber')}</ListItem>
-              </UnorderedList>
-              <RouterLinkButton
-                mt="2"
-                variant="primaryInverse"
-                rightIcon={<CaretRight aria-hidden="true" />}
-                aria-label={t('auth.registerButton')}
-              >
-                {t('auth.registerButton')}
-              </RouterLinkButton>
-            </AccordionPanel>
-          </AccordionItem>
-
-          <AccordionItem border="1px solid" borderColor="greys.lightGrey" mt={4}>
-            <h3>
-              <AccordionButton p={4} bg="greys.grey20">
-                <Box flex="1" textAlign="left" fontWeight="bold">
-                  {t('landing.contractor.healthSafetyContractors')}
-                </Box>
-                <AccordionIcon />
-              </AccordionButton>
-            </h3>
-            <AccordionPanel pb={4}>
+        {/* Registration Section */}
+        <Container as="section" maxW="container.lg" py={8}>
+          <Heading as="h2" mb={4} color="theme.blueAlt">
+            {t('landing.contractor.registeredContractor')}
+          </Heading>
+          <Text>{t('landing.contractor.needId')}</Text>
+          <Accordion allowToggle mt={4} borderRadius="md">
+            <AccordionItem border="1px solid" borderColor="greys.lightGrey">
+              <h3>
+                <AccordionButton bg="greys.grey20" p={4}>
+                  <Box flex="1" textAlign="left" fontWeight="bold">
+                    {t('landing.contractor.typeOfContractors')}
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+              </h3>
               <AccordionPanel pb={4} gap={4}>
-                <Text mb={2} fontWeight="bold">
+                <Heading as="h4" fontSize="md" fontWeight="bold" mb={2} mt={4}>
+                  {t('landing.contractor.notMember')}
+                </Heading>
+                <Text mb={2} variant="line_height_medium">
+                  {t('landing.contractor.hpcnMember')}{' '}
+                  <Link
+                    href={t('landing.contractor.visitHomeLink')}
+                    isExternal
+                    aria-label={`${t('landing.contractor.visitHome')} (opens in a new tab)`}
+                  >
+                    {t('landing.contractor.visitHome')}
+                  </Link>{' '}
+                  {t('landing.contractor.toJoin')}
+                </Text>
+                <Text mt={4} fontWeight="bold">
                   {t('landing.contractor.duringRegistration')}
                 </Text>
                 <UnorderedList mt={4}>
-                  {registrationRequirements.map((item, idx) => (
-                    <ListItem key={idx}>{item}</ListItem>
-                  ))}
+                  <ListItem>{t('landing.contractor.businessNumber')}</ListItem>
                 </UnorderedList>
                 <RouterLinkButton
                   mt="2"
                   variant="primaryInverse"
                   rightIcon={<CaretRight aria-hidden="true" />}
-                  aria-label={t('auth.registerButton')}
+                  aria-label="Register as HPCN member contractor"
                 >
                   {t('auth.registerButton')}
                 </RouterLinkButton>
               </AccordionPanel>
-            </AccordionPanel>
-          </AccordionItem>
-        </Accordion>
-      </Container>
+            </AccordionItem>
+
+            <AccordionItem border="1px solid" borderColor="greys.lightGrey" mt={4}>
+              <h3>
+                <AccordionButton p={4} bg="greys.grey20">
+                  <Box flex="1" textAlign="left" fontWeight="bold">
+                    {t('landing.contractor.healthSafetyContractors')}
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+              </h3>
+              <AccordionPanel pb={4}>
+                <AccordionPanel pb={4} gap={4}>
+                  <Text mb={2} fontWeight="bold">
+                    {t('landing.contractor.duringRegistration')}
+                  </Text>
+                  <UnorderedList mt={4}>
+                    {registrationRequirements.map((item, idx) => (
+                      <ListItem key={idx}>{item}</ListItem>
+                    ))}
+                  </UnorderedList>
+                  <RouterLinkButton
+                    mt="2"
+                    variant="primaryInverse"
+                    rightIcon={<CaretRight aria-hidden="true" />}
+                    aria-label="Register as Health Safety contractor"
+                  >
+                    {t('auth.registerButton')}
+                  </RouterLinkButton>
+                </AccordionPanel>
+              </AccordionPanel>
+            </AccordionItem>
+          </Accordion>
+        </Container>
+      </Box>
 
       {/* Already have an account? */}
       <Box as="footer" bg="greys.grey04" mb={8}>
         <Container as="section" maxW="container.lg" py={8} gap={8}>
-          <Heading as="h1" mb={2} color="theme.blueAlt" tabIndex={0}>
+          <Heading as="h2" mb={2} color="theme.blueAlt">
             {t('landing.contractor.alreadyAccount')}
           </Heading>
           <Text mt={4}>{t('landing.contractor.submitInvoices')}</Text>
@@ -205,7 +208,6 @@ const Stepper = ({
   steps: string[];
   orientation?: 'horizontal' | 'vertical';
 }) => {
-  const { t } = useTranslation();
   const isHorizontal = orientation === 'horizontal';
   const containerProps = isHorizontal
     ? {
@@ -215,8 +217,6 @@ const Stepper = ({
         justify: 'space-between',
         gap: 0,
         as: 'ol' as React.ElementType,
-        'aria-orientation': 'horizontal' as 'horizontal',
-        role: 'list',
       }
     : {
         direction: 'column' as const,
@@ -225,8 +225,6 @@ const Stepper = ({
         justify: 'center',
         gap: 6,
         as: 'ol' as React.ElementType,
-        'aria-orientation': 'vertical' as 'vertical',
-        role: 'list',
       };
 
   // Responsive lineProps based on orientation and screen size
@@ -273,14 +271,13 @@ const Stepper = ({
             color="white"
             flexShrink={0}
             mr={!isHorizontal ? 4 : 0}
-            role="img"
-            tabIndex={0}
+            aria-hidden="true"
           >
             {index + 1}
           </Box>
         );
         const StepLabel = (
-          <Text as="span" fontSize="sm" color="theme.blueAlt" fontWeight="bold" tabIndex={0}>
+          <Text as="span" fontSize="sm" color="theme.blueAlt" fontWeight="bold">
             {step}
           </Text>
         );
@@ -293,7 +290,7 @@ const Stepper = ({
             textAlign="center"
             w="full"
             zIndex={1}
-            aria-current={index === 0 ? 'step' : false}
+            aria-label={`Step ${index + 1}: ${step}`}
           >
             {StepCircle}
             {StepLabel}
@@ -306,7 +303,7 @@ const Stepper = ({
             position="relative"
             zIndex={1}
             mb={index < steps.length - 1 ? 6 : 0}
-            aria-current={index === 0 ? 'step' : false}
+            aria-label={`Step ${index + 1}: ${step}`}
           >
             {StepCircle}
             {StepLabel}

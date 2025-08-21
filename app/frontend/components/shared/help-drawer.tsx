@@ -9,7 +9,9 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
+  Hide,
   Link,
+  Show,
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
@@ -89,9 +91,19 @@ export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) 
                   <Text fontWeight="bold" sx={baseTextSx} mb={0}>
                     {t('site.helpDrawer.phoneTitle')}
                   </Text>
-                  <Text sx={{ ...baseTextSx, color: 'greys.anotherGrey' }} mb={0}>
-                    {t('auth.bcServiceCardInfo.energyCoach.phoneNumber')}
-                  </Text>
+                  <Show below="md">
+                    <Link
+                      href={`tel:${t('auth.bcServiceCardInfo.energyCoach.phoneNumber')}`}
+                      sx={{ ...baseTextSx, color: 'greys.anotherGrey' }}
+                    >
+                      {t('auth.bcServiceCardInfo.energyCoach.phoneNumber')}
+                    </Link>
+                  </Show>
+                  <Hide below="md">
+                    <Text sx={{ ...baseTextSx, color: 'greys.anotherGrey' }}>
+                      {t('auth.bcServiceCardInfo.energyCoach.phoneNumber')}
+                    </Text>
+                  </Hide>
                   <Text sx={{ ...baseTextSx, color: 'greys.anotherGrey' }} mb={0}>
                     {t('site.helpDrawer.phoneHours')}
                   </Text>

@@ -1,4 +1,4 @@
-import { Box, Container, Flex, Heading, Link, ListItem, Text, UnorderedList } from '@chakra-ui/react';
+import { Box, Container, Flex, Heading, Hide, Link, ListItem, Show, Text, UnorderedList } from '@chakra-ui/react';
 import { ArrowSquareOut, CaretRight } from '@phosphor-icons/react';
 import i18next from 'i18next';
 import { observer } from 'mobx-react-lite';
@@ -22,7 +22,7 @@ export const LandingScreen = observer(() => {
     <Flex direction="column" w="full" bg="greys.white">
       {/* Hero Section */}
       <Box
-        h="360px"
+        minH={{ base: '360px', md: '360px' }}
         w="full"
         position="relative"
         bgImage={`${colors.theme.blueImageGradient}, url('/images/header-background.png')`}
@@ -31,7 +31,6 @@ export const LandingScreen = observer(() => {
         display="flex"
         alignItems="center"
         justifyContent="center"
-        aria-hidden="true"
       >
         <Flex
           as="section"
@@ -44,7 +43,7 @@ export const LandingScreen = observer(() => {
           px={{ base: '24px', md: '32px' }}
           py="64px"
           w={{ base: '382px', md: '618px' }}
-          h={{ base: '320px', md: '228px' }}
+          minH="fit-content"
           filter={{
             base: 'none',
           }}
@@ -58,9 +57,9 @@ export const LandingScreen = observer(() => {
             textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px ${colors.darken[70]}`}
             lineHeight="65px"
             w="full"
-            h={{ base: '195px', md: '130px' }}
             display="flex"
             alignItems="center"
+            py={{ base: 4, md: 2 }}
           >
             {t('landing.title')}
           </Heading>
@@ -70,9 +69,9 @@ export const LandingScreen = observer(() => {
             textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px ${colors.darken[70]}`}
             lineHeight="27px"
             w="full"
-            h={{ base: '109px', md: '82px' }}
             display="flex"
             alignItems="center"
+            py={{ base: 3, md: 2 }}
           >
             {t('landing.intro')}
           </Text>
@@ -80,7 +79,7 @@ export const LandingScreen = observer(() => {
       </Box>
 
       {/* Main Content Section */}
-      <Container as="main" id="main-content" maxW="1170px" py="64px" px="32px">
+      <Container as="main" id="main-content" tabIndex={-1} maxW="1170px" py="64px" px="32px">
         <Flex direction="column" gap={{ base: '64px', md: '80px' }}>
           {/* Main Cards Section */}
           <Flex
@@ -192,7 +191,6 @@ export const LandingScreen = observer(() => {
                   h="50px"
                   minH="40px"
                   alignSelf="flex-start"
-                  aria-label={t('landing.ariaLabels.startApplication')}
                   _focus={{ outline: '2px solid', outlineColor: 'greys.white', outlineOffset: '2px' }}
                 >
                   {t('landing.getStarted')}
@@ -292,9 +290,20 @@ export const LandingScreen = observer(() => {
                 {t('landing.getHelpTitle')}
               </Heading>
               <Text fontSize="16px" lineHeight="27px" color="theme.blueAlt" mb={4}>
-                <Text as="span" aria-label={t('landing.ariaLabels.phoneNumber')}>
-                  {t('landing.phoneText')}
-                </Text>
+                <Show below="md">
+                  <Link
+                    href={`tel:${t('landing.phoneText')}`}
+                    aria-label={t('landing.ariaLabels.phoneNumber')}
+                    color="theme.blueAlt"
+                  >
+                    {t('landing.phoneText')}
+                  </Link>
+                </Show>
+                <Hide below="md">
+                  <Text as="span" color="theme.blueAlt">
+                    {t('landing.phoneText')}
+                  </Text>
+                </Hide>{' '}
                 {t('landing.phoneHours')}
               </Text>
             </Flex>

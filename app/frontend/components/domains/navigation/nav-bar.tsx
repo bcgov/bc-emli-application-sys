@@ -130,8 +130,7 @@ export const NavBar = observer(function NavBar() {
     <PopoverProvider>
       {/* Skip Links */}
       <Link
-        as={RouterLink}
-        to="#main-content"
+        href="#main-content"
         position="absolute"
         left="-9999px"
         zIndex={9999}
@@ -145,14 +144,20 @@ export const NavBar = observer(function NavBar() {
           left: '6px',
           top: '7px',
         }}
+        onClick={(e) => {
+          e.preventDefault();
+          const mainContent = document.getElementById('main-content');
+          if (mainContent) {
+            mainContent.focus();
+            mainContent.scrollIntoView({ behavior: 'auto', block: 'start' });
+          }
+        }}
       >
         {t('a11y.skipToMainContent')}
       </Link>
       <Box
-        as="nav"
-        role="navigation"
-        aria-label={t('site.mainNavigation')}
-        id="mainNav"
+        as="header"
+        role="banner"
         w="full"
         maxW="100%"
         color={'greys.anotherGrey'}
@@ -167,19 +172,15 @@ export const NavBar = observer(function NavBar() {
         <Container maxW="1170px" h="100%" mx="auto" p={0}>
           <Flex align="center" gap={2} w="full" h="100%">
             {/* Logo */}
-            <Link
-              as={RouterLink}
-              to="/"
-              aria-label={t('site.linkHome')}
-              display="flex"
-              alignItems="center"
-              _focus={{
-                outline: '2px solid',
-                outlineColor: 'theme.blue',
-                outlineOffset: '2px',
-              }}
-            >
-              <Image height="80px" width="auto" maxW="280px" fit="contain" src={'/images/logo.png'} alt="" />
+            <Link as={RouterLink} to="/" aria-label={t('site.linkHome')} display="flex" alignItems="center">
+              <Image
+                height="80px"
+                width="auto"
+                maxW="280px"
+                fit="contain"
+                src={'/images/logo.png'}
+                alt="Better Homes Energy Savings Program Home"
+              />
             </Link>
 
             {loggedIn && (
@@ -212,15 +213,14 @@ export const NavBar = observer(function NavBar() {
             {!loggedIn && (
               <Hide below="lg">
                 <Flex direction="column" w="full">
-                  <Heading
-                    as="h2"
+                  <Text
                     fontSize={{ base: 'xl', lg: '2xl' }}
                     fontWeight="400"
                     color="greys.anotherGrey"
                     whiteSpace="nowrap"
                   >
                     {t('site.titleLong')}
-                  </Heading>
+                  </Text>
                 </Flex>
                 <Spacer />
               </Hide>
@@ -230,58 +230,63 @@ export const NavBar = observer(function NavBar() {
               {/* Notifications - Logged in users only */}
               {loggedIn && <NotificationsPopover aria-label={t('notification.title')} color="greys.anotherGrey" />}
 
-              {/* Desktop Links - Logged in users (lg+) */}
-              {loggedIn && (
-                <Hide below="lg">
-                  <RouterLinkButton
-                    fontSize={{ base: 'lg', lg: 'xl' }}
-                    variant="tertiary"
-                    color="greys.anotherGrey"
-                    to={'/'}
-                    aria-current={path === '/' ? 'page' : undefined}
-                  >
-                    {t('site.home')}
-                  </RouterLinkButton>
-                  {!currentUser?.isSuperAdmin && !currentUser?.isAdminManager && !currentUser?.isAdmin && (
-                    <RouterLinkButton
-                      fontSize={{ base: 'lg', lg: 'xl' }}
-                      variant="tertiary"
-                      color="greys.anotherGrey"
-                      to={'/get-support'}
-                      aria-current={path === '/get-support' ? 'page' : undefined}
-                    >
-                      {t('site.support.getSupport')}
-                    </RouterLinkButton>
+              {/* Navigation */}
+              <Box as="nav" role="navigation" aria-label={t('site.mainNavigation')}>
+                <HStack gap={2}>
+                  {/* Desktop Links - Logged in users (lg+) */}
+                  {loggedIn && (
+                    <Hide below="lg">
+                      <RouterLinkButton
+                        fontSize={{ base: 'lg', lg: 'xl' }}
+                        variant="tertiary"
+                        color="greys.anotherGrey"
+                        to={'/'}
+                        aria-current={path === '/' ? 'page' : undefined}
+                      >
+                        {t('site.home')}
+                      </RouterLinkButton>
+                      {!currentUser?.isSuperAdmin && !currentUser?.isAdminManager && !currentUser?.isAdmin && (
+                        <RouterLinkButton
+                          fontSize={{ base: 'lg', lg: 'xl' }}
+                          variant="tertiary"
+                          color="greys.anotherGrey"
+                          to={'/get-support'}
+                          aria-current={path === '/get-support' ? 'page' : undefined}
+                        >
+                          {t('site.support.getSupport')}
+                        </RouterLinkButton>
+                      )}
+                    </Hide>
                   )}
-                </Hide>
-              )}
 
-              {/* Desktop Links - Non-logged in users (lg+) */}
-              {!loggedIn && (
-                <Hide below="lg">
-                  <RouterLinkButton
-                    fontSize={{ base: 'lg', lg: 'xl' }}
-                    variant="tertiary"
-                    color="greys.anotherGrey"
-                    to={'/get-support'}
-                    aria-current={path === '/get-support' ? 'page' : undefined}
-                  >
-                    {t('site.support.getSupport')}
-                  </RouterLinkButton>
-                  <RouterLinkButton
-                    fontSize={{ base: 'lg', lg: 'xl' }}
-                    variant="tertiary"
-                    color="greys.anotherGrey"
-                    to="/login"
-                    aria-current={path === '/login' ? 'page' : undefined}
-                  >
-                    {t('auth.login')}
-                  </RouterLinkButton>
-                </Hide>
-              )}
+                  {/* Desktop Links - Non-logged in users (lg+) */}
+                  {!loggedIn && (
+                    <Hide below="lg">
+                      <RouterLinkButton
+                        fontSize={{ base: 'lg', lg: 'xl' }}
+                        variant="tertiary"
+                        color="greys.anotherGrey"
+                        to={'/get-support'}
+                        aria-current={path === '/get-support' ? 'page' : undefined}
+                      >
+                        {t('site.support.getSupport')}
+                      </RouterLinkButton>
+                      <RouterLinkButton
+                        fontSize={{ base: 'lg', lg: 'xl' }}
+                        variant="tertiary"
+                        color="greys.anotherGrey"
+                        to="/login"
+                        aria-current={path === '/login' ? 'page' : undefined}
+                      >
+                        {t('auth.login')}
+                      </RouterLinkButton>
+                    </Hide>
+                  )}
 
-              {/* Mobile/Desktop Menu */}
-              <NavBarMenu />
+                  {/* Mobile/Desktop Menu */}
+                  <NavBarMenu />
+                </HStack>
+              </Box>
             </HStack>
           </Flex>
         </Container>
@@ -361,6 +366,13 @@ const NavBarMenu = observer(function NavBarMenu() {
     await logout();
   };
 
+  const handleMenuKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Tab') {
+      // Allow Tab key to close menu and continue navigation
+      setIsMenuOpen(false);
+    }
+  };
+
   // ===== MENU ITEMS BY ROLE =====
   const superAdminItems = (
     <MenuGroup>
@@ -423,6 +435,8 @@ const NavBarMenu = observer(function NavBarMenu() {
       placement="bottom-end"
       onOpen={() => setIsMenuOpen(true)}
       onClose={() => setIsMenuOpen(false)}
+      autoSelect={false}
+      computePositionOnMount={true}
     >
       {/* Unified mobile menu button */}
       {renderMenuButton()}
@@ -453,7 +467,14 @@ const NavBarMenu = observer(function NavBarMenu() {
       {/* ===== MENU DROPDOWN ===== */}
       <Portal>
         <Box color="text.primary">
-          <MenuList id="main-navigation-menu" role="menu" aria-label="menu-button" zIndex={99} boxShadow="2xl">
+          <MenuList
+            id="main-navigation-menu"
+            role="menu"
+            aria-label="menu-button"
+            zIndex={99}
+            boxShadow="2xl"
+            onKeyDown={handleMenuKeyDown}
+          >
             {/* ===== LOGGED IN MENU ===== */}
             {loggedIn && !currentUser?.isUnconfirmed ? (
               <>
@@ -552,7 +573,7 @@ const NavMenuItem = ({ label, to, onClick, ...rest }: INavMenuItemProps) => {
       py={2}
       px={3}
       onClick={handleClick}
-      _hover={{ cursor: 'pointer', bg: 'hover.blue' }}
+      _hover={{ bg: 'hover.blue' }}
       aria-current={isCurrentPage ? 'page' : undefined}
       fontWeight={isCurrentPage ? 'bold' : 'normal'}
       {...rest}
