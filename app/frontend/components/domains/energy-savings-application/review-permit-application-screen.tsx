@@ -89,10 +89,10 @@ export const ReviewPermitApplicationScreen = observer(() => {
       container.classList.remove('revision-mode');
     }
 
-    if (currentPermitApplication?.status === EPermitApplicationStatus.revisionsRequested) {
+    if (currentPermitApplication?.status === EPermitApplicationStatus.revisionsRequested && !saveEditsCompleted) {
       setRevisionMode(true);
     }
-  }, [currentPermitApplication?.revisionMode, currentPermitApplication?.status]);
+  }, [currentPermitApplication?.revisionMode, currentPermitApplication?.status, saveEditsCompleted]);
 
   // Monitor for staged revision requests (Save Edits workflow)
   useEffect(() => {
@@ -151,7 +151,8 @@ export const ReviewPermitApplicationScreen = observer(() => {
         // Participant pathway: redirect to submissions inbox
         navigate('/applications');
       } else {
-        // Staff pathway: scroll to submit button to guide user
+        // Staff pathway: Exit revision mode and scroll to submit button to guide user
+        setRevisionMode(false);
         setTimeout(() => {
           const submitButton = document.querySelector('button[type="submit"]') as HTMLButtonElement;
           if (submitButton) {

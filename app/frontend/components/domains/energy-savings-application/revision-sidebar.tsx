@@ -35,6 +35,7 @@ import { ScrollLink } from '../../shared/energy-savings-applications/scroll-link
 import ConfirmationModal from '../../shared/modals/confirmation-modal';
 import { RevisionModal } from '../../shared/revisions/revision-modal';
 import SubmissionVersionSelect from '../../shared/select/selectors/submission-version-select';
+import { formatFieldValue } from '../../../utils/field-value-formatter';
 
 interface IRevisionSideBarProps {
   permitApplication: IEnergySavingsApplication;
@@ -230,7 +231,7 @@ export const RevisionSideBar = observer(
           {/* Cancel button triggers remove updates modal */}
           {onCancel && (
             <>
-              {fields.length > 0 && !permitApplication.isRevisionsRequested ? (
+              {fields.length > 0 || permitApplication.isRevisionsRequested ? (
                 <ConfirmationModal
                   isSubmit={false}
                   promptHeader={t('energySavingsApplication.show.revision.cancelRequest')}
@@ -445,13 +446,16 @@ const RevisionRequestListItem = ({ revisionRequest }: IRevisionRequestListItemPr
           {(() => {
             const fieldKey = requirementJson?.key;
             const reqSubmission = submissionJson as any;
-            if (typeof reqSubmission === 'string') return reqSubmission;
+
+            if (typeof reqSubmission === 'string') {
+              return reqSubmission;
+            }
+
             if (reqSubmission?.data && fieldKey) {
               const fieldValue = reqSubmission.data[fieldKey];
-              if (fieldValue !== undefined && fieldValue !== null && fieldValue !== '') {
-                return String(fieldValue);
-              }
+              return formatFieldValue(fieldValue, t);
             }
+
             return t('energySavingsApplication.show.revision.noOriginalAnswer');
           })()}
         </Text>

@@ -19,6 +19,12 @@ const options = {
         a11y: {
           skipToMainContent: 'Skip to main content',
         },
+        fieldValue: {
+          complexObject: 'Complex data (object)',
+          unnamedFile: 'Unnamed file',
+          fileCount_one: '{{count}} file',
+          fileCount_other: '{{count}} files',
+        },
         auth: {
           login: 'Log in',
           findOut: 'Find out more to register',
@@ -436,7 +442,7 @@ const options = {
           preview: 'Preview',
           back: 'Back',
           next: ' Next',
-          backToInbox: 'Back to Inbox',
+          backToInbox: 'Back to inbox',
           backHome: 'Back to home',
           yes: 'Yes',
           no: 'No',
@@ -1005,7 +1011,7 @@ const options = {
               'Only the the specified fields highlighted below (in yellow) and their corresponding blocks can be edited',
             showList: 'Show list',
             hideList: 'Hide list',
-            backToInbox: 'Back to Inbox',
+            backToInbox: 'Back to inbox',
             locateRevisions: 'Locate each requested revision by clicking the links below.',
             revisionsWereRequested: 'Revisions to this application were requested on {{date}}',
             clickQuestion: 'Click on the question(s) or requirement(s) you want the submitter to revise.',
@@ -1287,7 +1293,7 @@ const options = {
             },
             applicant: 'Applicant',
             staff: 'Staff',
-            saveEdits: 'Save Edits',
+            saveEdits: 'Save edits',
             saveConfirmation: {
               title: 'Are you ready to save the updates you have made to this application ?',
               description:
@@ -1303,7 +1309,7 @@ const options = {
               'Only the the specified fields highlighted below (in yellow) and their corresponding blocks can be edited',
             showList: 'Show list',
             hideList: 'Hide list',
-            backToInbox: 'Back to Inbox',
+            backToInbox: 'Back to inbox',
             locateRevisions: 'Locate each requested revision by clicking the links below.',
             revisionsWereRequested: 'Updates to this application were requested on {{date}}',
             applicationSubmitted: 'Application was submitted on {{date}}',
