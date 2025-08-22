@@ -1,11 +1,11 @@
 /* tslint:disable */
-import { Components, Utils } from "formiojs"
-import { Constants } from "../Common/Constants.js"
-import editForm from "./Component.form.js"
-const ParentComponent = Components.components.file
-var uniqueName = Utils.uniqueName
-const ID = "simplefile"
-const DISPLAY = "File Upload"
+import { Components, Utils } from 'formiojs';
+import { Constants } from '../Common/Constants.js';
+import editForm from './Component.form.js';
+const ParentComponent = Components.components.file;
+var uniqueName = Utils.uniqueName;
+const ID = 'simplefile';
+const DISPLAY = 'File Upload';
 export default class Component extends ParentComponent {
   static schema(...extend) {
     return ParentComponent.schema(
@@ -13,123 +13,136 @@ export default class Component extends ParentComponent {
         type: ID,
         label: DISPLAY,
         key: ID,
-        storage: "s3custom", //REMOVED THE DEFAULT CHEFS STORAGE AS THERE IS NO SUCH TYPE HERE
-        url: "/files",
-        fileKey: "files",
-        fileNameTemplate: "{{fileName}}",
+        storage: 's3custom', //REMOVED THE DEFAULT CHEFS STORAGE AS THERE IS NO SUCH TYPE HERE
+        url: '/files',
+        fileKey: 'files',
+        fileNameTemplate: '{{fileName}}',
         image: false,
         webcam: false,
         webcamSize: 320,
         privateDownload: false,
-        imageSize: "200",
-        filePattern: "*",
-        fileMinSize: "0KB",
-        fileMaxSize: "100MB",
+        imageSize: '200',
+        filePattern: '*',
+        fileMinSize: '0KB',
+        fileMaxSize: '100MB',
         uploadOnly: false,
-        customClass: "formio-component-file",
+        customClass: 'formio-component-file',
       },
-      ...extend
-    )
+      ...extend,
+    );
   }
-  static editForm = editForm
+  static editForm = editForm;
   static get builderInfo() {
     return {
       title: DISPLAY,
-      group: "simple",
-      icon: "file",
+      group: 'simple',
+      icon: 'file',
       weight: 13,
       documentation: Constants.DEFAULT_HELP_LINK,
       schema: Component.schema(),
-    }
+    };
   }
   // we will read these in from runtime
-  _enabled
+  _enabled;
   constructor(...args) {
-    super(...args)
+    super(...args);
     try {
       if (this.options && this.options.componentOptions) {
         // componentOptions are passed in from the viewer, basically runtime configuration
-        const opts = this.options.componentOptions[ID]
-        this.component.options = { ...this.component.options, ...opts }
+        const opts = this.options.componentOptions[ID];
+        this.component.options = { ...this.component.options, ...opts };
         // the config.uploads object will say what size our server can handle and what path to use.
         if (opts.config && opts.config.uploads) {
-          const remSlash = (s) => s.replace(/^\s*\/*\s*|\s*\/*\s*$/gm, "")
-          const cfg = opts.config
-          const uploads = cfg.uploads
-          this.component.fileMinSize = uploads.fileMinSize
-          this.component.fileMaxSize = uploads.fileMaxSize
+          const remSlash = (s) => s.replace(/^\s*\/*\s*|\s*\/*\s*$/gm, '');
+          const cfg = opts.config;
+          const uploads = cfg.uploads;
+          this.component.fileMinSize = uploads.fileMinSize;
+          this.component.fileMaxSize = uploads.fileMaxSize;
           // set the default url to be for uploads.
-          this.component.url = `/${remSlash(cfg.basePath)}/${remSlash(cfg.apiPath)}/${remSlash(uploads.path)}`
+          this.component.url = `/${remSlash(cfg.basePath)}/${remSlash(cfg.apiPath)}/${remSlash(uploads.path)}`;
           // no idea what to do with this yet...
-          this._enabled = uploads.enabled
+          this._enabled = uploads.enabled;
         }
       }
     } catch (e) {}
   }
   deleteFile(fileInfo) {
-    const { options = {} } = this.component
-    const Provider = Formio.Providers.getProvider("storage", this.component.storage)
+    const { options = {} } = this.component;
+    const Provider = Formio.Providers.getProvider('storage', this.component.storage);
     if (Provider) {
-      const provider = new Provider(this)
-      if (fileInfo && provider && typeof provider.deleteFile === "function") {
-        provider.deleteFile(fileInfo, options)
+      const provider = new Provider(this);
+      if (fileInfo && provider && typeof provider.deleteFile === 'function') {
+        provider.deleteFile(fileInfo, options);
       }
     }
   }
   upload(files) {
     // Only allow one upload if not multiple.
     if (!this.component.multiple) {
-      files = Array.prototype.slice.call(files, 0, 1)
+      files = Array.prototype.slice.call(files, 0, 1);
     }
     if (this.component.storage && files && files.length) {
       // files is not really an array and does not have a forEach method, so fake it.
       Array.prototype.forEach.call(files, (file) => {
-        const fileName = uniqueName(file.name, this.component.fileNameTemplate, this.evalContext())
+        const fileName = uniqueName(file.name, this.component.fileNameTemplate, this.evalContext());
         const fileUpload = {
           originalName: file.name,
           name: fileName,
           size: file.size,
-          status: "info",
-          message: this.t("Starting upload"),
-        }
+          status: 'info',
+          message: this.t('Starting upload'),
+        };
         // Check file pattern
         if (this.component.filePattern && !this.validatePattern(file, this.component.filePattern)) {
-          fileUpload.status = "error"
-          fileUpload.message = this.t("File is the wrong type; it must be {{ pattern }}", {
+          fileUpload.status = 'error';
+          fileUpload.message = this.t('File is the wrong type; it must be {{ pattern }}', {
             pattern: this.component.filePattern,
-          })
+          });
+        }
+        // Check allowed file formats
+        if (file.name) {
+          const fileName = file.name.toLowerCase();
+          const allowedExtensions = ['.jpg', '.png', '.img', '.pdf', '.xlsx', '.xls', '.txt'];
+          const fileExtension = fileName.substring(fileName.lastIndexOf('.'));
+
+          if (!allowedExtensions.includes(fileExtension)) {
+            fileUpload.status = 'error';
+            fileUpload.message = this.t(
+              'File format not supported. Please upload one of these file types: .jpg, .png, .img, .pdf, .xlsx, .xls, .txt',
+            );
+          }
         }
         // Check file minimum size
         if (this.component.fileMinSize && !this.validateMinSize(file, this.component.fileMinSize)) {
-          fileUpload.status = "error"
-          fileUpload.message = this.t("File is too small; it must be at least {{ size }}", {
+          fileUpload.status = 'error';
+          fileUpload.message = this.t('File is too small; it must be at least {{ size }}', {
             size: this.component.fileMinSize,
-          })
+          });
         }
         // Check file maximum size
         if (this.component.fileMaxSize && !this.validateMaxSize(file, this.component.fileMaxSize)) {
-          fileUpload.status = "error"
-          fileUpload.message = this.t("File is too big; it must be at most {{ size }}", {
+          fileUpload.status = 'error';
+          fileUpload.message = this.t('File is too big; it must be at most {{ size }}', {
             size: this.component.fileMaxSize,
-          })
+          });
         }
         // Get a unique name for this file to keep file collisions from occurring.
-        const dir = this.interpolate(this.component.dir || "")
-        const { fileService } = this
+        const dir = this.interpolate(this.component.dir || '');
+        const { fileService } = this;
         if (!fileService) {
-          fileUpload.status = "error"
-          fileUpload.message = this.t("File Service not provided.")
+          fileUpload.status = 'error';
+          fileUpload.message = this.t('File Service not provided.');
         }
-        this.statuses.push(fileUpload)
-        this.redraw()
-        if (fileUpload.status !== "error") {
+        this.statuses.push(fileUpload);
+        this.redraw();
+        if (fileUpload.status !== 'error') {
           if (this.component.privateDownload) {
-            file.private = true
+            file.private = true;
           }
-          const { storage, options = {} } = this.component
-          const url = this.interpolate(this.component.url)
-          let groupKey = null
-          let groupPermissions = null
+          const { storage, options = {} } = this.component;
+          const url = this.interpolate(this.component.url);
+          let groupKey = null;
+          let groupPermissions = null;
           //Iterate through form custom-formio-components to find group resource if one exists
           this.root.everyComponent((element) => {
             if (element.component?.submissionAccess || element.component?.defaultPermission) {
@@ -140,14 +153,14 @@ export default class Component extends ParentComponent {
                       roles: [],
                     },
                   ]
-                : element.component.submissionAccess
+                : element.component.submissionAccess;
               groupPermissions.forEach((permission) => {
-                groupKey = ["admin", "write", "create"].includes(permission.type) ? element.component.key : null
-              })
+                groupKey = ['admin', 'write', 'create'].includes(permission.type) ? element.component.key : null;
+              });
             }
-          })
-          const fileKey = this.component.fileKey || "file"
-          const groupResourceId = groupKey ? this.currentForm.submission.data[groupKey]._id : null
+          });
+          const fileKey = this.component.fileKey || 'file';
+          const groupResourceId = groupKey ? this.currentForm.submission.data[groupKey]._id : null;
           fileService
             .uploadFile(
               storage,
@@ -155,53 +168,53 @@ export default class Component extends ParentComponent {
               fileName,
               dir,
               (evt) => {
-                fileUpload.status = "progress"
+                fileUpload.status = 'progress';
                 // @ts-ignore
-                fileUpload.progress = parseInt((100.0 * evt.loaded) / evt.total)
-                delete fileUpload.message
-                this.redraw()
+                fileUpload.progress = parseInt((100.0 * evt.loaded) / evt.total);
+                delete fileUpload.message;
+                this.redraw();
               },
               url,
               options,
               fileKey,
               groupPermissions,
-              groupResourceId
+              groupResourceId,
             )
             .then((fileInfo) => {
-              const index = this.statuses.indexOf(fileUpload)
+              const index = this.statuses.indexOf(fileUpload);
               if (index !== -1) {
-                this.statuses.splice(index, 1)
+                this.statuses.splice(index, 1);
               }
-              fileInfo.originalName = file.name
+              fileInfo.originalName = file.name;
               if (!this.hasValue()) {
-                this.dataValue = []
+                this.dataValue = [];
               }
-              this.dataValue.push(fileInfo)
-              this.redraw()
-              this.triggerChange()
+              this.dataValue.push(fileInfo);
+              this.redraw();
+              this.triggerChange();
             })
             .catch((response) => {
-              fileUpload.status = "error"
+              fileUpload.status = 'error';
               // grab the detail out our api-problem response.
-              fileUpload.message = response.detail
+              fileUpload.message = response.detail;
               // @ts-ignore
-              delete fileUpload.progress
-              this.redraw()
-            })
+              delete fileUpload.progress;
+              this.redraw();
+            });
         }
-      })
+      });
     }
   }
   getFile(fileInfo) {
-    const { options = {} } = this.component
-    const { fileService } = this
+    const { options = {} } = this.component;
+    const { fileService } = this;
     if (!fileService) {
-      return alert("File Service not provided")
+      return alert('File Service not provided');
     }
     fileService.downloadFile(fileInfo, options).catch((response) => {
       // Is alert the best way to do this?
       // User is expecting an immediate notification due to attempting to download a file.
-      alert(response)
-    })
+      alert(response);
+    });
   }
 }

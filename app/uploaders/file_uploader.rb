@@ -8,6 +8,24 @@ class FileUploader < Shrine
     validate_max_size Constants::Sizes::FILE_UPLOAD_MAX_SIZE * 1024 * 1024 # 100 MB to start
     # Could be images, excel files, bims, we do not have an exhaustive list right now.
 
+    # Allow only specific file formats
+    if file && file.original_filename
+      filename = file.original_filename.downcase
+
+      allowed_extensions = %w[.jpg .png .img .pdf .xlsx .xls .txt]
+      file_extension = File.extname(filename)
+
+      unless allowed_extensions.include?(file_extension)
+        allowed_formats = allowed_extensions.join(", ")
+        errors << I18n.t(
+          "file_upload.only_allowed_formats",
+          default:
+            "File format not supported. Please upload one of these file types: #{allowed_formats}",
+          formats: allowed_formats
+        )
+      end
+    end
+
     # Immediate virus scanning validation
     next unless file # Skip if no file attached
     next unless ClamAvService.enabled? # Skip if virus scanning disabled

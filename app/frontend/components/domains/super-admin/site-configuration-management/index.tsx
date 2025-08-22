@@ -26,7 +26,7 @@ export const SiteConfigurationManagementScreen = observer(function SiteConfigura
               h="full"
             />
           </GridItem>
-          <GridItem>
+          {/* <GridItem>
             <HomeScreenBox
               title={t(`${i18nPrefix}.adminUserIndex.title`)}
               description={t(`${i18nPrefix}.adminUserIndex.description`)}
@@ -35,7 +35,7 @@ export const SiteConfigurationManagementScreen = observer(function SiteConfigura
               href="users"
               h="full"
             />
-          </GridItem>
+          </GridItem> */}
           <GridItem>
             <HomeScreenBox
               title={t(`${i18nPrefix}.helpDrawerSetup.title`)}

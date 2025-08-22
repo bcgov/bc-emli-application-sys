@@ -2255,7 +2255,7 @@ const options = {
             reviewer: 'reviewer',
             super_admin: 'super admin',
             participant: 'participant',
-            admin: 'admin',
+            admin: 'Admin',
             contractor: 'contractor',
             admin_manager: 'Admin manager',
             system_admin: 'System admin',
