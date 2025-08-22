@@ -371,8 +371,19 @@ export const PermitApplicationStoreModel = types
         (self?.rootStore?.programStore?.currentProgram ?? self).setTablePermitApplications(filteredApplications);
 
         self.currentPage = opts?.page ?? self.currentPage;
-        self.totalPages = response.data.meta.totalPages;
-        self.totalCount = response.data.meta.totalCount;
+
+        // Update pagination numbers based on whether we're filtering by assigned user
+        if (self.assignedUserIdFilter) {
+          // When filtering by assigned user, calculate pagination based on filtered results
+          const filteredCount = filteredApplications.length;
+          self.totalCount = filteredCount;
+          self.totalPages = Math.ceil(filteredCount / (opts?.countPerPage ?? self.countPerPage));
+        } else {
+          // When not filtering, use the original backend pagination
+          self.totalPages = response.data.meta.totalPages;
+          self.totalCount = response.data.meta.totalCount;
+        }
+
         self.countPerPage = opts?.countPerPage ?? self.countPerPage;
       }
 
