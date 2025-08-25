@@ -102,13 +102,13 @@ export default class Component extends ParentComponent {
         // Check allowed file formats
         if (file.name) {
           const fileName = file.name.toLowerCase();
-          const allowedExtensions = ['.jpg', '.png', '.img', '.pdf', '.xlsx', '.xls', '.txt'];
+          const allowedExtensions = ['.jpg', '.jpeg', '.png', '.img', '.pdf', '.xlsx', '.xls', '.txt'];
           const fileExtension = fileName.substring(fileName.lastIndexOf('.'));
 
           if (!allowedExtensions.includes(fileExtension)) {
             fileUpload.status = 'error';
             fileUpload.message = this.t(
-              'File format not supported. Please upload one of these file types: .jpg, .png, .img, .pdf, .xlsx, .xls, .txt',
+              'File format not supported. Please upload one of these file types: .jpg, .jpeg, .png, .img, .pdf, .xlsx, .xls, .txt',
             );
           }
         }
