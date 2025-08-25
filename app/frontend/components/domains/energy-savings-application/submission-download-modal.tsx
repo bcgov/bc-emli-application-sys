@@ -125,7 +125,7 @@ export const SubmissionDownloadModal = observer(
           renderTrigger(onOpen)
         ) : (
           <Button variant="primary" onClick={onOpen} leftIcon={<Download />}>
-            {t('ui.download')}
+            {t('energySavingsApplication.show.viewApplicationFiles')}
           </Button>
         )}
 
