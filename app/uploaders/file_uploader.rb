@@ -12,7 +12,7 @@ class FileUploader < Shrine
     if file && file.original_filename
       filename = file.original_filename.downcase
 
-      allowed_extensions = %w[.jpg .png .img .pdf .xlsx .xls .txt]
+      allowed_extensions = %w[.jpg .jpeg .png .img .pdf .xlsx .xls .txt]
       file_extension = File.extname(filename)
 
       unless allowed_extensions.include?(file_extension)
