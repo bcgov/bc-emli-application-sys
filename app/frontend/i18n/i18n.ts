@@ -2577,7 +2577,7 @@ const options = {
           },
           revisionReasonsAttributesSetup: {
             title: 'Update reasons',
-            description: 'Setup reasons for revision requests',
+            description: 'Setup reasons for updates',
             options: 'Selectable options',
             fields: {
               reasonCode: 'Reason code',
