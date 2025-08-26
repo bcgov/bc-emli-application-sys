@@ -299,7 +299,10 @@ class NotificationService
       users_that_can_submit << designated_submitter_user
     end
 
-    users_that_can_submit.each do |user|
+    # Only send notifications to participants
+    participants_only = users_that_can_submit.select(&:participant?)
+
+    participants_only.each do |user|
       if user.preference&.enable_in_app_application_revisions_request_notification
         notification_user_hash[
           user.id
