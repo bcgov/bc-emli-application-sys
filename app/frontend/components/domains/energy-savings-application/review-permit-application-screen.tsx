@@ -64,6 +64,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const [hideRevisionList, setHideRevisionList] = useState(false);
   const [hasUnsavedEdits, setHasUnsavedEdits] = useState(false);
   const [saveEditsCompleted, setSaveEditsCompleted] = useState(false);
+  const [saveEditsDisabled, setSaveEditsDisabled] = useState(false);
 
   const sendRevisionContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -122,6 +123,9 @@ export const ReviewPermitApplicationScreen = observer(() => {
 
   // Handle Save Edits workflow
   const handleSaveEdits = useCallback(async () => {
+    // Immediately disable the button to prevent multiple clicks
+    setSaveEditsDisabled(true);
+
     // First: Capture and save current form data
     const formio = formRef.current;
     const submissionData = formio?.data;
@@ -158,7 +162,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
           if (submitButton) {
             submitButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
-        }, 100); // Brief delay to ensure button is enabled first
+        }, 200); // Brief delay to ensure button is enabled first
       }
     }
   }, [currentPermitApplication, formRef, performedBy, navigate, setSaveEditsCompleted]);
@@ -267,7 +271,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                   color="text.primary"
                   border="1px solid"
                   borderColor="border.light"
-                  isDisabled={!hasUnsavedEdits}
+                  isDisabled={!hasUnsavedEdits || saveEditsDisabled}
                   onClick={handleSaveEdits}
                 >
                   {t('energySavingsApplication.show.saveEdits')}

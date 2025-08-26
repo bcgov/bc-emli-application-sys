@@ -353,9 +353,9 @@ export const RequirementForm = observer(
               return;
             }
 
-            // Skip revision buttons - they should always be clickable
+            // Revision buttons (pencil icons) - disable after Save Edits completion
             if (requirement.key?.includes('-revision-button')) {
-              requirement.disabled = false;
+              requirement.disabled = saveEditsCompleted;
               return;
             }
 
@@ -372,11 +372,12 @@ export const RequirementForm = observer(
             // Field editability logic:
             // 1. Draft applications: All users can edit all fields (creation phase)
             // 2. Participants: Only flagged fields during revisions
-            // 3. Admins: Only on "staff" pathway (not "send to submitter")
+            // 3. Admins: Only on "staff" pathway (not "send to submitter") and before Save Edits completion
             const participantCanEdit =
               isRealParticipant && (isDraftApplication || (isRevisionsRequested && hasRevisionRequestInLatest));
             const adminCanEdit =
-              isDraftApplication || (hasRevisionRequestInLatest && isEditing && performedBy === 'staff');
+              isDraftApplication ||
+              (hasRevisionRequestInLatest && isEditing && performedBy === 'staff' && !saveEditsCompleted);
 
             requirement.disabled = !(participantCanEdit || adminCanEdit);
           });
