@@ -155,14 +155,14 @@ export const ReviewPermitApplicationScreen = observer(() => {
         // Participant pathway: redirect to submissions inbox
         navigate('/applications');
       } else {
-        // Staff pathway: Exit revision mode and scroll to submit button to guide user
+        // Staff pathway: Exit revision mode and scroll to submit button
         setRevisionMode(false);
         setTimeout(() => {
           const submitButton = document.querySelector('button[type="submit"]') as HTMLButtonElement;
           if (submitButton) {
             submitButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
-        }, 200); // Brief delay to ensure button is enabled first
+        }, 300); // Balanced timeout for React state propagation
       }
     }
   }, [currentPermitApplication, formRef, performedBy, navigate, setSaveEditsCompleted]);

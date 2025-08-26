@@ -270,6 +270,13 @@ class PermitApplication < ApplicationRecord
   end
 
   def submission_requirement_block_edit_permissions(user_id:)
+    user = User.find(user_id)
+    if user&.admin? || user&.admin_manager?
+      if user.program_memberships.active.exists?(program_id: self.program_id)
+        return :all
+      end
+    end
+
     if submitter_id != user_id &&
          !collaborator?(user_id:, collaboration_type: :submission)
       return nil
