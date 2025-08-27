@@ -64,6 +64,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const [hideRevisionList, setHideRevisionList] = useState(false);
   const [hasUnsavedEdits, setHasUnsavedEdits] = useState(false);
   const [saveEditsCompleted, setSaveEditsCompleted] = useState(false);
+  const [saveEditsDisabled, setSaveEditsDisabled] = useState(false);
 
   const sendRevisionContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -122,6 +123,9 @@ export const ReviewPermitApplicationScreen = observer(() => {
 
   // Handle Save Edits workflow
   const handleSaveEdits = useCallback(async () => {
+    // Immediately disable the button to prevent multiple clicks
+    setSaveEditsDisabled(true);
+
     // First: Capture and save current form data
     const formio = formRef.current;
     const submissionData = formio?.data;
@@ -151,14 +155,14 @@ export const ReviewPermitApplicationScreen = observer(() => {
         // Participant pathway: redirect to submissions inbox
         navigate('/applications');
       } else {
-        // Staff pathway: Exit revision mode and scroll to submit button to guide user
+        // Staff pathway: Exit revision mode and scroll to submit button
         setRevisionMode(false);
         setTimeout(() => {
           const submitButton = document.querySelector('button[type="submit"]') as HTMLButtonElement;
           if (submitButton) {
             submitButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
-        }, 100); // Brief delay to ensure button is enabled first
+        }, 300); // Balanced timeout for React state propagation
       }
     }
   }, [currentPermitApplication, formRef, performedBy, navigate, setSaveEditsCompleted]);
@@ -267,7 +271,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                   color="text.primary"
                   border="1px solid"
                   borderColor="border.light"
-                  isDisabled={!hasUnsavedEdits}
+                  isDisabled={!hasUnsavedEdits || saveEditsDisabled}
                   onClick={handleSaveEdits}
                 >
                   {t('energySavingsApplication.show.saveEdits')}
