@@ -1,4 +1,17 @@
-import { Box, Button, Container, Flex, HStack, Heading, Text, VStack } from '@chakra-ui/react';
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  Button,
+  Container,
+  Flex,
+  HStack,
+  Heading,
+  IconButton,
+  Stack,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import { FormProvider, useForm, Controller } from 'react-hook-form';
@@ -10,6 +23,8 @@ import { AsyncRadioGroup } from '../../shared/base/inputs/async-radio-group';
 import { TextFormControl } from '../../shared/form/input-form-control';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { EProgramUserGroupType } from '../../../types/enums';
+import SuccessAlert from '../../shared/base/success-alert';
+import { CheckCircle } from '@phosphor-icons/react';
 
 export type TCreateProgramFormData = {
   programName: string;
@@ -96,9 +111,31 @@ export const NewProgramScreen = observer(() => {
     <Container maxW="container.lg" pt={8} as="main">
       <FormProvider {...formMethods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <VStack alignItems={'flex-start'} pr={6} pl={6}>
+          <VStack alignItems={'center'} pr={6} pl={6}>
             {program ? (
-              <Flex direction="column" w="full" align="center" gap={6}>
+              <Flex direction="column" w="container.md" align="center" gap={6} px={12}>
+                <Stack
+                  py={3}
+                  pl={3}
+                  pr={32}
+                  bg="theme.lightGreen"
+                  border="1px"
+                  borderColor="success"
+                  borderRadius="lg"
+                  align="stretch"
+                >
+                  <Alert status="success" variant="subtle" bg="transparent" alignItems="center" p={0}>
+                    <IconButton
+                      variant="ghost"
+                      icon={<CheckCircle size={21.94} color="darkGreen" />}
+                      zIndex={1}
+                      aria-label="Check"
+                    />
+                    <Stack>
+                      <Text fontSize="md">{t('program.new.successMessage')}</Text>
+                    </Stack>
+                  </Alert>
+                </Stack>
                 <Heading as="h1" color="theme.blueAlt">
                   {t('program.new.title')}
                 </Heading>

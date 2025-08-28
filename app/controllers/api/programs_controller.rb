@@ -126,7 +126,7 @@ class Api::ProgramsController < Api::ApplicationController
 
     if @program.save
       render_success @program,
-                     "jurisdiction.create_success",
+                     nil,
                      {
                        blueprint: ProgramBlueprint,
                        blueprint_opts: {
