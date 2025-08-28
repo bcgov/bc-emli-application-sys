@@ -2,41 +2,32 @@ module Api::Concerns::Search::PermitApplications
   extend ActiveSupport::Concern
 
   def perform_permit_application_search
-    search_conditions = {
-      order: permit_application_order,
-      match: :word_start,
-      fields: [
-        { number: :word_middle },
-        { nickname: :word_middle },
-        { full_address: :word_middle },
-        { permit_classifications: :word_middle },
-        { submitter: :word_middle },
-        { status: :word_middle },
-        { user_group_type_id: :word_middle },
-        { submission_type_id: :word_middle },
-        { audience_type_id: :word_middle },
-        { review_delegatee_name: :word_middle }
-      ],
-      where: permit_application_where_clause,
-      page: permit_application_search_params[:page],
-      per_page:
-        (
-          if permit_application_search_params[:page]
-            (
-              permit_application_search_params[:per_page] ||
-                Kaminari.config.default_per_page
-            )
-          else
-            nil
-          end
-        ),
-      includes: PermitApplication::SEARCH_INCLUDES
-    }
+    params = search_params
+
     @permit_application_search =
-      PermitApplication.search(permit_application_query, **search_conditions)
+      PermitApplication.search(
+        params[:query].presence || "*",
+        fields: %i[
+          number
+          permit_classifications
+          submitter_name
+          review_delegatee_name
+        ],
+        match: :word_middle,
+        misspellings: false,
+        where: permit_application_where_clause,
+        order: permit_application_order,
+        page: params[:page],
+        per_page: params[:per_page] || Kaminari.config.default_per_page,
+        includes: PermitApplication::SEARCH_INCLUDES
+      )
   end
 
   private
+
+  def search_params
+    @search_params ||= permit_application_search_params
+  end
 
   def permit_application_search_params
     params.delete(:sort) if params[:sort].nil?
@@ -75,17 +66,13 @@ module Api::Concerns::Search::PermitApplications
     permitted_params
   end
 
-  def permit_application_query
-    if permit_application_search_params[:query].present?
-      permit_application_search_params[:query]
-    else
-      "*"
-    end
-  end
-
   def permit_application_order
-    if (sort = permit_application_search_params[:sort])
-      { sort[:field] => { order: sort[:direction], unmapped_type: "long" } }
+    if (sort = search_params[:sort])
+      field_name =
+        sort[:field] == "assigned" ? "review_delegatee_name" : sort[:field]
+      direction =
+        %w[asc desc].include?(sort[:direction]) ? sort[:direction] : "asc"
+      { field_name => { order: direction, unmapped_type: "long" } }
     elsif current_user.participant?
       { created_at: { order: :desc, unmapped_type: "long" } }
     else
@@ -94,7 +81,7 @@ module Api::Concerns::Search::PermitApplications
   end
 
   def permit_application_where_clause
-    filters = permit_application_search_params[:filters]
+    filters = search_params[:filters]
     where =
       if @program
         { program_id: @program.id }
