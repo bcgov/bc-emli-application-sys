@@ -16,21 +16,35 @@ import { RouterLinkButton } from '../../../shared/navigation/router-link-button'
 import { ActiveGridHeaders, DeactivatedGridHeaders, PendingGridHeaders } from './grid-header';
 import { ActiveUserRow, DeactivatedUserRow, PendingUserRow } from './user-table-rows';
 import { ISearch } from '../../../../lib/create-search-model';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 export const ProgramUserIndexScreen = observer(function ProgramUserIndex() {
   const { t } = useTranslation();
   const { userStore } = useMst();
   const { currentProgram, error } = useProgram();
-  const [tabIndex, setTabIndex] = useState(0);
+  const [searchParams] = useSearchParams();
   const location = useLocation();
+
+  // Get initial tab index from URL params
+  const getInitialTabIndex = () => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'pending') return 1;
+    if (tabParam === 'deactivated') return 2;
+    return 0; // default to active
+  };
+
+  const [tabIndex, setTabIndex] = useState(getInitialTabIndex);
 
   const basePath = location.pathname.startsWith('/configure-users') ? '/configure-users' : '/programs';
 
   useEffect(() => {
-    setTabIndex(0);
-    userStore.setStatus('active');
-  }, []);
+    const initialTabIndex = getInitialTabIndex();
+    setTabIndex(initialTabIndex);
+
+    const statusMap = ['active', 'pending', 'deactivated'] as const;
+    const initialStatus = statusMap[initialTabIndex];
+    userStore.setStatus(initialStatus);
+  }, [searchParams]);
 
   const handleSetTabIndex = (index: number) => {
     setTabIndex(index);

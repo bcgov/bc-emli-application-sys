@@ -13,7 +13,7 @@ import { EFlashMessageStatus, EPermitClassificationCode } from '../../../types/e
 import { RouterLink } from '../../shared/navigation/router-link';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { useMst } from '../../../setup/root';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const defaultRow: TInviteUserParams = {
   email: '',
@@ -39,6 +39,7 @@ export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
   const rootStore = useMst();
   const { uiStore } = rootStore;
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [rows, setRows] = useState<TInviteUserParams[]>([{ ...defaultRow }]);
   const basePath = location.pathname.startsWith('/configure-users') ? '/configure-users' : '/programs';
@@ -54,13 +55,16 @@ export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
         inbox_access: formatInboxAccessForApi(row.inboxAccess as ClassificationPresetName[]),
       }));
 
-      const result = await currentProgram.inviteUsers(apiRows);
+      await currentProgram.inviteUsers(apiRows);
 
       uiStore.flashMessage.show(
         EFlashMessageStatus.success,
         'Invite sent. Review the status of the invite in the user table.',
         '',
       );
+
+      // Redirect to the previous page (users table) and open the pending tab
+      navigate(`${basePath}/${currentProgram.id}/users?tab=pending`);
     } catch (error) {
       console.error('Failed to send invites:', error);
 
