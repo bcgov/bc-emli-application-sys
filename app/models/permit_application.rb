@@ -36,17 +36,10 @@ class PermitApplication < ApplicationRecord
   ]
 
   searchkick word_middle: %i[
-               nickname
-               full_address
-               permit_classifications
-               submitter
-               status
-               review_delegatee_name
-               updated_at
-               user_group_type_id
-               submission_type_id
-               audience_type_id
                number
+               permit_classifications
+               submitter_name
+               review_delegatee_name
              ]
 
   belongs_to :submitter, class_name: "User"
@@ -233,6 +226,7 @@ class PermitApplication < ApplicationRecord
       permit_classifications:
         "#{user_group_type&.name} #{audience_type&.name} #{submission_type&.name}",
       submitter: "#{submitter.name} #{submitter.email}",
+      submitter_name: submitter.name,
       submitted_at: submitted_at,
       resubmitted_at: resubmitted_at,
       viewed_at: viewed_at,
@@ -248,16 +242,12 @@ class PermitApplication < ApplicationRecord
       created_at: created_at,
       updated_at: updated_at,
       using_current_template_version: using_current_template_version,
+      review_delegatee_name: assigned_users.map(&:name).join(" "),
       user_ids_with_submission_edit_permissions:
         [submitter.id] +
           users_by_collaboration_options(collaboration_type: :submission).pluck(
             :id
           )
-      # review_delegatee_name:
-      #   users_by_collaboration_options(
-      #     collaboration_type: :review,
-      #     collaborator_type: :delegatee
-      #   ).first&.name,
       # sandbox_id: sandbox_id
     }
   end
