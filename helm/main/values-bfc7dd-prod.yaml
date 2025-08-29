@@ -59,7 +59,7 @@ sidekiq:
       memory: 256Mi
 
   env:
-    'APP_DOMAIN': 'hesp.apps.silver.devops.gov.bc.ca'
+    'APP_DOMAIN': 'bcenergysavingsprogram.ca'
     'FROM_EMAIL': 'no-reply@gov.bc.ca'
     # File Upload Configuration
     'BCGOV_OBJECT_STORAGE_REGION': 'ca-central-1'
