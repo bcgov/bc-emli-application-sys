@@ -101,12 +101,9 @@
     "generate-pdf": " node public/vite-ssr/ssr.js"
   },
   "lint-staged": {
-    "*.{js,css,md,ts,tsx}": [
-      "prettier --write"
-    ],
-    "*.rb": [
-      "stree write"
-    ]
+    "*.{js,css,md,ts,tsx}": "prettier --write",
+    "*.rb": "stree write",
+    "helm/**/*.{yaml,yml,tpl}": "bash scripts/helm-lint.sh"
   },
   "version": "1.21.7"
 }

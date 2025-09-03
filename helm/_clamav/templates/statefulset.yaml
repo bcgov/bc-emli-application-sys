@@ -30,14 +30,14 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: init-database
-          image: alpine:3.18
-          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.initContainer.image.repository }}:{{ .Values.initContainer.image.tag }}"
+          imagePullPolicy: {{ .Values.initContainer.image.pullPolicy }}
           command: ["/bin/sh", "-c"]
           args:
             - |
-              wget -O /var/lib/clamav/main.cvd https://clamav-mirror.apps.silver.devops.gov.bc.ca/main.cvd;
-              wget -O /var/lib/clamav/daily.cvd https://clamav-mirror.apps.silver.devops.gov.bc.ca/daily.cvd;
-              wget -O /var/lib/clamav/bytecode.cvd https://clamav-mirror.apps.silver.devops.gov.bc.ca/bytecode.cvd;
+              wget -O /var/lib/clamav/main.cvd {{ .Values.initContainer.clamavMirror }}/main.cvd;
+              wget -O /var/lib/clamav/daily.cvd {{ .Values.initContainer.clamavMirror }}/daily.cvd;
+              wget -O /var/lib/clamav/bytecode.cvd {{ .Values.initContainer.clamavMirror }}/bytecode.cvd;
           volumeMounts:
           - name: database
             mountPath: /var/lib/clamav
@@ -48,65 +48,39 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           env:
-            - name: CLAMAV_NO_CLAMD
-              value: 'false'
-            - name: CLAMAV_NO_FRESHCLAMD
-              value: 'false'
-            - name: CLAMAV_NO_MILTERD
-              value: 'true'
-            - name: CLAMD_STARTUP_TIMEOUT
-              value: '1800'
-            - name: FRESHCLAM_CHECKS
-              value: '1'
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
           volumeMounts:
-          # clamd.conf file
-          - mountPath: /etc/clamav/clamd.conf
-            name: config-volume
-            readOnly: true
-            subPath: clamd.conf
-          # freshclam.conf file
-          - mountPath: /etc/clamav/freshclam.conf
-            name: config-volume
-            readOnly: true
-            subPath: freshclam.conf
-          - name: database
-            mountPath: /var/lib/clamav
-          - name: logs
-            mountPath: /var/log
+            {{- toYaml .Values.volumeMounts | nindent 10 }}
           ports:
             - name: http
-              containerPort: 3310
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
           startupProbe:
             exec:
-              command:
-              - /bin/sh
-              - -c
-              - 'echo PING | nc -w 5 127.0.0.1 3310 | grep -q PONG'
-            initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
-            failureThreshold: {{ .Values.startupProbe.failureThreshold }}
-            periodSeconds: {{ .Values.startupProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
+              command: {{ toYaml .Values.probes.command | nindent 14 }}
+            initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.startup.timeoutSeconds }}
+
           livenessProbe:
             exec:
-              command:
-              - /bin/sh
-              - -c
-              - 'echo PING | nc -w 5 127.0.0.1 3310 | grep -q PONG'
-            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
-            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+              command: {{ toYaml .Values.probes.command | nindent 14 }}
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+
           readinessProbe:
             exec:
-              command:
-              - /bin/sh
-              - -c
-              - 'echo PING | nc -w 5 127.0.0.1 3310 | grep -q PONG'
-            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+              command: {{ toYaml .Values.probes.command | nindent 14 }}
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

@@ -18,5 +18,16 @@
       "lint": true,
       "rails": true
     }
-  }
+  },
+  "yaml.validate": true,
+  "yaml.schemas": {
+    "kubernetes": "helm/**"
+  },
+  "yaml.customTags": [
+    "!*",
+    "tag:yaml.org,2002:js/undefined",
+    "tag:yaml.org,2002:map",
+    "tag:yaml.org,2002:seq"
+  ],
 }
+

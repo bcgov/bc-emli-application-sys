@@ -36,23 +36,40 @@ tolerations: []
 affinity: {}
 
 # Health checks with appropriate timeouts for ClamAV startup
-startupProbe:
-  initialDelaySeconds: 240
-  periodSeconds: 30
-  failureThreshold: 3
-  timeoutSeconds: 600
+probes:
+  command: ["/bin/sh", "-c", "echo PING | nc -w 5 127.0.0.1 {{ .Values.service.port }} | grep -q PONG"]
 
-livenessProbe:
-  initialDelaySeconds: 300
-  periodSeconds: 10
-  failureThreshold: 3
-  timeoutSeconds: 600
+  startup:
+    initialDelaySeconds: 240
+    periodSeconds: 30
+    failureThreshold: 3
+    timeoutSeconds: 600
 
-readinessProbe:
-  initialDelaySeconds: 240
-  periodSeconds: 10
-  failureThreshold: 3
-  timeoutSeconds: 600
+  liveness:
+    initialDelaySeconds: 300
+    periodSeconds: 10
+    failureThreshold: 3
+    timeoutSeconds: 600
+
+  readiness:
+    initialDelaySeconds: 240
+    periodSeconds: 10
+    failureThreshold: 3
+    timeoutSeconds: 600
+
+volumeMounts:
+  - name: config-volume
+    mountPath: /etc/clamav/clamd.conf
+    subPath: clamd.conf
+    readOnly: true
+  - name: config-volume
+    mountPath: /etc/clamav/freshclam.conf
+    subPath: freshclam.conf
+    readOnly: true
+  - name: database
+    mountPath: /var/lib/clamav
+  - name: logs
+    mountPath: /var/log
 
 hpa:
   enabled: false
@@ -107,3 +124,15 @@ virusScanTempVolume:
 
 env:
   CLAMAV_LOG_LEVEL: INFO
+  CLAMAV_NO_CLAMD: "false"
+  CLAMAV_NO_FRESHCLAMD: "false"
+  CLAMAV_NO_MILTERD: "true"
+  CLAMD_STARTUP_TIMEOUT: "1800"
+  FRESHCLAM_CHECKS: "1"
+
+initContainer:
+  image:
+    repository: alpine
+    tag: "3.18"
+    pullPolicy: IfNotPresent
+  clamavMirror: "https://clamav-mirror.apps.silver.devops.gov.bc.ca"
