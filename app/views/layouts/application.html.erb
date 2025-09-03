@@ -7,18 +7,18 @@
   <meta name="deployment-timestamp" content="<%= ENV.fetch('DEPLOYMENT_TIMESTAMP', Time.now.utc.iso8601) %>">
   
   <!-- Open Graph metadata -->
-  <meta property="og:title" content="BC Energy Savings Program - Home Energy Rebates">
+  <meta property="og:title" content="Energy Savings Program">
   <meta property="og:description" content="Save energy, upgrade your home">
-  <meta property="og:image" content="<%= FrontendUrlHelper.frontend_url('/images/share-preview.webp') %>">
+  <meta property="og:image" content="<%= FrontendUrlHelper.frontend_url('/images/header-background.png') %>">
   <meta property="og:url" content="<%= FrontendUrlHelper.root_url %>">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="BC Energy Savings Program">
   
   <!-- Twitter Card metadata -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="BC Energy Savings Program - Home Energy Rebates">
+  <meta name="twitter:title" content="Energy Savings Program">
   <meta name="twitter:description" content="Save energy, upgrade your home">
-  <meta name="twitter:image" content="<%= FrontendUrlHelper.frontend_url('/images/share-preview.webp') %>">
+  <meta name="twitter:image" content="<%= FrontendUrlHelper.frontend_url('/images/header-background.png') %>">
 
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
