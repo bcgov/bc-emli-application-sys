@@ -2768,7 +2768,11 @@ const options = {
               'Contact us at 1-833-856-0333 from 9 am - 5 pm, Monday - Friday (excluding statutory holidays).',
             applicationHelpTitleShort: 'Get help with your Energy Savings Program application',
             applicationHelpDescriptionShort:
-              'Do you have questions about your application, the program or home upgrade opportunities? We can help you understand home energy upgrades and rebates by email, or you can schedule a call with an Energy Savings Program Specialist.',
+              'Do you have questions about your application, the program or home upgrade opportunities? We can help you understand home energy upgrades and rebates by email, or you can',
+            applicationHelpCallLink: 'schedule a call with an Energy Savings Program Specialist',
+            applicationHelpCallUrl:
+              'https://submit.digital.gov.bc.ca/app/form/submit?f=a216ecd7-c840-457a-9f8f-b350f334849b',
+            applicationHelpDescriptionEnd: '.',
             groundOrientedEmail: 'BetterHomesESP@CLEAResult.com',
             multiUnitEmail: 'ESPcondoapartment@CLEAResult.com',
             groundOrientedLabel: 'Ground-oriented home types:',

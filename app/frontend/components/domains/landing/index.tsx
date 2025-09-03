@@ -28,54 +28,52 @@ export const LandingScreen = observer(() => {
         bgImage={`${colors.theme.blueImageGradient}, url('/images/header-background.png')`}
         bgPosition="center"
         bgSize="cover"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
+        display="grid"
+        placeItems="center"
       >
-        <Flex
-          as="section"
-          aria-labelledby="hero-title"
-          direction="column"
-          alignItems="center"
-          justifyContent="center"
-          textAlign="center"
-          gap="16px"
-          px={{ base: '24px', md: '32px' }}
-          py="64px"
-          w={{ base: '382px', md: '618px' }}
-          minH="fit-content"
-          filter={{
-            base: 'none',
-          }}
-        >
-          <Heading
-            as="h1"
-            id="hero-title"
-            fontSize="48px"
-            fontWeight="700"
-            color="greys.white"
-            textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px ${colors.darken[70]}`}
-            lineHeight="65px"
+        <Box w="full" maxW="1170px" px={{ base: '24px', md: '32px' }} mx="auto">
+          <Flex
+            as="section"
+            aria-labelledby="hero-title"
+            direction="column"
+            alignItems="flex-start"
+            gap="16px"
+            py="64px"
             w="full"
-            display="flex"
-            alignItems="center"
-            py={{ base: 4, md: 2 }}
+            minH="fit-content"
+            filter={{
+              base: 'none',
+            }}
           >
-            {t('landing.title')}
-          </Heading>
-          <Text
-            fontSize="16px"
-            color="greys.white"
-            textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px ${colors.darken[70]}`}
-            lineHeight="27px"
-            w="full"
-            display="flex"
-            alignItems="center"
-            py={{ base: 3, md: 2 }}
-          >
-            {t('landing.intro')}
-          </Text>
-        </Flex>
+            <Heading
+              as="h1"
+              id="hero-title"
+              fontSize="48px"
+              fontWeight="700"
+              color="greys.white"
+              textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px ${colors.darken[70]}`}
+              lineHeight="65px"
+              w="full"
+              display="flex"
+              alignItems="center"
+              py={{ base: 4, md: 2 }}
+            >
+              {t('landing.title')}
+            </Heading>
+            <Text
+              fontSize="16px"
+              color="greys.white"
+              textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px ${colors.darken[70]}`}
+              lineHeight="27px"
+              w="full"
+              display="flex"
+              alignItems="center"
+              py={{ base: 3, md: 2 }}
+            >
+              {t('landing.intro')}
+            </Text>
+          </Flex>
+        </Box>
       </Box>
 
       {/* Main Content Section */}
