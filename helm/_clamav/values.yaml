@@ -37,7 +37,7 @@ affinity: {}
 
 # Health checks with appropriate timeouts for ClamAV startup
 probes:
-  command: ["/bin/sh", "-c", "echo PING | nc -w 5 127.0.0.1 {{ .Values.service.port }} | grep -q PONG"]
+  command: ["/bin/sh", "-c", "echo PING | nc -w 5 127.0.0.1 3310 | grep -q PONG"]
 
   startup:
     initialDelaySeconds: 240
