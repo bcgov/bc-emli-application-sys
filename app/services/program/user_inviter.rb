@@ -22,12 +22,17 @@ class Program::UserInviter
 
       user = User.find_by(email: email)
 
-      if user.present? && !user.discarded? && user.confirmed?
-        self.results[:email_taken] << user
-        next
-      end
+      if user.present? && !user.discarded?
+        # check if they already have this membership
+        if ProgramMembership.exists?(user: user, program: program)
+          self.results[:email_taken] << user
+          next
+        end
 
-      reinvited = user.present?
+        reinvited = true
+      else
+        reinvited = false
+      end
 
       if reinvited
         Current.user = inviter
@@ -48,6 +53,8 @@ class Program::UserInviter
       ProgramClassificationMembership.where(
         program_membership: program_membership
       ).delete_all
+
+      next if inbox_access.empty?
 
       # assign classifications
       inbox_access.each do |entry|
