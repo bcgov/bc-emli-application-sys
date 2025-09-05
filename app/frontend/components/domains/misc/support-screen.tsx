@@ -34,7 +34,13 @@ export const SupportScreen = () => {
             {t('site.support.applicationHelpTitleShort')}
           </Text>
 
-          <Text sx={baseTextSx}>{t('site.support.applicationHelpDescriptionShort')}</Text>
+          <Text sx={baseTextSx}>
+            {t('site.support.applicationHelpDescriptionShort')}{' '}
+            <Link href={t('site.support.applicationHelpCallUrl')} isExternal color="text.primary">
+              {t('site.support.applicationHelpCallLink')}
+            </Link>
+            {t('site.support.applicationHelpDescriptionEnd')}
+          </Text>
 
           <UnorderedList sx={{ listStyleType: 'disc' }}>
             <ListItem sx={baseTextSx}>
