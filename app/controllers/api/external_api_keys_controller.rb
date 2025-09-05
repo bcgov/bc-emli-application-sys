@@ -2,12 +2,11 @@ class Api::ExternalApiKeysController < Api::ApplicationController
   before_action :set_external_api_key, except: %i[index create]
 
   def index
-    # Only authorized to query own jurisdiction for review managers
-    if (current_user.system_admin? || current_user.admin_manager?) &&
-         params[:program_id].present? &&
-         !current_user.programs.find(params[:program_id])
-      raise Pundit::NotAuthorizedError
-    end
+    Rails.logger.info("index params: #{params.inspect}")
+    Rails.logger.info("current_user: #{current_user.inspect}")
+
+    # Only system admins can list API keys for any program
+    raise Pundit::NotAuthorizedError unless current_user.system_admin?
 
     @external_api_key =
       (
