@@ -8,6 +8,7 @@ on:
     paths:
       - .github/workflows/publish-clamav.yml
       - devops/docker/clamav/**
+      - helm/_clamav/**   #trigger on chart changes.
   # can manually run
   workflow_dispatch:
 
@@ -29,7 +30,7 @@ jobs:
       # Grab appVersion from the subchart
       - id: chart-version
         run: |
-          echo "appVersion=$(yq '.appVersion' _clamav/Chart.yaml)" >> $GITHUB_OUTPUT
+          echo "appVersion=$(yq '.appVersion' helm/_clamav/Chart.yaml)" >> $GITHUB_OUTPUT
 
       # Build & Push image with multiple tags
       - name: Build and Push
