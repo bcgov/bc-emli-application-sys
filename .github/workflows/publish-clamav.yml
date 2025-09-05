@@ -10,28 +10,35 @@ on:
 
 env:
   GITHUB_REGISTRY: ghcr.io
+  IMAGE_NAME: bcgov/hesp-clamav
 
 jobs:
   build-push-clamav:
     runs-on: ubuntu-22.04
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
       contents: read
       packages: write
 
     steps:
-      - uses: hmarr/debug-action@f7318c783045ac39ed9bb497e22ce835fdafbfe6
-      - uses: actions/checkout@8edcb1bdb4e267140fa742c62e395cd74f332709
+      - uses: actions/checkout@v4
 
+      # Grab appVersion from the subchart
+      - id: chart-version
+        run: |
+          echo "appVersion=$(yq '.appVersion' _clamav/Chart.yaml)" >> $GITHUB_OUTPUT
+
+      # Build & Push image with multiple tags
       - name: Build and Push
         uses: egose/actions/docker-build-push@46d589997e49cae4a8a3d06644ae8b04351a30f2
         with:
           registry-url: ${{ env.GITHUB_REGISTRY }}
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
-          image-name: bcgov/hesp-clamav
+          image-name: ${{ env.IMAGE_NAME }}
           docker-context: devops/docker/clamav
           docker-file: devops/docker/clamav/Dockerfile
           metadata-tags: |
-            type=ref,event=branch
-            type=sha,format=long,prefix=,suffix=
+            type=ref,event=branch              # → :main
+            type=sha,format=short              # → :abcd123
+            type=raw,value=${{ steps.chart-version.outputs.appVersion }}   # → :1.0.0
