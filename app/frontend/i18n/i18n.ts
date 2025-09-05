@@ -395,7 +395,7 @@ const options = {
           contractorPortalLinkText: 'Contractors - please visit the',
 
           energyCoachLink: 'https://submit.digital.gov.bc.ca/app/form/submit?f=a216ecd7-c840-457a-9f8f-b350f334849b',
-          homeEnergyPlannerLink: 'https://www.energystepcode.ca/home-energy-planner/',
+          homeEnergyPlannerLink: 'https://bchomeenergyplanner.ca/',
 
           // Aria labels
           ariaLabels: {
@@ -2775,7 +2775,7 @@ const options = {
             applicationHelpDescriptionEnd: '.',
             groundOrientedEmail: 'BetterHomesESP@CLEAResult.com',
             multiUnitEmail: 'ESPcondoapartment@CLEAResult.com',
-            groundOrientedLabel: 'Ground-oriented home types:',
+            groundOrientedLabel: 'Single family dwellings, rowhouses and other ground-oriented home types:',
             multiUnitLabel: 'Condo, apartment and other multi-unit home types:',
             learnMoreTitleShort: 'Learn more about the Energy Savings Program',
             learnMoreDescriptionShort:
