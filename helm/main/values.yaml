@@ -358,7 +358,7 @@ clamav:
 
   image:
     repository: ghcr.io/bcgov/hesp-clamav
-    tag: main
+    #tag: main
     pullPolicy: IfNotPresent
 
   nameOverride: hesp-clamav
