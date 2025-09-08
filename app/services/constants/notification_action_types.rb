@@ -24,5 +24,6 @@ module Constants
     ADMIN_UPDATED_PARTICIPANT_APP = "admin_updated_participant_app"
     PARTICIPANT_INCOMPLETE_DRAFT_NOTIFICATION =
       "participant_incomplete_draft_notification"
+    NEW_PARTICIPANT_WELCOME = "new_participant_welcome"
   end
 end
