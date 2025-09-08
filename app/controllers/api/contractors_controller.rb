@@ -32,6 +32,16 @@ class Api::ContractorsController < Api::ApplicationController
     head :no_content
   end
 
+  def shim
+    contractor =
+      Contractor.create!(
+        contact: current_user,
+        business_name: "TBD",
+        onboarded: false
+      )
+    render json: ContractorBlueprint.render(contractor), status: :created
+  end
+
   private
 
   def set_contractor

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_30_082300) do
+ActiveRecord::Schema[7.1].define(version: 2025_09_05_130200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -132,6 +132,53 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_30_082300) do
     t.uuid "contactable_id"
     t.index %w[contactable_type contactable_id],
             name: "index_contacts_on_contactable"
+  end
+
+  create_table "contractor_employees",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.uuid "contractor_id", null: false
+    t.uuid "employee_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index %w[contractor_id employee_id],
+            name: "index_contractor_employees_on_contractor_id_and_employee_id",
+            unique: true
+    t.index ["contractor_id"],
+            name: "index_contractor_employees_on_contractor_id"
+    t.index ["employee_id"], name: "index_contractor_employees_on_employee_id"
+  end
+
+  create_table "contractor_onboards",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.uuid "contractor_id", null: false
+    t.uuid "onboard_application_id", null: false
+    t.datetime "deactivated_at"
+    t.string "suspended_reason"
+    t.datetime "suspended_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contractor_id"],
+            name: "index_contractor_onboards_on_contractor_id"
+    t.index ["onboard_application_id"],
+            name: "index_contractor_onboards_on_onboard_application_id"
+  end
+
+  create_table "contractors",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.uuid "contact_id", null: false
+    t.string "business_name", null: false
+    t.string "website"
+    t.string "phone_number"
+    t.boolean "onboarded", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contact_id"], name: "index_contractors_on_contact_id"
   end
 
   create_table "early_access_previews",
@@ -1088,6 +1135,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_30_082300) do
   add_foreign_key "application_assignments", "users"
   add_foreign_key "audit_logs", "users"
   add_foreign_key "collaborators", "users"
+  add_foreign_key "contractor_employees", "contractors"
+  add_foreign_key "contractor_employees", "users", column: "employee_id"
+  add_foreign_key "contractor_onboards", "contractors"
+  add_foreign_key "contractor_onboards",
+                  "permit_applications",
+                  column: "onboard_application_id"
+  add_foreign_key "contractors", "users", column: "contact_id"
   add_foreign_key "early_access_previews", "users", column: "previewer_id"
   add_foreign_key "external_api_keys", "jurisdictions"
   add_foreign_key "external_api_keys", "programs"
