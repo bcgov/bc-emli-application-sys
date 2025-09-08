@@ -1,0 +1,13 @@
+<p>Hello <%= @user.first_name %> <%= @user.last_name %>,</p>
+
+<p>Your account has been successfully created. You can login using your <%= @user.authentication_method_text %>.</p>
+
+<p>Next step: Apply for the Better Homes Energy Savings Program by clicking the button below.</p>
+
+<div class="button-row">
+  <a href="<%= FrontendUrlHelper.frontend_url("/login") %>" class="btn-primary" target="_blank">Apply Now</a>
+</div>
+
+<p>If you have any questions, please call us at 1-833-856-0333 or email us at <a href="mailto:BetterHomesESP@clearesult.com">BetterHomesESP@clearesult.com</a>.</p>
+
+<p>Thank you,<br>Energy Savings Program Support</p>

@@ -260,4 +260,13 @@ class PermitHubMailer < ApplicationMailer
       }
     )
   end
+
+  def notify_new_participant_welcome(user)
+    @user = user
+
+    send_user_mail(
+      email: @user.email,
+      template_key: "notify_new_participant_welcome"
+    )
+  end
 end

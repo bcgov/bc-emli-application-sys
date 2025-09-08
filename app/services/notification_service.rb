@@ -510,6 +510,21 @@ class NotificationService
     end
   end
 
+  def self.publish_new_participant_welcome_event(user)
+    return unless user&.persisted? && !user.discarded?
+
+    # Email-only notification for new participant welcome
+    # No in-app notification needed as this is a one-time welcome message
+    begin
+      PermitHubMailer.notify_new_participant_welcome(user).deliver_later
+      Rails.logger.info "Welcome notification queued for user #{user.id} (#{user.email})"
+    rescue => e
+      Rails.logger.error "Failed to queue welcome notification for user #{user.id}: #{e.message}"
+      # Re-raise in development/test for debugging, but don't break user flow in production
+      raise e unless Rails.env.production?
+    end
+  end
+
   # this is just a wrapper around the activity's metadata methods
   # since in the case of a single instance it returns a specific return type (eg. Integer)
   # but in the case of multiple user_ids the activity is a hash object

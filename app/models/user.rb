@@ -365,6 +365,13 @@ class User < ApplicationRecord
     }
   end
 
+  def authentication_method_text
+    I18n.t(
+      "authentication_methods.#{omniauth_provider}",
+      default: I18n.t("authentication_methods.default")
+    )
+  end
+
   private
 
   def format_changed_fields(changed_fields)

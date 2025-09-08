@@ -162,6 +162,13 @@ en:
       notify_application_ineligible: 'Application %{permit_application_number} is ineligible'
       notify_admin_updated_participant_app: 'Your application has been updated'
       notify_participant_incomplete_draft_notification: 'Reminder: Your recently created application'
+      notify_new_participant_welcome: 'Welcome to the Better Homes Energy Savings Program'
+  authentication_methods:
+    bcsc: 'BC Services Card Account'
+    bceidbasic: 'Basic BCeID'
+    bceidbusiness: 'Business BCeID'
+    azureidir: 'IDIR Account'
+    default: 'your account'
   arbitrary_message_construct:
     devise:
       failure:
