@@ -557,6 +557,7 @@ const options = {
           configure: 'Configure',
           start: 'Start',
           publishBanner: 'Ready to publish site-wide banner?',
+          removeBanner: 'Ready to remove the site-wide banner?',
         },
         notification: {
           title: 'Notifications',
@@ -2567,7 +2568,7 @@ const options = {
             description: 'Enable and configure a site-wide message',
             enable: 'Show',
             label: 'Text for banner',
-            hint: 'This banner text will appear at the top of all public pages.',
+            hint: 'This banner text will appear at the top of all pages.',
             settings: 'Settings',
             colorLabel: 'Banner type',
             colors: {
