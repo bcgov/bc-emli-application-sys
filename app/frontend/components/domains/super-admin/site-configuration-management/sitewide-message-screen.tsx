@@ -21,7 +21,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -60,6 +60,7 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
 
   const { handleSubmit, formState, control, reset } = formMethods;
   const { isSubmitting } = formState;
+  const [currentDisplayValue, setCurrentDisplayValue] = useState(displaySitewideMessage);
 
   const { isOpen, onOpen, onClose } = useDisclosure(); // Chakra UI hook for modal state
 
@@ -115,7 +116,14 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
                         name="displaySitewideMessage"
                         control={control}
                         render={({ field }) => (
-                          <Switch id="displaySitewideMessage" isChecked={field.value} onChange={field.onChange} />
+                          <Switch
+                            id="displaySitewideMessage"
+                            isChecked={field.value}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              setCurrentDisplayValue(e.target.checked);
+                            }}
+                          />
                         )}
                       />
                       <FormLabel htmlFor="displaySitewideMessage" mb={0}>
@@ -131,6 +139,11 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
                     hint={t('siteConfiguration.sitewideMessage.hint')}
                     showOptional={false}
                     inputProps={{ w: 'lg', maxLength: 255 }} // Added maxLength to limit input to 255 characters
+                    sx={{
+                      '& label': {
+                        mb: 1,
+                      },
+                    }}
                   />
                 </Flex>
               </Flex>
@@ -152,7 +165,9 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader color="theme.blueAlt">{t('ui.publishBanner')}</ModalHeader>
+          <ModalHeader color="theme.blueAlt">
+            {currentDisplayValue ? t('ui.publishBanner') : t('ui.removeBanner')}
+          </ModalHeader>
           <ModalCloseButton size="sm" color="greys.anotherGrey" />
           <ModalFooter justifyContent="center">
             <Button
