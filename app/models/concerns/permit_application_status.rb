@@ -76,7 +76,13 @@ module PermitApplicationStatus
     def can_submit?
       signed =
         submission_data.dig("data", "section-completion-key", "signed").present?
-      signed && using_current_template_version
+      # Template version policy:
+      # - new_draft: Must use current template version (enforced)
+      # - All other statuses (newly_submitted, revisions_requested, resubmitted, etc.):
+      #   Can submit with their original template version (bypassed)
+      template_check = new_draft? ? using_current_template_version : true
+
+      signed && template_check
     end
 
     def can_finalize_requests?

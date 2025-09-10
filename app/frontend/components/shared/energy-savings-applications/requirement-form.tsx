@@ -109,7 +109,7 @@ export const RequirementForm = observer(
       if (shouldShowDiff && userShouldSeeDiff) {
         permitApplication.fetchDiff();
       }
-    }, []);
+    }, [shouldShowDiff, userShouldSeeDiff]);
 
     useEffect(() => {
       // The box observers need to be re-registered whenever a panel is collapsed
