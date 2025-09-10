@@ -242,11 +242,6 @@ class Api::PermitApplicationsController < Api::ApplicationController
   def submit
     authorize @permit_application
     # for submissions, we do not run the automated compliance as that should have already been complete
-    #
-    if !@permit_application.using_current_template_version
-      render_error "permit_application.outdated_error", message_opts: {} and
-        return
-    end
 
     update_submitted_for_from_submission_data
 
@@ -286,7 +281,14 @@ class Api::PermitApplicationsController < Api::ApplicationController
                    }
     end
   rescue AASM::InvalidTransition
-    render_error "permit_application.submit_state_error", message_opts: {}
+    # Provide specific error message for template version issues on draft applications
+    # Other statuses get generic state error (could be signing, validation, etc.)
+    if !@permit_application.using_current_template_version &&
+         @permit_application.new_draft?
+      render_error "permit_application.outdated_error", message_opts: {}
+    else
+      render_error "permit_application.submit_state_error", message_opts: {}
+    end
   end
 
   def create

@@ -325,7 +325,15 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         return self.permitCollaborationMap.get(collaborationId);
       },
       shouldShowApplicationDiff(isEditing: boolean) {
-        return isEditing && (!self.usingCurrentTemplateVersion || self.showingCompareAfter);
+        // Only show template changes for new_draft applications
+        // Submitted applications (including revisions_requested) should stay on old template without notifications
+        if (!isEditing || !self.status) return false;
+
+        const isDraftStatus = self.status === EPermitApplicationStatus.draft;
+        const hasVersionMismatch = !self.usingCurrentTemplateVersion;
+        const isShowingAfterUpdate = Boolean(self.showingCompareAfter);
+
+        return isDraftStatus && (hasVersionMismatch || isShowingAfterUpdate);
       },
       get contacts() {
         // traverses the nest form json components
