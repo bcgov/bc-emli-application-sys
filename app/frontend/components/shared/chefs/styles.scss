@@ -615,6 +615,17 @@
     border: none;
     overflow: visible;
 
+    // Hide remove button for first row in service information only
+    &.service-information-grid tbody tr:first-child .formio-button-remove-row,
+    &.service-information-grid .formio-datagrid-body > div:first-child .formio-button-remove-row {
+      visibility: hidden !important;
+    }
+
+    // Hide fieldset legend in service information
+    &.service-information-grid fieldset legend {
+      display: none !important;
+    }
+
     .contact-field-set {
       margin-top: 0;
     }
@@ -635,12 +646,20 @@
 
     .formio-button-add-row {
       margin-top: 14px;
-      background: transparent;
-      color: var(--chakra-colors-text-primary);
-      border: 1px solid var(--chakra-colors-border-dark);
+      background: var(--chakra-colors-theme-blue);
+      color: white;
+      border: 1px solid var(--chakra-colors-theme-blueAlt);
+
+      // Hide plus icon
+      i.fa-plus,
+      .fa-plus,
+      i[class*="fa-plus"] {
+        display: none !important;
+      }
 
       &:hover {
-        background: var(--chakra-colors-lighten-100);
+        background: var(--chakra-colors-theme-blueAlt);
+        opacity: 0.9;
       }
 
       &:disabled {
@@ -675,6 +694,7 @@
         margin-right: var(--chakra-space-2);
       }
     }
+
 
     @media (min-width: 766px) {
       .formio-button-remove-row {

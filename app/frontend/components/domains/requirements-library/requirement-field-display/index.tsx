@@ -1,5 +1,7 @@
 import {
+  Box,
   BoxProps,
+  Button,
   Checkbox,
   CheckboxGroup,
   FormControlProps,
@@ -332,6 +334,58 @@ const requirementsComponentMap = {
     ];
 
     return <GenericContactDisplay contactFieldItems={contactFieldItemTypes} {...props} />;
+  },
+
+  [ERequirementType.serviceInformation](props: TRequirementFieldDisplayProps) {
+    const serviceInfoFieldItemTypes: Array<{
+      type: ERequirementType;
+      key: string;
+      label: string;
+      containerProps?: BoxProps;
+      required?: boolean;
+    }> = [
+      {
+        type: ERequirementType.text,
+        key: 'name',
+        label: 'Employee name',
+        required: true,
+        containerProps: {
+          gridColumn: '1 ',
+        },
+      },
+      {
+        type: ERequirementType.email,
+        key: 'email',
+        label: 'Employee email',
+        required: true,
+        containerProps: {
+          gridColumn: '1 ',
+        },
+      },
+    ];
+    return (
+      <Box>
+        <GenericMultiDisplay
+          fieldItems={serviceInfoFieldItemTypes}
+          {...props}
+          showAddButton={false}
+          label={props.label || 'Employee Information'}
+        />
+        <Button
+          variant="primary"
+          size="sm"
+          my={6}
+          isDisabled
+          _disabled={{
+            bg: 'primary',
+            color: 'white',
+            cursor: 'not-allowed',
+          }}
+        >
+          Add employee
+        </Button>
+      </Box>
+    );
   },
 };
 

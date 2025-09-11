@@ -26,7 +26,8 @@ class Requirement < ApplicationRecord
          energy_step_code: 16,
          general_contact: 17,
          professional_contact: 18,
-         pid_info: 19
+         pid_info: 19,
+         service_information: 20
        },
        _prefix: true
 
@@ -238,7 +239,11 @@ class Requirement < ApplicationRecord
           end
 
           if label.blank?
-            ENERGY_STEP_CODE_REQUIREMENT_CODE
+            if input_type_service_information?
+              "employee_information"
+            else
+              ENERGY_STEP_CODE_REQUIREMENT_CODE
+            end
           else
             label.parameterize(separator: "_")
           end
