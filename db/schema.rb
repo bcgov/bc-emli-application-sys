@@ -942,10 +942,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_30_082300) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
-  create_table "target_user_id", id: false, force: :cascade do |t|
-    t.uuid "id"
-  end
-
   create_table "template_section_blocks",
                id: :uuid,
                default: -> { "gen_random_uuid()" },

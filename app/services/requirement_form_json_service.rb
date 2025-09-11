@@ -96,6 +96,17 @@ class RequirementFormJsonService
         get_contact_form_json(requirement_block_key)
       elsif requirement.input_type_pid_info?
         get_pid_info_components(requirement_block_key, requirement.required)
+      elsif requirement.input_type_service_information? ||
+            requirement.input_type == "service_information" ||
+            requirement.input_type.to_s == "service_information" ||
+            (
+              requirement.input_type.present? &&
+                requirement.input_type.include?("service")
+            )
+        get_service_information_components(
+          requirement_block_key,
+          requirement.required
+        )
       else
         {
           id: requirement.id,
@@ -475,6 +486,76 @@ class RequirementFormJsonService
       ]
     }
     multi_data_grid_form_json(key, component, true, "Add #{requirement.label}")
+  end
+
+  def get_service_information_components(
+    requirement_block_key = requirement&.requirement_block&.key,
+    required = false
+  )
+    return {} unless requirement.input_type_service_information?
+    key = "#{requirement.key(requirement_block_key)}|service_info_v2"
+    component = {
+      legend: requirement.label,
+      key: key,
+      type: "fieldset",
+      custom_class: "multi-field-set",
+      label: requirement.label,
+      hideLabel: true,
+      input: false,
+      tableView: false,
+      components: [
+        get_nested_info_component(
+          :employee_name,
+          requirement_block_key,
+          "Employee name",
+          true
+        ),
+        get_nested_info_component(
+          :employee_email,
+          requirement_block_key,
+          "Employee email",
+          true,
+          :email
+        )
+      ]
+    }
+    get_service_information_data_grid_form_json(
+      key,
+      component,
+      false,
+      "Add employee"
+    )
+  end
+
+  def get_service_information_data_grid_form_json(
+    override_key,
+    component,
+    initEmpty = true,
+    addMoreText = "Add employee"
+  )
+    {
+      label: requirement.label,
+      id: requirement.id,
+      reorder: false,
+      addAnother: addMoreText,
+      addAnotherPosition: "bottom",
+      layoutFixed: false,
+      enableRowGroups: false,
+      initEmpty: initEmpty,
+      hideLabel: true,
+      tableView: false,
+      custom_class: "multi-data-grid service-information-grid",
+      key: override_key,
+      type: "datagrid",
+      input: false,
+      components: [component],
+      template:
+        "<div class=\"row\"> {% util.eachComponent(components, function(component) { %} <div class=\"col-sm-12\"> {{ component }} </div> {% }) %}</div>",
+      addAnotherClass: "btn btn-service-info",
+      addAnotherStyle:
+        "background-color: var(--chakra-colors-theme-blueAlt); border: none; color: white;",
+      hideAddAnotherIcon: true
+    }
   end
 
   # this is a generic mulitgrid for a single component

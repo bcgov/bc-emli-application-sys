@@ -1560,6 +1560,7 @@ const options = {
             energyStepCode: 'Energy Step Code',
             stepCodePackageFile: 'Design package file for energy step code',
             pidInfo: 'Pid Info',
+            serviceInformation: 'Employee Information',
           },
           contactFieldItemLabels: {
             firstName: 'First name',

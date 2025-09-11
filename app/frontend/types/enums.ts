@@ -268,6 +268,7 @@ export enum ERequirementType {
   email = 'email',
   generalContact = 'general_contact',
   professionalContact = 'professional_contact',
+  serviceInformation = 'service_information',
 }
 
 export enum ENumberUnit {
