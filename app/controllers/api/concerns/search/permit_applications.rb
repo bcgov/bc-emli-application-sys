@@ -1,6 +1,16 @@
 module Api::Concerns::Search::PermitApplications
   extend ActiveSupport::Concern
 
+  # Simple status priority for business sorting
+  STATUS_PRIORITY = {
+    "newly_submitted" => 1,
+    "revisions_requested" => 2,
+    "resubmitted" => 3,
+    "in_review" => 4,
+    "ineligible" => 5,
+    "approved" => 6
+  }.freeze
+
   def perform_permit_application_search
     params = search_params
 
@@ -68,15 +78,39 @@ module Api::Concerns::Search::PermitApplications
 
   def permit_application_order
     if (sort = search_params[:sort])
+      # User clicked a column - use simple field sorting
       field_name =
-        sort[:field] == "assigned" ? "review_delegatee_name" : sort[:field]
+        case sort[:field]
+        when "assigned"
+          "review_delegatee_name"
+        when "status"
+          "status_display"
+        else
+          sort[:field]
+        end
       direction =
         %w[asc desc].include?(sort[:direction]) ? sort[:direction] : "asc"
       { field_name => { order: direction, unmapped_type: "long" } }
     elsif current_user.participant?
       { created_at: { order: :desc, unmapped_type: "long" } }
     else
-      { number: { order: :desc, unmapped_type: "long" } }
+      # Default sort - Business priority order (simple script)
+      {
+        _script: {
+          type: "number",
+          script: {
+            source:
+              "
+              if (doc.containsKey('status') && doc['status'].size() > 0) {
+                def statusPriority = [#{status_priority_map}];
+                return statusPriority.getOrDefault(doc['status'].value, 999);
+              }
+              return 999;
+            "
+          },
+          order: "asc"
+        }
+      }
     end
   end
 
@@ -95,5 +129,10 @@ module Api::Concerns::Search::PermitApplications
       submission_type_id: @submission_types.pluck(:id)
     ).compact!
     filters.to_h.deep_symbolize_keys.compact.merge!(where)
+  end
+
+  def status_priority_map
+    @status_priority_map ||=
+      STATUS_PRIORITY.map { |k, v| "'#{k}': #{v}" }.join(", ")
   end
 end

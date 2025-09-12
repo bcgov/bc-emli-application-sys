@@ -231,6 +231,7 @@ class PermitApplication < ApplicationRecord
       resubmitted_at: resubmitted_at,
       viewed_at: viewed_at,
       status: status,
+      status_display: status_display_label,
       #jurisdiction_id: jurisdiction&.id,
       user_group_type_id: user_group_type&.id,
       audience_type_id: audience_type&.id,
@@ -242,7 +243,10 @@ class PermitApplication < ApplicationRecord
       created_at: created_at,
       updated_at: updated_at,
       using_current_template_version: using_current_template_version,
-      review_delegatee_name: assigned_users.pluck(Arel.sql("first_name || ' ' || last_name")).join(" "),
+      review_delegatee_name:
+        assigned_users.pluck(Arel.sql("first_name || ' ' || last_name")).join(
+          " "
+        ),
       user_ids_with_submission_edit_permissions:
         [submitter.id] +
           users_by_collaboration_options(collaboration_type: :submission).pluck(
@@ -347,6 +351,12 @@ class PermitApplication < ApplicationRecord
       Rails.logger.error("Failed to update: #{errors.full_messages.join(", ")}")
       nil
     end
+  end
+
+  def status_display_label
+    return "UNKNOWN" if status.blank?
+
+    I18n.t("statuses.#{status}", default: "UNKNOWN")
   end
 
   def number_prefix
