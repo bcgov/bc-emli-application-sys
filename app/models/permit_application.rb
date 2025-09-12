@@ -231,6 +231,7 @@ class PermitApplication < ApplicationRecord
       resubmitted_at: resubmitted_at,
       viewed_at: viewed_at,
       status: status,
+      status_display: status_display_label,
       #jurisdiction_id: jurisdiction&.id,
       user_group_type_id: user_group_type&.id,
       audience_type_id: audience_type&.id,
@@ -347,6 +348,12 @@ class PermitApplication < ApplicationRecord
       Rails.logger.error("Failed to update: #{errors.full_messages.join(", ")}")
       nil
     end
+  end
+
+  def status_display_label
+    return "UNKNOWN" if status.blank?
+
+    I18n.t("statuses.#{status}", default: "UNKNOWN")
   end
 
   def number_prefix
