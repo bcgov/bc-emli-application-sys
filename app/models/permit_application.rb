@@ -23,7 +23,7 @@ class PermitApplication < ApplicationRecord
     program
     assigned_users
     submission_type
-    supporting_documents
+    template_version
   ]
 
   API_SEARCH_INCLUDES = %i[
@@ -42,7 +42,8 @@ class PermitApplication < ApplicationRecord
                review_delegatee_name
              ]
 
-  belongs_to :submitter, class_name: "User"
+  # belongs_to :submitter, class_name: "User"
+  belongs_to :submitter, polymorphic: true
   belongs_to :jurisdiction, optional: true
   belongs_to :permit_type, optional: true
   belongs_to :activity, optional: true
@@ -174,6 +175,16 @@ class PermitApplication < ApplicationRecord
       .distinct
   end
 
+  # helper method to return a User for legacy places that assume it
+  def submitter_user
+    case submitter
+    when User
+      submitter
+    when Contractor
+      submitter.contact
+    end
+  end
+
   # Helper method to get the latest SubmissionVersion
   def latest_submission_version
     submission_versions.order(created_at: :desc).first
@@ -243,7 +254,10 @@ class PermitApplication < ApplicationRecord
       created_at: created_at,
       updated_at: updated_at,
       using_current_template_version: using_current_template_version,
-      review_delegatee_name: assigned_users.pluck(Arel.sql("first_name || ' ' || last_name")).join(" "),
+      review_delegatee_name:
+        assigned_users.pluck(Arel.sql("first_name || ' ' || last_name")).join(
+          " "
+        ),
       user_ids_with_submission_edit_permissions:
         [submitter.id] +
           users_by_collaboration_options(collaboration_type: :submission).pluck(

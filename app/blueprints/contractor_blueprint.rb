@@ -1,0 +1,27 @@
+# app/blueprints/contractor_blueprint.rb
+class ContractorBlueprint < Blueprinter::Base
+  identifier :id
+
+  # base view with the full set of fields
+  view :base do
+    fields :business_name,
+           :website,
+           :phone_number,
+           :onboarded,
+           :created_at,
+           :updated_at
+
+    association :contact, blueprint: UserBlueprint
+    association :employees, blueprint: UserBlueprint
+  end
+
+  # minimal is same as base for now, can be adjusted if needed.
+  view :minimal do
+    include_view :base
+  end
+
+  # extended_api is also same as base for now, used in API
+  view :extended_api do
+    include_view :base
+  end
+end

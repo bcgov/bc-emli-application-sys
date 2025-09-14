@@ -29,7 +29,10 @@ class PermitApplicationBlueprint < Blueprinter::Base
     association :submission_versions,
                 blueprint: SubmissionVersionBlueprint,
                 view: :base
-    association :submitter, blueprint: UserBlueprint, view: :minimal
+    field :submitter do |pa, options|
+      SubmitterBlueprint.render(pa.submitter, view: :minimal)
+    end
+
     association :assigned_users,
                 blueprint: UserBlueprint,
                 view: :minimal,
@@ -60,7 +63,10 @@ class PermitApplicationBlueprint < Blueprinter::Base
         collaborator_type: :delegatee
       )
     end
-    association :submitter, blueprint: UserBlueprint, view: :minimal
+
+    field :submitter do |pa, options|
+      SubmitterBlueprint.render(pa.submitter, view: :minimal)
+    end
   end
 
   view :extended do
@@ -71,7 +77,10 @@ class PermitApplicationBlueprint < Blueprinter::Base
                 blueprint: UserBlueprint,
                 view: :minimal,
                 name: :assignedUsers
-    association :submitter, blueprint: UserBlueprint, view: :minimal
+
+    field :submitter do |pa, options|
+      SubmitterBlueprint.render(pa.submitter, view: :minimal)
+    end
 
     field :is_fully_loaded do |pa, options|
       true
@@ -172,35 +181,20 @@ class PermitApplicationBlueprint < Blueprinter::Base
 
   view :external_api do
     identifier :id
-    fields :status,
-           :number,
-           :full_address,
-           #  :pid,
-           #  :pin,
-           #  :reference_number,
-           :submitted_at,
-           :resubmitted_at
+    fields :status, :number, :full_address, :submitted_at, :resubmitted_at
 
     field :submission_data do |pa, _options|
       pa.formatted_submission_data_for_external_use
     end
 
-    # field :permit_classifications do |pa, _options|
-    #   pa.formatted_permit_classifications
-    # end
-
-    # field :raw_h2k_files do |pa, _options|
-    #   pa.formatted_raw_h2k_files_for_external_use
-    # end
-
     association :template_version,
                 blueprint: TemplateVersionBlueprint,
                 view: :external_api,
                 name: :application_version
-    association :submitter,
-                blueprint: UserBlueprint,
-                view: :external_api,
-                name: :account_holder
+
+    field :submitter do |pa, options|
+      SubmitterBlueprint.render(pa.submitter, view: :external_api)
+    end
 
     field :user_group_type, name: :user_group_type do |obj|
       obj.user_group_type&.code

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_30_082300) do
+ActiveRecord::Schema[7.1].define(version: 2025_09_10_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -132,6 +132,53 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_30_082300) do
     t.uuid "contactable_id"
     t.index %w[contactable_type contactable_id],
             name: "index_contacts_on_contactable"
+  end
+
+  create_table "contractor_employees",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.uuid "contractor_id", null: false
+    t.uuid "employee_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index %w[contractor_id employee_id],
+            name: "index_contractor_employees_on_contractor_id_and_employee_id",
+            unique: true
+    t.index ["contractor_id"],
+            name: "index_contractor_employees_on_contractor_id"
+    t.index ["employee_id"], name: "index_contractor_employees_on_employee_id"
+  end
+
+  create_table "contractor_onboards",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.uuid "contractor_id", null: false
+    t.uuid "onboard_application_id", null: false
+    t.datetime "deactivated_at"
+    t.string "suspended_reason"
+    t.datetime "suspended_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contractor_id"],
+            name: "index_contractor_onboards_on_contractor_id"
+    t.index ["onboard_application_id"],
+            name: "index_contractor_onboards_on_onboard_application_id"
+  end
+
+  create_table "contractors",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.uuid "contact_id", null: false
+    t.string "business_name", null: false
+    t.string "website"
+    t.string "phone_number"
+    t.boolean "onboarded", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contact_id"], name: "index_contractors_on_contact_id"
   end
 
   create_table "early_access_previews",
@@ -298,7 +345,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_30_082300) do
                default: -> { "gen_random_uuid()" },
                force: :cascade do |t|
     t.integer "status", default: 0
-    t.uuid "submitter_id", null: false
     t.uuid "jurisdiction_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -326,6 +372,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_30_082300) do
     t.uuid "submission_type_id"
     t.text "status_update_reason"
     t.string "submitted_for"
+    t.string "submitter_type", null: false
+    t.uuid "submitter_id", null: false
     t.index ["activity_id"], name: "index_permit_applications_on_activity_id"
     t.index ["audience_type_id"],
             name: "index_permit_applications_on_audience_type_id"
@@ -340,7 +388,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_30_082300) do
     t.index ["sandbox_id"], name: "index_permit_applications_on_sandbox_id"
     t.index ["submission_type_id"],
             name: "index_permit_applications_on_submission_type_id"
-    t.index ["submitter_id"], name: "index_permit_applications_on_submitter_id"
+    t.index %w[submitter_type submitter_id],
+            name: "index_permit_applications_on_submitter"
     t.index ["template_version_id"],
             name: "index_permit_applications_on_template_version_id"
     t.index ["user_group_type_id"],
@@ -872,6 +921,24 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_30_082300) do
             name: "index_submission_versions_on_permit_application_id"
   end
 
+  create_table "support_requests",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.uuid "parent_application_id", null: false
+    t.uuid "requested_by_id", null: false
+    t.uuid "linked_application_id"
+    t.text "additional_text"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["linked_application_id"],
+            name: "index_support_requests_on_linked_application_id"
+    t.index ["parent_application_id"],
+            name: "index_support_requests_on_parent_application_id"
+    t.index ["requested_by_id"],
+            name: "index_support_requests_on_requested_by_id"
+  end
+
   create_table "supporting_documents",
                id: :uuid,
                default: -> { "gen_random_uuid()" },
@@ -1088,6 +1155,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_30_082300) do
   add_foreign_key "application_assignments", "users"
   add_foreign_key "audit_logs", "users"
   add_foreign_key "collaborators", "users"
+  add_foreign_key "contractor_employees", "contractors"
+  add_foreign_key "contractor_employees", "users", column: "employee_id"
+  add_foreign_key "contractor_onboards", "contractors"
+  add_foreign_key "contractor_onboards",
+                  "permit_applications",
+                  column: "onboard_application_id"
+  add_foreign_key "contractors", "users", column: "contact_id"
   add_foreign_key "early_access_previews", "users", column: "previewer_id"
   add_foreign_key "external_api_keys", "jurisdictions"
   add_foreign_key "external_api_keys", "programs"
@@ -1124,7 +1198,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_30_082300) do
   add_foreign_key "permit_applications", "programs"
   add_foreign_key "permit_applications", "sandboxes"
   add_foreign_key "permit_applications", "template_versions"
-  add_foreign_key "permit_applications", "users", column: "submitter_id"
   add_foreign_key "permit_block_statuses", "permit_applications"
   add_foreign_key "permit_collaborations", "collaborators"
   add_foreign_key "permit_collaborations", "permit_applications"
@@ -1187,6 +1260,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_30_082300) do
   add_foreign_key "step_code_data_entries", "step_codes"
   add_foreign_key "step_codes", "permit_applications"
   add_foreign_key "submission_versions", "permit_applications"
+  add_foreign_key "support_requests",
+                  "permit_applications",
+                  column: "linked_application_id"
+  add_foreign_key "support_requests",
+                  "permit_applications",
+                  column: "parent_application_id"
+  add_foreign_key "support_requests", "users", column: "requested_by_id"
   add_foreign_key "supporting_documents", "permit_applications"
   add_foreign_key "supporting_documents", "submission_versions"
   add_foreign_key "taggings", "tags"
