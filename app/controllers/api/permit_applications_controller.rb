@@ -28,16 +28,6 @@ class Api::PermitApplicationsController < Api::ApplicationController
     authorized_results =
       apply_search_authorization(@permit_application_search.results)
 
-    # 🔎 Inspect the blueprint output as a hash
-    # blueprint_output = PermitApplicationBlueprint.render_as_hash(
-    #   authorized_results,
-    #   view: :base,
-    #   current_user: current_user
-    # )
-
-    # Rails.logger.debug "=== PermitApplicationBlueprint output ==="
-    # Rails.logger.debug blueprint_output.pretty_inspect
-
     render_success authorized_results,
                    nil,
                    {
