@@ -1,17 +1,36 @@
 class MakeApplicationSubmitterPolymorphic < ActiveRecord::Migration[7.1]
   def change
-    # drop the old FK reference to users
-    remove_reference :permit_applications,
-                     :submitter,
-                     foreign_key: {
-                       to_table: :users
-                     }
+    # remove old foreign key, but keep the submitter_id column intermittently
+    remove_foreign_key :permit_applications, column: :submitter_id
 
-    # add new polymorphic association to users and contractors
+    # rename the existing column so we can port the data
+    rename_column :permit_applications, :submitter_id, :old_submitter_id
+
+    # add the new polymorphic references (allow nulls temporarily)
     add_reference :permit_applications,
                   :submitter,
                   polymorphic: true,
                   type: :uuid,
-                  null: false
+                  null: true
+
+    # backfill existing rows with old IDs, assume all were Users
+    reversible { |dir| dir.up { execute <<-SQL.squish } }
+          UPDATE permit_applications
+          SET submitter_id = old_submitter_id,
+              submitter_type = 'User'
+          WHERE old_submitter_id IS NOT NULL
+        SQL
+
+    # now enforce NOT NULL
+    change_column_null :permit_applications, :submitter_id, false
+    change_column_null :permit_applications, :submitter_type, false
+
+    # add in a composite index for performance
+    add_index :permit_applications,
+              %i[submitter_type submitter_id],
+              name: "index_permit_applications_on_submitter"
+
+    # drop the old column were done with it
+    remove_column :permit_applications, :old_submitter_id
   end
 end
