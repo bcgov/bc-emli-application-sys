@@ -179,15 +179,6 @@ class Api::ProgramsController < Api::ApplicationController
     authorized_results =
       apply_search_authorization(@permit_application_search.results, "index")
 
-    json =
-      PermitApplicationBlueprint.render_as_hash(
-        authorized_results,
-        view: :jurisdiction_review_inbox
-      )
-
-    Rails.logger.debug "=== search_permit_applications output ==="
-    Rails.logger.debug json.pretty_inspect
-
     render_success authorized_results,
                    nil,
                    {

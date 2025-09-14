@@ -11,7 +11,8 @@ class MakeApplicationSubmitterPolymorphic < ActiveRecord::Migration[7.1]
                   :submitter,
                   polymorphic: true,
                   type: :uuid,
-                  null: true
+                  null: true,
+                  index: false
 
     # backfill existing rows with old IDs, assume all were Users
     reversible { |dir| dir.up { execute <<-SQL.squish } }
@@ -24,11 +25,6 @@ class MakeApplicationSubmitterPolymorphic < ActiveRecord::Migration[7.1]
     # now enforce NOT NULL
     change_column_null :permit_applications, :submitter_id, false
     change_column_null :permit_applications, :submitter_type, false
-
-    # add in a composite index for performance
-    add_index :permit_applications,
-              %i[submitter_type submitter_id],
-              name: "index_permit_applications_on_submitter"
 
     # drop the old column were done with it
     remove_column :permit_applications, :old_submitter_id
