@@ -27,6 +27,17 @@ class Api::PermitApplicationsController < Api::ApplicationController
     perform_permit_application_search
     authorized_results =
       apply_search_authorization(@permit_application_search.results)
+
+    # 🔎 Inspect the blueprint output as a hash
+    # blueprint_output = PermitApplicationBlueprint.render_as_hash(
+    #   authorized_results,
+    #   view: :base,
+    #   current_user: current_user
+    # )
+
+    # Rails.logger.debug "=== PermitApplicationBlueprint output ==="
+    # Rails.logger.debug blueprint_output.pretty_inspect
+
     render_success authorized_results,
                    nil,
                    {
@@ -37,7 +48,8 @@ class Api::PermitApplicationsController < Api::ApplicationController
                      },
                      blueprint: PermitApplicationBlueprint,
                      blueprint_opts: {
-                       view: :base
+                       view: :base,
+                       current_user: current_user
                      }
                    }
   end
@@ -292,27 +304,38 @@ class Api::PermitApplicationsController < Api::ApplicationController
   end
 
   def create
+    submitter =
+      if params[:contractor_id].present?
+        Contractor.find(params[:contractor_id])
+      else
+        current_user
+      end
+
     @permit_application =
       PermitApplication.build(
         permit_application_params.to_h.merge(
-          submitter: current_user,
+          submitter: submitter,
           sandbox: current_sandbox
         )
       )
+
     authorize @permit_application
+
     if @permit_application.save
       if !Rails.env.development? || ENV["RUN_COMPLIANCE_ON_SAVE"] == "true"
         AutomatedCompliance::AutopopulateJob.perform_async(
           @permit_application.id
         )
       end
+
       render_success @permit_application,
                      "permit_application.create_success",
                      {
                        blueprint: PermitApplicationBlueprint,
                        blueprint_opts: {
                          view: :extended,
-                         current_user: current_user
+                         current_user: current_user, # can be nil here
+                         submitter: @permit_application.submitter # always present
                        }
                      }
     else
