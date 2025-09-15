@@ -30,13 +30,16 @@ fi
 # if IS_APP_SERVER == true; then
 if [ -n "$IS_APP_SERVER" ]; then
   until nc -z -v -w30 postgres 5432; do
-    echo "Waiting for PostgreSQL database (postgres) to start..."
+    echo "Waiting for PostgreSQL database to start..."
     sleep 1
   done
 
   echo "*** Preparing Database..."
   
   ./bin/rails db:migrate
+
+  echo "*** reindexing models for search..."
+  ./bin/rails search:reindex
 fi
 
 # bundle exec rails s -b '0.0.0.0' -p 3000
