@@ -35,7 +35,7 @@ class Api::ContractorsController < Api::ApplicationController
   def shim
     contractor =
       Contractor.create!(
-        contact: current_user,
+        # contact: current_user,
         business_name: "TBD",
         onboarded: false
       )
