@@ -61,30 +61,47 @@ export const PermitApplicationSubmitModal = observer(function PermitApplicationS
         <ModalBody py={6}>
           {permitApplication.canUserSubmit(currentUser) ? (
             <Flex direction="column" gap={8}>
-              <Heading as="h3" color="theme.blueAlt">
-                {currentUser.isParticipant
-                  ? t('energySavingsApplication.new.ready')
-                  : 'Ready to submit on someone’s behalf?'}
-              </Heading>
-              <Box
-                borderRadius="md"
-                border="1px solid"
-                borderColor="theme.orange"
-                backgroundColor="semantic.warningLight"
-                px={6}
-                py={3}
-              >
-                <HStack spacing={4}>
-                  <Box color={'theme.orange'} alignSelf={'start'}>
-                    <Warning size={24} aria-label={'warning icon'} />
-                  </Box>
-                  <Text>
-                    {currentUser.isParticipant
-                      ? t('energySavingsApplication.new.confirmation')
-                      : t('energySavingsApplication.new.confirmationOnBehalf')}
+              {!currentUser.isContractor && (
+                <Heading as="h3" color="theme.blueAlt">
+                  {currentUser.isParticipant
+                    ? t('energySavingsApplication.new.ready')
+                    : 'Ready to submit on someone’s behalf?'}
+                </Heading>
+              )}
+              {currentUser.isContractor && (
+                <>
+                  <Text fontSize="2xl" fontWeight="bold">
+                    Ready to submit your registration details?
                   </Text>
-                </HStack>
-              </Box>
+                  <Text fontSize="md">
+                    By submitting your registration details you confirm that the information you provided was completed
+                    to the best of your knowledge and ability.
+                  </Text>
+                </>
+              )}
+              {!currentUser.isContractor && (
+                <Box
+                  borderRadius="md"
+                  border="1px solid"
+                  borderColor="theme.orange"
+                  backgroundColor="semantic.warningLight"
+                  px={6}
+                  py={3}
+                >
+                  <HStack spacing={4}>
+                    <Box color={'theme.orange'} alignSelf={'start'}>
+                      <Warning size={24} aria-label={'warning icon'} />
+                    </Box>
+                    <Text>
+                      {currentUser.isContractor
+                        ? 'By submitting your registration details you confirm that the information you provided was completed to the best of your knowledge and ability.'
+                        : currentUser.isParticipant
+                          ? t('energySavingsApplication.new.confirmation')
+                          : t('energySavingsApplication.new.confirmationOnBehalf')}
+                    </Text>
+                  </HStack>
+                </Box>
+              )}
               <Flex justify="center" gap={6}>
                 <Button onClick={onSubmit} variant="primary">
                   {t('ui.submit')}
