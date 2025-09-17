@@ -8,8 +8,8 @@ class Api::ConfirmationsController < Devise::ConfirmationsController
     self.resource = resource_class.confirm_by_token(params[:confirmation_token])
     yield resource if block_given?
 
-    if resource.errors.empty?
-      PermitHubMailer.welcome(@user).deliver_later
+    if resource.errors.empty? && resource.participant?
+      PermitHubMailer.notify_new_participant_welcome(resource).deliver_later
       redirect_to confirmed_url(
                     frontend_flash_message(
                       "user.confirmation_success",
