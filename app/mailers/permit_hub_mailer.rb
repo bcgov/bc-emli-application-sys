@@ -1,10 +1,5 @@
 class PermitHubMailer < ApplicationMailer
   # define instance variables that will be used in the view template
-  def welcome(user)
-    @user = user
-    send_user_mail(email: user.email, template_key: "welcome")
-  end
-
   def onboarding(user)
     @user = user
     send_user_mail(email: user.email, template_key: "onboarding")
