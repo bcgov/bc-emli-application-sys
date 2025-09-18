@@ -63,6 +63,11 @@ class PermitApplicationPolicy < ApplicationPolicy
     user.admin_manager? || user.admin?
   end
 
+  # Default hook for support requests – subclasses/services must override!
+  def support_requests?
+    false
+  end
+
   def upload_supporting_document?
     case record.status
     when "new_draft"
