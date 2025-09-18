@@ -58,6 +58,10 @@ class RequirementTemplatePolicy < ApplicationPolicy
     create? && record.early_access?
   end
 
+  def request_supporting_files?
+    true
+  end
+
   class Scope < Scope
     def resolve
       scope.all

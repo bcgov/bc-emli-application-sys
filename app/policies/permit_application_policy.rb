@@ -59,6 +59,10 @@ class PermitApplicationPolicy < ApplicationPolicy
     user.admin_manager? || user.admin?
   end
 
+  def request_supporting_files?
+    user.admin_manager? || user.admin?
+  end
+
   def upload_supporting_document?
     case record.status
     when "new_draft"
