@@ -230,6 +230,13 @@ Rails.application.routes.draw do
       get "active_programs", on: :collection, to: "users#active_programs"
     end
 
+    resources :contractors, only: %i[index show create update destroy] do
+      get "current_contractor/license_agreements",
+          on: :collection,
+          to: "contractors#license_agreements"
+      post "shim", on: :collection, to: "contractors#shim"
+    end
+
     resources :audit_logs, only: %i[index] do
       get "filter_options", on: :collection
     end

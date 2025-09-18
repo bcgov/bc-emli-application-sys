@@ -5,16 +5,17 @@ class Api::UsersController < Api::ApplicationController
                 only: %i[
                   destroy
                   restore
-                  accept_eula
                   update
                   reinvite
                   accept_invitation
                   update_user_role
                 ]
   skip_after_action :verify_policy_scoped, only: %i[index]
+  skip_after_action :verify_authorized, only: %i[accept_eula]
   skip_before_action :require_confirmation, only: %i[profile]
   skip_before_action :require_confirmation,
                      only: %i[accept_eula resend_confirmation]
+  skip_before_action :authenticate_user!, only: %i[accept_eula]
 
   def index
     authorize :user, :index?
@@ -196,14 +197,32 @@ class Api::UsersController < Api::ApplicationController
   end
 
   def accept_eula
-    authorize @user
-    @user.license_agreements.create!(
-      accepted_at: Time.current,
-      agreement: EndUserLicenseAgreement.active_agreement(@user.eula_variant)
-    )
-    render_success @user,
-                   "user.terms_accepted",
-                   { blueprint_opts: { view: :current_user } }
+    account_id = params[:id]
+
+    # Try to find contractor first, then user
+    contractor = Contractor.find_by(id: account_id)
+    if contractor
+      # Non-registered contractor accepting EULA
+      contractor.license_agreements.create!(
+        accepted_at: Time.current,
+        agreement: EndUserLicenseAgreement.active_agreement("contractor")
+      )
+      render_success contractor,
+                     "user.terms_accepted",
+                     { blueprint: ContractorBlueprint }
+    else
+      # Registered user accepting EULA
+      @user = User.find(account_id)
+      authorize @user
+      @user.license_agreements.create!(
+        accepted_at: Time.current,
+        agreement: EndUserLicenseAgreement.active_agreement(@user.eula_variant),
+        account: @user
+      )
+      render_success @user,
+                     "user.terms_accepted",
+                     { blueprint_opts: { view: :current_user } }
+    end
   end
 
   def accept_invitation

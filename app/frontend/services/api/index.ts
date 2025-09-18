@@ -347,8 +347,12 @@ export class Api {
     return this.client.patch<ApiResponse<IUser>>(`/users/${id}/restore`);
   }
 
-  async acceptEULA(userId: string) {
-    return this.client.patch<ApiResponse<IUser>>(`/users/${userId}/accept_eula`);
+  async acceptEULA(accountId: string) {
+    return this.client.patch<ApiResponse<IUser>>(`/users/${accountId}/accept_eula`);
+  }
+
+  async createContractorShim() {
+    return this.client.post<ApiResponse<any>>('/contractors/shim');
   }
 
   async updateUserRole(id: string, role: string) {
