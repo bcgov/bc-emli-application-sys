@@ -684,6 +684,9 @@ en:
       template_version_mismatch:
         title: 'Error'
         message: 'The template version does not match the expected criteria'
+      no_published_template_version:
+        title: 'Error'
+        message: 'No published Supporting Files request template was found. Please contact an administrator.'
   services:
     auto_compliance_configuration:
       digital_seal_validator:

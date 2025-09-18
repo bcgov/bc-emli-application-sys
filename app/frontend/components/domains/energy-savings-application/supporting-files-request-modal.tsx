@@ -60,9 +60,9 @@ export const SupportingFilesRequestModal = observer(
         console.log('Confirmed submit with note:', note);
 
         // Call your backend
-        const permitApplicationId = await permitApplicationStore.requestSupportingFiles(permitApplication.id, { note });
+        const result = await permitApplicationStore.requestSupportingFiles(permitApplication.id, { note });
 
-        console.log('Created supporting request for permitApplicationId:', permitApplicationId);
+        console.log('Created supporting request for permitApplicationId:', result);
 
         // Close modals
         confirmDisclosure.onClose();

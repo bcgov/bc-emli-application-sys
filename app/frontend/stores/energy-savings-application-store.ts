@@ -317,9 +317,8 @@ export const PermitApplicationStoreModel = types
       if (!permitApplication) return false;
 
       const { ok, data: response } = yield self.environment.api.requestSupportingFiles(permitApplicationId, note);
-      if (ok && response.data) {
-        permitApplication.merge(response.data);
-        return true;
+      if (ok && response) {
+        return response;
       }
       return false;
     }),

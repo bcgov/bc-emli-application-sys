@@ -1,8 +1,8 @@
 import { Box, Button, Divider, Flex, HStack, Heading, Spacer, Stack, Text, useDisclosure } from '@chakra-ui/react';
-import { CaretDown, CaretRight, CaretUp, CheckCircle, UploadSimple, NotePencil, Prohibit } from '@phosphor-icons/react';
+import { CaretDown, CaretRight, CaretUp, CheckCircle, NotePencil, Prohibit } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useController, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
@@ -38,16 +38,11 @@ export const ReviewPermitApplicationScreen = observer(() => {
     formRef,
   });
   const navigate = useNavigate();
-  const { control, reset, handleSubmit } = useForm<IReferenceNumberForm>({
+  const { reset } = useForm<IReferenceNumberForm>({
     defaultValues: {
       referenceNumber: currentPermitApplication?.referenceNumber || '',
     },
   });
-
-  const {
-    field: { value: referenceNumber, onChange: onReferenceNumberChange },
-  } = useController<IReferenceNumberForm>({ control, name: 'referenceNumber' });
-  const [referenceNumberSnapshot] = useState<null | string>(null);
 
   const [completedBlocks, setCompletedBlocks] = useState({});
   const [performedBy, setPerformedBy] = useState(null);
@@ -187,7 +182,9 @@ export const ReviewPermitApplicationScreen = observer(() => {
           },
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      // Handle error if needed
+    }
     onScreenInclose();
   };
 
@@ -392,7 +389,6 @@ export const ReviewPermitApplicationScreen = observer(() => {
       )}
       {isRequestSupportingFilesOpen && (
         <SupportingFilesRequestModal
-          isOpen={isRequestSupportingFilesOpen}
           onOpen={onRequestSupportingFilesOpen}
           onClose={onRequestSupportingFilesClose}
           permitApplication={currentPermitApplication}
