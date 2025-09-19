@@ -1,11 +1,11 @@
 class UserLicenseAgreement < ApplicationRecord
   include Auditable
 
-  belongs_to :user
+  belongs_to :account, polymorphic: true
   belongs_to :agreement, class_name: "EndUserLicenseAgreement"
 
   validates :accepted_at, presence: true
-  validate :user_eula_variant_matches_agreement_variant
+  validate :account_eula_variant_matches_agreement_variant
 
   def self.active_agreement(variant)
     where(agreement_id: EndUserLicenseAgreement.active_agreement(variant).id)
@@ -13,11 +13,11 @@ class UserLicenseAgreement < ApplicationRecord
 
   private
 
-  def user_eula_variant_matches_agreement_variant
-    return if user.blank? || agreement.blank?
+  def account_eula_variant_matches_agreement_variant
+    return if account.blank? || agreement.blank?
 
-    unless user.eula_variant == agreement.variant
-      errors.add(:agreement, "variant must match user's eula_variant")
+    if account.is_a?(User) && account.eula_variant != agreement.variant
+      errors.add(:agreement, "variant must match account's eula_variant")
     end
   end
 end
