@@ -325,6 +325,14 @@ export const RequirementForm = observer(
       const revisionRequests = permitApplication?.latestRevisionRequests || [];
       const revisionRequestKeys = new Set(revisionRequests.map((rr) => rr.requirementJson?.key).filter(Boolean));
 
+      // Check if household size field has revision request (for income field enablement)
+      const householdKeyPattern = 'how_many_people_living_in_your_home_are_18_excluding_your_dependants';
+      const incomeFieldKeyPattern = 'pre-tax_annual_income_of_all_people_aged_18';
+
+      const householdHasRevision = Array.from(revisionRequestKeys).some((key) => {
+        return key.includes(householdKeyPattern);
+      });
+
       // Set individual field disabled states based on isEditing (pathway-aware)
       clonedFormJson.components?.forEach((section: any) => {
         section.components?.forEach((block: any) => {
@@ -372,12 +380,17 @@ export const RequirementForm = observer(
             // Field editability logic:
             // 1. Draft applications: All users can edit all fields (creation phase)
             // 2. Participants: Only flagged fields during revisions
-            // 3. Admins: Only on "staff" pathway (not "send to submitter") and before Save Edits completion
+            // 3. Special case: Income fields editable when household size revised (for form completion)
+            // 4. Admins: Only on "staff" pathway (not "send to submitter") and before Save Edits completion
+            const isIncomeField = requirement.key.includes(incomeFieldKeyPattern);
             const participantCanEdit =
-              isRealParticipant && (isDraftApplication || (isRevisionsRequested && hasRevisionRequestInLatest));
+              isRealParticipant &&
+              (isDraftApplication ||
+                (isRevisionsRequested && (hasRevisionRequestInLatest || (isIncomeField && householdHasRevision))));
             const adminCanEdit =
               isDraftApplication ||
-              (hasRevisionRequestInLatest && isEditing && performedBy === 'staff' && !saveEditsCompleted);
+              (hasRevisionRequestInLatest && isEditing && performedBy === 'staff' && !saveEditsCompleted) ||
+              (isIncomeField && householdHasRevision && isEditing && performedBy === 'staff' && !saveEditsCompleted);
 
             requirement.disabled = !(participantCanEdit || adminCanEdit);
           });
