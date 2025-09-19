@@ -326,8 +326,10 @@ export const RequirementForm = observer(
       const revisionRequestKeys = new Set(revisionRequests.map((rr) => rr.requirementJson?.key).filter(Boolean));
 
       // Check if household size field has revision request (for income field enablement)
+      const householdKeyPattern = 'how_many_people_living_in_your_home_are_18_excluding_your_dependants';
+      const incomeFieldKeyPattern = 'pre-tax_annual_income_of_all_people_aged_18';
+
       const householdHasRevision = Array.from(revisionRequestKeys).some((key) => {
-        const householdKeyPattern = 'how_many_people_living_in_your_home_are_18_excluding_your_dependants';
         return key.includes(householdKeyPattern);
       });
 
@@ -380,7 +382,7 @@ export const RequirementForm = observer(
             // 2. Participants: Only flagged fields during revisions
             // 3. Special case: Income fields editable when household size revised (for form completion)
             // 4. Admins: Only on "staff" pathway (not "send to submitter") and before Save Edits completion
-            const isIncomeField = requirement.key.includes('pre-tax_annual_income_of_all_people_aged_18');
+            const isIncomeField = requirement.key.includes(incomeFieldKeyPattern);
             const participantCanEdit =
               isRealParticipant &&
               (isDraftApplication ||
