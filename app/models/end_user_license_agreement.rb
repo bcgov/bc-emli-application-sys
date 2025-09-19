@@ -7,14 +7,7 @@ class EndUserLicenseAgreement < ApplicationRecord
 
   after_create :replace_active_agreement, if: :active
 
-  enum variant: {
-         open: 0,
-         employee: 1,
-         terms: 2,
-         contractor: 3,
-         contractor_employee: 4
-       },
-       _default: 2
+  enum variant: { open: 0, employee: 1, terms: 2 }, _default: 2
 
   validates :active, uniqueness: { scope: :variant }, if: :active?, on: :update
 

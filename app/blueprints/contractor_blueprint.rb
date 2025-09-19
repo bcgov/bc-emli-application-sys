@@ -2,10 +2,6 @@
 class ContractorBlueprint < Blueprinter::Base
   identifier :id
 
-  view :accepted_license_agreements do
-    association :license_agreements, blueprint: UserLicenseAgreementBlueprint
-  end
-
   # base view with the full set of fields
   view :base do
     fields :business_name,

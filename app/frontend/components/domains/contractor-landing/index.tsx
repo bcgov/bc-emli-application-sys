@@ -135,7 +135,6 @@ export const ContractorLandingScreen = () => {
                   <ListItem>{t('landing.contractor.businessNumber')}</ListItem>
                 </UnorderedList>
                 <RouterLinkButton
-                  to="/terms"
                   mt="2"
                   variant="primaryInverse"
                   rightIcon={<CaretRight aria-hidden="true" />}
@@ -166,7 +165,6 @@ export const ContractorLandingScreen = () => {
                     ))}
                   </UnorderedList>
                   <RouterLinkButton
-                    to="/terms"
                     mt="2"
                     variant="primaryInverse"
                     rightIcon={<CaretRight aria-hidden="true" />}

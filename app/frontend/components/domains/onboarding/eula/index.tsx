@@ -4,14 +4,13 @@ import { observer } from 'mobx-react-lite';
 import React, { Suspense, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { useMst, useServerAPI } from '../../../../setup/root';
+import { useMst } from '../../../../setup/root';
 import { LoadingScreen } from '../../../shared/base/loading-screen';
 
 const Editor = React.lazy(() => import('../../../shared/editor/editor').then((module) => ({ default: module.Editor })));
 
 export const EULAScreen = observer(function EULAScreen({ withClose }: { withClose?: boolean }) {
   const { userStore } = useMst();
-  const api = useServerAPI();
   const { eula } = userStore;
   const navigate = useNavigate();
 
@@ -19,34 +18,7 @@ export const EULAScreen = observer(function EULAScreen({ withClose }: { withClos
   const { isLoading, isValid } = formState;
 
   const onSubmit = async () => {
-    if (userStore.currentUser) {
-      // Authenticated user - accept EULA in database
-      await userStore.currentUser.acceptEULA();
-    } else {
-      // Non-registered user - create contractor and accept EULA
-      try {
-        // Step 1: Create contractor via shim endpoint
-        const shimResponse = await api.createContractorShim();
-
-        if (!shimResponse.ok || !shimResponse.data?.data) {
-          throw new Error('Failed to create contractor');
-        }
-
-        const contractor = shimResponse.data.data;
-
-        // Step 2: Accept EULA for contractor
-        const eulaResponse = await api.acceptEULA(contractor.id);
-
-        if (eulaResponse.ok) {
-          // Store contractor ID for potential future use
-          localStorage.setItem('contractorId', contractor.id);
-        } else {
-          throw new Error('Failed to accept EULA');
-        }
-      } catch (error) {
-        console.error('Error in contractor EULA flow:', error);
-      }
-    }
+    await userStore.currentUser.acceptEULA();
   };
 
   useEffect(() => {
@@ -74,13 +46,13 @@ export const EULAScreen = observer(function EULAScreen({ withClose }: { withClos
               <Box maxW="4xl" overflow="hidden" sx={{ '.quill': { height: '100%', overflow: 'auto' } }}>
                 <Editor value={eula.content} readOnly={true} modules={{ toolbar: false }} />
               </Box>
-              {(userStore.currentUser && !userStore.currentUser.eulaAccepted) || !userStore.currentUser ? (
+              {!userStore.currentUser.eulaAccepted && (
                 <form onSubmit={handleSubmit(onSubmit)} style={{ flex: 0, flexBasis: 'auto' }}>
                   <Button variant="primary" type="submit" isLoading={isLoading} isDisabled={!isValid || isLoading}>
                     {t('eula.accept')}
                   </Button>
                 </form>
-              ) : null}
+              )}
             </>
           )}
         </Suspense>

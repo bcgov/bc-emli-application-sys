@@ -1,7 +1,5 @@
 class Api::ContractorsController < Api::ApplicationController
   before_action :set_contractor, only: %i[show update destroy]
-  skip_before_action :authenticate_user!, only: %i[shim]
-  skip_after_action :verify_authorized, only: %i[shim]
 
   def index
     contractors = Contractor.all
@@ -41,22 +39,7 @@ class Api::ContractorsController < Api::ApplicationController
         business_name: "TBD",
         onboarded: false
       )
-    render_success contractor, nil, { blueprint: ContractorBlueprint }
-  end
-
-  def license_agreements
-    # Find contractor where current user is the contact (owner)
-    @contractor = Contractor.find_by!(contact: current_user)
-    authorize @contractor
-
-    render_success @contractor,
-                   nil,
-                   {
-                     blueprint: ContractorBlueprint,
-                     blueprint_opts: {
-                       view: :accepted_license_agreements
-                     }
-                   }
+    render json: ContractorBlueprint.render(contractor), status: :created
   end
 
   private

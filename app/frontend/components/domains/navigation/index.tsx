@@ -574,7 +574,6 @@ const AppRoutes = observer(() => {
         <Route path="/confirmed" element={<EmailConfirmedScreen />} />
         <Route path="/welcome" element={<LandingScreen />} />
         <Route path="/welcome/contractor" element={<ContractorLandingScreen />} />
-        <Route path="/terms" element={<EULAScreen withClose />} />
         <Route path="/check-eligible" element={<EligibilityCheck />} />
         <Route path="/get-support" element={<SupportScreen />} />
         <Route

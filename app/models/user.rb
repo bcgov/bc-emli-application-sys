@@ -84,7 +84,6 @@ class User < ApplicationRecord
            source: :jurisdiction
   has_many :license_agreements,
            class_name: "UserLicenseAgreement",
-           as: :account,
            dependent: :destroy
   has_many :contacts, as: :contactable, dependent: :destroy
   has_many :collaborators, as: :collaboratorable, dependent: :destroy
@@ -141,7 +140,7 @@ class User < ApplicationRecord
       admin: "terms",
       admin_manager: "terms",
       participant_support_rep: "terms",
-      contractor: "contractor",
+      contractor: "terms",
       unassigned: "terms",
       system_admin: "terms"
     }[
