@@ -687,7 +687,10 @@ en:
       no_published_template_version:
         title: 'Error'
         message: 'No published Supporting Files request template was found. Please contact an administrator.'
-  services:
+      support_request_not_created:
+        title: 'Error'
+        message: 'The support request could not be created.'
+    services:
     auto_compliance_configuration:
       digital_seal_validator:
         label: 'Digital Seal Validator for AIBC and EGBC - Validates the digital seal of a file'

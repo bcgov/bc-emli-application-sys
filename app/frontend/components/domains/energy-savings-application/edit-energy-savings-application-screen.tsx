@@ -1,44 +1,23 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Flex,
-  Heading,
-  HStack,
-  Spacer,
-  Stack,
-  Text,
-  Tooltip,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  ModalCloseButton,
-} from '@chakra-ui/react';
+import { Box, Button, Divider, Flex, Heading, HStack, Spacer, Stack, Text, useDisclosure } from '@chakra-ui/react';
 import { Phone } from '@phosphor-icons/react';
-import { CaretDown, CaretRight, CaretUp, FloppyDiskBack, Info, NotePencil } from '@phosphor-icons/react';
+import { CaretDown, CaretRight, CaretUp, FloppyDiskBack, Info, NotePencil, Warning } from '@phosphor-icons/react';
 import { t } from 'i18next';
 import { observer } from 'mobx-react-lite';
 import * as R from 'ramda';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { requirementTypeToFormioType } from '../../../constants';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
 import { useInterval } from '../../../hooks/use-interval';
 import { useMst } from '../../../setup/root';
 import { ICustomEventMap } from '../../../types/dom';
-import { ECollaborationType, ECustomEvents, EFlashMessageStatus, ERequirementType } from '../../../types/enums';
+import { ECollaborationType, ECustomEvents, ERequirementType } from '../../../types/enums';
 import { handleScrollToBottom } from '../../../utils/utility-functions';
 import { CopyableValue } from '../../shared/base/copyable-value';
 import { ErrorScreen } from '../../shared/base/error-screen';
 import { LoadingScreen } from '../../shared/base/loading-screen';
-import { EditableInputWithControls } from '../../shared/editable-input-with-controls';
-import { BrowserSearchPrompt } from '../../shared/energy-savings-applications/browser-search-prompt';
 import { EnergySavingsApplicationStatusTag } from '../../shared/energy-savings-applications/energy-savings-application-status-tag';
 import { PermitApplicationSubmitModal } from '../../shared/energy-savings-applications/permit-application-submit-modal';
 import { RequirementForm } from '../../shared/energy-savings-applications/requirement-form';
@@ -46,7 +25,6 @@ import { FloatingHelpDrawer } from '../../shared/floating-help-drawer';
 import SandboxHeader from '../../shared/sandbox/sandbox-header';
 import { ChecklistSideBar } from './checklist-sidebar';
 import { BlockCollaboratorAssignmentManagement } from './assignment-management/block-collaborator-assignment-management';
-//import { CollaboratorsSidebar } from './collaborator-management/collaborators-sidebar';
 import { useCollaborationAssignmentNodes } from './assignment-management/hooks/use-collaboration-assignment-nodes';
 import { ContactSummaryModal } from './contact-summary-modal';
 import { RevisionSideBar } from './revision-sidebar';
@@ -307,49 +285,6 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
             <HStack gap={4} flex={1}>
               <EnergySavingsApplicationStatusTag energySavingsApplication={currentPermitApplication} />
               <Flex direction="column" w="full">
-                {/* <form>
-                  <Tooltip label={t('permitApplication.edit.clickToWriteNickname')} placement="top-start">
-                    <Box>
-                      <EditableInputWithControls
-                        w="full"
-                        initialHint={t('permitApplication.edit.clickToWriteNickname')}
-                        value={nicknameWatch || ''}
-                        isDisabled={!doesUserHaveSubmissionPermission || isSubmitted}
-                        controlsProps={{
-                          iconButtonProps: {
-                            color: 'greys.white',
-                            display: !doesUserHaveSubmissionPermission || isSubmitted ? 'none' : 'block',
-                          },
-                        }}
-                        editableInputProps={{
-                          fontWeight: 700,
-                          fontSize: 'xl',
-                          width: '100%',
-                          ...register('nickname', {
-                            maxLength: {
-                              value: 256,
-                              message: t('ui.invalidInput'),
-                            },
-                          }),
-
-                          onSubmit: () => {
-                            handleSave();
-                          },
-                          'aria-label': 'Edit Nickname',
-                        }}
-                        editablePreviewProps={{
-                          fontWeight: 700,
-                          fontSize: 'xl',
-                        }}
-                        onEdit={() => {
-                          setIsDirty(true);
-                        }}
-                        aria-label={'Edit Nickname'}
-                        onCancel={(previousValue) => setValue('nickname', previousValue)}
-                      />
-                    </Box>
-                  </Tooltip>
-                </form> */}
                 <Heading fontSize="xl" as="h3">
                   {currentPermitApplication.fullAddress}
                 </Heading>
@@ -366,17 +301,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
 
             {isSubmitted || isIneligible ? (
               <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
-                {/* <BrowserSearchPrompt /> */}
-                {/* <Button variant="ghost" leftIcon={<Info size={20} />} color="white" onClick={onContactsOpen}>
-                  {t('energySavingsApplication.show.contactsSummary')}
-                </Button>{' '} */}
-                {/* <CollaboratorsSidebar
-                  permitApplication={currentPermitApplication}
-                  collaborationType={ECollaborationType.submission}
-                /> */}
-                {/* {doesUserHaveSubmissionPermission && ( */}
                 <SubmissionDownloadModal permitApplication={currentPermitApplication} />
-                {/* )} */}
                 <Button rightIcon={<CaretRight />} onClick={() => navigate('/')}>
                   {t(
                     currentUser.isParticipant
@@ -393,11 +318,6 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 }}
                 gap={4}
               >
-                {/* <BrowserSearchPrompt /> */}
-                {/* <CollaboratorsSidebar
-                  permitApplication={currentPermitApplication}
-                  collaborationType={ECollaborationType.submission}
-                /> */}
                 {currentPermitApplication?.isDraft && (
                   <Button variant="primary" onClick={handleClickWithdrawl}>
                     {t('energySavingsApplication.edit.withdrawl')}
@@ -443,6 +363,25 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               position="absolute"
             />
           </Flex>
+          {currentPermitApplication?.supportRequest && (
+            <Flex
+              position="sticky"
+              zIndex={11}
+              w="full"
+              px={4}
+              py={2}
+              bg="theme.yellow"
+              justify="flex-start"
+              align="center"
+              gap={4}
+              top={permitHeaderHeight}
+            >
+              <Warning size={24} />
+              <Heading fontSize="lg" mt={2}>
+                Supporting files requested
+              </Heading>
+            </Flex>
+          )}
           {currentPermitApplication.isRevisionsRequested && (
             <Flex
               position="sticky"

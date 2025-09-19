@@ -42,6 +42,7 @@ import { IPermitBlockStatus, PermitBlockStatusModel } from './permit-block-statu
 import { IActivity, IAudienceType, IPermitType, ISubmissionType, IUserGroupType } from './permit-classification';
 import { IPermitCollaboration, PermitCollaborationModel } from './permit-collaboration';
 import { IRequirement } from './requirement';
+import { ISupportRequest, SupportRequestModel } from './support_request';
 import { SandboxModel } from './sandbox';
 import { StepCodeModel } from './step-code';
 import { ProgramModel } from './program';
@@ -103,6 +104,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       permitCollaborationMap: types.map(PermitCollaborationModel),
       permitBlockStatusMap: types.map(PermitBlockStatusModel),
       isViewingPastRequests: types.optional(types.boolean, false),
+      supportRequests: types.maybeNull(types.array(types.frozen<ISupportRequest>())), // Array of ISupportRequest
     })
     .extend(withEnvironment())
     .extend(withRootStore())
@@ -572,6 +574,28 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
             return acc;
           }, {}),
         );
+      },
+    }))
+    .views((self) => ({
+      // Latest SR created_at as Date object (or null if none)
+      get latestSupportRequestDate(): Date | null {
+        if (self.supportRequests.length === 0) return null;
+        const latest = self.supportRequests.reduce((acc, sr) =>
+          new Date(sr.created_at) > new Date(acc.created_at) ? sr : acc,
+        );
+        return new Date(latest.created_at);
+      },
+
+      // Strict UI format: YYYY/MM/DD
+      get latestSupportRequestDateString(): string | null {
+        const date = this.latestSupportRequestDate;
+        if (!date) return null;
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}/${month}/${day}`;
       },
     }))
     .actions((self) => ({

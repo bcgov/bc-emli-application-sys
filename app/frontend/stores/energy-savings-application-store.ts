@@ -318,6 +318,7 @@ export const PermitApplicationStoreModel = types
 
       const { ok, data: response } = yield self.environment.api.requestSupportingFiles(permitApplicationId, note);
       if (ok && response) {
+        self.mergeUpdate(response, 'permitApplicationMap');
         return response;
       }
       return false;

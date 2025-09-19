@@ -65,6 +65,12 @@ class PermitApplication < ApplicationRecord
   has_many :assigned_users, through: :application_assignments, source: :user
   has_many :permit_block_statuses, dependent: :destroy
 
+  # Support requests *spawned from this permit application*
+  has_many :support_requests,
+           foreign_key: :parent_application_id,
+           inverse_of: :parent_application,
+           dependent: :destroy
+
   scope :submitted, -> { joins(:submission_versions).distinct }
 
   scope :sandboxed, -> { where.not(sandbox_id: nil) }

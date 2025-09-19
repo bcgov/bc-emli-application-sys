@@ -5,5 +5,7 @@ class SupportRequestBlueprint < Blueprinter::Base
 
   association :parent_application, blueprint: PermitApplicationBlueprint
   association :requested_by, blueprint: UserBlueprint
-  association :linked_application, blueprint: PermitApplicationBlueprint
+  association :linked_application,
+              blueprint: PermitApplicationBlueprint,
+              view: :minimal
 end

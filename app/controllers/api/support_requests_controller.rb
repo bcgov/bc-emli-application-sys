@@ -1,5 +1,7 @@
 class Api::SupportRequestsController < Api::ApplicationController
   before_action :set_request, only: %i[show update destroy]
+
+  # Skip default Pundit check — service handles create/view authorizations internally
   skip_after_action :verify_authorized, only: :request_supporting_files
 
   def index
@@ -34,25 +36,27 @@ class Api::SupportRequestsController < Api::ApplicationController
   end
 
   def request_supporting_files
-    Rails.logger.info(
-      "SupportRequestsController#request_supporting_files called by user"
-    )
     parent_app = PermitApplication.find(params[:parent_application_id])
-    Rails.logger.info(
-      "Requesting supporting files for application #{parent_app.id} by user #{pundit_user.user.id}"
-    )
     support_request =
       SupportRequests::SupportingFilesService.new(
         parent_app: parent_app,
         user_context: pundit_user,
         note: params[:note]
       ).call
-    Rails.logger.info(
-      "Created support request #{support_request.id} for application #{parent_app.id} by user #{pundit_user.user.id}"
-    )
 
-    render json: SupportRequestBlueprint.render(support_request),
-           status: :created
+    # check it actually got created
+    if support_request.persisted?
+      parent_app.reload
+
+      render json:
+               PermitApplicationBlueprint.render(parent_app, view: :extended),
+             status: :created
+    else
+      render_error(
+        "application_controller.support_request_not_created",
+        status: :unprocessable_entity
+      )
+    end
   rescue ActiveRecord::RecordNotFound => e
     render_error(
       "application_controller.no_published_template_version",
