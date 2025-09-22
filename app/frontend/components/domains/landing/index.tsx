@@ -61,7 +61,7 @@ export const LandingScreen = observer(() => {
               {t('landing.title')}
             </Heading>
             <Text
-              fontSize="16px"
+              fontSize="24px"
               color="greys.white"
               textShadow={`${colors.theme.bannerTextShadow}, 0 0 3px ${colors.darken[70]}`}
               lineHeight="27px"
