@@ -37,14 +37,14 @@ export const EnergySavingsApplicationStatusTag = ({
   };
 
   const colorMap = {
-    [EPermitApplicationStatus.submitted]: 'text.primary',
-    [EPermitApplicationStatus.resubmitted]: 'text.primary',
-    [EPermitApplicationStatus.draft]: 'theme.blueButtonHover',
-    [EPermitApplicationStatus.revisionsRequested]: 'text.primary',
-    // [EPermitApplicationStatus.ephemeral]: 'text.primary',
-    [EPermitApplicationStatus.inReview]: 'text.primary',
-    [EPermitApplicationStatus.approved]: 'text.primary',
-    [EPermitApplicationStatus.ineligible]: 'text.primary',
+    [EPermitApplicationStatus.submitted]: 'greys.anotherGrey',
+    [EPermitApplicationStatus.resubmitted]: 'greys.anotherGrey',
+    [EPermitApplicationStatus.draft]: 'greys.anotherGrey',
+    [EPermitApplicationStatus.revisionsRequested]: 'greys.anotherGrey',
+    // [EPermitApplicationStatus.ephemeral]: 'greys.anotherGrey',
+    [EPermitApplicationStatus.inReview]: 'greys.anotherGrey',
+    [EPermitApplicationStatus.approved]: 'greys.anotherGrey',
+    [EPermitApplicationStatus.ineligible]: 'greys.anotherGrey',
   };
 
   const borderColorMap = {
