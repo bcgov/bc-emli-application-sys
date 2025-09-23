@@ -1,4 +1,10 @@
 class Contractor < ApplicationRecord
+  searchkick(
+    callbacks: false,
+    searchable: %i[business_name contact_name contact_email],
+    word_middle: %i[business_name contact_name contact_email]
+  )
+
   belongs_to :contact, class_name: "User", optional: true
 
   has_many :contractor_onboards, dependent: :destroy
@@ -11,4 +17,19 @@ class Contractor < ApplicationRecord
            dependent: :destroy
 
   validates :business_name, presence: true
+
+  def search_data
+    {
+      id: id,
+      business_name: business_name,
+      contact_name: contact&.name,
+      contact_email: contact&.email,
+      created_at: created_at,
+      updated_at: updated_at
+    }
+  end
+
+  def contact_name
+    contact&.name
+  end
 end

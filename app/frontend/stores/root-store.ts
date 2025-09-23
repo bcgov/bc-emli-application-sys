@@ -4,6 +4,7 @@ import { createUserChannelConsumer } from '../channels/user_channel';
 import { withEnvironment } from '../lib/with-environment';
 import { CollaboratorStoreModel, ICollaboratorStore } from './collaborator-store';
 import { ContactStoreModel, IContactStore } from './contact-store';
+import { ContractorStoreModel, IContractorStore } from './contractor-store';
 import { EarlyAccessPreviewStoreModel, IEarlyAccessPreviewStoreModel } from './early-access-preview-store';
 import {
   EarlyAccessRequirementBlockStoreModel,
@@ -51,6 +52,7 @@ export const RootStoreModel = types
     stepCodeStore: types.optional(StepCodeStoreModel, {}),
     siteConfigurationStore: types.optional(SiteConfigurationStoreModel, {}),
     contactStore: types.optional(ContactStoreModel, {}),
+    contractorStore: types.optional(ContractorStoreModel, {}),
     notificationStore: types.optional(NotificationStoreModel, {}),
     sandboxStore: types.optional(SandboxStoreModel, {}),
   })
@@ -131,6 +133,7 @@ export interface IRootStore extends IStateTreeNode {
   stepCodeStore: IStepCodeStore;
   siteConfigurationStore: ISiteConfigurationStore;
   contactStore: IContactStore;
+  contractorStore: IContractorStore;
   notificationStore: INotificationStore;
   collaboratorStore: ICollaboratorStore;
   sandboxStore: ISandboxStore;

@@ -17,6 +17,7 @@ import { ProgramInviteUserScreen } from '../programs/invite-users';
 import RejectApplicationScreen from '../permit-application/application-rejection-reason';
 import { BlankTemplateScreen } from '../requirement-template/screens/blank-template';
 import { ContractorLandingScreen } from '../contractor-landing';
+import { ContractorManagementScreen } from '../contractor-management';
 
 const ExternalApiKeysIndexScreen = lazy(() =>
   import('../external-api-key').then((module) => ({ default: module.ExternalApiKeysIndexScreen })),
@@ -409,6 +410,7 @@ const AppRoutes = observer(() => {
       <Route path="/configure-users" element={<ProgramsIndexScreen />} />
       <Route path="/configure-users/:programId/users" element={<ProgramUserIndexScreen />} />
       <Route path="/configure-users/:programId/invite" element={<ProgramInviteUserScreen />} />
+      <Route path="/contractor-management" element={<ContractorManagementScreen />} />
       <Route path="/audit-log" element={<AuditLogScreen />} />
     </>
   );
@@ -417,6 +419,7 @@ const AppRoutes = observer(() => {
     <>
       <Route path="/submission-inbox" element={<ProgramSubmissionInboxScreen />} />
       <Route path="/applications/:permitApplicationId" element={<ReviewPermitApplicationScreen />} />
+      <Route path="/contractor-management" element={<ContractorManagementScreen />} />
       <Route path="/blank-template/:templateVersionId" element={<BlankTemplateScreen />} />
       // view blank applications and view supported applications to go here
       {import.meta.env.DEV && (

@@ -1,7 +1,12 @@
 class ContractorPolicy < ApplicationPolicy
+  def index?
+    # For now, all authenticated users can see contractors in the index
+    true
+  end
+
   def show?
     # Users can view contractors they are contact for, or admins can view any
-    user.system_admin? || user.admin? || record.contact == user
+    user.system_admin? || user.admin? || user.manager? || record.contact == user
   end
 
   def update?
@@ -10,8 +15,8 @@ class ContractorPolicy < ApplicationPolicy
   end
 
   def destroy?
-    # Only the contact (owner) can delete contractor
-    record.contact == user
+    # Admins, managers, and system admins can delete any contractor, or the contact (owner) can delete their own
+    user.system_admin? || user.admin? || user.manager? || record.contact == user
   end
 
   def license_agreements?
@@ -26,7 +31,7 @@ class ContractorPolicy < ApplicationPolicy
 
   class Scope < ApplicationPolicy::Scope
     def resolve
-      if user.system_admin? || user.admin?
+      if user.system_admin? || user.admin? || user.manager?
         scope.all
       else
         scope.where(contact: user)

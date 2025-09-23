@@ -355,6 +355,22 @@ export class Api {
     return this.client.post<ApiResponse<any>>('/contractors/shim');
   }
 
+  async fetchContractors(params?) {
+    return this.client.get<ApiResponse<any>>('/contractors', params);
+  }
+
+  async createContractor(params) {
+    return this.client.post<ApiResponse<any>>('/contractors', { contractor: params });
+  }
+
+  async updateContractor(id: string, params) {
+    return this.client.patch<ApiResponse<any>>(`/contractors/${id}`, { contractor: params });
+  }
+
+  async destroyContractor(id: string) {
+    return this.client.delete<ApiResponse<any>>(`/contractors/${id}`);
+  }
+
   async updateUserRole(id: string, role: string) {
     return this.client.patch<ApiResponse<IUser>>(`/users/${id}/role`, { role });
   }
