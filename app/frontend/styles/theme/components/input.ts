@@ -1,38 +1,38 @@
-import { inputAnatomy } from "@chakra-ui/anatomy"
-import { createMultiStyleConfigHelpers } from "@chakra-ui/react"
+import { inputAnatomy } from '@chakra-ui/anatomy';
+import { createMultiStyleConfigHelpers } from '@chakra-ui/react';
 
-const { definePartsStyle, defineMultiStyleConfig } = createMultiStyleConfigHelpers(inputAnatomy.keys)
+const { definePartsStyle, defineMultiStyleConfig } = createMultiStyleConfigHelpers(inputAnatomy.keys);
 
 const baseStyle = definePartsStyle({
   field: {
-    lineHeight: "27px",
-    borderRadius: "sm",
+    lineHeight: '27px',
+    borderRadius: 'sm',
     paddingInlineStart: 3,
     paddingInlineEnd: 3,
     _disabled: {
-      bg: "greys.grey04",
-      borderColor: "border.light",
-      color: "greys.grey01",
+      bg: 'greys.grey04',
+      borderColor: 'border.light',
+      color: 'greys.homeScreenGrey',
       opacity: 1,
       _hover: {
-        borderColor: "border.light",
-        cursor: "auto",
+        borderColor: 'border.light',
+        cursor: 'auto',
       },
     },
-    _placeholder: { color: "greys.grey01" },
+    _placeholder: { color: 'greys.grey01' },
   },
-})
+});
 
 const styles = {
   baseStyle,
   variants: {
     outline: {
       field: {
-        borderColor: "border.light",
-        _hover: { borderColor: "greys.grey01" },
+        borderColor: 'border.light',
+        _hover: { borderColor: 'greys.grey01' },
       },
     },
   },
-}
+};
 
-export const Input = defineMultiStyleConfig(styles)
+export const Input = defineMultiStyleConfig(styles);
