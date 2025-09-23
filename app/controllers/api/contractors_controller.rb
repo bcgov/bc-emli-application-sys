@@ -1,19 +1,37 @@
 class Api::ContractorsController < Api::ApplicationController
+  include Api::Concerns::Search::Contractors
   before_action :set_contractor, only: %i[show update destroy]
   skip_before_action :authenticate_user!, only: %i[shim]
   skip_after_action :verify_authorized, only: %i[shim]
+  skip_after_action :verify_policy_scoped, only: [:index]
 
   def index
-    contractors = Contractor.all
-    render json: ContractorBlueprint.render(contractors)
+    perform_contractor_search
+    contractors = @contractor_search.results
+
+    render_success contractors,
+                   nil,
+                   {
+                     blueprint: ContractorBlueprint,
+                     blueprint_opts: {
+                       view: :base
+                     },
+                     meta: {
+                       total_pages: @contractor_search.total_pages,
+                       total_count: @contractor_search.total_count,
+                       current_page: @contractor_search.current_page
+                     }
+                   }
   end
 
   def show
+    authorize @contractor
     render json: ContractorBlueprint.render(@contractor)
   end
 
   def create
     contractor = Contractor.new(contractor_params)
+    authorize contractor
     if contractor.save
       render json: ContractorBlueprint.render(contractor), status: :created
     else
@@ -22,6 +40,7 @@ class Api::ContractorsController < Api::ApplicationController
   end
 
   def update
+    authorize @contractor
     if @contractor.update(contractor_params)
       render json: ContractorBlueprint.render(@contractor)
     else
@@ -30,6 +49,7 @@ class Api::ContractorsController < Api::ApplicationController
   end
 
   def destroy
+    authorize @contractor
     @contractor.destroy
     head :no_content
   end

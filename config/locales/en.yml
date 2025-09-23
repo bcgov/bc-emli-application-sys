@@ -789,3 +789,24 @@ en:
     login_from_ip: 'Login from IP: %{ip}'
     login_count: 'Total logins: %{count}'
     applications: 'applications'
+  contact:
+    fields:
+      phone: 'Phone'
+      email: 'Email'
+  contractor:
+    fields:
+      contractorId: 'Contractor ID'
+      primaryContactName: 'Primary contact name'
+      primaryContactEmail: 'Primary contact email'
+      doingBusinessAs: 'Doing business as'
+      program: 'Program'
+      lastUpdated: 'Last updated'
+    management:
+      title: 'Contractor Management'
+      addButton: 'Add Contractor'
+    actions:
+      manage: 'Manage'
+      inviteEmployee: 'Invite Employee'
+      viewEmployees: 'View Employees'
+      editContractor: 'Edit Contractor'
+      suspendContractor: 'Suspend Contractor'
