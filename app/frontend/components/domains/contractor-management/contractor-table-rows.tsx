@@ -1,5 +1,5 @@
 import { Badge, Box, Flex, Menu, MenuButton, MenuItem, MenuList, Link } from '@chakra-ui/react';
-import { Eye, PencilSimple, Trash, Envelope, Users, Prohibit, HourglassMedium } from '@phosphor-icons/react';
+import { Eye, PencilSimple, Envelope, Users, Prohibit, HourglassMedium, Trash } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,26 +23,6 @@ export const ContractorRow = observer(({ contractor }: ContractorRowProps) => {
 
   const handleView = () => {
     navigate(`/contractor-management/${contractor.id}`);
-  };
-
-  const handleDelete = async () => {
-    if (window.confirm(t('contractor.management.confirmDelete', 'Are you sure you want to delete this contractor?'))) {
-      try {
-        const success = await contractor.destroy();
-        if (success) {
-          // Refresh the search results to update pagination
-          await contractorStore.searchContractors({
-            page: contractorStore.currentPage,
-            countPerPage: contractorStore.countPerPage,
-          });
-          console.log('Contractor removed successfully');
-        } else {
-          console.error('Failed to remove contractor');
-        }
-      } catch (error) {
-        console.error('Error removing contractor:', error);
-      }
-    }
   };
 
   const handleInviteEmployee = () => {
@@ -108,7 +88,7 @@ export const ContractorRow = observer(({ contractor }: ContractorRowProps) => {
               <MenuItem icon={<HourglassMedium />} onClick={handleSuspend}>
                 {t('contractor.actions.suspendContractor')}
               </MenuItem>
-              <MenuItem icon={<Trash />} onClick={handleDelete} color="red.500">
+              <MenuItem icon={<Trash />} color="red.500">
                 {t('contractor.actions.removeContractor')}
               </MenuItem>
             </MenuList>

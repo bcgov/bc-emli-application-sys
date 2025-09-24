@@ -631,7 +631,7 @@ const options = {
             targetGroup: 'Select target user group:',
             nameOfProgram: 'Name of program',
             fundedBy: 'Funded by',
-            nextStep: 'Next step is to invite users',
+            nextStep: 'Next step is to invite users.',
             successMessage: 'New program created!',
           },
           edit: {
@@ -689,7 +689,7 @@ const options = {
             createButton: 'Create jurisdiction',
             nameLabel: 'Name of local jurisdiction',
             postalAddressLabel: 'Postal address',
-            nextStep: 'Next step is to invite users',
+            nextStep: 'Next step is to invite users.',
             useCustom: 'Use a custom locality type',
           },
           index: {
