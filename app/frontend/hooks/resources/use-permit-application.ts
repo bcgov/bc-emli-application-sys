@@ -29,7 +29,11 @@ export const usePermitApplication = ({ review }: { review?: boolean } = {}) => {
           } else {
             // API call failed - redirect participants back to applications list
             if (currentUser?.role === 'participant') {
-              navigate('/');
+              if (window.history.length > 1) {
+                navigate(-1); // Go back if there's history
+              } else {
+                navigate('/'); // Fallback to home
+              }
             }
           }
         }
