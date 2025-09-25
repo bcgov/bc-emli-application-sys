@@ -110,7 +110,7 @@ crunchy-postgres:
   instances:
     replicas: 1
     dataVolumeClaimSpec:
-      storage: 2Gi
+      storage: 20Gi
     requests:
       cpu: 10m
       memory: 256Mi
@@ -123,7 +123,7 @@ crunchy-postgres:
     retention: '1'
     repos:
       volume:
-        storage: 256Mi
+        storage: 10Gi
     repoHost:
       requests:
         cpu: 1m
