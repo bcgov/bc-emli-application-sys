@@ -42,7 +42,7 @@ export const usePermitApplication = ({ review }: { review?: boolean } = {}) => {
         setError(new Error(t('errors.fetchPermitApplication')));
       }
     })();
-  }, [pathname, currentSandbox?.id]);
+  }, [pathname, currentSandbox?.id, navigate, currentUser]);
 
   return { currentPermitApplication, error };
 };
