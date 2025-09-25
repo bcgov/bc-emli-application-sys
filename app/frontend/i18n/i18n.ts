@@ -388,13 +388,15 @@ const options = {
           phoneHours: ', 9 am to 5 pm, Monday to Friday (excluding statutory holidays).',
 
           // External links
-          energyCoachBooking: 'Book a call',
+          // energyCoachBooking: 'Book a call',
+          energyCoachBooking: 'Learn how to get support',
           homeEnergyPlanner: 'Use the BC Home Energy Planner',
           energySavingsProgramPortal: 'Energy Savings Program contractor portal',
           serviceCardLink: 'https://id.gov.bc.ca/account/',
           contractorPortalLinkText: 'Contractors - please visit the',
 
-          energyCoachLink: 'https://submit.digital.gov.bc.ca/app/form/submit?f=a216ecd7-c840-457a-9f8f-b350f334849b',
+          //energyCoachLink: 'https://submit.digital.gov.bc.ca/app/form/submit?f=a216ecd7-c840-457a-9f8f-b350f334849b',
+          energyCoachLink: `/get-support`,
           homeEnergyPlannerLink: 'https://bchomeenergyplanner.ca/',
 
           // Aria labels
@@ -2769,12 +2771,14 @@ const options = {
             contactInfo:
               'Contact us at 1-833-856-0333 from 9 am - 5 pm, Monday - Friday (excluding statutory holidays).',
             applicationHelpTitleShort: 'Get help with your Energy Savings Program application',
+            // applicationHelpDescriptionShort:
+            //   'Do you have questions about your application, the program or home upgrade opportunities? We can help you understand home energy upgrades and rebates by email, or you can',
+            // applicationHelpCallLink: 'schedule a call with an Energy Savings Program Specialist',
+            // applicationHelpCallUrl:
+            //   'https://submit.digital.gov.bc.ca/app/form/submit?f=a216ecd7-c840-457a-9f8f-b350f334849b',
+            //applicationHelpDescriptionEnd: '.',
             applicationHelpDescriptionShort:
-              'Do you have questions about your application, the program or home upgrade opportunities? We can help you understand home energy upgrades and rebates by email, or you can',
-            applicationHelpCallLink: 'schedule a call with an Energy Savings Program Specialist',
-            applicationHelpCallUrl:
-              'https://submit.digital.gov.bc.ca/app/form/submit?f=a216ecd7-c840-457a-9f8f-b350f334849b',
-            applicationHelpDescriptionEnd: '.',
+              "We can help you understand home energy upgrades and rebates by email or phone. Job action means we can't currently schedule calls with Energy Savings Program Specialists: please phone us instead.",
             groundOrientedEmail: 'BetterHomesESP@CLEAResult.com',
             multiUnitEmail: 'ESPcondoapartment@CLEAResult.com',
             groundOrientedLabel: 'Single family dwellings, rowhouses and other ground-oriented home types:',
