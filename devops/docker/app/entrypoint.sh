@@ -35,11 +35,11 @@ if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
 
   echo "*** Preparing Database..."
   
-  IS_DOCKER_BUILD=true ./bin/rails db:migrate
+  IS_APP_SERVER=true ./bin/rails db:migrate
 
   echo "*** reindexing models for search..."
   
-  IS_DOCKER_BUILD=true ./bin/rails search:reindex
+  IS_APP_SERVER=true ./bin/rails search:reindex
 fi
 
 exec "$@"
