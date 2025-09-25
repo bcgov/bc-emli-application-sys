@@ -27,7 +27,7 @@ export const usePermitApplication = ({ review }: { review?: boolean } = {}) => {
             setCurrentPermitApplication(permitApplicationId);
             setError(null);
           } else {
-            // API call failed - redirect participants back to applications list
+            // API call failed - navigate participants back or to home
             if (currentUser?.role === 'participant') {
               if (window.history.length > 1) {
                 navigate(-1); // Go back if there's history
