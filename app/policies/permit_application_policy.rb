@@ -1,10 +1,15 @@
 class PermitApplicationPolicy < ApplicationPolicy
-  # All user types can use the search permit application
+  # Policy controls whether user can view this permit application
+  # Used for: search results, individual record access, list filtering
   def index?
-    if user.system_admin? || record.submitter == user || user.admin_manager? ||
-         user.admin?
-      # record.collaborator?(user_id: user.id, collaboration_type: :submission)
+    if user.system_admin? || user.admin_manager? || user.admin?
+      # Admin users can see all applications they have access to
       true
+    elsif record.submitter == user
+      # Participants can see their own applications, EXCEPT 'in_review' status
+      !record.in_review?
+    else
+      false
     end
   end
 
