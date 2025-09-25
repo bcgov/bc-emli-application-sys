@@ -6,8 +6,7 @@ global:
     role:
     # sub-path of the vault secret
     subPath:
-    podAnnotations:
-      {}
+    podAnnotations: {}
       # See https://developer.hashicorp.com/vault/docs/platform/k8s/injector/annotations#agent-annotations
       # vault.hashicorp.com/auth-path: auth/k8s-silver
       # vault.hashicorp.com/namespace: platform-services
@@ -75,6 +74,7 @@ app:
     'VITE_BUSINESS_BCEID_REGISTRATION_URL': ''
     'VITE_KEYCLOAK_LOGOUT_URL': ''
     'VITE_POST_LOGOUT_REDIRECT_URL': ''
+    'IS_APP_SERVER': true
 
 sidekiq:
   enabled: false
