@@ -29,9 +29,14 @@ class ContractorPolicy < ApplicationPolicy
     true
   end
 
+  def search_users?
+    # Admin managers and system admins can search contractor users
+    user.system_admin? || user.admin? || user.admin_manager?
+  end
+
   class Scope < ApplicationPolicy::Scope
     def resolve
-      if user.system_admin? || user.admin? || user.manager?
+      if user.system_admin? || user.admin? || user.admin_manager?
         scope.all
       else
         scope.where(contact: user)

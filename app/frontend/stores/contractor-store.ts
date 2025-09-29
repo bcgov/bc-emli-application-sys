@@ -20,6 +20,7 @@ export const ContractorStoreModel = types
     types.model('ContractorStoreModel').props({
       contractorsMap: types.map(ContractorModel),
       tableContractors: types.array(types.reference(ContractorModel)),
+      currentContractor: types.maybeNull(types.safeReference(ContractorModel)),
     }),
     createSearchModel<EContractorSortFields>('searchContractors'),
   )
@@ -54,7 +55,10 @@ export const ContractorStoreModel = types
       }
       if (contractor && contractor.employees) {
         contractor.employees.forEach((employee) => {
-          self.rootStore.userStore.mergeUpdate(employee, 'usersMap');
+          // Only merge employees that have complete data (including role field)
+          if (employee.role) {
+            self.rootStore.userStore.mergeUpdate(employee, 'usersMap');
+          }
         });
         contractor.employees = contractor.employees.map((emp) => emp.id);
       }
@@ -80,6 +84,9 @@ export const ContractorStoreModel = types
       self.tableContractors.replace(filteredContractors);
       // Then remove from contractorsMap
       self.contractorsMap.delete(contractorId);
+    },
+    setCurrentContractor(contractorId: string | null) {
+      self.currentContractor = contractorId;
     },
   }))
   .actions((self) => ({
@@ -118,6 +125,13 @@ export const ContractorStoreModel = types
       if (response.ok) {
         self.mergeUpdate(response.data.data, 'contractorsMap');
         yield (self as any).searchContractors({ reset: true });
+      }
+      return response;
+    }),
+    fetchContractor: flow(function* (contractorId: string) {
+      const response = yield self.environment.api.fetchContractor(contractorId);
+      if (response.ok) {
+        self.mergeUpdate(response.data.data, 'contractorsMap');
       }
       return response;
     }),

@@ -1,42 +1,56 @@
-class Api::ContractorEmployeesController < Api::ApplicationController
-  before_action :set_employee, only: %i[show update destroy]
+class Api::ContractorEmployeesController < ApplicationController
+  before_action :set_contractor
+  before_action :set_employee
 
-  def index
-    employees = ContractorEmployee.all
-    render json: ContractorEmployeeBlueprint.render(employees)
-  end
-
-  def show
+  # Remove employee from contractor program
+  def remove
+    @employee.employee.update(discarded_at: Time.current)
     render json: ContractorEmployeeBlueprint.render(@employee)
   end
 
-  def create
-    employee = ContractorEmployee.new(employee_params)
-    if employee.save
-      render json: ContractorEmployeeBlueprint.render(employee),
-             status: :created
+  # Reactivate removed employee
+  def reactivate
+    @employee.employee.update(discarded_at: nil)
+    render json: ContractorEmployeeBlueprint.render(@employee)
+  end
+
+  # Re-invite pending employee
+  def reinvite
+    employee_user = @employee.employee
+    if employee_user.present?
+      employee_user.invite!
+      render json: { message: I18n.t("contractor.employees.reinvite_success") }
     else
-      render json: employee.errors, status: :unprocessable_entity
+      render json: {
+               error: I18n.t("contractor.employees.employee_not_found")
+             },
+             status: :not_found
     end
   end
 
-  def update
-    if @employee.update(employee_params)
-      render json: ContractorEmployeeBlueprint.render(@employee)
+  # Revoke invite for pending employee
+  def revoke_invite
+    employee_user = @employee.employee
+    if employee_user.present? && employee_user.invitation_token.present?
+      employee_user.invitation_token = nil
+      employee_user.save
+      render json: { message: I18n.t("contractor.employees.revoke_success") }
     else
-      render json: @employee.errors, status: :unprocessable_entity
+      render json: {
+               error: I18n.t("contractor.employees.no_pending_invite")
+             },
+             status: :unprocessable_entity
     end
-  end
-
-  def destroy
-    @employee.destroy
-    head :no_content
   end
 
   private
 
+  def set_contractor
+    @contractor = Contractor.find(params[:contractor_id])
+  end
+
   def set_employee
-    @employee = ContractorEmployee.find(params[:id])
+    @employee = @contractor.contractor_employees.find(params[:id])
   end
 
   def employee_params
