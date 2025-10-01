@@ -29,7 +29,7 @@ export const UserStoreModel = types
       tableUsers: types.array(types.reference(UserModel)),
       activeUsers: types.array(types.reference(UserModel)),
       isSuperAdminsLoaded: types.optional(types.boolean, false),
-      status: types.optional(types.enumeration(['active', 'pending', 'deactivated', 'removed']), 'active'),
+      status: types.optional(types.enumeration(['active', 'pending', 'deactivated']), 'active'),
       allUsers: types.optional(types.boolean, false),
     }),
     createSearchModel<EActiveUserSortFields | EPendingUserSortFields | EDeactivatedUserSortFields>('searchUsers'),

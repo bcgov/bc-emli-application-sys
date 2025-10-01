@@ -1,10 +1,11 @@
 import React from 'react';
-import { Box, Flex, Link } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { IUser } from '../../../../models/user';
 import { SearchGridItem } from '../../../shared/grid/search-grid-item';
 import { IUserStore } from '../../../../stores/user-store';
+import { ManageContractorEmployeeMenu } from '../../../shared/user/manage-contractor-employee-menu';
 
 interface SimpleEmployeeRowProps {
   user: IUser;
@@ -35,16 +36,7 @@ export function SimpleEmployeeRow({ user, userStore }: SimpleEmployeeRowProps) {
       </SearchGridItem>
       <SearchGridItem headers="employee-action-header">
         <Flex justify="center">
-          <Link
-            color="black"
-            textDecoration="underline"
-            _hover={{ textDecoration: 'underline', color: 'theme.blue' }}
-            fontSize="sm"
-            fontWeight="normal"
-            cursor="pointer"
-          >
-            {t('contractor.employees.actions.manage')}
-          </Link>
+          <ManageContractorEmployeeMenu user={user} searchModel={userStore} type={userStore.status} />
         </Flex>
       </SearchGridItem>
     </Box>

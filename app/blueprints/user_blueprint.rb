@@ -27,7 +27,14 @@ class UserBlueprint < Blueprinter::Base
            :updated_at,
            :confirmation_sent_at,
            :discarded_at,
-           :last_sign_in_at
+           :last_sign_in_at,
+           :invitation_sent_at,
+           :invitation_accepted_at
+
+    field :has_pending_invitation do |user|
+      user.invitation_token.present?
+    end
+
     association :physical_address, blueprint: UserAddressBlueprint
     association :mailing_address, blueprint: UserAddressBlueprint
     association :preference, blueprint: PreferenceBlueprint

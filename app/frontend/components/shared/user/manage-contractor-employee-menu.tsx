@@ -1,52 +1,20 @@
 import { Button, Menu, MenuButton, MenuList } from '@chakra-ui/react';
-import { Archive, CheckCircle, Envelope, WarningCircle } from '@phosphor-icons/react';
 import { t } from 'i18next';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { useForm } from 'react-hook-form';
 import { ISearch } from '../../../lib/create-search-model';
 import { IUser } from '../../../models/user';
 import { useMst } from '../../../setup/root';
-import { EFlashMessageStatus } from '../../../types/enums';
 import { ManageMenuItemButton } from '../base/manage-menu-item';
 import { Can } from './can';
 import { useParams } from 'react-router-dom';
-
-// Reinvite Employee Form
-interface IFormProps {
-  user: IUser;
-}
-
-const ReinviteEmployeeForm = ({ user }: IFormProps) => {
-  const { handleSubmit, formState } = useForm();
-  const { isSubmitting } = formState;
-  const { contractorId } = useParams<{ contractorId: string }>();
-  const { environment } = useMst();
-
-  const onSubmit = async () => {
-    await environment.api.reinviteContractorEmployee(contractorId!, user.id);
-  };
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <ManageMenuItemButton
-        color="text.primary"
-        type="submit"
-        leftIcon={<Envelope size={16} />}
-        isLoading={isSubmitting}
-        isDisabled={isSubmitting}
-      >
-        {t('contractor.employees.actions.reinviteToProgram')}
-      </ManageMenuItemButton>
-    </form>
-  );
-};
+import { EmployeeActionConfirmationModal } from '../modals/employee-action-confirmation-modal';
 
 // Main component
 interface IManageContractorEmployeeMenuProps<TSearchModel extends ISearch> {
   user: IUser;
   searchModel?: TSearchModel;
-  type: 'active' | 'pending' | 'removed';
+  type: 'active' | 'pending' | 'deactivated';
 }
 
 export const ManageContractorEmployeeMenu = observer(function ManageContractorEmployeeMenu<
@@ -54,97 +22,125 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
 >({ user, searchModel, type }: IManageContractorEmployeeMenuProps<TSearchModel>) {
   const {
     contractorStore: { currentContractor },
-    uiStore,
-    environment,
   } = useMst();
 
   const { contractorId } = useParams<{ contractorId: string }>();
 
-  const handleRemove = async () => {
-    if (
-      window.confirm(
-        t(
-          'contractor.employees.actions.confirmRemove',
-          'Are you sure you want to remove this employee from the program?',
-        ),
-      )
-    ) {
-      await environment.api.removeContractorEmployee(contractorId!, user.id);
-      uiStore.flashMessage.show(EFlashMessageStatus.success, 'Employee removed from program', '');
-      searchModel?.search();
-    }
+  type EmployeeActionMode = 'deactivate' | 'reactivate' | 'revoke' | 'reinvite' | null;
+
+  const [modalState, setModalState] = React.useState<{
+    mode: EmployeeActionMode;
+    isLoading: boolean;
+  }>({ mode: null, isLoading: false });
+
+  const openModal = (mode: Exclude<EmployeeActionMode, null>) => {
+    setModalState({ mode, isLoading: false });
   };
 
-  const handleReactivate = async () => {
-    if (
-      window.confirm(
-        t('contractor.employees.actions.confirmReactivate', 'Are you sure you want to reactivate this employee?'),
-      )
-    ) {
-      await environment.api.reactivateContractorEmployee(contractorId!, user.id);
-      uiStore.flashMessage.show(EFlashMessageStatus.success, 'Employee reactivated', '');
-      searchModel?.search();
-    }
+  const closeModal = () => {
+    setModalState({ mode: null, isLoading: false });
   };
 
-  const handleRevokeInvite = async () => {
-    if (
-      window.confirm(
-        t('contractor.employees.actions.confirmRevoke', "Are you sure you want to revoke this employee's invite?"),
-      )
-    ) {
-      await environment.api.revokeContractorEmployeeInvite(contractorId!, user.id);
-      uiStore.flashMessage.show(EFlashMessageStatus.success, 'Employee invite revoked', '');
-      searchModel?.search();
+  // Early return if contractorId is not available
+  if (!contractorId) {
+    console.error('ContractorId is required for contractor employee management');
+    return null;
+  }
+
+  const handleConfirmAction = async () => {
+    if (!modalState.mode) return;
+
+    setModalState((prev) => ({ ...prev, isLoading: true }));
+
+    try {
+      let success = false;
+      switch (modalState.mode) {
+        case 'deactivate':
+          success = await user.deactivateFromContractor(contractorId);
+          break;
+        case 'reactivate':
+          success = await user.reactivateInContractor(contractorId);
+          break;
+        case 'reinvite':
+          success = await user.reinviteToContractor(contractorId);
+          break;
+        case 'revoke':
+          success = await user.revokeContractorInvite(contractorId);
+          break;
+      }
+      if (success) {
+        searchModel?.search();
+        closeModal();
+      }
+    } catch (error) {
+      console.error(`Failed to ${modalState.mode} employee:`, error);
+    } finally {
+      setModalState((prev) => ({ ...prev, isLoading: false }));
     }
   };
 
   return (
-    <Can action="contractor:manage" data={{ contractor: currentContractor }}>
-      <Menu>
-        <MenuButton as={Button} variant="link">
-          {t('ui.manage')}
-        </MenuButton>
-        {(() => {
-          switch (type) {
-            case 'active':
-              return (
-                <MenuList>
-                  <ManageMenuItemButton color="semantic.error" onClick={handleRemove} leftIcon={<Archive size={16} />}>
-                    {t('contractor.employees.actions.removeFromProgram')}
-                  </ManageMenuItemButton>
-                </MenuList>
-              );
-            case 'removed':
-              return (
-                <MenuList>
-                  <ManageMenuItemButton
-                    color="text.primary"
-                    onClick={handleReactivate}
-                    leftIcon={<CheckCircle size={16} />}
-                  >
-                    {t('contractor.employees.actions.reactivateEmployee')}
-                  </ManageMenuItemButton>
-                </MenuList>
-              );
-            case 'pending':
-              return (
-                <MenuList>
-                  <ReinviteEmployeeForm user={user} />
-                  <ManageMenuItemButton
-                    color="semantic.error"
-                    onClick={handleRevokeInvite}
-                    leftIcon={<WarningCircle size={16} />}
-                  >
-                    {t('contractor.employees.actions.revokeInvite')}
-                  </ManageMenuItemButton>
-                </MenuList>
-              );
-            default:
-              return null;
-          }
-        })()}
-      </Menu>
-    </Can>
+    <>
+      <Can action="contractor:manage" data={{ contractor: currentContractor }}>
+        <Menu>
+          <MenuButton as={Button} variant="link">
+            {t('ui.manage')}
+          </MenuButton>
+          {(() => {
+            switch (type) {
+              case 'active':
+                return (
+                  <MenuList>
+                    <ManageMenuItemButton color="semantic.error" onClick={() => openModal('deactivate')}>
+                      {t('contractor.employees.actions.deactivateEmployee')}
+                    </ManageMenuItemButton>
+                  </MenuList>
+                );
+              case 'deactivated':
+                return (
+                  <MenuList>
+                    <ManageMenuItemButton color="text.primary" onClick={() => openModal('reactivate')}>
+                      {t('contractor.employees.actions.reactivateEmployee')}
+                    </ManageMenuItemButton>
+                  </MenuList>
+                );
+              case 'pending':
+                return (
+                  <MenuList>
+                    <ManageMenuItemButton color="text.primary" onClick={() => openModal('reinvite')}>
+                      {t('contractor.employees.actions.reinviteEmployee')}
+                    </ManageMenuItemButton>
+                    <ManageMenuItemButton
+                      color="semantic.error"
+                      onClick={() => openModal('revoke')}
+                      isDisabled={!user.hasPendingInvitation}
+                      aria-disabled={!user.hasPendingInvitation}
+                      _disabled={{
+                        opacity: 0.6,
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      {t('contractor.employees.actions.revokeEmployeeInvite')}
+                    </ManageMenuItemButton>
+                  </MenuList>
+                );
+              default:
+                return null;
+            }
+          })()}
+        </Menu>
+      </Can>
+
+      {modalState.mode && (
+        <EmployeeActionConfirmationModal
+          isOpen={true}
+          onClose={closeModal}
+          onConfirm={handleConfirmAction}
+          user={user}
+          mode={modalState.mode}
+          isLoading={modalState.isLoading}
+        />
+      )}
+    </>
   );
 });

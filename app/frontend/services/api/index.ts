@@ -35,6 +35,7 @@ import {
   IAcceptInvitationResponse,
   IApiResponse,
   ICollaboratorSearchResponse,
+  IEmployeeActionResponse,
   IJurisdictionPermitApplicationResponse,
   IJurisdictionResponse,
   INotificationResponse,
@@ -377,17 +378,19 @@ export class Api {
   async searchContractorUsers(contractorId: string, params?) {
     return this.client.post<IUsersResponse>(`/contractors/${contractorId}/users/search`, params);
   }
-  async removeContractorEmployee(contractorId: string, employeeId: string) {
-    return this.client.post<ApiResponse<any>>(`/contractors/${contractorId}/employees/${employeeId}/remove`);
+  async deactivateContractorEmployee(contractorId: string, employeeId: string) {
+    return this.client.post<IEmployeeActionResponse>(`/contractors/${contractorId}/employees/${employeeId}/deactivate`);
   }
   async reactivateContractorEmployee(contractorId: string, employeeId: string) {
-    return this.client.post<ApiResponse<any>>(`/contractors/${contractorId}/employees/${employeeId}/reactivate`);
+    return this.client.post<IEmployeeActionResponse>(`/contractors/${contractorId}/employees/${employeeId}/reactivate`);
   }
   async reinviteContractorEmployee(contractorId: string, employeeId: string) {
-    return this.client.post<ApiResponse<any>>(`/contractors/${contractorId}/employees/${employeeId}/reinvite`);
+    return this.client.post<IEmployeeActionResponse>(`/contractors/${contractorId}/employees/${employeeId}/reinvite`);
   }
   async revokeContractorEmployeeInvite(contractorId: string, employeeId: string) {
-    return this.client.post<ApiResponse<any>>(`/contractors/${contractorId}/employees/${employeeId}/revoke_invite`);
+    return this.client.post<IEmployeeActionResponse>(
+      `/contractors/${contractorId}/employees/${employeeId}/revoke_invite`,
+    );
   }
 
   async updateUserRole(id: string, role: string) {

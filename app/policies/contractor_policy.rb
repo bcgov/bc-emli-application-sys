@@ -30,8 +30,28 @@ class ContractorPolicy < ApplicationPolicy
   end
 
   def search_users?
-    # Admin managers and system admins can search contractor users
+    # Admin managers, admins, and system admins can search contractor users
     user.system_admin? || user.admin? || user.admin_manager?
+  end
+
+  def deactivate?
+    # Admin managers and admins can deactivate contractor employees
+    user.admin_manager? || user.admin?
+  end
+
+  def reactivate?
+    # Same permissions as deactivate
+    deactivate?
+  end
+
+  def reinvite?
+    # Same permissions as deactivate
+    deactivate?
+  end
+
+  def revoke_invite?
+    # Same permissions as deactivate
+    deactivate?
   end
 
   class Scope < ApplicationPolicy::Scope

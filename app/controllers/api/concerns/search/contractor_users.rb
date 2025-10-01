@@ -26,7 +26,7 @@ module Api::Concerns::Search::ContractorUsers
           .where.not(users: { invitation_sent_at: nil })
           .where(users: { invitation_accepted_at: nil })
           .where(users: { discarded_at: nil })
-    when "removed"
+    when "deactivated"
       contractor_employees_scope =
         contractor_employees_scope
           .joins(:employee)

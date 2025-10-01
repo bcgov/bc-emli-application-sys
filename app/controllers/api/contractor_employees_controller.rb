@@ -1,45 +1,67 @@
-class Api::ContractorEmployeesController < ApplicationController
+class Api::ContractorEmployeesController < Api::ApplicationController
   before_action :set_contractor
   before_action :set_employee
 
-  # Remove employee from contractor program
-  def remove
-    @employee.employee.update(discarded_at: Time.current)
-    render json: ContractorEmployeeBlueprint.render(@employee)
+  # Deactivate employee
+  def deactivate
+    authorize @contractor
+    if @employee.employee.update(discarded_at: Time.current)
+      render_success nil, "contractor.employees.deactivate_success"
+    else
+      render_error "contractor.employees.deactivate_error",
+                   status: :unprocessable_entity
+    end
   end
 
-  # Reactivate removed employee
+  # Reactivate employee
   def reactivate
-    @employee.employee.update(discarded_at: nil)
-    render json: ContractorEmployeeBlueprint.render(@employee)
+    authorize @contractor
+    if @employee.employee.update(discarded_at: nil)
+      render_success nil, "contractor.employees.reactivate_success"
+    else
+      render_error "contractor.employees.reactivate_error",
+                   status: :unprocessable_entity
+    end
   end
 
   # Re-invite pending employee
   def reinvite
+    authorize @contractor
     employee_user = @employee.employee
     if employee_user.present?
-      employee_user.invite!
-      render json: { message: I18n.t("contractor.employees.reinvite_success") }
+      begin
+        employee_user.invite!(
+          current_user,
+          { contractor_name: @contractor.business_name }
+        )
+        render_success nil, "contractor.employees.reinvite_success"
+      rescue StandardError => e
+        Rails.logger.error(
+          "Failed to reinvite employee #{employee_user.id}: #{e.message}"
+        )
+        render_error "contractor.employees.reinvite_error",
+                     { status: :unprocessable_entity }
+      end
     else
-      render json: {
-               error: I18n.t("contractor.employees.employee_not_found")
-             },
-             status: :not_found
+      render_error "contractor.employees.employee_not_found", status: :not_found
     end
   end
 
   # Revoke invite for pending employee
   def revoke_invite
+    authorize @contractor
     employee_user = @employee.employee
     if employee_user.present? && employee_user.invitation_token.present?
       employee_user.invitation_token = nil
-      employee_user.save
-      render json: { message: I18n.t("contractor.employees.revoke_success") }
+      if employee_user.save
+        render_success nil, "contractor.employees.revoke_success"
+      else
+        render_error "contractor.employees.revoke_error",
+                     status: :unprocessable_entity
+      end
     else
-      render json: {
-               error: I18n.t("contractor.employees.no_pending_invite")
-             },
-             status: :unprocessable_entity
+      render_error "contractor.employees.no_pending_invite",
+                   status: :unprocessable_entity
     end
   end
 
@@ -50,10 +72,8 @@ class Api::ContractorEmployeesController < ApplicationController
   end
 
   def set_employee
-    @employee = @contractor.contractor_employees.find(params[:id])
-  end
-
-  def employee_params
-    params.require(:contractor_employee).permit(:contractor_id, :employee_id)
+    # params[:id] is the User ID (employee_id), not ContractorEmployee ID
+    @employee =
+      @contractor.contractor_employees.find_by!(employee_id: params[:id])
   end
 end

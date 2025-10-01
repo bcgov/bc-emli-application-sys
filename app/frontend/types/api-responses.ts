@@ -1,21 +1,21 @@
-import { ICollaborator } from "../models/collaborator"
-import { IJurisdiction } from "../models/jurisdiction"
-import { IPermitApplication } from "../models/energy-savings-application"
-import { IRequirementBlock } from "../models/requirement-block"
-import { IRequirementTemplate } from "../models/requirement-template"
-import { IUser } from "../models/user"
-import { INotification, IOption, ITemplateVersionDiff } from "./types"
+import { ICollaborator } from '../models/collaborator';
+import { IJurisdiction } from '../models/jurisdiction';
+import { IPermitApplication } from '../models/energy-savings-application';
+import { IRequirementBlock } from '../models/requirement-block';
+import { IRequirementTemplate } from '../models/requirement-template';
+import { IUser } from '../models/user';
+import { INotification, IOption, ITemplateVersionDiff } from './types';
 import { IProgram } from '../models/program';
 
 export interface IApiResponse<TData, TMeta> {
-  data: TData
-  meta: TMeta
+  data: TData;
+  meta: TMeta;
 }
 
 export interface IPageMeta {
-  totalPages: number
-  totalCount: number
-  currentPage: number
+  totalPages: number;
+  totalCount: number;
+  currentPage: number;
 }
 
 export interface IUserResponse extends IApiResponse<IUser, {}> {}
@@ -42,10 +42,13 @@ export interface IInvitationResponse
 export interface IOptionResponse<T = string> extends IApiResponse<IOption<T>[], IPageMeta> {}
 
 export interface INotificationResponse {
-  data: INotification[]
-  meta: { unreadCount: number; totalPages: number }
+  data: INotification[];
+  meta: { unreadCount: number; totalPages: number };
 }
 
 export interface ITemplateVersionDiffResponse {
-  data: ITemplateVersionDiff
+  data: ITemplateVersionDiff;
 }
+
+export interface IEmployeeActionResponse
+  extends IApiResponse<null, { message: { type: string; title: string; message: string } }> {}

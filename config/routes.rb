@@ -243,7 +243,7 @@ Rails.application.routes.draw do
                 controller: "contractor_employees",
                 only: [:index] do
         member do
-          post :remove
+          post :deactivate
           post :reactivate
           post :reinvite
           post :revoke_invite

@@ -27,7 +27,7 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
   const getInitialTabIndex = () => {
     const tabParam = searchParams.get('tab');
     if (tabParam === 'pending') return 1;
-    if (tabParam === 'removed') return 2;
+    if (tabParam === 'deactivated') return 2;
     return 0; // default to active
   };
 
@@ -37,7 +37,7 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
     const newTabIndex = getInitialTabIndex();
     setTabIndex(newTabIndex);
 
-    const statusMap = ['active', 'pending', 'removed'] as const;
+    const statusMap = ['active', 'pending', 'deactivated'] as const;
     const newStatus = statusMap[newTabIndex];
     userStore.setStatus(newStatus);
   }, [searchParams]);
@@ -45,7 +45,7 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
   const handleSetTabIndex = (index: number) => {
     setTabIndex(index);
 
-    const statusMap = ['active', 'pending', 'removed'] as const;
+    const statusMap = ['active', 'pending', 'deactivated'] as const;
     const newStatus = statusMap[index];
 
     userStore.setStatus(newStatus);
@@ -123,10 +123,10 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
               _selected={selectedTabStyles}
               role="tab"
               aria-selected={tabIndex === 2}
-              aria-controls="removed-tabpanel"
-              id="removed-tab"
+              aria-controls="deactivated-tabpanel"
+              id="deactivated-tab"
             >
-              {t('contractor.employees.tabs.removed')}
+              {t('contractor.employees.tabs.deactivated')}
             </Tab>
           </TabList>
 
@@ -176,8 +176,8 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
             <TabPanel
               p={0}
               role="tabpanel"
-              aria-labelledby="removed-tab"
-              id="removed-tabpanel"
+              aria-labelledby="deactivated-tab"
+              id="deactivated-tabpanel"
               tabIndex={tabIndex === 2 ? 0 : -1}
             >
               <SearchGrid templateColumns="1fr 2fr 1fr 1fr" minW="1138px" alignSelf="flex-start" mt={4}>

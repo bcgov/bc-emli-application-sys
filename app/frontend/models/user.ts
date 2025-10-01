@@ -32,6 +32,9 @@ export const UserModel = types
     lastSignInAt: types.maybeNull(types.Date),
     eulaAccepted: types.maybeNull(types.boolean),
     invitedByEmail: types.maybeNull(types.string),
+    invitationSentAt: types.maybeNull(types.Date),
+    invitationAcceptedAt: types.maybeNull(types.Date),
+    hasPendingInvitation: types.maybeNull(types.boolean),
     reviewed: types.maybeNull(types.boolean),
     preference: types.maybeNull(types.frozen<IPreference>()),
     invitedToProgram: types.maybeNull(types.frozen<IProgram>()),
@@ -247,6 +250,34 @@ export const UserModel = types
       const response = yield self.environment.api.reinviteUser(self.id);
       if (response.ok) {
         self.rootStore.userStore.mergeUpdate(response.data.data, 'usersMap');
+      }
+      return response.ok;
+    }),
+    deactivateFromContractor: flow(function* (contractorId: string) {
+      const response = yield self.environment.api.deactivateContractorEmployee(contractorId, self.id);
+      if (response.ok) {
+        yield self.rootStore.userStore.searchUsers({ reset: false });
+      }
+      return response.ok;
+    }),
+    reactivateInContractor: flow(function* (contractorId: string) {
+      const response = yield self.environment.api.reactivateContractorEmployee(contractorId, self.id);
+      if (response.ok) {
+        yield self.rootStore.userStore.searchUsers({ reset: false });
+      }
+      return response.ok;
+    }),
+    reinviteToContractor: flow(function* (contractorId: string) {
+      const response = yield self.environment.api.reinviteContractorEmployee(contractorId, self.id);
+      if (response.ok) {
+        yield self.rootStore.userStore.searchUsers({ reset: false });
+      }
+      return response.ok;
+    }),
+    revokeContractorInvite: flow(function* (contractorId: string) {
+      const response = yield self.environment.api.revokeContractorEmployeeInvite(contractorId, self.id);
+      if (response.ok) {
+        yield self.rootStore.userStore.searchUsers({ reset: false });
       }
       return response.ok;
     }),
