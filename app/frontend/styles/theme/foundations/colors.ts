@@ -1,7 +1,7 @@
 export const colors = {
   text: {
     primary: '#292929',
-    secondary: '#464341',
+    secondary: '#474543',
     link: '#255A90',
   },
   theme: {

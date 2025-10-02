@@ -185,9 +185,21 @@ export const UserStoreModel = types
         filter_for_assignment: opts.filterForAssignment,
       };
 
-      const response = yield self.rootStore.programStore.currentProgram?.id
-        ? self.environment.api.fetchUsersByProgram(self.rootStore.programStore.currentProgram.id, searchParams)
-        : self.environment.api.fetchAdminUsers(searchParams);
+      // Determine which API endpoint to use based on context
+      let response;
+      const currentContractorId = self.rootStore.contractorStore.currentContractor?.id;
+      const currentProgramId = self.rootStore.programStore.currentProgram?.id;
+
+      if (currentContractorId) {
+        // Contractor user search
+        response = yield self.environment.api.searchContractorUsers(currentContractorId, searchParams);
+      } else if (currentProgramId) {
+        // Program user search
+        response = yield self.environment.api.fetchUsersByProgram(currentProgramId, searchParams);
+      } else {
+        // Admin user search
+        response = yield self.environment.api.fetchAdminUsers(searchParams);
+      }
 
       if (response.ok) {
         // Skip expensive mergeUpdateAll for search-only results (assignment popup)
@@ -218,7 +230,7 @@ export const UserStoreModel = types
     }),
   }))
   .actions((self) => ({
-    setStatus(status: 'active' | 'pending' | 'deactivated') {
+    setStatus(status: 'active' | 'pending' | 'deactivated' | 'removed') {
       self.status = status;
       self.searchUsers({ reset: true });
     },

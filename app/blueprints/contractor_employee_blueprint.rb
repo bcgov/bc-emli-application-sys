@@ -3,6 +3,6 @@ class ContractorEmployeeBlueprint < Blueprinter::Base
 
   fields :created_at, :updated_at
 
-  association :contractor, blueprint: ContractorBlueprint
-  association :employee, blueprint: UserBlueprint
+  association :contractor, blueprint: ContractorBlueprint, view: :minimal
+  association :employee, blueprint: UserBlueprint, view: :minimal
 end

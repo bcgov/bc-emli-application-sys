@@ -235,6 +235,18 @@ Rails.application.routes.draw do
           on: :collection,
           to: "contractors#license_agreements"
       post "shim", on: :collection, to: "contractors#shim"
+
+      # Follow program pattern for contractor users
+      post "users/search", on: :member, to: "contractors#search_users"
+
+      resources :employees, controller: "contractor_employees", only: [] do
+        member do
+          post :deactivate
+          post :reactivate
+          post :reinvite
+          post :revoke_invite
+        end
+      end
     end
 
     resources :audit_logs, only: %i[index] do

@@ -35,6 +35,7 @@ import {
   IAcceptInvitationResponse,
   IApiResponse,
   ICollaboratorSearchResponse,
+  IEmployeeActionResponse,
   IJurisdictionPermitApplicationResponse,
   IJurisdictionResponse,
   INotificationResponse,
@@ -358,6 +359,9 @@ export class Api {
   async fetchContractors(params?) {
     return this.client.get<ApiResponse<any>>('/contractors', params);
   }
+  async fetchContractor(contractorId: string) {
+    return this.client.get<ApiResponse<any>>(`/contractors/${contractorId}`);
+  }
 
   async createContractor(params) {
     return this.client.post<ApiResponse<any>>('/contractors', { contractor: params });
@@ -366,9 +370,27 @@ export class Api {
   async updateContractor(id: string, params) {
     return this.client.patch<ApiResponse<any>>(`/contractors/${id}`, { contractor: params });
   }
-
   async destroyContractor(id: string) {
     return this.client.delete<ApiResponse<any>>(`/contractors/${id}`);
+  }
+
+  // Contractor User methods (following program pattern)
+  async searchContractorUsers(contractorId: string, params?) {
+    return this.client.post<IUsersResponse>(`/contractors/${contractorId}/users/search`, params);
+  }
+  async deactivateContractorEmployee(contractorId: string, employeeId: string) {
+    return this.client.post<IEmployeeActionResponse>(`/contractors/${contractorId}/employees/${employeeId}/deactivate`);
+  }
+  async reactivateContractorEmployee(contractorId: string, employeeId: string) {
+    return this.client.post<IEmployeeActionResponse>(`/contractors/${contractorId}/employees/${employeeId}/reactivate`);
+  }
+  async reinviteContractorEmployee(contractorId: string, employeeId: string) {
+    return this.client.post<IEmployeeActionResponse>(`/contractors/${contractorId}/employees/${employeeId}/reinvite`);
+  }
+  async revokeContractorEmployeeInvite(contractorId: string, employeeId: string) {
+    return this.client.post<IEmployeeActionResponse>(
+      `/contractors/${contractorId}/employees/${employeeId}/revoke_invite`,
+    );
   }
 
   async updateUserRole(id: string, role: string) {

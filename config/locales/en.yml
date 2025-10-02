@@ -251,6 +251,39 @@ en:
       destroy_error:
         title: Oops
         message: '%{error_message}'
+    contractor:
+      employees:
+        unknownEmployee: 'Unknown Employee'
+        deactivate_success:
+          title: ''
+          message: 'Employee deactivated successfully'
+        deactivate_error:
+          title: Error
+          message: 'Failed to deactivate employee'
+        reactivate_success:
+          title: ''
+          message: 'Employee reactivated successfully'
+        reactivate_error:
+          title: Error
+          message: 'Failed to reactivate employee'
+        reinvite_success:
+          title: ''
+          message: 'Employee re-invited successfully'
+        reinvite_error:
+          title: Error
+          message: 'Failed to send employee invitation'
+        revoke_success:
+          title: ''
+          message: 'Employee invite revoked successfully'
+        revoke_error:
+          title: Error
+          message: 'Failed to revoke employee invite'
+        employee_not_found:
+          title: Error
+          message: 'Employee not found'
+        no_pending_invite:
+          title: Error
+          message: 'No pending invite found for this employee'
     user:
       not_confirmed_error:
         title: Failed to login.
@@ -810,3 +843,4 @@ en:
       viewEmployees: 'View Employees'
       editContractor: 'Edit Contractor'
       suspendContractor: 'Suspend Contractor'
+      removeContractor: 'Remove Contractor'

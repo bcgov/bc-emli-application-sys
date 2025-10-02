@@ -20,6 +20,7 @@ const adminManagerRules = {
     'user:updateRole',
     'program:manage',
     'program:edit',
+    'contractor:manage',
   ],
   dynamic: {
     ...sharedDynamicRules,
@@ -31,13 +32,20 @@ const adminManagerRules = {
 
 export const rules = {
   [EUserRoles.systemAdmin]: {
-    static: [...sharedStaticRules, 'program:manage', 'user:invite', 'requirementTemplate:manage', 'program:edit'],
+    static: [
+      ...sharedStaticRules,
+      'program:manage',
+      'user:invite',
+      'requirementTemplate:manage',
+      'program:edit',
+      'contractor:manage',
+    ],
     dynamic: { ...sharedDynamicRules },
   },
   [EUserRoles.adminManager]: adminManagerRules,
 
   [EUserRoles.admin]: {
-    static: [...sharedStaticRules, 'user:view', 'application:download'],
+    static: [...sharedStaticRules, 'user:view', 'application:download', 'contractor:manage'],
     dynamic: { ...sharedDynamicRules },
   },
   [EUserRoles.participant]: {

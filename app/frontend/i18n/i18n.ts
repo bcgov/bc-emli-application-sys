@@ -432,6 +432,9 @@ const options = {
           confirmOverwrite: 'Are you sure you want to save and overwrite this item?',
           sureDelete: 'Are you sure you want to delete this item?',
           disable: 'Disable',
+          deactivate: 'Deactivate',
+          reactivate: 'Reactivate',
+          reinvite: 'Re-invite',
           ok: 'OK',
           dismiss: 'Dismiss',
           revoke: 'Revoke',
@@ -2094,6 +2097,7 @@ const options = {
         },
         admin: {},
         errors: {
+          fetchContractor: 'Something went wrong fetching the contractor',
           fetchJurisdiction: 'Something went wrong fetching the jurisdiction',
           fetchPermitApplication: 'Something went wrong fetching the permit application',
           fetchPermitTypeOptions: 'Something went wrong fetching the permit type options',
@@ -2882,6 +2886,7 @@ const options = {
             edit: 'Edit program',
             users: 'Users',
             contractorManagement: 'Manage contractor details',
+            employees: 'View employees',
             editTemplate: 'Edit template',
             editPermit: 'Edit permit',
             applications: 'Applications',
@@ -3005,6 +3010,46 @@ const options = {
             suspendContractor: 'Suspend contractor',
             removeContractor: 'Remove contractor',
           },
+          employees: {
+            viewEmployees: 'View employees',
+            description:
+              'Employee names and emails are associated with their Business BCeIDs. To update information, direct employees to manage their Business BCeID accounts.',
+            loading: 'Loading employees',
+            unknownEmployee: 'Unknown Employee',
+            unknownContractor: 'Unknown Contractor',
+            fields: {
+              name: 'Name',
+              email: 'Email address',
+              lastUpdated: 'Last updated',
+              action: 'Action',
+            },
+            tabs: {
+              active: 'Active',
+              pending: 'Pending',
+              deactivated: 'Deactivated',
+              ariaLabel: 'Employee status filter tabs',
+              listAriaLabel: 'Select employee status to filter by',
+            },
+            actions: {
+              deactivateEmployee: 'Deactivate employee',
+              reinviteEmployee: 'Re-invite employee',
+              revokeEmployeeInvite: 'Revoke employee invite',
+              reactivateEmployee: 'Reactivate employee',
+              confirmDeactivateTitle: 'Are you sure you want to deactivate {{name}}?',
+              confirmReactivateTitle: 'Are you sure you want to reactivate {{name}}?',
+              confirmRevokeTitle: 'Are you sure you want to revoke this invite?',
+              confirmReinviteTitle: 'Are you sure you want to re-invite\n{{name}}?',
+              deactivateWarning:
+                '{{name}} will not be able to access the application system until you reactivate them.',
+              reactivateWarning:
+                '{{name}} will be able to access the application system again when you reactivate their account.',
+              revokeWarning: '{{name}} will no longer be able to create an account if you revoke this invite.',
+              reinviteWarning: '{{name}} will receive another invite email when\nyou re-invite them.',
+            },
+          },
+        },
+        common: {
+          search: 'Search',
         },
         shared: {
           actions: 'Actions',

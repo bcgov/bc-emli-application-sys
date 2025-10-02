@@ -15,8 +15,8 @@ class ContractorBlueprint < Blueprinter::Base
            :created_at,
            :updated_at
 
-    association :contact, blueprint: UserBlueprint
-    association :employees, blueprint: UserBlueprint
+    association :contact, blueprint: UserBlueprint, view: :minimal
+    association :employees, blueprint: UserBlueprint, view: :minimal
   end
 
   # minimal is same as base for now, can be adjusted if needed.

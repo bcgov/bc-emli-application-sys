@@ -1,6 +1,7 @@
 class Api::ContractorsController < Api::ApplicationController
   include Api::Concerns::Search::Contractors
-  before_action :set_contractor, only: %i[show update destroy]
+  include Api::Concerns::Search::ContractorUsers
+  before_action :set_contractor, only: %i[show update destroy search_users]
   skip_before_action :authenticate_user!, only: %i[shim]
   skip_after_action :verify_authorized, only: %i[shim]
   skip_after_action :verify_policy_scoped, only: [:index]
@@ -26,7 +27,14 @@ class Api::ContractorsController < Api::ApplicationController
 
   def show
     authorize @contractor
-    render json: ContractorBlueprint.render(@contractor)
+    render_success @contractor,
+                   nil,
+                   {
+                     blueprint: ContractorBlueprint,
+                     blueprint_opts: {
+                       view: :base
+                     }
+                   }
   end
 
   def create
@@ -62,6 +70,27 @@ class Api::ContractorsController < Api::ApplicationController
         onboarded: false
       )
     render_success contractor, nil, { blueprint: ContractorBlueprint }
+  end
+
+  def search_users
+    authorize @contractor
+    perform_contractor_user_search
+    authorized_results = @user_search.results
+    total_count = @user_search.total_count
+
+    render_success authorized_results,
+                   nil,
+                   {
+                     blueprint: UserBlueprint,
+                     blueprint_opts: {
+                       view: :base
+                     },
+                     meta: {
+                       total_pages: @user_search.total_pages,
+                       total_count: total_count,
+                       current_page: @user_search.current_page
+                     }
+                   }
   end
 
   def license_agreements
