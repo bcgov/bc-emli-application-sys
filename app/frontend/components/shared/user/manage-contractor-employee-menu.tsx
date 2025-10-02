@@ -2,7 +2,6 @@ import { Button, Menu, MenuButton, MenuList } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { ISearch } from '../../../lib/create-search-model';
 import { IUser } from '../../../models/user';
 import { useMst } from '../../../setup/root';
 import { ManageMenuItemButton } from '../base/manage-menu-item';
@@ -11,15 +10,15 @@ import { useParams } from 'react-router-dom';
 import { EmployeeActionConfirmationModal } from '../modals/employee-action-confirmation-modal';
 
 // Main component
-interface IManageContractorEmployeeMenuProps<TSearchModel extends ISearch> {
+interface IManageContractorEmployeeMenuProps {
   user: IUser;
-  searchModel?: TSearchModel;
   type: 'active' | 'pending' | 'deactivated';
 }
 
-export const ManageContractorEmployeeMenu = observer(function ManageContractorEmployeeMenu<
-  TSearchModel extends ISearch,
->({ user, searchModel, type }: IManageContractorEmployeeMenuProps<TSearchModel>) {
+export const ManageContractorEmployeeMenu = observer(function ManageContractorEmployeeMenu({
+  user,
+  type,
+}: IManageContractorEmployeeMenuProps) {
   const {
     contractorStore: { currentContractor },
   } = useMst();

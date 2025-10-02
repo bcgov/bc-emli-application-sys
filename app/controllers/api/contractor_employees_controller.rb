@@ -29,6 +29,17 @@ class Api::ContractorEmployeesController < Api::ApplicationController
     authorize @contractor
     employee_user = @employee.employee
     if employee_user.present?
+      # Server-side guard: only allow reinvite if pending invitation exists
+      unless employee_user.invitation_token.present? ||
+               (
+                 employee_user.invitation_sent_at.present? &&
+                   employee_user.invitation_accepted_at.nil?
+               )
+        render_error "contractor.employees.no_pending_invite",
+                     status: :unprocessable_entity
+        return
+      end
+
       begin
         employee_user.invite!(
           current_user,

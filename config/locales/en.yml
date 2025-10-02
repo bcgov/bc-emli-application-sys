@@ -844,12 +844,3 @@ en:
       editContractor: 'Edit Contractor'
       suspendContractor: 'Suspend Contractor'
       removeContractor: 'Remove Contractor'
-    employees:
-      reinvite_success: 'Employee re-invited successfully'
-      employee_not_found: 'Employee not found'
-      revoke_success: 'Employee invite revoked successfully'
-      no_pending_invite: 'No pending invite found for this employee'
-      user_not_belongs_to_contractor: 'User does not belong to this contractor'
-      user_not_found: 'User not found'
-      deactivate_success: 'Employee deactivated successfully'
-      reactivate_success: 'Employee reactivated successfully'

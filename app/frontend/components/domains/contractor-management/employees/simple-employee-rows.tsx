@@ -36,7 +36,7 @@ export function SimpleEmployeeRow({ user, userStore }: SimpleEmployeeRowProps) {
       </SearchGridItem>
       <SearchGridItem headers="employee-action-header">
         <Flex justify="center">
-          <ManageContractorEmployeeMenu user={user} searchModel={userStore} type={userStore.status} />
+          <ManageContractorEmployeeMenu user={user} type={userStore.status} />
         </Flex>
       </SearchGridItem>
     </Box>

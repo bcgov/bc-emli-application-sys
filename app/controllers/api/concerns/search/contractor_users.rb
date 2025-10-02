@@ -1,4 +1,4 @@
-# app/controllers/concerns/api/search/contractor_users.rb
+# app/controllers/api/concerns/search/contractor_users.rb
 module Api::Concerns::Search::ContractorUsers
   extend ActiveSupport::Concern
 
@@ -33,14 +33,8 @@ module Api::Concerns::Search::ContractorUsers
           .where.not(users: { discarded_at: nil })
     end
 
-    contractor_employees = contractor_employees_scope.to_a
-
-    # Index contractor employees by user_id for rendering contractor-specific data
-    @contractor_employees_by_user_id =
-      contractor_employees.group_by(&:employee_id)
-
     # Extract user_ids for search
-    user_ids = contractor_employees.map(&:employee_id)
+    user_ids = contractor_employees_scope.pluck(:employee_id)
 
     # Run the search
     @user_search =
@@ -62,7 +56,20 @@ module Api::Concerns::Search::ContractorUsers
 
   def user_order
     if (sort = params[:sort])
-      { sort[:field] => { order: sort[:direction], unmapped_type: "long" } }
+      # When sorting by first_name, also sort by last_name as tiebreaker
+      if sort[:field] == "first_name"
+        [
+          {
+            "first_name" => {
+              order: sort[:direction],
+              unmapped_type: "text"
+            }
+          },
+          { "last_name" => { order: sort[:direction], unmapped_type: "text" } }
+        ]
+      else
+        { sort[:field] => { order: sort[:direction], unmapped_type: "long" } }
+      end
     else
       { created_at: { order: :desc, unmapped_type: "long" } }
     end
