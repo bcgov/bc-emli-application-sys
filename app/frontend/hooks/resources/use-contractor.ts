@@ -33,7 +33,7 @@ export const useContractor = () => {
           }
 
           if (contractor) {
-            setError(null);
+            setError(undefined);
             setCurrentContractor(contractorId);
           }
         }

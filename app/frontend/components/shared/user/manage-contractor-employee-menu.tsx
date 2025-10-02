@@ -69,7 +69,6 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
           break;
       }
       if (success) {
-        searchModel?.search();
         closeModal();
       }
     } catch (error) {

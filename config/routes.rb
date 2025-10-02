@@ -239,9 +239,7 @@ Rails.application.routes.draw do
       # Follow program pattern for contractor users
       post "users/search", on: :member, to: "contractors#search_users"
 
-      resources :employees,
-                controller: "contractor_employees",
-                only: [:index] do
+      resources :employees, controller: "contractor_employees", only: [] do
         member do
           post :deactivate
           post :reactivate
