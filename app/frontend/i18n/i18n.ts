@@ -3012,6 +3012,7 @@ const options = {
               'Employee names and emails are associated with their Business BCeIDs. To update information, direct employees to manage their Business BCeID accounts.',
             loading: 'Loading employees',
             unknownEmployee: 'Unknown Employee',
+            unknownContractor: 'Unknown Contractor',
             fields: {
               name: 'Name',
               email: 'Email address',

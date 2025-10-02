@@ -84,7 +84,7 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
         {/* Contractor Name */}
         <Box>
           <Heading as="h2" size="md" color="gray.800">
-            {currentContractor?.businessName || 'Unknown Contractor'}
+            {currentContractor?.businessName || t('contractor.employees.unknownContractor')}
           </Heading>
         </Box>
 
@@ -202,7 +202,11 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
   );
 });
 
-const TableControls = ({ userStore }: { userStore: any }) => {
+interface ITableControlsProps {
+  userStore: ISearch;
+}
+
+const TableControls = ({ userStore }: ITableControlsProps) => {
   const { currentPage, totalPages, totalCount, countPerPage, handleCountPerPageChange, handlePageChange } = userStore;
 
   return (
