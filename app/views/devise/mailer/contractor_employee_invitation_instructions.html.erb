@@ -5,7 +5,7 @@
 <p>Click below to accept your invitation and set up your account:</p>
 
 <div class="button-row">
-  <a href="<%= "#{@root_url}accept-invitation?invitation_token=#{@token}" %>" class="btn-primary" target="_blank">Accept Invitation</a>
+  <a href="<%= @root_url %>programs/<%= @program_id %>/accept-invitation?invitation_token=<%= @token %>" class="btn-primary" target="_blank">Accept Invitation</a>
 </div>
 
 <p>Thank you,<br>

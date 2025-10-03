@@ -240,6 +240,7 @@ Rails.application.routes.draw do
       post "users/search", on: :member, to: "contractors#search_users"
 
       resources :employees, controller: "contractor_employees", only: [] do
+        collection { post :invite }
         member do
           post :deactivate
           post :reactivate

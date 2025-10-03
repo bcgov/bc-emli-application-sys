@@ -384,13 +384,25 @@ export class Api {
   async reactivateContractorEmployee(contractorId: string, employeeId: string) {
     return this.client.post<IEmployeeActionResponse>(`/contractors/${contractorId}/employees/${employeeId}/reactivate`);
   }
-  async reinviteContractorEmployee(contractorId: string, employeeId: string) {
-    return this.client.post<IEmployeeActionResponse>(`/contractors/${contractorId}/employees/${employeeId}/reinvite`);
+  async reinviteContractorEmployee(contractorId: string, employeeId: string, programId: string) {
+    return this.client.post<IEmployeeActionResponse>(`/contractors/${contractorId}/employees/${employeeId}/reinvite`, {
+      program_id: programId,
+    });
   }
   async revokeContractorEmployeeInvite(contractorId: string, employeeId: string) {
     return this.client.post<IEmployeeActionResponse>(
       `/contractors/${contractorId}/employees/${employeeId}/revoke_invite`,
     );
+  }
+  async inviteContractorEmployees(
+    contractorId: string,
+    programId: string,
+    users: { email: string; name?: string; role: string }[],
+  ) {
+    return this.client.post<ApiResponse<any>>(`/contractors/${contractorId}/employees/invite`, {
+      users,
+      program_id: programId,
+    });
   }
 
   async updateUserRole(id: string, role: string) {

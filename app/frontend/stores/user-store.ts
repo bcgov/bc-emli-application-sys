@@ -83,6 +83,9 @@ export const UserStoreModel = types
     resetInvitationResponse: () => {
       self.invitationResponse = null;
     },
+    setInvitationResponse: (response) => {
+      self.invitationResponse = response;
+    },
     setTableUsers: (users) => {
       self.tableUsers = users.map((user) => user.id);
     },

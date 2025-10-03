@@ -1,6 +1,27 @@
 class Api::ContractorEmployeesController < Api::ApplicationController
   before_action :set_contractor
-  before_action :set_employee
+  before_action :set_employee, except: [:invite]
+
+  # Invite new employees
+  def invite
+    authorize @contractor
+
+    program = Program.find(params[:program_id])
+    inviter =
+      ContractorEmployeeInviter.new(
+        contractor: @contractor,
+        program: program,
+        invited_by: current_user
+      )
+
+    results = inviter.invite_employees(users_params)
+
+    if results.values.flatten.any?
+      render_success(results, nil, { blueprint: InvitationBlueprint })
+    else
+      render_error "contractor.employees.invite_error"
+    end
+  end
 
   # Deactivate employee
   def deactivate
@@ -41,9 +62,10 @@ class Api::ContractorEmployeesController < Api::ApplicationController
       end
 
       begin
+        program = Program.find(params[:program_id])
         employee_user.invite!(
           current_user,
-          { contractor_name: @contractor.business_name }
+          { contractor_name: @contractor.business_name, program_id: program.id }
         )
         render_success nil, "contractor.employees.reinvite_success"
       rescue StandardError => e
@@ -86,5 +108,11 @@ class Api::ContractorEmployeesController < Api::ApplicationController
     # params[:id] is the User ID (employee_id), not ContractorEmployee ID
     @employee =
       @contractor.contractor_employees.find_by!(employee_id: params[:id])
+  end
+
+  def users_params
+    params
+      .require(:users)
+      .map { |user_param| user_param.permit(:email, :name, :role) }
   end
 end

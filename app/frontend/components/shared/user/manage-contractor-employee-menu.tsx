@@ -1,7 +1,7 @@
 import { Button, Menu, MenuButton, MenuList } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { IUser } from '../../../models/user';
 import { useMst } from '../../../setup/root';
 import { ManageMenuItemButton } from '../base/manage-menu-item';
@@ -21,6 +21,8 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
 }: IManageContractorEmployeeMenuProps) {
   const {
     contractorStore: { currentContractor },
+    userStore: { currentUser, fetchActivePrograms },
+    environment,
   } = useMst();
 
   const { contractorId } = useParams<{ contractorId: string }>();
@@ -31,6 +33,11 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
     mode: EmployeeActionMode;
     isLoading: boolean;
   }>({ mode: null, isLoading: false });
+
+  // Fetch active programs on mount
+  useEffect(() => {
+    fetchActivePrograms();
+  }, [fetchActivePrograms]);
 
   const openModal = (mode: Exclude<EmployeeActionMode, null>) => {
     setModalState({ mode, isLoading: false });
@@ -61,7 +68,22 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
           success = await user.reactivateInContractor(contractorId);
           break;
         case 'reinvite':
-          success = await user.reinviteToContractor(contractorId);
+          // Get program_id from current user's active programs
+          const activePrograms = currentUser?.activePrograms;
+          if (!activePrograms || activePrograms.length === 0) {
+            console.error('No active programs found for current user');
+            break;
+          }
+          const programId = activePrograms[0]?.program?.id;
+          if (!programId) {
+            console.error('Could not extract program ID');
+            break;
+          }
+          const response = await environment.api.reinviteContractorEmployee(contractorId, user.id, programId);
+          if (response.ok) {
+            await user.rootStore.userStore.searchUsers({ reset: false });
+          }
+          success = response.ok;
           break;
         case 'revoke':
           success = await user.revokeContractorInvite(contractorId);

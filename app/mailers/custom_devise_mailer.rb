@@ -16,6 +16,7 @@ class CustomDeviseMailer < Devise::Mailer
     # Check if this is a contractor employee invitation
     if opts[:contractor_name].present?
       @contractor_name = opts[:contractor_name]
+      @program_id = opts[:program_id]
       @root_url = FrontendUrlHelper.root_url
 
       devise_mail(record, :contractor_employee_invitation_instructions, opts)
