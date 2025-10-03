@@ -26,7 +26,7 @@ export function SimpleEmployeeRow({ user, userStore }: SimpleEmployeeRowProps) {
   return (
     <Box key={user.id} className="simple-employee-index-grid-row" role="row" display="contents">
       <SearchGridItem fontSize="sm" headers="employee-name-header">
-        {user.name || t('contractor.employees.unknownEmployee')}
+        {user.name || user.firstName || t('contractor.employees.unknownEmployee')}
       </SearchGridItem>
       <SearchGridItem fontSize="sm" headers="employee-email-header">
         {user.email || '-'}

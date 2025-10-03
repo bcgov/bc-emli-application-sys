@@ -284,6 +284,9 @@ const AcceptInvitationScreen = lazy(() =>
   import('../programs/accept-invitation-screen').then((module) => ({ default: module.AcceptInvitationScreen })),
 );
 const InviteScreen = lazy(() => import('../users/invite-screen').then((module) => ({ default: module.InviteScreen })));
+const InviteEmployeeScreen = lazy(() =>
+  import('../users/invite-employee-screen').then((module) => ({ default: module.InviteEmployeeScreen })),
+);
 const ProfileScreen = lazy(() =>
   import('../users/profile-screen').then((module) => ({ default: module.ProfileScreen })),
 );
@@ -399,6 +402,7 @@ const AppRoutes = observer(() => {
       <Route path="/configuration-management/landing-setup" element={<LandingSetupScreen />} />
       <Route path="/configuration-management/users" element={<AdminUserIndexScreen />} />
       <Route path="/configuration-management/users/invite" element={<AdminInviteScreen />} />
+      <Route path="/configuration-management/invite-employee" element={<InviteEmployeeScreen />} />
       <Route path="/audit-log" element={<AuditLogScreen />} />
       <Route path="/reporting" element={<ReportingScreen />} />
       <Route path="/reporting/export-template-summary" element={<ExportTemplateSummaryScreen />} />
@@ -413,6 +417,7 @@ const AppRoutes = observer(() => {
       <Route path="/configure-users/:programId/invite" element={<ProgramInviteUserScreen />} />
       <Route path="/contractor-management" element={<ContractorManagementScreen />} />
       <Route path="/contractor-management/:contractorId/employees" element={<ContractorEmployeeIndexScreen />} />
+      <Route path="/contractor-management/:contractorId/invite-employee" element={<InviteEmployeeScreen />} />
       <Route path="/audit-log" element={<AuditLogScreen />} />
     </>
   );
@@ -574,6 +579,7 @@ const AppRoutes = observer(() => {
         <Route path="/rejection-reason/:permitApplicationId/:id" element={<RejectApplicationScreen />} />
         <Route path="/programs/:programId/accept-invitation" element={<AcceptInvitationScreen />} />
         {/* <Route path="/accept-invitation" element={<AcceptInvitationScreen />} /> */}
+
         <Route path="/contact" element={<ContactScreen />} />
         <Route path="/confirmed" element={<EmailConfirmedScreen />} />
         <Route path="/welcome" element={<LandingScreen />} />

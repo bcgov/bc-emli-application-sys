@@ -54,6 +54,11 @@ class ContractorPolicy < ApplicationPolicy
     deactivate?
   end
 
+  def invite?
+    # Admin managers and admins can invite contractor employees
+    user.admin_manager? || user.admin?
+  end
+
   class Scope < ApplicationPolicy::Scope
     def resolve
       if user.system_admin? || user.admin? || user.admin_manager?

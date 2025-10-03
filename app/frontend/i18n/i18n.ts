@@ -2230,14 +2230,17 @@ const options = {
           reinviteSuccess: 'Invite re-sent!',
           inviteError: 'Email taken',
           takenErrorTitle: 'Some of these emails already belong to existing users',
-          takenErrorDescription:
-            'One or more of the requested users have an existing account. Please ask them to change their email on their current account. You can then re-invite them into your local jurisdiction.',
+          takenErrorDescription: '',
           sendInvites: 'Send invites',
           acceptInvitation: 'Accept invitation',
           acceptInstructions: 'Enter your login and other user info below to finalize your account creation.',
           rolesAndPermissions: 'User roles & permissions',
           inviteInstructions:
             'Enter the email addresses of whom you wish to invite below. For details about permissions for each role, please see <a>User Roles & Permissions</a>',
+          inviteEmployeesTitle: 'Invite employees',
+          inviteEmployeesDescription:
+            'Enter the email address of the employee to invite. They will receive a link through their email to create an account using their Business BCeID.',
+          addMoreEmails: 'Add more emails',
           notifications: {
             essential: 'Essential communications (cannot disable)',
             event: 'Event',
@@ -2880,6 +2883,7 @@ const options = {
             programs: 'Programs',
             configureUsers: 'Configure users',
             invite: 'Invite',
+            inviteEmployee: 'Invite employee',
             templateVersions: 'Template versions',
             requirementsLibrary: 'Requirements library',
             requirementTemplates: 'Applications template catalog',
