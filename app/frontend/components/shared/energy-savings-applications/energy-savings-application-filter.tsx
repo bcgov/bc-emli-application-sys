@@ -202,7 +202,9 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
                 {filterValue === EPermitApplicationStatusGroup.submitted &&
                 [EUserRoles.admin, EUserRoles.adminManager].includes(currentUser.role)
                   ? t(`energySavingsApplication.status.unread`)
-                  : t(`energySavingsApplication.statusGroup.${filterValue}`)}
+                  : filterValue === EPermitApplicationStatusGroup.inReview && currentUser.isParticipant
+                    ? t(`energySavingsApplication.statusGroup.underReview`)
+                    : t(`energySavingsApplication.statusGroup.${filterValue}`)}
               </Checkbox>
             </MenuItem>
           ))}

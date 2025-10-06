@@ -6,8 +6,8 @@ class PermitApplicationPolicy < ApplicationPolicy
       # Admin users can see all applications they have access to
       true
     elsif record.submitter == user
-      # Participants can see their own applications, EXCEPT 'in_review' status
-      !record.in_review?
+      # Participants can see their own applications
+      true
     else
       false
     end

@@ -378,7 +378,11 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 <SubmissionDownloadModal permitApplication={currentPermitApplication} />
                 {/* )} */}
                 <Button rightIcon={<CaretRight />} onClick={() => navigate('/')}>
-                  {t('energySavingsApplication.show.backToInbox')}
+                  {t(
+                    currentUser.isParticipant
+                      ? 'energySavingsApplication.edit.back'
+                      : 'energySavingsApplication.show.backToInbox',
+                  )}
                 </Button>
               </Stack>
             ) : (
@@ -399,22 +403,28 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                     {t('energySavingsApplication.edit.withdrawl')}
                   </Button>
                 )}
-                {!currentPermitApplication?.isIneligible && (
-                  <>
-                    <Button variant="primary" onClick={handleClickFinishLater}>
-                      {t('energySavingsApplication.edit.saveDraft')}
-                    </Button>
-                    <Button
-                      rightIcon={<CaretRight />}
-                      onClick={
-                        currentPermitApplication.canUserSubmit(currentUser)
-                          ? handleScrollToBottom
-                          : onSubmitBlockedModalOpen
-                      }
-                    >
-                      {t('energySavingsApplication.edit.submit')}
-                    </Button>
-                  </>
+                {currentPermitApplication?.isInReview && currentUser.isParticipant ? (
+                  <Button rightIcon={<CaretRight />} onClick={() => navigate('/')}>
+                    {t('energySavingsApplication.edit.back')}
+                  </Button>
+                ) : (
+                  !currentPermitApplication?.isIneligible && (
+                    <>
+                      <Button variant="primary" onClick={handleClickFinishLater}>
+                        {t('energySavingsApplication.edit.saveDraft')}
+                      </Button>
+                      <Button
+                        rightIcon={<CaretRight />}
+                        onClick={
+                          currentPermitApplication.canUserSubmit(currentUser)
+                            ? handleScrollToBottom
+                            : onSubmitBlockedModalOpen
+                        }
+                      >
+                        {t('energySavingsApplication.edit.submit')}
+                      </Button>
+                    </>
+                  )
                 )}
 
                 {!currentPermitApplication.canUserSubmit(currentUser) && isSubmitBlockedModalOpen && (

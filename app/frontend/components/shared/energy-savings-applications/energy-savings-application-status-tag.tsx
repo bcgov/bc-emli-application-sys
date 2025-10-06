@@ -66,6 +66,9 @@ export const EnergySavingsApplicationStatusTag = ({
     ) {
       return t(`energySavingsApplication.status.unread`);
     }
+    if (status === EPermitApplicationStatus.inReview && currentUser.isParticipant) {
+      return t(`energySavingsApplication.statusGroup.underReview`);
+    }
     return t(`energySavingsApplication.status.${status}`);
   };
 
