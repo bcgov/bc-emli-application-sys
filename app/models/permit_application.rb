@@ -236,8 +236,8 @@ class PermitApplication < ApplicationRecord
       nickname: nickname,
       permit_classifications:
         "#{user_group_type&.name} #{audience_type&.name} #{submission_type&.name}",
-      submitter: "#{submitter.name} #{submitter.email}",
-      submitter_name: submitter.name,
+      submitter: "#{submitter&.name} #{submitter&.email}",
+      submitter_name: submitter&.name,
       submitted_at: submitted_at,
       resubmitted_at: resubmitted_at,
       viewed_at: viewed_at,
@@ -248,7 +248,7 @@ class PermitApplication < ApplicationRecord
       audience_type_id: audience_type&.id,
       submission_type_id: submission_type&.id,
       program_id: program&.id,
-      submitter_id: submitter.id,
+      submitter_id: submitter&.id,
       template_version_id: template_version.id,
       requirement_template_id: template_version.requirement_template.id,
       created_at: created_at,
@@ -259,7 +259,7 @@ class PermitApplication < ApplicationRecord
           " "
         ),
       user_ids_with_submission_edit_permissions:
-        [submitter.id] +
+        [submitter&.id].compact +
           users_by_collaboration_options(collaboration_type: :submission).pluck(
             :id
           )

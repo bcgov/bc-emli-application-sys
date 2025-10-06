@@ -49,6 +49,7 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
         energySavingsApplication.isIneligible,
         energySavingsApplication.isResubmitted,
         energySavingsApplication.isApproved,
+        energySavingsApplication.isInReview,
       ].some(Boolean)
     ) {
       return t('energySavingsApplication.card.viewApplication');
@@ -218,7 +219,19 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
             to={`/applications/${id}/edit`}
             variant="secondary"
             w={{ base: 'full', md: 'fit-content' }}
-            leftIcon={!energySavingsApplication.isSubmitted && isSubmissionCollaboration ? <Users /> : <Pencil />}
+            leftIcon={
+              !energySavingsApplication.isSubmitted && isSubmissionCollaboration ? (
+                <Users />
+              ) : [
+                  energySavingsApplication.isSubmitted,
+                  energySavingsApplication.isIneligible,
+                  energySavingsApplication.isResubmitted,
+                  energySavingsApplication.isApproved,
+                  energySavingsApplication.isInReview,
+                ].some(Boolean) ? undefined : (
+                <Pencil />
+              )
+            }
           >
             {routingButtonText}
           </RouterLinkButton>
