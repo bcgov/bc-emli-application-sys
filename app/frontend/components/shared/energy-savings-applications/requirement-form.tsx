@@ -518,11 +518,13 @@ export const RequirementForm = observer(
           />
         </Flex>
 
-        <BuilderBottomFloatingButtons
-          isCollapsedAll={isCollapsedAll}
-          setIsCollapsedAll={setIsCollapsedAll}
-          renderSaveButton={!isSubmitted ? renderSaveButton : null}
-        />
+        {!(permitApplication?.isInReview && currentUser?.isParticipant) && (
+          <BuilderBottomFloatingButtons
+            isCollapsedAll={isCollapsedAll}
+            setIsCollapsedAll={setIsCollapsedAll}
+            renderSaveButton={!isSubmitted ? renderSaveButton : null}
+          />
+        )}
         {isOpen && (
           <PermitApplicationSubmitModal
             permitApplication={permitApplication}

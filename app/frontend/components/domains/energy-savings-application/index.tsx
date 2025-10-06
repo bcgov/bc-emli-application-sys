@@ -111,6 +111,7 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
                     EPermitApplicationStatusGroup.draft,
                     EPermitApplicationStatusGroup.submitted,
                     EPermitApplicationStatusGroup.revisionsRequested,
+                    EPermitApplicationStatusGroup.inReview,
                     EPermitApplicationStatusGroup.approved,
                     EPermitApplicationStatusGroup.ineligible,
                     EPermitApplicationStatusGroup.resubmitted,

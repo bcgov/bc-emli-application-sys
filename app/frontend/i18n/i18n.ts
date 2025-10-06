@@ -1142,6 +1142,7 @@ const options = {
             submitted: 'Submitted',
             resubmitted: 'Resubmitted',
             inReview: 'Screened In',
+            underReview: 'Under Review',
             revisionsRequested: 'Update needed',
             approved: 'Approved',
             ineligible: 'Ineligible',
