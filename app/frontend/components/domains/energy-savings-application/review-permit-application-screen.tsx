@@ -1,9 +1,9 @@
 import { Box, Button, Divider, Flex, HStack, Heading, Spacer, Stack, Text, useDisclosure } from '@chakra-ui/react';
-import { CaretDown, CaretRight, CaretUp, CheckCircle, NotePencil, Prohibit } from '@phosphor-icons/react';
+import { CaretDown, CaretRight, CaretUp, CheckCircle, NotePencil, Prohibit, Warning } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
 import { useMst } from '../../../setup/root';
@@ -60,6 +60,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const [hasUnsavedEdits, setHasUnsavedEdits] = useState(false);
   const [saveEditsCompleted, setSaveEditsCompleted] = useState(false);
   const [saveEditsDisabled, setSaveEditsDisabled] = useState(false);
+  const [supportRequestDate, setSupportRequestDate] = useState(null);
 
   const sendRevisionContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -101,9 +102,16 @@ export const ReviewPermitApplicationScreen = observer(() => {
     }
   }, [currentPermitApplication?.latestRevisionRequests?.length]);
 
+  useEffect(() => {
+    if (currentPermitApplication?.latestSupportRequestDateString) {
+      setSupportRequestDate(currentPermitApplication.latestSupportRequestDateString);
+    }
+  }, [currentPermitApplication?.latestSupportRequestDateString]);
+
   // Handle revision mode cancellation
   const handleRevisionCancel = async () => {
     try {
+      1;
       // Clear revision requests created by admin Save Edits
       const ok = await currentPermitApplication.removeRevisionRequests();
 
@@ -273,6 +281,43 @@ export const ReviewPermitApplicationScreen = observer(() => {
           <SandboxHeader borderTopRadius={0} override sandbox={currentPermitApplication.sandbox} position="sticky" />
         )}
       </Flex>
+      {supportRequestDate && (
+        <Flex direction="column" bg="theme.orangeLight02">
+          <Flex
+            top={permitHeaderHeight}
+            position="sticky"
+            zIndex={11}
+            w="full"
+            px={4}
+            py={2}
+            mt={2}
+            bg="theme.orangeLight02"
+            justify="flex-start"
+            align="left"
+            gap={4}
+          >
+            <Warning size={24} color="var(--chakra-colors-semantic-warning)" aria-label={'Warning icon'} />
+            <Heading fontSize="md">{t('energySavingsApplication.show.supportingFilesRequest.requestedHeader')}</Heading>
+          </Flex>
+          <Flex
+            direction="column"
+            position="sticky"
+            zIndex={11}
+            w="full"
+            px={14}
+            mb={3}
+            bg="theme.orangeLight02"
+            justify="flex-start"
+            align="left"
+            gap={4}
+          >
+            <Trans
+              i18nKey="energySavingsApplication.show.supportingFilesRequest.requestedText"
+              values={{ date: supportRequestDate }}
+            />
+          </Flex>
+        </Flex>
+      )}
       <Box id="sidebar-and-form-container" sx={{ '&:after': { content: `""`, display: 'block', clear: 'both' } }}>
         {revisionMode && !hideRevisionList ? (
           <RevisionSideBar

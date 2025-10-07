@@ -579,11 +579,17 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
     .views((self) => ({
       // Latest SR created_at as Date object (or null if none)
       get latestSupportRequestDate(): Date | null {
-        if (self.supportRequests.length === 0) return null;
+        if (!self.supportRequests || self.supportRequests?.length === 0) return null;
+
+        // Find the latest by createdAt
         const latest = self.supportRequests.reduce((acc, sr) =>
-          new Date(sr.created_at) > new Date(acc.created_at) ? sr : acc,
+          new Date(sr.createdAt) > new Date(acc.createdAt) ? sr : acc,
         );
-        return new Date(latest.created_at);
+
+        // Only return if not approved
+        if (latest.status === EPermitApplicationStatus.approved) return null;
+
+        return new Date(latest.createdAt);
       },
 
       // Strict UI format: YYYY/MM/DD

@@ -6,6 +6,19 @@ class PermitApplication < ApplicationRecord
   include PermitApplicationStatus
   include Auditable
 
+  # ensure `status` column exists and stays authoritative
+  enum status: {
+         new_draft: 0,
+         newly_submitted: 1,
+         revisions_requested: 3,
+         resubmitted: 4,
+         in_review: 5,
+         update_needed: 6,
+         approved: 7,
+         ineligible: 8
+       },
+       _default: 0
+
   # SEARCH_INCLUDES = %i[
   #   permit_type
   #   submission_versions
@@ -124,6 +137,20 @@ class PermitApplication < ApplicationRecord
         end
 
   COMPLETION_SECTION_KEY = "section-completion-key"
+
+  def flow
+    @flow ||=
+      begin
+        key = [
+          submission_type&.name,
+          user_group_type&.name,
+          audience_type&.name
+        ]
+        klass =
+          PermitApplicationStatus::FLOW_MAP[key] || ApplicationFlow::Default
+        klass.new(self)
+      end
+  end
 
   def supporting_documents_for_submitter_based_on_user_permissions(
     supporting_documents,

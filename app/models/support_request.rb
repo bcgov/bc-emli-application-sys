@@ -26,4 +26,6 @@ class SupportRequest < ApplicationRecord
       )
     end
   end
+
+  # NotificationService.publish_application_submission_event(self)
 end
