@@ -1,12 +1,4 @@
 class PermitApplication < ApplicationRecord
-  include FormSupportingDocuments
-  include AutomatedComplianceUtils
-  include StepCodeFieldExtraction
-  include ZipfileUploader.Attachment(:zipfile)
-  include PermitApplicationStatus
-  include Auditable
-
-  # ensure `status` column exists and stays authoritative
   enum status: {
          new_draft: 0,
          newly_submitted: 1,
@@ -18,6 +10,14 @@ class PermitApplication < ApplicationRecord
          ineligible: 8
        },
        _default: 0
+
+  include PermitApplicationStatus
+
+  include FormSupportingDocuments
+  include AutomatedComplianceUtils
+  include StepCodeFieldExtraction
+  include ZipfileUploader.Attachment(:zipfile)
+  include Auditable
 
   # SEARCH_INCLUDES = %i[
   #   permit_type
@@ -37,6 +37,9 @@ class PermitApplication < ApplicationRecord
     assigned_users
     submission_type
     template_version
+    support_requests
+    user_group_type
+    audience_type
   ]
 
   API_SEARCH_INCLUDES = %i[
@@ -80,6 +83,18 @@ class PermitApplication < ApplicationRecord
 
   # Support requests *spawned from this permit application*
   has_many :support_requests,
+           -> do
+             includes(
+               :requested_by,
+               linked_application: %i[
+                 program
+                 submitter
+                 submission_type
+                 user_group_type
+                 audience_type
+               ]
+             )
+           end,
            foreign_key: :parent_application_id,
            inverse_of: :parent_application,
            dependent: :destroy
@@ -137,20 +152,6 @@ class PermitApplication < ApplicationRecord
         end
 
   COMPLETION_SECTION_KEY = "section-completion-key"
-
-  def flow
-    @flow ||=
-      begin
-        key = [
-          submission_type&.name,
-          user_group_type&.name,
-          audience_type&.name
-        ]
-        klass =
-          PermitApplicationStatus::FLOW_MAP[key] || ApplicationFlow::Default
-        klass.new(self)
-      end
-  end
 
   def supporting_documents_for_submitter_based_on_user_permissions(
     supporting_documents,

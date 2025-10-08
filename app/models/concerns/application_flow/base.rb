@@ -3,34 +3,28 @@ module ApplicationFlow
   class Base
     include AASM
 
-    attr_reader :permit_application
+    attr_reader :application
+    delegate :status,
+             :status=,
+             :update,
+             :submission_versions,
+             :submission_data,
+             :step_code,
+             to: :application
 
-    def initialize(permit_application)
-      @permit_application = permit_application
+    def initialize(application)
+      @application = application
     end
 
-    delegate_missing_to :permit_application
-
-    aasm column: "status", enum: true, whiny_transitions: false do
+    # Shared statuses
+    aasm column: "status", enum: true do
       state :new_draft, initial: true
       state :newly_submitted
       state :revisions_requested
       state :resubmitted
       state :in_review
-      state :update_needed
       state :approved
       state :ineligible
-
-      event :submit do
-        transitions from: :new_draft,
-                    to: :newly_submitted,
-                    guard: :can_submit?,
-                    after: :handle_submission
-        transitions from: :revisions_requested,
-                    to: :resubmitted,
-                    guard: :can_submit?,
-                    after: :handle_submission
-      end
 
       event :finalize_revision_requests do
         transitions from: %i[newly_submitted resubmitted revisions_requested],
@@ -43,13 +37,14 @@ module ApplicationFlow
         transitions from: :revisions_requested,
                     to: :newly_submitted,
                     guard: :was_originally_newly_submitted?
+
         transitions from: :revisions_requested,
                     to: :resubmitted,
                     guard: :was_originally_resubmitted?
       end
     end
 
-    # Shared helpers
+    # ===== Common Predicates =====
     def draft?
       new_draft? || revisions_requested?
     end
@@ -62,62 +57,44 @@ module ApplicationFlow
       in_review?
     end
 
-    # Guards & callback helpers
+    # ===== Common Guards =====
     def can_submit?
       signed =
         submission_data.dig("data", "section-completion-key", "signed").present?
-      # Template version policy:
-      # - new_draft: Must use current template version (enforced)
-      # - All other statuses (newly_submitted, revisions_requested, resubmitted, etc.):
-      #   Can submit with their original template version (bypassed)
-      template_check = new_draft? ? using_current_template_version : true
+      template_check =
+        new_draft? ? application.using_current_template_version : true
       signed && template_check
     end
 
     def can_finalize_requests?
-      latest_submission_version.revision_requests.any?
+      application.latest_submission_version.revision_requests.any?
     end
 
     def was_originally_newly_submitted?
-      submission_versions.count == 1
+      application.submission_versions.count == 1
     end
 
     def was_originally_resubmitted?
-      submission_versions.count > 1
+      application.submission_versions.count > 1
     end
 
+    # ===== Common Handlers =====
     def handle_finalize_revision_requests
-      update(revisions_requested_at: Time.current)
-      NotificationService.publish_application_revisions_request_event(self)
-    end
-
-    def handle_submission
-      update(signed_off_at: Time.current)
-
-      checklist = step_code&.pre_construction_checklist
-
-      submission_versions.create!(
-        form_json: form_json,
-        submission_data: submission_data,
-        step_code_checklist_json:
-          (
-            if checklist.present?
-              StepCodeChecklistBlueprint.render_as_hash(
-                checklist,
-                view: :extended
-              )
-            else
-              nil
-            end
-          )
+      application.update(revisions_requested_at: Time.current)
+      NotificationService.publish_application_revisions_request_event(
+        application
       )
-
-      zip_and_upload_supporting_documents
-      send_submit_notifications
     end
 
     def handle_ineligible_status
-      NotificationService.publish_application_ineligible_event(self)
+      NotificationService.publish_application_ineligible_event(application)
+    end
+
+    # ===== Abstracted Methods =====
+
+    def handle_submission
+      raise NotImplementedError,
+            "#{self.class.name} must implement #handle_submission"
     end
   end
 end

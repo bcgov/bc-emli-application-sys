@@ -10,7 +10,7 @@ import { RouterLinkButton } from '../navigation/router-link-button';
 import SandboxHeader from '../sandbox/sandbox-header';
 import { EnergySavingsApplicationStatusTag } from './energy-savings-application-status-tag';
 import { EPermitApplicationStatus, EPermitApplicationStatusGroup } from '../../../types/enums';
-
+import SupportRequestList from './support-request-list';
 interface IEnergySavingsApplicationCardProps {
   energySavingsApplication: IEnergySavingsApplication;
 }
@@ -111,26 +111,6 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
           </Flex>
         </Show>
         <Flex direction="column" gap={2} flex={{ base: 0, md: 5 }} maxW={{ base: '100%', md: '75%' }}>
-          {/* commented out for future use */}
-          {/* {isSubmissionCollaboration && (
-            <Flex bg="semantic.info" color={'white'} {...calloutBannerContainerProps}>
-              <Info size={14} />
-              <Text {...calloutBannerTextProps}>
-                <Trans
-                  i18nKey={
-                    energySavingsApplication.isDraft
-                      ? 'energySavingsApplication.card.collaborationCalloutDraft'
-                      : 'energySavingsApplication.card.collaborationCalloutSubmitted'
-                  }
-                  t={t}
-                  components={{ 1: <Text as="span" fontWeight="bold" /> }}
-                  values={{
-                    authorName: energySavingsApplication.submitter?.name,
-                  }}
-                />
-              </Text>
-            </Flex>
-          )} */}
           <Flex direction="column" flex={1} gap={2}>
             {energySavingsApplication.status === EPermitApplicationStatus.revisionsRequested && (
               <Flex bg="theme.orange" p={2} borderRadius={4} alignItems={'center'}>
@@ -237,6 +217,9 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
           </RouterLinkButton>
         </Flex>
       </Flex>
+      {energySavingsApplication.supportRequests?.length > 0 && (
+        <SupportRequestList supportRequests={energySavingsApplication.supportRequests} />
+      )}
     </Flex>
   );
 };

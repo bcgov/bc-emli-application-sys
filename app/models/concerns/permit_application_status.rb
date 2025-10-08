@@ -2,29 +2,54 @@
 module PermitApplicationStatus
   extend ActiveSupport::Concern
 
-  # add additional flows as needed for new application types
   FLOW_MAP = {
     %w[application participant external] =>
       ApplicationFlow::ApplicationExternalParticipant,
-    %w[support_request participant external] =>
-      ApplicationFlow::SupportRequestInternalParticipant
+    %w[application participant internal] =>
+      ApplicationFlow::ApplicationExternalParticipant,
+    %w[support_request participant internal] =>
+      ApplicationFlow::SupportRequestInternalParticipant,
+    %w[onboarding contractor external] =>
+      ApplicationFlow::OnboardingExternalContractor
   }.freeze
 
   included do
     after_initialize :set_flow
     after_update :check_ineligible_transition
 
-    def flow
-      @flow ||= set_flow
+    # Let model calls (like application.submitted?) proxy to the flow
+    delegate_missing_to :flow
+
+    AASM_EVENTS = %i[
+      submit
+      review
+      approve
+      reject
+      finalize_revision_requests
+      cancel_revision_requests
+    ].freeze
+
+    AASM_EVENTS.each do |event|
+      define_method("#{event}!") do
+        flow.public_send("#{event}!") if flow.respond_to?("#{event}!")
+      end
+      define_method("may_#{event}?") do
+        flow.public_send("may_#{event}?") if flow.respond_to?("may_#{event}?")
+      end
     end
+  end
+
+  def flow
+    @flow ||= set_flow
+    @flow
   end
 
   private
 
   def set_flow
-    key = [submission_type&.name, user_group_type&.name, audience_type&.name]
+    key = [submission_type&.code, user_group_type&.code, audience_type&.code]
     klass = FLOW_MAP[key] || ApplicationFlow::Default
-    @flow = klass.new(self)
+    klass.new(self)
   end
 
   def check_ineligible_transition

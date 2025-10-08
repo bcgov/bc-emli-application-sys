@@ -1,6 +1,6 @@
 # app/models/concerns/application_flow/support_request_internal_participant.rb
 module ApplicationFlow
-  class SupportRequestInternalParticipant < Base
+  class OnboardingExternalContractor < Base
     aasm do
       # Override submit
       event :submit do
@@ -11,9 +11,8 @@ module ApplicationFlow
     end
 
     def handle_submission
-      #TODO: define support request submission flow
+      # TODO:
       application.update(signed_off_at: Time.current)
-      #NotificationService.publish_support_request_submitted(application)
     end
   end
 end

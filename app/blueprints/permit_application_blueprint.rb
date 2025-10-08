@@ -66,6 +66,7 @@ class PermitApplicationBlueprint < Blueprinter::Base
                 view: :base do |pa, options|
       pa.template_version&.requirement_template&.audience_type
     end
+    association :support_requests, blueprint: SupportRequestBlueprint
   end
 
   view :jurisdiction_review_inbox do
@@ -138,7 +139,6 @@ class PermitApplicationBlueprint < Blueprinter::Base
     association :submission_versions,
                 blueprint: SubmissionVersionBlueprint,
                 view: :extended
-    association :support_requests, blueprint: SupportRequestBlueprint
   end
 
   view :pdf_generation do

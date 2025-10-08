@@ -11,6 +11,7 @@ module SupportRequests
     def initialize(parent_app:, user_context:, note:)
       @parent_app = parent_app # The application this support request is linked to
       @program = parent_app.program
+      @submitted_for = parent_app.submitter_id
       @user_context = user_context # Current user_context making the request
       @note = note # Optional text entered in the request form
     end
@@ -81,7 +82,7 @@ module SupportRequests
     # Create the new PermitApplication using the resolved template and type codes.
     def create_permit_application!(template)
       PermitApplication.create!(
-        submitter: @user_context.user,
+        submitter: @parent_app.submitter,
         user_group_type: UserGroupType.find_by!(code: user_group_type_code),
         audience_type: AudienceType.find_by!(code: audience_type_code),
         submission_type: SubmissionType.find_by!(code: submission_type_code),

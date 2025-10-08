@@ -138,8 +138,6 @@ module FormSupportingDocuments
     )
   end
 
-  private
-
   def zip_and_upload_supporting_documents
     return unless submitted?
 
