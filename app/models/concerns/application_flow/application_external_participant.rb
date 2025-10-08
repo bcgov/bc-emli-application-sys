@@ -1,7 +1,44 @@
-# app/models/concerns/application_flow/application_external_participant.rb
 module ApplicationFlow
   class ApplicationExternalParticipant < Base
-    aasm do
+    aasm column: :status, enum: true, autosave: true do
+      # --- States ---
+      state :new_draft, initial: true
+      state :newly_submitted
+      state :revisions_requested
+      state :resubmitted
+      state :in_review
+      state :approved
+      state :ineligible
+
+      # --- Events ---
+      event :submit do
+        transitions from: :new_draft,
+                    to: :newly_submitted,
+                    guard: :can_submit?,
+                    after: :handle_submission
+
+        transitions from: :revisions_requested,
+                    to: :resubmitted,
+                    guard: :can_submit?,
+                    after: :handle_submission
+      end
+
+      event :finalize_revision_requests do
+        transitions from: %i[newly_submitted resubmitted revisions_requested],
+                    to: :revisions_requested,
+                    guard: :can_finalize_requests?,
+                    after: :handle_finalize_revision_requests
+      end
+
+      event :cancel_revision_requests do
+        transitions from: :revisions_requested,
+                    to: :newly_submitted,
+                    guard: :was_originally_newly_submitted?
+        transitions from: :revisions_requested,
+                    to: :resubmitted,
+                    guard: :was_originally_resubmitted?
+      end
+
       event :review do
         transitions from: :newly_submitted, to: :in_review
       end
@@ -15,20 +52,9 @@ module ApplicationFlow
                     to: :ineligible,
                     after: :handle_ineligible_status
       end
-
-      event :submit do
-        transitions from: :new_draft,
-                    to: :newly_submitted,
-                    guard: :can_submit?,
-                    after: :handle_submission
-
-        transitions from: :revisions_requested,
-                    to: :resubmitted,
-                    guard: :can_submit?,
-                    after: :handle_submission
-      end
     end
 
+    # --- Flow-specific handler ---
     def handle_submission
       application.update(signed_off_at: Time.current)
 
@@ -43,6 +69,8 @@ module ApplicationFlow
                 checklist,
                 view: :extended
               )
+            else
+              nil
             end
           )
       )

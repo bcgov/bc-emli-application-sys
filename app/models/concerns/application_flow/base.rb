@@ -1,7 +1,9 @@
-# app/models/concerns/application_flow/base.rb
 module ApplicationFlow
   class Base
     include AASM
+
+    # every subclass' aasm neesd to save its final state
+    aasm { after_all_transitions :persist_state }
 
     attr_reader :application
     delegate :status,
@@ -16,35 +18,23 @@ module ApplicationFlow
       @application = application
     end
 
-    # Shared statuses
-    aasm column: "status", enum: true do
-      state :new_draft, initial: true
-      state :newly_submitted
-      state :revisions_requested
-      state :resubmitted
-      state :in_review
-      state :approved
-      state :ineligible
-
-      event :finalize_revision_requests do
-        transitions from: %i[newly_submitted resubmitted revisions_requested],
-                    to: :revisions_requested,
-                    guard: :can_finalize_requests?,
-                    after: :handle_finalize_revision_requests
-      end
-
-      event :cancel_revision_requests do
-        transitions from: :revisions_requested,
-                    to: :newly_submitted,
-                    guard: :was_originally_newly_submitted?
-
-        transitions from: :revisions_requested,
-                    to: :resubmitted,
-                    guard: :was_originally_resubmitted?
-      end
+    # persistence wiring for aasm
+    def aasm_read_attribute(name)
+      application.public_send(name)
     end
 
-    # ===== Common Predicates =====
+    def aasm_write_attribute(name, value)
+      application.public_send("#{name}=", value)
+      application.save!
+    end
+
+    # persistence hook for all subclasses
+    def persist_state
+      new_state = aasm.to_state
+      application.update_column(:status, new_state)
+    end
+
+    # --- Common predicates ---
     def draft?
       new_draft? || revisions_requested?
     end
@@ -57,7 +47,7 @@ module ApplicationFlow
       in_review?
     end
 
-    # ===== Common Guards =====
+    # --- Common guards ---
     def can_submit?
       signed =
         submission_data.dig("data", "section-completion-key", "signed").present?
@@ -78,7 +68,7 @@ module ApplicationFlow
       application.submission_versions.count > 1
     end
 
-    # ===== Common Handlers =====
+    # --- Common handlers ---
     def handle_finalize_revision_requests
       application.update(revisions_requested_at: Time.current)
       NotificationService.publish_application_revisions_request_event(
@@ -90,8 +80,7 @@ module ApplicationFlow
       NotificationService.publish_application_ineligible_event(application)
     end
 
-    # ===== Abstracted Methods =====
-
+    # --- Abstract methods ---
     def handle_submission
       raise NotImplementedError,
             "#{self.class.name} must implement #handle_submission"

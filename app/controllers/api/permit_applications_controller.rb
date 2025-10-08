@@ -258,9 +258,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
       end
     update_success = @permit_application.update(params_to_use)
     @permit_application.send(:set_flow) if update_success
-    Rails.logger.info(
-      "Flow: #{@permit_application.flow.class}, responds_to_submit!: #{@permit_application.flow.respond_to?(:submit!)}"
-    )
+
     submit_success = @permit_application.submit! if update_success
 
     if update_success && submit_success

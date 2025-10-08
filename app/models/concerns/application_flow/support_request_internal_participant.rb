@@ -1,8 +1,13 @@
 # app/models/concerns/application_flow/support_request_internal_participant.rb
 module ApplicationFlow
   class SupportRequestInternalParticipant < Base
-    aasm do
-      # Override submit
+    aasm column: :status, enum: true, autosave: true do
+      # sub-classed states
+      state :new_draft, initial: true
+      state :newly_submitted
+      state :approved
+
+      # Overridden sumbit
       event :submit do
         transitions from: :new_draft,
                     to: :newly_submitted,
