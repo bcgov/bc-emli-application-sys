@@ -14,7 +14,6 @@ class PermitApplicationPolicy < ApplicationPolicy
   end
 
   def show?
-    Rails.logger.info("record=#{record.submitter}")
     index?
   end
 

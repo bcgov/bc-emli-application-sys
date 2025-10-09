@@ -10,14 +10,16 @@ module PermitApplicationStatus
     %w[support_request participant internal] =>
       ApplicationFlow::SupportRequestInternalParticipant,
     %w[onboarding contractor external] =>
-      ApplicationFlow::OnboardingExternalContractor
+      ApplicationFlow::OnboardingExternalContractor,
+    %w[invoice contractor external] =>
+      ApplicationFlow::InvoiceExternalContractor
   }.freeze
 
   included do
     after_initialize :set_flow
     after_update :check_ineligible_transition
 
-    # Let model calls (like application.submitted?) proxy to the flow
+    # Let model calls (like application.submit?) proxy to the flow
     delegate_missing_to :flow
 
     AASM_EVENTS = %i[
