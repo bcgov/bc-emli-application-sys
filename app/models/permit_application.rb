@@ -29,18 +29,19 @@ class PermitApplication < ApplicationRecord
   #   permit_collaborations
   # ]
 
-  SEARCH_INCLUDES = %i[
-    submission_versions
-    submitter
-    sandbox
-    program
-    assigned_users
-    submission_type
-    template_version
-    support_requests
-    user_group_type
-    audience_type
-  ]
+  SEARCH_INCLUDES =
+    %i[
+      submission_versions
+      submitter
+      sandbox
+      program
+      assigned_users
+      submission_type
+      template_version
+      support_requests
+      user_group_type
+      audience_type
+    ] + [{ template_version: :requirement_template }]
 
   API_SEARCH_INCLUDES = %i[
     program
@@ -98,6 +99,12 @@ class PermitApplication < ApplicationRecord
            foreign_key: :parent_application_id,
            inverse_of: :parent_application,
            dependent: :destroy
+
+  has_many :incoming_support_requests,
+           class_name: "SupportRequest",
+           foreign_key: :linked_application_id,
+           inverse_of: :linked_application,
+           dependent: :nullify
 
   scope :submitted, -> { joins(:submission_versions).distinct }
 
@@ -558,6 +565,17 @@ class PermitApplication < ApplicationRecord
     return latest_submission_version.created_at
   end
 
+  def uploaded_date
+    support_requests
+      .joins(:linked_application)
+      .where(linked_applications: { status: "submitted" })
+      .order("linked_applications.updated_at DESC")
+      .limit(1)
+      .pick("linked_applications.submitted_date")
+  end
+
+  # TODO: consider extracting notification data builders into a Concern
+  # or service object if/when we expand event types for different 'form' nee. 'applications'
   def submit_event_notification_data
     i18n_key =
       (
@@ -711,6 +729,20 @@ class PermitApplication < ApplicationRecord
         Constants::NotificationActionTypes::PARTICIPANT_INCOMPLETE_DRAFT_NOTIFICATION,
       "action_text" =>
         "#{I18n.t("notification.permit_application.participant_incomplete_draft_notification", number: number, program_name: program_name)}",
+      "object_data" => {
+        "permit_application_id" => id,
+        "permit_application_number" => number
+      }
+    }
+  end
+
+  def participant_uploaded_supporting_files_event_notification_data
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::SUPPORTING_FILES_UPDLOADED,
+      "action_text" =>
+        "#{I18n.t("notification.permit_application.supporting_files_uploaded", uploaded_date: uploaded_date)}",
       "object_data" => {
         "permit_application_id" => id,
         "permit_application_number" => number

@@ -146,7 +146,6 @@ class OmniauthUserResolver
   end
 
   def raw_info
-    #Rails.logger.info("Auth Info: #{auth}")
     @raw_info ||= auth.extra.raw_info
   end
 

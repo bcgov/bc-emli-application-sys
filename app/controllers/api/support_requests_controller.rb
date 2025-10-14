@@ -48,6 +48,8 @@ class Api::SupportRequestsController < Api::ApplicationController
     if support_request.persisted?
       parent_app.reload
 
+      #TODO: this is where the notification email to the participant needs to happen
+
       render json:
                PermitApplicationBlueprint.render(parent_app, view: :extended),
              status: :created

@@ -74,15 +74,11 @@ class Api::ProgramsController < Api::ApplicationController
     desired_enabled = update_external_api_enabled_params
 
     begin
-      Rails.logger.info(
-        "starting api_state #{desired_enabled}, and #{current_user.system_admin?}"
-      )
       @program.update_external_api_state!(
         enable_external_api: desired_enabled,
         allow_reset: current_user.system_admin?
       )
 
-      Rails.logger.info("external_api_state: #{@program.external_api_state}")
       # Determine the appropriate success message based on the new state
       message =
         case @program.external_api_state

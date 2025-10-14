@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 interface LinkedApplication {
   id?: string | number;
   nickname?: string;
+  status?: string;
 }
 
 interface SupportRequest {
@@ -84,12 +85,9 @@ export default function SupportRequestList({ supportRequests }: SupportRequestLi
               </Text>
               {isOpen ? <CaretUp size={20} /> : <CaretDown size={20} />}
             </Flex>
-
-            {/* Collapsible Body with 2 coloum flex */}
             <Collapse in={isOpen} animateOpacity>
               <Box bg="white" px={4} py={3}>
                 <Flex flexDirection={{ base: 'column', md: 'row' }} gap={6} w="full" align="flex-start">
-                  {/* Left column: metadata + files (80%) */}
                   <Flex direction="column" flex={{ base: 1, md: 4 }} maxW={{ base: '100%', md: '80%' }}>
                     <Text fontSize="sm" color="gray.600">
                       Requested: {formatDate(sr.createdAt)}
@@ -99,8 +97,6 @@ export default function SupportRequestList({ supportRequests }: SupportRequestLi
                       Please upload {formatFiles(sr.additionalText)}
                     </Text>
                   </Flex>
-
-                  {/* Right column: status + button (20%) */}
                   <Flex
                     direction="column"
                     flex={{ base: 1, md: 1 }}
@@ -110,14 +106,15 @@ export default function SupportRequestList({ supportRequests }: SupportRequestLi
                     gap={2}
                   >
                     <EnergySavingsApplicationStatusTag energySavingsApplication={sr.linkedApplication} />
-
-                    <RouterLinkButton
-                      to={`/applications/${sr.linkedApplication.id}/edit`}
-                      variant="secondary"
-                      w={{ base: 'full', md: 'fit-content' }}
-                    >
-                      {t('energySavingsApplication.card.viewApplication')}
-                    </RouterLinkButton>
+                    {(sr.linkedApplication?.status == 'draft' || sr.linkedApplication?.status == 'new_draft') && (
+                      <RouterLinkButton
+                        to={`/applications/${sr.linkedApplication.id}/edit`}
+                        variant="secondary"
+                        w={{ base: 'full', md: 'fit-content' }}
+                      >
+                        {t('energySavingsApplication.card.viewApplication')}
+                      </RouterLinkButton>
+                    )}
                   </Flex>
                 </Flex>
               </Box>

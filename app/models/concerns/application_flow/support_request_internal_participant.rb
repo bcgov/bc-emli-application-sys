@@ -5,7 +5,11 @@ module ApplicationFlow
       # sub-classed states
       state :new_draft, initial: true
       state :newly_submitted
+      state :revisions_requested
+      state :resubmitted
+      state :in_review
       state :approved
+      state :ineligible
 
       # Overridden sumbit
       event :submit do
@@ -16,9 +20,15 @@ module ApplicationFlow
     end
 
     def handle_submission
+      Rails.logger.info(
+        "Application info: #{application.incoming_support_requests.first.parent_application_id}"
+      )
       #TODO: define support request submission flow
       application.update(signed_off_at: Time.current)
-      #NotificationService.publish_support_request_submitted(application)
+
+      # TODO: need to call a function that 'moves' the submitted files from the linkedApplication to the parentApplication
+
+      # NotificationService.participant_uploaded_supporting_files_event_notification_data(application)
     end
   end
 end
