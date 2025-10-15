@@ -807,7 +807,7 @@ en:
     newly_submitted: 'UNREAD'
     revisions_requested: 'UPDATE NEEDED'
     resubmitted: 'RESUBMITTED'
-    in_review: 'SCREENED IN'
+    in_review: 'UNDER REVIEW'
     ineligible: 'INELIGIBLE'
     approved: 'APPROVED'
   file_upload:

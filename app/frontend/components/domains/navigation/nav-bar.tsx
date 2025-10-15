@@ -483,9 +483,9 @@ const NavBarMenu = observer(function NavBarMenu() {
                   {(currentUser?.isSuperAdmin || currentUser?.isAdmin || currentUser?.isAdminManager) && (
                     <Box py={2} px={3} fontSize="md" color="inherit">
                       {currentUser?.isSuperAdmin
-                        ? 'System Admin'
+                        ? 'System admin'
                         : currentUser?.isAdminManager
-                          ? 'Admin Manager'
+                          ? 'Admin manager'
                           : 'Admin'}
                     </Box>
                   )}
