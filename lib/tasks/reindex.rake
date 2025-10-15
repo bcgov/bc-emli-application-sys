@@ -11,6 +11,7 @@ namespace :search do
       PermitApplication,
       User,
       LiveRequirementTemplate
+      Contractor
       # add more models here
     ].each do |model|
       puts "Reindexing #{model.name}..."
