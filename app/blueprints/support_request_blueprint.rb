@@ -7,5 +7,5 @@ class SupportRequestBlueprint < Blueprinter::Base
   association :requested_by, blueprint: UserBlueprint
   association :linked_application,
               blueprint: PermitApplicationBlueprint,
-              view: :minimal
+              view: :minimal_with_documents
 end

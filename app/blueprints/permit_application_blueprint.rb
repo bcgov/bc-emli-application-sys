@@ -17,6 +17,11 @@ class PermitApplicationBlueprint < Blueprinter::Base
                 view: :name
   end
 
+  view :minimal_with_documents do
+    include_view :minimal
+    association :supporting_documents, blueprint: SupportingDocumentBlueprint
+  end
+
   view :base do
     identifier :id
     fields :nickname,

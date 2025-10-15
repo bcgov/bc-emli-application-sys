@@ -20,15 +20,10 @@ module ApplicationFlow
     end
 
     def handle_submission
-      Rails.logger.info(
-        "Application info: #{application.incoming_support_requests.first.parent_application_id}"
-      )
-      #TODO: define support request submission flow
+      # we don't need to do anything else for this support request because it's for adding files
+      # files added here are linked via the SupportRequest. Parent sees the linked_application supportDocuments.
+
       application.update(signed_off_at: Time.current)
-
-      # TODO: need to call a function that 'moves' the submitted files from the linkedApplication to the parentApplication
-
-      # NotificationService.participant_uploaded_supporting_files_event_notification_data(application)
     end
   end
 end

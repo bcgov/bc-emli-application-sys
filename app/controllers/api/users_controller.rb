@@ -63,8 +63,6 @@ class Api::UsersController < Api::ApplicationController
       return render_error "misc.user_not_authorized_error"
     end
 
-    # Rails.logger.info("Updating user: #{user_params}")
-
     if @user.update(user_params)
       render_success @user,
                      "user.update_success",
@@ -315,8 +313,6 @@ class Api::UsersController < Api::ApplicationController
 
   def role_param
     role = params.require(:role).to_s
-    Rails.logger.info("Received role param: #{role}")
-    Rails.logger.info("Available enum keys: #{User.roles.keys.inspect}")
 
     unless User.roles.key?(role)
       raise ActionController::BadRequest, "Invalid role: #{role}"
