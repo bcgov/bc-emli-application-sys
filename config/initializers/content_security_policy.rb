@@ -11,10 +11,16 @@ Rails.application.configure do
       vite_host = "ws://localhost:3036" # Vite dev server WebSocket
       reactotron_ws = "ws://localhost:9090" # Reactotron debugging WebSocket
       cable_ws = "ws://localhost:8080" # ActionCable WebSocket (or any custom WS server)
+      minio_url = "http://localhost:9000"
 
       policy.script_src :self, :https, :unsafe_eval, :unsafe_inline, vite_host
       policy.style_src :self, :https, :unsafe_eval, :unsafe_inline, vite_host
-      policy.connect_src :self, :https, vite_host, reactotron_ws, cable_ws
+      policy.connect_src :self,
+                         :https,
+                         vite_host,
+                         reactotron_ws,
+                         cable_ws,
+                         minio_url
     else
       cable_ws = ENV["ANYCABLE_URL"]
 

@@ -241,9 +241,60 @@ class Api::PermitApplicationsController < Api::ApplicationController
     end
   end
 
+  # def submit
+  #   authorize @permit_application
+  #   # for submissions, we do not run the automated compliance as that should have already been complete
+
+  #   update_submitted_for_from_submission_data
+
+  #   is_current_user_submitter =
+  #     current_user.id == @permit_application.submitter_id
+
+  #   params_to_use =
+  #     if is_current_user_submitter
+  #       permit_application_params
+  #     else
+  #       submission_collaborator_permit_application_params
+  #     end
+  #   update_success = @permit_application.update(params_to_use)
+  #   @permit_application.send(:set_flow) if update_success
+
+  #   submit_success = @permit_application.submit! if update_success
+
+  #   if update_success && submit_success
+  #     # Notify admin staff about new submission
+  #     NotificationService.publish_new_submission_received_event(
+  #       @permit_application
+  #     )
+
+  #     render_success @permit_application,
+  #                    nil,
+  #                    {
+  #                      blueprint: PermitApplicationBlueprint,
+  #                      blueprint_opts: {
+  #                        view: :extended,
+  #                        current_user: current_user
+  #                      }
+  #                    }
+  #   else
+  #     render_error "permit_application.submit_error",
+  #                  message_opts: {
+  #                    error_message:
+  #                      @permit_application.errors.full_messages.join(", ")
+  #                  }
+  #   end
+  # rescue AASM::InvalidTransition
+  #   # Provide specific error message for template version issues on draft applications
+  #   # Other statuses get generic state error (could be signing, validation, etc.)
+  #   if !@permit_application.using_current_template_version &&
+  #        @permit_application.new_draft?
+  #     render_error "permit_application.outdated_error", message_opts: {}
+  #   else
+  #     render_error "permit_application.submit_state_error", message_opts: {}
+  #   end
+  # end
   def submit
     authorize @permit_application
-    # for submissions, we do not run the automated compliance as that should have already been complete
 
     update_submitted_for_from_submission_data
 
@@ -251,29 +302,27 @@ class Api::PermitApplicationsController < Api::ApplicationController
       current_user.id == @permit_application.submitter_id
 
     params_to_use =
-      if is_current_user_submitter
-        permit_application_params
-      else
-        submission_collaborator_permit_application_params
-      end
-    update_success = @permit_application.update(params_to_use)
+      (
+        if is_current_user_submitter
+          permit_application_params
+        else
+          submission_collaborator_permit_application_params
+        end
+      )
 
+    update_success = @permit_application.update(params_to_use)
+    @permit_application.send(:set_flow) if update_success
     submit_success = @permit_application.submit! if update_success
 
     if update_success && submit_success
-      # Notify admin staff about new submission
-      NotificationService.publish_new_submission_received_event(
-        @permit_application
-      )
+      handle_submission_notifications(@permit_application)
 
       render_success @permit_application,
                      nil,
-                     {
-                       blueprint: PermitApplicationBlueprint,
-                       blueprint_opts: {
-                         view: :extended,
-                         current_user: current_user
-                       }
+                     blueprint: PermitApplicationBlueprint,
+                     blueprint_opts: {
+                       view: :extended,
+                       current_user: current_user
                      }
     else
       render_error "permit_application.submit_error",
@@ -283,8 +332,6 @@ class Api::PermitApplicationsController < Api::ApplicationController
                    }
     end
   rescue AASM::InvalidTransition
-    # Provide specific error message for template version issues on draft applications
-    # Other statuses get generic state error (could be signing, validation, etc.)
     if !@permit_application.using_current_template_version &&
          @permit_application.new_draft?
       render_error "permit_application.outdated_error", message_opts: {}
@@ -610,6 +657,20 @@ class Api::PermitApplicationsController < Api::ApplicationController
   end
 
   private
+
+  def handle_submission_notifications(application)
+    submission_type = application.submission_type&.code&.to_sym
+    user_group_type = application.user_group_type&.code&.to_sym
+    audience_type = application.audience_type&.code&.to_sym
+
+    case [submission_type, user_group_type, audience_type]
+    when %i[support_request participant internal]
+      # NotificationService.publish_support_request_admin_event(application)
+    else
+      # Notify admin staff about new submission
+      NotificationService.publish_new_submission_received_event(application)
+    end
+  end
 
   def show_blueprint_view_for(user)
     if params[:review] && user.review_staff?

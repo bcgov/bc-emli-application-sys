@@ -58,6 +58,16 @@ class RequirementTemplatePolicy < ApplicationPolicy
     create? && record.early_access?
   end
 
+  def request_supporting_files?
+    true # Any logged-in user can request supporting files requirement template for now...
+    #user.admin_manager? || user.admin?
+  end
+
+  # Default hook for support requests – subclasses/services must override!
+  def support_requests?
+    false
+  end
+
   class Scope < Scope
     def resolve
       scope.all

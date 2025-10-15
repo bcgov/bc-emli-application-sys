@@ -216,6 +216,10 @@ Rails.application.routes.draw do
           to: "permit_applications#download_application_metrics_csv"
     end
 
+    resources :support_requests, only: %i[index show create update destroy] do
+      collection { post :request_supporting_files }
+    end
+
     resources :permit_collaborations, only: %i[destroy] do
       post "reinvite", on: :member, to: "permit_collaborations#reinvite"
     end

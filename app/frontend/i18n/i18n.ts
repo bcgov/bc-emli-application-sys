@@ -1351,6 +1351,13 @@ const options = {
               noNotification:
                 'No notifications will be sent to the applicant and you will lose any current revisions you may have added.',
             },
+            supportingFilesRequest: {
+              requestSupportingFiles: 'Request supporting files',
+              prompt:
+                'List the required files below, one line per file. Each line will be a bullet point in the email to the participant.',
+              requestedHeader: 'Supporting files requested',
+              requestedText: 'Supporting files have been requested from the participant on {{date}}',
+            },
           },
         },
         sandbox: {

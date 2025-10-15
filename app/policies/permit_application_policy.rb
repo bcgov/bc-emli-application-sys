@@ -5,7 +5,7 @@ class PermitApplicationPolicy < ApplicationPolicy
     if user.system_admin? || user.admin_manager? || user.admin?
       # Admin users can see all applications they have access to
       true
-    elsif record.submitter == user
+    elsif record.submitter == user || record.submitted_for == user.id
       # Participants can see their own applications
       true
     else
@@ -57,6 +57,15 @@ class PermitApplicationPolicy < ApplicationPolicy
 
   def remove_revision_requests?
     user.admin_manager? || user.admin?
+  end
+
+  def request_supporting_files?
+    user.admin_manager? || user.admin?
+  end
+
+  # Default hook for support requests – subclasses/services must override!
+  def support_requests?
+    false
   end
 
   def upload_supporting_document?

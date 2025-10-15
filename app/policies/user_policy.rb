@@ -84,9 +84,6 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update_role?
-    Rails.logger.info(
-      "can update? #{(user.system_admin? || user.admin_manager?)}"
-    )
     (user.system_admin? || user.admin_manager?) && user != record
   end
 

@@ -19,7 +19,7 @@ import {
 import { Download, FileArrowDown, FileZip, Gear, Eye } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { datefnsAppDateFormat } from '../../../constants';
 import { IPermitApplication } from '../../../models/energy-savings-application';
@@ -42,6 +42,8 @@ export const SubmissionDownloadModal = observer(
     const { allSubmissionVersionCompletedSupportingDocuments, zipfileUrl, zipfileName, stepCode } = permitApplication;
     const checklist = stepCode?.preConstructionChecklist;
 
+    const [supportingFiles, setSupportingFiles] = useState([]);
+
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     useEffect(() => {
@@ -51,6 +53,14 @@ export const SubmissionDownloadModal = observer(
         permitApplicationStore.fetchPermitApplication(permitApplication?.id, review);
       }
     }, [permitApplication?.isFullyLoaded, isOpen]);
+
+    useEffect(() => {
+      // Flatten all supportingDocuments from supportRequests
+      const supportRequestDocs =
+        permitApplication?.supportRequests?.flatMap((sr) => sr.linkedApplication?.supportingDocuments || []) || [];
+
+      setSupportingFiles(supportRequestDocs);
+    }, [permitApplication]);
 
     // Separate useEffect for WebSocket connection that only depends on modal being open
     useEffect(() => {
@@ -153,11 +163,28 @@ export const SubmissionDownloadModal = observer(
                 </ModalHeader>
                 <ModalBody>
                   <Flex direction="column" gap={3} borderRadius="lg" borderWidth={1} borderColor="border.light" p={4}>
+                    <Text fontSize="md" fontWeight="normal">
+                      Original Files:
+                    </Text>
                     <VStack align="flex-start" w="full" spacing={3}>
                       {permitApplication.missingPdfs.map((pdfKey) => (
                         <MissingPdf key={pdfKey} pdfKey={pdfKey} />
                       ))}
                       {allSubmissionVersionCompletedSupportingDocuments.map((doc) => (
+                        <FileViewLink
+                          key={doc.viewUrl}
+                          url={doc.viewUrl}
+                          name={doc.fileName}
+                          size={doc.fileSize}
+                          createdAt={doc.createdAt}
+                        />
+                      ))}
+                    </VStack>
+                    <Text fontSize="md" fontWeight="normal">
+                      Additional Files:
+                    </Text>
+                    <VStack align="flex-start" w="full" spacing={3}>
+                      {supportingFiles.map((doc) => (
                         <FileViewLink
                           key={doc.viewUrl}
                           url={doc.viewUrl}

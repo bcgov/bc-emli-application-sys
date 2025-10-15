@@ -312,6 +312,13 @@ export class Api {
     });
   }
 
+  async requestSupportingFiles(parentId: string, params: { note: string }) {
+    return this.client.post<ApiResponse<IEnergySavingsApplication>>(`/support_requests/request_supporting_files`, {
+      parent_application_id: parentId,
+      ...params,
+    });
+  }
+
   async createRequirementBlock(params: IRequirementBlockParams) {
     return this.client.post<IRequirementBlockResponse>(`/requirement_blocks`, { requirementBlock: params });
   }

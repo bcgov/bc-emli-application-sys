@@ -5,6 +5,10 @@ class RequirementTemplate < ApplicationRecord
     last_three_deprecated_template_versions
     activity
     scheduled_template_versions
+    audience_type
+    program
+    submission_type
+    user_group_type
   ]
 
   searchkick searchable: %i[

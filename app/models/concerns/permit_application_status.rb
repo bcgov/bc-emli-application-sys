@@ -1,146 +1,63 @@
+# app/models/concerns/permit_application_status.rb
 module PermitApplicationStatus
   extend ActiveSupport::Concern
-  included do
-    include AASM
-    enum status: {
-           new_draft: 0,
-           newly_submitted: 1,
-           revisions_requested: 3,
-           resubmitted: 4,
-           in_review: 5,
-           update_needed: 6,
-           approved: 7,
-           ineligible: 8
-         },
-         _default: 0
 
+  FLOW_MAP = {
+    %w[application participant external] =>
+      ApplicationFlow::ApplicationExternalParticipant,
+    %w[application participant internal] =>
+      ApplicationFlow::ApplicationExternalParticipant,
+    %w[support_request participant internal] =>
+      ApplicationFlow::SupportRequestInternalParticipant,
+    %w[onboarding contractor external] =>
+      ApplicationFlow::OnboardingExternalContractor,
+    %w[invoice contractor external] =>
+      ApplicationFlow::InvoiceExternalContractor
+  }.freeze
+
+  included do
+    after_initialize :set_flow
     after_update :check_ineligible_transition
 
-    def self.draft_statuses
-      %w[new_draft revisions_requested]
-    end
+    # Let model calls (like application.submit?) proxy to the flow
+    delegate_missing_to :flow
 
-    def self.submitted_statuses
-      %w[newly_submitted resubmitted]
-    end
+    AASM_EVENTS = %i[
+      submit
+      review
+      approve
+      reject
+      finalize_revision_requests
+      cancel_revision_requests
+    ].freeze
 
-    aasm column: "status", enum: true do
-      state :new_draft, initial: true
-      state :newly_submitted
-      state :revisions_requested
-      state :resubmitted
-      state :in_review
-      state :approved
-      state :ineligible
-
-      event :submit do
-        transitions from: :new_draft,
-                    to: :newly_submitted,
-                    guard: :can_submit?,
-                    after: :handle_submission
-        transitions from: :revisions_requested,
-                    to: :resubmitted,
-                    guard: :can_submit?,
-                    after: :handle_submission
+    AASM_EVENTS.each do |event|
+      define_method("#{event}!") do
+        flow.public_send("#{event}!") if flow.respond_to?("#{event}!")
       end
-
-      event :finalize_revision_requests do
-        transitions from: %i[newly_submitted resubmitted revisions_requested],
-                    to: :revisions_requested,
-                    guard: :can_finalize_requests?,
-                    after: :handle_finalize_revision_requests
-      end
-
-      event :cancel_revision_requests do
-        transitions from: :revisions_requested,
-                    to: :newly_submitted,
-                    guard: :was_originally_newly_submitted?
-        transitions from: :revisions_requested,
-                    to: :resubmitted,
-                    guard: :was_originally_resubmitted?
+      define_method("may_#{event}?") do
+        flow.public_send("may_#{event}?") if flow.respond_to?("may_#{event}?")
       end
     end
+  end
 
-    def draft?
-      new_draft? || revisions_requested?
-    end
+  def flow
+    @flow ||= set_flow
+    @flow
+  end
 
-    def submitted?
-      newly_submitted? || resubmitted?
-    end
+  private
 
-    def screen_in?
-      in_review?
-    end
+  def set_flow
+    key = [submission_type&.code, user_group_type&.code, audience_type&.code]
+    klass = FLOW_MAP[key] || ApplicationFlow::Default
+    klass.new(self)
+  end
 
-    def can_submit?
-      signed =
-        submission_data.dig("data", "section-completion-key", "signed").present?
-      # Template version policy:
-      # - new_draft: Must use current template version (enforced)
-      # - All other statuses (newly_submitted, revisions_requested, resubmitted, etc.):
-      #   Can submit with their original template version (bypassed)
-      template_check = new_draft? ? using_current_template_version : true
-
-      signed && template_check
-    end
-
-    def can_finalize_requests?
-      latest_submission_version.revision_requests.any?
-    end
-
-    def was_originally_newly_submitted?
-      # Check if this application was never resubmitted before
-      submission_versions.count == 1
-    end
-
-    def was_originally_resubmitted?
-      # Check if this application was resubmitted before
-      submission_versions.count > 1
-    end
-
-    def handle_finalize_revision_requests
-      update(revisions_requested_at: Time.current)
-      NotificationService.publish_application_revisions_request_event(self)
-    end
-
-    def handle_submission
-      update(signed_off_at: Time.current)
-
-      checklist = step_code&.pre_construction_checklist
-
-      submission_versions.create!(
-        form_json: self.form_json,
-        submission_data: self.submission_data,
-        step_code_checklist_json:
-          (
-            if checklist.present?
-              StepCodeChecklistBlueprint.render_as_hash(
-                checklist,
-                view: :extended
-              )
-            else
-              nil
-            end
-          )
-      )
-
-      zip_and_upload_supporting_documents
-
-      send_submit_notifications
-    end
-
-    def handle_ineligible_status
-      NotificationService.publish_application_ineligible_event(self)
-    end
-
-    private
-
-    def check_ineligible_transition
-      if saved_change_to_status? && status_previously_was != "ineligible" &&
-           status == "ineligible"
-        handle_ineligible_status
-      end
+  def check_ineligible_transition
+    if saved_change_to_status? && status_previously_was != "ineligible" &&
+         status == "ineligible"
+      flow.handle_ineligible_status
     end
   end
 end

@@ -1,4 +1,27 @@
 class PermitApplicationBlueprint < Blueprinter::Base
+  view :minimal do
+    identifier :id
+    fields :nickname, :status, :number, :created_at, :updated_at
+    association :program, blueprint: ProgramBlueprint, view: :minimal
+    field :submitter do |pa, options|
+      SubmitterBlueprint.render(pa.submitter, view: :minimal)
+    end
+    association :submission_type,
+                blueprint: PermitClassificationBlueprint,
+                view: :name
+    association :user_group_type,
+                blueprint: PermitClassificationBlueprint,
+                view: :name
+    association :audience_type,
+                blueprint: PermitClassificationBlueprint,
+                view: :name
+  end
+
+  view :minimal_with_documents do
+    include_view :minimal
+    association :supporting_documents, blueprint: SupportingDocumentBlueprint
+  end
+
   view :base do
     identifier :id
     fields :nickname,
@@ -48,6 +71,7 @@ class PermitApplicationBlueprint < Blueprinter::Base
                 view: :base do |pa, options|
       pa.template_version&.requirement_template&.audience_type
     end
+    association :support_requests, blueprint: SupportRequestBlueprint
   end
 
   view :jurisdiction_review_inbox do

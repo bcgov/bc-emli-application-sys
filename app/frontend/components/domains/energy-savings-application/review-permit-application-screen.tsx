@@ -1,9 +1,9 @@
 import { Box, Button, Divider, Flex, HStack, Heading, Spacer, Stack, Text, useDisclosure } from '@chakra-ui/react';
-import { CaretDown, CaretRight, CaretUp, CheckCircle, Info, NotePencil, Prohibit } from '@phosphor-icons/react';
+import { CaretDown, CaretRight, CaretUp, CheckCircle, NotePencil, Prohibit, Warning } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useController, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+import { useForm } from 'react-hook-form';
+import { useTranslation, Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
 import { useMst } from '../../../setup/root';
@@ -11,14 +11,10 @@ import { ECollaborationType, EPermitApplicationStatus } from '../../../types/enu
 import { CopyableValue } from '../../shared/base/copyable-value';
 import { ErrorScreen } from '../../shared/base/error-screen';
 import { LoadingScreen } from '../../shared/base/loading-screen';
-import { EditableInputWithControls } from '../../shared/editable-input-with-controls';
-import { BrowserSearchPrompt } from '../../shared/energy-savings-applications/browser-search-prompt';
-import { PermitApplicationViewedAtTag } from '../../shared/energy-savings-applications/permit-application-viewed-at-tag';
 import { RequirementForm } from '../../shared/energy-savings-applications/requirement-form';
 import SandboxHeader from '../../shared/sandbox/sandbox-header';
 import { ChecklistSideBar } from './checklist-sidebar';
 import { BlockCollaboratorAssignmentManagement } from './assignment-management/block-collaborator-assignment-management';
-import { CollaboratorsSidebar } from './assignment-management/collaborators-sidebar';
 import { useCollaborationAssignmentNodes } from './assignment-management/hooks/use-collaboration-assignment-nodes';
 import { ContactSummaryModal } from './contact-summary-modal';
 import { RevisionSideBar } from './revision-sidebar';
@@ -26,7 +22,7 @@ import { SubmissionDownloadModal } from './submission-download-modal';
 import ApplicationReviewModal from '../../shared/modals/application-review-modal';
 import UpdatePathwayModal from '../../shared/modals/application-update-pathway';
 import { EnergySavingsApplicationStatusTag } from '../../shared/energy-savings-applications/energy-savings-application-status-tag';
-
+import { SupportingFilesRequestModal } from './supporting-files-request-modal';
 interface IReferenceNumberForm {
   referenceNumber?: string;
 }
@@ -42,29 +38,29 @@ export const ReviewPermitApplicationScreen = observer(() => {
     formRef,
   });
   const navigate = useNavigate();
-  const { control, reset, handleSubmit } = useForm<IReferenceNumberForm>({
+  const { reset } = useForm<IReferenceNumberForm>({
     defaultValues: {
       referenceNumber: currentPermitApplication?.referenceNumber || '',
     },
   });
 
-  const {
-    field: { value: referenceNumber, onChange: onReferenceNumberChange },
-  } = useController<IReferenceNumberForm>({ control, name: 'referenceNumber' });
-  const [referenceNumberSnapshot, setReferenceNumberSnapshot] = useState<null | string>(null);
-
   const [completedBlocks, setCompletedBlocks] = useState({});
   const [performedBy, setPerformedBy] = useState(null);
-  const [originalStatus, setOriginalStatus] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isScreenIn, onOpen: onScreenIn, onClose: onScreenInclose } = useDisclosure();
   const { isOpen: isContactsOpen, onOpen: onContactsOpen, onClose: onContactsClose } = useDisclosure();
   const { isOpen: isUpdatePathwayOpen, onOpen: onUpdatePathwayOpen, onClose: onUpdatePathwayClose } = useDisclosure();
+  const {
+    isOpen: isRequestSupportingFilesOpen,
+    onOpen: onRequestSupportingFilesOpen,
+    onClose: onRequestSupportingFilesClose,
+  } = useDisclosure();
 
   const [hideRevisionList, setHideRevisionList] = useState(false);
   const [hasUnsavedEdits, setHasUnsavedEdits] = useState(false);
   const [saveEditsCompleted, setSaveEditsCompleted] = useState(false);
   const [saveEditsDisabled, setSaveEditsDisabled] = useState(false);
+  const [supportRequestDate, setSupportRequestDate] = useState(null);
 
   const sendRevisionContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -72,6 +68,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
 
   useEffect(() => {
     reset({ referenceNumber: currentPermitApplication?.referenceNumber || '' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPermitApplication?.referenceNumber]);
 
   useEffect(() => {
@@ -93,6 +90,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
     if (currentPermitApplication?.status === EPermitApplicationStatus.revisionsRequested && !saveEditsCompleted) {
       setRevisionMode(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPermitApplication?.revisionMode, currentPermitApplication?.status, saveEditsCompleted]);
 
   // Monitor for staged revision requests (Save Edits workflow)
@@ -104,9 +102,16 @@ export const ReviewPermitApplicationScreen = observer(() => {
     }
   }, [currentPermitApplication?.latestRevisionRequests?.length]);
 
+  useEffect(() => {
+    if (currentPermitApplication?.latestSupportRequestDateString) {
+      setSupportRequestDate(currentPermitApplication.latestSupportRequestDateString);
+    }
+  }, [currentPermitApplication?.latestSupportRequestDateString]);
+
   // Handle revision mode cancellation
   const handleRevisionCancel = async () => {
     try {
+      1;
       // Clear revision requests created by admin Save Edits
       const ok = await currentPermitApplication.removeRevisionRequests();
 
@@ -165,29 +170,14 @@ export const ReviewPermitApplicationScreen = observer(() => {
         }, 300); // Balanced timeout for React state propagation
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPermitApplication, formRef, performedBy, navigate, setSaveEditsCompleted]);
 
   if (error) return <ErrorScreen error={error} />;
   if (!currentPermitApplication?.isFullyLoaded) return <LoadingScreen />;
 
-  const { permitTypeAndActivity, formattedFormJson, number, revisionMode, setRevisionMode } = currentPermitApplication;
+  const { formattedFormJson, number, revisionMode, setRevisionMode } = currentPermitApplication;
 
-  const onSaveReferenceNumber = handleSubmit(async ({ referenceNumber: referenceNumberToSave }) => {
-    if (referenceNumber === referenceNumberSnapshot) {
-      return;
-    }
-
-    try {
-      const response = await currentPermitApplication.update({
-        referenceNumber: referenceNumberToSave,
-        review: true,
-      });
-
-      !response.ok && onReferenceNumberChange(referenceNumberSnapshot);
-    } catch (e) {
-      onReferenceNumberChange(referenceNumberSnapshot);
-    }
-  });
   const handleConfirm = async () => {
     try {
       const response = await currentPermitApplication.updateStatus({
@@ -200,11 +190,13 @@ export const ReviewPermitApplicationScreen = observer(() => {
           },
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      // Handle error if needed
+    }
     onScreenInclose();
   };
 
-  // @ts-ignore
+  // @ts-expect-error ts-migrate(2345) FIXME: Argument of type 'string | number | readonly stri... Remove this comment to see the full error message
   const permitHeaderHeight = permitHeaderRef?.current?.offsetHeight ?? 0;
 
   return (
@@ -224,39 +216,11 @@ export const ReviewPermitApplicationScreen = observer(() => {
                   value={number}
                   label={t('permitApplication.fields.number')}
                 />
-                {/* <HStack mt={2} sx={{ svg: { fill: 'theme.yellow' } }}>
-                  <Text textTransform={'uppercase'}> {t('permitApplication.referenceNumber')}:</Text>
-                  <EditableInputWithControls
-                    size={'xs'}
-                    value={referenceNumber}
-                    onChange={onReferenceNumberChange}
-                    onEdit={() => setReferenceNumberSnapshot(referenceNumber)}
-                    onSubmit={() => onSaveReferenceNumber()}
-                    editablePreviewProps={{
-                      mb: 4,
-                    }}
-                    editableInputProps={{
-                      'aria-label': 'Edit Template Description',
-                      bg: 'white',
-                      color: 'text.primary',
-                      width: '79px',
-                    }}
-                    controlsProps={{
-                      saveButtonProps: { variant: 'primaryInverse', textContent: t('ui.onlySave') },
-                      cancelButtonProps: { variant: 'secondaryInverse' },
-                    }}
-                    aria-label={'Edit Template Description'}
-                    onCancel={(previousValue) => onReferenceNumberChange(previousValue)}
-                  />
-                </HStack> */}
               </HStack>
             </Flex>
           </HStack>
           <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
-            {/* <BrowserSearchPrompt /> */}
-            {/* <Button variant="ghost" leftIcon={<Info size={20} />} color="white" onClick={onContactsOpen}>
-              {t('permitApplication.show.contactsSummary')}
-            </Button> */}
+            <SupportingFilesRequestModal permitApplication={currentPermitApplication} />
             <SubmissionDownloadModal permitApplication={currentPermitApplication} review />
             <Button variant="primary" rightIcon={<CaretRight />} onClick={() => navigate(`/submission-inbox`)}>
               {t('ui.backToInbox')}
@@ -317,6 +281,43 @@ export const ReviewPermitApplicationScreen = observer(() => {
           <SandboxHeader borderTopRadius={0} override sandbox={currentPermitApplication.sandbox} position="sticky" />
         )}
       </Flex>
+      {supportRequestDate && (
+        <Flex direction="column" bg="theme.orangeLight02">
+          <Flex
+            top={permitHeaderHeight}
+            position="sticky"
+            zIndex={11}
+            w="full"
+            px={4}
+            py={2}
+            mt={2}
+            bg="theme.orangeLight02"
+            justify="flex-start"
+            align="left"
+            gap={4}
+          >
+            <Warning size={24} color="var(--chakra-colors-semantic-warning)" aria-label={'Warning icon'} />
+            <Heading fontSize="md">{t('energySavingsApplication.show.supportingFilesRequest.requestedHeader')}</Heading>
+          </Flex>
+          <Flex
+            direction="column"
+            position="sticky"
+            zIndex={11}
+            w="full"
+            px={14}
+            mb={3}
+            bg="theme.orangeLight02"
+            justify="flex-start"
+            align="left"
+            gap={4}
+          >
+            <Trans
+              i18nKey="energySavingsApplication.show.supportingFilesRequest.requestedText"
+              values={{ date: supportRequestDate }}
+            />
+          </Flex>
+        </Flex>
+      )}
       <Box id="sidebar-and-form-container" sx={{ '&:after': { content: `""`, display: 'block', clear: 'both' } }}>
         {revisionMode && !hideRevisionList ? (
           <RevisionSideBar
@@ -341,13 +342,6 @@ export const ReviewPermitApplicationScreen = observer(() => {
                 return (
                   !revisionMode && (
                     <HStack spacing={6}>
-                      {/* <Button variant="callout" leftIcon={<NotePencil />} onClick={() => setRevisionMode(true)}>
-                        {currentPermitApplication.isRevisionsRequested
-                          ? t('permitApplication.show.viewRevisionRequests')
-                          : t('permitApplication.show.requestRevisions')}{' '}
-                        {currentPermitApplication?.latestRevisionRequests?.length > 0 &&
-                          `(${currentPermitApplication.latestRevisionRequests.length})`}
-                      </Button> */}
                       <Button
                         variant="calloutInverse"
                         leftIcon={<NotePencil />}
@@ -375,13 +369,6 @@ export const ReviewPermitApplicationScreen = observer(() => {
                       >
                         {t('permitApplication.show.screenIn')}
                       </Button>
-                      {/* <CollaboratorsSidebar
-                        permitApplication={currentPermitApplication}
-                        collaborationType={ECollaborationType.review}
-                        triggerButtonProps={{
-                          variant: 'secondary',
-                        }}
-                      /> */}
                       <Button
                         variant="calloutInverse"
                         leftIcon={<Prohibit />}
@@ -442,6 +429,13 @@ export const ReviewPermitApplicationScreen = observer(() => {
           isOpen={isContactsOpen}
           onOpen={onContactsOpen}
           onClose={onContactsClose}
+          permitApplication={currentPermitApplication}
+        />
+      )}
+      {isRequestSupportingFilesOpen && (
+        <SupportingFilesRequestModal
+          onOpen={onRequestSupportingFilesOpen}
+          onClose={onRequestSupportingFilesClose}
           permitApplication={currentPermitApplication}
         />
       )}

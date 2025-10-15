@@ -684,7 +684,13 @@ en:
       template_version_mismatch:
         title: 'Error'
         message: 'The template version does not match the expected criteria'
-  services:
+      no_published_template_version:
+        title: 'Error'
+        message: 'No published Supporting Files request template was found. Please contact an administrator.'
+      support_request_not_created:
+        title: 'Error'
+        message: 'The support request could not be created.'
+    services:
     auto_compliance_configuration:
       digital_seal_validator:
         label: 'Digital Seal Validator for AIBC and EGBC - Validates the digital seal of a file'
@@ -773,6 +779,8 @@ en:
       new_submission_received_notification: 'New application %{number} submitted to %{program_name} on %{submitted_at}'
       assignment_notification: 'Application %{number} from %{program_name} has been assigned to you'
       participant_incomplete_draft_notification: 'This is a reminder that your application to the %{program_name} is still in draft. You can complete your application by viewing it here'
+    support_request:
+      supporting_files_uploaded: 'Supporting files have been uploaded to this application on %{uploaded_date}'
     user:
       account_update_notification: 'Your account was updated on %{updated_at}. Changes: %{changed_fields}. If you did not make this change, please contact support immediately.'
     permit_collaboration:

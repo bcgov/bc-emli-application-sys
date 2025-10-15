@@ -312,6 +312,17 @@ export const PermitApplicationStoreModel = types
     },
   }))
   .actions((self) => ({
+    requestSupportingFiles: flow(function* (permitApplicationId: string, note: string) {
+      const permitApplication = self.getPermitApplicationById(permitApplicationId);
+      if (!permitApplication) return false;
+
+      const { ok, data: response } = yield self.environment.api.requestSupportingFiles(permitApplicationId, note);
+      if (ok && response) {
+        self.mergeUpdate(response, 'permitApplicationMap');
+        return response;
+      }
+      return false;
+    }),
     createEnergyApplication: flow(function* (formData: TCreateEnergyApplicationFormData) {
       const { ok, data: response } = yield self.environment.api.createEnergyApplication(formData);
       if (ok && response.id) {
