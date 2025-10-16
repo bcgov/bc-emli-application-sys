@@ -666,6 +666,8 @@ class Api::PermitApplicationsController < Api::ApplicationController
     case [submission_type, user_group_type, audience_type]
     when %i[support_request participant internal]
       # NotificationService.publish_support_request_admin_event(application)
+    when %i[support_request participant external]
+      #
     else
       # Notify admin staff about new submission
       NotificationService.publish_new_submission_received_event(application)
@@ -792,8 +794,6 @@ class Api::PermitApplicationsController < Api::ApplicationController
         end
       end
     end
-
-    Rails.logger.info("First Name: #{first_name}, Last Name: #{last_name}")
 
     # Update submitted_for with first name and last name if present
     if first_name.present? || last_name.present?

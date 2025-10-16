@@ -41,6 +41,7 @@ class PermitApplication < ApplicationRecord
       support_requests
       user_group_type
       audience_type
+      supporting_documents
     ] + [{ template_version: :requirement_template }]
 
   API_SEARCH_INCLUDES = %i[

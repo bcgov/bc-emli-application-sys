@@ -6,7 +6,7 @@ module SupportRequests
       :participant
     end
     def audience_type_code
-      :internal
+      :external
     end
     def submission_type_code
       :support_request

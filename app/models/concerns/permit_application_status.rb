@@ -9,6 +9,8 @@ module PermitApplicationStatus
       ApplicationFlow::ApplicationExternalParticipant,
     %w[support_request participant internal] =>
       ApplicationFlow::SupportRequestInternalParticipant,
+    %w[support_request participant external] =>
+      ApplicationFlow::SupportRequestExternalParticipant,
     %w[onboarding contractor external] =>
       ApplicationFlow::OnboardingExternalContractor,
     %w[invoice contractor external] =>

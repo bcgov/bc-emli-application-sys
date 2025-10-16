@@ -69,9 +69,9 @@ module Api::Concerns::Search::PermitApplications
     @audience_types =
       AudienceType.where(code: permitted_params[:filters][:audience_type_id])
     @submission_types =
-      SubmissionType.where(
-        code: permitted_params[:filters][:submission_type_id]
-      )
+      SubmissionType
+        .where(code: permitted_params[:filters][:submission_type_id])
+        .where.not(code: "support_request")
 
     permitted_params
   end
