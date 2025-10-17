@@ -52,6 +52,7 @@ export const ContractorLandingScreen = () => {
           </Text>
           <HStack spacing={4} mt={8} flexDirection={{ base: 'column', md: 'row' }} align="stretch" w="full">
             <RouterLinkButton
+              to="/contractor"
               mt="2"
               w={{ base: '100%', md: '200px' }}
               variant="primaryInverse"
@@ -135,7 +136,7 @@ export const ContractorLandingScreen = () => {
                   <ListItem>{t('landing.contractor.businessNumber')}</ListItem>
                 </UnorderedList>
                 <RouterLinkButton
-                  to="/terms"
+                  to="/contractor"
                   mt="2"
                   variant="primaryInverse"
                   rightIcon={<CaretRight aria-hidden="true" />}
@@ -166,7 +167,7 @@ export const ContractorLandingScreen = () => {
                     ))}
                   </UnorderedList>
                   <RouterLinkButton
-                    to="/terms"
+                    to="/contractor"
                     mt="2"
                     variant="primaryInverse"
                     rightIcon={<CaretRight aria-hidden="true" />}
@@ -189,6 +190,7 @@ export const ContractorLandingScreen = () => {
           </Heading>
           <Text mt={4}>{t('landing.contractor.submitInvoices')}</Text>
           <RouterLinkButton
+            to="/contractor"
             mt={4}
             variant="primaryInverse"
             rightIcon={<CaretRight aria-hidden="true" />}

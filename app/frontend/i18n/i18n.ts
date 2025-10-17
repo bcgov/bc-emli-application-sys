@@ -33,6 +33,7 @@ const options = {
           psrLogin: 'PSR Log in',
           adminMgrLogin: 'Admin Manager Log in',
           sysAdminLogin: 'System Admin Log in',
+          contractorLogin: 'Contractor login',
           sysAdmin: {
             createTitle: 'Create system admin account',
             loginTitle: 'System admin log in',
@@ -110,8 +111,12 @@ const options = {
               description:
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent aliquet pretium ipsum quis interdum. Mauris in dapibus ligula. ',
               ctaText: 'Log in with Business BCeID',
+              loginPrompt: 'You must log in with a Business BCeID account.',
+              loginButton: 'Log in with Business BCeID Account',
               learnMore: 'Learn more about BCeID',
               setupAccount: 'and how to set up an account',
+              needSetup: 'Do you need to set up your Business BCeID account? Get started',
+              here: 'here',
             },
           },
           noAccount: 'Don’t have an account?',

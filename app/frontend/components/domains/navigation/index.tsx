@@ -570,6 +570,7 @@ const AppRoutes = observer(() => {
         {/* TODO: we need to add security around some of the role logins */}
         <Route element={<ProtectedRoute isAllowed={!loggedIn} redirectPath="/" />}>
           <Route path="/login" element={<LoginScreen />} />
+          <Route path="/contractor" element={<AdminPortalLogin isContractor />} />
           <Route path="/admin" element={<AdminPortalLogin isAdmin />} />
           {/* <Route path="/psr" element={<AdminPortalLogin isPSR />} /> */}
           <Route path="/admin-mgr" element={<AdminPortalLogin isAdminMgr />} />
