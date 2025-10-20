@@ -19,6 +19,7 @@ import { BlankTemplateScreen } from '../requirement-template/screens/blank-templ
 import { ContractorLandingScreen } from '../contractor-landing';
 import { ContractorManagementScreen } from '../contractor-management';
 import { ContractorEmployeeIndexScreen } from '../contractor-management/employees';
+import { trackPageViewEvent } from '../../../utils/snowplow';
 
 const ExternalApiKeysIndexScreen = lazy(() =>
   import('../external-api-key').then((module) => ({ default: module.ExternalApiKeysIndexScreen })),
@@ -349,6 +350,20 @@ const AppRoutes = observer(() => {
 
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  // Track page views on route changes (Snowplow)
+  useEffect(() => {
+    // Skip tracking for BC Services Card login route and external BC Gov login pages
+    if (
+      location.pathname.includes('/bcsc') ||
+      window.location.href.includes('idtest.gov.bc.ca') ||
+      window.location.href.includes('id.gov.bc.ca')
+    ) {
+      return;
+    }
+
+    trackPageViewEvent();
+  }, [location.pathname]);
 
   useEffect(() => {
     if (tokenExpired) {

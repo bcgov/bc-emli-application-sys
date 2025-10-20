@@ -579,8 +579,11 @@ Created: 2025-07-28 11:56:24 -0700
 3. Configure environment variables in `.env.docker_compose`:
 
    ```env
-   # For MinIO local S3 setup
-   BCGOV_OBJECT_STORAGE_ENDPOINT=http://127.0.0.1:9001
+   # For MinIO local S3 setup (Docker Compose service)
+   # Internal endpoint for app container to reach MinIO
+   BCGOV_OBJECT_STORAGE_ENDPOINT=http://minio:9000
+   # Public endpoint for browser access (presigned URLs)
+   BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT=http://localhost:9000
    BCGOV_OBJECT_STORAGE_BUCKET=hous-local
    BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID=your-minio-access-key
    BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY=your-minio-secret-key
@@ -589,8 +592,10 @@ Created: 2025-07-28 11:56:24 -0700
    # Database encryption for AWS credentials
    POSTGRES_ENCRYPTION_KEY=your-32-byte-encryption-key
 
-   # Virus scanning (optional)
-   CLAMAV_ENABLED=false  # Enable if you have ClamAV container
+   # Virus scanning (automatically configured via docker-compose.yml)
+   CLAMAV_ENABLED=true
+   CLAMAV_HOST=clamav
+   CLAMAV_PORT=3310
 
    ```
 
@@ -615,25 +620,25 @@ Created: 2025-07-28 11:56:24 -0700
 
 ### Local File Storage Setup (MinIO)
 
-**Install MinIO:**
+**Docker Compose Setup (Recommended):**
 
-```bash
-# macOS
-brew install minio
+MinIO is automatically configured in `docker-compose.yml`. The service runs on:
 
-# Start MinIO server
-minio server --address 127.0.0.1:9001 ~/minio-storage
-```
+- **API Port:** `http://localhost:9000`
+- **Console Port:** `http://localhost:9001`
+- **Default Credentials:** `minioadmin` / `minioadmin123`
 
-**Configure MinIO:**
+**Configure MinIO for Development:**
 
-1. Access MinIO Console: `http://127.0.0.1:9001`
+1. Access MinIO Console: `http://localhost:9001`
 
-2. Create bucket: `hous-local`
+2. Login with credentials: `minioadmin` / `minioadmin123`
 
-3. Create user: `hous-formio-user`
+3. Create bucket: `hous-local`
 
-4. Create policy: `formioupload`
+4. Create user: `hous-formio-user`
+
+5. Create policy: `formioupload`
 
    ```json
    {
@@ -661,32 +666,67 @@ minio server --address 127.0.0.1:9001 ~/minio-storage
    }
    ```
 
-5. Assign policy to user
+6. Assign policy to user
 
-6. Update `.env` with MinIO credentials:
+7. Update `.env.docker_compose` with MinIO credentials:
+
    ```env
-   BCGOV_OBJECT_STORAGE_ENDPOINT=http://127.0.0.1:9001
+   BCGOV_OBJECT_STORAGE_ENDPOINT=http://minio:9000
+   BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT=http://localhost:9000
    BCGOV_OBJECT_STORAGE_BUCKET=hous-local
    BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID=<minio-access-key>
    BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY=<minio-secret-key>
    BCGOV_OBJECT_STORAGE_REGION=us-east-1
    ```
 
-### Local ClamAV Setup (Optional)
+8. **Content Security Policy Configuration:**
 
-**Docker Approach:**
+   The CSP is already configured for MinIO in development at `config/initializers/content_security_policy.rb:14`.
+
+   If using a different MinIO port or external S3 endpoint, update the CSP:
+
+   ```ruby
+   # config/initializers/content_security_policy.rb
+   if Rails.env.development?
+     minio_url = "http://localhost:9000" # Update if using different port
+     policy.connect_src :self, :https, vite_host, reactotron_ws, cable_ws, minio_url
+   end
+   ```
+
+   For production/staging environments using AWS S3 or other endpoints, add the storage endpoint to the CSP:
+
+   ```ruby
+   # In production block
+   storage_endpoint = ENV["BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT"]
+   policy.connect_src :self, :https, cable_ws, storage_endpoint if storage_endpoint.present?
+   ```
+
+**Alternative: Native MinIO Installation:**
 
 ```bash
-# Run ClamAV daemon in Docker
-docker run -d -p 3310:3310 --name clamav clamav/clamav
+# macOS
+brew install minio
 
-# Enable in environment
-CLAMAV_ENABLED=true
-CLAMAV_HOST=localhost
-CLAMAV_PORT=3310
+# Start MinIO server
+minio server --address 127.0.0.1:9000 --console-address 127.0.0.1:9001 ~/minio-storage
 ```
 
-**Native Installation:**
+For native installation, use `http://localhost:9000` for both endpoints in your `.env` file.
+
+### Local ClamAV Setup
+
+**Docker Compose Setup (Recommended):**
+
+ClamAV is automatically configured in `docker-compose.yml`. The service:
+
+- Runs on port `3310`
+- Shares `/tmp/virus_scan` volume with app and sidekiq containers
+- Auto-updates virus definitions via `freshclam`
+- Includes health checks for reliability
+
+**Configuration is automatic** - no manual setup required when using Docker Compose.
+
+**Alternative: Native Installation:**
 
 ```bash
 # macOS
@@ -698,6 +738,11 @@ clamd      # Start daemon
 sudo apt-get install clamav clamav-daemon
 sudo freshclam
 sudo systemctl start clamav-daemon
+
+# Enable in .env
+CLAMAV_ENABLED=true
+CLAMAV_HOST=localhost
+CLAMAV_PORT=3310
 ```
 
 ### Testing File Upload Flow

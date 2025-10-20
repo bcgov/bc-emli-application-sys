@@ -15,6 +15,7 @@ import { theme } from '../styles/theme';
 
 import { useTranslation } from 'react-i18next';
 import '../i18n/i18n';
+import { initializeSnowplow } from '../utils/snowplow';
 
 const nonce = document.querySelector("meta[name='csp-nonce']")?.getAttribute('content') || undefined; //get nonce
 
@@ -54,6 +55,10 @@ const renderApp = (rootStore) => {
 
 document.addEventListener('DOMContentLoaded', () => {
   const rootStore = setupRootStore();
+
+  // Initialize Snowplow analytics
+  initializeSnowplow();
+
   if (import.meta.env.PROD) {
     renderApp(rootStore);
   } else if (import.meta.env.DEV) {
