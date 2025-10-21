@@ -105,6 +105,34 @@ export const RequirementForm = observer(
 
     const infoBoxData = permitApplication.diffToInfoBoxData;
 
+    const [statusItems, setStatusItems] = useState([]);
+
+    useEffect(() => {
+      if (!permitApplication) return;
+
+      const statuses = [];
+
+      if (permitApplication.isSubmitted || permitApplication.isInReview)
+        statuses.push({
+          label: 'Submitted',
+          date: permitApplication.submittedAt,
+        });
+
+      if (permitApplication.reviewedAt)
+        statuses.push({
+          label: 'Reviewed',
+          date: permitApplication.reviewedAt,
+        });
+
+      if (permitApplication.approvedAt)
+        statuses.push({
+          label: 'Approved',
+          date: permitApplication.approvedAt,
+        });
+
+      setStatusItems(statuses);
+    }, [permitApplication]);
+
     useEffect(() => {
       if (shouldShowDiff && userShouldSeeDiff) {
         permitApplication.fetchDiff();
@@ -418,6 +446,14 @@ export const RequirementForm = observer(
       }
     };
     const showVersionDiffContactWarning = shouldShowDiff && !userShouldSeeDiff;
+
+    const latestSupportRequestDate = permitApplication?.latestSupportRequestDate;
+
+    // Safely format or return empty string/null
+    const formattedSupportRequestDate = latestSupportRequestDate
+      ? format(latestSupportRequestDate, 'MMM d, yyyy h:mm a')
+      : '';
+
     return (
       <>
         <Flex
@@ -470,16 +506,39 @@ export const RequirementForm = observer(
               status="warning"
             />
           )}
-          {permitApplication?.isSubmitted && (
+          {formattedSupportRequestDate && (
             <CustomMessageBox
-              description={t('energySavingsApplication.show.applicationSubmitted', {
-                date: permitApplication?.submittedAt
-                  ? format(new Date(permitApplication.submittedAt), 'MMM d, yyyy h:mm a')
-                  : '',
+              description={t('energySavingsApplication.show.supportingFilesRequest.requestedText', {
+                date: formattedSupportRequestDate,
               })}
-              status="info"
+              status="warning"
             />
           )}
+          {permitApplication?.isSubmitted ||
+            (permitApplication?.status === 'in_review' && (
+              <CustomMessageBox
+                description={t('energySavingsApplication.show.applicationSubmitted', {
+                  date: permitApplication?.submittedAt
+                    ? format(new Date(permitApplication.submittedAt), 'MMM d, yyyy h:mm a')
+                    : '',
+                })}
+                status="info"
+              />
+            ))}
+          {/* {statusItems.length > 0 && (
+            <CustomMessageBox
+              status="info"
+              description={
+                <ul>
+                  {statusItems.map((s, idx) => (
+                    <li key={idx}>
+                      {s.label}: {format(new Date(s.date), 'MMM d, yyyy h:mm a')}
+                    </li>
+                  ))}
+                </ul>
+              }
+            />
+          )} */}
           {showVersionDiffContactWarning && (
             <CustomMessageBox
               description={t('energySavingsApplication.show.versionDiffContactWarning')}

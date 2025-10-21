@@ -111,7 +111,6 @@ export const ReviewPermitApplicationScreen = observer(() => {
   // Handle revision mode cancellation
   const handleRevisionCancel = async () => {
     try {
-      1;
       // Clear revision requests created by admin Save Edits
       const ok = await currentPermitApplication.removeRevisionRequests();
 
@@ -281,7 +280,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
           <SandboxHeader borderTopRadius={0} override sandbox={currentPermitApplication.sandbox} position="sticky" />
         )}
       </Flex>
-      {supportRequestDate && (
+      {/* {supportRequestDate && (
         <Flex direction="column" bg="theme.orangeLight02">
           <Flex
             top={permitHeaderHeight}
@@ -317,7 +316,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
             />
           </Flex>
         </Flex>
-      )}
+      )} */}
       <Box id="sidebar-and-form-container" sx={{ '&:after': { content: `""`, display: 'block', clear: 'both' } }}>
         {revisionMode && !hideRevisionList ? (
           <RevisionSideBar

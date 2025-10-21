@@ -16,7 +16,7 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { IPermitApplication } from '../../../models/energy-savings-application';
 import { useMst } from '../../../setup/root';
 import SandboxHeader from '../sandbox/sandbox-header';
@@ -40,6 +40,8 @@ export const PermitApplicationSubmitModal = observer(function PermitApplicationS
   const currentUser = userStore.currentUser;
   const { t } = useTranslation();
 
+  const isSupportRequest = permitApplication.submissionType.code == 'support_request' ? true : false;
+
   return (
     <Modal onClose={onClose} isOpen={isOpen} size="2xl">
       <ModalOverlay />
@@ -61,33 +63,50 @@ export const PermitApplicationSubmitModal = observer(function PermitApplicationS
         <ModalBody py={6}>
           {permitApplication.canUserSubmit(currentUser) ? (
             <Flex direction="column" gap={8}>
-              <Heading as="h3" color="theme.blueAlt">
-                {currentUser.isParticipant
-                  ? t('energySavingsApplication.new.ready')
-                  : 'Ready to submit on someone’s behalf?'}
-              </Heading>
-              <Box
-                borderRadius="md"
-                border="1px solid"
-                borderColor="theme.orange"
-                backgroundColor="semantic.warningLight"
-                px={6}
-                py={3}
-              >
+              {!isSupportRequest && (
+                <Heading as="h3" color="theme.blueAlt">
+                  {currentUser.isParticipant
+                    ? t('energySavingsApplication.new.ready')
+                    : 'Ready to submit on someone’s behalf?'}
+                </Heading>
+              )}
+              {isSupportRequest ? (
                 <HStack spacing={4}>
-                  <Box color={'theme.orange'} alignSelf={'start'}>
-                    <Warning size={24} aria-label={'warning icon'} />
-                  </Box>
-                  <Text>
-                    {currentUser.isParticipant
-                      ? t('energySavingsApplication.new.confirmation')
-                      : t('energySavingsApplication.new.confirmationOnBehalf')}
-                  </Text>
+                  <Heading fontSize={24} color="theme.blueAlt">
+                    {currentUser.isParticipant ? (
+                      <Trans
+                        i18nKey="energySavingsApplication.show.supportingFilesRequest.readyToUpload"
+                        values={{ applicationNumber: permitApplication.number }}
+                      />
+                    ) : (
+                      t('energySavingsApplication.new.confirmationOnBehalf')
+                    )}
+                  </Heading>
                 </HStack>
-              </Box>
+              ) : (
+                <Box
+                  borderRadius="md"
+                  border="1px solid"
+                  borderColor="theme.orange"
+                  backgroundColor="semantic.warningLight"
+                  px={6}
+                  py={3}
+                >
+                  <HStack spacing={4}>
+                    <Box color={'theme.orange'} alignSelf={'start'}>
+                      <Warning size={24} aria-label={'warning icon'} />
+                    </Box>
+                    <Text>
+                      {currentUser.isParticipant
+                        ? t('energySavingsApplication.new.confirmation')
+                        : t('energySavingsApplication.new.confirmationOnBehalf')}
+                    </Text>
+                  </HStack>
+                </Box>
+              )}
               <Flex justify="center" gap={6}>
                 <Button onClick={onSubmit} variant="primary">
-                  {t('ui.submit')}
+                  {isSupportRequest ? t('ui.confirm') : t('ui.submit')}
                 </Button>
                 <Button onClick={onClose} variant="secondary">
                   {t('ui.cancel')}

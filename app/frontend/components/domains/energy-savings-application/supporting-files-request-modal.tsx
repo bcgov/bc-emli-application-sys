@@ -128,7 +128,7 @@ export const SupportingFilesRequestModal = observer(
                 <ModalFooter>
                   <Grid templateColumns="repeat(6, 1fr)" gap={2} justifyContent="center" w="full">
                     <GridItem colStart={3} colSpan={1}>
-                      <PageConfirmationModal onConfirm={handleConfirm} />
+                      <PageConfirmationModal onConfirm={handleConfirm} applicationNumber={permitApplication.number} />
                     </GridItem>
                     <GridItem colStart={4} colSpan={1}>
                       <Button w="full" variant="secondary" onClick={requestDisclosure.onClose}>
@@ -146,7 +146,7 @@ export const SupportingFilesRequestModal = observer(
   },
 );
 
-export const PageConfirmationModal = ({ onConfirm }: { onConfirm: () => void }) => {
+export const PageConfirmationModal = ({ onConfirm, applicationNumber }: { onConfirm: () => void }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { t } = useTranslation();
   const handleConfirm = () => {
@@ -163,9 +163,12 @@ export const PageConfirmationModal = ({ onConfirm }: { onConfirm: () => void }) 
       <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered={false} motionPreset="slideInBottom">
         <ModalOverlay />
         <ModalContent p={4}>
-          <ModalHeader>Confirm submission</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>Are you sure you want to continue with this action?</ModalBody>
+          <ModalBody>
+            <Text as="span" fontSize="lg" color="theme.blueAlt" fontWeight="bold">
+              {`Are you sure you want to request supporting files for ${applicationNumber}`}
+            </Text>
+          </ModalBody>
           <ModalFooter>
             <Grid templateColumns="repeat(6, 1fr)" gap={2} justifyContent="center" w="full">
               <GridItem colStart={3} colSpan={1}>
