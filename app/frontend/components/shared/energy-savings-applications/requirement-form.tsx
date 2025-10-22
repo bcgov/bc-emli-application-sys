@@ -1,7 +1,6 @@
-import { Box, Button, Center, Flex, Link, Text, useDisclosure, VStack } from '@chakra-ui/react';
+import { Box, Center, Flex, Link, useDisclosure } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 
-import { ArrowSquareOut } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 import * as R from 'ramda';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -104,33 +103,32 @@ export const RequirementForm = observer(
     } = useDisclosure();
 
     const infoBoxData = permitApplication.diffToInfoBoxData;
-
-    const [statusItems, setStatusItems] = useState([]);
+    const [applicationNumber, setApplicationNumber] = useState(null);
+    const [infoStatusItems, setInfoStatusItems] = useState([]);
 
     useEffect(() => {
       if (!permitApplication) return;
 
+      const latestSR = permitApplication.latestSubmittedSupportRequestWithDocuments;
       const statuses = [];
 
       if (permitApplication.isSubmitted || permitApplication.isInReview)
         statuses.push({
-          label: 'Submitted',
-          date: permitApplication.submittedAt,
+          label: t('energySavingsApplication.show.applicationSubmitted', {
+            date: permitApplication?.submittedAt
+              ? format(new Date(permitApplication.submittedAt), 'MMM d, yyyy h:mm a')
+              : '',
+          }),
         });
 
-      if (permitApplication.reviewedAt)
+      if (latestSR)
         statuses.push({
-          label: 'Reviewed',
-          date: permitApplication.reviewedAt,
+          label: t('energySavingsApplication.show.supportingFilesRequest.filesAdded', {
+            date: format(new Date(latestSR), 'MMM d, yyyy h:mm a'),
+          }),
         });
 
-      if (permitApplication.approvedAt)
-        statuses.push({
-          label: 'Approved',
-          date: permitApplication.approvedAt,
-        });
-
-      setStatusItems(statuses);
+      setInfoStatusItems(statuses);
     }, [permitApplication]);
 
     useEffect(() => {
@@ -281,10 +279,26 @@ export const RequirementForm = observer(
       }
     };
 
+    const getApplicationNumber = (formData) => {
+      if (!formData || typeof formData !== 'object') return null;
+
+      return (
+        Object.values(formData)
+          .map((section) =>
+            section && typeof section === 'object'
+              ? Object.entries(section).find(([key]) => key.includes('|application_number'))
+              : null,
+          )
+          .filter(Boolean)
+          .map(([, value]) => value)[0] || null
+      );
+    };
+
     const onBlur = (containerComponent) => {
       if (onCompletedBlocksChange) {
         onCompletedBlocksChange(getCompletedBlocksFromForm(containerComponent.root));
       }
+      permitApplication?.setLinkedApplicationNumber(getApplicationNumber(containerComponent.root._data));
     };
     const onScroll = (event) => {
       setFloatErrorBox(hasErrors && isFirstComponentNearTopOfView(firstComponentKey));
@@ -305,6 +319,9 @@ export const RequirementForm = observer(
         // trigger save to rerun compliance and save file
         triggerSave?.({ autosave: true, skipPristineCheck: true });
       }
+
+      const foundAppNumber = getApplicationNumber(formRef.current?._data);
+      permitApplication?.setLinkedApplicationNumber(foundAppNumber);
     };
 
     const onInitialized = (event) => {
@@ -506,7 +523,7 @@ export const RequirementForm = observer(
               status="warning"
             />
           )}
-          {formattedSupportRequestDate && (
+          {formattedSupportRequestDate && isAdminUser && (
             <CustomMessageBox
               description={t('energySavingsApplication.show.supportingFilesRequest.requestedText', {
                 date: formattedSupportRequestDate,
@@ -514,8 +531,8 @@ export const RequirementForm = observer(
               status="warning"
             />
           )}
-          {permitApplication?.isSubmitted ||
-            (permitApplication?.status === 'in_review' && (
+          {/* {permitApplication?.isSubmitted ||
+            (permitApplication?.isInReview && (
               <CustomMessageBox
                 description={t('energySavingsApplication.show.applicationSubmitted', {
                   date: permitApplication?.submittedAt
@@ -524,21 +541,19 @@ export const RequirementForm = observer(
                 })}
                 status="info"
               />
-            ))}
-          {/* {statusItems.length > 0 && (
+            ))} */}
+          {infoStatusItems.length > 0 && (
             <CustomMessageBox
               status="info"
               description={
-                <ul>
-                  {statusItems.map((s, idx) => (
-                    <li key={idx}>
-                      {s.label}: {format(new Date(s.date), 'MMM d, yyyy h:mm a')}
-                    </li>
+                <ul style={{ marginBottom: 0 }}>
+                  {infoStatusItems.map((s, idx) => (
+                    <li key={idx}>{s.label}</li>
                   ))}
                 </ul>
               }
             />
-          )} */}
+          )}
           {showVersionDiffContactWarning && (
             <CustomMessageBox
               description={t('energySavingsApplication.show.versionDiffContactWarning')}

@@ -16,12 +16,11 @@ import {
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { IPermitApplication } from '../../../models/energy-savings-application';
 import { useMst } from '../../../setup/root';
 import SandboxHeader from '../sandbox/sandbox-header';
-import { EUserRoles } from '../../../types/enums';
-import { Warning } from '@phosphor-icons/react';
+import { WarningIcon } from '@phosphor-icons/react';
 
 interface IProps {
   permitApplication: IPermitApplication;
@@ -36,11 +35,11 @@ export const PermitApplicationSubmitModal = observer(function PermitApplicationS
   onSubmit,
   onClose,
 }: IProps) {
-  const { userStore, permitApplicationStore } = useMst();
+  const { userStore } = useMst();
   const currentUser = userStore.currentUser;
   const { t } = useTranslation();
 
-  const isSupportRequest = permitApplication.submissionType.code == 'support_request' ? true : false;
+  const isSupportRequest = permitApplication.submissionType.code === 'support_request' ? true : false;
 
   return (
     <Modal onClose={onClose} isOpen={isOpen} size="2xl">
@@ -73,14 +72,9 @@ export const PermitApplicationSubmitModal = observer(function PermitApplicationS
               {isSupportRequest ? (
                 <HStack spacing={4}>
                   <Heading fontSize={24} color="theme.blueAlt">
-                    {currentUser.isParticipant ? (
-                      <Trans
-                        i18nKey="energySavingsApplication.show.supportingFilesRequest.readyToUpload"
-                        values={{ applicationNumber: permitApplication.number }}
-                      />
-                    ) : (
-                      t('energySavingsApplication.new.confirmationOnBehalf')
-                    )}
+                    {t('energySavingsApplication.show.supportingFilesRequest.readyToUpload', {
+                      applicationNumber: permitApplication.incomingSupportRequests?.parentApplication?.number,
+                    })}
                   </Heading>
                 </HStack>
               ) : (
@@ -94,7 +88,7 @@ export const PermitApplicationSubmitModal = observer(function PermitApplicationS
                 >
                   <HStack spacing={4}>
                     <Box color={'theme.orange'} alignSelf={'start'}>
-                      <Warning size={24} aria-label={'warning icon'} />
+                      <WarningIcon size={24} aria-label={'warning icon'} />
                     </Box>
                     <Text>
                       {currentUser.isParticipant

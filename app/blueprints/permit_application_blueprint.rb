@@ -22,6 +22,11 @@ class PermitApplicationBlueprint < Blueprinter::Base
     association :supporting_documents, blueprint: SupportingDocumentBlueprint
   end
 
+  view :bare_minimum do
+    identifier :id
+    fields :nickname, :status, :number
+  end
+
   view :base do
     identifier :id
     fields :nickname,
@@ -44,6 +49,9 @@ class PermitApplicationBlueprint < Blueprinter::Base
            :missing_pdfs
     #association :permit_type, blueprint: PermitClassificationBlueprint
     association :submission_type,
+                blueprint: PermitClassificationBlueprint,
+                view: :base
+    association :user_group_type,
                 blueprint: PermitClassificationBlueprint,
                 view: :base
     #association :activity, blueprint: PermitClassificationBlueprint
@@ -71,7 +79,9 @@ class PermitApplicationBlueprint < Blueprinter::Base
                 view: :base do |pa, options|
       pa.template_version&.requirement_template&.audience_type
     end
-    association :support_requests, blueprint: SupportRequestBlueprint
+    association :support_requests,
+                blueprint: SupportRequestBlueprint,
+                view: :base
   end
 
   view :jurisdiction_review_inbox do
@@ -144,6 +154,9 @@ class PermitApplicationBlueprint < Blueprinter::Base
     association :submission_versions,
                 blueprint: SubmissionVersionBlueprint,
                 view: :extended
+    association :incoming_support_requests,
+                blueprint: SupportRequestBlueprint,
+                view: :minimal
   end
 
   view :pdf_generation do

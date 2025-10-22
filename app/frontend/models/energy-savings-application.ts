@@ -105,6 +105,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       permitBlockStatusMap: types.map(PermitBlockStatusModel),
       isViewingPastRequests: types.optional(types.boolean, false),
       supportRequests: types.maybeNull(types.array(types.frozen<ISupportRequest>())), // Array of ISupportRequest
+      incomingSupportRequests: types.maybeNull(types.frozen<ISupportRequest>()), // ISupportRequest link to Parent Application
     })
     .extend(withEnvironment())
     .extend(withRootStore())
@@ -589,7 +590,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         // Only return if not approved
         if (latest.status === EPermitApplicationStatus.approved) return null;
 
-        return new Date(latest.createdAt);
+        return latest.createdAt ? new Date(latest.createdAt) : null;
       },
 
       // Strict UI format: YYYY/MM/DD
@@ -602,6 +603,32 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         const day = String(date.getDate()).padStart(2, '0');
 
         return `${year}/${month}/${day}`;
+      },
+
+      get latestSubmittedSupportRequestWithDocuments() {
+        if (!self.supportRequests || self.supportRequests.length === 0) return null;
+
+        const validRequests = self.supportRequests.filter((sr) => {
+          const linked = sr.linkedApplication;
+          if (!linked) return false;
+
+          const hasDocuments = Array.isArray(linked.supportingDocuments) && linked.supportingDocuments.length > 0;
+
+          const validStatus = linked.status === 'submitted' || linked.status === 'newly_submitted';
+
+          return hasDocuments && validStatus;
+        });
+
+        if (validRequests.length === 0) return null;
+
+        // Sort descending by updatedAt
+        const sorted = validRequests.slice().sort((a, b) => {
+          const dateA = new Date(a.linkedApplication.updatedAt).getTime();
+          const dateB = new Date(b.linkedApplication.updatedAt).getTime();
+          return dateB - dateA;
+        });
+
+        return sorted[0].linkedApplication.updatedAt;
       },
     }))
     .actions((self) => ({
@@ -623,6 +650,24 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       },
       updatePermitBlockStatus(permitBlockStatus: IPermitBlockStatus) {
         self.permitBlockStatusMap.put(permitBlockStatus);
+      },
+      setLinkedApplicationNumber(number: string) {
+        if (!number) return;
+
+        // Ensure the object exists
+        if (!self.incomingSupportRequests) {
+          self.incomingSupportRequests = { parentApplication: { number } };
+          return;
+        }
+
+        // Ensure the nested parentApplication exists
+        if (!self.incomingSupportRequests.parentApplication) {
+          self.incomingSupportRequests.parentApplication = { number };
+          return;
+        }
+
+        // update the number into the object
+        self.incomingSupportRequests.parentApplication.number = number;
       },
     }))
     .actions((self) => ({

@@ -1192,7 +1192,7 @@ const options = {
             startApplication: 'Start an application',
             noTemplate: 'No templates available for this program.',
             sucessfulSubmission: 'Application submitted',
-            viewAllSubmissions: 'Return to dashboard',
+            viewAllSubmissions: 'Return to home',
             locationHeading: 'Location for permit',
             submitToOwn:
               'Make sure you are submitting to a jurisdiction that you have inbox access to so that you can see it.',
@@ -1365,6 +1365,7 @@ const options = {
               confirmationText: 'Are you sure you want to request supporting files for {{applicationNumber}}',
               readyToUpload:
                 'Are you ready to upload your supporting file(s) to your application {{applicationNumber}}',
+              filesAdded: 'Supporting files added on {{date}}',
             },
           },
         },

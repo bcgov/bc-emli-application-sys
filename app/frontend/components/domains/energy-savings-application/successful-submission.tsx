@@ -1,5 +1,5 @@
 import { Container, Flex, Heading, Icon, Tag, VStack } from '@chakra-ui/react';
-import { CheckCircle } from '@phosphor-icons/react';
+import { CheckCircleIcon } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,12 @@ export const SuccessfulSubmissionScreen = observer(() => {
   if (error) return <ErrorScreen error={error} />;
   if (!currentPermitApplication?.isFullyLoaded) return <LoadingScreen />;
 
-  const isSupportRequest = currentPermitApplication?.isInReview ? true : false;
+  const isSupportRequest =
+    currentPermitApplication?.submissionType?.code === 'support_request' &&
+    currentPermitApplication?.userGroupType?.code === 'participant'
+      ? true
+      : false;
+
   const { number } = currentPermitApplication;
   const { userStore } = useMst();
 
@@ -30,7 +35,7 @@ export const SuccessfulSubmissionScreen = observer(() => {
   return (
     <Container maxW="container.lg">
       <Flex direction="column" align="center" my={24} gap={8}>
-        <Icon as={CheckCircle} boxSize="14" color="theme.darkGreen" />
+        <Icon as={CheckCircleIcon} boxSize="14" color="theme.darkGreen" />
 
         <VStack>
           <Heading as="h1" color="theme.blueAlt">

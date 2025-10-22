@@ -101,11 +101,11 @@ class PermitApplication < ApplicationRecord
            inverse_of: :parent_application,
            dependent: :destroy
 
-  has_many :incoming_support_requests,
-           class_name: "SupportRequest",
-           foreign_key: :linked_application_id,
-           inverse_of: :linked_application,
-           dependent: :nullify
+  has_one :incoming_support_requests,
+          class_name: "SupportRequest",
+          foreign_key: :linked_application_id,
+          inverse_of: :linked_application,
+          dependent: :nullify
 
   scope :submitted, -> { joins(:submission_versions).distinct }
 

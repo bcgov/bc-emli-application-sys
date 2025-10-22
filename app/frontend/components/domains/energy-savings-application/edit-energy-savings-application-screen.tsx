@@ -44,6 +44,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
   const { t } = useTranslation();
   const formRef = useRef(null);
   const navigate = useNavigate();
+  const [applicationNumber, setApplicationNumber] = useState(null); //used only when admin linking a support request
 
   const getDefaultPermitApplicationMetadataValues = () => ({ nickname: currentPermitApplication?.nickname });
 
@@ -344,6 +345,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 )}
                 {!currentPermitApplication.canUserSubmit(currentUser) && isSubmitBlockedModalOpen && (
                   <PermitApplicationSubmitModal
+                    applicationNumber={applicationNumber}
                     permitApplication={currentPermitApplication}
                     isOpen={isSubmitBlockedModalOpen}
                     onClose={onSubmitBlockedModalClose}
