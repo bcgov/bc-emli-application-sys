@@ -525,6 +525,24 @@ class NotificationService
     end
   end
 
+  def self.publish_supporting_files_requested_event(permit_application)
+    # TODO:
+  end
+
+  def self.publish_supporting_files_sumbitted_event(user, permit_application)
+    # Only notify admin or admin_manager who requested the supporting files
+    notification_user_hash = {}
+
+    # Send in-app notification to admin user who made request that new files were added
+    notification_user_hash[
+      user.id
+    ] = permit_application.publish_supporting_files_sumbitted__data
+
+    unless notification_user_hash.empty?
+      NotificationPushJob.perform_async(notification_user_hash)
+    end
+  end
+
   # this is just a wrapper around the activity's metadata methods
   # since in the case of a single instance it returns a specific return type (eg. Integer)
   # but in the case of multiple user_ids the activity is a hash object

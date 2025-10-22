@@ -22,8 +22,24 @@ module ApplicationFlow
     def handle_submission
       # we don't need to do anything else for this support request because it's for adding files
       # files added here are linked via the SupportRequest. Parent sees the linked_application supportDocuments.
-
+      Rails.logger.info(
+        "External participant support request submitted: #{application.inspect}"
+      )
       application.update(signed_off_at: Time.current)
+
+      support_request =
+        SupportRequest.find_by(linked_application_id: application.id)
+
+      if (support_request)
+        parent_application_id = support_request.parent_application.id
+        requested_by = support_request.requested_by
+        parentApplication = PermitApplication.find(parent_application_id)
+
+        NotificationService.publish_supporting_files_sumbitted_event(
+          requested_by,
+          parentApplication
+        )
+      end
     end
   end
 end

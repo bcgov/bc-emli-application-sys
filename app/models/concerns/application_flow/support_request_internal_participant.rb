@@ -63,7 +63,7 @@ module ApplicationFlow
 
       SupportRequest.create!(
         parent_application: parent_application,
-        requested_by: requested_by_user, # ✅ Always a User instance
+        requested_by: requested_by_user, # user instance
         linked_application: application,
         additional_text: ""
       )

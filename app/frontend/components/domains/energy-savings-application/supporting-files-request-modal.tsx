@@ -57,18 +57,11 @@ export const SupportingFilesRequestModal = observer(
 
     const handleConfirm = async () => {
       try {
-        console.log('Confirmed submit with note:', note);
-
-        // Call your backend
         const result = await permitApplicationStore.requestSupportingFiles(permitApplication.id, { note });
 
-        console.log('Created supporting request for permitApplicationId:', result);
-
-        // Close modals
         confirmDisclosure.onClose();
         requestDisclosure.onClose();
 
-        // Restore focus
         triggerRef.current?.focus();
       } catch (err) {
         console.error('Failed to request supporting files:', err);
