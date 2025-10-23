@@ -20,6 +20,7 @@ module PermitApplicationStatus
   included do
     after_initialize :set_flow
     after_update :check_ineligible_transition
+    after_save :reset_flow_if_status_changed
 
     # Let model calls (like application.submit?) proxy to the flow
     delegate_missing_to :flow
@@ -44,8 +45,11 @@ module PermitApplicationStatus
   end
 
   def flow
+    if @flow && @flow.aasm.current_state.to_s != status
+      Rails.logger.warn "Flow desync detected for #{id}: flow=#{@flow.aasm.current_state}, status=#{status}"
+      @flow = set_flow
+    end
     @flow ||= set_flow
-    @flow
   end
 
   private
@@ -61,5 +65,9 @@ module PermitApplicationStatus
          status == "ineligible"
       flow.handle_ineligible_status
     end
+  end
+
+  def reset_flow_if_status_changed
+    @flow = set_flow if saved_change_to_status?
   end
 end

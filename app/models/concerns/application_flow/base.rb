@@ -16,6 +16,10 @@ module ApplicationFlow
 
     def initialize(application)
       @application = application
+      if application.status.present? &&
+           aasm.states.map(&:name).include?(application.status.to_sym)
+        aasm.current_state = application.status.to_sym
+      end
     end
 
     # persistence wiring for aasm

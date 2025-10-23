@@ -68,6 +68,8 @@ module ApplicationFlow
         additional_text: ""
       )
 
+      #TODO : in app and email notification to participant
+
       Rails.logger.info(
         "Created support request linking #{application.id} (#{application.number}) " \
           "to parent #{parent_application.id} (#{parent_application.number}) " \

@@ -54,7 +54,7 @@ module ApplicationFlow
       end
     end
 
-    # --- Flow-specific handler ---
+    # --- Flow-specific handlers ---
     def handle_submission
       application.update(signed_off_at: Time.current)
 
