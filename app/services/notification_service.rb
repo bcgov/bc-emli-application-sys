@@ -525,12 +525,17 @@ class NotificationService
     end
   end
 
-  def self.publish_supporting_files_requested_event(permit_application)
-    # TODO:
+  def self.publish_supporting_files_requested_event(
+    permit_application,
+    missing_files:
+  )
+    PermitHubMailer.notify_participant_supporting_files_requested(
+      permit_application,
+      missing_files: missing_files
+    )&.deliver_later
   end
 
   def self.publish_supporting_files_sumbitted_event(user, permit_application)
-    # Only notify admin or admin_manager who requested the supporting files
     notification_user_hash = {}
 
     # Send in-app notification to admin user who made request that new files were added

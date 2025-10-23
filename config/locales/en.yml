@@ -163,6 +163,7 @@ en:
       notify_admin_updated_participant_app: 'Your application has been updated'
       notify_participant_incomplete_draft_notification: 'Reminder: Your recently created application'
       notify_new_participant_welcome: 'Welcome to the Better Homes Energy Savings Program'
+      notify_participant_supporting_files_requested: 'Supporting files requested for Application %{permit_application_number}'
   authentication_methods:
     bcsc: 'BC Services Card Account'
     bceidbasic: 'Basic BCeID'

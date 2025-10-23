@@ -256,6 +256,23 @@ class PermitHubMailer < ApplicationMailer
     )
   end
 
+  def notify_participant_supporting_files_requested(
+    permit_application,
+    missing_files:
+  )
+    @permit_application = permit_application
+    @user = permit_application.submitter
+    @missing_files = missing_files
+
+    send_user_mail(
+      email: @user.email,
+      template_key: "notify_participant_supporting_files_requested",
+      subject_i18n_params: {
+        permit_application_number: permit_application.number
+      }
+    )
+  end
+
   def notify_new_participant_welcome(user)
     @user = user
 
