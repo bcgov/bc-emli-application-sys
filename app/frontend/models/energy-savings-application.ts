@@ -651,23 +651,37 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       updatePermitBlockStatus(permitBlockStatus: IPermitBlockStatus) {
         self.permitBlockStatusMap.put(permitBlockStatus);
       },
+      // setLinkedApplicationNumber(number: string) {
+      //   if (!number) return;
+
+      //   // Ensure the object exists
+      //   if (!self.incomingSupportRequests) {
+      //     self.incomingSupportRequests = { parentApplication: { number } };
+      //     return;
+      //   }
+
+      //   // Ensure the nested parentApplication exists
+      //   if (!self.incomingSupportRequests.parentApplication) {
+      //     self.incomingSupportRequests.parentApplication = { number };
+      //     return;
+      //   }
+
+      //   // update the number into the object
+      //   self.incomingSupportRequests.parentApplication.number = number;
+      // },
       setLinkedApplicationNumber(number: string) {
         if (!number) return;
 
-        // Ensure the object exists
-        if (!self.incomingSupportRequests) {
-          self.incomingSupportRequests = { parentApplication: { number } };
-          return;
-        }
+        const current = self.incomingSupportRequests ?? {};
+        const parentApp = current.parentApplication ?? {};
 
-        // Ensure the nested parentApplication exists
-        if (!self.incomingSupportRequests.parentApplication) {
-          self.incomingSupportRequests.parentApplication = { number };
-          return;
-        }
-
-        // update the number into the object
-        self.incomingSupportRequests.parentApplication.number = number;
+        self.incomingSupportRequests = {
+          ...current,
+          parentApplication: {
+            ...parentApp,
+            number,
+          },
+        };
       },
     }))
     .actions((self) => ({
