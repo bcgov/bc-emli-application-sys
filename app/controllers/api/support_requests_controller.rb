@@ -53,7 +53,8 @@ class Api::SupportRequestsController < Api::ApplicationController
 
       NotificationService.publish_supporting_files_requested_event(
         parent_app,
-        missing_files: missing_files
+        missing_files: missing_files,
+        linked_application_id: support_request.linked_application_id
       )
 
       render json:

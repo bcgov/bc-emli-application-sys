@@ -258,11 +258,13 @@ class PermitHubMailer < ApplicationMailer
 
   def notify_participant_supporting_files_requested(
     permit_application,
-    missing_files:
+    missing_files:,
+    linked_application_id:
   )
     @permit_application = permit_application
     @user = permit_application.submitter
     @missing_files = missing_files
+    @linked_application_id = linked_application_id
 
     send_user_mail(
       email: @user.email,

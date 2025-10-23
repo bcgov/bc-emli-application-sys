@@ -527,11 +527,13 @@ class NotificationService
 
   def self.publish_supporting_files_requested_event(
     permit_application,
-    missing_files:
+    missing_files:,
+    linked_application_id:
   )
     PermitHubMailer.notify_participant_supporting_files_requested(
       permit_application,
-      missing_files: missing_files
+      missing_files: missing_files,
+      linked_application_id: linked_application_id
     )&.deliver_later
   end
 
