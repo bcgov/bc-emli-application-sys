@@ -41,6 +41,7 @@ class PermitApplication < ApplicationRecord
       support_requests
       user_group_type
       audience_type
+      supporting_documents
     ] + [{ template_version: :requirement_template }]
 
   API_SEARCH_INCLUDES = %i[
@@ -100,11 +101,11 @@ class PermitApplication < ApplicationRecord
            inverse_of: :parent_application,
            dependent: :destroy
 
-  has_many :incoming_support_requests,
-           class_name: "SupportRequest",
-           foreign_key: :linked_application_id,
-           inverse_of: :linked_application,
-           dependent: :nullify
+  has_one :incoming_support_requests,
+          class_name: "SupportRequest",
+          foreign_key: :linked_application_id,
+          inverse_of: :linked_application,
+          dependent: :nullify
 
   scope :submitted, -> { joins(:submission_versions).distinct }
 
@@ -695,6 +696,29 @@ class PermitApplication < ApplicationRecord
     }
   end
 
+  def publish_supporting_files_sumbitted__data
+    latest_linked =
+      support_requests
+        .map(&:linked_application)
+        .compact
+        .select { |app| %w[submitted newly_submitted].include?(app.status) }
+        .max_by(&:updated_at)
+
+    uploaded_date = latest_linked&.updated_at || updated_at
+
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::SUPPORTING_FILES_UPDLOADED,
+      "action_text" =>
+        "#{I18n.t("notification.support_request.supporting_files_uploaded", application_number: number, uploaded_date: I18n.l(uploaded_date, format: :long))}",
+      "object_data" => {
+        "permit_application_id" => id,
+        "permit_application_number" => number
+      }
+    }
+  end
+
   def application_assignment_event_notification_data
     {
       "id" => SecureRandom.uuid,
@@ -729,20 +753,6 @@ class PermitApplication < ApplicationRecord
         Constants::NotificationActionTypes::PARTICIPANT_INCOMPLETE_DRAFT_NOTIFICATION,
       "action_text" =>
         "#{I18n.t("notification.permit_application.participant_incomplete_draft_notification", number: number, program_name: program_name)}",
-      "object_data" => {
-        "permit_application_id" => id,
-        "permit_application_number" => number
-      }
-    }
-  end
-
-  def participant_uploaded_supporting_files_event_notification_data
-    {
-      "id" => SecureRandom.uuid,
-      "action_type" =>
-        Constants::NotificationActionTypes::SUPPORTING_FILES_UPDLOADED,
-      "action_text" =>
-        "#{I18n.t("notification.permit_application.supporting_files_uploaded", uploaded_date: uploaded_date)}",
       "object_data" => {
         "permit_application_id" => id,
         "permit_application_number" => number

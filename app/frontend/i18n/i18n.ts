@@ -1192,7 +1192,7 @@ const options = {
             startApplication: 'Start an application',
             noTemplate: 'No templates available for this program.',
             sucessfulSubmission: 'Application submitted',
-            viewAllSubmissions: 'View all submissions',
+            viewAllSubmissions: 'Return to home',
             locationHeading: 'Location for permit',
             submitToOwn:
               'Make sure you are submitting to a jurisdiction that you have inbox access to so that you can see it.',
@@ -1362,6 +1362,10 @@ const options = {
                 'List the required files below, one line per file. Each line will be a bullet point in the email to the participant.',
               requestedHeader: 'Supporting files requested',
               requestedText: 'Supporting files have been requested from the participant on {{date}}',
+              confirmationText: 'Are you sure you want to request supporting files for {{applicationNumber}}',
+              readyToUpload:
+                'Are you ready to upload your supporting file(s) to your application {{applicationNumber}}',
+              filesAdded: 'Supporting files added on {{date}}',
             },
           },
         },

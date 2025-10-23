@@ -51,7 +51,14 @@ export const CustomMessageBox = ({
             </Heading>
           )}
 
-          {typeof description === 'string' ? <ReactMarkdown>{description}</ReactMarkdown> : <Text>{description}</Text>}
+          {/* {typeof description === 'string' ? <ReactMarkdown>{description}</ReactMarkdown> : <Text>{description}</Text>} */}
+          {typeof description === 'string' ? (
+            <Text>{description}</Text>
+          ) : React.isValidElement(description) ? (
+            description
+          ) : (
+            <Text>{description}</Text>
+          )}
           {children}
         </Flex>
       </Flex>

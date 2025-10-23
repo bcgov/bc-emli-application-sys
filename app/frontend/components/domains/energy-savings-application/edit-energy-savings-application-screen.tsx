@@ -44,6 +44,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
   const { t } = useTranslation();
   const formRef = useRef(null);
   const navigate = useNavigate();
+  const [applicationNumber, setApplicationNumber] = useState(null); //used only when admin linking a support request
 
   const getDefaultPermitApplicationMetadataValues = () => ({ nickname: currentPermitApplication?.nickname });
 
@@ -266,6 +267,8 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
     currentUser?.id ===
       currentPermitApplication?.getCollaborationDelegatee(ECollaborationType.submission)?.collaborator?.user?.id;
 
+  const isInReview = currentPermitApplication?.isInReview;
+
   return (
     <Box as="main" id="submitter-view-permit">
       {!isStepCode && (
@@ -299,7 +302,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               </Flex>
             </HStack>
 
-            {isSubmitted || isIneligible ? (
+            {isSubmitted || isIneligible || isInReview ? (
               <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
                 <SubmissionDownloadModal permitApplication={currentPermitApplication} />
                 <Button rightIcon={<CaretRight />} onClick={() => navigate('/')}>
@@ -323,32 +326,26 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                     {t('energySavingsApplication.edit.withdrawl')}
                   </Button>
                 )}
-                {currentPermitApplication?.isInReview && currentUser.isParticipant ? (
-                  <Button rightIcon={<CaretRight />} onClick={() => navigate('/')}>
-                    {t('energySavingsApplication.edit.back')}
-                  </Button>
-                ) : (
-                  !currentPermitApplication?.isIneligible && (
-                    <>
-                      <Button variant="primary" onClick={handleClickFinishLater}>
-                        {t('energySavingsApplication.edit.saveDraft')}
-                      </Button>
-                      <Button
-                        rightIcon={<CaretRight />}
-                        onClick={
-                          currentPermitApplication.canUserSubmit(currentUser)
-                            ? handleScrollToBottom
-                            : onSubmitBlockedModalOpen
-                        }
-                      >
-                        {t('energySavingsApplication.edit.submit')}
-                      </Button>
-                    </>
-                  )
+                {!currentPermitApplication?.isIneligible && (
+                  <>
+                    <Button variant="primary" onClick={handleClickFinishLater}>
+                      {t('energySavingsApplication.edit.saveDraft')}
+                    </Button>
+                    <Button
+                      rightIcon={<CaretRight />}
+                      onClick={
+                        currentPermitApplication.canUserSubmit(currentUser)
+                          ? handleScrollToBottom
+                          : onSubmitBlockedModalOpen
+                      }
+                    >
+                      {t('energySavingsApplication.edit.submit')}
+                    </Button>
+                  </>
                 )}
-
                 {!currentPermitApplication.canUserSubmit(currentUser) && isSubmitBlockedModalOpen && (
                   <PermitApplicationSubmitModal
+                    applicationNumber={applicationNumber}
                     permitApplication={currentPermitApplication}
                     isOpen={isSubmitBlockedModalOpen}
                     onClose={onSubmitBlockedModalClose}

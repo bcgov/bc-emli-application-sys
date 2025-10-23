@@ -163,6 +163,7 @@ en:
       notify_admin_updated_participant_app: 'Your application has been updated'
       notify_participant_incomplete_draft_notification: 'Reminder: Your recently created application'
       notify_new_participant_welcome: 'Welcome to the Better Homes Energy Savings Program'
+      notify_participant_supporting_files_requested: 'Supporting files requested for Application %{permit_application_number}'
   authentication_methods:
     bcsc: 'BC Services Card Account'
     bceidbasic: 'Basic BCeID'
@@ -780,7 +781,7 @@ en:
       assignment_notification: 'Application %{number} from %{program_name} has been assigned to you'
       participant_incomplete_draft_notification: 'This is a reminder that your application to the %{program_name} is still in draft. You can complete your application by viewing it here'
     support_request:
-      supporting_files_uploaded: 'Supporting files have been uploaded to this application on %{uploaded_date}'
+      supporting_files_uploaded: 'Supporting files added to application %{application_number} on %{uploaded_date}'
     user:
       account_update_notification: 'Your account was updated on %{updated_at}. Changes: %{changed_fields}. If you did not make this change, please contact support immediately.'
     permit_collaboration:

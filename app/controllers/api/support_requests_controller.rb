@@ -48,7 +48,14 @@ class Api::SupportRequestsController < Api::ApplicationController
     if support_request.persisted?
       parent_app.reload
 
-      #TODO: this is where the notification email to the participant needs to happen
+      missing_files =
+        params[:note].to_s.split(/\r?\n/).map(&:strip).reject(&:blank?)
+
+      NotificationService.publish_supporting_files_requested_event(
+        parent_app,
+        missing_files: missing_files,
+        linked_application_id: support_request.linked_application_id
+      )
 
       render json:
                PermitApplicationBlueprint.render(parent_app, view: :extended),
