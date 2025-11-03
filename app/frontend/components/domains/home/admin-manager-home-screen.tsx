@@ -74,14 +74,9 @@ export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
             <HomeScreenBox
               title={t('home.contractorProgramResources')}
               description=""
-              //description={t('home.contractorDescription')}
               icon={<File size={24} />}
-              href="/contractor-management"
-              pointerEvents="none"
+              href="/contractor-program-resources"
               h="full"
-              bg="greys.grey10"
-              headingColor="greys.homeScreenGrey"
-              linkText={t('ui.comingSoon')}
             />
 
             <HomeScreenBox

@@ -19,6 +19,7 @@ import { BlankTemplateScreen } from '../requirement-template/screens/blank-templ
 import { ContractorLandingScreen } from '../contractor-landing';
 import { ContractorManagementScreen } from '../contractor-management';
 import { ContractorEmployeeIndexScreen } from '../contractor-management/employees';
+import { ContractorProgramResourcesScreen } from '../contractor-management/contractor-program-resources-screen';
 import { trackPageViewEvent } from '../../../utils/snowplow';
 
 const ExternalApiKeysIndexScreen = lazy(() =>
@@ -433,6 +434,7 @@ const AppRoutes = observer(() => {
       <Route path="/contractor-management" element={<ContractorManagementScreen />} />
       <Route path="/contractor-management/:contractorId/employees" element={<ContractorEmployeeIndexScreen />} />
       <Route path="/contractor-management/:contractorId/invite-employee" element={<InviteEmployeeScreen />} />
+      <Route path="/contractor-program-resources" element={<ContractorProgramResourcesScreen />} />
       <Route path="/audit-log" element={<AuditLogScreen />} />
     </>
   );
