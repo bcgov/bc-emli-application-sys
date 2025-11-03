@@ -29,9 +29,9 @@ export const EmployeeUserInput = observer(({ index, remove }: IEmployeeUserInput
 
   return (
     <Flex bg="greys.grey03" p={4} borderRadius="md" flexWrap="wrap">
-      <HStack spacing={4} w="full">
-        <EmailFormControl fieldName={`users.${index}.email`} validate required />
-        <TextFormControl label="Name" fieldName={`users.${index}.name`} required />
+      <HStack spacing={4} w="full" alignItems="flex-start">
+        <TextFormControl label="Name" fieldName={`users.${index}.name`} required flex={1} />
+        <EmailFormControl fieldName={`users.${index}.email`} validate required flex={1} />
         <Box alignSelf="flex-end" minW={150}>
           {isSubmitting ? (
             <SharedSpinner position="relative" top={4} left={5} minW="fit-content" />

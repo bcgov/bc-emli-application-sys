@@ -66,12 +66,8 @@ export const AdminHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               title={t('home.contractorProgramResources')}
               description=""
               icon={<File size={24} />}
-              href="/contractor-management"
-              pointerEvents="none"
+              href="/contractor-program-resources"
               h="full"
-              bg="greys.grey10"
-              headingColor="greys.homeScreenGrey"
-              linkText={t('ui.comingSoon')}
             />
           </Flex>
         </Flex>

@@ -844,11 +844,11 @@ en:
       program: 'Program'
       lastUpdated: 'Last updated'
     management:
-      title: 'Contractor Management'
+      title: 'Manage contractor details'
       addButton: 'Add Contractor'
     actions:
       manage: 'Manage'
-      inviteEmployee: 'Invite Employee'
+      inviteEmployee: 'Invite Employees'
       viewEmployees: 'View Employees'
       editContractor: 'Edit Contractor'
       suspendContractor: 'Suspend Contractor'

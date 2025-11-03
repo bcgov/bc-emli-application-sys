@@ -20,7 +20,7 @@ type TInviteFormData = {
 
 export const InviteEmployeeScreen = observer(({}: IInviteEmployeeScreenProps) => {
   const { t } = useTranslation();
-  const { userStore } = useMst();
+  const { userStore, contractorStore } = useMst();
   const { contractorId } = useParams<{ contractorId: string }>();
 
   const { currentUser, resetInvitationResponse, fetchActivePrograms, setInvitationResponse, takenEmails } = userStore;
@@ -55,7 +55,13 @@ export const InviteEmployeeScreen = observer(({}: IInviteEmployeeScreenProps) =>
     resetInvitationResponse();
     // Fetch active programs for current user
     fetchActivePrograms();
-  }, []);
+    // Fetch contractor details
+    if (contractorId) {
+      contractorStore.fetchContractor(contractorId).then(() => {
+        contractorStore.setCurrentContractor(contractorId);
+      });
+    }
+  }, [contractorId]);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -111,7 +117,11 @@ export const InviteEmployeeScreen = observer(({}: IInviteEmployeeScreenProps) =>
           <Heading as="h1" color="theme.blueAlt">
             {t('user.inviteEmployeesTitle')}
           </Heading>
+
           <Text>{t('user.inviteEmployeesDescription')}</Text>
+          <Text fontWeight="bold" fontSize="2xl" mt={4}>
+            {contractorStore.currentContractor?.businessName}
+          </Text>
         </Flex>
         <FormProvider {...formMethods}>
           <form onSubmit={handleSubmit(onSubmit)}>

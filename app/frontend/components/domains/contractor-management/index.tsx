@@ -42,7 +42,7 @@ export const ContractorManagementScreen = observer(function ContractorManagement
       <VStack alignItems={'flex-start'} spacing={5} w={'full'} h={'full'}>
         <Box>
           <Heading as="h1" color={'theme.blueAlt'}>
-            {t('contractor.management.title', 'Contractor Management')}
+            {t('contractor.management.title', 'Manage contractor details')}
           </Heading>
         </Box>
         <Flex
