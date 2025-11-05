@@ -13,9 +13,13 @@ interface IProps {
 
 export const SearchInput = observer(function SearchInput(props: IProps) {
   const { query, onQueryChange, inputGroupProps = {}, inputProps } = props;
+  const inputId = `search-input-${Math.random().toString(36).substring(2, 11)}`;
+
   return (
     <InputGroup as={'section'} bg={'white'} {...inputGroupProps} w={inputGroupProps?.w ?? { md: '20%', base: 'full' }}>
       <Input
+        id={inputId}
+        aria-label={inputProps?.placeholder || 'Search'}
         title={'search input'}
         type={'search'}
         placeholder={'Search'}
@@ -24,9 +28,11 @@ export const SearchInput = observer(function SearchInput(props: IProps) {
         value={query ?? ''}
         h="38px"
         borderColor="border.input"
+        role="searchbox"
+        aria-describedby={`${inputId}-description`}
         {...inputProps}
       />
-      <InputLeftElement color={'greys.grey01'}>
+      <InputLeftElement color={'greys.grey01'} aria-hidden="true">
         <MagnifyingGlass size={16} />
       </InputLeftElement>
     </InputGroup>

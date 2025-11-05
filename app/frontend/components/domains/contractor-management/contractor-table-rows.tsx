@@ -34,11 +34,14 @@ export const ContractorRow = observer(({ contractor }: ContractorRowProps) => {
   };
 
   const handleSuspend = async () => {
-    if (
-      window.confirm(t('contractor.management.confirmSuspend', 'Are you sure you want to suspend this contractor?'))
-    ) {
+    if (window.confirm(t('contractor.management.confirmSuspend'))) {
       // TODO: Implement suspend functionality
-      console.log('Suspend contractor:', contractor.id);
+    }
+  };
+
+  const handleRemove = async () => {
+    if (window.confirm(t('contractor.management.confirmDelete'))) {
+      // TODO: Implement remove functionality
     }
   };
 
@@ -53,42 +56,138 @@ export const ContractorRow = observer(({ contractor }: ContractorRowProps) => {
 
   return (
     <Box key={contractor.id} className="contractor-index-grid-row" role="row" display="contents">
-      <SearchGridItem fontSize="sm">{contractor.id}</SearchGridItem>
-      <SearchGridItem fontSize="sm">{contractor.contactName}</SearchGridItem>
-      <SearchGridItem fontSize="sm">{contractor.contact?.email || '-'}</SearchGridItem>
-      <SearchGridItem fontSize="sm" maxWidth="300px" sx={{ wordBreak: 'break-word' }}>
-        {contractor.businessName}
+      <SearchGridItem fontSize="sm" role="cell">
+        <span aria-label={`Contractor ID: ${contractor.id}`}>{contractor.id}</span>
       </SearchGridItem>
-      <SearchGridItem fontSize="sm">{t('contractor.fields.programPlaceholder', 'N/A')}</SearchGridItem>
-      <SearchGridItem fontSize="sm">{formatDate(contractor.updatedAt)}</SearchGridItem>
-      <SearchGridItem>
+      <SearchGridItem fontSize="sm" role="cell">
+        <span aria-label={`Primary contact name: ${contractor.contactName || 'Not specified'}`}>
+          {contractor.contactName}
+        </span>
+      </SearchGridItem>
+      <SearchGridItem fontSize="sm" role="cell">
+        <span aria-label={`Primary email: ${contractor.contact?.email || 'Not specified'}`}>
+          {contractor.contact?.email || '-'}
+        </span>
+      </SearchGridItem>
+      <SearchGridItem fontSize="sm" maxWidth="300px" sx={{ wordBreak: 'break-word' }} role="cell">
+        <span aria-label={`Doing business as: ${contractor.businessName}`}>{contractor.businessName}</span>
+      </SearchGridItem>
+      <SearchGridItem fontSize="sm" role="cell">
+        <span aria-label={`Program name: ${t('contractor.fields.programPlaceholder', 'N/A')}`}>
+          {t('contractor.fields.programPlaceholder', 'N/A')}
+        </span>
+      </SearchGridItem>
+      <SearchGridItem fontSize="sm" role="cell">
+        <span aria-label={`Last updated: ${formatDate(contractor.updatedAt)}`}>{formatDate(contractor.updatedAt)}</span>
+      </SearchGridItem>
+      <SearchGridItem role="cell">
         <Flex justify="center">
           <Menu>
             <MenuButton
-              as={Link}
+              as="button"
               color="black"
               textDecoration="underline"
               _hover={{ textDecoration: 'underline', color: 'theme.blue' }}
+              _focus={{
+                outline: '2px solid',
+                outlineColor: 'theme.blue',
+                outlineOffset: '2px',
+                textDecoration: 'underline',
+              }}
               fontSize="sm"
               fontWeight="normal"
               cursor="pointer"
+              bg="transparent"
+              border="none"
+              p={1}
+              tabIndex={0}
+              aria-label={`Manage actions for contractor ${contractor.businessName}`}
+              aria-haspopup="menu"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  // The menu will handle opening automatically
+                }
+              }}
             >
               {t('contractor.actions.manage')}
             </MenuButton>
-            <MenuList>
-              <MenuItem icon={<Envelope />} onClick={handleInviteEmployee}>
+            <MenuList role="menu" aria-label="Contractor management actions" _focus={{ outline: 'none' }}>
+              <MenuItem
+                icon={<Envelope />}
+                onClick={handleInviteEmployee}
+                role="menuitem"
+                aria-label={`Invite employees for ${contractor.businessName}`}
+                _focus={{ bg: 'blue.50', outline: 'none' }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleInviteEmployee();
+                  }
+                }}
+              >
                 {t('contractor.actions.inviteEmployee')}
               </MenuItem>
-              <MenuItem icon={<Users />} onClick={handleViewEmployees}>
+              <MenuItem
+                icon={<Users />}
+                onClick={handleViewEmployees}
+                role="menuitem"
+                aria-label={`View employees for ${contractor.businessName}`}
+                _focus={{ bg: 'blue.50', outline: 'none' }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleViewEmployees();
+                  }
+                }}
+              >
                 {t('contractor.actions.viewEmployees')}
               </MenuItem>
-              <MenuItem icon={<PencilSimple />} onClick={handleEdit}>
+              <MenuItem
+                icon={<PencilSimple />}
+                onClick={handleEdit}
+                role="menuitem"
+                aria-label={`Edit contractor details for ${contractor.businessName}`}
+                _focus={{ bg: 'blue.50', outline: 'none' }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleEdit();
+                  }
+                }}
+              >
                 {t('contractor.actions.editContractor')}
               </MenuItem>
-              <MenuItem icon={<HourglassMedium />} onClick={handleSuspend}>
+              <MenuItem
+                icon={<HourglassMedium />}
+                onClick={handleSuspend}
+                role="menuitem"
+                aria-label={`Suspend contractor ${contractor.businessName}`}
+                _focus={{ bg: 'blue.50', outline: 'none' }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleSuspend();
+                  }
+                }}
+              >
                 {t('contractor.actions.suspendContractor')}
               </MenuItem>
-              <MenuItem icon={<Trash />} color="red.500">
+              <MenuItem
+                icon={<Trash />}
+                onClick={handleRemove}
+                color="red.500"
+                role="menuitem"
+                aria-label={`Remove contractor ${contractor.businessName}`}
+                _focus={{ bg: 'red.50', outline: 'none' }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleRemove();
+                  }
+                }}
+              >
                 {t('contractor.actions.removeContractor')}
               </MenuItem>
             </MenuList>

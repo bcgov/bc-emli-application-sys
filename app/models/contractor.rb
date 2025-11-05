@@ -1,7 +1,7 @@
 class Contractor < ApplicationRecord
   searchkick(
     callbacks: false,
-    searchable: %i[business_name contact_name contact_email],
+    searchable: %i[id business_name contact_name contact_email],
     word_middle: %i[business_name contact_name contact_email]
   )
 

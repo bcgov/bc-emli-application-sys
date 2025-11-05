@@ -21,6 +21,7 @@ export const ContractorStoreModel = types
       contractorsMap: types.map(ContractorModel),
       tableContractors: types.array(types.reference(ContractorModel)),
       currentContractor: types.maybeNull(types.safeReference(ContractorModel)),
+      statusFilter: types.optional(types.enumeration(['active', 'suspended', 'removed']), 'active'),
     }),
     createSearchModel<EContractorSortFields>('searchContractors'),
   )
@@ -88,6 +89,11 @@ export const ContractorStoreModel = types
     setCurrentContractor(contractorId: string | null) {
       self.currentContractor = contractorId;
     },
+    setStatusFilter(status: 'active' | 'suspended' | 'removed') {
+      self.statusFilter = status;
+      // Trigger a new search with the status filter
+      (self as any).searchContractors({ reset: true });
+    },
   }))
   .actions((self) => ({
     searchContractors: flow(function* (
@@ -106,6 +112,7 @@ export const ContractorStoreModel = types
         sort: self.sort,
         page: opts.page ?? self.currentPage,
         perPage: opts.countPerPage ?? self.countPerPage,
+        status: self.statusFilter,
       };
 
       const response = yield self.environment.api.fetchContractors(searchParams);
