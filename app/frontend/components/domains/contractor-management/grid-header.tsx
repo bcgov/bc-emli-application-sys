@@ -21,7 +21,7 @@ export const ContractorGridHeaders = observer(() => {
             <Text role={'heading'} fontSize="lg">
               {t('contractor.management.tableHeading')}
             </Text>
-            <Flex gap={3} maxW="500px" w="fit-content">
+            <Flex gap={3} maxW="500px" w="fit-content" alignItems="center">
               <Box minW="300px" w="300px">
                 <ModelSearchInput
                   searchModel={contractorStore}
@@ -30,10 +30,15 @@ export const ContractorGridHeaders = observer(() => {
                     w: '100%',
                   }}
                   inputProps={{
-                    placeholder: t('contractor.management.searchPlaceholder'),
+                    id: 'contractor-search',
+                    placeholder: t('contractor.management.searchPlaceholder', 'Search by ID, name, or email'),
                     borderColor: 'greys.lightGrey',
                     _placeholder: { color: 'greys.grey' },
                     size: 'md',
+                    'aria-label': t(
+                      'contractor.management.searchAriaLabel',
+                      'Search contractors by ID, business name, contact name, or email',
+                    ),
                   }}
                 />
               </Box>

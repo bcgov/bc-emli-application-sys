@@ -3017,7 +3017,7 @@ const options = {
             searchPlaceholder: 'Search',
             tableHeading: 'Contractor accounts',
             confirmSuspend: 'Are you sure you want to suspend this contractor?',
-            confirmDelete: 'Are you sure you want to remove this contractor? This action cannot be undone.',
+            confirmDelete: 'Are you sure you want to remove this contractor?',
           },
           tabs: {
             active: 'Active',

@@ -524,6 +524,14 @@ const NavBarMenu = observer(function NavBarMenu() {
 
                   <MenuDivider my={0} borderColor="border.light" />
 
+                  {/* Admin Manager items */}
+                  {currentUser?.isAdminManager && (
+                    <NavMenuItem
+                      label={t('contractor.management.title', 'Manage contractor details')}
+                      to={'/contractor-management'}
+                    />
+                  )}
+
                   {/* Admin-only items */}
                   {(currentUser?.isReviewManager || currentUser?.isSuperAdmin) && (
                     <NavMenuItem label={t('home.auditLogTitle')} to={`/audit-log`} />

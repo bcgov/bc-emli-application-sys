@@ -1,10 +1,10 @@
-import { Grid, GridProps } from "@chakra-ui/react"
-import React, { ReactNode } from "react"
+import { Grid, GridProps } from '@chakra-ui/react';
+import React, { ReactNode } from 'react';
 
-interface ISearchGridProps extends Partial<Omit<GridProps, "templateColumns">> {
-  children: ReactNode
-  templateColumns: string
-  gridRowClassName?: string
+interface ISearchGridProps extends Partial<Omit<GridProps, 'templateColumns'>> {
+  children: ReactNode;
+  templateColumns: string;
+  gridRowClassName?: string;
 }
 
 export const SearchGrid = ({
@@ -17,6 +17,7 @@ export const SearchGrid = ({
   return (
     <Grid
       role={'table'}
+      aria-label="Contractors table"
       templateColumns={templateColumns}
       w="full"
       maxW={'full'}
@@ -45,4 +46,4 @@ export const SearchGrid = ({
       {children}
     </Grid>
   );
-}
+};

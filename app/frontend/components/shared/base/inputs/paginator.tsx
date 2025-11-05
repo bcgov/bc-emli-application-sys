@@ -1,15 +1,15 @@
-import { Box, Button, IconButton } from "@chakra-ui/react"
-import { css } from "@emotion/react"
-import Pagination, { PaginationProps } from "rc-pagination"
-import "rc-pagination/assets/index.css"
+import { Box, Button, IconButton } from '@chakra-ui/react';
+import { css } from '@emotion/react';
+import Pagination, { PaginationProps } from 'rc-pagination';
+import 'rc-pagination/assets/index.css';
 
-import { CaretLeft, CaretRight } from "@phosphor-icons/react"
-import { observer } from "mobx-react-lite"
-import React from "react"
+import { CaretLeft, CaretRight } from '@phosphor-icons/react';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
 
-interface IPaginatorProps extends Omit<PaginationProps, "itemRender"> {
-  handlePageChange: (page: number) => void | Promise<void>
-  totalPages: number
+interface IPaginatorProps extends Omit<PaginationProps, 'itemRender'> {
+  handlePageChange: (page: number) => void | Promise<void>;
+  totalPages: number;
 }
 
 export const Paginator = observer(({ handlePageChange, totalPages, ...paginationProps }: IPaginatorProps) => {
@@ -26,13 +26,13 @@ export const Paginator = observer(({ handlePageChange, totalPages, ...pagination
     .rc-pagination-options {
       display: none !important;
     }
-  `
+  `;
 
   const ItemRender = (pageToTransitionTo: number, type: string, element: React.ReactNode) => {
-    if (type === "page") {
+    if (type === 'page') {
       return (
         <Button
-          variant={pageToTransitionTo === paginationProps.current ? "primary" : "primaryInverse"}
+          variant={pageToTransitionTo === paginationProps.current ? 'primary' : 'primaryInverse'}
           border={pageToTransitionTo === paginationProps.current ? undefined : 0}
           size="sm"
           mx={1}
@@ -40,9 +40,9 @@ export const Paginator = observer(({ handlePageChange, totalPages, ...pagination
         >
           {pageToTransitionTo}
         </Button>
-      )
+      );
     }
-    if (type === "prev") {
+    if (type === 'prev') {
       return (
         <IconButton
           variant="primaryInverse"
@@ -55,13 +55,13 @@ export const Paginator = observer(({ handlePageChange, totalPages, ...pagination
             </Box>
           }
           onClick={() => handlePageChange(pageToTransitionTo)}
-          aria-label={"previous page"}
-          _after={{ display: "none !important" }}
+          aria-label={'previous page'}
+          _after={{ display: 'none !important' }}
           isDisabled={pageToTransitionTo === 0}
         ></IconButton>
-      )
+      );
     }
-    if (type === "next") {
+    if (type === 'next') {
       return (
         <IconButton
           variant="primaryInverse"
@@ -74,20 +74,26 @@ export const Paginator = observer(({ handlePageChange, totalPages, ...pagination
             </Box>
           }
           onClick={() => handlePageChange(pageToTransitionTo)}
-          aria-label={"next page"}
-          _after={{ display: "none !important" }}
+          aria-label={'next page'}
+          _after={{ display: 'none !important' }}
           isDisabled={
             totalPages === 0 || (totalPages === pageToTransitionTo && pageToTransitionTo === paginationProps.current)
           }
         ></IconButton>
-      )
+      );
     }
-    return element
-  }
+    return element;
+  };
 
   return (
-    <Box display="flex" justifyContent="center" css={paginationItemStyle}>
+    <Box
+      display="flex"
+      justifyContent="center"
+      css={paginationItemStyle}
+      role="navigation"
+      aria-label="Pagination navigation"
+    >
       <Pagination style={{ border: 0 }} itemRender={ItemRender} onChange={() => {}} {...paginationProps} />
     </Box>
-  )
-})
+  );
+});
