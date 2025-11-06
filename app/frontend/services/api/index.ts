@@ -417,6 +417,16 @@ export class Api {
     });
   }
 
+  async createContractorOnboarding(contractorId: string) {
+    return this.client.post<ApiResponse<any>>(`/contractor_onboards`, {
+      contractor_id: contractorId,
+    });
+  }
+
+  async getContractorOnboarding(contractorId: string) {
+    return this.client.get<ApiResponse<any>>(`/contractor_onboards/${contractorId}`);
+  }
+
   async updateUserRole(id: string, role: string) {
     return this.client.patch<ApiResponse<IUser>>(`/users/${id}/role`, { role });
   }

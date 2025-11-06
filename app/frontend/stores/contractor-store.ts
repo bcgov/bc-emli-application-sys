@@ -89,6 +89,11 @@ export const ContractorStoreModel = types
     setCurrentContractor(contractorId: string | null) {
       self.currentContractor = contractorId;
     },
+    findByContactId(contactId: string) {
+      return (
+        Array.from(self.contractorsMap.values()).find((contractor) => contractor.contact?.id === contactId) || null
+      );
+    },
     setStatusFilter(status: 'active' | 'suspended' | 'removed') {
       self.statusFilter = status;
       // Trigger a new search with the status filter
@@ -141,6 +146,17 @@ export const ContractorStoreModel = types
         self.mergeUpdate(response.data.data, 'contractorsMap');
       }
       return response;
+    }),
+    fetchOnboarding: flow(function* (contractorId: string) {
+      const response = yield self.environment.api.getContractorOnboarding(contractorId);
+      if (response.ok && response.data?.data) {
+        return response.data.data; // pass back to UI layer
+      }
+      return null;
+    }),
+    createOnboarding: flow(function* (contractorId: string) {
+      const response = yield self.environment.api.createContractorOnboarding(contractorId);
+      return response.ok ? response.data.data : null;
     }),
   }));
 

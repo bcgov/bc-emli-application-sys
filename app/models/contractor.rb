@@ -29,6 +29,14 @@ class Contractor < ApplicationRecord
     }
   end
 
+  def name
+    business_name.presence || contact&.name
+  end
+
+  def email
+    contact&.email
+  end
+
   def contact_name
     contact&.name
   end

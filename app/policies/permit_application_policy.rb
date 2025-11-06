@@ -68,6 +68,11 @@ class PermitApplicationPolicy < ApplicationPolicy
     false
   end
 
+  def contractor_onboarding?
+    user.contractor?
+    #TODO: we'll likely need to check that the user isn't already associated with a Contractor company
+  end
+
   def upload_supporting_document?
     case record.status
     when "new_draft"

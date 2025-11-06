@@ -16,7 +16,7 @@ import {
   AccordionIcon,
 } from '@chakra-ui/react';
 import { colors } from '../../../styles/theme/foundations/colors';
-import { CaretRight, ArrowSquareOut } from '@phosphor-icons/react';
+import { CaretRightIcon, ArrowSquareOutIcon } from '@phosphor-icons/react';
 import React from 'react';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { useTranslation } from 'react-i18next';
@@ -56,7 +56,7 @@ export const ContractorLandingScreen = () => {
               mt="2"
               w={{ base: '100%', md: '200px' }}
               variant="primaryInverse"
-              rightIcon={<CaretRight aria-hidden="true" />}
+              rightIcon={<CaretRightIcon aria-hidden="true" />}
               aria-label={t('auth.login')}
             >
               {t('auth.login')}
@@ -90,7 +90,7 @@ export const ContractorLandingScreen = () => {
             isExternal
             aria-label={`${t('landing.contractor.learnMore')} (opens in a new tab)`}
           >
-            {t('landing.contractor.learnMore')} <ArrowSquareOut aria-hidden="true" />
+            {t('landing.contractor.learnMore')} <ArrowSquareOutIcon aria-hidden="true" />
           </Link>
           {/* Stepper for desktop */}
           <Stepper steps={flow} orientation="horizontal" />
@@ -139,7 +139,7 @@ export const ContractorLandingScreen = () => {
                   to="/contractor"
                   mt="2"
                   variant="primaryInverse"
-                  rightIcon={<CaretRight aria-hidden="true" />}
+                  rightIcon={<CaretRightIcon aria-hidden="true" />}
                   aria-label="Register as HPCN member contractor"
                 >
                   {t('auth.registerButton')}
@@ -170,7 +170,7 @@ export const ContractorLandingScreen = () => {
                     to="/contractor"
                     mt="2"
                     variant="primaryInverse"
-                    rightIcon={<CaretRight aria-hidden="true" />}
+                    rightIcon={<CaretRightIcon aria-hidden="true" />}
                     aria-label="Register as Health Safety contractor"
                   >
                     {t('auth.registerButton')}
@@ -193,7 +193,7 @@ export const ContractorLandingScreen = () => {
             to="/contractor"
             mt={4}
             variant="primaryInverse"
-            rightIcon={<CaretRight aria-hidden="true" />}
+            rightIcon={<CaretRightIcon aria-hidden="true" />}
             aria-label={t('auth.login')}
           >
             {t('auth.login')}

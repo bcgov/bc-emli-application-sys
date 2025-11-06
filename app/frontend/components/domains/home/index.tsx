@@ -4,7 +4,7 @@ import { useMst } from '../../../setup/root';
 import { EUserRoles } from '../../../types/enums';
 import { EnergySavingsApplicationIndexScreen } from '../energy-savings-application';
 import { AdminManagerHomeScreen } from './admin-manager-home-screen';
-import { ReviewerHomeScreen } from './reviewer-home-screen';
+import { ContractorOnboardingScreen } from './contractor-onboarding';
 import { SuperAdminHomeScreen } from './super-admin-home-screen';
 import { AdminHomeScreen } from './admin-home.screen';
 
@@ -13,8 +13,7 @@ const roleSpecificScreens = (role: EUserRoles, props: IHomeScreenProps) => {
     [EUserRoles.systemAdmin]: <SuperAdminHomeScreen {...props} />,
     [EUserRoles.admin]: <AdminHomeScreen {...props} />,
     [EUserRoles.adminManager]: <AdminManagerHomeScreen {...props} />,
-    //TODO: [EUserRoles.participantSupportRep]: <ParticipantSupportRep {...props} />,
-    //TODO:
+    [EUserRoles.contractor]: <ContractorOnboardingScreen {...props} />,
     [EUserRoles.participant]: <EnergySavingsApplicationIndexScreen {...props} />,
   }[role];
 };
