@@ -5,6 +5,7 @@ import { withEnvironment } from '../lib/with-environment';
 import { withMerge } from '../lib/with-merge';
 import { withRootStore } from '../lib/with-root-store';
 import { IContractor, ContractorModel } from '../models/contractor';
+import { ContractorOnboardModel } from '../models/contractor-onboard';
 
 export enum EContractorSortFields {
   id = 'id',
@@ -89,6 +90,13 @@ export const ContractorStoreModel = types
     setCurrentContractor(contractorId: string | null) {
       self.currentContractor = contractorId;
     },
+    setCurrentContractorById(id: string) {
+      if (self.contractorsMap.has(id)) {
+        self.currentContractor = self.contractorsMap.get(id);
+      } else {
+        self.currentContractor = null;
+      }
+    },
     findByContactId(contactId: string) {
       return (
         Array.from(self.contractorsMap.values()).find((contractor) => contractor.contact?.id === contactId) || null
@@ -149,15 +157,31 @@ export const ContractorStoreModel = types
     }),
     fetchOnboarding: flow(function* (contractorId: string) {
       const response = yield self.environment.api.getContractorOnboarding(contractorId);
-      if (response.ok && response.data?.data) {
+      if (response.ok && response.data) {
         return response.data.data; // pass back to UI layer
       }
       return null;
     }),
     createOnboarding: flow(function* (contractorId: string) {
       const response = yield self.environment.api.createContractorOnboarding(contractorId);
-      return response.ok ? response.data.data : null;
+      if (!response.ok) return null;
+
+      const data = response.data;
+
+      const permitApplicationId = data.onboardApplication?.id;
+      const contractorIdReturned = data.contractor?.id;
+
+      self.setCurrentContractorById(contractorIdReturned);
+
+      return {
+        permitApplicationId,
+        contractorId: contractorIdReturned,
+      };
     }),
+    mergeContractor(contractorData: any) {
+      // replace or add the contractor safely
+      self.contractorsMap.set(contractorData.id, contractorData);
+    },
   }));
 
 export interface IContractorStore extends Instance<typeof ContractorStoreModel> {}

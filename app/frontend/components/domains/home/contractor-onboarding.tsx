@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useMst } from '../../../setup/root';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface IContractorOnboardingScreenProps {}
 
@@ -16,46 +17,91 @@ export type TCreateEnergyApplicationFormData = {
 export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScreenProps) => {
   const { permitApplicationStore, userStore, uiStore, contractorStore } = useMst();
   const { currentUser } = userStore;
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!currentUser.isContractor) return;
-    //navigate back to welcome or somewhere;
+    contractorStore.searchContractors();
+  }, []);
 
-    const init = async () => {
+  // Core onboarding logic wrapped in useCallback
+  const checkOnboarding = useCallback(async () => {
+    if (!currentUser) return;
+
+    // Only contractors are allowed here
+    if (!currentUser.isContractor) {
+      navigate('/welcome');
+      return;
+    }
+
+    try {
+      let onboarding = null;
+
+      // Ensure contractor list is hydrated
+      if (contractorStore.contractorsMap.size === 0) {
+        await contractorStore.searchContractors({ reset: true });
+      }
+
+      // Find contractor linked to this user
       const contractor = contractorStore.findByContactId(currentUser.id);
 
+      // If contractor record doesn’t exist, create onboarding (which creates contractor)
       if (!contractor) {
-        const onboarding = await contractorStore.createOnboarding(currentUser.id);
-        if (!onboarding.ok) {
-          console.error('Error creating onboarding');
-          return;
+        onboarding = await contractorStore.createOnboarding(currentUser.id);
+        if (onboarding) {
+          console.log(`Created onboarding app ${onboarding.permitApplicationId}`);
+          navigate(`/applications/${onboarding.permitApplicationId}/edit`);
+        } else {
+          console.error('Failed to create onboarding; redirecting to welcome');
+          navigate('/welcome');
         }
-        console.log(`Created onboarding application: ${onboarding.data.data.onboard_application.id}`);
         return;
       }
 
-      const onboarding = await contractorStore.fetchOnboarding();
-      //const { id, status } = onboarding.onboard_application;
-      // switch (status) {
-      //   case 'new_draft':
-      //   case 'draft':
-      //     console.log('Navigate to the Onboarding Form Edit screen');
-      //     break;
-      //   case 'submitted':
-      //   case 'resubmitted':
-      //   case 'in_review':
-      //     console.log('Navigate to the Onboarding Submitted/Review screen');
-      //     break;
-      //   case 'approved':
-      //     console.log('Navigate to the Contractor Dashboard');
-      //     break;
-      //   default:
-      //     console.log('Onboarding was declined or ineligible');
-      // }
-    };
+      // Otherwise, fetch latest onboarding for existing contractor
+      onboarding = await contractorStore.fetchOnboarding(contractor.id);
+      if (!onboarding) {
+        console.error('No onboarding found; what happens here? why didnt we create one?');
+        return;
+      }
 
-    init();
-  }, [currentUser]);
+      // Optional: suspension/deactivation checks
+      if (onboarding.suspendedAt) {
+        navigate('/onboarding/suspended');
+        return;
+      }
+      if (onboarding.deactivatedAt) {
+        navigate('/onboarding/deactivated');
+        return;
+      }
+
+      // Route based on onboarding status
+      const { onboardApplicationId, status } = onboarding;
+      switch (status) {
+        case 'new_draft':
+        case 'draft':
+          navigate(`/applications/${onboardApplicationId}/edit`);
+          break;
+        case 'submitted':
+        case 'resubmitted':
+        case 'in_review':
+          navigate('/onboarding/submitted');
+          break;
+        case 'approved':
+          navigate('/contractor/dashboard');
+          break;
+        default:
+          navigate('/onboarding/ineligible');
+      }
+    } catch (err) {
+      console.error('Onboarding init failed:', err);
+      navigate('/welcome');
+    }
+  }, [contractorStore, currentUser, navigate]);
+
+  // Run the check on every page load or route revisit
+  useEffect(() => {
+    checkOnboarding();
+  }, [checkOnboarding, location.pathname]);
 
   return <>Contractor Onboarding Form Creation and Loading</>;
 };

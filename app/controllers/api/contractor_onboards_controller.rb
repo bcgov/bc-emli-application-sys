@@ -1,7 +1,7 @@
 class Api::ContractorOnboardsController < Api::ApplicationController
   before_action :set_onboard, only: %i[show update destroy]
 
-  skip_after_action :verify_authorized, only: :create
+  skip_after_action :verify_authorized, only: %i[create show]
 
   def index
     onboards = ContractorOnboard.all
@@ -21,6 +21,7 @@ class Api::ContractorOnboardsController < Api::ApplicationController
         business_name: "TBD",
         onboarded: false
       )
+    contractor.reindex
 
     # Create the PermitApplication (Contractor Onboarding type)
     onboarding_form =
@@ -45,7 +46,17 @@ class Api::ContractorOnboardsController < Api::ApplicationController
   end
 
   def show
+    Rails.logger.info("ContractorOnboards#show params: #{params[:id]}")
     contractor = Contractor.find(params[:id])
+
+    unless contractor
+      render json: {
+               error: "Contractor not found for contact_id #{params[:id]}"
+             },
+             status: :not_found
+      return
+    end
+
     onboard =
       contractor
         .contractor_onboards
@@ -53,7 +64,7 @@ class Api::ContractorOnboardsController < Api::ApplicationController
         .order(created_at: :desc)
         .first
 
-    if onboard.present?
+    if onboard
       render json: {
                data: {
                  id: onboard.id,
@@ -83,7 +94,7 @@ class Api::ContractorOnboardsController < Api::ApplicationController
   private
 
   def set_onboard
-    @onboard = ContractorOnboard.find(params[:id])
+    @onboard = Contractor.find(params[:id])
   end
 
   def onboard_params

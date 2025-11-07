@@ -24,6 +24,7 @@ class Contractor < ApplicationRecord
       business_name: business_name,
       contact_name: contact&.name,
       contact_email: contact&.email,
+      contact_id: contact&.id,
       created_at: created_at,
       updated_at: updated_at
     }

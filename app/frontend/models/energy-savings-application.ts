@@ -48,6 +48,7 @@ import { StepCodeModel } from './step-code';
 import { ProgramModel } from './program';
 import { TemplateVersionModel } from './template-version';
 import { IUser, UserModel } from './user';
+import { ContractorModel } from './contractor';
 import { IProgram } from './program';
 
 export const EnergySavingsApplicationModel = types.snapshotProcessor(
@@ -67,7 +68,9 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       submissionType: types.frozen<ISubmissionType>(),
       program: types.frozen<IProgram>(),
       status: types.enumeration(Object.values(EPermitApplicationStatus)),
-      submitter: types.maybeNull(types.maybe(types.reference(types.late(() => UserModel)))),
+      submitter: types.maybeNull(
+        types.union(types.reference(types.late(() => ContractorModel)), types.reference(types.late(() => UserModel))),
+      ),
       // assignedUsers: types.maybeNull(types.array(types.late(() => UserModel))),
       assignedUsers: types.array(types.frozen<IMinimalFrozenUser>()),
       jurisdiction: types.maybeNull(types.maybe(types.reference(types.late(() => JurisdictionModel)))),
