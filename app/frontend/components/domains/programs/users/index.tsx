@@ -43,7 +43,7 @@ export const ProgramUserIndexScreen = observer(function ProgramUserIndex() {
 
     const statusMap = ['active', 'pending', 'deactivated'] as const;
     const initialStatus = statusMap[initialTabIndex];
-    userStore.setStatus(initialStatus);
+    userStore.setStatusWithoutSearch(initialStatus);
   }, [searchParams]);
 
   const handleSetTabIndex = (index: number) => {
@@ -52,7 +52,7 @@ export const ProgramUserIndexScreen = observer(function ProgramUserIndex() {
     const statusMap = ['active', 'pending', 'deactivated'] as const;
     const newStatus = statusMap[index];
 
-    userStore.setStatus(newStatus);
+    userStore.setStatusWithoutSearch(newStatus);
   };
 
   const { isSearching, showArchived } = userStore;
@@ -68,7 +68,7 @@ export const ProgramUserIndexScreen = observer(function ProgramUserIndex() {
     borderRadius: 0,
   };
 
-  useSearch(userStore as ISearch, [currentProgram?.id, showArchived]);
+  useSearch(userStore as ISearch, [currentProgram?.id, showArchived, userStore.status]);
 
   if (error) return <ErrorScreen error={error} />;
   if (!currentProgram) return <LoadingScreen />;

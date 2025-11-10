@@ -39,7 +39,7 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
 
     const statusMap = ['active', 'pending', 'deactivated'] as const;
     const newStatus = statusMap[newTabIndex];
-    userStore.setStatus(newStatus);
+    userStore.setStatusWithoutSearch(newStatus);
   }, [searchParams]);
 
   const handleSetTabIndex = (index: number) => {
@@ -48,7 +48,7 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
     const statusMap = ['active', 'pending', 'deactivated'] as const;
     const newStatus = statusMap[index];
 
-    userStore.setStatus(newStatus);
+    userStore.setStatusWithoutSearch(newStatus);
   };
 
   const { isSearching, showArchived } = userStore;
@@ -64,7 +64,7 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
     borderRadius: 0,
   };
 
-  useSearch(userStore as ISearch, [currentContractor?.id, showArchived]);
+  useSearch(userStore as ISearch, [currentContractor?.id, showArchived, userStore.status]);
 
   if (error) return <ErrorScreen error={error} />;
   if (!currentContractor) return <LoadingScreen />;

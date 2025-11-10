@@ -250,6 +250,7 @@ Rails.application.routes.draw do
           post :reactivate
           post :reinvite
           post :revoke_invite
+          post :set_primary_contact
         end
       end
     end

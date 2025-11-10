@@ -2,10 +2,12 @@ import React from 'react';
 import { Box, Flex } from '@chakra-ui/react';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { AddressBook } from '@phosphor-icons/react';
 import { IUser } from '../../../../models/user';
 import { SearchGridItem } from '../../../shared/grid/search-grid-item';
 import { IUserStore } from '../../../../stores/user-store';
 import { ManageContractorEmployeeMenu } from '../../../shared/user/manage-contractor-employee-menu';
+import { useMst } from '../../../../setup/root';
 
 interface SimpleEmployeeRowProps {
   user: IUser;
@@ -14,6 +16,10 @@ interface SimpleEmployeeRowProps {
 
 export function SimpleEmployeeRow({ user, userStore }: SimpleEmployeeRowProps) {
   const { t } = useTranslation();
+  const { contractorStore } = useMst();
+  const { currentContractor } = contractorStore;
+
+  const isPrimaryContact = currentContractor?.contact?.id === user.id;
 
   const formatDate = (date: Date | null) => {
     if (!date) return '-';
@@ -26,7 +32,10 @@ export function SimpleEmployeeRow({ user, userStore }: SimpleEmployeeRowProps) {
   return (
     <Box key={user.id} className="simple-employee-index-grid-row" role="row" display="contents">
       <SearchGridItem fontSize="sm" headers="employee-name-header">
-        {user.name || user.firstName || t('contractor.employees.unknownEmployee')}
+        <Flex alignItems="center" gap={2}>
+          {isPrimaryContact && <AddressBook size={16} />}
+          {user.name || user.firstName || t('contractor.employees.unknownEmployee')}
+        </Flex>
       </SearchGridItem>
       <SearchGridItem fontSize="sm" headers="employee-email-header">
         {user.email || '-'}

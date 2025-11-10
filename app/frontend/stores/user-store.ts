@@ -237,6 +237,9 @@ export const UserStoreModel = types
       self.status = status;
       self.searchUsers({ reset: true });
     },
+    setStatusWithoutSearch(status: 'active' | 'pending' | 'deactivated' | 'removed') {
+      self.status = status;
+    },
     setAllUsers(allUsers: boolean) {
       self.allUsers = allUsers;
       self.searchUsers({ reset: true });

@@ -21,7 +21,7 @@ interface EmployeeActionConfirmationModalProps {
   onClose: () => void;
   onConfirm: () => void;
   user: IUser;
-  mode?: 'deactivate' | 'reactivate' | 'revoke' | 'reinvite';
+  mode?: 'deactivate' | 'reactivate' | 'revoke' | 'reinvite' | 'setPrimaryContact';
   isLoading?: boolean;
 }
 
@@ -34,7 +34,7 @@ export const EmployeeActionConfirmationModal = ({
   isLoading = false,
 }: EmployeeActionConfirmationModalProps) => {
   const { t } = useTranslation();
-  const userName = user.name || t('contractor.employees.unknownEmployee');
+  const userName = user.name || user.firstName || user.lastName || t('contractor.employees.unknownEmployee');
 
   const modalConfig = {
     reinvite: {
@@ -61,6 +61,12 @@ export const EmployeeActionConfirmationModal = ({
       warningDefault: `${userName} will not be able to access the application system until you reactivate them.`,
       buttonTextKey: 'ui.deactivate',
     },
+    setPrimaryContact: {
+      titleKey: 'confirmSetPrimaryContactTitle',
+      warningKey: 'setPrimaryContactWarning',
+      warningDefault: `${userName} will be set as the primary contact for this contractor.`,
+      buttonTextKey: 'Set Primary Contact',
+    },
   };
 
   const config = modalConfig[mode];
@@ -84,7 +90,9 @@ export const EmployeeActionConfirmationModal = ({
           color="theme.blueAlt"
           whiteSpace="pre-line"
         >
-          {t(`contractor.employees.actions.${config.titleKey}`, { name: userName })}
+          {mode === 'setPrimaryContact'
+            ? `Set ${userName} as Primary Contact`
+            : t(`contractor.employees.actions.${config.titleKey}`, { name: userName })}
         </ModalHeader>
         <ModalBody px="32px">
           <Alert
@@ -105,10 +113,12 @@ export const EmployeeActionConfirmationModal = ({
               color="greys.anotherGrey"
               whiteSpace="pre-line"
             >
-              {t(`contractor.employees.actions.${config.warningKey}`, {
-                name: userName,
-                defaultValue: config.warningDefault,
-              })}
+              {mode === 'setPrimaryContact'
+                ? config.warningDefault
+                : t(`contractor.employees.actions.${config.warningKey}`, {
+                    name: userName,
+                    defaultValue: config.warningDefault,
+                  })}
             </Text>
           </Alert>
         </ModalBody>
@@ -123,9 +133,9 @@ export const EmployeeActionConfirmationModal = ({
             onClick={onConfirm}
             isLoading={isLoading}
             isDisabled={isLoading}
-            loadingText={t(config.buttonTextKey)}
+            loadingText={mode === 'setPrimaryContact' ? config.buttonTextKey : t(config.buttonTextKey)}
           >
-            {t(config.buttonTextKey)}
+            {mode === 'setPrimaryContact' ? config.buttonTextKey : t(config.buttonTextKey)}
           </Button>
           <Button
             w="155px"

@@ -431,10 +431,6 @@ const AppRoutes = observer(() => {
       <Route path="/configure-users" element={<ProgramsIndexScreen />} />
       <Route path="/configure-users/:programId/users" element={<ProgramUserIndexScreen />} />
       <Route path="/configure-users/:programId/invite" element={<ProgramInviteUserScreen />} />
-      <Route path="/contractor-management" element={<ContractorManagementScreen />} />
-      <Route path="/contractor-management/:contractorId/employees" element={<ContractorEmployeeIndexScreen />} />
-      <Route path="/contractor-management/:contractorId/invite-employee" element={<InviteEmployeeScreen />} />
-      <Route path="/contractor-program-resources" element={<ContractorProgramResourcesScreen />} />
       <Route path="/audit-log" element={<AuditLogScreen />} />
     </>
   );
@@ -444,6 +440,10 @@ const AppRoutes = observer(() => {
       <Route path="/submission-inbox" element={<ProgramSubmissionInboxScreen />} />
       <Route path="/applications/:permitApplicationId" element={<ReviewPermitApplicationScreen />} />
       <Route path="/blank-template/:templateVersionId" element={<BlankTemplateScreen />} />
+      <Route path="/contractor-management" element={<ContractorManagementScreen />} />
+      <Route path="/contractor-management/:contractorId/employees" element={<ContractorEmployeeIndexScreen />} />
+      <Route path="/contractor-management/:contractorId/invite-employee" element={<InviteEmployeeScreen />} />
+      <Route path="/contractor-program-resources" element={<ContractorProgramResourcesScreen />} />
       // view blank applications and view supported applications to go here
       {import.meta.env.DEV && (
         <>

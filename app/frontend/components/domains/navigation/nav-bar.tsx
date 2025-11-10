@@ -525,7 +525,7 @@ const NavBarMenu = observer(function NavBarMenu() {
                   <MenuDivider my={0} borderColor="border.light" />
 
                   {/* Admin Manager items */}
-                  {currentUser?.isAdminManager && (
+                  {(currentUser?.isAdminManager || currentUser?.isAdmin || currentUser?.isSuperAdmin) && (
                     <NavMenuItem
                       label={t('contractor.management.title', 'Manage contractor details')}
                       to={'/contractor-management'}

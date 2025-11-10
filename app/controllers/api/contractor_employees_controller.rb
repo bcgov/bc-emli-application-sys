@@ -98,6 +98,23 @@ class Api::ContractorEmployeesController < Api::ApplicationController
     end
   end
 
+  # Set employee as primary contact
+  def set_primary_contact
+    authorize @contractor
+    employee_user = @employee.employee
+
+    if employee_user.present?
+      if @contractor.update(contact: employee_user)
+        render_success nil, "contractor.employees.set_primary_contact_success"
+      else
+        render_error "contractor.employees.set_primary_contact_error",
+                     status: :unprocessable_entity
+      end
+    else
+      render_error "contractor.employees.employee_not_found", status: :not_found
+    end
+  end
+
   private
 
   def set_contractor
