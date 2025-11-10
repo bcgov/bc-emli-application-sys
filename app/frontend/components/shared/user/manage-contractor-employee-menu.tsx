@@ -27,7 +27,7 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
 
   const { contractorId } = useParams<{ contractorId: string }>();
 
-  type EmployeeActionMode = 'deactivate' | 'reactivate' | 'revoke' | 'reinvite' | null;
+  type EmployeeActionMode = 'deactivate' | 'reactivate' | 'revoke' | 'reinvite' | 'setPrimaryContact' | null;
 
   const [modalState, setModalState] = React.useState<{
     mode: EmployeeActionMode;
@@ -46,6 +46,9 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
   const closeModal = () => {
     setModalState({ mode: null, isLoading: false });
   };
+
+  // Check if this user is already the primary contact
+  const isAlreadyPrimaryContact = currentContractor?.contact?.id === user.id;
 
   // Early return if contractorId is not available
   if (!contractorId) {
@@ -88,6 +91,15 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
         case 'revoke':
           success = await user.revokeContractorInvite(contractorId);
           break;
+        case 'setPrimaryContact':
+          // TODO: Implement setPrimaryContact functionality
+          const setPrimaryResponse = await environment.api.setPrimaryContact(contractorId, user.id);
+          if (setPrimaryResponse.ok) {
+            await user.rootStore.userStore.searchUsers({ reset: false });
+            await currentContractor?.reload();
+          }
+          success = setPrimaryResponse.ok;
+          break;
       }
       if (success) {
         closeModal();
@@ -111,6 +123,18 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
               case 'active':
                 return (
                   <MenuList>
+                    <ManageMenuItemButton
+                      color="text.primary"
+                      onClick={() => openModal('setPrimaryContact')}
+                      isDisabled={isAlreadyPrimaryContact}
+                      aria-disabled={isAlreadyPrimaryContact}
+                      _disabled={{
+                        opacity: 0.6,
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      Primary contact
+                    </ManageMenuItemButton>
                     <ManageMenuItemButton color="semantic.error" onClick={() => openModal('deactivate')}>
                       {t('contractor.employees.actions.deactivateEmployee')}
                     </ManageMenuItemButton>

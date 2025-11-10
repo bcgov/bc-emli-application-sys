@@ -401,6 +401,11 @@ export class Api {
       `/contractors/${contractorId}/employees/${employeeId}/revoke_invite`,
     );
   }
+  async setPrimaryContact(contractorId: string, employeeId: string) {
+    return this.client.post<IEmployeeActionResponse>(
+      `/contractors/${contractorId}/employees/${employeeId}/set_primary_contact`,
+    );
+  }
   async inviteContractorEmployees(
     contractorId: string,
     programId: string,

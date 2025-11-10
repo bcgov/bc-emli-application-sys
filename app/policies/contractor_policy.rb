@@ -54,6 +54,11 @@ class ContractorPolicy < ApplicationPolicy
     deactivate?
   end
 
+  def set_primary_contact?
+    # Same permissions as deactivate - admin managers and admins can set primary contact
+    deactivate?
+  end
+
   def invite?
     # Admin managers and admins can invite contractor employees
     user.admin_manager? || user.admin?

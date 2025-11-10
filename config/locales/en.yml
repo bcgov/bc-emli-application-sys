@@ -279,6 +279,12 @@ en:
         revoke_error:
           title: Error
           message: 'Failed to revoke employee invite'
+        set_primary_contact_success:
+          title: ''
+          message: 'Employee set as primary contact successfully'
+        set_primary_contact_error:
+          title: Error
+          message: 'Failed to set employee as primary contact'
         employee_not_found:
           title: Error
           message: 'Employee not found'
