@@ -5,9 +5,7 @@ module ApplicationFlow
       # --- States ---
       state :new_draft, initial: true
       state :newly_submitted
-      state :revisions_requested
-      state :resubmitted
-      state :in_review
+      state :training_pending
       state :approved
       state :ineligible
 
@@ -16,6 +14,19 @@ module ApplicationFlow
         transitions from: :new_draft,
                     to: :newly_submitted,
                     after: :handle_submission
+      end
+
+      #additional state transitions based on figma workflow
+      event :start_training do
+        transitions from: :newly_submitted, to: :training_pending
+      end
+
+      event :approve do
+        transitions from: :training_pending, to: :approved
+      end
+
+      event :mark_ineligible do
+        transitions from: %i[newly_submitted training_pending], to: :ineligible
       end
     end
 

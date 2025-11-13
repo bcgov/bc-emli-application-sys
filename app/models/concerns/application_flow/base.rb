@@ -51,6 +51,10 @@ module ApplicationFlow
       in_review?
     end
 
+    def approved?
+      approved? || approved_pending? || approved_paid?
+    end
+
     # --- Common guards ---
     def can_submit?
       signed =

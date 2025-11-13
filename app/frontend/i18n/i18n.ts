@@ -1052,6 +1052,21 @@ const options = {
               'I confirm this application has all the required information. This application is ready for review.',
           },
         },
+        contractorOnboarding: {
+          readyContractor: 'Ready to submit your registration details?',
+          confirmationContractor:
+            'By submitting your registration details you confirm that the information you provided was completed to the best of your knowledge and ability',
+          submissionSuccess: 'You have submitted your details to the Energy Savings Program.',
+          whatsNext: {
+            heading: 'What’s next?',
+            line1:
+              'Please wait while we assess your registration details. We will email you once your registration is approved. If we need more information we will reach out via email.',
+            line2:
+              'If you need to add, edit, or remove employees from your account in the future you will need to call us.',
+            line3: 'If you have any questions, please call us at 1-833-856-0333 or email us at <1>{{email}}</1>.',
+          },
+          returnToDashboard: 'Return to Contractor homepage',
+        },
         energySavingsApplication: {
           submissionBlockModal: {
             title: 'Trying to submit this application?',
@@ -1239,12 +1254,13 @@ const options = {
               'See the status of your application or your application history any time by logging in to the Better Homes Energy Savings Program. Contact <email /> if you have any questions about your application.',
             whatsNextTitle: "What's next?",
             ready: 'Ready to submit this application?',
+            onBehalf: 'Ready to submit on someone’s behalf?',
             bySubmitting: 'By submitting this application',
             confirmationOnBehalf:
               'I confirm that the information provided is accurate to the best of my knowledge. The applicant has given consent for me to submit this application on their behalf.',
             confirmation:
               'By submitting this application you confirm that the information you provided was completed to the best of your knowledge and ability',
-            yourReference: 'Application ID is: #{{ number }}',
+            yourReference: 'Reference #{{ number }}',
             noContactsAvailable:
               'This jurisdiction is not ready to accept applications through this tool yet. Please check with your local jurisdiction.',
             whatsNext:
@@ -1367,6 +1383,7 @@ const options = {
               readyToUpload:
                 'Are you ready to upload your supporting file(s) to your application {{applicationNumber}}?',
               filesAdded: 'Supporting files added on {{date}}',
+              filesUploaded: 'Supporting file(s) successfully uploaded',
             },
           },
         },
@@ -2812,6 +2829,7 @@ const options = {
             learnMoreDescriptionShort:
               "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It's part of the Province of B.C.'s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
             betterHomesLinkTextShort: 'Better Homes',
+            contractorSupportEmail: 'ESPcontractorsupport@clearesult',
           },
           territorialAcknowledgement:
             'The B.C. Public Service acknowledges the territories of First Nations around B.C. and is grateful to carry out our work on these lands. We acknowledge these rights, interests, priorities, and concerns of all Indigenous Peoples - First Nations, Métis, and Inuit - respecting and acknowledging their distinct cultures, histories, rights, laws, and governments.',
@@ -2928,6 +2946,7 @@ const options = {
             submissionsInboxSetup: 'Submissions inbox setup',
             confirmed: 'E-mail confirmed',
             welcome: 'Welcome',
+            contractor: 'Contractor',
             getSupport: 'Get support',
             sitewideBanner: 'Site-wide banner',
             apiSettings: 'API settings',

@@ -25,6 +25,9 @@ interface IProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: () => void;
+  hideActions?: boolean;
+  confirmText?: string;
+  cancelText?: string;
 }
 
 export const GlobalConfirmationModal = observer(function GlobalConfirmationModal({
@@ -34,10 +37,12 @@ export const GlobalConfirmationModal = observer(function GlobalConfirmationModal
   isOpen,
   onSubmit,
   onClose,
+  hideActions,
+  confirmText,
+  cancelText,
 }: IProps) {
   const { t } = useTranslation();
 
-  // status-based styles and icons
   const statusConfig = {
     [EFlashMessageStatus.warning]: {
       color: 'theme.orange',
@@ -62,6 +67,7 @@ export const GlobalConfirmationModal = observer(function GlobalConfirmationModal
   };
 
   const config = status ? statusConfig[status] : undefined;
+  const isStatusMode = Boolean(config);
 
   return (
     <Modal onClose={onClose} isOpen={isOpen} size="2xl">
@@ -72,20 +78,21 @@ export const GlobalConfirmationModal = observer(function GlobalConfirmationModal
         </ModalHeader>
         <ModalBody py={6}>
           <Flex direction="column" gap={8}>
-            <Heading as="h3" color="theme.primary">
+            <Heading as="h3" fontSize="2xl">
               {headerText}
             </Heading>
-            {config ? (
+
+            {isStatusMode ? (
               <Box
                 borderRadius="md"
                 border="1px solid"
-                borderColor={config.color}
-                backgroundColor={config.bg}
+                borderColor={config!.color}
+                backgroundColor={config!.bg}
                 px={6}
                 py={3}
               >
                 <HStack spacing={4}>
-                  <Box color={config.color} alignSelf="start">
+                  <Box color={config!.color} alignSelf="start">
                     <config.Icon size={24} aria-label={`${status} icon`} />
                   </Box>
                   <Text>{bodyText || headerText}</Text>
@@ -94,14 +101,19 @@ export const GlobalConfirmationModal = observer(function GlobalConfirmationModal
             ) : (
               <Text>{bodyText || headerText}</Text>
             )}
-            <Flex justify="center" gap={6}>
-              <Button onClick={onSubmit} variant="primary">
-                {t('ui.confirm')}
-              </Button>
-              <Button onClick={onClose} variant="secondary">
-                {t('ui.cancel')}
-              </Button>
-            </Flex>
+
+            {!hideActions && (
+              <Flex justify="center" gap={6}>
+                {onSubmit && (
+                  <Button onClick={onSubmit} variant="primary">
+                    {t('ui.confirm')}
+                  </Button>
+                )}
+                <Button onClick={onClose} variant="secondary">
+                  {t('ui.cancel')}
+                </Button>
+              </Flex>
+            )}
           </Flex>
         </ModalBody>
       </ModalContent>

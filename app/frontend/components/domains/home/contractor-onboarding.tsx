@@ -1,6 +1,8 @@
 import React, { useEffect, useCallback } from 'react';
 import { useMst } from '../../../setup/root';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { SharedSpinner } from '../../shared/base/shared-spinner';
+import { Flex } from '@chakra-ui/react';
 
 interface IContractorOnboardingScreenProps {}
 
@@ -78,13 +80,11 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
       const { onboardApplicationId, status } = onboarding;
       switch (status) {
         case 'new_draft':
-        case 'draft':
           navigate(`/applications/${onboardApplicationId}/edit`);
           break;
-        case 'submitted':
-        case 'resubmitted':
-        case 'in_review':
-          navigate('/onboarding/submitted');
+        case 'newly_submitted':
+        case 'training_pending':
+          navigate(`/applications/${onboardApplicationId}/successful-submission`);
           break;
         case 'approved':
           navigate('/contractor/dashboard');
@@ -103,5 +103,9 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
     checkOnboarding();
   }, [checkOnboarding, location.pathname]);
 
-  return <>Contractor Onboarding Form Creation and Loading</>;
+  return (
+    <Flex justify="center" p={8}>
+      <SharedSpinner />
+    </Flex>
+  );
 };

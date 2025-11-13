@@ -7,7 +7,10 @@ class PermitApplication < ApplicationRecord
          in_review: 5,
          update_needed: 6,
          approved: 7,
-         ineligible: 8
+         ineligible: 8,
+         training_pending: 9,
+         approved_pending: 10,
+         approved_paid: 11
        },
        _default: 0
 

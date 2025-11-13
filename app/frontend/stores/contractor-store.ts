@@ -98,9 +98,7 @@ export const ContractorStoreModel = types
       }
     },
     findByContactId(contactId: string) {
-      return (
-        Array.from(self.contractorsMap.values()).find((contractor) => contractor.contact?.id === contactId) || null
-      );
+      return Array.from(self.contractorsMap.values()).find((contractor) => contractor.contactId === contactId) || null;
     },
     setStatusFilter(status: 'active' | 'suspended' | 'removed') {
       self.statusFilter = status;
@@ -131,8 +129,12 @@ export const ContractorStoreModel = types
       const response = yield self.environment.api.fetchContractors(searchParams);
 
       if (response.ok) {
-        self.mergeUpdateAll(response.data.data, 'contractorsMap');
-        self.setTableContractors(response.data.data);
+        const normalizedData = response.data.data.map((c) => ({
+          ...c,
+          contactId: c.contact?.id ?? null,
+        }));
+        self.mergeUpdateAll(normalizedData, 'contractorsMap');
+        self.setTableContractors(normalizedData);
         self.currentPage = opts.page ?? self.currentPage;
         self.totalPages = response.data.meta.totalPages;
         self.totalCount = response.data.meta.totalCount;

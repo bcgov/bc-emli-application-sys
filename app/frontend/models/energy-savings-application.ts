@@ -10,6 +10,7 @@ import {
   EPermitBlockStatus,
   ERequirementChangeAction,
   ERequirementType,
+  EPermitClassificationCode,
 } from '../types/enums';
 import {
   ICompareRequirementsBoxData,
@@ -149,6 +150,21 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       },
       get permitBlockStatuses() {
         return Array.from(self.permitBlockStatusMap.values());
+      },
+    }))
+    .views((self) => ({
+      get isSupportRequest() {
+        return (
+          self.submissionType?.code === EPermitClassificationCode.supportRequest &&
+          self.userGroupType?.code === EPermitClassificationCode.participant
+        );
+      },
+
+      get isContractorOnboarding() {
+        return (
+          self.submissionType?.code === EPermitClassificationCode.onboarding &&
+          self.userGroupType?.code === EPermitClassificationCode.contractor
+        );
       },
     }))
     .views((self) => ({
@@ -510,7 +526,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         return self.getCollaborationAssigneesByBlockIdMap(collaborationType)[requirementBlockId] ?? [];
       },
       canUserSubmit(user: IUser) {
-        if (self.submitter.id === user.id) {
+        if (self.submitter.id === user.id || self.submitter?.contactId === user.id) {
           return true;
         }
 
