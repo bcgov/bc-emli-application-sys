@@ -1,4 +1,4 @@
-import { Button, ButtonProps, MenuItem } from "@chakra-ui/react"
+import { ButtonProps, MenuItem } from "@chakra-ui/react"
 import React, { ReactElement, ReactNode } from "react"
 import { IRouterLinkProps, RouterLink } from "../navigation/router-link"
 
@@ -24,9 +24,20 @@ export const ManageMenuItem = ({ icon, children, ...rest }: IManageMenuItemProps
   )
 }
 
-export const ManageMenuItemButton = ({ leftIcon, children, ...rest }: ButtonProps) => {
+export const ManageMenuItemButton = ({ leftIcon, children, onClick, isDisabled, ...rest }: ButtonProps) => {
   return (
-    <MenuItem as={Button} icon={leftIcon} w="full" justifyContent="flex-start" {...rest}>
+    <MenuItem
+      icon={leftIcon}
+      w="full"
+      justifyContent="flex-start"
+      onClick={onClick}
+      isDisabled={isDisabled}
+      _focus={{
+        bg: 'blue.50',
+        outline: 'none'
+      }}
+      {...rest}
+    >
       {children}
     </MenuItem>
   )

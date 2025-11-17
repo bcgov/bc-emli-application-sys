@@ -2,6 +2,7 @@ import { Box, Container, Flex, Heading, Link, Text, VStack } from '@chakra-ui/re
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BlueTitleBar } from '../../shared/base/blue-title-bar';
+import { SubNavBar } from '../navigation/sub-nav-bar';
 
 interface ProgramResource {
   id: string;
@@ -209,12 +210,13 @@ export const ContractorProgramResourcesScreen = () => {
   };
 
   return (
-    <Flex as="main" direction="column" w="full" bg="greys.white" pb="16">
+    <Flex as="main" direction="column" w="full" bg="greys.grey04" pb="16">
+
       {/* Blue Header Bar */}
       <BlueTitleBar title={t('contractor.programResources.title')} />
 
       {/* Main Content */}
-      <Container maxW="container.lg" py={16}>
+      <Container maxW="container.lg" py={16} bg="white" px={10}>
         <Heading as="h1" fontSize="5xl" fontWeight="700" color="greys.grey60" mb={4}>
           {t('contractor.programResources.programResourcesPrefix')}{' '}
           {t(SIDEBAR_CATEGORIES.find((cat) => cat.key === selectedCategory)?.label || '')}
@@ -251,15 +253,22 @@ export const ContractorProgramResourcesScreen = () => {
                   textAlign="left"
                   fontSize="16px"
                   fontWeight={selectedCategory === category.key ? '600' : '400'}
+                  border="none"
                   borderLeft="4px solid"
                   borderLeftColor={selectedCategory === category.key ? 'theme.blueAlt' : 'transparent'}
                   transition="all 0.2s"
+                  sx={{
+                    '&:focus:not(:focus-visible)': {
+                      outline: 'none',
+                    },
+                  }}
                   _hover={{
                     bg: 'theme.blueLight02',
                   }}
-                  _focus={{
-                    outline: 'none',
-                    bg: 'theme.blueLight02',
+                  _focusVisible={{
+                    outline: '3px solid',
+                    outlineColor: 'theme.blue',
+                    outlineOffset: '2px',
                   }}
                   _first={{
                     borderTop: 'none',
@@ -311,13 +320,18 @@ export const ContractorProgramResourcesScreen = () => {
                     textDecoration="underline"
                     fontWeight="bold"
                     _hover={{ color: 'theme.blue' }}
-                    _focus={{
-                      outline: '2px solid',
+                    _focusVisible={{
+                      outline: '3px solid',
                       outlineColor: 'theme.blue',
                       outlineOffset: '2px',
                       color: 'theme.blue',
                     }}
-                    sx={baseTextSx}
+                    sx={{
+                      ...baseTextSx,
+                      '&:focus:not(:focus-visible)': {
+                        outline: 'none',
+                      },
+                    }}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={getResourceAriaLabel(resource)}
@@ -343,10 +357,15 @@ export const ContractorProgramResourcesScreen = () => {
                             color="theme.blueAlt"
                             textDecoration="underline"
                             _hover={{ color: 'theme.blue' }}
-                            _focus={{
-                              outline: '2px solid',
+                            _focusVisible={{
+                              outline: '3px solid',
                               outlineColor: 'theme.blue',
                               outlineOffset: '2px',
+                            }}
+                            sx={{
+                              '&:focus:not(:focus-visible)': {
+                                outline: 'none',
+                              },
                             }}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -368,10 +387,15 @@ export const ContractorProgramResourcesScreen = () => {
                             color="theme.blueAlt"
                             textDecoration="underline"
                             _hover={{ color: 'theme.blue' }}
-                            _focus={{
-                              outline: '2px solid',
+                            _focusVisible={{
+                              outline: '3px solid',
                               outlineColor: 'theme.blue',
                               outlineOffset: '2px',
+                            }}
+                            sx={{
+                              '&:focus:not(:focus-visible)': {
+                                outline: 'none',
+                              },
                             }}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -393,10 +417,15 @@ export const ContractorProgramResourcesScreen = () => {
                             color="theme.blueAlt"
                             textDecoration="underline"
                             _hover={{ color: 'theme.blue' }}
-                            _focus={{
-                              outline: '2px solid',
+                            _focusVisible={{
+                              outline: '3px solid',
                               outlineColor: 'theme.blue',
                               outlineOffset: '2px',
+                            }}
+                            sx={{
+                              '&:focus:not(:focus-visible)': {
+                                outline: 'none',
+                              },
                             }}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -410,7 +439,7 @@ export const ContractorProgramResourcesScreen = () => {
                         <>
                           {
                             t('contractor.programResources.descriptions.ventilationList').split(
-                              t('contractor.programResources.linkText.searchableProductList'),
+                              t('contractor.programResources.linkText.productList'),
                             )[0]
                           }
                           <Link
@@ -418,24 +447,31 @@ export const ContractorProgramResourcesScreen = () => {
                             color="theme.blueAlt"
                             textDecoration="underline"
                             _hover={{ color: 'theme.blue' }}
-                            _focus={{
-                              outline: '2px solid',
+                            _focusVisible={{
+                              outline: '3px solid',
                               outlineColor: 'theme.blue',
                               outlineOffset: '2px',
                             }}
+                            sx={{
+                              '&:focus:not(:focus-visible)': {
+                                outline: 'none',
+                              },
+                            }}
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-label="Open Natural Resources Canada searchable product list in new tab"
+                            aria-label="Open Natural Resources Canada product list in new tab"
                           >
-                            {t('contractor.programResources.linkText.searchableProductList')}
+                            {t('contractor.programResources.linkText.productList')}
                           </Link>
-                          {t('contractor.programResources.fileInfo')}
+                          {t('contractor.programResources.descriptions.ventilationList').split(
+                            t('contractor.programResources.linkText.productList'),
+                          )[1]}
                         </>
                       ) : resource.id === 'bathroom-fan-product-list' ? (
                         <>
                           {
                             t('contractor.programResources.descriptions.bathroomFanProductList').split(
-                              t('contractor.programResources.linkText.searchableProductList'),
+                              t('contractor.programResources.linkText.productList'),
                             )[0]
                           }
                           <Link
@@ -443,18 +479,25 @@ export const ContractorProgramResourcesScreen = () => {
                             color="theme.blueAlt"
                             textDecoration="underline"
                             _hover={{ color: 'theme.blue' }}
-                            _focus={{
-                              outline: '2px solid',
+                            _focusVisible={{
+                              outline: '3px solid',
                               outlineColor: 'theme.blue',
                               outlineOffset: '2px',
                             }}
+                            sx={{
+                              '&:focus:not(:focus-visible)': {
+                                outline: 'none',
+                              },
+                            }}
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-label="Open EPA and DOE searchable product list in new tab"
+                            aria-label="Open EPA and DOE product list in new tab"
                           >
-                            {t('contractor.programResources.linkText.searchableProductList')}
+                            {t('contractor.programResources.linkText.productList')}
                           </Link>
-                          {t('contractor.programResources.fileInfo')}
+                          {t('contractor.programResources.descriptions.bathroomFanProductList').split(
+                            t('contractor.programResources.linkText.productList'),
+                          )[1]}
                         </>
                       ) : (
                         t(resource.description)

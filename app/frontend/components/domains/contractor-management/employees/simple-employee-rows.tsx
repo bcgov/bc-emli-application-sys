@@ -33,7 +33,9 @@ export function SimpleEmployeeRow({ user, userStore }: SimpleEmployeeRowProps) {
     <Box key={user.id} className="simple-employee-index-grid-row" role="row" display="contents">
       <SearchGridItem fontSize="sm" headers="employee-name-header">
         <Flex alignItems="center" gap={2}>
-          {isPrimaryContact && <AddressBook size={16} />}
+          {isPrimaryContact && (
+            <AddressBook size={16} aria-label={t('contractor.employees.primaryContact')} />
+          )}
           {user.name || user.firstName || t('contractor.employees.unknownEmployee')}
         </Flex>
       </SearchGridItem>

@@ -84,32 +84,29 @@ export const ContractorRow = observer(({ contractor }: ContractorRowProps) => {
         <Flex justify="center">
           <Menu>
             <MenuButton
-              as="button"
+              as={Link}
               color="black"
               textDecoration="underline"
+              border="2px solid transparent"
               _hover={{ textDecoration: 'underline', color: 'theme.blue' }}
-              _focus={{
-                outline: '2px solid',
-                outlineColor: 'theme.blue',
-                outlineOffset: '2px',
+              sx={{
+                '&:focus:not(:focus-visible)': {
+                  outline: 'none',
+                  border: '2px solid transparent',
+                },
+              }}
+              _focusVisible={{
+                outline: 'none',
+                border: '2px solid',
+                borderColor: 'theme.blue',
                 textDecoration: 'underline',
               }}
               fontSize="sm"
               fontWeight="normal"
               cursor="pointer"
-              bg="transparent"
-              border="none"
-              p={1}
               tabIndex={0}
               aria-label={`Manage actions for contractor ${contractor.businessName}`}
               aria-haspopup="menu"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  // The menu will handle opening automatically
-                }
-              }}
             >
               {t('contractor.actions.manage')}
             </MenuButton>

@@ -3039,6 +3039,7 @@ const options = {
             loading: 'Loading employees',
             unknownEmployee: 'Unknown Employee',
             unknownContractor: 'Unknown Contractor',
+            primaryContact: 'Primary contact',
             fields: {
               name: 'Name',
               email: 'Email address',
@@ -3053,6 +3054,7 @@ const options = {
               listAriaLabel: 'Select employee status to filter by',
             },
             actions: {
+              setPrimaryContact: 'Primary contact',
               deactivateEmployee: 'Deactivate employee',
               reinviteEmployee: 'Re-invite employee',
               revokeEmployeeInvite: 'Revoke employee invite',

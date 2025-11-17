@@ -30,9 +30,9 @@ export const ContractorManagementScreen = observer(function ContractorManagement
 
   const handleSetTabIndex = (index: number) => {
     setTabIndex(index);
-    // Filter contractors based on status
-    const statusMap = ['active', 'suspended', 'removed'] as const;
-    contractorStore.setStatusFilter(statusMap[index]);
+    // TODO: Implement status filtering when backend support is added
+    // const statusMap = ['active', 'suspended', 'removed'] as const;
+    // contractorStore.setStatusFilter(statusMap[index]);
   };
 
   return (
@@ -189,9 +189,6 @@ const TableControls = ({ contractorStore }) => {
       aria-label={t('contractor.management.tableControls', 'Table controls')}
     >
       <Box>
-        <Text fontSize="sm" color="gray.600" mb={2}>
-          {t('contractor.management.totalItems', `${totalCount} total items`)}
-        </Text>
         <PerPageSelect
           handleCountPerPageChange={handleCountPerPageChange}
           countPerPage={countPerPage}

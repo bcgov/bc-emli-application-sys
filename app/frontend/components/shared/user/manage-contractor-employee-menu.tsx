@@ -133,7 +133,7 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
                         pointerEvents: 'none',
                       }}
                     >
-                      Primary contact
+                      {t('contractor.employees.actions.setPrimaryContact')}
                     </ManageMenuItemButton>
                     <ManageMenuItemButton color="semantic.error" onClick={() => openModal('deactivate')}>
                       {t('contractor.employees.actions.deactivateEmployee')}
