@@ -51,16 +51,26 @@ export const ContractorGridHeaders = observer(() => {
           const field = EContractorSortFields[key as keyof typeof EContractorSortFields];
 
           return (
-            <GridHeader key={key} role={'columnheader'}>
+            <GridHeader key={key} role={'columnheader'} position="relative">
               <Flex
                 w={'full'}
+                h={'full'}
                 as={'button'}
                 justifyContent={'space-between'}
+                alignItems={'center'}
                 cursor="pointer"
                 onClick={() => toggleSort(field)}
-                borderRight={'1px solid'}
-                borderColor={'border.light'}
                 px={4}
+                _after={{
+                  content: '""',
+                  position: 'absolute',
+                  right: 0,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  height: '20px',
+                  width: '1px',
+                  bg: 'border.light',
+                }}
               >
                 <Text textAlign="left">{getSortColumnHeader(field)}</Text>
                 <SortIcon<EContractorSortFields> field={field} currentSort={sort} />
@@ -69,7 +79,7 @@ export const ContractorGridHeaders = observer(() => {
           );
         })}
         <GridHeader role={'columnheader'}>
-          <Flex w={'full'} justifyContent={'center'} px={4}>
+          <Flex w={'full'} h={'full'} justifyContent={'center'} alignItems={'center'} px={4}>
             <Text textAlign="center">{t('shared.actions', 'Actions')}</Text>
           </Flex>
         </GridHeader>

@@ -57,10 +57,10 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
     borderLeft: '0px Solid',
     borderRight: '0px Solid',
     borderTop: '0px solid',
-    borderBottom: '4px solid',
+    borderBottom: '3px solid',
     borderColor: 'border.dark',
     borderLeftColor: 'border.dark',
-    borderBottomColor: 'theme.black',
+    borderBottomColor: 'theme.darkBlue',
     borderRadius: 0,
   };
 
@@ -102,7 +102,19 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
             aria-label={t('contractor.employees.tabs.listAriaLabel')}
           >
             <Tab
+              pr={4}
+              position="relative"
               _selected={selectedTabStyles}
+              _after={{
+                content: '""',
+                position: 'absolute',
+                right: 0,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                height: '16px',
+                width: '1px',
+                bg: 'gray.300',
+              }}
               role="tab"
               aria-selected={tabIndex === 0}
               aria-controls="active-tabpanel"
@@ -111,7 +123,20 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
               {t('contractor.employees.tabs.active')}
             </Tab>
             <Tab
+              pl={4}
+              pr={4}
+              position="relative"
               _selected={selectedTabStyles}
+              _after={{
+                content: '""',
+                position: 'absolute',
+                right: 0,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                height: '16px',
+                width: '1px',
+                bg: 'gray.300',
+              }}
               role="tab"
               aria-selected={tabIndex === 1}
               aria-controls="pending-tabpanel"
@@ -120,6 +145,7 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
               {t('contractor.employees.tabs.pending')}
             </Tab>
             <Tab
+              pl={4}
               _selected={selectedTabStyles}
               role="tab"
               aria-selected={tabIndex === 2}
