@@ -43,6 +43,7 @@ export const Footer = observer(() => {
     '/check-eligible',
     '/not-found',
     '/get-support',
+    '/contractor-program-resources',
   ];
 
   const shouldShowFooter = onlyShowFooterOnRoutes.some(
