@@ -24,8 +24,8 @@ export const ContractorManagementScreen = observer(function ContractorManagement
 
   const selectedTabStyles = {
     color: 'theme.blue',
-    borderBottomColor: 'theme.blue',
-    borderBottomWidth: '2px',
+    borderBottomColor: 'theme.darkBlue',
+    borderBottomWidth: '3px',
   };
 
   const handleSetTabIndex = (index: number) => {
@@ -47,6 +47,8 @@ export const ContractorManagementScreen = observer(function ContractorManagement
           <TabList borderBottom="0px solid" borderColor="border.dark" mt={4}>
             <Tab
               ml={4}
+              pr={4}
+              position="relative"
               _selected={selectedTabStyles}
               _focus={{
                 outline: 'none',
@@ -60,12 +62,24 @@ export const ContractorManagementScreen = observer(function ContractorManagement
               _active={{
                 outline: 'none',
                 boxShadow: 'none',
+              }}
+              _after={{
+                content: '""',
+                position: 'absolute',
+                right: 0,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                height: '16px',
+                width: '1px',
+                bg: 'gray.300',
               }}
             >
               {t('contractor.tabs.active', 'Active')}
             </Tab>
             <Tab
-              ml={4}
+              pl={4}
+              pr={4}
+              position="relative"
               _selected={selectedTabStyles}
               _focus={{
                 outline: 'none',
@@ -80,11 +94,21 @@ export const ContractorManagementScreen = observer(function ContractorManagement
                 outline: 'none',
                 boxShadow: 'none',
               }}
+              _after={{
+                content: '""',
+                position: 'absolute',
+                right: 0,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                height: '16px',
+                width: '1px',
+                bg: 'gray.300',
+              }}
             >
               {t('contractor.tabs.suspended', 'Suspended')}
             </Tab>
             <Tab
-              ml={4}
+              pl={4}
               _selected={selectedTabStyles}
               _focus={{
                 outline: 'none',
@@ -104,7 +128,7 @@ export const ContractorManagementScreen = observer(function ContractorManagement
             </Tab>
           </TabList>
           <TabPanels as={Flex} direction="column" flex={1} overflowY="auto">
-            <TabPanel flex={1}>
+            <TabPanel flex={1} px={0}>
               <SearchGrid templateColumns="1fr 1fr 1fr 1fr 1fr 1fr 120px">
                 <ContractorGridHeaders />
                 {isSearching ? (
@@ -125,7 +149,7 @@ export const ContractorManagementScreen = observer(function ContractorManagement
               </SearchGrid>
               <TableControls contractorStore={contractorStore} />
             </TabPanel>
-            <TabPanel flex={1}>
+            <TabPanel flex={1} px={0}>
               <SearchGrid templateColumns="1fr 1fr 1fr 1fr 1fr 1fr 120px">
                 <ContractorGridHeaders />
                 {isSearching ? (
@@ -146,7 +170,7 @@ export const ContractorManagementScreen = observer(function ContractorManagement
               </SearchGrid>
               <TableControls contractorStore={contractorStore} />
             </TabPanel>
-            <TabPanel flex={1}>
+            <TabPanel flex={1} px={0}>
               <SearchGrid templateColumns="1fr 1fr 1fr 1fr 1fr 1fr 120px">
                 <ContractorGridHeaders />
                 {isSearching ? (

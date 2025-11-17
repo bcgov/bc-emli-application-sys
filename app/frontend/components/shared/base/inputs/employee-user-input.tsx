@@ -64,7 +64,8 @@ export const EmployeeUserInput = observer(({ index, remove }: IEmployeeUserInput
             <Button
               onClick={() => remove(index)}
               variant="tertiary"
-              leftIcon={<Trash size={16} color="red" />}
+              leftIcon={<Trash size={24} />}
+              color="semantic.errorDark"
               aria-label="Remove"
             />
           )}
