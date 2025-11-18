@@ -126,6 +126,19 @@ export const NavBar = observer(function NavBar() {
   const location = useLocation();
   const path = location.pathname;
 
+  // Track contractor flow using sessionStorage
+  React.useEffect(() => {
+    if (path === '/welcome/contractor' || path === '/contractor') {
+      sessionStorage.setItem('isContractorFlow', 'true');
+    } else if (path === '/welcome') {
+      sessionStorage.setItem('isContractorFlow', 'false');
+    }
+  }, [path]);
+
+  const isContractorFlow = sessionStorage.getItem('isContractorFlow') === 'true';
+  const loginPath = path === '/welcome/contractor' ? '/contractor' : '/login';
+  const logoPath = isContractorFlow ? '/welcome/contractor' : '/welcome';
+
   return (
     <PopoverProvider>
       {/* Skip Links */}
@@ -172,7 +185,7 @@ export const NavBar = observer(function NavBar() {
         <Container maxW="1170px" h="100%" mx="auto" p={0}>
           <Flex align="center" gap={2} w="full" h="100%">
             {/* Logo */}
-            <Link as={RouterLink} to="/" aria-label={t('site.linkHome')} display="flex" alignItems="center">
+            <Link as={RouterLink} to={logoPath} aria-label={t('site.linkHome')} display="flex" alignItems="center">
               <Image
                 height="80px"
                 width="auto"
@@ -275,8 +288,8 @@ export const NavBar = observer(function NavBar() {
                         fontSize={{ base: 'lg', lg: 'xl' }}
                         variant="tertiary"
                         color="greys.anotherGrey"
-                        to="/login"
-                        aria-current={path === '/login' ? 'page' : undefined}
+                        to={loginPath}
+                        aria-current={path === loginPath ? 'page' : undefined}
                       >
                         {t('auth.login')}
                       </RouterLinkButton>
@@ -284,7 +297,7 @@ export const NavBar = observer(function NavBar() {
                   )}
 
                   {/* Mobile/Desktop Menu */}
-                  <NavBarMenu />
+                  <NavBarMenu loginPath={loginPath} />
                 </HStack>
               </Box>
             </HStack>
@@ -354,7 +367,11 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
 });
 
 // ===== MENU COMPONENT ====
-const NavBarMenu = observer(function NavBarMenu() {
+interface INavBarMenuProps {
+  loginPath: string;
+}
+
+const NavBarMenu = observer(function NavBarMenu({ loginPath }: INavBarMenuProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { sessionStore, userStore } = useMst();
@@ -546,7 +563,7 @@ const NavBarMenu = observer(function NavBarMenu() {
               /* ===== NON-LOGGED IN MENU ===== */
               <>
                 <MenuList display="flex" flexWrap="wrap" px={2} py={0} gap={2} border="0" boxShadow="none" maxW="300px">
-                  <NavMenuItemCTA label={t('auth.login')} to="/login" />
+                  <NavMenuItemCTA label={t('auth.login')} to={loginPath} />
                 </MenuList>
                 <MenuDivider my={0} borderColor="border.light" />
                 <NavMenuItem label={t('site.support.getSupport')} to="/get-support" />
