@@ -1078,6 +1078,7 @@ const options = {
           newVersionPublished: 'New version of template has been published - please review changes',
           card: {
             viewApplication: 'View application',
+            continueButton: 'Continue',
             collaborateButton: 'Collaborate',
             collaborationCalloutDraft:
               '<1>{{authorName}} has assigned you to this permit.</1> Collaborate on this permit application.',
@@ -1280,7 +1281,7 @@ const options = {
               'A new version of the permit is available. Please ask author or designated submitter to review and acknowledge changes to proceed.',
             contactsSummary: 'Contacts summary',
             downloadApplication: 'Download application',
-            viewApplicationFiles: 'View application files',
+            viewApplicationFiles: 'View supporting files',
             fetchingMissingPdf: 'Fetching {{missingPdf}}...',
             missingPdfLabels: {
               permitApplication: 'permit application pdf',
@@ -1362,9 +1363,9 @@ const options = {
                 'List the required files below, one line per file. Each line will be a bullet point in the email to the participant.',
               requestedHeader: 'Supporting files requested',
               requestedText: 'Supporting files have been requested from the participant on {{date}}',
-              confirmationText: 'Are you sure you want to request supporting files for {{applicationNumber}}',
+              confirmationText: 'Are you sure you want to request supporting files for {{applicationNumber}}?',
               readyToUpload:
-                'Are you ready to upload your supporting file(s) to your application {{applicationNumber}}',
+                'Are you ready to upload your supporting file(s) to your application {{applicationNumber}}?',
               filesAdded: 'Supporting files added on {{date}}',
             },
           },

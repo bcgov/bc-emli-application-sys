@@ -51,7 +51,7 @@ export default function SupportRequestList({ supportRequests }: SupportRequestLi
       .split('\n')
       .map((line) => line.trim())
       .filter(Boolean);
-    return lines.map((line, i) => `[${line}]`).join(', ');
+    return lines.map((line, i) => `${line}`).join(', ');
   };
 
   return (
@@ -94,7 +94,10 @@ export default function SupportRequestList({ supportRequests }: SupportRequestLi
                     </Text>
 
                     <Text fontSize="sm" mt={2}>
-                      Please upload {formatFiles(sr.additionalText)}
+                      {sr.linkedApplication?.status === 'newly_submitted' ||
+                      sr.linkedApplication?.status === 'submitted'
+                        ? `Thank you for uploading your file(s). For reference, we requested: ${formatFiles(sr.additionalText)}`
+                        : `Please upload... ${formatFiles(sr.additionalText)}`}
                     </Text>
                   </Flex>
                   <Flex
@@ -112,7 +115,7 @@ export default function SupportRequestList({ supportRequests }: SupportRequestLi
                         variant="secondary"
                         w={{ base: 'full', md: 'fit-content' }}
                       >
-                        {t('energySavingsApplication.card.viewApplication')}
+                        {t('energySavingsApplication.card.continueButton')}
                       </RouterLinkButton>
                     )}
                   </Flex>
