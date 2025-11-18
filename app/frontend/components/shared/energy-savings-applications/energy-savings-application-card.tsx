@@ -1,33 +1,19 @@
 import { Box, Flex, Hide, Image, Show, Spacer, Text } from '@chakra-ui/react';
-import { Info, Pencil, Users, Warning } from '@phosphor-icons/react';
+import { PencilIcon, UsersIcon, WarningIcon } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 import React from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { useMst } from '../../../setup/root';
 import { GreenLineSmall } from '../base/decorative/green-line-small';
 import { RouterLinkButton } from '../navigation/router-link-button';
 import SandboxHeader from '../sandbox/sandbox-header';
 import { EnergySavingsApplicationStatusTag } from './energy-savings-application-status-tag';
-import { EPermitApplicationStatus, EPermitApplicationStatusGroup } from '../../../types/enums';
+import { EPermitApplicationStatus } from '../../../types/enums';
 import SupportRequestList from './support-request-list';
 interface IEnergySavingsApplicationCardProps {
   energySavingsApplication: IEnergySavingsApplication;
 }
-
-const calloutBannerContainerProps = {
-  py: '0.375rem',
-  px: 2,
-  align: 'center',
-  gap: '0.375rem',
-  w: 'fit-content',
-  borderRadius: 'sm',
-};
-
-const calloutBannerTextProps = {
-  fontSize: 'sm',
-  numOfLines: 2,
-};
 
 export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEnergySavingsApplicationCardProps) => {
   const { id, nickname, permitTypeAndActivity, number, createdAt, updatedAt, viewedAt } = energySavingsApplication;
@@ -35,10 +21,6 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
   const { userStore } = useMst();
   const currentUser = userStore.currentUser;
   const { t } = useTranslation();
-
-  const { usingCurrentTemplateVersion } = energySavingsApplication;
-
-  const showNewVersionWarning = !usingCurrentTemplateVersion && !energySavingsApplication.isSubmitted;
 
   const isSubmissionCollaboration = energySavingsApplication.submitter?.id !== currentUser?.id;
 
@@ -115,7 +97,7 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
             {energySavingsApplication.status === EPermitApplicationStatus.revisionsRequested && (
               <Flex bg="theme.orange" p={2} borderRadius={4} alignItems={'center'}>
                 <Box>
-                  <Warning size={16} aria-label={'warning icon'} />
+                  <WarningIcon size={16} aria-label={'warning icon'} />
                 </Box>
                 <Text fontSize="sm" ml={2}>
                   <b>{t(`energySavingsApplication.card.actionRequired`)}</b>{' '}
@@ -201,7 +183,7 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
             w={{ base: 'full', md: 'fit-content' }}
             leftIcon={
               !energySavingsApplication.isSubmitted && isSubmissionCollaboration ? (
-                <Users />
+                <UsersIcon />
               ) : [
                   energySavingsApplication.isSubmitted,
                   energySavingsApplication.isIneligible,
@@ -209,7 +191,7 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
                   energySavingsApplication.isApproved,
                   energySavingsApplication.isInReview,
                 ].some(Boolean) ? undefined : (
-                <Pencil />
+                <PencilIcon />
               )
             }
           >

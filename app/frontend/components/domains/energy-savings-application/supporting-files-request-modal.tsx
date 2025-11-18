@@ -121,7 +121,11 @@ export const SupportingFilesRequestModal = observer(
                 <ModalFooter>
                   <Grid templateColumns="repeat(6, 1fr)" gap={2} justifyContent="center" w="full">
                     <GridItem colStart={3} colSpan={1}>
-                      <PageConfirmationModal onConfirm={handleConfirm} applicationNumber={permitApplication.number} />
+                      <PageConfirmationModal
+                        onConfirm={handleConfirm}
+                        applicationNumber={permitApplication.number}
+                        note={note}
+                      />
                     </GridItem>
                     <GridItem colStart={4} colSpan={1}>
                       <Button w="full" variant="secondary" onClick={requestDisclosure.onClose}>
@@ -139,7 +143,15 @@ export const SupportingFilesRequestModal = observer(
   },
 );
 
-export const PageConfirmationModal = ({ onConfirm, applicationNumber }: { onConfirm: () => void }) => {
+export const PageConfirmationModal = ({
+  onConfirm,
+  applicationNumber,
+  note,
+}: {
+  onConfirm: () => void;
+  applicationNumber: string;
+  note: string;
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { t } = useTranslation();
   const handleConfirm = () => {
@@ -149,7 +161,7 @@ export const PageConfirmationModal = ({ onConfirm, applicationNumber }: { onConf
 
   return (
     <>
-      <Button onClick={onOpen} variant="primary" w="full" type="submit">
+      <Button onClick={onOpen} variant="primary" w="full" type="submit" disabled={!note?.trim()}>
         {t('ui.next')}
       </Button>
 
