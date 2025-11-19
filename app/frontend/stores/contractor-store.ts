@@ -5,6 +5,7 @@ import { withEnvironment } from '../lib/with-environment';
 import { withMerge } from '../lib/with-merge';
 import { withRootStore } from '../lib/with-root-store';
 import { IContractor, ContractorModel } from '../models/contractor';
+import { ContractorOnboardModel } from '../models/contractor-onboard';
 
 export enum EContractorSortFields {
   id = 'id',
@@ -89,6 +90,16 @@ export const ContractorStoreModel = types
     setCurrentContractor(contractorId: string | null) {
       self.currentContractor = contractorId;
     },
+    setCurrentContractorById(id: string) {
+      if (self.contractorsMap.has(id)) {
+        self.currentContractor = self.contractorsMap.get(id);
+      } else {
+        self.currentContractor = null;
+      }
+    },
+    findByContactId(contactId: string) {
+      return Array.from(self.contractorsMap.values()).find((contractor) => contractor.contactId === contactId) || null;
+    },
     setStatusFilter(status: 'active' | 'suspended' | 'removed') {
       self.statusFilter = status;
       // Trigger a new search with the status filter
@@ -118,8 +129,12 @@ export const ContractorStoreModel = types
       const response = yield self.environment.api.fetchContractors(searchParams);
 
       if (response.ok) {
-        self.mergeUpdateAll(response.data.data, 'contractorsMap');
-        self.setTableContractors(response.data.data);
+        const normalizedData = response.data.data.map((c) => ({
+          ...c,
+          contactId: c.contact?.id ?? null,
+        }));
+        self.mergeUpdateAll(normalizedData, 'contractorsMap');
+        self.setTableContractors(normalizedData);
         self.currentPage = opts.page ?? self.currentPage;
         self.totalPages = response.data.meta.totalPages;
         self.totalCount = response.data.meta.totalCount;
@@ -142,6 +157,33 @@ export const ContractorStoreModel = types
       }
       return response;
     }),
+    fetchOnboarding: flow(function* (contractorId: string) {
+      const response = yield self.environment.api.getContractorOnboarding(contractorId);
+      if (response.ok && response.data) {
+        return response.data.data; // pass back to UI layer
+      }
+      return null;
+    }),
+    createOnboarding: flow(function* (contractorId: string) {
+      const response = yield self.environment.api.createContractorOnboarding(contractorId);
+      if (!response.ok) return null;
+
+      const data = response.data;
+
+      const permitApplicationId = data.onboardApplication?.id;
+      const contractorIdReturned = data.contractor?.id;
+
+      self.setCurrentContractorById(contractorIdReturned);
+
+      return {
+        permitApplicationId,
+        contractorId: contractorIdReturned,
+      };
+    }),
+    mergeContractor(contractorData: any) {
+      // replace or add the contractor safely
+      self.contractorsMap.set(contractorData.id, contractorData);
+    },
   }));
 
 export interface IContractorStore extends Instance<typeof ContractorStoreModel> {}

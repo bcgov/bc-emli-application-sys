@@ -247,6 +247,13 @@ export const UserStoreModel = types
     searchUsersOptimized: flow(function* () {
       return yield self.searchUsers();
     }),
+    mergeUser(userData: any) {
+      if (userData.id === self.currentUser?.id) {
+        // avoid overwriting the logged-in user snapshot
+        return;
+      }
+      self.usersMap.set(userData.id, userData);
+    },
   }));
 
 export interface IUserStore extends Instance<typeof UserStoreModel> {}

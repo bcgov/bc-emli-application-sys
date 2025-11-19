@@ -10,6 +10,7 @@ import {
   EPermitBlockStatus,
   ERequirementChangeAction,
   ERequirementType,
+  EPermitClassificationCode,
 } from '../types/enums';
 import {
   ICompareRequirementsBoxData,
@@ -48,6 +49,7 @@ import { StepCodeModel } from './step-code';
 import { ProgramModel } from './program';
 import { TemplateVersionModel } from './template-version';
 import { IUser, UserModel } from './user';
+import { ContractorModel } from './contractor';
 import { IProgram } from './program';
 
 export const EnergySavingsApplicationModel = types.snapshotProcessor(
@@ -67,7 +69,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       submissionType: types.frozen<ISubmissionType>(),
       program: types.frozen<IProgram>(),
       status: types.enumeration(Object.values(EPermitApplicationStatus)),
-      submitter: types.maybeNull(types.maybe(types.reference(types.late(() => UserModel)))),
+      submitterSnapshot: types.maybeNull(types.frozen()),
       // assignedUsers: types.maybeNull(types.array(types.late(() => UserModel))),
       assignedUsers: types.array(types.frozen<IMinimalFrozenUser>()),
       jurisdiction: types.maybeNull(types.maybe(types.reference(types.late(() => JurisdictionModel)))),
@@ -149,6 +151,21 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       },
     }))
     .views((self) => ({
+      get isSupportRequest() {
+        return (
+          self.submissionType?.code === EPermitClassificationCode.supportRequest &&
+          self.userGroupType?.code === EPermitClassificationCode.participant
+        );
+      },
+
+      get isContractorOnboarding() {
+        return (
+          self.submissionType?.code === EPermitClassificationCode.onboarding &&
+          self.userGroupType?.code === EPermitClassificationCode.contractor
+        );
+      },
+    }))
+    .views((self) => ({
       getRequirementBlockIdToStatusMap(collaborationType: ECollaborationType) {
         return self.permitBlockStatuses.reduce((acc, permitBlockStatus) => {
           if (permitBlockStatus.collaborationType === collaborationType) {
@@ -164,6 +181,25 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
           return null;
         }
         return self.sortedSubmissionVersions[0];
+      },
+      get submitter() {
+        const snapshot = self.submitterSnapshot;
+        if (!snapshot) return undefined;
+
+        // Use the injected root store
+        const root = self.rootStore;
+
+        // Resolve to a UserModel
+        if (snapshot.type === 'User') {
+          return root.userStore.usersMap.get(snapshot.id);
+        }
+
+        // Resolve to a ContractorModel
+        if (snapshot.type === 'Contractor') {
+          return root.contractorStore.contractorsMap.get(snapshot.id);
+        }
+
+        return undefined;
       },
     }))
     .views((self) => ({
@@ -507,7 +543,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         return self.getCollaborationAssigneesByBlockIdMap(collaborationType)[requirementBlockId] ?? [];
       },
       canUserSubmit(user: IUser) {
-        if (self.submitter.id === user.id) {
+        if (self.submitter.id === user.id || self.submitter?.contactId === user.id) {
           return true;
         }
 
@@ -651,24 +687,6 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       updatePermitBlockStatus(permitBlockStatus: IPermitBlockStatus) {
         self.permitBlockStatusMap.put(permitBlockStatus);
       },
-      // setLinkedApplicationNumber(number: string) {
-      //   if (!number) return;
-
-      //   // Ensure the object exists
-      //   if (!self.incomingSupportRequests) {
-      //     self.incomingSupportRequests = { parentApplication: { number } };
-      //     return;
-      //   }
-
-      //   // Ensure the nested parentApplication exists
-      //   if (!self.incomingSupportRequests.parentApplication) {
-      //     self.incomingSupportRequests.parentApplication = { number };
-      //     return;
-      //   }
-
-      //   // update the number into the object
-      //   self.incomingSupportRequests.parentApplication.number = number;
-      // },
       setLinkedApplicationNumber(number: string) {
         if (!number) return;
 

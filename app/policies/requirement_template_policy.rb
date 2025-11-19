@@ -68,6 +68,11 @@ class RequirementTemplatePolicy < ApplicationPolicy
     false
   end
 
+  def contractor_onboarding?
+    user.contractor?
+    #TODO: we'll likely need to check that the user isn't already associated with a Contractor company
+  end
+
   class Scope < Scope
     def resolve
       scope.all

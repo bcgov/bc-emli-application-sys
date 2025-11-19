@@ -2,12 +2,16 @@ class PermitApplicationPolicy < ApplicationPolicy
   # Policy controls whether user can view this permit application
   # Used for: search results, individual record access, list filtering
   def index?
-    if user.system_admin? || user.admin_manager? || user.admin?
-      # Admin users can see all applications they have access to
-      true
-    elsif record.submitter == user || record.submitted_for == user.id
-      # Participants can see their own applications
-      true
+    return true if user.system_admin? || user.admin_manager? || user.admin?
+
+    # polymorphic submitter check
+    case record.submitter
+    when User
+      # submitted directly by a user
+      record.submitter == user || record.submitted_for == user.id
+    when Contractor
+      # submitted by a contractor — allow if the user is that contractor’s contact
+      record.submitter.contact_id == user.id
     else
       false
     end
@@ -66,6 +70,11 @@ class PermitApplicationPolicy < ApplicationPolicy
   # Default hook for support requests – subclasses/services must override!
   def support_requests?
     false
+  end
+
+  def contractor_onboarding?
+    user.contractor?
+    #TODO: we'll likely need to check that the user isn't already associated with a Contractor company
   end
 
   def upload_supporting_document?

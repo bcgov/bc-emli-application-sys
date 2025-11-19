@@ -255,6 +255,8 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :contractor_onboards, only: %i[create update show]
+
     resources :audit_logs, only: %i[index] do
       get "filter_options", on: :collection
     end

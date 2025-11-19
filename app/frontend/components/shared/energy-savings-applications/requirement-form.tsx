@@ -364,7 +364,7 @@ export const RequirementForm = observer(
       const clonedFormJson = JSON.parse(JSON.stringify(formattedFormJson));
 
       // Calculate shared variables once outside loops for performance
-      const isRealParticipant = currentUser?.role === 'participant';
+      const isRealParticipant = currentUser?.role === 'participant' || currentUser?.role === 'contractor';
       const isDraftApplication = permitApplication?.status === 'draft' || permitApplication?.status === 'new_draft';
       const isRevisionsRequested = permitApplication?.status === 'revisions_requested';
       const revisionRequests = permitApplication?.latestRevisionRequests || [];

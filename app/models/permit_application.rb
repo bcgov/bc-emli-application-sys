@@ -7,7 +7,10 @@ class PermitApplication < ApplicationRecord
          in_review: 5,
          update_needed: 6,
          approved: 7,
-         ineligible: 8
+         ineligible: 8,
+         training_pending: 9,
+         approved_pending: 10,
+         approved_paid: 11
        },
        _default: 0
 
@@ -29,20 +32,26 @@ class PermitApplication < ApplicationRecord
   #   permit_collaborations
   # ]
 
-  SEARCH_INCLUDES =
-    %i[
-      submission_versions
-      submitter
-      sandbox
-      program
-      assigned_users
-      submission_type
-      template_version
-      support_requests
-      user_group_type
-      audience_type
-      supporting_documents
-    ] + [{ template_version: :requirement_template }]
+  SEARCH_INCLUDES = [
+    :submission_versions,
+    :submitter,
+    :sandbox,
+    :program,
+    :assigned_users,
+    :submission_type,
+    :template_version,
+    :support_requests,
+    :user_group_type,
+    :audience_type,
+    { template_version: :requirement_template },
+    :supporting_documents,
+    {
+      support_requests: [
+        :requested_by,
+        { linked_application: :supporting_documents }
+      ]
+    }
+  ]
 
   API_SEARCH_INCLUDES = %i[
     program
@@ -227,6 +236,18 @@ class PermitApplication < ApplicationRecord
     end
   end
 
+  # helper method to check if a given user owns this application
+  def owned_by?(user)
+    case submitter
+    when User
+      submitter == user
+    when Contractor
+      submitter.contact_id == user.id
+    else
+      false
+    end
+  end
+
   # Helper method to get the latest SubmissionVersion
   def latest_submission_version
     submission_versions.order(created_at: :desc).first
@@ -242,11 +263,15 @@ class PermitApplication < ApplicationRecord
   end
 
   def form_json(current_user: nil)
+    effective_user =
+      (submitter.is_a?(Contractor) ? submitter.contact : current_user)
+    Rails.logger.info "Generating form JSON for PermitApplication #{id} with effective user #{effective_user.inspect}"
     result =
       PermitApplication::FormJsonService.new(
         permit_application: self,
-        current_user:
+        current_user: effective_user
       ).call
+
     result.form_json
   end
 
@@ -318,17 +343,27 @@ class PermitApplication < ApplicationRecord
 
   def submission_requirement_block_edit_permissions(user_id:)
     user = User.find(user_id)
-    if user&.admin? || user&.admin_manager?
-      if user.program_memberships.active.exists?(program_id: self.program_id)
+    return nil unless user
+
+    # If submitter is a Contractor and their contact matches this user, treat as the same
+    if submitter.is_a?(Contractor) && submitter.contact_id == user_id
+      return :all
+    end
+
+    # Admins or admin managers with program membership
+    if user.admin? || user.admin_manager?
+      if user.program_memberships.active.exists?(program_id: program_id)
         return :all
       end
     end
 
+    # Non-owners without collaboration access get nothing
     if submitter_id != user_id &&
          !collaborator?(user_id:, collaboration_type: :submission)
       return nil
     end
 
+    # Direct submitters or delegatee collaborators get all
     if submitter_id == user_id ||
          collaborator?(
            user_id:,
@@ -338,6 +373,7 @@ class PermitApplication < ApplicationRecord
       return :all
     end
 
+    # Otherwise return assigned block IDs
     permit_collaborations
       .joins(:collaborator)
       .where(collaboration_type: :submission, collaborators: { user_id: })

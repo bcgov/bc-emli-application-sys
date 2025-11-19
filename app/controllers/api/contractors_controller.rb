@@ -10,6 +10,7 @@ class Api::ContractorsController < Api::ApplicationController
     perform_contractor_search
     contractors = @contractor_search.results
 
+    Rails.logger.info("Contractors: #{contractors.inspect} ")
     render_success contractors,
                    nil,
                    {

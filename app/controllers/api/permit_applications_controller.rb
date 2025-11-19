@@ -668,6 +668,8 @@ class Api::PermitApplicationsController < Api::ApplicationController
       # NotificationService.publish_support_request_admin_event(application)
     when %i[support_request participant external]
       #
+    when %i[onboarding contractor external]
+      #
     else
       # Notify admin staff about new submission
       NotificationService.publish_new_submission_received_event(application)
