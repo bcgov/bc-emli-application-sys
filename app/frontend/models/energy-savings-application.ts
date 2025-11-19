@@ -69,9 +69,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       submissionType: types.frozen<ISubmissionType>(),
       program: types.frozen<IProgram>(),
       status: types.enumeration(Object.values(EPermitApplicationStatus)),
-      submitter: types.maybeNull(
-        types.union(types.reference(types.late(() => ContractorModel)), types.reference(types.late(() => UserModel))),
-      ),
+      submitterSnapshot: types.maybeNull(types.frozen()),
       // assignedUsers: types.maybeNull(types.array(types.late(() => UserModel))),
       assignedUsers: types.array(types.frozen<IMinimalFrozenUser>()),
       jurisdiction: types.maybeNull(types.maybe(types.reference(types.late(() => JurisdictionModel)))),
@@ -183,6 +181,25 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
           return null;
         }
         return self.sortedSubmissionVersions[0];
+      },
+      get submitter() {
+        const snapshot = self.submitterSnapshot;
+        if (!snapshot) return undefined;
+
+        // Use the injected root store
+        const root = self.rootStore;
+
+        // Resolve to a UserModel
+        if (snapshot.type === 'User') {
+          return root.userStore.usersMap.get(snapshot.id);
+        }
+
+        // Resolve to a ContractorModel
+        if (snapshot.type === 'Contractor') {
+          return root.contractorStore.contractorsMap.get(snapshot.id);
+        }
+
+        return undefined;
       },
     }))
     .views((self) => ({
@@ -670,24 +687,6 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       updatePermitBlockStatus(permitBlockStatus: IPermitBlockStatus) {
         self.permitBlockStatusMap.put(permitBlockStatus);
       },
-      // setLinkedApplicationNumber(number: string) {
-      //   if (!number) return;
-
-      //   // Ensure the object exists
-      //   if (!self.incomingSupportRequests) {
-      //     self.incomingSupportRequests = { parentApplication: { number } };
-      //     return;
-      //   }
-
-      //   // Ensure the nested parentApplication exists
-      //   if (!self.incomingSupportRequests.parentApplication) {
-      //     self.incomingSupportRequests.parentApplication = { number };
-      //     return;
-      //   }
-
-      //   // update the number into the object
-      //   self.incomingSupportRequests.parentApplication.number = number;
-      // },
       setLinkedApplicationNumber(number: string) {
         if (!number) return;
 

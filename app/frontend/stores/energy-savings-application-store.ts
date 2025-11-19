@@ -13,7 +13,6 @@ import { IPermitBlockStatus } from '../models/permit-block-status';
 import { IRequirementTemplate } from '../models/requirement-template';
 import { IUser } from '../models/user';
 import { cast } from 'mobx-state-tree';
-import { runInAction } from 'mobx';
 
 import {
   ECustomEvents,

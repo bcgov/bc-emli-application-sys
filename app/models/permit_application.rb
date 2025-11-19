@@ -32,20 +32,26 @@ class PermitApplication < ApplicationRecord
   #   permit_collaborations
   # ]
 
-  SEARCH_INCLUDES =
-    %i[
-      submission_versions
-      submitter
-      sandbox
-      program
-      assigned_users
-      submission_type
-      template_version
-      support_requests
-      user_group_type
-      audience_type
-      supporting_documents
-    ] + [{ template_version: :requirement_template }]
+  SEARCH_INCLUDES = [
+    :submission_versions,
+    :submitter,
+    :sandbox,
+    :program,
+    :assigned_users,
+    :submission_type,
+    :template_version,
+    :support_requests,
+    :user_group_type,
+    :audience_type,
+    { template_version: :requirement_template },
+    :supporting_documents,
+    {
+      support_requests: [
+        :requested_by,
+        { linked_application: :supporting_documents }
+      ]
+    }
+  ]
 
   API_SEARCH_INCLUDES = %i[
     program
