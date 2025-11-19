@@ -32,8 +32,8 @@ class OmniauthUserResolver
     if existing_user
       self.user = update_user
     else
-      #it's a new user, however only Basic BCeID/BCSC can create own accounts, others must be invited
-      if @entry_point == "isParticipant"
+      #it's a new user, however only Basic BCeID/BCSC/Contractor can create own accounts, others must be invited
+      if @entry_point == "isParticipant" || @entry_point == "isContractor"
         self.user = create_user
       else
         self.user = invited_user
@@ -146,7 +146,6 @@ class OmniauthUserResolver
   end
 
   def raw_info
-    #Rails.logger.info("Auth Info: #{auth}")
     @raw_info ||= auth.extra.raw_info
   end
 

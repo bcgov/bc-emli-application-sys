@@ -10,6 +10,7 @@ import {
   EPermitBlockStatus,
   ERequirementChangeAction,
   ERequirementType,
+  EPermitClassificationCode,
 } from '../types/enums';
 import {
   ICompareRequirementsBoxData,
@@ -42,11 +43,13 @@ import { IPermitBlockStatus, PermitBlockStatusModel } from './permit-block-statu
 import { IActivity, IAudienceType, IPermitType, ISubmissionType, IUserGroupType } from './permit-classification';
 import { IPermitCollaboration, PermitCollaborationModel } from './permit-collaboration';
 import { IRequirement } from './requirement';
+import { ISupportRequest, SupportRequestModel } from './support_request';
 import { SandboxModel } from './sandbox';
 import { StepCodeModel } from './step-code';
 import { ProgramModel } from './program';
 import { TemplateVersionModel } from './template-version';
 import { IUser, UserModel } from './user';
+import { ContractorModel } from './contractor';
 import { IProgram } from './program';
 
 export const EnergySavingsApplicationModel = types.snapshotProcessor(
@@ -66,7 +69,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       submissionType: types.frozen<ISubmissionType>(),
       program: types.frozen<IProgram>(),
       status: types.enumeration(Object.values(EPermitApplicationStatus)),
-      submitter: types.maybeNull(types.maybe(types.reference(types.late(() => UserModel)))),
+      submitterSnapshot: types.maybeNull(types.frozen()),
       // assignedUsers: types.maybeNull(types.array(types.late(() => UserModel))),
       assignedUsers: types.array(types.frozen<IMinimalFrozenUser>()),
       jurisdiction: types.maybeNull(types.maybe(types.reference(types.late(() => JurisdictionModel)))),
@@ -103,6 +106,8 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       permitCollaborationMap: types.map(PermitCollaborationModel),
       permitBlockStatusMap: types.map(PermitBlockStatusModel),
       isViewingPastRequests: types.optional(types.boolean, false),
+      supportRequests: types.maybeNull(types.array(types.frozen<ISupportRequest>())), // Array of ISupportRequest
+      incomingSupportRequests: types.maybeNull(types.frozen<ISupportRequest>()), // ISupportRequest link to Parent Application
     })
     .extend(withEnvironment())
     .extend(withRootStore())
@@ -146,6 +151,21 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       },
     }))
     .views((self) => ({
+      get isSupportRequest() {
+        return (
+          self.submissionType?.code === EPermitClassificationCode.supportRequest &&
+          self.userGroupType?.code === EPermitClassificationCode.participant
+        );
+      },
+
+      get isContractorOnboarding() {
+        return (
+          self.submissionType?.code === EPermitClassificationCode.onboarding &&
+          self.userGroupType?.code === EPermitClassificationCode.contractor
+        );
+      },
+    }))
+    .views((self) => ({
       getRequirementBlockIdToStatusMap(collaborationType: ECollaborationType) {
         return self.permitBlockStatuses.reduce((acc, permitBlockStatus) => {
           if (permitBlockStatus.collaborationType === collaborationType) {
@@ -161,6 +181,25 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
           return null;
         }
         return self.sortedSubmissionVersions[0];
+      },
+      get submitter() {
+        const snapshot = self.submitterSnapshot;
+        if (!snapshot) return undefined;
+
+        // Use the injected root store
+        const root = self.rootStore;
+
+        // Resolve to a UserModel
+        if (snapshot.type === 'User') {
+          return root.userStore.usersMap.get(snapshot.id);
+        }
+
+        // Resolve to a ContractorModel
+        if (snapshot.type === 'Contractor') {
+          return root.contractorStore.contractorsMap.get(snapshot.id);
+        }
+
+        return undefined;
       },
     }))
     .views((self) => ({
@@ -504,7 +543,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         return self.getCollaborationAssigneesByBlockIdMap(collaborationType)[requirementBlockId] ?? [];
       },
       canUserSubmit(user: IUser) {
-        if (self.submitter.id === user.id) {
+        if (self.submitter.id === user.id || self.submitter?.contactId === user.id) {
           return true;
         }
 
@@ -574,6 +613,60 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         );
       },
     }))
+    .views((self) => ({
+      // Latest SR created_at as Date object (or null if none)
+      get latestSupportRequestDate(): Date | null {
+        if (!self.supportRequests || self.supportRequests?.length === 0) return null;
+
+        // Find the latest by createdAt
+        const latest = self.supportRequests.reduce((acc, sr) =>
+          new Date(sr.createdAt) > new Date(acc.createdAt) ? sr : acc,
+        );
+
+        // Only return if not approved
+        if (latest.status === EPermitApplicationStatus.approved) return null;
+
+        return latest.createdAt ? new Date(latest.createdAt) : null;
+      },
+
+      // Strict UI format: YYYY/MM/DD
+      get latestSupportRequestDateString(): string | null {
+        const date = this.latestSupportRequestDate;
+        if (!date) return null;
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}/${month}/${day}`;
+      },
+
+      get latestSubmittedSupportRequestWithDocuments() {
+        if (!self.supportRequests || self.supportRequests.length === 0) return null;
+
+        const validRequests = self.supportRequests.filter((sr) => {
+          const linked = sr.linkedApplication;
+          if (!linked) return false;
+
+          const hasDocuments = Array.isArray(linked.supportingDocuments) && linked.supportingDocuments.length > 0;
+
+          const validStatus = linked.status === 'submitted' || linked.status === 'newly_submitted';
+
+          return hasDocuments && validStatus;
+        });
+
+        if (validRequests.length === 0) return null;
+
+        // Sort descending by updatedAt
+        const sorted = validRequests.slice().sort((a, b) => {
+          const dateA = new Date(a.linkedApplication.updatedAt).getTime();
+          const dateB = new Date(b.linkedApplication.updatedAt).getTime();
+          return dateB - dateA;
+        });
+
+        return sorted[0].linkedApplication.updatedAt;
+      },
+    }))
     .actions((self) => ({
       setName(name: string) {
         self.nickname = name;
@@ -593,6 +686,20 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       },
       updatePermitBlockStatus(permitBlockStatus: IPermitBlockStatus) {
         self.permitBlockStatusMap.put(permitBlockStatus);
+      },
+      setLinkedApplicationNumber(number: string) {
+        if (!number) return;
+
+        const current = self.incomingSupportRequests ?? {};
+        const parentApp = current.parentApplication ?? {};
+
+        self.incomingSupportRequests = {
+          ...current,
+          parentApplication: {
+            ...parentApp,
+            number,
+          },
+        };
       },
     }))
     .actions((self) => ({

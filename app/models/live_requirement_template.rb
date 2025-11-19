@@ -2,7 +2,7 @@ class LiveRequirementTemplate < RequirementTemplate
   # validate :unique_classification_for_undiscarded
   validate :unique_application_for_participant
   validate :unique_external_onboarding_for_contractor
-  validate :support_request_internal_only
+  #validate :support_request_internal_only
 
   def visibility
     "live"

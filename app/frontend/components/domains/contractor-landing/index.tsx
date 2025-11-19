@@ -16,7 +16,7 @@ import {
   AccordionIcon,
 } from '@chakra-ui/react';
 import { colors } from '../../../styles/theme/foundations/colors';
-import { CaretRight, ArrowSquareOut } from '@phosphor-icons/react';
+import { CaretRightIcon, ArrowSquareOutIcon } from '@phosphor-icons/react';
 import React from 'react';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { useTranslation } from 'react-i18next';
@@ -52,10 +52,11 @@ export const ContractorLandingScreen = () => {
           </Text>
           <HStack spacing={4} mt={8} flexDirection={{ base: 'column', md: 'row' }} align="stretch" w="full">
             <RouterLinkButton
+              to="/contractor"
               mt="2"
               w={{ base: '100%', md: '200px' }}
               variant="primaryInverse"
-              rightIcon={<CaretRight aria-hidden="true" />}
+              rightIcon={<CaretRightIcon aria-hidden="true" />}
               aria-label={t('auth.login')}
             >
               {t('auth.login')}
@@ -89,7 +90,7 @@ export const ContractorLandingScreen = () => {
             isExternal
             aria-label={`${t('landing.contractor.learnMore')} (opens in a new tab)`}
           >
-            {t('landing.contractor.learnMore')} <ArrowSquareOut aria-hidden="true" />
+            {t('landing.contractor.learnMore')} <ArrowSquareOutIcon aria-hidden="true" />
           </Link>
           {/* Stepper for desktop */}
           <Stepper steps={flow} orientation="horizontal" />
@@ -135,10 +136,10 @@ export const ContractorLandingScreen = () => {
                   <ListItem>{t('landing.contractor.businessNumber')}</ListItem>
                 </UnorderedList>
                 <RouterLinkButton
-                  to="/terms"
+                  to="/contractor"
                   mt="2"
                   variant="primaryInverse"
-                  rightIcon={<CaretRight aria-hidden="true" />}
+                  rightIcon={<CaretRightIcon aria-hidden="true" />}
                   aria-label="Register as HPCN member contractor"
                 >
                   {t('auth.registerButton')}
@@ -166,10 +167,10 @@ export const ContractorLandingScreen = () => {
                     ))}
                   </UnorderedList>
                   <RouterLinkButton
-                    to="/terms"
+                    to="/contractor"
                     mt="2"
                     variant="primaryInverse"
-                    rightIcon={<CaretRight aria-hidden="true" />}
+                    rightIcon={<CaretRightIcon aria-hidden="true" />}
                     aria-label="Register as Health Safety contractor"
                   >
                     {t('auth.registerButton')}
@@ -189,9 +190,10 @@ export const ContractorLandingScreen = () => {
           </Heading>
           <Text mt={4}>{t('landing.contractor.submitInvoices')}</Text>
           <RouterLinkButton
+            to="/contractor"
             mt={4}
             variant="primaryInverse"
-            rightIcon={<CaretRight aria-hidden="true" />}
+            rightIcon={<CaretRightIcon aria-hidden="true" />}
             aria-label={t('auth.login')}
           >
             {t('auth.login')}

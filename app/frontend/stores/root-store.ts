@@ -2,6 +2,7 @@ import { makePersistable } from 'mobx-persist-store';
 import { IStateTreeNode, flow, protect, types, unprotect } from 'mobx-state-tree';
 import { createUserChannelConsumer } from '../channels/user_channel';
 import { withEnvironment } from '../lib/with-environment';
+import { Environment } from '../models/environment';
 import { CollaboratorStoreModel, ICollaboratorStore } from './collaborator-store';
 import { ContactStoreModel, IContactStore } from './contact-store';
 import { ContractorStoreModel, IContractorStore } from './contractor-store';
@@ -137,6 +138,7 @@ export interface IRootStore extends IStateTreeNode {
   notificationStore: INotificationStore;
   collaboratorStore: ICollaboratorStore;
   sandboxStore: ISandboxStore;
+  environment: Environment;
   subscribeToUserChannel: () => Promise<void>;
   disconnectUserChannel: () => void;
   loadLocalPersistedData: () => void;

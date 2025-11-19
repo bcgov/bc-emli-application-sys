@@ -35,6 +35,10 @@ class UserPolicy < ApplicationPolicy
     user.admin_manager?
   end
 
+  def contractor?
+    user.contractor?
+  end
+
   def search_jurisdiction_users?
     if user.system_admin? && (record.manager? || record.system_admin?)
       return true
@@ -84,9 +88,6 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update_role?
-    Rails.logger.info(
-      "can update? #{(user.system_admin? || user.admin_manager?)}"
-    )
     (user.system_admin? || user.admin_manager?) && user != record
   end
 

@@ -163,6 +163,7 @@ en:
       notify_admin_updated_participant_app: 'Your application has been updated'
       notify_participant_incomplete_draft_notification: 'Reminder: Your recently created application'
       notify_new_participant_welcome: 'Welcome to the Better Homes Energy Savings Program'
+      notify_participant_supporting_files_requested: 'Supporting files requested for Application %{permit_application_number}'
   authentication_methods:
     bcsc: 'BC Services Card Account'
     bceidbasic: 'Basic BCeID'
@@ -251,6 +252,45 @@ en:
       destroy_error:
         title: Oops
         message: '%{error_message}'
+    contractor:
+      employees:
+        unknownEmployee: 'Unknown Employee'
+        deactivate_success:
+          title: ''
+          message: 'Employee deactivated successfully'
+        deactivate_error:
+          title: Error
+          message: 'Failed to deactivate employee'
+        reactivate_success:
+          title: ''
+          message: 'Employee reactivated successfully'
+        reactivate_error:
+          title: Error
+          message: 'Failed to reactivate employee'
+        reinvite_success:
+          title: ''
+          message: 'Employee re-invited successfully'
+        reinvite_error:
+          title: Error
+          message: 'Failed to send employee invitation'
+        revoke_success:
+          title: ''
+          message: 'Employee invite revoked successfully'
+        revoke_error:
+          title: Error
+          message: 'Failed to revoke employee invite'
+        set_primary_contact_success:
+          title: ''
+          message: 'Employee set as primary contact successfully'
+        set_primary_contact_error:
+          title: Error
+          message: 'Failed to set employee as primary contact'
+        employee_not_found:
+          title: Error
+          message: 'Employee not found'
+        no_pending_invite:
+          title: Error
+          message: 'No pending invite found for this employee'
     user:
       not_confirmed_error:
         title: Failed to login.
@@ -651,7 +691,13 @@ en:
       template_version_mismatch:
         title: 'Error'
         message: 'The template version does not match the expected criteria'
-  services:
+      no_published_template_version:
+        title: 'Error'
+        message: 'No published Supporting Files request template was found. Please contact an administrator.'
+      support_request_not_created:
+        title: 'Error'
+        message: 'The support request could not be created.'
+    services:
     auto_compliance_configuration:
       digital_seal_validator:
         label: 'Digital Seal Validator for AIBC and EGBC - Validates the digital seal of a file'
@@ -740,6 +786,8 @@ en:
       new_submission_received_notification: 'New application %{number} submitted to %{program_name} on %{submitted_at}'
       assignment_notification: 'Application %{number} from %{program_name} has been assigned to you'
       participant_incomplete_draft_notification: 'This is a reminder that your application to the %{program_name} is still in draft. You can complete your application by viewing it here'
+    support_request:
+      supporting_files_uploaded: 'Supporting files added to application %{application_number} on %{uploaded_date}'
     user:
       account_update_notification: 'Your account was updated on %{updated_at}. Changes: %{changed_fields}. If you did not make this change, please contact support immediately.'
     permit_collaboration:
@@ -766,7 +814,7 @@ en:
     newly_submitted: 'UNREAD'
     revisions_requested: 'UPDATE NEEDED'
     resubmitted: 'RESUBMITTED'
-    in_review: 'SCREENED IN'
+    in_review: 'UNDER REVIEW'
     ineligible: 'INELIGIBLE'
     approved: 'APPROVED'
   file_upload:
@@ -802,11 +850,12 @@ en:
       program: 'Program'
       lastUpdated: 'Last updated'
     management:
-      title: 'Contractor Management'
+      title: 'Manage contractor details'
       addButton: 'Add Contractor'
     actions:
       manage: 'Manage'
-      inviteEmployee: 'Invite Employee'
+      inviteEmployee: 'Invite Employees'
       viewEmployees: 'View Employees'
       editContractor: 'Edit Contractor'
       suspendContractor: 'Suspend Contractor'
+      removeContractor: 'Remove Contractor'

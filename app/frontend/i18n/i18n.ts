@@ -33,6 +33,7 @@ const options = {
           psrLogin: 'PSR Log in',
           adminMgrLogin: 'Admin Manager Log in',
           sysAdminLogin: 'System Admin Log in',
+          contractorLogin: 'Contractor login',
           sysAdmin: {
             createTitle: 'Create system admin account',
             loginTitle: 'System admin log in',
@@ -110,8 +111,12 @@ const options = {
               description:
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent aliquet pretium ipsum quis interdum. Mauris in dapibus ligula. ',
               ctaText: 'Log in with Business BCeID',
+              loginPrompt: 'You must log in with a Business BCeID account.',
+              loginButton: 'Log in with Business BCeID Account',
               learnMore: 'Learn more about BCeID',
               setupAccount: 'and how to set up an account',
+              needSetup: 'Do you need to set up your Business BCeID account? Get started',
+              here: 'here',
             },
           },
           noAccount: 'Don’t have an account?',
@@ -126,7 +131,7 @@ const options = {
           phoneNumberHours:
             'This phone line is answered 7:30 am - 5 pm Monday to Friday (excluding statutory holidays).',
           role: 'Role',
-          emailLabel: 'Email address',
+          emailLabel: 'Email',
           userFirstNameLabel: 'First name',
           userLastNameLabel: 'Last name',
           organizationLabel: 'Organization',
@@ -432,6 +437,9 @@ const options = {
           confirmOverwrite: 'Are you sure you want to save and overwrite this item?',
           sureDelete: 'Are you sure you want to delete this item?',
           disable: 'Disable',
+          deactivate: 'Deactivate',
+          reactivate: 'Reactivate',
+          reinvite: 'Re-invite',
           ok: 'OK',
           dismiss: 'Dismiss',
           revoke: 'Revoke',
@@ -1044,6 +1052,21 @@ const options = {
               'I confirm this application has all the required information. This application is ready for review.',
           },
         },
+        contractorOnboarding: {
+          readyContractor: 'Ready to submit your registration details?',
+          confirmationContractor:
+            'By submitting your registration details you confirm that the information you provided was completed to the best of your knowledge and ability',
+          submissionSuccess: 'You have submitted your details to the Energy Savings Program.',
+          whatsNext: {
+            heading: 'What’s next?',
+            line1:
+              'Please wait while we assess your registration details. We will email you once your registration is approved. If we need more information we will reach out via email.',
+            line2:
+              'If you need to add, edit, or remove employees from your account in the future you will need to call us.',
+            line3: 'If you have any questions, please call us at 1-833-856-0333 or email us at <1>{{email}}</1>.',
+          },
+          returnToDashboard: 'Return to Contractor homepage',
+        },
         energySavingsApplication: {
           submissionBlockModal: {
             title: 'Trying to submit this application?',
@@ -1070,6 +1093,7 @@ const options = {
           newVersionPublished: 'New version of template has been published - please review changes',
           card: {
             viewApplication: 'View application',
+            continueButton: 'Continue',
             collaborateButton: 'Collaborate',
             collaborationCalloutDraft:
               '<1>{{authorName}} has assigned you to this permit.</1> Collaborate on this permit application.',
@@ -1120,16 +1144,16 @@ const options = {
             resubmitted: 'Resubmitted',
             revisions_requested: 'Update needed',
             ephemeral: 'Preview',
-            in_review: 'Screened In',
+            in_review: 'Under Review',
             approved: 'Approved',
             ineligible: 'Ineligible',
-            screen_in: 'Screened In',
+            screen_in: 'Under Review',
             unread: 'Unread',
           },
           filter: {
             draft: 'Draft',
             submitted: 'Submitted',
-            inReview: 'Screened In',
+            inReview: 'Under Review',
             approved: 'Approved',
             ineligible: 'Ineligible',
             resubmitted: 'Resubmitted',
@@ -1141,7 +1165,7 @@ const options = {
             draft: 'Draft',
             submitted: 'Submitted',
             resubmitted: 'Resubmitted',
-            inReview: 'Screened In',
+            inReview: 'Under Review',
             underReview: 'Under Review',
             revisionsRequested: 'Update needed',
             approved: 'Approved',
@@ -1184,7 +1208,7 @@ const options = {
             startApplication: 'Start an application',
             noTemplate: 'No templates available for this program.',
             sucessfulSubmission: 'Application submitted',
-            viewAllSubmissions: 'View all submissions',
+            viewAllSubmissions: 'Return to home',
             locationHeading: 'Location for permit',
             submitToOwn:
               'Make sure you are submitting to a jurisdiction that you have inbox access to so that you can see it.',
@@ -1230,12 +1254,13 @@ const options = {
               'See the status of your application or your application history any time by logging in to the Better Homes Energy Savings Program. Contact <email /> if you have any questions about your application.',
             whatsNextTitle: "What's next?",
             ready: 'Ready to submit this application?',
+            onBehalf: 'Ready to submit on someone’s behalf?',
             bySubmitting: 'By submitting this application',
             confirmationOnBehalf:
               'I confirm that the information provided is accurate to the best of my knowledge. The applicant has given consent for me to submit this application on their behalf.',
             confirmation:
               'By submitting this application you confirm that the information you provided was completed to the best of your knowledge and ability',
-            yourReference: 'Application ID is: #{{ number }}',
+            yourReference: 'Reference #{{ number }}',
             noContactsAvailable:
               'This jurisdiction is not ready to accept applications through this tool yet. Please check with your local jurisdiction.',
             whatsNext:
@@ -1272,7 +1297,7 @@ const options = {
               'A new version of the permit is available. Please ask author or designated submitter to review and acknowledge changes to proceed.',
             contactsSummary: 'Contacts summary',
             downloadApplication: 'Download application',
-            viewApplicationFiles: 'View application files',
+            viewApplicationFiles: 'View supporting files',
             fetchingMissingPdf: 'Fetching {{missingPdf}}...',
             missingPdfLabels: {
               permitApplication: 'permit application pdf',
@@ -1347,6 +1372,18 @@ const options = {
               cancelRequest: 'Are you sure you want to cancel?',
               noNotification:
                 'No notifications will be sent to the applicant and you will lose any current revisions you may have added.',
+            },
+            supportingFilesRequest: {
+              requestSupportingFiles: 'Request supporting files',
+              prompt:
+                'List the required files below, one line per file. Each line will be a bullet point in the email to the participant.',
+              requestedHeader: 'Supporting files requested',
+              requestedText: 'Supporting files have been requested from the participant on {{date}}',
+              confirmationText: 'Are you sure you want to request supporting files for {{applicationNumber}}?',
+              readyToUpload:
+                'Are you ready to upload your supporting file(s) to your application {{applicationNumber}}?',
+              filesAdded: 'Supporting files added on {{date}}',
+              filesUploaded: 'Supporting file(s) successfully uploaded',
             },
           },
         },
@@ -2095,6 +2132,7 @@ const options = {
         },
         admin: {},
         errors: {
+          fetchContractor: 'Something went wrong fetching the contractor',
           fetchJurisdiction: 'Something went wrong fetching the jurisdiction',
           fetchPermitApplication: 'Something went wrong fetching the permit application',
           fetchPermitTypeOptions: 'Something went wrong fetching the permit type options',
@@ -2227,14 +2265,17 @@ const options = {
           reinviteSuccess: 'Invite re-sent!',
           inviteError: 'Email taken',
           takenErrorTitle: 'Some of these emails already belong to existing users',
-          takenErrorDescription:
-            'One or more of the requested users have an existing account. Please ask them to change their email on their current account. You can then re-invite them into your local jurisdiction.',
+          takenErrorDescription: '',
           sendInvites: 'Send invites',
           acceptInvitation: 'Accept invitation',
           acceptInstructions: 'Enter your login and other user info below to finalize your account creation.',
           rolesAndPermissions: 'User roles & permissions',
           inviteInstructions:
             'Enter the email addresses of whom you wish to invite below. For details about permissions for each role, please see <a>User Roles & Permissions</a>',
+          inviteEmployeesTitle: 'Invite employees',
+          inviteEmployeesDescription:
+            'Enter the email address of the employee to invite. They will receive a link through their email to create an account using their Business BCeID.',
+          addMoreEmails: 'Add more emails',
           notifications: {
             essential: 'Essential communications (cannot disable)',
             event: 'Event',
@@ -2790,6 +2831,7 @@ const options = {
             learnMoreDescriptionShort:
               "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It's part of the Province of B.C.'s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
             betterHomesLinkTextShort: 'Better Homes',
+            contractorSupportEmail: 'ESPcontractorsupport@clearesult.com',
           },
           territorialAcknowledgement:
             'The B.C. Public Service acknowledges the territories of First Nations around B.C. and is grateful to carry out our work on these lands. We acknowledge these rights, interests, priorities, and concerns of all Indigenous Peoples - First Nations, Métis, and Inuit - respecting and acknowledging their distinct cultures, histories, rights, laws, and governments.',
@@ -2879,12 +2921,15 @@ const options = {
             programs: 'Programs',
             configureUsers: 'Configure users',
             invite: 'Invite',
+            inviteEmployee: 'Invite employees',
             templateVersions: 'Template versions',
             requirementsLibrary: 'Requirements library',
             requirementTemplates: 'Applications template catalog',
             edit: 'Edit program',
             users: 'Users',
             contractorManagement: 'Manage contractor details',
+            contractorProgramResources: 'Contractor program resources',
+            employees: 'View employees',
             editTemplate: 'Edit template',
             editPermit: 'Edit permit',
             applications: 'Applications',
@@ -2903,6 +2948,7 @@ const options = {
             submissionsInboxSetup: 'Submissions inbox setup',
             confirmed: 'E-mail confirmed',
             welcome: 'Welcome',
+            contractor: 'Contractor',
             getSupport: 'Get support',
             sitewideBanner: 'Site-wide banner',
             apiSettings: 'API settings',
@@ -2988,12 +3034,12 @@ const options = {
             programPlaceholder: 'N/A',
           },
           management: {
-            title: 'Contractor Management',
+            title: 'Manage contractor details',
             addButton: 'Add Contractor',
             searchPlaceholder: 'Search',
             tableHeading: 'Contractor accounts',
             confirmSuspend: 'Are you sure you want to suspend this contractor?',
-            confirmDelete: 'Are you sure you want to remove this contractor? This action cannot be undone.',
+            confirmDelete: 'Are you sure you want to remove this contractor?',
           },
           tabs: {
             active: 'Active',
@@ -3002,12 +3048,111 @@ const options = {
           },
           actions: {
             manage: 'Manage',
-            inviteEmployee: 'Invite employee',
+            inviteEmployee: 'Invite employees',
             viewEmployees: 'View employees',
             editContractor: 'Edit contractor',
             suspendContractor: 'Suspend contractor',
             removeContractor: 'Remove contractor',
           },
+          employees: {
+            viewEmployees: 'View employees',
+            description:
+              'Employee names and emails are associated with their Business BCeIDs. To update information, direct employees to manage their Business BCeID accounts.',
+            loading: 'Loading employees',
+            unknownEmployee: 'Unknown Employee',
+            unknownContractor: 'Unknown Contractor',
+            primaryContact: 'Primary contact',
+            fields: {
+              name: 'Name',
+              email: 'Email address',
+              lastUpdated: 'Last updated',
+              action: 'Action',
+            },
+            tabs: {
+              active: 'Active',
+              pending: 'Pending',
+              deactivated: 'Deactivated',
+              ariaLabel: 'Employee status filter tabs',
+              listAriaLabel: 'Select employee status to filter by',
+            },
+            actions: {
+              setPrimaryContact: 'Primary contact',
+              deactivateEmployee: 'Deactivate employee',
+              reinviteEmployee: 'Re-invite employee',
+              revokeEmployeeInvite: 'Revoke employee invite',
+              reactivateEmployee: 'Reactivate employee',
+              confirmDeactivateTitle: 'Are you sure you want to deactivate {{name}}?',
+              confirmReactivateTitle: 'Are you sure you want to reactivate {{name}}?',
+              confirmRevokeTitle: 'Are you sure you want to revoke this invite?',
+              confirmReinviteTitle: 'Are you sure you want to re-invite\n{{name}}?',
+              deactivateWarning:
+                '{{name}} will not be able to access the application system until you reactivate them.',
+              reactivateWarning:
+                '{{name}} will be able to access the application system again when you reactivate their account.',
+              revokeWarning: '{{name}} will no longer be able to create an account if you revoke this invite.',
+              reinviteWarning: '{{name}} will receive another invite email when\nyou re-invite them.',
+            },
+          },
+          programResources: {
+            title: 'Contractor program resources',
+            pageHeading: 'Program resources: Program guidance',
+            programGuidance: 'Program guidance',
+            qualifiedProductList: 'Qualified product list',
+            sampleInvoices: 'Sample invoices',
+            resourcesForCustomers: 'Resources for your customers',
+            noResources: 'No resources available in this category.',
+            resources: {
+              contractorRebateJourney: 'Contractor rebate journey',
+              heatPumpExceptionForm: 'Heat pump exception form',
+              heatPumpRequirements: 'Heat pump requirements guide',
+              rebateEligibility: 'Rebate eligibility requirements',
+              insulationCutSheet: 'Insulation cut sheet',
+              windowsDoorsCutSheet: 'Windows and doors cut sheet',
+              contractorTermsConditions: 'Contractor terms and conditions',
+              heatPump: 'Heat pump',
+              heatPumpWaterHeater: 'Heat pump water heater',
+              windowsAndDoors: 'Windows and doors',
+              insulation: 'Insulation',
+              electricServiceUpgrade: 'Electric service upgrade',
+              ventilation: 'Ventilation',
+              healthAndSafety: 'Health & safety',
+              participantInfoSheet: 'Participant info sheet',
+              rebateEligibilityRequirements: 'Rebate eligibility requirements',
+              participantTermsAndConditions: 'Participant terms and conditions',
+              miniSplitHeatPumps: 'Mini-split, multi-split, central and dual fuel heat pumps',
+              airToWaterHeatPumps: 'Air-to-water heat pumps',
+              heatPumpWaterHeaterList: 'Heat pump water heater',
+              windowsAndDoorsList: 'Windows and doors',
+              ventilationList: 'Ventilation',
+              bathroomFanProductList: 'Bathroom fan product list',
+            },
+            descriptions: {
+              miniSplitHeatPumps:
+                'The installed heat pump must have an AHRI certified reference number and must be on the Qualifying Product List.',
+              airToWaterHeatPumps:
+                'For eligible air-to-water heat pumps and combination space and hot water air-to-water heat pumps, the heat pump must be on the product list.',
+              heatPumpWaterHeaterList: 'The installed heater must be on Tier 2 or higher of the Eligible Models List.',
+              windowsAndDoorsList:
+                'The window must be on the listed under one of the following certifications: Canadian Standards Association (CSA) Certification, CSA Laboratory, Intertek Warnock Hersey, National Fenestration Rating Council.',
+              ventilationList:
+                "The installed heat-energy recovery ventilators must be ENERGY STAR® certified and listed on Natural Resources Canada's searchable product list.",
+              bathroomFanProductList:
+                "The installed bathroom fan must be ENERGY STAR certified and listed on the US Environmental Protection Agency and US Department of Energy's searchable product list.",
+            },
+            linkText: {
+              qualifyingProductList: 'Qualifying Product List',
+              productList: 'product list',
+              eligibleModelsList: 'Eligible Models List',
+              searchableProductList: 'searchable product list',
+            },
+            fileInfo: '. [Size, Type]',
+            qualifiedProductListSubheading:
+              'Installations must use items on the relevant qualified product list and/or be certified by the specified body to be eligible for ESP rebates.',
+            programResourcesPrefix: 'Program resources:',
+          },
+        },
+        common: {
+          search: 'Search',
         },
         shared: {
           actions: 'Actions',

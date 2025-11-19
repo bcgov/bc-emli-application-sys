@@ -1,9 +1,25 @@
 class PermitApplication < ApplicationRecord
+  enum status: {
+         new_draft: 0,
+         newly_submitted: 1,
+         revisions_requested: 3,
+         resubmitted: 4,
+         in_review: 5,
+         update_needed: 6,
+         approved: 7,
+         ineligible: 8,
+         training_pending: 9,
+         approved_pending: 10,
+         approved_paid: 11
+       },
+       _default: 0
+
+  include PermitApplicationStatus
+
   include FormSupportingDocuments
   include AutomatedComplianceUtils
   include StepCodeFieldExtraction
   include ZipfileUploader.Attachment(:zipfile)
-  include PermitApplicationStatus
   include Auditable
 
   # SEARCH_INCLUDES = %i[
@@ -16,14 +32,25 @@ class PermitApplication < ApplicationRecord
   #   permit_collaborations
   # ]
 
-  SEARCH_INCLUDES = %i[
-    submission_versions
-    submitter
-    sandbox
-    program
-    assigned_users
-    submission_type
-    template_version
+  SEARCH_INCLUDES = [
+    :submission_versions,
+    :submitter,
+    :sandbox,
+    :program,
+    :assigned_users,
+    :submission_type,
+    :template_version,
+    :support_requests,
+    :user_group_type,
+    :audience_type,
+    { template_version: :requirement_template },
+    :supporting_documents,
+    {
+      support_requests: [
+        :requested_by,
+        { linked_application: :supporting_documents }
+      ]
+    }
   ]
 
   API_SEARCH_INCLUDES = %i[
@@ -64,6 +91,30 @@ class PermitApplication < ApplicationRecord
   has_many :application_assignments
   has_many :assigned_users, through: :application_assignments, source: :user
   has_many :permit_block_statuses, dependent: :destroy
+
+  # Support requests *spawned from this permit application*
+  has_many :support_requests,
+           -> do
+             includes(
+               :requested_by,
+               linked_application: %i[
+                 program
+                 submitter
+                 submission_type
+                 user_group_type
+                 audience_type
+               ]
+             )
+           end,
+           foreign_key: :parent_application_id,
+           inverse_of: :parent_application,
+           dependent: :destroy
+
+  has_one :incoming_support_requests,
+          class_name: "SupportRequest",
+          foreign_key: :linked_application_id,
+          inverse_of: :linked_application,
+          dependent: :nullify
 
   scope :submitted, -> { joins(:submission_versions).distinct }
 
@@ -185,6 +236,18 @@ class PermitApplication < ApplicationRecord
     end
   end
 
+  # helper method to check if a given user owns this application
+  def owned_by?(user)
+    case submitter
+    when User
+      submitter == user
+    when Contractor
+      submitter.contact_id == user.id
+    else
+      false
+    end
+  end
+
   # Helper method to get the latest SubmissionVersion
   def latest_submission_version
     submission_versions.order(created_at: :desc).first
@@ -200,11 +263,15 @@ class PermitApplication < ApplicationRecord
   end
 
   def form_json(current_user: nil)
+    effective_user =
+      (submitter.is_a?(Contractor) ? submitter.contact : current_user)
+    Rails.logger.info "Generating form JSON for PermitApplication #{id} with effective user #{effective_user.inspect}"
     result =
       PermitApplication::FormJsonService.new(
         permit_application: self,
-        current_user:
+        current_user: effective_user
       ).call
+
     result.form_json
   end
 
@@ -276,17 +343,27 @@ class PermitApplication < ApplicationRecord
 
   def submission_requirement_block_edit_permissions(user_id:)
     user = User.find(user_id)
-    if user&.admin? || user&.admin_manager?
-      if user.program_memberships.active.exists?(program_id: self.program_id)
+    return nil unless user
+
+    # If submitter is a Contractor and their contact matches this user, treat as the same
+    if submitter.is_a?(Contractor) && submitter.contact_id == user_id
+      return :all
+    end
+
+    # Admins or admin managers with program membership
+    if user.admin? || user.admin_manager?
+      if user.program_memberships.active.exists?(program_id: program_id)
         return :all
       end
     end
 
+    # Non-owners without collaboration access get nothing
     if submitter_id != user_id &&
          !collaborator?(user_id:, collaboration_type: :submission)
       return nil
     end
 
+    # Direct submitters or delegatee collaborators get all
     if submitter_id == user_id ||
          collaborator?(
            user_id:,
@@ -296,6 +373,7 @@ class PermitApplication < ApplicationRecord
       return :all
     end
 
+    # Otherwise return assigned block IDs
     permit_collaborations
       .joins(:collaborator)
       .where(collaboration_type: :submission, collaborators: { user_id: })
@@ -524,6 +602,17 @@ class PermitApplication < ApplicationRecord
     return latest_submission_version.created_at
   end
 
+  def uploaded_date
+    support_requests
+      .joins(:linked_application)
+      .where(linked_applications: { status: "submitted" })
+      .order("linked_applications.updated_at DESC")
+      .limit(1)
+      .pick("linked_applications.submitted_date")
+  end
+
+  # TODO: consider extracting notification data builders into a Concern
+  # or service object if/when we expand event types for different 'form' nee. 'applications'
   def submit_event_notification_data
     i18n_key =
       (
@@ -636,6 +725,29 @@ class PermitApplication < ApplicationRecord
         Constants::NotificationActionTypes::NEW_SUBMISSION_RECEIVED,
       "action_text" =>
         "#{I18n.t("notification.permit_application.new_submission_received_notification", number: number, program_name: program_name, submitted_at: I18n.l(submitted_at, format: :long))}",
+      "object_data" => {
+        "permit_application_id" => id,
+        "permit_application_number" => number
+      }
+    }
+  end
+
+  def publish_supporting_files_sumbitted__data
+    latest_linked =
+      support_requests
+        .map(&:linked_application)
+        .compact
+        .select { |app| %w[submitted newly_submitted].include?(app.status) }
+        .max_by(&:updated_at)
+
+    uploaded_date = latest_linked&.updated_at || updated_at
+
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::SUPPORTING_FILES_UPDLOADED,
+      "action_text" =>
+        "#{I18n.t("notification.support_request.supporting_files_uploaded", application_number: number, uploaded_date: I18n.l(uploaded_date, format: :long))}",
       "object_data" => {
         "permit_application_id" => id,
         "permit_application_number" => number

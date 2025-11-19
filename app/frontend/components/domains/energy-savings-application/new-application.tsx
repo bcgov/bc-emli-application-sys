@@ -60,6 +60,15 @@ export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) =>
         ...(template?.versionId && { template_version_id: template.versionId }),
       };
 
+      if (!nickname) {
+        if (
+          params.user_group_type == EPermitClassificationCode.participant &&
+          params.audience_type == EPermitClassificationCode.internal &&
+          params.submission_type == EPermitClassificationCode.supportRequest
+        )
+          params.nickname = 'Supporting files upload form';
+      }
+
       if (isBlank) {
         navigate(`/blank-template/${template.versionId}`);
       } else {

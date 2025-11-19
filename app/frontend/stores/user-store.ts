@@ -83,6 +83,9 @@ export const UserStoreModel = types
     resetInvitationResponse: () => {
       self.invitationResponse = null;
     },
+    setInvitationResponse: (response) => {
+      self.invitationResponse = response;
+    },
     setTableUsers: (users) => {
       self.tableUsers = users.map((user) => user.id);
     },
@@ -185,9 +188,21 @@ export const UserStoreModel = types
         filter_for_assignment: opts.filterForAssignment,
       };
 
-      const response = yield self.rootStore.programStore.currentProgram?.id
-        ? self.environment.api.fetchUsersByProgram(self.rootStore.programStore.currentProgram.id, searchParams)
-        : self.environment.api.fetchAdminUsers(searchParams);
+      // Determine which API endpoint to use based on context
+      let response;
+      const currentContractorId = self.rootStore.contractorStore.currentContractor?.id;
+      const currentProgramId = self.rootStore.programStore.currentProgram?.id;
+
+      if (currentContractorId) {
+        // Contractor user search
+        response = yield self.environment.api.searchContractorUsers(currentContractorId, searchParams);
+      } else if (currentProgramId) {
+        // Program user search
+        response = yield self.environment.api.fetchUsersByProgram(currentProgramId, searchParams);
+      } else {
+        // Admin user search
+        response = yield self.environment.api.fetchAdminUsers(searchParams);
+      }
 
       if (response.ok) {
         // Skip expensive mergeUpdateAll for search-only results (assignment popup)
@@ -218,9 +233,12 @@ export const UserStoreModel = types
     }),
   }))
   .actions((self) => ({
-    setStatus(status: 'active' | 'pending' | 'deactivated') {
+    setStatus(status: 'active' | 'pending' | 'deactivated' | 'removed') {
       self.status = status;
       self.searchUsers({ reset: true });
+    },
+    setStatusWithoutSearch(status: 'active' | 'pending' | 'deactivated' | 'removed') {
+      self.status = status;
     },
     setAllUsers(allUsers: boolean) {
       self.allUsers = allUsers;
@@ -229,6 +247,13 @@ export const UserStoreModel = types
     searchUsersOptimized: flow(function* () {
       return yield self.searchUsers();
     }),
+    mergeUser(userData: any) {
+      if (userData.id === self.currentUser?.id) {
+        // avoid overwriting the logged-in user snapshot
+        return;
+      }
+      self.usersMap.set(userData.id, userData);
+    },
   }));
 
 export interface IUserStore extends Instance<typeof UserStoreModel> {}

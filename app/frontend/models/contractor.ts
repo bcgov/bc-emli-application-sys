@@ -2,6 +2,7 @@ import { Instance, applySnapshot, flow, types } from 'mobx-state-tree';
 import { withEnvironment } from '../lib/with-environment';
 import { withRootStore } from '../lib/with-root-store';
 import { IUser, UserModel } from './user';
+import { ContractorOnboardModel } from './contractor-onboard';
 
 export const ContractorModel = types
   .model('ContractorModel')
@@ -13,8 +14,9 @@ export const ContractorModel = types
     onboarded: types.optional(types.boolean, false),
     createdAt: types.maybeNull(types.Date),
     updatedAt: types.maybeNull(types.Date),
-    contact: types.maybeNull(types.reference(UserModel)),
+    contactId: types.maybeNull(types.string),
     employees: types.optional(types.array(types.reference(UserModel)), []),
+    onboardings: types.optional(types.array(types.reference(ContractorOnboardModel)), []),
   })
   .extend(withRootStore())
   .extend(withEnvironment())

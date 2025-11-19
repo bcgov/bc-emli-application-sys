@@ -216,6 +216,10 @@ Rails.application.routes.draw do
           to: "permit_applications#download_application_metrics_csv"
     end
 
+    resources :support_requests, only: %i[index show create update destroy] do
+      collection { post :request_supporting_files }
+    end
+
     resources :permit_collaborations, only: %i[destroy] do
       post "reinvite", on: :member, to: "permit_collaborations#reinvite"
     end
@@ -235,7 +239,23 @@ Rails.application.routes.draw do
           on: :collection,
           to: "contractors#license_agreements"
       post "shim", on: :collection, to: "contractors#shim"
+
+      # Follow program pattern for contractor users
+      post "users/search", on: :member, to: "contractors#search_users"
+
+      resources :employees, controller: "contractor_employees", only: [] do
+        collection { post :invite }
+        member do
+          post :deactivate
+          post :reactivate
+          post :reinvite
+          post :revoke_invite
+          post :set_primary_contact
+        end
+      end
     end
+
+    resources :contractor_onboards, only: %i[create update show]
 
     resources :audit_logs, only: %i[index] do
       get "filter_options", on: :collection

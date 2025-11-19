@@ -13,6 +13,7 @@ import { IPermitBlockStatus } from '../models/permit-block-status';
 import { IRequirementTemplate } from '../models/requirement-template';
 import { IUser } from '../models/user';
 import { cast } from 'mobx-state-tree';
+
 import {
   ECustomEvents,
   EPermitApplicationSocketEventTypes,
@@ -117,7 +118,15 @@ export const PermitApplicationStoreModel = types
         pad.sandbox && self.rootStore.sandboxStore.mergeUpdate(pad.sandbox, 'sandboxMap');
         pad.stepCode && self.rootStore.stepCodeStore.mergeUpdate(pad.stepCode, 'stepCodesMap');
         pad.jurisdiction && self.rootStore.jurisdictionStore.mergeUpdate(pad.jurisdiction, 'jurisdictionMap');
-        pad.submitter && self.rootStore.userStore.mergeUpdate(pad.submitter, 'usersMap');
+        // pad.submitter && self.rootStore.userStore.mergeUpdate(pad.submitter, 'usersMap');
+        if (pad.submitter) {
+          if (pad.submitter.type === 'Contractor' || pad.submitter.businessName) {
+            self.rootStore.contractorStore.mergeContractor(pad.submitter);
+          } else {
+            self.rootStore.userStore.mergeUpdate(pad.submitter, 'usersMap');
+          }
+        }
+
         pad.templateVersion &&
           self.rootStore.templateVersionStore.mergeUpdate(pad.templateVersion, 'templateVersionMap');
         pad.publishedTemplateVersion &&
@@ -312,6 +321,17 @@ export const PermitApplicationStoreModel = types
     },
   }))
   .actions((self) => ({
+    requestSupportingFiles: flow(function* (permitApplicationId: string, note: string) {
+      const permitApplication = self.getPermitApplicationById(permitApplicationId);
+      if (!permitApplication) return false;
+
+      const { ok, data: response } = yield self.environment.api.requestSupportingFiles(permitApplicationId, note);
+      if (ok && response) {
+        self.mergeUpdate(response, 'permitApplicationMap');
+        return response;
+      }
+      return false;
+    }),
     createEnergyApplication: flow(function* (formData: TCreateEnergyApplicationFormData) {
       const { ok, data: response } = yield self.environment.api.createEnergyApplication(formData);
       if (ok && response.id) {
@@ -396,8 +416,24 @@ export const PermitApplicationStoreModel = types
       if (ok && response.data) {
         const permitApplication = response.data;
 
-        permitApplication.isFullyLoaded = true;
+        const submitter = permitApplication.submitter;
+        if (submitter.type === 'Contractor') {
+          if (submitter.contact && typeof submitter.contact === 'object') {
+            const contact = submitter.contact;
+            submitter.contactId = contact.id;
 
+            // Optionally seed the userStore
+            if (!self.rootStore.userStore.usersMap.has(contact.id)) {
+              self.rootStore.userStore.usersMap.set(contact.id, contact);
+            }
+          }
+
+          delete submitter.contact; // Prevent MST from seeing it
+          self.rootStore.contractorStore.mergeContractor(submitter);
+        }
+
+        permitApplication.isFullyLoaded = true;
+        console.log('>>> About to mergeUpdate permitApplication', permitApplication);
         self.mergeUpdate(permitApplication, 'permitApplicationMap');
         return permitApplication;
       }

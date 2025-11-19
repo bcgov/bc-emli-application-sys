@@ -18,6 +18,9 @@ import RejectApplicationScreen from '../permit-application/application-rejection
 import { BlankTemplateScreen } from '../requirement-template/screens/blank-template';
 import { ContractorLandingScreen } from '../contractor-landing';
 import { ContractorManagementScreen } from '../contractor-management';
+import { ContractorEmployeeIndexScreen } from '../contractor-management/employees';
+import { ContractorProgramResourcesScreen } from '../contractor-management/contractor-program-resources-screen';
+import { trackPageViewEvent } from '../../../utils/snowplow';
 
 const ExternalApiKeysIndexScreen = lazy(() =>
   import('../external-api-key').then((module) => ({ default: module.ExternalApiKeysIndexScreen })),
@@ -283,6 +286,9 @@ const AcceptInvitationScreen = lazy(() =>
   import('../programs/accept-invitation-screen').then((module) => ({ default: module.AcceptInvitationScreen })),
 );
 const InviteScreen = lazy(() => import('../users/invite-screen').then((module) => ({ default: module.InviteScreen })));
+const InviteEmployeeScreen = lazy(() =>
+  import('../users/invite-employee-screen').then((module) => ({ default: module.InviteEmployeeScreen })),
+);
 const ProfileScreen = lazy(() =>
   import('../users/profile-screen').then((module) => ({ default: module.ProfileScreen })),
 );
@@ -346,6 +352,20 @@ const AppRoutes = observer(() => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  // Track page views on route changes (Snowplow)
+  useEffect(() => {
+    // Skip tracking for BC Services Card login route and external BC Gov login pages
+    if (
+      location.pathname.includes('/bcsc') ||
+      window.location.href.includes('idtest.gov.bc.ca') ||
+      window.location.href.includes('id.gov.bc.ca')
+    ) {
+      return;
+    }
+
+    trackPageViewEvent();
+  }, [location.pathname]);
+
   useEffect(() => {
     if (tokenExpired) {
       resetAuth();
@@ -398,6 +418,7 @@ const AppRoutes = observer(() => {
       <Route path="/configuration-management/landing-setup" element={<LandingSetupScreen />} />
       <Route path="/configuration-management/users" element={<AdminUserIndexScreen />} />
       <Route path="/configuration-management/users/invite" element={<AdminInviteScreen />} />
+      <Route path="/configuration-management/invite-employee" element={<InviteEmployeeScreen />} />
       <Route path="/audit-log" element={<AuditLogScreen />} />
       <Route path="/reporting" element={<ReportingScreen />} />
       <Route path="/reporting/export-template-summary" element={<ExportTemplateSummaryScreen />} />
@@ -410,7 +431,6 @@ const AppRoutes = observer(() => {
       <Route path="/configure-users" element={<ProgramsIndexScreen />} />
       <Route path="/configure-users/:programId/users" element={<ProgramUserIndexScreen />} />
       <Route path="/configure-users/:programId/invite" element={<ProgramInviteUserScreen />} />
-      <Route path="/contractor-management" element={<ContractorManagementScreen />} />
       <Route path="/audit-log" element={<AuditLogScreen />} />
     </>
   );
@@ -419,8 +439,11 @@ const AppRoutes = observer(() => {
     <>
       <Route path="/submission-inbox" element={<ProgramSubmissionInboxScreen />} />
       <Route path="/applications/:permitApplicationId" element={<ReviewPermitApplicationScreen />} />
-      <Route path="/contractor-management" element={<ContractorManagementScreen />} />
       <Route path="/blank-template/:templateVersionId" element={<BlankTemplateScreen />} />
+      <Route path="/contractor-management" element={<ContractorManagementScreen />} />
+      <Route path="/contractor-management/:contractorId/employees" element={<ContractorEmployeeIndexScreen />} />
+      <Route path="/contractor-management/:contractorId/invite-employee" element={<InviteEmployeeScreen />} />
+      <Route path="/contractor-program-resources" element={<ContractorProgramResourcesScreen />} />
       // view blank applications and view supported applications to go here
       {import.meta.env.DEV && (
         <>
@@ -564,6 +587,7 @@ const AppRoutes = observer(() => {
         {/* TODO: we need to add security around some of the role logins */}
         <Route element={<ProtectedRoute isAllowed={!loggedIn} redirectPath="/" />}>
           <Route path="/login" element={<LoginScreen />} />
+          <Route path="/contractor" element={<AdminPortalLogin isContractor />} />
           <Route path="/admin" element={<AdminPortalLogin isAdmin />} />
           {/* <Route path="/psr" element={<AdminPortalLogin isPSR />} /> */}
           <Route path="/admin-mgr" element={<AdminPortalLogin isAdminMgr />} />
@@ -573,6 +597,7 @@ const AppRoutes = observer(() => {
         <Route path="/rejection-reason/:permitApplicationId/:id" element={<RejectApplicationScreen />} />
         <Route path="/programs/:programId/accept-invitation" element={<AcceptInvitationScreen />} />
         {/* <Route path="/accept-invitation" element={<AcceptInvitationScreen />} /> */}
+
         <Route path="/contact" element={<ContactScreen />} />
         <Route path="/confirmed" element={<EmailConfirmedScreen />} />
         <Route path="/welcome" element={<LandingScreen />} />

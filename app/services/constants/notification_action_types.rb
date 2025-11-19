@@ -25,5 +25,6 @@ module Constants
     PARTICIPANT_INCOMPLETE_DRAFT_NOTIFICATION =
       "participant_incomplete_draft_notification"
     NEW_PARTICIPANT_WELCOME = "new_participant_welcome"
+    SUPPORTING_FILES_UPDLOADED = "supporting_files_uploaded"
   end
 end

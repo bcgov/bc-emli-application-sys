@@ -7,6 +7,8 @@ class ContractorOnboardBlueprint < Blueprinter::Base
          :created_at,
          :updated_at
 
-  association :contractor, blueprint: ContractorBlueprint
-  association :onboard_application, blueprint: PermitApplicationBlueprint
+  association :contractor, blueprint: ContractorBlueprint, view: :minimal
+  association :onboard_application,
+              blueprint: PermitApplicationBlueprint,
+              view: :minimal
 end

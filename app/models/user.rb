@@ -244,6 +244,7 @@ class User < ApplicationRecord
             RequirementTemplate
               .kept
               .where(program_id: program.id)
+              .includes(:requirements)
               .distinct
               .map do |template|
                 version =

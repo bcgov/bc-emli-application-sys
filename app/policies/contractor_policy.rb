@@ -29,9 +29,44 @@ class ContractorPolicy < ApplicationPolicy
     true
   end
 
+  def search_users?
+    # Admin managers, admins, and system admins can search contractor users
+    user.system_admin? || user.admin? || user.admin_manager?
+  end
+
+  def deactivate?
+    # Admin managers and admins can deactivate contractor employees
+    user.admin_manager? || user.admin?
+  end
+
+  def reactivate?
+    # Same permissions as deactivate
+    deactivate?
+  end
+
+  def reinvite?
+    # Same permissions as deactivate
+    deactivate?
+  end
+
+  def revoke_invite?
+    # Same permissions as deactivate
+    deactivate?
+  end
+
+  def set_primary_contact?
+    # Same permissions as deactivate - admin managers and admins can set primary contact
+    deactivate?
+  end
+
+  def invite?
+    # Admin managers and admins can invite contractor employees
+    user.admin_manager? || user.admin?
+  end
+
   class Scope < ApplicationPolicy::Scope
     def resolve
-      if user.system_admin? || user.admin? || user.manager?
+      if user.system_admin? || user.admin? || user.admin_manager?
         scope.all
       else
         scope.where(contact: user)

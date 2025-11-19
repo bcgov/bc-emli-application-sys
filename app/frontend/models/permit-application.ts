@@ -116,6 +116,9 @@ export const PermitApplicationModel = types.snapshotProcessor(
       get isEphemeral() {
         return self.status === EPermitApplicationStatus.ephemeral;
       },
+      get isInReview() {
+        return self.status === EPermitApplicationStatus.inReview;
+      },
       get sortedSubmissionVersions() {
         return self.submissionVersions.slice().sort((a, b) => b.createdAt - a.createdAt);
       },

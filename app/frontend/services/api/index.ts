@@ -35,6 +35,7 @@ import {
   IAcceptInvitationResponse,
   IApiResponse,
   ICollaboratorSearchResponse,
+  IEmployeeActionResponse,
   IJurisdictionPermitApplicationResponse,
   IJurisdictionResponse,
   INotificationResponse,
@@ -311,6 +312,13 @@ export class Api {
     });
   }
 
+  async requestSupportingFiles(parentId: string, params: { note: string }) {
+    return this.client.post<ApiResponse<IEnergySavingsApplication>>(`/support_requests/request_supporting_files`, {
+      parent_application_id: parentId,
+      ...params,
+    });
+  }
+
   async createRequirementBlock(params: IRequirementBlockParams) {
     return this.client.post<IRequirementBlockResponse>(`/requirement_blocks`, { requirementBlock: params });
   }
@@ -358,6 +366,9 @@ export class Api {
   async fetchContractors(params?) {
     return this.client.get<ApiResponse<any>>('/contractors', params);
   }
+  async fetchContractor(contractorId: string) {
+    return this.client.get<ApiResponse<any>>(`/contractors/${contractorId}`);
+  }
 
   async createContractor(params) {
     return this.client.post<ApiResponse<any>>('/contractors', { contractor: params });
@@ -366,9 +377,54 @@ export class Api {
   async updateContractor(id: string, params) {
     return this.client.patch<ApiResponse<any>>(`/contractors/${id}`, { contractor: params });
   }
-
   async destroyContractor(id: string) {
     return this.client.delete<ApiResponse<any>>(`/contractors/${id}`);
+  }
+
+  // Contractor User methods (following program pattern)
+  async searchContractorUsers(contractorId: string, params?) {
+    return this.client.post<IUsersResponse>(`/contractors/${contractorId}/users/search`, params);
+  }
+  async deactivateContractorEmployee(contractorId: string, employeeId: string) {
+    return this.client.post<IEmployeeActionResponse>(`/contractors/${contractorId}/employees/${employeeId}/deactivate`);
+  }
+  async reactivateContractorEmployee(contractorId: string, employeeId: string) {
+    return this.client.post<IEmployeeActionResponse>(`/contractors/${contractorId}/employees/${employeeId}/reactivate`);
+  }
+  async reinviteContractorEmployee(contractorId: string, employeeId: string, programId: string) {
+    return this.client.post<IEmployeeActionResponse>(`/contractors/${contractorId}/employees/${employeeId}/reinvite`, {
+      program_id: programId,
+    });
+  }
+  async revokeContractorEmployeeInvite(contractorId: string, employeeId: string) {
+    return this.client.post<IEmployeeActionResponse>(
+      `/contractors/${contractorId}/employees/${employeeId}/revoke_invite`,
+    );
+  }
+  async setPrimaryContact(contractorId: string, employeeId: string) {
+    return this.client.post<IEmployeeActionResponse>(
+      `/contractors/${contractorId}/employees/${employeeId}/set_primary_contact`,
+    );
+  }
+  async inviteContractorEmployees(
+    contractorId: string,
+    programId: string,
+    users: { email: string; name?: string; role: string }[],
+  ) {
+    return this.client.post<ApiResponse<any>>(`/contractors/${contractorId}/employees/invite`, {
+      users,
+      program_id: programId,
+    });
+  }
+
+  async createContractorOnboarding(contractorId: string) {
+    return this.client.post<ApiResponse<any>>(`/contractor_onboards`, {
+      contractor_id: contractorId,
+    });
+  }
+
+  async getContractorOnboarding(contractorId: string) {
+    return this.client.get<ApiResponse<any>>(`/contractor_onboards/${contractorId}`);
   }
 
   async updateUserRole(id: string, role: string) {
