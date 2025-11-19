@@ -36,10 +36,10 @@ export const SupportScreen = () => {
 
           <Text sx={baseTextSx}>
             {t('site.support.applicationHelpDescriptionShort')}{' '}
-            {/* <Link href={t('site.support.applicationHelpCallUrl')} isExternal color="text.primary">
+            <Link href={t('site.support.applicationHelpCallUrl')} isExternal color="text.primary">
               {t('site.support.applicationHelpCallLink')}
             </Link>
-            {t('site.support.applicationHelpDescriptionEnd')} */}
+            {t('site.support.applicationHelpDescriptionEnd')}
           </Text>
 
           <UnorderedList sx={{ listStyleType: 'disc' }}>
@@ -53,6 +53,12 @@ export const SupportScreen = () => {
               {t('site.support.multiUnitLabel')}{' '}
               <Link href={`mailto:${t('site.support.multiUnitEmail')}`} isExternal color="text.primary">
                 {t('site.support.multiUnitEmail')}
+              </Link>
+            </ListItem>
+            <ListItem sx={baseTextSx}>
+              {t('site.support.contractorLabel')}{' '}
+              <Link href={`mailto:${t('site.support.contractorEmail')}`} isExternal color="text.primary">
+                {t('site.support.contractorEmail')}
               </Link>
             </ListItem>
           </UnorderedList>
