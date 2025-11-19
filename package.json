@@ -108,5 +108,5 @@
     "*.rb": "stree write",
     "helm/**/*.{yaml,yml,tpl}": "bash scripts/helm-lint.sh"
   },
-  "version": "1.27.0"
+  "version": "1.28.0"
 }
