@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   Modal,
@@ -9,26 +9,24 @@ import {
   ModalBody,
   ModalCloseButton,
   Select,
-  useDisclosure,
   Text,
-  Box,
 } from '@chakra-ui/react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import CollectionConsentModal from './consent-modal';
-import { EUpdateRoles } from '../../../types/enums';
+import { EUpdateRoles, EUserRoles, EPermitClassificationCode } from '../../../types/enums';
 import { useMst } from '../../../setup/root';
 
 const UpdatePathwayModal = ({ isOpen, onClose, setRevisionMode, setPerformedBy, permitApplication }) => {
   const { t } = useTranslation();
   const { userStore } = useMst();
   const currentUser = userStore.currentUser;
-  const isAdminUser = currentUser?.role === 'admin' || currentUser?.role === 'admin_manager';
+  const isAdminUser = currentUser?.role === EUserRoles.admin || currentUser?.role === EUserRoles.adminManager;
 
   const [selectedOption, setSelectedOption] = useState(null);
   const [isCollectionConsentModalOpen, setCollectionConsentModalOpen] = useState(false);
 
   // Proper implementation: use audience type to detect internal applications
-  const isInternalApplication = permitApplication?.audienceType?.code === 'internal';
+  const isInternalApplication = permitApplication?.audienceType?.code === EPermitClassificationCode.internal;
 
   // Reset state when modal opens
   React.useEffect(() => {
@@ -40,7 +38,7 @@ const UpdatePathwayModal = ({ isOpen, onClose, setRevisionMode, setPerformedBy, 
   // For internal applications, skip the pathway modal and go straight to consent
   React.useEffect(() => {
     if (isOpen && isInternalApplication && isAdminUser) {
-      setPerformedBy('staff');
+      setPerformedBy(EUpdateRoles.staff);
       setCollectionConsentModalOpen(true);
     }
   }, [isOpen, isInternalApplication, isAdminUser, setPerformedBy]);
@@ -86,10 +84,24 @@ const UpdatePathwayModal = ({ isOpen, onClose, setRevisionMode, setPerformedBy, 
                 {isAdminUser ? (
                   <>
                     <option value={EUpdateRoles.applicant}>
-                      {t('energySavingsApplication.show.updatePathwayOptions.participantOption')}
+                      <Trans
+                        i18nKey="energySavingsApplication.show.updatePathwayOptions.participantOption"
+                        values={{
+                          userGroup:
+                            (permitApplication?.userGroupType.code || EPermitClassificationCode.participant)
+                              .charAt(0)
+                              .toUpperCase() +
+                            (permitApplication?.userGroupType.code || EPermitClassificationCode.participant).slice(1),
+                        }}
+                      />
                     </option>
                     <option value={EUpdateRoles.staff}>
-                      {t('energySavingsApplication.show.updatePathwayOptions.adminOption')}
+                      <Trans
+                        i18nKey="energySavingsApplication.show.updatePathwayOptions.adminOption"
+                        values={{
+                          userGroup: permitApplication?.userGroupType.code || EPermitClassificationCode.participant,
+                        }}
+                      />
                     </option>
                   </>
                 ) : (

@@ -1318,8 +1318,8 @@ const options = {
             updatePathway: 'Update pathway',
             performedBy: 'Update performed by',
             updatePathwayOptions: {
-              participantOption: 'Participant (send request to them)',
-              adminOption: "Admin (on participant's behalf)",
+              participantOption: '{{userGroup}} (send request to them)',
+              adminOption: "Admin (on {{userGroup}}'s behalf)",
             },
             applicant: 'Applicant',
             staff: 'Staff',
