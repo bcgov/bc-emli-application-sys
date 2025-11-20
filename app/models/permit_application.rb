@@ -307,7 +307,7 @@ class PermitApplication < ApplicationRecord
       number: number,
       nickname: nickname,
       permit_classifications:
-        "#{user_group_type&.name} #{audience_type&.name} #{submission_type&.name}",
+        "#{user_group_type&.name} #{audience_type&.name} #{submission_type&.name} #{submission_variant&.name}",
       submitter: "#{submitter&.name} #{submitter&.email}",
       submitter_name: submitter&.name,
       submitted_at: submitted_at,
@@ -319,6 +319,7 @@ class PermitApplication < ApplicationRecord
       user_group_type_id: user_group_type&.id,
       audience_type_id: audience_type&.id,
       submission_type_id: submission_type&.id,
+      submission_variant_id: submission_variant&.id,
       program_id: program&.id,
       submitter_id: submitter&.id,
       template_version_id: template_version.id,
