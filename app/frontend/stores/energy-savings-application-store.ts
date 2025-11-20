@@ -321,6 +321,40 @@ export const PermitApplicationStoreModel = types
     },
   }))
   .actions((self) => ({
+    normalizeSubmitter(app) {
+      const root = self.rootStore;
+      const submitter = app.submitter;
+
+      // Create snapshot
+      app.submitterSnapshot = submitter || null;
+
+      if (!submitter) return app;
+
+      // User
+      if (submitter.type === 'User') {
+        if (!root.userStore.usersMap.has(submitter.id)) {
+          root.userStore.usersMap.set(submitter.id, submitter);
+        }
+        return app;
+      }
+
+      // Contractor
+      if (submitter.type === 'Contractor') {
+        if (submitter.contact && typeof submitter.contact === 'object') {
+          const contact = submitter.contact;
+          submitter.contactId = contact.id;
+
+          if (!root.userStore.usersMap.has(contact.id)) {
+            root.userStore.usersMap.set(contact.id, contact);
+          }
+        }
+
+        delete submitter.contact;
+        root.contractorStore.mergeContractor(submitter);
+      }
+
+      return app;
+    },
     requestSupportingFiles: flow(function* (permitApplicationId: string, note: string) {
       const permitApplication = self.getPermitApplicationById(permitApplicationId);
       if (!permitApplication) return false;
@@ -380,8 +414,8 @@ export const PermitApplicationStoreModel = types
         : yield self.environment.api.fetchPermitApplications(searchParams);
 
       if (response.ok) {
-        const permitApplications = response.data.data;
-
+        //const permitApplications = response.data.data;
+        const permitApplications = response.data.data.map((app) => self.normalizeSubmitter(app));
         // Filter based on assignedUserId if set in the store
         const filteredApplications = self.assignedUserIdFilter
           ? permitApplications.filter((app) => app.assignedUsers?.some((user) => user.id === self.assignedUserIdFilter))
@@ -411,29 +445,15 @@ export const PermitApplicationStoreModel = types
     }),
 
     fetchPermitApplication: flow(function* (id: string, review?: boolean) {
-      // If the user is review staff, we still need to hit the show endpoint to update viewedAt
       const { ok, data: response } = yield self.environment.api.fetchPermitApplication(id, review);
+
       if (ok && response.data) {
         const permitApplication = response.data;
 
-        const submitter = permitApplication.submitter;
-        if (submitter.type === 'Contractor') {
-          if (submitter.contact && typeof submitter.contact === 'object') {
-            const contact = submitter.contact;
-            submitter.contactId = contact.id;
-
-            // Optionally seed the userStore
-            if (!self.rootStore.userStore.usersMap.has(contact.id)) {
-              self.rootStore.userStore.usersMap.set(contact.id, contact);
-            }
-          }
-
-          delete submitter.contact; // Prevent MST from seeing it
-          self.rootStore.contractorStore.mergeContractor(submitter);
-        }
+        self.normalizeSubmitter(permitApplication);
 
         permitApplication.isFullyLoaded = true;
-        console.log('>>> About to mergeUpdate permitApplication', permitApplication);
+
         self.mergeUpdate(permitApplication, 'permitApplicationMap');
         return permitApplication;
       }
