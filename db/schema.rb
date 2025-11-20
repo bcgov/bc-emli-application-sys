@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_11_19_233222) do
+ActiveRecord::Schema[7.1].define(version: 2025_11_19_235800) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -374,6 +374,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_19_233222) do
     t.string "submitted_for"
     t.string "submitter_type", null: false
     t.uuid "submitter_id", null: false
+    t.uuid "submission_variant_id"
     t.index ["activity_id"], name: "index_permit_applications_on_activity_id"
     t.index ["audience_type_id"],
             name: "index_permit_applications_on_audience_type_id"
@@ -388,6 +389,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_19_233222) do
     t.index ["sandbox_id"], name: "index_permit_applications_on_sandbox_id"
     t.index ["submission_type_id"],
             name: "index_permit_applications_on_submission_type_id"
+    t.index ["submission_variant_id"],
+            name: "index_permit_applications_on_submission_variant_id"
     t.index %w[submitter_type submitter_id],
             name: "index_permit_applications_on_submitter"
     t.index ["template_version_id"],
@@ -624,6 +627,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_19_233222) do
     t.uuid "user_group_type_id"
     t.uuid "audience_type_id"
     t.uuid "submission_type_id"
+    t.uuid "submission_variant_id"
     t.index ["activity_id"], name: "index_requirement_templates_on_activity_id"
     t.index ["assignee_id"], name: "index_requirement_templates_on_assignee_id"
     t.index ["copied_from_id"],
@@ -635,6 +639,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_19_233222) do
     t.index ["program_id"], name: "index_requirement_templates_on_program_id"
     t.index ["submission_type_id"],
             name: "index_requirement_templates_on_submission_type_id"
+    t.index ["submission_variant_id"],
+            name: "index_requirement_templates_on_submission_variant_id"
     t.index ["type"], name: "index_requirement_templates_on_type"
   end
 
@@ -1196,6 +1202,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_19_233222) do
                   column: "submission_type_id"
   add_foreign_key "permit_applications",
                   "permit_classifications",
+                  column: "submission_variant_id"
+  add_foreign_key "permit_applications",
+                  "permit_classifications",
                   column: "user_group_type_id"
   add_foreign_key "permit_applications", "programs"
   add_foreign_key "permit_applications", "sandboxes"
@@ -1240,6 +1249,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_19_233222) do
   add_foreign_key "requirement_templates",
                   "permit_classifications",
                   column: "submission_type_id"
+  add_foreign_key "requirement_templates",
+                  "permit_classifications",
+                  column: "submission_variant_id"
   add_foreign_key "requirement_templates",
                   "permit_classifications",
                   column: "user_group_type_id"

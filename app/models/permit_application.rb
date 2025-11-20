@@ -410,7 +410,8 @@ class PermitApplication < ApplicationRecord
       program_id,
       user_group_type_id,
       audience_type_id,
-      submission_type_id
+      submission_type_id,
+      submission_variant_id
     )
   end
 
