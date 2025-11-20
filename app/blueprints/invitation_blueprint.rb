@@ -7,7 +7,11 @@ class InvitationBlueprint < Blueprinter::Base
     UserBlueprint.render_as_hash(hash[:invited], view: :base)
   end
 
-  field :email_taken do |hash, _options|
-    UserBlueprint.render_as_hash(hash[:email_taken], view: :base)
+  field :email_taken_active do |hash, _options|
+    UserBlueprint.render_as_hash(hash[:email_taken_active], view: :base)
+  end
+
+  field :email_taken_deactivated do |hash, _options|
+    UserBlueprint.render_as_hash(hash[:email_taken_deactivated], view: :base)
   end
 end

@@ -1,4 +1,4 @@
-import { Box, Container, Flex, Heading, VStack, Text, Button } from '@chakra-ui/react';
+import { Box, Container, Flex, Heading, VStack, Text, Button, Spinner } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
@@ -13,7 +13,8 @@ import { EFlashMessageStatus, EPermitClassificationCode } from '../../../types/e
 import { RouterLink } from '../../shared/navigation/router-link';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { useMst } from '../../../setup/root';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { CustomMessageBox } from '../../shared/base/custom-message-box';
 
 const defaultRow: TInviteUserParams = {
   email: '',
@@ -39,9 +40,10 @@ export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
   const rootStore = useMst();
   const { uiStore } = rootStore;
   const location = useLocation();
-  const navigate = useNavigate();
 
   const [rows, setRows] = useState<TInviteUserParams[]>([{ ...defaultRow }]);
+  const [invitationResponse, setInvitationResponse] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const basePath = location.pathname.startsWith('/configure-users') ? '/configure-users' : '/programs';
 
   if (error) return <ErrorScreen error={error} />;
@@ -49,26 +51,42 @@ export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
 
   const handleSendInvites = async () => {
     try {
+      setIsSubmitting(true);
+      setInvitationResponse(null);
+
       const apiRows = rows.map((row) => ({
         email: row.email,
         role: row.role,
         inbox_access: formatInboxAccessForApi(row.inboxAccess as ClassificationPresetName[]),
       }));
 
-      await currentProgram.inviteUsers(apiRows);
+      const response = await currentProgram.inviteUsers(apiRows);
 
-      uiStore.flashMessage.show(
-        EFlashMessageStatus.success,
-        'Invite sent. Review the status of the invite in the user table.',
-        '',
-      );
+      // Store the response data for displaying inline status tags
+      const responseData = response?.data || response;
+      setInvitationResponse(responseData);
 
-      // Redirect to the previous page (users table) and open the pending tab
-      navigate(`${basePath}/${currentProgram.id}/users?tab=pending`);
+      // Check the response categories (use camelCase!)
+      const invited = responseData?.invited || [];
+      const reinvited = responseData?.reinvited || [];
+      const emailTakenActive = responseData?.emailTakenActive || [];
+      const emailTakenDeactivated = responseData?.emailTakenDeactivated || [];
+
+      // Show success message only for newly invited users (not existing users assigned to program)
+      if (invited.length > 0) {
+        uiStore.flashMessage.show(
+          EFlashMessageStatus.success,
+          t('user.inviteSentSuccess', {
+            count: invited.length,
+          }),
+          '',
+        );
+      }
     } catch (error) {
       console.error('Failed to send invites:', error);
-
       uiStore.flashMessage.show(EFlashMessageStatus.error, 'Failed to send invite', '');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -94,7 +112,34 @@ export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
         </Flex>
       </VStack>
 
-      <InviteUserTable rows={rows} setRows={setRows} defaultRow={defaultRow} />
+      {invitationResponse && (invitationResponse.emailTakenActive?.length > 0 || invitationResponse.emailTakenDeactivated?.length > 0) && (
+        <CustomMessageBox
+          status="warning"
+          title={t('user.takenErrorTitle')}
+          description={
+            <VStack align="start" spacing={1}>
+              {invitationResponse.emailTakenActive?.map((user: any) => (
+                <Text key={user.email}>
+                  {user.email} - {t('user.inviteAlreadyActive')}
+                </Text>
+              ))}
+              {invitationResponse.emailTakenDeactivated?.map((user: any) => (
+                <Text key={user.email}>
+                  {user.email} - {t('user.inviteAlreadyDeactivated')}
+                </Text>
+              ))}
+            </VStack>
+          }
+        />
+      )}
+
+      <InviteUserTable
+        rows={rows}
+        setRows={setRows}
+        defaultRow={defaultRow}
+        invitationResponse={invitationResponse}
+        isSubmitting={isSubmitting}
+      />
 
       <Flex gap={4} pt={3}>
         <Button
@@ -102,6 +147,8 @@ export const ProgramInviteUserScreen = observer(function ProgramInviteUser() {
           variant={'primary'}
           alignSelf="flex-start"
           rightIcon={<PaperPlaneTilt size={16} />}
+          isLoading={isSubmitting}
+          loadingText={t('user.sendInvites')}
         >
           {t('user.sendInvites')}
         </Button>
