@@ -82,6 +82,10 @@ class PermitApplication < ApplicationRecord
   belongs_to :template_version
   belongs_to :sandbox, optional: true
 
+  belongs_to :submission_variant,
+             class_name: "SubmissionVariant",
+             optional: true
+
   # The front end form update provides a json payload of items we want to force update on the front-end since form io maintains its own state and does not 'rerender' if we send the form data back
   attr_accessor :front_end_form_update
   has_one :step_code
@@ -129,6 +133,7 @@ class PermitApplication < ApplicationRecord
   validate :name_presence
   validates :number, presence: true
   validates :reference_number, length: { maximum: 300 }, allow_nil: true
+  validate :submission_variant_consistency
   #validate :sandbox_belongs_to_jurisdiction
 
   delegate :qualified_name, to: :program, prefix: true
@@ -965,6 +970,18 @@ class PermitApplication < ApplicationRecord
   end
 
   private
+
+  def submission_variant_consistency
+    return if submission_variant.nil?
+
+    # ensure the variant belongs to the same submission type
+    unless submission_variant.parent_id == submission_type_id
+      errors.add(
+        :submission_variant,
+        "must belong to the selected submission type"
+      )
+    end
+  end
 
   def update_collaboration_assignments
     # TODO: Implement this method to remove collaborations for missing requirement block when a new template is published
