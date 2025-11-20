@@ -8,7 +8,14 @@ import { withEnvironment } from '../lib/with-environment';
 import { withRootStore } from '../lib/with-root-store';
 import { EFlashMessageStatus, ERequirementTemplateType, EVisibility } from '../types/enums';
 import { EarlyAccessPreviewModel } from './early-access-preview';
-import { IActivity, IAudienceType, IPermitType, ISubmissionType, IUserGroupType } from './permit-classification';
+import {
+  IActivity,
+  IAudienceType,
+  IPermitType,
+  ISubmissionType,
+  IUserGroupType,
+  ISubmissionVariant,
+} from './permit-classification';
 import { RequirementTemplateSectionModel } from './requirement-template-section';
 import { TemplateVersionModel } from './template-version';
 import { UserModel } from './user';
@@ -79,6 +86,7 @@ export const RequirementTemplateModel = types.snapshotProcessor(
       activity: types.frozen<IActivity>(),
       audienceType: types.frozen<IAudienceType>(),
       submissionType: types.frozen<ISubmissionType>(),
+      submissionVariant: types.maybeNull(types.frozen<ISubmissionVariant>()),
       userGroupType: types.frozen<IUserGroupType>(),
       program: types.frozen<IProgram>(),
       formJson: types.frozen<IRequirementTemplateFormJson>(),
@@ -92,6 +100,7 @@ export const RequirementTemplateModel = types.snapshotProcessor(
       fetchedAt: types.maybeNull(types.Date),
       isFullyLoaded: types.optional(types.boolean, false),
       public: types.boolean,
+      submission_variant_id: types.maybeNull(types.string),
     })
     .extend(withRootStore())
     .extend(withEnvironment())

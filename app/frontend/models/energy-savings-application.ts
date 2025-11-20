@@ -59,9 +59,9 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       nickname: types.string,
       submittedFor: types.maybeNull(types.string),
       number: types.string,
-      fullAddress: types.maybeNull(types.string), // for now some seeds will not have this
-      pin: types.maybeNull(types.string), // for now some seeds will not have this
-      pid: types.maybeNull(types.string), // for now some seeds will not have this
+      fullAddress: types.maybeNull(types.string),
+      pin: types.maybeNull(types.string),
+      pid: types.maybeNull(types.string),
       permitType: types.frozen<IPermitType>(),
       activity: types.frozen<IActivity>(),
       userGroupType: types.frozen<IUserGroupType>(),
@@ -70,7 +70,6 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       program: types.frozen<IProgram>(),
       status: types.enumeration(Object.values(EPermitApplicationStatus)),
       submitterSnapshot: types.maybeNull(types.frozen()),
-      // assignedUsers: types.maybeNull(types.array(types.late(() => UserModel))),
       assignedUsers: types.array(types.frozen<IMinimalFrozenUser>()),
       jurisdiction: types.maybeNull(types.maybe(types.reference(types.late(() => JurisdictionModel)))),
       templateVersion: types.maybeNull(types.reference(types.late(() => TemplateVersionModel))),
@@ -175,7 +174,6 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
           return acc;
         }, {});
       },
-
       get latestSubmissionVersion() {
         if (self.submissionVersions?.length === 0) {
           return null;

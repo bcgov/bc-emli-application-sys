@@ -16,10 +16,10 @@ import {
   Grid,
   GridItem,
 } from '@chakra-ui/react';
-import { Download } from '@phosphor-icons/react';
+import { DownloadIcon } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { SharedSpinner } from '../../shared/base/shared-spinner';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { useMst } from '../../../setup/root';
@@ -74,7 +74,7 @@ export const SupportingFilesRequestModal = observer(
         {renderTrigger ? (
           renderTrigger(requestDisclosure.onOpen)
         ) : (
-          <Button ref={triggerRef} variant="primary" onClick={requestDisclosure.onOpen} leftIcon={<Download />}>
+          <Button ref={triggerRef} variant="primary" onClick={requestDisclosure.onOpen} leftIcon={<DownloadIcon />}>
             {t('energySavingsApplication.show.supportingFilesRequest.requestSupportingFiles')}
           </Button>
         )}
@@ -95,7 +95,7 @@ export const SupportingFilesRequestModal = observer(
               <>
                 <ModalHeader>
                   <VStack w="full" align="start">
-                    <Heading as="h1" fontSize="2xl" textTransform="capitalize">
+                    <Heading as="h1" fontSize="2xl">
                       {t('energySavingsApplication.show.supportingFilesRequest.requestSupportingFiles')}
                       <br />
                       <Text as="span" fontSize="lg" color="text.secondary">
@@ -171,7 +171,9 @@ export const PageConfirmationModal = ({
           <ModalCloseButton />
           <ModalBody>
             <Text as="span" fontSize="lg" color="theme.blueAlt" fontWeight="bold">
-              {`Are you sure you want to request supporting files for ${applicationNumber}`}
+              {t('energySavingsApplication.show.supportingFilesRequest.confirmationText', {
+                applicationNumber: applicationNumber,
+              })}
             </Text>
           </ModalBody>
           <ModalFooter>
