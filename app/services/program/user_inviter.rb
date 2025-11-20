@@ -6,7 +6,7 @@ class Program::UserInviter
     @inviter = inviter
     @users_params = users_params
     @program = program
-    @results = { invited: [], reinvited: [], email_taken: [] }
+    @results = { invited: [], reinvited: [], email_taken_active: [], email_taken_deactivated: [] }
   end
 
   def call
@@ -24,8 +24,14 @@ class Program::UserInviter
 
       if user.present? && !user.discarded?
         # check if they already have this membership
-        if ProgramMembership.exists?(user: user, program: program)
-          self.results[:email_taken] << user
+        membership = ProgramMembership.find_by(user: user, program: program)
+        if membership
+          # Categorize by membership status
+          if membership.active?
+            self.results[:email_taken_active] << user
+          else
+            self.results[:email_taken_deactivated] << user
+          end
           next
         end
 
