@@ -883,7 +883,8 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         self.isLoading = true;
         const response = yield self.environment.api.updatePermitApplication(self.id, params, review);
         if (response.ok) {
-          const { data: permitApplication } = response.data;
+          let { data: permitApplication } = response.data;
+          permitApplication = self.rootStore.permitApplicationStore.normalizeSubmitter(permitApplication);
           if (!autosave) {
             self.rootStore.permitApplicationStore.mergeUpdate(permitApplication, 'permitApplicationMap');
           }

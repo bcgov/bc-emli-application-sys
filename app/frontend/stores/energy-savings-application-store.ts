@@ -361,6 +361,7 @@ export const PermitApplicationStoreModel = types
 
       const { ok, data: response } = yield self.environment.api.requestSupportingFiles(permitApplicationId, note);
       if (ok && response) {
+        self.normalizeSubmitter(response);
         self.mergeUpdate(response, 'permitApplicationMap');
         return response;
       }
@@ -376,6 +377,7 @@ export const PermitApplicationStoreModel = types
     createPermitApplication: flow(function* (formData: TCreatePermitApplicationFormData) {
       const { ok, data: response } = yield self.environment.api.createPermitApplication(formData);
       if (ok && response.data) {
+        self.normalizeSubmitter(response.data);
         self.mergeUpdate(response.data, 'permitApplicationMap');
         return response.data;
       }
