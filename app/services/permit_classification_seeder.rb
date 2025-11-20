@@ -114,17 +114,37 @@ class PermitClassificationSeeder
       }
     ]
 
-    # Create Classifications
-    classifications.each do |classification_attrs|
-      # Attempt to find the Activity by code
-      classification =
-        PermitClassification.find_by(code: classification_attrs[:code])
-      if classification
-        # If found, update the attributes
-        classification.update(classification_attrs)
-      else
-        # If not found, create the Activity with all attributes
-        PermitClassification.create!(classification_attrs)
+    classifications.each do |attrs|
+      record = PermitClassification.find_or_initialize_by(code: attrs[:code])
+      record.update!(attrs)
+    end
+
+    # --- Invoice Variants ---
+    invoice = SubmissionType.find_by(code: :invoice)
+
+    variants = [
+      {
+        name: "Invoice 1",
+        code: PermitClassification.codes[:invoice_1],
+        parent: invoice
+      },
+      {
+        name: "Invoice 2",
+        code: PermitClassification.codes[:invoice_2],
+        parent: invoice
+      },
+      {
+        name: "Invoice 3",
+        code: PermitClassification.codes[:invoice_3],
+        parent: invoice
+      }
+    ]
+
+    variants.each do |attrs|
+      SubmissionVariant.find_or_create_by!(code: attrs[:code]) do |sv|
+        sv.name = attrs[:name]
+        sv.parent = attrs[:parent]
+        sv.enabled = true
       end
     end
 

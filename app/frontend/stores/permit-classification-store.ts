@@ -13,6 +13,8 @@ import {
   IUserGroupType,
   SubmissionTypeModel,
   ISubmissionType,
+  SubmissionVariantModel,
+  ISubmissionVariant,
 } from '../models/permit-classification';
 import { EPermitClassificationCode, EPermitClassificationType } from '../types/enums';
 import { IOption } from '../types/types';
@@ -34,9 +36,11 @@ export const PermitClassificationStoreModel = types
     audienceTypeMap: types.map(AudienceTypeModel),
     userGroupTypeMap: types.map(UserGroupTypeModel),
     submissionTypeMap: types.map(SubmissionTypeModel),
+    submissionVariantMap: types.map(SubmissionVariantModel),
     isAudienceTypeLoading: types.optional(types.boolean, false),
     isUserGroupTypeLoading: types.optional(types.boolean, false),
     isSubmissionTypeLoading: types.optional(types.boolean, false),
+    isSubmissionVariantLoading: types.optional(types.boolean, false),
     isLoaded: types.optional(types.boolean, false),
   })
   .extend(withEnvironment())
@@ -115,6 +119,16 @@ export const PermitClassificationStoreModel = types
         .filter((item) => item.code !== EPermitClassificationCode.onboarding)
         .map((item) => item.id);
     },
+    // submission variant types
+    getSubmissionVariantById(id: string) {
+      return self.submissionVariantMap.get(id);
+    },
+    get submissionVariants() {
+      return Array.from(self.submissionVariantMap.values());
+    },
+    getSubmissionVariantsForType(submissionTypeId: string) {
+      return Array.from(self.submissionVariantMap.values()).filter((v) => v.parent_id === submissionTypeId);
+    },
   }))
   .actions((self) => ({
     // Action to add a new PermitType
@@ -141,11 +155,15 @@ export const PermitClassificationStoreModel = types
         const submissionData = response.data.data.filter((pc) => pc.type == EPermitClassificationType.SubmissionType);
         const userGroupData = response.data.data.filter((pc) => pc.type == EPermitClassificationType.UserGroupType);
         const audienceData = response.data.data.filter((pc) => pc.type == EPermitClassificationType.AudienceType);
+        const submissionVariantData = response.data.data.filter(
+          (pc) => pc.type == EPermitClassificationType.SubmissionVariant,
+        );
         if (permitTypeData.length) self.mergeUpdateAll(permitTypeData, 'permitTypeMap');
         if (activityData.length) self.mergeUpdateAll(activityData, 'activityMap');
         if (submissionData.length) self.mergeUpdateAll(submissionData, 'submissionTypeMap');
         if (userGroupData.length) self.mergeUpdateAll(userGroupData, 'userGroupTypeMap');
         if (audienceData.length) self.mergeUpdateAll(audienceData, 'audienceTypeMap');
+        if (submissionVariantData.length) self.mergeUpdateAll(submissionVariantData, 'submissionVariantMap');
       }
       self.isLoaded = true;
       return response.ok;
@@ -291,6 +309,29 @@ export const PermitClassificationStoreModel = types
       );
       self.isUserGroupTypeLoading = false;
       return (response?.data?.data ?? []) as IOption<IUserGroupType>[];
+    }),
+    fetchSubmissionVariantOptions: flow(function* (
+      publishedOnly = false,
+      firstNations = null,
+      pid = null,
+      jurisdictionId = null,
+    ) {
+      self.isSubmissionVariantLoading = true;
+      const response = yield* toGenerator(
+        self.environment.api.fetchPermitClassificationOptions(
+          EPermitClassificationType.SubmissionVariant,
+          publishedOnly,
+          firstNations,
+          null,
+          null,
+          pid,
+          jurisdictionId,
+        ),
+      );
+      self.isSubmissionVariantLoading = false;
+      return ((response?.data?.data ?? []) as unknown as IOption<ISubmissionVariant>[]).filter(
+        (pc) => (pc.value as any).type === EPermitClassificationType.SubmissionVariant,
+      );
     }),
   }));
 

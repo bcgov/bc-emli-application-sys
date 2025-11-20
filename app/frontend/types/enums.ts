@@ -19,6 +19,7 @@ export enum EPermitClassificationType {
   SubmissionType = 'SubmissionType',
   PermitType = 'PermitType',
   Activity = 'Activity',
+  SubmissionVariant = 'SubmissionVariant',
 }
 
 export enum ERequirementTemplateType {
@@ -42,6 +43,9 @@ export enum EPermitClassificationCode {
   application = 'application',
   supportRequest = 'support_request',
   onboarding = 'onboarding',
+  invoice_1 = 'invoice_1',
+  invoice_2 = 'invoice_2',
+  invoice_3 = 'invoice_3',
 }
 
 export enum ESubmissionInboxTypes {
