@@ -896,8 +896,8 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         self.isLoading = true;
         const response = yield self.environment.api.updateRevisionRequests(self.id, params);
         if (response.ok) {
-          const { data: permitApplication } = response.data;
-
+          let { data: permitApplication } = response.data;
+          permitApplication = self.rootStore.permitApplicationStore.normalizeSubmitter(permitApplication);
           self.rootStore.permitApplicationStore.mergeUpdate(
             { ...permitApplication, revisionMode: true },
             'permitApplicationMap',
@@ -910,8 +910,8 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         self.isLoading = true;
         const response = yield self.environment.api.setPermitApplicationStatus(self.id, params);
         if (response.ok) {
-          const { data: permitApplication } = response.data;
-
+          let { data: permitApplication } = response.data;
+          permitApplication = self.rootStore.permitApplicationStore.normalizeSubmitter(permitApplication);
           self.rootStore.permitApplicationStore.mergeUpdate(
             { ...permitApplication, revisionMode: true },
             'permitApplicationMap',
@@ -929,7 +929,8 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         const retainedDiff = self.diff;
         const response = yield self.environment.api.updatePermitApplicationVersion(self.id);
         if (response.ok) {
-          const { data: permitApplication } = response.data;
+          let { data: permitApplication } = response.data;
+          permitApplication = self.rootStore.permitApplicationStore.normalizeSubmitter(permitApplication);
           self.rootStore.permitApplicationStore.mergeUpdate(permitApplication, 'permitApplicationMap');
         }
         self.diff = retainedDiff;
@@ -940,7 +941,8 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       submit: flow(function* (params) {
         const response = yield self.environment.api.submitPermitApplication(self.id, params);
         if (response.ok) {
-          const { data: permitApplication } = response.data;
+          let { data: permitApplication } = response.data;
+          permitApplication = self.rootStore.permitApplicationStore.normalizeSubmitter(permitApplication);
           self.rootStore.permitApplicationStore.mergeUpdate(permitApplication, 'permitApplicationMap');
         }
         return response.ok;
@@ -962,7 +964,8 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       markAsViewed: flow(function* () {
         const response = yield self.environment.api.viewPermitApplication(self.id);
         if (response.ok) {
-          const { data: permitApplication } = response.data;
+          let { data: permitApplication } = response.data;
+          permitApplication = self.rootStore.permitApplicationStore.normalizeSubmitter(permitApplication);
           self.rootStore.permitApplicationStore.mergeUpdate(permitApplication, 'permitApplicationMap');
         }
         return response.ok;
