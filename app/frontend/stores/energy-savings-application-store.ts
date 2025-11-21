@@ -333,7 +333,7 @@ export const PermitApplicationStoreModel = types
       // User
       if (submitter.type === 'User') {
         if (!root.userStore.usersMap.has(submitter.id)) {
-          root.userStore.usersMap.set(submitter.id, submitter);
+          root.userStore.mergeUser(submitter);
         }
         return app;
       }
@@ -345,7 +345,7 @@ export const PermitApplicationStoreModel = types
           submitter.contactId = contact.id;
 
           if (!root.userStore.usersMap.has(contact.id)) {
-            root.userStore.usersMap.set(contact.id, contact);
+            root.userStore.mergeUser(contact);
           }
         }
 
