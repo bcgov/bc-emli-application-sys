@@ -9,6 +9,7 @@ import { LoadingScreen } from '../../shared/base/loading-screen';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { useLocation } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
+import { GreenLineSmall } from '../../shared/base/decorative/green-line-small';
 
 // Successful Submission Screen
 export const SuccessfulSubmissionScreen = observer(() => {
@@ -49,19 +50,19 @@ export const SuccessfulSubmissionScreen = observer(() => {
   }
 
   return (
-    <Container maxW="container.lg">
-      <Flex direction="column" align="center" my={24} gap={8}>
+    <Container maxW="container.lg" width="60%">
+      <Flex direction="column" align="center" my={24}>
         <Icon as={CheckCircleIcon} boxSize="14" color="theme.darkGreen" />
         <VStack>
-          <Heading as="h1" color="theme.blueAlt">
+          <Heading as="h1" color="theme.blueAlt" textAlign="center">
             {determinedMessage}
           </Heading>
-          <Tag mt="4" color="semantic.info" border="1px solid" borderColor="semantic.info" p={2}>
+          <Tag  color="semantic.info" border="1px solid" borderColor="semantic.info" p={2}>
             {t('energySavingsApplication.new.yourReference', { number })}
           </Tag>
         </VStack>
         {whatsNextHeadingKey && whatsNextLineKeys.length > 0 && (
-          <WhatsNextBlock headingKey={whatsNextHeadingKey} lineKeys={whatsNextLineKeys} email={whatsNextEmail} />
+          <WhatsNextBlock headingKey={whatsNextHeadingKey} lineKeys={whatsNextLineKeys} email={whatsNextEmail}  />
         )}
         <SubmissionReturnButton
           currentUser={currentUser}
@@ -89,14 +90,15 @@ const WhatsNextBlock = ({ headingKey, lineKeys, email }: WhatsNextBlockProps) =>
   if (nonEmptyLines.length === 0) return null;
 
   return (
-    <Box mt={12} p={8} borderRadius="md" backgroundColor="semantic.infoLight">
-      <Text fontSize="3xl" fontWeight="bold" mb={4} pb={1} width="fit-content">
+    <Box mt={12} p={8} borderRadius="md" backgroundColor="greys.grey10" width="100%" >
+      <GreenLineSmall />
+      <Text fontSize="2xl" fontWeight="bold" mb={6} pb={2}>
         {t(headingKey)}
       </Text>
 
-      <VStack align="start" spacing={4}>
-        {lineKeys.map((key) => (
-          <Text fontSize="lg" key={key}>
+      <VStack align="start" spacing={0}>
+        {lineKeys.map((key, index) => (
+          <Text fontSize="md" key={key} mt={index === 0 ? 0 : 8}>
             <Trans
               i18nKey={key}
               values={{ email: email ?? '' }}
@@ -157,7 +159,7 @@ const SubmissionReturnButton = ({
   }
 
   return (
-    <RouterLinkButton to={returnPath} variant="primary">
+    <RouterLinkButton to={returnPath} variant="primary" mt={6}>
       {returnLabel}
     </RouterLinkButton>
   );

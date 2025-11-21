@@ -1058,14 +1058,14 @@ const options = {
             'By submitting your registration details you confirm that the information you provided was completed to the best of your knowledge and ability',
           submissionSuccess: 'You have submitted your details to the Energy Savings Program.',
           whatsNext: {
-            heading: 'What’s next?',
+            heading: "What's next?",
             line1:
               'Please wait while we assess your registration details. We will email you once your registration is approved. If we need more information we will reach out via email.',
             line2:
               'If you need to add, edit, or remove employees from your account in the future you will need to call us.',
             line3: 'If you have any questions, please call us at 1-833-856-0333 or email us at <1>{{email}}</1>.',
           },
-          returnToDashboard: 'Return to Contractor homepage',
+          returnToDashboard: 'Back to Contractor homepage',
         },
         energySavingsApplication: {
           submissionBlockModal: {
@@ -1260,7 +1260,7 @@ const options = {
               'I confirm that the information provided is accurate to the best of my knowledge. The applicant has given consent for me to submit this application on their behalf.',
             confirmation:
               'By submitting this application you confirm that the information you provided was completed to the best of your knowledge and ability',
-            yourReference: 'Reference #{{ number }}',
+            yourReference: 'Reference # {{ number }}',
             noContactsAvailable:
               'This jurisdiction is not ready to accept applications through this tool yet. Please check with your local jurisdiction.',
             whatsNext:
