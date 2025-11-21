@@ -115,8 +115,8 @@ export const RequirementForm = observer(
       if (permitApplication.isSubmitted || permitApplication.isInReview)
         statuses.push({
           label: t('energySavingsApplication.show.applicationSubmitted', {
-            date: permitApplication?.submittedAt
-              ? format(new Date(permitApplication.submittedAt), 'MMM d, yyyy h:mm a')
+            date: permitApplication?.updatedAt
+              ? format(new Date(permitApplication.updatedAt), 'MMM d, yyyy h:mm a')
               : '',
           }),
         });
