@@ -331,7 +331,18 @@ class Api::RequirementTemplatesController < Api::ApplicationController
         :submission_type_id,
         :type,
         :public,
-        requirement_template_sections_attributes: %i[id name position _destroy]
+        requirement_template_sections_attributes: [
+          :id,
+          :name,
+          :position,
+          :_destroy,
+          template_section_blocks_attributes: %i[
+            id
+            requirement_block_id
+            position
+            _destroy
+          ]
+        ]
       )
 
     # This is a workaround needed to validate step code related errors
