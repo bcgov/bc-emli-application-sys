@@ -40,7 +40,14 @@ import { convertResourceArrayToRecord } from '../utils/utility-functions';
 import { ICollaborator } from './collaborator';
 import { JurisdictionModel } from './jurisdiction';
 import { IPermitBlockStatus, PermitBlockStatusModel } from './permit-block-status';
-import { IActivity, IAudienceType, IPermitType, ISubmissionType, IUserGroupType } from './permit-classification';
+import {
+  IActivity,
+  IAudienceType,
+  IPermitType,
+  ISubmissionType,
+  ISubmissionVariant,
+  IUserGroupType,
+} from './permit-classification';
 import { IPermitCollaboration, PermitCollaborationModel } from './permit-collaboration';
 import { IRequirement } from './requirement';
 import { ISupportRequest, SupportRequestModel } from './support_request';
@@ -67,6 +74,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       userGroupType: types.frozen<IUserGroupType>(),
       audienceType: types.frozen<IAudienceType>(),
       submissionType: types.frozen<ISubmissionType>(),
+      submissionVariant: types.maybeNull(types.frozen<ISubmissionVariant>()),
       program: types.frozen<IProgram>(),
       status: types.enumeration(Object.values(EPermitApplicationStatus)),
       submitterSnapshot: types.maybeNull(types.frozen()),
