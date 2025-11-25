@@ -1,45 +1,31 @@
-import { Button, Checkbox, Flex, Link, Text, VStack } from '@chakra-ui/react';
+import { Button, Flex, Text, VStack } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { IRequirementTemplate } from '../../../models/requirement-template';
 import { useMst } from '../../../setup/root';
-import { EProgramUserGroupType, ERequirementTemplateType } from '../../../types/enums';
+import { ERequirementTemplateType } from '../../../types/enums';
 import { IOption, TCreateRequirementTemplateFormData } from '../../../types/types';
 import { AsyncRadioGroup } from '../base/inputs/async-radio-group';
 import { TextFormControl } from '../form/input-form-control';
-import { HStack } from '../../domains/step-code/checklist/pdf-content/shared/h-stack';
 import { useSearch } from '../../../hooks/use-search';
 import { AsyncDropdown } from '../base/inputs/async-dropdown';
+import { FieldBlock } from '../base/field-block';
 interface IRequirementTemplateFormProps {
   type: ERequirementTemplateType;
   onSuccess: (createdRequirementTemplate: IRequirementTemplate) => void;
 }
 
-// interface IOption<T> {
-//   value: T;
-//   label: string;
-// }
-
 export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequirementTemplateFormProps) => {
   const { t } = useTranslation();
   const {
     requirementTemplateStore: { createRequirementTemplate, copyRequirementTemplate },
-    permitClassificationStore: { fetchAudienceTypeOptions, fetchUserGroupTypeOptions, fetchSubmissionTypeOptions },
+    permitClassificationStore,
   } = useMst();
   const { programStore } = useMst();
-  const {
-    tablePrograms,
-    currentPage,
-    totalPages,
-    totalCount,
-    countPerPage,
-    handleCountPerPageChange,
-    handlePageChange,
-    isSearching,
-  } = programStore;
+  const { tablePrograms } = programStore;
 
   useSearch(programStore);
   const [copyExisting, setCopyExisting] = useState(false);
@@ -73,6 +59,14 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
 
   const { isSubmitting, isValid } = formState;
 
+  const selectedSubmissionTypeId = useWatch({
+    control,
+    name: 'submissionTypeId',
+  });
+  const variants = selectedSubmissionTypeId
+    ? permitClassificationStore.getSubmissionVariantsForType(selectedSubmissionTypeId)
+    : [];
+
   const onSubmit = async (formData: TCreateRequirementTemplateFormData) => {
     formData.type = type;
 
@@ -84,6 +78,12 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
       onSuccess(createdRequirementTemplate);
     }
   };
+
+  useEffect(() => {
+    if (!permitClassificationStore.isLoaded) {
+      permitClassificationStore.fetchPermitClassifications();
+    }
+  }, [permitClassificationStore.isLoaded]);
 
   return (
     <FormProvider {...formMethods}>
@@ -102,21 +102,37 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
             <AsyncRadioGroup
               valueField="id"
               question={t('requirementTemplate.fields.userGroupTypeSelect')}
-              fetchOptions={fetchUserGroupTypeOptions}
+              fetchOptions={async () => permitClassificationStore.userGroupTypeOptions}
               fieldName={'userGroupTypeId'}
             />
             <AsyncRadioGroup
               valueField="id"
               question={t('requirementTemplate.fields.audienceTypeSelect')}
-              fetchOptions={fetchAudienceTypeOptions}
+              fetchOptions={async () => permitClassificationStore.audienceTypeOptions}
               fieldName={'audienceTypeId'}
             />
-            <AsyncDropdown
-              fetchOptions={fetchSubmissionTypeOptions}
-              fieldName={'submissionTypeId'}
-              question={t('requirementTemplate.fields.submissionTypeSelect')}
-              useBoxWrapper={true}
-            />
+            <FieldBlock>
+              <AsyncDropdown
+                fetchOptions={async () => permitClassificationStore.submissionTypeOptions}
+                fieldName="submissionTypeId"
+                question={t('requirementTemplate.fields.submissionTypeSelect')}
+                useBoxWrapper={false}
+              />
+              {variants.length > 0 && (
+                <AsyncDropdown
+                  fetchOptions={async () =>
+                    variants.map((v) => ({
+                      label: v.name,
+                      value: v.code,
+                      raw: v,
+                    }))
+                  }
+                  fieldName="submissionVariantId"
+                  question={t('requirementTemplate.fields.submissionSubTypeSelect')}
+                  useBoxWrapper={false}
+                />
+              )}
+            </FieldBlock>
             <Flex
               bg="greys.grey10"
               p={4}
@@ -137,33 +153,6 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
               />
             </Flex>
           </VStack>
-
-          {/* <Controller
-            name="firstNations"
-            control={control}
-            defaultValue={false}
-            render={({ field: { onChange, value } }) => (
-              <Checkbox isChecked={value} onChange={onChange}>
-                <Trans
-                  i18nKey={'requirementTemplate.new.firstNationsLand'}
-                  components={{
-                    1: (
-                      <Link
-                        isExternal
-                        href="https://services.aadnc-aandc.gc.ca/ILRS_Public/Home/Home.aspx?ReturnUrl=%2filrs_public%2f"
-                      />
-                    ),
-                  }}
-                />
-              </Checkbox>
-            )}
-          /> */}
-          {/* {firstNationsChecked && (
-            <Checkbox isChecked={copyExisting} onChange={(e) => setCopyExisting(e.target.checked)}>
-              {t('requirementTemplate.new.copyExistingByClassifications')}
-            </Checkbox>
-          )} */}
-
           <Flex
             bg="greys.grey10"
             p={4}

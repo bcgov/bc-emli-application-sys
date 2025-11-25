@@ -76,11 +76,17 @@ export const PermitClassificationStoreModel = types
     get audienceTypes() {
       return Array.from(self.audienceTypeMap.values());
     },
+    get audienceTypeOptions(): Array<IOption<string> & { raw: IAudienceType }> {
+      return Array.from(self.audienceTypeMap.values()).map((item) => ({
+        label: item.name,
+        value: item.code, // or item.code if UI needs the code instead
+        raw: item,
+      }));
+    },
     // View to get a User group type by id
     getUserGroupTypeById(id: string) {
       return self.userGroupTypeMap.get(id);
     },
-
     // View to get an Audience type by id
     getUserGroupTypeByCode(code: number) {
       return self.userGroupTypeMap.get(code.toString());
@@ -90,16 +96,21 @@ export const PermitClassificationStoreModel = types
       const match = Array.from(self.userGroupTypeMap.values()).find((item) => item.code === code);
       return match?.id;
     },
-
     // view to get all User group types
     get userGroupTypes() {
       return Array.from(self.userGroupTypeMap.values());
+    },
+    get userGroupTypeOptions(): Array<IOption<string> & { raw: IUserGroupType }> {
+      return Array.from(self.userGroupTypeMap.values()).map((item) => ({
+        label: item.name,
+        value: item.code, // or item.code if UI needs the code instead
+        raw: item,
+      }));
     },
     // View to get a submission type by id
     getSubmissionTypeById(id: string) {
       return self.submissionTypeMap.get(id);
     },
-
     // View to get a User group type id by code
     getSubmissionTypeIdByCode(code: string) {
       const match = Array.from(self.submissionTypeMap.values()).find((item) => item.code === code);
@@ -108,6 +119,13 @@ export const PermitClassificationStoreModel = types
     // view to get all submission types
     get submissionTypes() {
       return Array.from(self.submissionTypeMap.values());
+    },
+    get submissionTypeOptions(): Array<IOption<string> & { raw: ISubmissionType }> {
+      return Array.from(self.submissionTypeMap.values()).map((item) => ({
+        label: item.name,
+        value: item.code, // or item.code if UI needs the code instead
+        raw: item,
+      }));
     },
     // view to get all submission types ids
     getAllSubmissionTypeIds() {
@@ -126,8 +144,13 @@ export const PermitClassificationStoreModel = types
     get submissionVariants() {
       return Array.from(self.submissionVariantMap.values());
     },
-    getSubmissionVariantsForType(submissionTypeId: string) {
-      return Array.from(self.submissionVariantMap.values()).filter((v) => v.parent_id === submissionTypeId);
+    getSubmissionVariantsForType(submissionTypeCode: string) {
+      // Convert code → id
+      const submissionTypeId = (self as any).getSubmissionTypeIdByCode(submissionTypeCode);
+      if (!submissionTypeId) return [];
+
+      // Now filter using the actual GUID-based parent_id
+      return Array.from(self.submissionVariantMap.values()).filter((v) => v.parentId === submissionTypeId);
     },
   }))
   .actions((self) => ({
@@ -208,124 +231,53 @@ export const PermitClassificationStoreModel = types
     },
   }))
   .actions((self) => ({
-    fetchPermitTypeOptions: flow(function* (
-      publishedOnly = false,
-      firstNations = null,
-      pid = null,
-      jurisdictionId = null,
-    ) {
+    fetchPermitTypeOptions: flow(function* (publishedOnly = false) {
       self.isPermitTypeLoading = true;
       const response = yield* toGenerator(
-        self.environment.api.fetchPermitClassificationOptions(
-          EPermitClassificationType.PermitType,
-          publishedOnly,
-          firstNations,
-          null,
-          null,
-          pid,
-          jurisdictionId,
-        ),
+        self.environment.api.fetchPermitClassificationOptions(EPermitClassificationType.PermitType, publishedOnly),
       );
       self.isPermitTypeLoading = false;
       return (response?.data?.data ?? []) as IOption<IPermitType>[];
     }),
-    fetchActivityOptions: flow(function* (publishedOnly = false, firstNations = null, permitTypeId = null) {
+    fetchActivityOptions: flow(function* (publishedOnly = false) {
       self.isActivityLoading = true;
       const response = yield* toGenerator(
-        self.environment.api.fetchPermitClassificationOptions(
-          EPermitClassificationType.Activity,
-          publishedOnly,
-          firstNations,
-          permitTypeId,
-        ),
+        self.environment.api.fetchPermitClassificationOptions(EPermitClassificationType.Activity, publishedOnly),
       );
       self.isActivityLoading = false;
       return (response?.data?.data ?? []) as IOption<IActivity>[];
     }),
     // new classification types
-    fetchAudienceTypeOptions: flow(function* (
-      publishedOnly = false,
-      firstNations = null,
-      pid = null,
-      jurisdictionId = null,
-    ) {
+    fetchAudienceTypeOptions: flow(function* (publishedOnly = false) {
       self.isAudienceTypeLoading = true;
       const response = yield* toGenerator(
-        self.environment.api.fetchPermitClassificationOptions(
-          EPermitClassificationType.AudienceType,
-          publishedOnly,
-          firstNations,
-          null,
-          null,
-          pid,
-          jurisdictionId,
-        ),
+        self.environment.api.fetchPermitClassificationOptions(EPermitClassificationType.AudienceType, publishedOnly),
       );
       self.isAudienceTypeLoading = false;
       return (response?.data?.data ?? []) as IOption<IAudienceType>[];
     }),
-    fetchSubmissionTypeOptions: flow(function* (
-      publishedOnly = false,
-      firstNations = null,
-      pid = null,
-      jurisdictionId = null,
-    ) {
+    fetchSubmissionTypeOptions: flow(function* (publishedOnly = false) {
       self.isSubmissionTypeLoading = true;
       const response = yield* toGenerator(
-        self.environment.api.fetchPermitClassificationOptions(
-          EPermitClassificationType.SubmissionType,
-          publishedOnly,
-          firstNations,
-          null,
-          null,
-          pid,
-          jurisdictionId,
-        ),
+        self.environment.api.fetchPermitClassificationOptions(EPermitClassificationType.SubmissionType, publishedOnly),
       );
       self.isSubmissionTypeLoading = false;
-      return (response?.data?.data ?? []).map((item) => ({
-        label: item.label,
-        value: item.value.id,
-        raw: item.value,
-      })) as Array<IOption<string> & { raw: ISubmissionType }>;
+      return (response?.data?.data ?? []) as IOption<ISubmissionType>[];
     }),
-    fetchUserGroupTypeOptions: flow(function* (
-      publishedOnly = false,
-      firstNations = null,
-      pid = null,
-      jurisdictionId = null,
-    ) {
+    fetchUserGroupTypeOptions: flow(function* (publishedOnly = false) {
       self.isUserGroupTypeLoading = true;
       const response = yield* toGenerator(
-        self.environment.api.fetchPermitClassificationOptions(
-          EPermitClassificationType.UserGroupType,
-          publishedOnly,
-          firstNations,
-          null,
-          null,
-          pid,
-          jurisdictionId,
-        ),
+        self.environment.api.fetchPermitClassificationOptions(EPermitClassificationType.UserGroupType, publishedOnly),
       );
       self.isUserGroupTypeLoading = false;
       return (response?.data?.data ?? []) as IOption<IUserGroupType>[];
     }),
-    fetchSubmissionVariantOptions: flow(function* (
-      publishedOnly = false,
-      firstNations = null,
-      pid = null,
-      jurisdictionId = null,
-    ) {
+    fetchSubmissionVariantOptions: flow(function* (publishedOnly = false) {
       self.isSubmissionVariantLoading = true;
       const response = yield* toGenerator(
         self.environment.api.fetchPermitClassificationOptions(
           EPermitClassificationType.SubmissionVariant,
           publishedOnly,
-          firstNations,
-          null,
-          null,
-          pid,
-          jurisdictionId,
         ),
       );
       self.isSubmissionVariantLoading = false;

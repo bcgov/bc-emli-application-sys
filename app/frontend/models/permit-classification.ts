@@ -39,7 +39,7 @@ export const ActivityModel = PermitClassificationModel.named('ActivityModel').pr
 // Subclass Model for SubmissionVariant
 export const SubmissionVariantModel = PermitClassificationModel.named('SubmissionVariantModel').props({
   type: types.literal('SubmissionVariant'),
-  parent_id: types.maybeNull(types.string),
+  parentId: types.maybeNull(types.string),
 });
 
 export interface IPermitClassification extends Instance<typeof PermitClassificationModel> {}
