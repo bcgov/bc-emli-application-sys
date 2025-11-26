@@ -1,8 +1,8 @@
 class Contractor < ApplicationRecord
   searchkick(
     callbacks: false,
-    searchable: %i[id business_name contact_name contact_email],
-    word_middle: %i[business_name contact_name contact_email]
+    searchable: %i[id business_name contact_name contact_email number],
+    word_middle: %i[business_name contact_name contact_email number]
   )
 
   belongs_to :contact, class_name: "User", optional: true
@@ -18,6 +18,8 @@ class Contractor < ApplicationRecord
 
   validates :business_name, presence: true
 
+  before_validation :assign_unique_number, on: :create
+
   def search_data
     {
       id: id,
@@ -26,7 +28,8 @@ class Contractor < ApplicationRecord
       contact_email: contact&.email,
       contact_id: contact&.id,
       created_at: created_at,
-      updated_at: updated_at
+      updated_at: updated_at,
+      number: number
     }
   end
 
@@ -40,5 +43,30 @@ class Contractor < ApplicationRecord
 
   def contact_name
     contact&.name
+  end
+
+  private
+
+  def assign_unique_number
+    return self.number unless self.number.blank?
+
+    # Get the highest existing contractor number (as an integer)
+    last_number =
+      Contractor
+        .order(Arel.sql("LENGTH(number) DESC"), number: :desc)
+        .limit(1)
+        .pluck(:number)
+        .first
+
+    if last_number.present?
+      new_integer = last_number.to_i + 1
+    else
+      new_integer = 1
+    end
+
+    # Pad to 5 characters, no dashes
+    new_number = format("%05d", new_integer)
+
+    self.number = new_number
   end
 end
