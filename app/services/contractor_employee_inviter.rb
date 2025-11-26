@@ -5,7 +5,7 @@ class ContractorEmployeeInviter
     @contractor = contractor
     @program = program
     @invited_by = invited_by
-    @results = { invited: [], reinvited: [], email_taken: [] }
+    @results = { invited: [], reinvited: [], email_taken_active: [], email_taken_pending: [], email_taken_deactivated: [] }
   end
 
   def invite_employees(users_params)
@@ -22,20 +22,37 @@ class ContractorEmployeeInviter
 
     user = User.find_by(email: email)
 
-    if user.present? && !user.discarded?
-      return handle_email_taken(user) if employee_exists?(user)
-      reinvite_user(user, role)
+    if user.present?
+      contractor_employee = employee_exists?(user)
+      return handle_email_taken(user) if contractor_employee
+
+      # Only reinvite if user is not discarded
+      if !user.discarded?
+        reinvite_user(user, role)
+      else
+        # User exists but is deactivated and not yet a contractor employee - don't allow invite
+        results[:email_taken_deactivated] << user
+      end
     else
       invite_new_user(email, name, role)
     end
   end
 
   def employee_exists?(user)
-    ContractorEmployee.exists?(contractor: contractor, employee: user)
+    ContractorEmployee.find_by(contractor: contractor, employee: user)
   end
 
   def handle_email_taken(user)
-    results[:email_taken] << user
+    # Check if the user is discarded to categorize appropriately
+    if user.discarded?
+      results[:email_taken_deactivated] << user
+    elsif user.invitation_sent_at.present? && user.invitation_accepted_at.nil?
+      # User has been invited but hasn't accepted yet (pending)
+      results[:email_taken_pending] << user
+    else
+      # User is active (has accepted invitation or signed up)
+      results[:email_taken_active] << user
+    end
   end
 
   def reinvite_user(user, role)

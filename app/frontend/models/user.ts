@@ -110,7 +110,10 @@ export const UserModel = types
       return self.omniauthProvider === 'bcsc';
     },
     get name() {
-      return self.firstName && self.lastName && `${self.firstName} ${self.lastName}`;
+      if (self.firstName && self.lastName) {
+        return `${self.firstName} ${self.lastName}`;
+      }
+      return self.firstName || self.lastName || null;
     },
     get jurisdiction() {
       return (

@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Flex } from '@chakra-ui/react';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { observer } from 'mobx-react-lite';
 import { AddressBook } from '@phosphor-icons/react';
 import { IUser } from '../../../../models/user';
 import { SearchGridItem } from '../../../shared/grid/search-grid-item';
@@ -14,7 +15,7 @@ interface SimpleEmployeeRowProps {
   userStore: IUserStore;
 }
 
-export function SimpleEmployeeRow({ user, userStore }: SimpleEmployeeRowProps) {
+export const SimpleEmployeeRow = observer(function SimpleEmployeeRow({ user, userStore }: SimpleEmployeeRowProps) {
   const { t } = useTranslation();
   const { contractorStore } = useMst();
   const { currentContractor } = contractorStore;
@@ -52,4 +53,4 @@ export function SimpleEmployeeRow({ user, userStore }: SimpleEmployeeRowProps) {
       </SearchGridItem>
     </Box>
   );
-}
+});

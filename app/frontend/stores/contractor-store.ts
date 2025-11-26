@@ -53,7 +53,9 @@ export const ContractorStoreModel = types
     __beforeMergeUpdate(contractor) {
       if (contractor && contractor.contact) {
         self.rootStore.userStore.mergeUpdate(contractor.contact, 'usersMap');
-        contractor.contact = contractor.contact.id;
+        const contactId = contractor.contact.id;
+        contractor.contactId = contactId;
+        contractor.contact = contactId;
       }
       if (contractor && contractor.employees) {
         contractor.employees.forEach((employee) => {
