@@ -9,6 +9,7 @@ class RequirementTemplate < ApplicationRecord
     program
     submission_type
     user_group_type
+    submission_variant
   ]
 
   searchkick searchable: %i[
@@ -18,6 +19,7 @@ class RequirementTemplate < ApplicationRecord
                user_group_type
                audience_type
                submission_type
+               submission_variant
              ],
              word_start: %i[
                permit_type
@@ -26,6 +28,7 @@ class RequirementTemplate < ApplicationRecord
                user_group_type
                audience_type
                submission_type
+               submission_variant
              ]
 
   #  text_middle: %i[description current_version permit_type program nickname]

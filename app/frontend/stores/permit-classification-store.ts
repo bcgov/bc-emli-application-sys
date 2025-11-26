@@ -76,11 +76,10 @@ export const PermitClassificationStoreModel = types
     get audienceTypes() {
       return Array.from(self.audienceTypeMap.values());
     },
-    get audienceTypeOptions(): Array<IOption<string> & { raw: IAudienceType }> {
+    get audienceTypeOptions(): Array<IOption<IAudienceType>> {
       return Array.from(self.audienceTypeMap.values()).map((item) => ({
         label: item.name,
-        value: item.code, // or item.code if UI needs the code instead
-        raw: item,
+        value: item,
       }));
     },
     // View to get a User group type by id
@@ -100,11 +99,10 @@ export const PermitClassificationStoreModel = types
     get userGroupTypes() {
       return Array.from(self.userGroupTypeMap.values());
     },
-    get userGroupTypeOptions(): Array<IOption<string> & { raw: IUserGroupType }> {
+    get userGroupTypeOptions(): Array<IOption<IUserGroupType>> {
       return Array.from(self.userGroupTypeMap.values()).map((item) => ({
         label: item.name,
-        value: item.code, // or item.code if UI needs the code instead
-        raw: item,
+        value: item,
       }));
     },
     // View to get a submission type by id
@@ -120,11 +118,10 @@ export const PermitClassificationStoreModel = types
     get submissionTypes() {
       return Array.from(self.submissionTypeMap.values());
     },
-    get submissionTypeOptions(): Array<IOption<string> & { raw: ISubmissionType }> {
+    get submissionTypeOptions(): Array<IOption<string>> {
       return Array.from(self.submissionTypeMap.values()).map((item) => ({
         label: item.name,
-        value: item.code, // or item.code if UI needs the code instead
-        raw: item,
+        value: item.id,
       }));
     },
     // view to get all submission types ids
@@ -144,9 +141,7 @@ export const PermitClassificationStoreModel = types
     get submissionVariants() {
       return Array.from(self.submissionVariantMap.values());
     },
-    getSubmissionVariantsForType(submissionTypeCode: string) {
-      // Convert code → id
-      const submissionTypeId = (self as any).getSubmissionTypeIdByCode(submissionTypeCode);
+    getSubmissionVariantsForType(submissionTypeId: string) {
       if (!submissionTypeId) return [];
 
       // Now filter using the actual GUID-based parent_id
