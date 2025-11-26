@@ -22,7 +22,8 @@ export const ContractorModel = types
   .extend(withEnvironment())
   .views((self) => ({
     get contactName() {
-      return self.contact?.name || '';
+      const contact = self.contactId ? self.rootStore.userStore.getUser(self.contactId) : null;
+      return contact?.name || '';
     },
     get employeeCount() {
       return self.employees.length;
@@ -40,6 +41,14 @@ export const ContractorModel = types
       const response = yield self.environment.api.destroyContractor(self.id);
       if (response.ok) {
         self.rootStore.contractorStore.removeContractor(self);
+      }
+      return response.ok;
+    }),
+    reload: flow(function* () {
+      const response = yield self.environment.api.fetchContractor(self.id);
+      if (response.ok) {
+        const data = response.data.data;
+        self.rootStore.contractorStore.mergeUpdate(data, 'contractorsMap');
       }
       return response.ok;
     }),

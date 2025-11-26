@@ -49,7 +49,19 @@ export const UserStoreModel = types
       return self.invitationResponse?.data?.invited?.map((user) => user.email) || [];
     },
     get takenEmails(): string[] {
-      return self.invitationResponse?.data?.emailTaken?.map((user) => user.email) || [];
+      const active = self.invitationResponse?.data?.emailTakenActive?.map((user) => user.email) || [];
+      const pending = self.invitationResponse?.data?.emailTakenPending?.map((user) => user.email) || [];
+      const deactivated = self.invitationResponse?.data?.emailTakenDeactivated?.map((user) => user.email) || [];
+      return [...active, ...pending, ...deactivated];
+    },
+    get takenActiveEmails(): string[] {
+      return self.invitationResponse?.data?.emailTakenActive?.map((user) => user.email) || [];
+    },
+    get takenPendingEmails(): string[] {
+      return self.invitationResponse?.data?.emailTakenPending?.map((user) => user.email) || [];
+    },
+    get takenDeactivatedEmails(): string[] {
+      return self.invitationResponse?.data?.emailTakenDeactivated?.map((user) => user.email) || [];
     },
     getActiveUserSortColumnHeader(field: EActiveUserSortFields) {
       //@ts-ignore
