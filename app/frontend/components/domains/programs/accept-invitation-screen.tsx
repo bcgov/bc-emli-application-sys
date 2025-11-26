@@ -55,6 +55,7 @@ const Content = observer(function Content({ invitedUser }: Readonly<IProps>) {
     isAdmin: role === 'admin',
     isAdminMgr: role === 'admin_manager',
     isSysAdmin: role === 'system_admin',
+    isContractor: role === 'contractor',
   };
 
   // const loginKey = Object.keys(loginScreenProps).find((key) => loginScreenProps[key as keyof typeof loginScreenProps]);
@@ -74,6 +75,7 @@ const Content = observer(function Content({ invitedUser }: Readonly<IProps>) {
       isAdmin={loginScreenProps.isAdmin}
       isAdminMgr={loginScreenProps.isAdminMgr}
       isSysAdmin={loginScreenProps.isSysAdmin}
+      isContractor={loginScreenProps.isContractor}
     />
     // <CenterContainer>
     //   <Flex
