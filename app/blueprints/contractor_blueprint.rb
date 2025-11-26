@@ -13,7 +13,8 @@ class ContractorBlueprint < Blueprinter::Base
            :phone_number,
            :onboarded,
            :created_at,
-           :updated_at
+           :updated_at,
+           :number
 
     association :contact, blueprint: UserBlueprint, view: :minimal
     association :employees, blueprint: UserBlueprint, view: :minimal
