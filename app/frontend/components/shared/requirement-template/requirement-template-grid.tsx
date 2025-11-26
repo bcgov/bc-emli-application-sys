@@ -58,7 +58,7 @@ export const RequirementTemplateGrid: React.FC<RequirementTemplateGridProps> = o
               </SearchGridItem>
               <SearchGridItem>{rt.userGroupType?.name}</SearchGridItem>
               <SearchGridItem>{rt.audienceType?.name}</SearchGridItem>
-              <SearchGridItem>{rt.submissionType?.name}</SearchGridItem>
+              <SearchGridItem>{rt.submissionTypeWithVariant}</SearchGridItem>
               <SearchGridItem fontWeight="bold">{rt.nickname ?? 'N/A'}</SearchGridItem>
               {/* <SearchGridItem>{rt.description}</SearchGridItem> */}
 

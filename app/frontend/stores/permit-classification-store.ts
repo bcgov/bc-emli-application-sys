@@ -13,6 +13,8 @@ import {
   IUserGroupType,
   SubmissionTypeModel,
   ISubmissionType,
+  SubmissionVariantModel,
+  ISubmissionVariant,
 } from '../models/permit-classification';
 import { EPermitClassificationCode, EPermitClassificationType } from '../types/enums';
 import { IOption } from '../types/types';
@@ -34,9 +36,11 @@ export const PermitClassificationStoreModel = types
     audienceTypeMap: types.map(AudienceTypeModel),
     userGroupTypeMap: types.map(UserGroupTypeModel),
     submissionTypeMap: types.map(SubmissionTypeModel),
+    submissionVariantMap: types.map(SubmissionVariantModel),
     isAudienceTypeLoading: types.optional(types.boolean, false),
     isUserGroupTypeLoading: types.optional(types.boolean, false),
     isSubmissionTypeLoading: types.optional(types.boolean, false),
+    isSubmissionVariantLoading: types.optional(types.boolean, false),
     isLoaded: types.optional(types.boolean, false),
   })
   .extend(withEnvironment())
@@ -72,11 +76,16 @@ export const PermitClassificationStoreModel = types
     get audienceTypes() {
       return Array.from(self.audienceTypeMap.values());
     },
+    get audienceTypeOptions(): Array<IOption<IAudienceType>> {
+      return Array.from(self.audienceTypeMap.values()).map((item) => ({
+        label: item.name,
+        value: item,
+      }));
+    },
     // View to get a User group type by id
     getUserGroupTypeById(id: string) {
       return self.userGroupTypeMap.get(id);
     },
-
     // View to get an Audience type by id
     getUserGroupTypeByCode(code: number) {
       return self.userGroupTypeMap.get(code.toString());
@@ -86,16 +95,20 @@ export const PermitClassificationStoreModel = types
       const match = Array.from(self.userGroupTypeMap.values()).find((item) => item.code === code);
       return match?.id;
     },
-
     // view to get all User group types
     get userGroupTypes() {
       return Array.from(self.userGroupTypeMap.values());
+    },
+    get userGroupTypeOptions(): Array<IOption<IUserGroupType>> {
+      return Array.from(self.userGroupTypeMap.values()).map((item) => ({
+        label: item.name,
+        value: item,
+      }));
     },
     // View to get a submission type by id
     getSubmissionTypeById(id: string) {
       return self.submissionTypeMap.get(id);
     },
-
     // View to get a User group type id by code
     getSubmissionTypeIdByCode(code: string) {
       const match = Array.from(self.submissionTypeMap.values()).find((item) => item.code === code);
@@ -104,6 +117,12 @@ export const PermitClassificationStoreModel = types
     // view to get all submission types
     get submissionTypes() {
       return Array.from(self.submissionTypeMap.values());
+    },
+    get submissionTypeOptions(): Array<IOption<string>> {
+      return Array.from(self.submissionTypeMap.values()).map((item) => ({
+        label: item.name,
+        value: item.id,
+      }));
     },
     // view to get all submission types ids
     getAllSubmissionTypeIds() {
@@ -114,6 +133,19 @@ export const PermitClassificationStoreModel = types
       return Array.from(self.submissionTypeMap.values())
         .filter((item) => item.code !== EPermitClassificationCode.onboarding)
         .map((item) => item.id);
+    },
+    // submission variant types
+    getSubmissionVariantById(id: string) {
+      return self.submissionVariantMap.get(id);
+    },
+    get submissionVariants() {
+      return Array.from(self.submissionVariantMap.values());
+    },
+    getSubmissionVariantsForType(submissionTypeId: string) {
+      if (!submissionTypeId) return [];
+
+      // Now filter using the actual GUID-based parent_id
+      return Array.from(self.submissionVariantMap.values()).filter((v) => v.parentId === submissionTypeId);
     },
   }))
   .actions((self) => ({
@@ -141,11 +173,15 @@ export const PermitClassificationStoreModel = types
         const submissionData = response.data.data.filter((pc) => pc.type == EPermitClassificationType.SubmissionType);
         const userGroupData = response.data.data.filter((pc) => pc.type == EPermitClassificationType.UserGroupType);
         const audienceData = response.data.data.filter((pc) => pc.type == EPermitClassificationType.AudienceType);
+        const submissionVariantData = response.data.data.filter(
+          (pc) => pc.type == EPermitClassificationType.SubmissionVariant,
+        );
         if (permitTypeData.length) self.mergeUpdateAll(permitTypeData, 'permitTypeMap');
         if (activityData.length) self.mergeUpdateAll(activityData, 'activityMap');
         if (submissionData.length) self.mergeUpdateAll(submissionData, 'submissionTypeMap');
         if (userGroupData.length) self.mergeUpdateAll(userGroupData, 'userGroupTypeMap');
         if (audienceData.length) self.mergeUpdateAll(audienceData, 'audienceTypeMap');
+        if (submissionVariantData.length) self.mergeUpdateAll(submissionVariantData, 'submissionVariantMap');
       }
       self.isLoaded = true;
       return response.ok;
@@ -190,107 +226,59 @@ export const PermitClassificationStoreModel = types
     },
   }))
   .actions((self) => ({
-    fetchPermitTypeOptions: flow(function* (
-      publishedOnly = false,
-      firstNations = null,
-      pid = null,
-      jurisdictionId = null,
-    ) {
+    fetchPermitTypeOptions: flow(function* (publishedOnly = false) {
       self.isPermitTypeLoading = true;
       const response = yield* toGenerator(
-        self.environment.api.fetchPermitClassificationOptions(
-          EPermitClassificationType.PermitType,
-          publishedOnly,
-          firstNations,
-          null,
-          null,
-          pid,
-          jurisdictionId,
-        ),
+        self.environment.api.fetchPermitClassificationOptions(EPermitClassificationType.PermitType, publishedOnly),
       );
       self.isPermitTypeLoading = false;
       return (response?.data?.data ?? []) as IOption<IPermitType>[];
     }),
-    fetchActivityOptions: flow(function* (publishedOnly = false, firstNations = null, permitTypeId = null) {
+    fetchActivityOptions: flow(function* (publishedOnly = false) {
       self.isActivityLoading = true;
       const response = yield* toGenerator(
-        self.environment.api.fetchPermitClassificationOptions(
-          EPermitClassificationType.Activity,
-          publishedOnly,
-          firstNations,
-          permitTypeId,
-        ),
+        self.environment.api.fetchPermitClassificationOptions(EPermitClassificationType.Activity, publishedOnly),
       );
       self.isActivityLoading = false;
       return (response?.data?.data ?? []) as IOption<IActivity>[];
     }),
     // new classification types
-    fetchAudienceTypeOptions: flow(function* (
-      publishedOnly = false,
-      firstNations = null,
-      pid = null,
-      jurisdictionId = null,
-    ) {
+    fetchAudienceTypeOptions: flow(function* (publishedOnly = false) {
       self.isAudienceTypeLoading = true;
       const response = yield* toGenerator(
-        self.environment.api.fetchPermitClassificationOptions(
-          EPermitClassificationType.AudienceType,
-          publishedOnly,
-          firstNations,
-          null,
-          null,
-          pid,
-          jurisdictionId,
-        ),
+        self.environment.api.fetchPermitClassificationOptions(EPermitClassificationType.AudienceType, publishedOnly),
       );
       self.isAudienceTypeLoading = false;
       return (response?.data?.data ?? []) as IOption<IAudienceType>[];
     }),
-    fetchSubmissionTypeOptions: flow(function* (
-      publishedOnly = false,
-      firstNations = null,
-      pid = null,
-      jurisdictionId = null,
-    ) {
+    fetchSubmissionTypeOptions: flow(function* (publishedOnly = false) {
       self.isSubmissionTypeLoading = true;
       const response = yield* toGenerator(
-        self.environment.api.fetchPermitClassificationOptions(
-          EPermitClassificationType.SubmissionType,
-          publishedOnly,
-          firstNations,
-          null,
-          null,
-          pid,
-          jurisdictionId,
-        ),
+        self.environment.api.fetchPermitClassificationOptions(EPermitClassificationType.SubmissionType, publishedOnly),
       );
       self.isSubmissionTypeLoading = false;
-      return (response?.data?.data ?? []).map((item) => ({
-        label: item.label,
-        value: item.value.id,
-        raw: item.value,
-      })) as Array<IOption<string> & { raw: ISubmissionType }>;
+      return (response?.data?.data ?? []) as IOption<ISubmissionType>[];
     }),
-    fetchUserGroupTypeOptions: flow(function* (
-      publishedOnly = false,
-      firstNations = null,
-      pid = null,
-      jurisdictionId = null,
-    ) {
+    fetchUserGroupTypeOptions: flow(function* (publishedOnly = false) {
       self.isUserGroupTypeLoading = true;
       const response = yield* toGenerator(
-        self.environment.api.fetchPermitClassificationOptions(
-          EPermitClassificationType.UserGroupType,
-          publishedOnly,
-          firstNations,
-          null,
-          null,
-          pid,
-          jurisdictionId,
-        ),
+        self.environment.api.fetchPermitClassificationOptions(EPermitClassificationType.UserGroupType, publishedOnly),
       );
       self.isUserGroupTypeLoading = false;
       return (response?.data?.data ?? []) as IOption<IUserGroupType>[];
+    }),
+    fetchSubmissionVariantOptions: flow(function* (publishedOnly = false) {
+      self.isSubmissionVariantLoading = true;
+      const response = yield* toGenerator(
+        self.environment.api.fetchPermitClassificationOptions(
+          EPermitClassificationType.SubmissionVariant,
+          publishedOnly,
+        ),
+      );
+      self.isSubmissionVariantLoading = false;
+      return ((response?.data?.data ?? []) as unknown as IOption<ISubmissionVariant>[]).filter(
+        (pc) => (pc.value as any).type === EPermitClassificationType.SubmissionVariant,
+      );
     }),
   }));
 

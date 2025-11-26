@@ -73,15 +73,7 @@ export const ProgramClassificationModel = types
     ) {
       self.isPermitTypeLoading = true;
       const response = yield* toGenerator(
-        self.environment.api.fetchPermitClassificationOptions(
-          EPermitClassificationType.PermitType,
-          publishedOnly,
-          firstNations,
-          null,
-          null,
-          pid,
-          jurisdictionId,
-        ),
+        self.environment.api.fetchPermitClassificationOptions(EPermitClassificationType.PermitType, publishedOnly),
       );
       self.isPermitTypeLoading = false;
       return (response?.data?.data ?? []) as IOption<IPermitType>[];
@@ -89,12 +81,7 @@ export const ProgramClassificationModel = types
     fetchActivityOptions: flow(function* (publishedOnly = false, firstNations = null, permitTypeId = null) {
       self.isActivityLoading = true;
       const response = yield* toGenerator(
-        self.environment.api.fetchPermitClassificationOptions(
-          EPermitClassificationType.Activity,
-          publishedOnly,
-          firstNations,
-          permitTypeId,
-        ),
+        self.environment.api.fetchPermitClassificationOptions(EPermitClassificationType.Activity, publishedOnly),
       );
       self.isActivityLoading = false;
       return (response?.data?.data ?? []) as IOption<IActivity>[];

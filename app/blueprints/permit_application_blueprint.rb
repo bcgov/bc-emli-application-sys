@@ -15,6 +15,9 @@ class PermitApplicationBlueprint < Blueprinter::Base
     association :audience_type,
                 blueprint: PermitClassificationBlueprint,
                 view: :name
+    association :submission_variant,
+                blueprint: PermitClassificationBlueprint,
+                view: :name
   end
 
   view :minimal_with_documents do
@@ -47,14 +50,15 @@ class PermitApplicationBlueprint < Blueprinter::Base
            :resubmitted_at,
            :revisions_requested_at,
            :missing_pdfs
-    #association :permit_type, blueprint: PermitClassificationBlueprint
     association :submission_type,
+                blueprint: PermitClassificationBlueprint,
+                view: :base
+    association :submission_variant,
                 blueprint: PermitClassificationBlueprint,
                 view: :base
     association :user_group_type,
                 blueprint: PermitClassificationBlueprint,
                 view: :base
-    #association :activity, blueprint: PermitClassificationBlueprint
     association :program, blueprint: ProgramBlueprint, view: :summary
     association :sandbox, blueprint: SandboxBlueprint
     association :submission_versions,
