@@ -1,10 +1,10 @@
-import { Flex, FlexProps, Radio, RadioGroup, Stack, Text } from "@chakra-ui/react"
-import { observer } from "mobx-react-lite"
-import React, { useEffect, useState } from "react"
-import { Controller, useFormContext } from "react-hook-form"
-import { useTranslation } from "react-i18next"
-import { IOption } from "../../../../types/types"
-import { SharedSpinner } from "../shared-spinner"
+import { Flex, FlexProps, Radio, RadioGroup, Stack, Text } from '@chakra-ui/react';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { IOption } from '../../../../types/types';
+import { SharedSpinner } from '../shared-spinner';
 
 interface IAsyncRadioGroupProps<T> extends FlexProps {
   label?: string;
@@ -32,7 +32,7 @@ export const AsyncRadioGroup = observer(
           setError(e instanceof Error ? e : new Error(t('errors.fetchOptions')));
         }
       })();
-    }, []);
+    }, [fetchOptions, t]);
 
     return options?.length > 0 ? (
       <Flex direction="column" w="full" {...rest}>

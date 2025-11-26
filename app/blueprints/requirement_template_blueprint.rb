@@ -27,6 +27,9 @@ class RequirementTemplateBlueprint < Blueprinter::Base
   association :submission_type,
               blueprint: PermitClassificationBlueprint,
               view: :base
+  association :submission_variant,
+              blueprint: PermitClassificationBlueprint,
+              view: :base
 
   association :program, blueprint: ProgramBlueprint, view: :base
   association :last_three_deprecated_template_versions,

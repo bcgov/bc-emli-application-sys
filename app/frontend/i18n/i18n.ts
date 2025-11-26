@@ -2462,6 +2462,7 @@ const options = {
             userGroupTypeSelect: 'Select a user group for this template*',
             audienceTypeSelect: 'Select the audience for this program*',
             submissionTypeSelect: 'Select the submission type*',
+            submissionSubTypeSelect: 'Select the submission subtype*',
             audienceType: 'Audience',
             submissionType: 'Submission type',
             userGroupType: 'User group',

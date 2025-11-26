@@ -67,16 +67,6 @@ class Api::PermitClassificationsController < Api::ApplicationController
   private
 
   def classification_option_params
-    params.permit(
-      %i[
-        type
-        pid
-        published
-        permit_type_id
-        activity_id
-        jurisdiction_id
-        first_nations
-      ]
-    )
+    params.permit(%i[type published])
   end
 end

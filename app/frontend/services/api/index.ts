@@ -191,25 +191,12 @@ export class Api {
     return this.client.get<IOptionResponse<IContact>>(`/permit_classifications`);
   }
 
-  async fetchPermitClassificationOptions(
-    type,
-    published = false,
-    firstNations = false,
-    permitTypeId: string = null,
-    activityId: string = null,
-    pid: string = null,
-    jurisdictionId: string = null,
-  ) {
+  async fetchPermitClassificationOptions(type, published = false) {
     return this.client.post<
       IOptionResponse<IPermitType | IActivity | IAudienceType | IUserGroupType | ISubmissionType>
     >(`/permit_classifications/permit_classification_options`, {
       type,
       published,
-      firstNations,
-      permitTypeId,
-      activityId,
-      pid,
-      jurisdictionId,
     });
   }
 

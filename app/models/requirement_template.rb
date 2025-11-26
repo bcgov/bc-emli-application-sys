@@ -9,6 +9,7 @@ class RequirementTemplate < ApplicationRecord
     program
     submission_type
     user_group_type
+    submission_variant
   ]
 
   searchkick searchable: %i[
@@ -18,6 +19,7 @@ class RequirementTemplate < ApplicationRecord
                user_group_type
                audience_type
                submission_type
+               submission_variant
              ],
              word_start: %i[
                permit_type
@@ -26,6 +28,7 @@ class RequirementTemplate < ApplicationRecord
                user_group_type
                audience_type
                submission_type
+               submission_variant
              ]
 
   #  text_middle: %i[description current_version permit_type program nickname]
@@ -36,6 +39,9 @@ class RequirementTemplate < ApplicationRecord
   belongs_to :audience_type, optional: true
   belongs_to :user_group_type, optional: true
   belongs_to :submission_type, optional: true
+  belongs_to :submission_variant,
+             class_name: "SubmissionVariant",
+             optional: true
   belongs_to :copied_from, class_name: "RequirementTemplate", optional: true
 
   has_many :requirement_template_sections,
@@ -226,9 +232,10 @@ class RequirementTemplate < ApplicationRecord
     program_id,
     user_group_type_id,
     audience_type_id,
-    submission_type_id
+    submission_type_id,
+    submission_variant_id = nil
   )
-    # Parameter validation - prevents nil query issues
+    # Validate input
     if [
          program_id,
          user_group_type_id,
@@ -238,22 +245,31 @@ class RequirementTemplate < ApplicationRecord
       return nil
     end
 
-    requirement_template =
-      joins(:published_template_version)
-        .where(
-          program_id: program_id,
-          user_group_type_id: user_group_type_id,
-          audience_type_id: audience_type_id,
-          submission_type_id: submission_type_id,
-          discarded_at: nil
-        )
-        .order(:created_at)
-        .first
+    # Base query
+    query =
+      joins(:published_template_version).where(
+        program_id: program_id,
+        user_group_type_id: user_group_type_id,
+        audience_type_id: audience_type_id,
+        submission_type_id: submission_type_id,
+        discarded_at: nil
+      )
 
-    published_version = requirement_template&.published_template_version
-    published_version
+    # Apply variant if present
+    query =
+      query.where(
+        submission_variant_id: submission_variant_id
+      ) if submission_variant_id.present?
+
+    requirement_template = query.order(:created_at).first
+
+    requirement_template&.published_template_version
   rescue StandardError => e
-    Rails.logger.error "Template version lookup failed: #{e.message}, program_id: #{program_id}, classifications: [#{user_group_type_id}, #{audience_type_id}, #{submission_type_id}]"
+    Rails.logger.error(
+      "Template version lookup failed: #{e.message}, " \
+        "program_id: #{program_id}, classifications: [#{user_group_type_id}, #{audience_type_id}, #{submission_type_id}, variant: #{submission_variant_id}]"
+    )
+    nil
   end
 
   def search_data
@@ -292,12 +308,11 @@ class RequirementTemplate < ApplicationRecord
 
   def validate_uniqueness_of_blocks
     # Track duplicates across all sections within the same template
-    duplicates =
-      requirement_blocks
-        .unscope(:order)
-        .group(:id)
-        .having("COUNT(*) > 1")
-        .pluck(:name)
+    requirement_blocks
+      .unscope(:order)
+      .group(:id)
+      .having("COUNT(*) > 1")
+      .pluck(:name)
   end
 
   def requirement_block_ids_from_nested_attributes_copy

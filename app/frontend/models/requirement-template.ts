@@ -152,6 +152,13 @@ export const RequirementTemplateModel = types.snapshotProcessor(
       get isEarlyAccess() {
         return self.type === ERequirementTemplateType.EarlyAccessRequirementTemplate;
       },
+      get submissionTypeWithVariant() {
+        if (self.submissionVariant) {
+          return self.submissionType.name + ': ' + self.submissionVariant.name;
+        } else {
+          return self.submissionType.name;
+        }
+      },
     }))
     .views((self) => ({
       get numberOfPreviewers() {

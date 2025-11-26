@@ -2,10 +2,35 @@ class LiveRequirementTemplate < RequirementTemplate
   # validate :unique_classification_for_undiscarded
   validate :unique_application_for_participant
   validate :unique_external_onboarding_for_contractor
+  validate :unique_template
   #validate :support_request_internal_only
 
   def visibility
     "live"
+  end
+
+  def unique_template
+    return unless discarded_at.nil?
+
+    existing =
+      LiveRequirementTemplate.where(
+        program_id: program_id,
+        audience_type_id: audience_type_id,
+        user_group_type_id: user_group_type_id,
+        submission_type_id: submission_type_id,
+        submission_variant_id: submission_variant_id,
+        discarded_at: nil
+      )
+    existing = existing.where.not(id: id) if id.present?
+
+    if existing.exists?
+      errors.add(
+        :base,
+        I18n.t(
+          "activerecord.errors.models.requirement_template.nonunique_template"
+        )
+      )
+    end
   end
 
   def support_request_internal_only
@@ -113,9 +138,13 @@ class LiveRequirementTemplate < RequirementTemplate
 
   private
 
-  def types_match?(aud:, group:, sub:)
-    audience_type&.code&.to_sym == aud &&
-      user_group_type&.code&.to_sym == group &&
-      submission_type&.code&.to_sym == sub
+  def types_match?(aud: nil, group: nil, sub: nil, sub_variance: nil)
+    # all nils aren't a match fail gracefully
+    return false if aud.nil? && group.nil? && sub.nil? && sub_variance.nil?
+
+    (aud.nil? || audience_type&.code&.to_sym == aud) &&
+      (group.nil? || user_group_type&.code&.to_sym == group) &&
+      (sub.nil? || submission_type&.code&.to_sym == sub) &&
+      (sub_variance.nil? || sub_variance_type&.code&.to_sym == sub_variance)
   end
 end
