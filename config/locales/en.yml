@@ -276,7 +276,7 @@ en:
           message: 'Failed to send employee invitation'
         revoke_success:
           title: ''
-          message: 'Employee invite revoked successfully'
+          message: 'Invite revoked successfully'
         revoke_error:
           title: Error
           message: 'Failed to revoke employee invite'
@@ -292,6 +292,9 @@ en:
         no_pending_invite:
           title: Error
           message: 'No pending invite found for this employee'
+        cannot_reinvite_deactivated:
+          title: Error
+          message: 'Cannot re-invite a deactivated employee. Please reactivate them first.'
     user:
       not_confirmed_error:
         title: Failed to login.

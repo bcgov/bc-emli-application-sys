@@ -23,7 +23,7 @@ export const InviteEmployeeScreen = observer(({}: IInviteEmployeeScreenProps) =>
   const { userStore, contractorStore } = useMst();
   const { contractorId } = useParams<{ contractorId: string }>();
 
-  const { currentUser, resetInvitationResponse, fetchActivePrograms, setInvitationResponse, takenEmails } = userStore;
+  const { currentUser, resetInvitationResponse, fetchActivePrograms, setInvitationResponse, takenActiveEmails, takenPendingEmails, takenDeactivatedEmails } = userStore;
 
   const { environment } = useMst();
   const navigate = useNavigate();
@@ -102,7 +102,23 @@ export const InviteEmployeeScreen = observer(({}: IInviteEmployeeScreenProps) =>
 
     if (response.ok) {
       // Update the invitation response in the store so EmployeeUserInput can show status
-      setInvitationResponse(response.data);
+      const responseData = response.data as any;
+      setInvitationResponse(responseData);
+
+      // Show success message for newly invited and reinvited users
+      const invited = responseData?.invited || [];
+      const reinvited = responseData?.reinvited || [];
+      const totalSuccess = invited.length + reinvited.length;
+
+      if (totalSuccess > 0) {
+        const { uiStore } = useMst();
+        const { EFlashMessageStatus } = await import('../../../types/enums');
+        uiStore.flashMessage.show(
+          EFlashMessageStatus.success,
+          t('user.inviteSentSuccess', { count: totalSuccess }),
+          '',
+        );
+      }
     } else {
       console.error('Failed to send invitations');
     }
@@ -139,7 +155,7 @@ export const InviteEmployeeScreen = observer(({}: IInviteEmployeeScreenProps) =>
                   {t('user.addMoreEmails')}
                 </Button>
               </Flex>
-              {!R.isEmpty(takenEmails) && (
+              {(!R.isEmpty(takenActiveEmails) || !R.isEmpty(takenPendingEmails) || !R.isEmpty(takenDeactivatedEmails)) && (
                 <CustomMessageBox
                   status="error"
                   title={t('user.takenErrorTitle')}
@@ -157,7 +173,7 @@ export const InviteEmployeeScreen = observer(({}: IInviteEmployeeScreenProps) =>
                 >
                   {t('user.sendInvites')}
                 </Button>
-                <Button variant="secondary" isDisabled={isSubmitting} onClick={() => navigate(-1)}>
+                <Button variant="secondary" isDisabled={isSubmitting} onClick={() => navigate(`/contractor-management/${contractorId}/employees?currentPage=1`)}>
                   {t('ui.cancel')}
                 </Button>
               </Flex>

@@ -12,13 +12,15 @@ module Api::Concerns::Search::ContractorUsers
     # Filter by status - contractor employees follow invitation model like program users
     case (params[:status].presence || "active")
     when "active"
+      # Active users are reviewed, not discarded, and have accepted their invitation
+      # (or don't have a pending invitation token)
       contractor_employees_scope =
-        contractor_employees_scope.joins(:employee).where(
-          users: {
-            discarded_at: nil,
-            reviewed: true
-          }
-        )
+        contractor_employees_scope
+          .joins(:employee)
+          .where(users: { discarded_at: nil, reviewed: true })
+          .where(
+            "users.invitation_token IS NULL OR users.invitation_accepted_at IS NOT NULL"
+          )
     when "pending"
       contractor_employees_scope =
         contractor_employees_scope

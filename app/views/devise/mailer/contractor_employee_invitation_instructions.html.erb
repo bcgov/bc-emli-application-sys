@@ -1,12 +1,8 @@
-<p>Hello<% if @user.first_name.present? %> <%= @user.first_name %><% end %>,</p>
+<p>Hello,</p>
 
-<p>You've been invited to join the Energy Savings Program for <%= @contractor_name %>.</p>
+<p>You have been invited to create an account to access the Better Homes Energy Saving Program's contractor portal. To create your account with your Business BCeID, <a href="<%= @root_url %>programs/<%= @program_id %>/accept-invitation?invitation_token=<%= @token %>" target="_blank">click here</a>.</p>
 
-<p>Click below to accept your invitation and set up your account:</p>
-
-<div class="button-row">
-  <a href="<%= @root_url %>programs/<%= @program_id %>/accept-invitation?invitation_token=<%= @token %>" class="btn-primary" target="_blank">Accept Invitation</a>
-</div>
+<p>If you have any questions, please call us at 1-833-856-0333 or email us at <a href="mailto:ESPcontractorsupport@clearesult.com">ESPcontractorsupport@clearesult.com</a>.</p>
 
 <p>Thank you,<br>
 Energy Savings Program Support</p>

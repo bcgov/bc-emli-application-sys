@@ -543,10 +543,16 @@ const NavBarMenu = observer(function NavBarMenu({ loginPath }: INavBarMenuProps)
 
                   {/* Admin Manager items */}
                   {(currentUser?.isAdminManager || currentUser?.isAdmin || currentUser?.isSuperAdmin) && (
-                    <NavMenuItem
-                      label={t('contractor.management.title', 'Manage contractor details')}
-                      to={'/contractor-management'}
-                    />
+                    <>
+                      <NavMenuItem
+                        label={t('contractor.management.title', 'Manage contractor details')}
+                        to={'/contractor-management'}
+                      />
+                      <NavMenuItem
+                        label={t('contractor.programResources.title')}
+                        to={'/contractor-program-resources'}
+                      />
+                    </>
                   )}
 
                   {/* Admin-only items */}

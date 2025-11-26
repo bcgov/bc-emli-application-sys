@@ -92,11 +92,12 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
           success = await user.revokeContractorInvite(contractorId);
           break;
         case 'setPrimaryContact':
-          // TODO: Implement setPrimaryContact functionality
           const setPrimaryResponse = await environment.api.setPrimaryContact(contractorId, user.id);
           if (setPrimaryResponse.ok) {
-            await user.rootStore.userStore.searchUsers({ reset: false });
+            // Reload contractor to get updated contact information
             await currentContractor?.reload();
+            // Refresh the employee list to update the UI
+            await user.rootStore.userStore.searchUsers({ reset: false });
           }
           success = setPrimaryResponse.ok;
           break;

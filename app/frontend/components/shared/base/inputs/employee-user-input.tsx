@@ -22,10 +22,12 @@ export const EmployeeUserInput = observer(({ index, remove }: IEmployeeUserInput
   const emailWatch = watch(`users.${index}.email`);
 
   const { userStore } = useMst();
-  const { reinvitedEmails, invitedEmails, takenEmails } = userStore;
+  const { reinvitedEmails, invitedEmails, takenActiveEmails, takenPendingEmails, takenDeactivatedEmails } = userStore;
   const reinvited = reinvitedEmails?.includes(emailWatch);
   const invited = invitedEmails?.includes(emailWatch);
-  const taken = takenEmails?.includes(emailWatch);
+  const takenActive = takenActiveEmails?.includes(emailWatch);
+  const takenPending = takenPendingEmails?.includes(emailWatch);
+  const takenDeactivated = takenDeactivatedEmails?.includes(emailWatch);
 
   return (
     <Flex bg="greys.grey03" p={4} borderRadius="md" flexWrap="wrap">
@@ -40,7 +42,7 @@ export const EmployeeUserInput = observer(({ index, remove }: IEmployeeUserInput
               {reinvited && (
                 <IInviteResultTag
                   bg="semantic.successLight"
-                  text={t('user.reinviteSuccess')}
+                  text={t('user.contractorReinviteSuccess')}
                   icon={<CheckCircle size={20} />}
                 />
               )}
@@ -51,16 +53,30 @@ export const EmployeeUserInput = observer(({ index, remove }: IEmployeeUserInput
                   icon={<CheckCircle size={20} />}
                 />
               )}
-              {taken && (
+              {takenActive && (
                 <IInviteResultTag
                   bg="semantic.errorLight"
                   text={t('user.inviteError')}
                   icon={<WarningCircle size={20} />}
                 />
               )}
+              {takenPending && (
+                <IInviteResultTag
+                  bg="semantic.errorLight"
+                  text={t('user.contractorPendingError')}
+                  icon={<WarningCircle size={20} />}
+                />
+              )}
+              {takenDeactivated && (
+                <IInviteResultTag
+                  bg="semantic.errorLight"
+                  text={t('user.contractorDeactivatedError')}
+                  icon={<WarningCircle size={20} />}
+                />
+              )}
             </>
           )}
-          {!invited && !taken && !reinvited && remove && !isSubmitting && (
+          {!invited && !takenActive && !takenPending && !takenDeactivated && !reinvited && remove && !isSubmitting && (
             <Button
               onClick={() => remove(index)}
               variant="tertiary"
@@ -88,16 +104,19 @@ const IInviteResultTag = ({ bg, icon, text, ...rest }: IInviteResultTagProps) =>
       border="1px solid"
       borderColor={color}
       mb={2}
-      noOfLines={1}
       bg={bg}
       color={color}
       display="flex"
-      alignItems="center"
+      alignItems="flex-start"
       gap={2}
+      width={280}
+      whiteSpace="normal"
+      height="auto"
+      py={2}
       {...rest}
     >
       {icon}
-      <Text>{text}</Text>
+      <Text whiteSpace="normal" wordBreak="break-word" noOfLines={3}>{text}</Text>
     </Tag>
   );
 };
