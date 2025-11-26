@@ -154,7 +154,7 @@ export const RequirementTemplateModel = types.snapshotProcessor(
       },
       get submissionTypeWithVariant() {
         if (self.submissionVariant) {
-          return self.submissionType.name + ' - ' + self.submissionVariant.name;
+          return self.submissionType.name + ': ' + self.submissionVariant.name;
         } else {
           return self.submissionType.name;
         }
