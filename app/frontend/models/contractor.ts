@@ -17,10 +17,15 @@ export const ContractorModel = types
     contactId: types.maybeNull(types.string),
     employees: types.optional(types.array(types.reference(UserModel)), []),
     onboardings: types.optional(types.array(types.reference(ContractorOnboardModel)), []),
+    number: types.maybeNull(types.string),
   })
   .extend(withRootStore())
   .extend(withEnvironment())
   .views((self) => ({
+    get contact() {
+      if (!self.contactId) return null;
+      return self.rootStore.userStore.getUser(self.contactId) || null;
+    },
     get contactName() {
       return self.contact?.name || '';
     },

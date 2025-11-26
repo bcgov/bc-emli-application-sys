@@ -23,7 +23,7 @@ class Api::ContractorOnboardsController < Api::ApplicationController
       )
     contractor.reindex
 
-    # Create the PermitApplication (Contractor Onboarding type)
+    # Create the Permit Aplication (Contractor Onboarding type)
     onboarding_form =
       PermitApplication::ContractorOnboarding.new(
         program: program,
@@ -31,7 +31,7 @@ class Api::ContractorOnboardsController < Api::ApplicationController
         user_context: pundit_user
       ).call
 
-    # Build ContractorOnboard record, linking the contractor and application
+    # Build contractor onboard record, linking the contractor and application
     onboard =
       ContractorOnboard.new(
         contractor_id: contractor.id,

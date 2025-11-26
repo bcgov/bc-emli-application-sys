@@ -55,9 +55,9 @@ export const ContractorRow = observer(({ contractor }: ContractorRowProps) => {
   };
 
   return (
-    <Box key={contractor.id} className="contractor-index-grid-row" role="row" display="contents">
+    <Box key={contractor.number} className="contractor-index-grid-row" role="row" display="contents">
       <SearchGridItem fontSize="sm" role="cell">
-        <span aria-label={`Contractor ID: ${contractor.id}`}>{contractor.id}</span>
+        <span aria-label={`Contractor ID: ${contractor.number}`}>{contractor.number}</span>
       </SearchGridItem>
       <SearchGridItem fontSize="sm" role="cell">
         <span aria-label={`Primary contact name: ${contractor.contactName || 'Not specified'}`}>
