@@ -329,6 +329,7 @@ class Api::RequirementTemplatesController < Api::ApplicationController
         :user_group_type_id,
         :audience_type_id,
         :submission_type_id,
+        :submission_variant_id,
         :type,
         :public,
         requirement_template_sections_attributes: [

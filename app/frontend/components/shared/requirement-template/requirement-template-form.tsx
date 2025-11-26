@@ -123,8 +123,7 @@ export const RequirementTemplateForm = observer(({ type, onSuccess }: IRequireme
                   fetchOptions={async () =>
                     variants.map((v) => ({
                       label: v.name,
-                      value: v.code,
-                      raw: v,
+                      value: v.id,
                     }))
                   }
                   fieldName="submissionVariantId"
