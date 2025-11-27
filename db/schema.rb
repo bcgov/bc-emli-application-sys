@@ -392,8 +392,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_26_014826) do
             name: "index_permit_applications_on_submission_type_id"
     t.index ["submission_variant_id"],
             name: "index_permit_applications_on_submission_variant_id"
-    t.index %w[submitter_type submitter_id],
-            name: "index_permit_applications_on_submitter"
     t.index ["template_version_id"],
             name: "index_permit_applications_on_template_version_id"
     t.index ["user_group_type_id"],
