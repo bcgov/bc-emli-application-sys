@@ -1249,9 +1249,11 @@ const options = {
               'https://www2.gov.bc.ca/gov/content/governments/local-governments/facts-framework/local-government-maps',
             submitted: 'You sent this application for review.',
             markedIneligible: 'You have marked this application ineligible.',
-            hearBack: 'Need Help?',
+            submissionSuccess: 'Your {{ submissionType }} form has been submitted!',
+            confirmationEmail: 'A confirmation email has been sent to your account.',
+            hearBack: 'Need help?',
             contactInstruction:
-              'See the status of your application or your application history any time by logging in to the Better Homes Energy Savings Program. Contact <email /> if you have any questions about your application.',
+              'See the status of your application or your application history any time by logging in to the Better Homes Energy Savings Program. Contact <1>{{ email }}</1> if you have any questions about your application.',
             whatsNextTitle: "What's next?",
             ready: 'Ready to submit this application?',
             onBehalf: 'Ready to submit on someone’s behalf?',
