@@ -516,6 +516,8 @@ export enum ENotificationActionType {
   accountUpdate = 'account_update',
   newSubmissionReceived = 'new_submission_received',
   templatePublished = 'template_published',
+  newSupportingFilesRequested = 'supporting_files_requested',
+  newSupportingFilesUploaded = 'supporting_files_uploaded',
 }
 
 export enum ECollaboratorableType {

@@ -161,7 +161,16 @@ export const NotificationStoreModel = types
               href: '/get-support',
             },
           ];
-
+        case ENotificationActionType.newSupportingFilesRequested: {
+          const data = objectData as IPermitNotificationObjectData;
+          return [
+            {
+              text: t('ui.review'),
+              href: `/applications/${data.permitApplicationId}/edit`,
+            },
+          ];
+        }
+        case ENotificationActionType.newSupportingFilesUploaded:
         case ENotificationActionType.newSubmissionReceived: {
           const data = objectData as IPermitNotificationObjectData;
           return [

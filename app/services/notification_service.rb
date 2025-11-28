@@ -530,11 +530,25 @@ class NotificationService
     missing_files:,
     linked_application_id:
   )
+    notification_user_hash = {}
+
     PermitHubMailer.notify_participant_supporting_files_requested(
       permit_application,
       missing_files: missing_files,
       linked_application_id: linked_application_id
     )&.deliver_later
+
+    #in app notification
+    #supporting_files_requested
+    #permit_application.submitter.id
+    ##linked = parent_application_number
+    notification_user_hash[
+      permit_application.submitter.id
+    ] = permit_application.publish_supporting_files_requested__data
+
+    unless notification_user_hash.empty?
+      NotificationPushJob.perform_async(notification_user_hash)
+    end
   end
 
   def self.publish_supporting_files_sumbitted_event(user, permit_application)
