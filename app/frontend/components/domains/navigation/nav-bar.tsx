@@ -136,7 +136,7 @@ export const NavBar = observer(function NavBar() {
   }, [path]);
 
   const isContractorFlow = sessionStorage.getItem('isContractorFlow') === 'true';
-  const loginPath = path === '/welcome/contractor' ? '/contractor' : '/login';
+  const loginPath = isContractorFlow ? '/contractor' : '/login';
   const logoPath = isContractorFlow ? '/welcome/contractor' : '/welcome';
 
   return (
