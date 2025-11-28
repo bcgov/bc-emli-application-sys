@@ -752,12 +752,34 @@ class PermitApplication < ApplicationRecord
     {
       "id" => SecureRandom.uuid,
       "action_type" =>
-        Constants::NotificationActionTypes::SUPPORTING_FILES_UPDLOADED,
+        Constants::NotificationActionTypes::SUPPORTING_FILES_UPLOADED,
       "action_text" =>
         "#{I18n.t("notification.support_request.supporting_files_uploaded", application_number: number, uploaded_date: I18n.l(uploaded_date, format: :long))}",
       "object_data" => {
         "permit_application_id" => id,
         "permit_application_number" => number
+      }
+    }
+  end
+
+  def publish_supporting_files_requested__data
+    latest_sr =
+      SupportRequest
+        .where(parent_application_id: id)
+        .order(created_at: :desc)
+        .first
+
+    latest_linked_app = latest_sr&.linked_application
+    created_date = latest_linked_app&.created_at || created_at
+
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::SUPPORTING_FILES_REQUESTED,
+      "action_text" =>
+        "#{I18n.t("notification.support_request.supporting_files_requested", parent_application_number: number, created_date: I18n.l(created_date, format: :long))}",
+      "object_data" => {
+        "permit_application_id" => latest_linked_app&.id
       }
     }
   end
