@@ -13,7 +13,7 @@ import { usePermitApplication } from '../../../hooks/resources/use-permit-applic
 import { useInterval } from '../../../hooks/use-interval';
 import { useMst } from '../../../setup/root';
 import { ICustomEventMap } from '../../../types/dom';
-import { ECollaborationType, ECustomEvents, ERequirementType } from '../../../types/enums';
+import { ECollaborationType, ECustomEvents, EPermitApplicationStatus, ERequirementType } from '../../../types/enums';
 import { handleScrollToBottom } from '../../../utils/utility-functions';
 import { CopyableValue } from '../../shared/base/copyable-value';
 import { ErrorScreen } from '../../shared/base/error-screen';
@@ -321,7 +321,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 }}
                 gap={4}
               >
-                {currentPermitApplication?.isDraft && (
+                {currentPermitApplication?.status === EPermitApplicationStatus.draft && (
                   <Button variant="primary" onClick={handleClickWithdrawl}>
                     {t('energySavingsApplication.edit.withdrawl')}
                   </Button>
