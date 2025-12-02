@@ -45,9 +45,11 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
   const { programStore, permitApplicationStore, permitClassificationStore, userStore, uiStore } = useMst();
   const { setValue } = methods;
 
-  const { setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, search } = permitApplicationStore;
+  const { setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, setStatusFilter, search } =
+    permitApplicationStore;
 
   const [programOptions, setProgramOptions] = useState([]);
+  const [submissionOptions, setSubmissionOptions] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
 
   const { currentPage, totalPages, totalCount, countPerPage, handleCountPerPageChange, handlePageChange, isSearching } =
@@ -55,30 +57,66 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
 
   const { currentProgram, error } = useProgram();
 
-  //For future use: Contractor submission inbox. Refer to commit history prior to May 7th for changes
-  // const handleChange = (selectedOption) => {
-  //   setUserGroupFilter(selectedOption?.userGroupType);
-  //   setAudienceTypeFilter(selectedOption?.AudienceType);
-  //   setSubmissionTypeFilter(selectedOption?.SubmissionType);
-  //   search();
-  // };
+  const handleChange = (selectedValue) => {
+    if (!selectedValue) {
+      return;
+    }
+
+    // Set classification filters
+    setUserGroupFilter(selectedValue?.userGroupType);
+    setAudienceTypeFilter(selectedValue?.AudienceType);
+    setSubmissionTypeFilter(selectedValue?.SubmissionType);
+
+    // Also set the status filter from the dropdown option
+    if (selectedValue?.status) {
+      setStatusFilter(selectedValue.status);
+    }
+
+    // The EnergySavingsApplicationFilter component will update the status filter
+    // and trigger a new search with the correct statuses for this submission type
+  };
+
+  const handleProgramChange = useCallback(async (programId) => {
+    await programStore.fetchProgram(programId);
+    programStore.setCurrentProgram(programId);
+  }, [programStore]);
 
   // Fetch submission options and program options separately
   const fetchSubmissionOptions = useCallback(async () => {
     try {
-      // const result = await permitClassificationStore.submissionOptionTypes();
-      setUserGroupFilter(EPermitClassificationCode.participant);
-      setAudienceTypeFilter([EPermitClassificationCode.external, EPermitClassificationCode.internal]);
-      setSubmissionTypeFilter([
-        EPermitClassificationCode.application,
-        EPermitClassificationCode.onboarding,
-        EPermitClassificationCode.invoice,
-        EPermitClassificationCode.supportRequest,
-      ]);
+      const result = permitClassificationStore.submissionOptionTypes();
+
+      // Translate the labels
+      const translatedOptions = result.map((option) => {
+        let translatedLabel = option.label;
+        if (option.label === 'participantSubmission') {
+          translatedLabel = t('energySavingsApplication.submissionInbox.participantSubmission');
+        } else if (option.label === 'contractorSubmission') {
+          translatedLabel = t('energySavingsApplication.submissionInbox.contractorSubmission');
+        } else if (option.label === 'contractorOnboarding') {
+          translatedLabel = t('energySavingsApplication.submissionInbox.contractorOnboarding');
+        }
+        const translatedOption = {
+          ...option,
+          label: translatedLabel,
+        };
+        return translatedOption;
+      });
+      setSubmissionOptions(translatedOptions);
+
+      // Set default to participant submissions (set filters but don't search yet)
+      if (translatedOptions.length > 0) {
+        const defaultOption = translatedOptions[0].value;
+        methods.setValue('selectedType', defaultOption);
+        setUserGroupFilter(defaultOption?.userGroupType);
+        setAudienceTypeFilter(defaultOption?.AudienceType);
+        setSubmissionTypeFilter(defaultOption?.SubmissionType);
+        // Status filter will be set by EnergySavingsApplicationFilter component
+      }
     } catch (error) {
       console.error('Failed to fetch submission options', error);
     }
-  }, [permitClassificationStore, t]);
+  }, [permitClassificationStore, t, setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, methods]);
 
   const loadProgramOptions = useCallback(async () => {
     try {
@@ -98,21 +136,19 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
       }));
       setProgramOptions(options);
 
-      await fetchSubmissionOptions();
-
+      // Set the program FIRST before setting submission options
       if (options?.length > 0) {
         const firstOption = options[0];
         methods.setValue('programId', firstOption.value);
-        handleProgramChange(firstOption.value);
+        await handleProgramChange(firstOption.value);
       }
-    } catch (error) {}
-  }, [programStore, methods, fetchSubmissionOptions, t]);
 
-  const handleProgramChange = async (programId) => {
-    await programStore.fetchProgram(programId);
-    programStore.setCurrentProgram(programId);
-    search();
-  };
+      // Then set submission options, which will trigger the search
+      await fetchSubmissionOptions();
+    } catch (error) {
+      console.error('Error in loadProgramOptions:', error);
+    }
+  }, [userStore, uiStore, programStore, methods, fetchSubmissionOptions, handleProgramChange, t]);
 
   useEffect(() => {
     loadProgramOptions();
@@ -133,54 +169,44 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
             <FormProvider {...methods}>
               {programOptions.length > 0 && (
                 <form>
-                  <Controller
-                    name="programId"
-                    control={methods.control}
-                    defaultValue={methods.getValues('programId')}
-                    render={({ field }) => (
-                      <AsyncDropdown
-                        mt={4}
-                        fetchOptions={() => Promise.resolve(programOptions)}
-                        fieldName="programId"
-                        placeholderOptionLabel={t('ui.chooseProgram')}
-                        useBoxWrapper={false}
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                          handleProgramChange(value);
-                        }}
-                      />
-                    )}
-                  />
-                  {/* Retained for future use: Contractor submission inbox. Refer to commit history prior to May 7th for changes */}
-                  {/* <Controller
-                  name="selectedType"
-                  control={methods.control}
-                  render={({ field }) => (
-                    <AsyncDropdown
+                  <AsyncDropdown
                     mt={4}
-                    fetchOptions={async () => options}
-                    fieldName="selectedType"
+                    fetchOptions={() => Promise.resolve(programOptions)}
+                    fieldName="programId"
+                    placeholderOptionLabel={t('ui.chooseProgram')}
                     useBoxWrapper={false}
-                    value={field.value}
                     onValueChange={(value) => {
-                      handleChange(value);
-                      field.onChange(value);
+                      handleProgramChange(value);
                     }}
-                    {...field}
+                  />
+                       <Box w={'full'}>
+          <Heading as="h2" color="theme.blueAlt" mt={8}>
+            Participant Submissions
+          </Heading>
+          <Text mt={2} color="greys.grey70">
+            {t('energySavingsApplication.submissionInbox.chooseSubmissionInbox')}
+          </Text>
+        </Box>
+                  {submissionOptions.length > 0 && (
+                    <AsyncDropdown
+                      mt={4}
+                      fetchOptions={async () => submissionOptions}
+                      fieldName="selectedType"
+                      useBoxWrapper={false}
+                      onValueChange={(value) => {
+                        handleChange(value);
+                      }}
                     />
                   )}
-                  /> */}
                 </form>
               )}
             </FormProvider>
-
-            <Heading as="h2" color="theme.blueAlt" mt={8}>
-              {t('energySavingsApplication.submissionInbox.tableSubHeading')}
-            </Heading>
           </Box>
         </Flex>
 
-        <SearchGrid templateColumns="repeat(7, 1fr)">
+   
+
+        <SearchGrid templateColumns="1.5fr repeat(6, 1fr)" mt={4}>
           <GridHeaders />
 
           {isSearching ? (

@@ -183,8 +183,34 @@ export const ContractorStoreModel = types
       };
     }),
     mergeContractor(contractorData: any) {
-      // replace or add the contractor safely
-      self.contractorsMap.set(contractorData.id, contractorData);
+      try {
+        // Clone the data to avoid mutating the original
+        const processedData = { ...contractorData };
+
+        // Remove employees and onboardings entirely to avoid MobX validation errors
+        // These arrays contain user objects with invalid/undefined roles that fail validation
+        delete processedData.employees;
+        delete processedData.onboardings;
+
+        // Also remove contact if it's an object (should be just an ID)
+        if (processedData.contact && typeof processedData.contact === 'object') {
+          processedData.contactId = processedData.contact.id;
+          delete processedData.contact;
+        }
+
+        // Now add the contractor directly to the map
+        const existingContractor = self.contractorsMap.get(processedData.id);
+        if (existingContractor) {
+          // Merge with existing
+          self.contractorsMap.put({ ...existingContractor, ...processedData });
+        } else {
+          // Add new
+          self.contractorsMap.put(processedData);
+        }
+      } catch (error) {
+        console.error('Error merging contractor:', error, contractorData);
+        // Silently fail to avoid breaking the UI
+      }
     },
   }));
 

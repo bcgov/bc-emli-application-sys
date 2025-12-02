@@ -16,13 +16,14 @@ import {
   SubmissionVariantModel,
   ISubmissionVariant,
 } from '../models/permit-classification';
-import { EPermitClassificationCode, EPermitClassificationType } from '../types/enums';
+import { EPermitClassificationCode, EPermitClassificationType, EPermitApplicationStatus } from '../types/enums';
 import { IOption } from '../types/types';
 
 interface FetchOptionI {
   userGroupType: string;
-  AudienceType: string;
+  AudienceType: string | string[];
   SubmissionType: string[] | string;
+  status?: string[];
 }
 
 export const PermitClassificationStoreModel = types
@@ -187,39 +188,57 @@ export const PermitClassificationStoreModel = types
       return response.ok;
     }),
     submissionOptionTypes(): Array<IOption<FetchOptionI>> {
-      const participantId = self.getUserTypeIdByCode(EPermitClassificationCode.participant);
-      const contractorId = self.getUserTypeIdByCode(EPermitClassificationCode.contractor);
-      const externalId = self.getAudienceTypeIdByCode(EPermitClassificationCode.external);
-      const internalId = self.getAudienceTypeIdByCode(EPermitClassificationCode.internal);
-      const onboardingId = self.getSubmissionTypeIdByCode(EPermitClassificationCode.onboarding);
-
-      if (!participantId || !contractorId || !externalId || !internalId || !onboardingId) {
-        return [];
-      }
-
+      // Backend expects CODES, not IDs
       return [
         {
           label: 'participantSubmission',
           value: {
-            userGroupType: participantId,
-            AudienceType: externalId,
-            SubmissionType: self.getAllSubmissionTypeIds(),
+            userGroupType: EPermitClassificationCode.participant,
+            AudienceType: [EPermitClassificationCode.external, EPermitClassificationCode.internal],
+            SubmissionType: [
+              EPermitClassificationCode.application,
+              EPermitClassificationCode.onboarding,
+              EPermitClassificationCode.invoice,
+            ],
+            status: [
+              EPermitApplicationStatus.submitted, // newly_submitted
+              EPermitApplicationStatus.revisionsRequested, // revisions_requested
+              EPermitApplicationStatus.resubmitted, // resubmitted
+              EPermitApplicationStatus.inReview, // in_review
+              EPermitApplicationStatus.approved, // approved
+              EPermitApplicationStatus.ineligible, // ineligible
+            ],
           },
         },
         {
           label: 'contractorSubmission',
           value: {
-            userGroupType: contractorId,
-            AudienceType: internalId,
-            SubmissionType: self.getSubmissionTypeIdsExceptOnboarding(),
+            userGroupType: EPermitClassificationCode.contractor,
+            AudienceType: [EPermitClassificationCode.internal],
+            SubmissionType: [EPermitClassificationCode.application, EPermitClassificationCode.invoice],
+            status: [
+              EPermitApplicationStatus.submitted, // newly_submitted
+              EPermitApplicationStatus.revisionsRequested, // update_needed
+              EPermitApplicationStatus.resubmitted, // resubmitted
+              EPermitApplicationStatus.inReview, // in_review
+              EPermitApplicationStatus.approvedPending, // approved_pending
+              EPermitApplicationStatus.approvedPaid, // approved_paid
+              EPermitApplicationStatus.ineligible, // ineligible
+            ],
           },
         },
         {
           label: 'contractorOnboarding',
           value: {
-            userGroupType: contractorId,
-            AudienceType: internalId,
-            SubmissionType: onboardingId,
+            userGroupType: EPermitClassificationCode.contractor,
+            AudienceType: [EPermitClassificationCode.internal],
+            SubmissionType: [EPermitClassificationCode.onboarding],
+            status: [
+              EPermitApplicationStatus.submitted, // newly_submitted
+              EPermitApplicationStatus.trainingPending, // training_pending
+              EPermitApplicationStatus.approved, // approved
+              EPermitApplicationStatus.ineligible, // ineligible
+            ],
           },
         },
       ];

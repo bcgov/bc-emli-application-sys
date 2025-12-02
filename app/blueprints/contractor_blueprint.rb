@@ -20,9 +20,19 @@ class ContractorBlueprint < Blueprinter::Base
     association :employees, blueprint: UserBlueprint, view: :minimal
   end
 
-  # minimal is same as base for now, can be adjusted if needed.
+  # minimal view - excludes employees to avoid validation issues with undefined roles
   view :minimal do
-    include_view :base
+    fields :business_name,
+           :website,
+           :phone_number,
+           :onboarded,
+           :created_at,
+           :updated_at,
+           :number
+
+    field :contact_id do |contractor|
+      contractor.contact_id
+    end
   end
 
   # extended_api is also same as base for now, used in API

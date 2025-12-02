@@ -43,6 +43,9 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
   const submittedFilters = [EPermitApplicationStatus.submitted];
   const inReviewFilters = [EPermitApplicationStatus.inReview];
   const approvedFilters = [EPermitApplicationStatus.approved];
+  const approvedPendingFilters = [EPermitApplicationStatus.approvedPending];
+  const approvedPaidFilters = [EPermitApplicationStatus.approvedPaid];
+  const trainingPendingFilters = [EPermitApplicationStatus.trainingPending];
   const ineligibleFilters = [EPermitApplicationStatus.ineligible];
   const revisionRequestedFilters = [EPermitApplicationStatus.revisionsRequested];
   const resubmittedFilters = [EPermitApplicationStatus.resubmitted];
@@ -75,6 +78,12 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
         return inReviewFilters;
       case 'approved':
         return approvedFilters;
+      case 'approvedPending':
+        return approvedPendingFilters;
+      case 'approvedPaid':
+        return approvedPaidFilters;
+      case 'trainingPending':
+        return trainingPendingFilters;
       case 'ineligible':
         return ineligibleFilters;
       case 'resubmitted':
@@ -96,6 +105,12 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
         return 'inReview';
       case EPermitApplicationStatus.approved:
         return 'approved';
+      case EPermitApplicationStatus.approvedPending:
+        return 'approvedPending';
+      case EPermitApplicationStatus.approvedPaid:
+        return 'approvedPaid';
+      case EPermitApplicationStatus.trainingPending:
+        return 'trainingPending';
       case EPermitApplicationStatus.ineligible:
         return 'ineligible';
       case EPermitApplicationStatus.revisionsRequested:
@@ -139,36 +154,28 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
     window.history.replaceState(null, '', '?' + newParams.toString());
   };
 
+  // Create a stable string representation of statusGroups for comparison
+  const statusGroupsKey = statusGroups.join(',');
+
   useEffect(() => {
-    //functionality to handle filters When first time page loads
-
-    const params = new URLSearchParams(window.location.search);
-
-    // Get the 'status' parameter and split it into an array
-    const statusParam = params.get('status');
-    if (statusParam) {
-      const statusParamArray = statusParam.split(',');
-      const filtersFromUrl = statusParamArray.flatMap(mapStatusToFilterArray);
-      setSelectedFilters(filtersFromUrl);
-      setPendingFilters(filtersFromUrl);
-    } else {
-      // Set the selected filters based on the provided statusGroups
-      const allFilters = statusGroups.map((group) => group.toString());
-      const statusArray = statusGroups.flatMap(mapFilterToStatusArray);
-      setSelectedFilters(allFilters);
-      setPendingFilters(allFilters);
-      setStatusFilter(statusArray);
-      search();
+    // When statusGroups change (e.g., switching from participant to contractor submissions),
+    // reset the filters to show all available statuses for that group
+    if (statusGroups.length === 0) {
+      // Don't search if there are no status groups yet
+      return;
     }
-  }, []);
 
-  useEffect(() => {
     const allFilters = statusGroups.map((group) => group.toString());
-    setSelectedFilters(allFilters); // Select all filter buttons based on statusGroups
-    setPendingFilters(allFilters); // Initialize pending filters
-    setStatusFilter(statusGroups.flatMap(mapFilterToStatusArray)); // Apply statuses based on statusGroups
-    search(); // Trigger search with all filters
-  }, []);
+    const statusArray = statusGroups.flatMap(mapFilterToStatusArray);
+
+    setSelectedFilters(allFilters);
+    setPendingFilters(allFilters);
+    setStatusFilter(statusArray);
+
+    // Trigger search immediately after setting the status filter
+    search();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusGroupsKey]); // Only depend on statusGroupsKey to avoid infinite loops
 
   return (
     <Container maxW="container.lg" {...rest}>

@@ -161,7 +161,16 @@ export const PermitApplicationStoreModel = types
         (u: IUser) => u.id,
         permitApplicationsData.filter((pa) => pa.submitter).map((pa) => pa.submitter),
       );
-      self.rootStore.userStore.mergeUpdateAll(submittersUniq, 'usersMap');
+      // Split submitters into users and contractors
+      const userSubmitters = submittersUniq.filter((s: any) => s.type !== 'Contractor' && !s.businessName);
+      const contractorSubmitters = submittersUniq.filter((s: any) => s.type === 'Contractor' || s.businessName);
+
+      self.rootStore.userStore.mergeUpdateAll(userSubmitters, 'usersMap');
+
+      // Merge contractors into contractor store
+      contractorSubmitters.forEach((contractor: any) => {
+        self.rootStore.contractorStore.mergeContractor(contractor);
+      });
 
       self.rootStore.templateVersionStore.mergeUpdateAll(
         R.reject(
@@ -230,10 +239,11 @@ export const PermitApplicationStoreModel = types
       self.userGroupTypeIdFilter = id;
     },
     setSubmissionTypeFilter(id: string | string[]) {
-      if (!id || (Array.isArray(id) && id.length === 0)) return;
+      if (!id || (Array.isArray(id) && id.length === 0)) {
+        return;
+      }
 
       const ids = Array.isArray(id) ? id : [id];
-      const joinedIds = ids.join(',');
 
       // @ts-ignor"
       self.submissionTypeIdFilter = cast(ids);
@@ -401,16 +411,22 @@ export const PermitApplicationStoreModel = types
         page: opts?.page ?? self.currentPage,
         perPage: opts?.countPerPage ?? self.countPerPage,
         filters: {
-          status: self.statusFilter,
+          status: self.statusFilter ? [...self.statusFilter] : undefined,
           userGroupTypeId: self.userGroupTypeIdFilter,
-          submissionTypeId: self.submissionTypeIdFilter,
-          audienceTypeId: self.audienceTypeIdFilter,
+          submissionTypeId: self.submissionTypeIdFilter ? [...self.submissionTypeIdFilter] : undefined,
+          audienceTypeId: self.audienceTypeIdFilter ? [...self.audienceTypeIdFilter] : undefined,
           templateVersionId: self.templateVersionIdFilter,
           requirementTemplateId: self.requirementTemplateIdFilter,
         },
       } as TSearchParams<EPermitApplicationSortFields, IEnergySavingsApplicationSearchFilters>;
 
       const currentProgramId = self.rootStore?.programStore?.currentProgram?.id;
+
+      // Don't search if we don't have the required filters set
+      if (!searchParams.filters.userGroupTypeId || !searchParams.filters.submissionTypeId) {
+        return false;
+      }
+
       const response = currentProgramId
         ? yield self.environment.api.fetchProgramPermitApplications(currentProgramId, searchParams)
         : yield self.environment.api.fetchPermitApplications(searchParams);

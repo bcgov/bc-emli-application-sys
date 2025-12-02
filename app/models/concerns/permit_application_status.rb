@@ -13,7 +13,13 @@ module PermitApplicationStatus
       ApplicationFlow::SupportRequestExternalParticipant,
     %w[onboarding contractor external] =>
       ApplicationFlow::OnboardingExternalContractor,
+    %w[onboarding contractor internal] =>
+      ApplicationFlow::OnboardingExternalContractor,
     %w[invoice contractor external] =>
+      ApplicationFlow::InvoiceExternalContractor,
+    %w[invoice contractor internal] =>
+      ApplicationFlow::InvoiceExternalContractor,
+    %w[application contractor internal] =>
       ApplicationFlow::InvoiceExternalContractor
   }.freeze
 

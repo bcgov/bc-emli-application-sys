@@ -1,8 +1,18 @@
-# app/models/concerns/application_flow/default.rb
+# app/models/concerns/application_flow/invoice_external_contractor.rb
 module ApplicationFlow
   class InvoiceExternalContractor < Base
-    aasm do
-      # Override submit
+    aasm column: :status, enum: true, autosave: true do
+      # --- States ---
+      state :new_draft, initial: true
+      state :newly_submitted
+      state :revisions_requested
+      state :resubmitted
+      state :in_review
+      state :approved_pending
+      state :approved_paid
+      state :ineligible
+
+      # --- Events ---
       event :submit do
         transitions from: :new_draft,
                     to: :newly_submitted,

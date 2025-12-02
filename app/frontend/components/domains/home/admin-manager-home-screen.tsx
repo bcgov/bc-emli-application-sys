@@ -68,8 +68,7 @@ export const AdminManagerHomeScreen = ({ ...rest }: IHomeScreenProps) => {
               description=""
               //description={t('home.contractorDescription')}
               icon={<FileIcon size={24} />}
-              href="/contractor-management"
-              pointerEvents="none"
+              href="/contractor-program-resources"
               h="full"
             />
 
