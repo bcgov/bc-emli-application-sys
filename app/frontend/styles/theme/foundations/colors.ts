@@ -55,6 +55,7 @@ export const colors = {
     grey05: '#9F9D9C',
     grey10: '#FAF9F8',
     grey20: '#F3F2F1',
+    grey50: '#D1CFCD',
     grey80: '#EDEBE9',
     grey90: '#3B3A39',
     grey100: '#1A1A1A',

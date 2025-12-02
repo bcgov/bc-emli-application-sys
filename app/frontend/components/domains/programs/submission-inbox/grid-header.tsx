@@ -7,6 +7,7 @@ import {
   EPermitApplicationReviewerSortFields,
   EPermitApplicationSortFields,
   EPermitApplicationStatusGroup,
+  EPermitClassificationCode,
 } from '../../../../types/enums';
 import { ModelSearchInput } from '../../../shared/base/model-search-input';
 import { GridHeader } from '../../../shared/grid/grid-header';
@@ -14,13 +15,59 @@ import { SortIcon } from '../../../shared/sort-icon';
 import { EnergySavingsApplicationFilter } from '../../../shared/energy-savings-applications/energy-savings-application-filter';
 
 export const GridHeaders = observer(function GridHeaders() {
-  const { permitApplicationStore, userStore } = useMst();
+  const { permitApplicationStore, userStore, permitClassificationStore, programStore } = useMst();
   const { t } = useTranslation();
   const getSortColumnHeader = permitApplicationStore?.getSortColumnHeader;
-  const { search, setAssignedUserIdFilter, assignedUserIdFilter } = permitApplicationStore;
   const currentUserId = userStore.currentUser?.id;
 
-  const { toggleSort, sort } = permitApplicationStore;
+
+  // Don't render the filter if program is not set yet (prevents premature search on mount)
+  if (!programStore.currentProgram) {
+    return null;
+  }
+
+  // Filters now contain codes directly, not IDs
+  const submissionTypeCodes = permitApplicationStore.submissionTypeIdFilter ? [...permitApplicationStore.submissionTypeIdFilter] : [];
+  const userGroupTypeCode = permitApplicationStore.userGroupTypeIdFilter;
+
+  const isContractor = userGroupTypeCode === EPermitClassificationCode.contractor;
+  const isOnboarding = submissionTypeCodes?.includes(EPermitClassificationCode.onboarding);
+  const isOnlyOnboarding = submissionTypeCodes?.length === 1 && submissionTypeCodes?.includes(EPermitClassificationCode.onboarding);
+
+  let statusGroups: EPermitApplicationStatusGroup[];
+
+  if (isContractor && isOnlyOnboarding) {
+    // For contractor onboarding, show onboarding-specific statuses
+    statusGroups = [
+      EPermitApplicationStatusGroup.submitted,
+      EPermitApplicationStatusGroup.trainingPending,
+      EPermitApplicationStatusGroup.approved,
+      EPermitApplicationStatusGroup.ineligible,
+    ];
+  } else if (isContractor) {
+    // For contractor applications/invoices, show contractor-specific statuses
+    statusGroups = [
+      EPermitApplicationStatusGroup.submitted,
+      EPermitApplicationStatusGroup.revisionsRequested,
+      EPermitApplicationStatusGroup.resubmitted,
+      EPermitApplicationStatusGroup.inReview,
+      EPermitApplicationStatusGroup.approvedPending,
+      EPermitApplicationStatusGroup.approvedPaid,
+      EPermitApplicationStatusGroup.ineligible,
+    ];
+  } else {
+    // For participant submissions, show participant statuses
+    statusGroups = [
+      EPermitApplicationStatusGroup.submitted,
+      EPermitApplicationStatusGroup.revisionsRequested,
+      EPermitApplicationStatusGroup.resubmitted,
+      EPermitApplicationStatusGroup.inReview,
+      EPermitApplicationStatusGroup.approved,
+      EPermitApplicationStatusGroup.ineligible,
+    ];
+  }
+
+  const filterKey = `filter-${permitApplicationStore.userGroupTypeIdFilter}-${submissionTypeCodes?.join(',') || 'none'}`;
 
   return (
     <Box display={'contents'} role={'rowgroup'}>
@@ -30,14 +77,8 @@ export const GridHeaders = observer(function GridHeaders() {
             <Flex gap={2} maxW="1000px" w="fit-content">
               <Box flex="1">
                 <EnergySavingsApplicationFilter
-                  statusGroups={[
-                    EPermitApplicationStatusGroup.resubmitted,
-                    EPermitApplicationStatusGroup.submitted,
-                    EPermitApplicationStatusGroup.revisionsRequested,
-                    EPermitApplicationStatusGroup.inReview,
-                    EPermitApplicationStatusGroup.ineligible,
-                    EPermitApplicationStatusGroup.approved,
-                  ]}
+                  key={filterKey}
+                  statusGroups={statusGroups}
                 />
               </Box>
               <Box flex="1">
@@ -57,16 +98,16 @@ export const GridHeaders = observer(function GridHeaders() {
               >
                 <Checkbox
                   colorScheme="gray"
-                  isChecked={!!assignedUserIdFilter}
+                  isChecked={!!permitApplicationStore.assignedUserIdFilter}
                   onChange={(e) => {
                     const checked = e.target.checked;
 
                     if (checked && currentUserId) {
-                      setAssignedUserIdFilter(currentUserId);
+                      permitApplicationStore.setAssignedUserIdFilter(currentUserId);
                     } else {
-                      setAssignedUserIdFilter(null);
+                      permitApplicationStore.setAssignedUserIdFilter(null);
                     }
-                    search();
+                    permitApplicationStore.search();
                   }}
                 >
                   {t('energySavingsApplication.submissionInbox.assignedTo')}
@@ -89,14 +130,14 @@ export const GridHeaders = observer(function GridHeaders() {
                   as={'button'}
                   justifyContent={'space-between'}
                   cursor="pointer"
-                  onClick={() => toggleSort(castField)}
+                  onClick={() => permitApplicationStore.toggleSort(castField)}
                   borderRight={'1px solid'}
                   borderColor={'border.light'}
                   px={4}
                 >
                   <Text textAlign="left">{getSortColumnHeader(castField)}</Text>
                   {EPermitApplicationReviewerSortFields[key] !== EPermitApplicationReviewerSortFields.actions && (
-                    <SortIcon<EPermitApplicationSortFields> field={castField} currentSort={sort} />
+                    <SortIcon<EPermitApplicationSortFields> field={castField} currentSort={permitApplicationStore.sort} />
                   )}
                 </Flex>
               </GridHeader>

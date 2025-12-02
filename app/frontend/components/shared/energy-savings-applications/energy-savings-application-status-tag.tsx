@@ -33,7 +33,10 @@ export const EnergySavingsApplicationStatusTag = ({
     // [EPermitApplicationStatus.ephemeral]: 'theme.blueLight',
     [EPermitApplicationStatus.inReview]: 'theme.lightGreen',
     [EPermitApplicationStatus.approved]: 'theme.lightGreen',
-    [EPermitApplicationStatus.ineligible]: 'semantic.infoLight',
+    [EPermitApplicationStatus.approvedPending]: 'theme.lightGreen',
+    [EPermitApplicationStatus.approvedPaid]: 'theme.lightGreen',
+    [EPermitApplicationStatus.trainingPending]: 'theme.orangeLight02',
+    [EPermitApplicationStatus.ineligible]: 'greys.grey50',
   };
 
   const colorMap = {
@@ -44,6 +47,9 @@ export const EnergySavingsApplicationStatusTag = ({
     // [EPermitApplicationStatus.ephemeral]: 'greys.anotherGrey',
     [EPermitApplicationStatus.inReview]: 'greys.anotherGrey',
     [EPermitApplicationStatus.approved]: 'greys.anotherGrey',
+    [EPermitApplicationStatus.approvedPending]: 'greys.anotherGrey',
+    [EPermitApplicationStatus.approvedPaid]: 'greys.anotherGrey',
+    [EPermitApplicationStatus.trainingPending]: 'greys.anotherGrey',
     [EPermitApplicationStatus.ineligible]: 'greys.anotherGrey',
   };
 
@@ -55,7 +61,10 @@ export const EnergySavingsApplicationStatusTag = ({
     // [EPermitApplicationStatus.ephemeral]: 'theme.blueLight',
     [EPermitApplicationStatus.inReview]: 'theme.darkGreen',
     [EPermitApplicationStatus.approved]: 'theme.darkGreen',
-    [EPermitApplicationStatus.ineligible]: 'theme.darkBlue',
+    [EPermitApplicationStatus.approvedPending]: 'theme.darkGreen',
+    [EPermitApplicationStatus.approvedPaid]: 'theme.darkGreen',
+    [EPermitApplicationStatus.trainingPending]: 'theme.orange',
+    [EPermitApplicationStatus.ineligible]: 'border.randomBorderColorforthePublishModal',
   };
 
   const getStatusText = (status: EPermitApplicationStatus) => {

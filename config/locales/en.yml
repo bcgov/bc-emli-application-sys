@@ -819,7 +819,7 @@ en:
     newly_submitted: 'UNREAD'
     revisions_requested: 'UPDATE NEEDED'
     resubmitted: 'RESUBMITTED'
-    in_review: 'UNDER REVIEW'
+    in_review: 'IN REVIEW'
     ineligible: 'INELIGIBLE'
     approved: 'APPROVED'
   file_upload:
