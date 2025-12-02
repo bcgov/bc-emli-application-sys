@@ -51,6 +51,7 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
   const [programOptions, setProgramOptions] = useState([]);
   const [submissionOptions, setSubmissionOptions] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const { currentPage, totalPages, totalCount, countPerPage, handleCountPerPageChange, handlePageChange, isSearching } =
     permitApplicationStore;
@@ -120,6 +121,7 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
 
   const loadProgramOptions = useCallback(async () => {
     try {
+      setIsInitialLoading(true);
       await userStore.fetchActivePrograms();
       const activePrograms = userStore.currentUser?.activePrograms ?? [];
       if (activePrograms.length === 0) {
@@ -128,6 +130,7 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
           t('energySavingsApplication.submissionInbox.noAccess'),
           '',
         );
+        setIsInitialLoading(false);
         return;
       }
       const options = activePrograms.map((data) => ({
@@ -145,8 +148,10 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
 
       // Then set submission options, which will trigger the search
       await fetchSubmissionOptions();
+      setIsInitialLoading(false);
     } catch (error) {
       console.error('Error in loadProgramOptions:', error);
+      setIsInitialLoading(false);
     }
   }, [userStore, uiStore, programStore, methods, fetchSubmissionOptions, handleProgramChange, t]);
 
@@ -155,7 +160,7 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
   }, [loadProgramOptions]);
 
   if (errorMessage) return <ErrorScreen error={errorMessage} />;
-  if (!permitClassificationStore.isLoaded) return <LoadingScreen />;
+  if (!permitClassificationStore.isLoaded || isInitialLoading) return <LoadingScreen />;
 
   return (
     <Container maxW="container.xl" as={'main'}>
