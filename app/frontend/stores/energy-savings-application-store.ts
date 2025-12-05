@@ -420,10 +420,11 @@ export const PermitApplicationStoreModel = types
         },
       } as TSearchParams<EPermitApplicationSortFields, IEnergySavingsApplicationSearchFilters>;
 
+
       const currentProgramId = self.rootStore?.programStore?.currentProgram?.id;
 
       // Don't search if we don't have the required filters set
-      if (!searchParams.filters.userGroupTypeId || !searchParams.filters.submissionTypeId) {
+      if (!searchParams.filters.userGroupTypeId || !searchParams.filters.submissionTypeId || (Array.isArray(searchParams.filters.submissionTypeId) && searchParams.filters.submissionTypeId.length === 0)) {
         return false;
       }
 

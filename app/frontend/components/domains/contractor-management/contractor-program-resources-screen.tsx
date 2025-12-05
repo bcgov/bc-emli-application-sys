@@ -189,7 +189,11 @@ const SIDEBAR_CATEGORIES: { key: ResourceCategory; label: string }[] = [
   { key: 'resourcesForCustomers', label: 'contractor.programResources.resourcesForCustomers' },
 ];
 
-export const ContractorProgramResourcesScreen = () => {
+interface ContractorProgramResourcesScreenProps {
+  hideBlueSection?: boolean;
+}
+
+export const ContractorProgramResourcesScreen = ({ hideBlueSection = false }: ContractorProgramResourcesScreenProps) => {
   const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<ResourceCategory>('programGuidance');
 
@@ -210,14 +214,14 @@ export const ContractorProgramResourcesScreen = () => {
   };
 
   return (
-    <Flex as="main" direction="column" w="full" bg="greys.grey04" pb="16">
+    <Flex as="main" direction="column" w="full" bg={hideBlueSection ? 'white' : 'greys.grey04'} pb={hideBlueSection ? 0 : '16'}>
 
       {/* Blue Header Bar */}
-      <BlueTitleBar title={t('contractor.programResources.title')} />
+      {!hideBlueSection && <BlueTitleBar title={t('contractor.programResources.title')} />}
 
       {/* Main Content */}
-      <Container maxW="container.lg" py={16} bg="white" px={10}>
-        <Heading as="h1" fontSize="5xl" fontWeight="700" color="greys.grey60" mb={4}>
+      <Container maxW={hideBlueSection ? 'full' : 'container.lg'} py={hideBlueSection ? 0 : 16} bg="white" px={hideBlueSection ? 0 : 10}>
+        <Heading as="h1" fontSize="5xl" fontWeight="700" color="greys.grey60" mb={4} mt={hideBlueSection ? 10 : 0}>
           {t('contractor.programResources.programResourcesPrefix')}{' '}
           {t(SIDEBAR_CATEGORIES.find((cat) => cat.key === selectedCategory)?.label || '')}
         </Heading>

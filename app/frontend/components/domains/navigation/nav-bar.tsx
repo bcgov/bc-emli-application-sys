@@ -96,6 +96,10 @@ function isblankTemplatePath(path: string): boolean {
   return regex.test(path);
 }
 
+function isContractorDashboardPath(path: string): boolean {
+  return path === '/contractor-dashboard';
+}
+
 function shouldHideSubNavbarForPath(path: string): boolean {
   const matchers: Array<(path: string) => boolean> = [
     (path) => path === '/',
@@ -111,6 +115,7 @@ function shouldHideSubNavbarForPath(path: string): boolean {
     isSuccessfullSubmissionPath,
     isSuccessfullWithdrawlPath,
     isblankTemplatePath,
+    isContractorDashboardPath,
   ];
 
   return matchers.some((matcher) => matcher(path));
