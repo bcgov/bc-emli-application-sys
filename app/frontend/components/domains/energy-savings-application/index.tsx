@@ -27,9 +27,15 @@ import { PermitApplicationStatusTabs } from '../../shared/energy-savings-applica
 import { EnergySavingsApplicationFilter } from '../../shared/energy-savings-applications/energy-savings-application-filter';
 import { useLocation } from 'react-router-dom';
 
-interface IEnergySavingsApplicationIndexScreenProps {}
+interface IEnergySavingsApplicationIndexScreenProps {
+  skipDefaultFilters?: boolean;
+  hideBlueSection?: boolean;
+  customButtonText?: string;
+  customButtonLink?: string;
+  customEmptyMessage?: string;
+}
 
-export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsApplicationIndexScreenProps) => {
+export const EnergySavingsApplicationIndexScreen = observer(({ skipDefaultFilters = false, hideBlueSection = false, customButtonText, customButtonLink, customEmptyMessage }: IEnergySavingsApplicationIndexScreenProps) => {
   const { t } = useTranslation();
   const { permitApplicationStore, sandboxStore, userStore } = useMst();
   const {
@@ -55,20 +61,31 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
   const templateVersionId = query.get('templateVersionId');
   const filters = t('energySavingsApplication.filter', { returnObjects: true }) as { [key: string]: string };
 
-  setUserGroupFilter(EPermitClassificationCode.participant);
-  setAudienceTypeFilter(
-    currentUser.isParticipant ? EPermitClassificationCode.external : EPermitClassificationCode.internal,
-  );
-  setSubmissionTypeFilter(
-    currentUser.isParticipant
-      ? EPermitClassificationCode.application
-      : [
-          EPermitClassificationCode.application,
-          EPermitClassificationCode.onboarding,
-          EPermitClassificationCode.invoice,
-          EPermitClassificationCode.supportRequest,
-        ],
-  );
+  // Only set default filters if skipDefaultFilters is false
+  React.useEffect(() => {
+    if (!skipDefaultFilters) {
+      setUserGroupFilter(EPermitClassificationCode.participant);
+      setAudienceTypeFilter(
+        currentUser.isParticipant ? EPermitClassificationCode.external : EPermitClassificationCode.internal,
+      );
+      setSubmissionTypeFilter(
+        currentUser.isParticipant
+          ? EPermitClassificationCode.application
+          : [
+              EPermitClassificationCode.application,
+              EPermitClassificationCode.onboarding,
+              EPermitClassificationCode.invoice,
+              EPermitClassificationCode.supportRequest,
+            ],
+      );
+    } else {
+      // console.log('[EnergySavingsApplicationIndexScreen] Skipping default filters, current filters:', {
+      //   submissionType: permitApplicationStore.submissionTypeIdFilter,
+      //   userGroup: permitApplicationStore.userGroupTypeIdFilter,
+      //   audienceType: permitApplicationStore.audienceTypeIdFilter,
+      // });
+    }
+  }, [skipDefaultFilters, setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, currentUser.isParticipant, permitApplicationStore]);
 
   useSearch(permitApplicationStore, [
     requirementTemplateId || '',
@@ -81,13 +98,15 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
   return (
     <Flex as="main" direction="column" w="full" bg="greys.white" pb="24">
       {/* <PermitApplicationStatusTabs /> */}
-      <BlueTitleBar
-        title={
-          location.pathname.endsWith('/supported-applications')
-            ? t('site.breadcrumb.supportedApplications')
-            : t('site.myApplications')
-        }
-      />
+      {!hideBlueSection && (
+        <BlueTitleBar
+          title={
+            location.pathname.endsWith('/supported-applications')
+              ? t('site.breadcrumb.supportedApplications')
+              : t('site.myApplications')
+          }
+        />
+      )}
       <Container maxW="container.lg" pb={4}>
         <Flex as="section" direction="column" p={6} gap={6} flex={1}>
           <Flex
@@ -96,8 +115,8 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
             justify="space-between"
             direction={{ base: 'column', md: 'row' }}
           >
-            <RouterLinkButton to="/new-application" variant="primary" w={{ base: 'full', md: 'fit-content' }}>
-              {t('energySavingsApplication.start')}
+            <RouterLinkButton to={customButtonLink || "/new-application"} variant="primary" w={{ base: 'full', md: 'fit-content' }}>
+              {customButtonText || t('energySavingsApplication.start')}
             </RouterLinkButton>
             <Flex
               align={{ md: 'end' }}
@@ -145,8 +164,13 @@ export const EnergySavingsApplicationIndexScreen = observer(({}: IEnergySavingsA
               <SharedSpinner h={50} w={50} />
             </Flex>
           ) : tablePermitApplications.length === 0 ? (
-            <Flex py="50" w="full" justify="center">
-              {t('errors.noResults')}
+            <Flex direction="column" w="full">
+              {customEmptyMessage && (
+                <Box borderBottom="2px solid" borderColor="greys.lightGrey"  mt={4}/>
+              )}
+              <Flex py="10" w="full" justify={customEmptyMessage ? "flex-start" : "center"}>
+                {customEmptyMessage || t('errors.noResults')}
+              </Flex>
             </Flex>
           ) : (
             tablePermitApplications.map((pa) => (

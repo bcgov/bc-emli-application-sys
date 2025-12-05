@@ -358,6 +358,13 @@ const options = {
               'Certificate of commercial liability insurance',
               'Technical Safety BC Certification (electrical contractors only) ',
             ],
+            dashboard: {
+              title: 'Contractor portal',
+              invoiceSubmission: 'Invoice submission',
+              programResources: 'Program resources',
+              submitInvoice: 'Submit invoice',
+              uploadInfo: 'You will need to upload your invoice and supporting documentation. Have them ready before you begin.',
+            },
           },
           duringApplication: 'During the application, we will ask for:',
           informationReady: 'To make things easier, collect this information before you begin your application.',

@@ -60,6 +60,7 @@ export const colors = {
     grey90: '#3B3A39',
     grey100: '#1A1A1A',
     anotherGrey: '#2D2D2D',
+    dividerGrey:'#898785',
     homeScreenGrey: '#474543',
   },
   border: {

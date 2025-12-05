@@ -20,6 +20,7 @@ import { ContractorLandingScreen } from '../contractor-landing';
 import { ContractorManagementScreen } from '../contractor-management';
 import { ContractorEmployeeIndexScreen } from '../contractor-management/employees';
 import { ContractorProgramResourcesScreen } from '../contractor-management/contractor-program-resources-screen';
+import { ContractorDashboardScreen } from '../contractor-dashboard/contractor-dashboard-screen';
 import { trackPageViewEvent } from '../../../utils/snowplow';
 
 const ExternalApiKeysIndexScreen = lazy(() =>
@@ -516,6 +517,7 @@ const AppRoutes = observer(() => {
           <Route path="/new-application" element={<NewApplicationScreen />} />
           <Route path="/blank-applications" element={<NewApplicationScreen />} />
           <Route path="/supported-applications" element={<EnergySavingsApplicationIndexScreen />} />
+          <Route path="/contractor-dashboard" element={<ContractorDashboardScreen />} />
           <Route path="/applications/:permitApplicationId/edit" element={<EditPermitApplicationScreen />}>
             <Route path="step-code" element={<StepCodeForm />} />
           </Route>
