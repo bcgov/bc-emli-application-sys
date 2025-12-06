@@ -363,7 +363,8 @@ const options = {
               invoiceSubmission: 'Invoice submission',
               programResources: 'Program resources',
               submitInvoice: 'Submit invoice',
-              uploadInfo: 'You will need to upload your invoice and supporting documentation. Have them ready before you begin.',
+              uploadInfo:
+                'You will need to upload your invoice and supporting documentation. Have them ready before you begin.',
             },
           },
           duringApplication: 'During the application, we will ask for:',
@@ -912,7 +913,7 @@ const options = {
               'Choose a submission inbox to view from the dropdown list. Submitted applications will appear in the relevant submission inbox. ',
           },
           fields: {
-            number: 'Application #',
+            number: 'Reference #',
             pin: 'PIN',
             jurisdiction: 'Jurisdiction',
           },
@@ -989,8 +990,8 @@ const options = {
           },
           edit: {
             saveDraft: 'Save and finish later',
-            withdrawl: 'Withdraw application',
-            submit: 'Submit application',
+            withdrawl: 'Withdraw',
+            submit: 'Submit',
             permit: 'Permit',
             fullAddress: 'Full address',
             pidPin: 'PID / PIN',
@@ -1210,7 +1211,7 @@ const options = {
               'A copy of all submitted applications are also sent to one or more email addresses configured by the review manager.',
           },
           fields: {
-            number: 'Application #',
+            number: 'Reference #',
             pin: 'PIN',
             jurisdiction: 'Jurisdiction',
           },
@@ -1295,8 +1296,8 @@ const options = {
           edit: {
             back: 'Back to My applications',
             saveDraft: 'Save and finish later',
-            withdrawl: 'Withdraw application',
-            submit: 'Submit application',
+            withdrawl: 'Withdraw',
+            submit: 'Submit',
             permit: 'Permit',
             fullAddress: 'Full address',
             pidPin: 'PID / PIN',
