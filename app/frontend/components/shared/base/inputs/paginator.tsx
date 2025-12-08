@@ -37,6 +37,13 @@ export const Paginator = observer(({ handlePageChange, totalPages, ...pagination
           size="sm"
           mx={1}
           onClick={() => handlePageChange(pageToTransitionTo)}
+          aria-label={`Go to page ${pageToTransitionTo}`}
+          aria-current={pageToTransitionTo === paginationProps.current ? 'page' : undefined}
+          _focusVisible={{
+            outline: '2px solid',
+            outlineColor: 'theme.blue',
+            outlineOffset: '2px',
+          }}
         >
           {pageToTransitionTo}
         </Button>
@@ -57,6 +64,11 @@ export const Paginator = observer(({ handlePageChange, totalPages, ...pagination
           onClick={() => handlePageChange(pageToTransitionTo)}
           aria-label={'previous page'}
           _after={{ display: 'none !important' }}
+          _focusVisible={{
+            outline: '2px solid',
+            outlineColor: 'theme.blue',
+            outlineOffset: '2px',
+          }}
           isDisabled={pageToTransitionTo === 0}
         ></IconButton>
       );
@@ -76,6 +88,11 @@ export const Paginator = observer(({ handlePageChange, totalPages, ...pagination
           onClick={() => handlePageChange(pageToTransitionTo)}
           aria-label={'next page'}
           _after={{ display: 'none !important' }}
+          _focusVisible={{
+            outline: '2px solid',
+            outlineColor: 'theme.blue',
+            outlineOffset: '2px',
+          }}
           isDisabled={
             totalPages === 0 || (totalPages === pageToTransitionTo && pageToTransitionTo === paginationProps.current)
           }

@@ -92,6 +92,7 @@ export const EnergySavingsApplicationStatusTag = ({
       textTransform="uppercase"
       minW="fit-content"
       textAlign="center"
+      aria-label={`Submission status: ${getStatusText(status)}`}
       {...rest}
     >
       {getStatusText(status)}

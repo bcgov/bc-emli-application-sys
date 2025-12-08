@@ -115,7 +115,12 @@ export const EnergySavingsApplicationIndexScreen = observer(({ skipDefaultFilter
             justify="space-between"
             direction={{ base: 'column', md: 'row' }}
           >
-            <RouterLinkButton to={customButtonLink || "/new-application"} variant="primary" w={{ base: 'full', md: 'fit-content' }}>
+            <RouterLinkButton
+              to={customButtonLink || "/new-application"}
+              variant="primary"
+              w={{ base: 'full', md: 'fit-content' }}
+              aria-label={customButtonText ? `${customButtonText} - start a new invoice submission` : t('energySavingsApplication.start')}
+            >
               {customButtonText || t('energySavingsApplication.start')}
             </RouterLinkButton>
             <Flex
@@ -168,7 +173,7 @@ export const EnergySavingsApplicationIndexScreen = observer(({ skipDefaultFilter
               {customEmptyMessage && (
                 <Box borderBottom="2px solid" borderColor="greys.lightGrey"  mt={4}/>
               )}
-              <Flex py="10" w="full" justify={customEmptyMessage ? "flex-start" : "center"}>
+              <Flex py="10" w="full" justify={customEmptyMessage ? "flex-start" : "center"} role="status" aria-live="polite">
                 {customEmptyMessage || t('errors.noResults')}
               </Flex>
             </Flex>

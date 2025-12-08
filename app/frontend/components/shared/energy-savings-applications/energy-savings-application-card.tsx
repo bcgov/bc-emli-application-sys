@@ -181,6 +181,7 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
             to={`/applications/${id}/edit`}
             variant="secondary"
             w={{ base: 'full', md: 'fit-content' }}
+            aria-label={`${routingButtonText} for ${nicknameSplitText?.[0]} ${nicknameSplitText?.[1] || ''}`}
             leftIcon={
               !energySavingsApplication.isSubmitted && isSubmissionCollaboration ? (
                 <UsersIcon />

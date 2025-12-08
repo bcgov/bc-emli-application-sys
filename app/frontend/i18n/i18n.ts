@@ -360,7 +360,7 @@ const options = {
             ],
             dashboard: {
               title: 'Contractor portal',
-              invoiceSubmission: 'Invoice submission',
+              invoiceSubmission: 'Invoice submissions',
               programResources: 'Program resources',
               submitInvoice: 'Submit invoice',
               uploadInfo:
