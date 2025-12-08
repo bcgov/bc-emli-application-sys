@@ -76,7 +76,7 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
           <Heading as="h1" color={'theme.blueAlt'}>
             {t('contractor.employees.viewEmployees')}
           </Heading>
-          <Text color="text.secondary" fontSize="sm" mt={2}>
+          <Text color="text.secondary" fontSize="md" mt={2}>
             {t('contractor.employees.description')}
           </Text>
         </Box>
