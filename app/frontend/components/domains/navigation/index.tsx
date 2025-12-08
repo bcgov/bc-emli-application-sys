@@ -515,6 +515,7 @@ const AppRoutes = observer(() => {
         >
           <Route path="/applications" element={<EnergySavingsApplicationIndexScreen />} />
           <Route path="/new-application" element={<NewApplicationScreen />} />
+          <Route path="/new-invoice" element={<NewApplicationScreen />} />
           <Route path="/blank-applications" element={<NewApplicationScreen />} />
           <Route path="/supported-applications" element={<EnergySavingsApplicationIndexScreen />} />
           <Route path="/contractor-dashboard" element={<ContractorDashboardScreen />} />

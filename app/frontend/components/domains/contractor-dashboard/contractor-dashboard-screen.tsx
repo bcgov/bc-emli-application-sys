@@ -59,7 +59,7 @@ export const ContractorDashboardScreen = observer(function ContractorDashboard()
                 outlineOffset: '2px',
               }}
             >
-              {t('landing.contractor.dashboard.invoiceSubmission', 'Invoice submission')}
+              {t('landing.contractor.dashboard.invoiceSubmission', 'Invoice submissions')}
             </Tab>
             <Box px={2} py={2} color="greys.dividerGrey">
               |

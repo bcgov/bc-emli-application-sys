@@ -44,6 +44,7 @@ export const Footer = observer(() => {
     '/not-found',
     '/get-support',
     '/contractor-program-resources',
+    '/contractor-dashboard',
   ];
 
   const shouldShowFooter = onlyShowFooterOnRoutes.some(
