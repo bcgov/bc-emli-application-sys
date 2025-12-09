@@ -851,7 +851,7 @@ const options = {
           referenceNumber: 'Reference #',
           pdf: {
             for: 'Permit application for',
-            id: 'Application ID',
+            id: 'Reference #',
             submissionDate: 'Submission date',
             applicant: 'Applicant',
             jurisdiction: 'Jurisdiction',
@@ -891,7 +891,7 @@ const options = {
             submitted: 'Submitted permits',
           },
           columns: {
-            number: 'Application ID',
+            number: 'Reference #',
             reference_number: 'Reference #',
             permit_classification: 'Types',
             submitter: 'Submitter',
@@ -964,7 +964,7 @@ const options = {
             bySubmitting: 'By submitting this application',
             confirmation:
               'You confirm that the information you provided was completed to the best of your knowledge and ability',
-            yourReference: 'Your application ID is {{ number }}',
+            yourReference: 'Your reference # is {{ number }}',
             noContactsAvailable:
               'This jurisdiction is not ready to accept applications through this tool yet. Please check with your local jurisdiction.',
             whatsNext:
@@ -1113,7 +1113,7 @@ const options = {
           referenceNumber: 'Reference #',
           pdf: {
             for: 'Permit application for',
-            id: 'Application ID',
+            id: 'Reference #',
             submissionDate: 'Submission date',
             applicant: 'Applicant',
             jurisdiction: 'Jurisdiction',
@@ -1363,7 +1363,7 @@ const options = {
             clickQuestion: 'Click on the question(s) or requirement(s) you want the submitter to revise.',
             clickQuestionUpdate: 'Click on the question(s) or requirement(s) you want to update.',
             inEligibleDetails: 'Ineligible application details',
-            applicationId: 'Application ID is #',
+            applicationId: 'Reference # is',
             inEligibleReason: 'Reason this application is ineligible:',
             revision: {
               newRevision: 'New revision',
@@ -1397,8 +1397,7 @@ const options = {
               requestedHeader: 'Supporting files requested',
               requestedText: 'Supporting files have been requested from the participant on {{date}}',
               confirmationText: 'Are you sure you want to request supporting files for {{applicationNumber}}?',
-              readyToUpload:
-                'Are you ready to upload your supporting file(s) to your application {{applicationNumber}}?',
+              readyToUpload: 'Are you ready to upload your supporting file(s) for {{applicationNumber}}?',
               filesAdded: 'Supporting files added on {{date}}',
               filesUploaded: 'Supporting file(s) successfully uploaded',
             },

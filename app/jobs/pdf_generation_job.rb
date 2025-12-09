@@ -667,7 +667,7 @@ class PdfGenerationJob
     content << "PERMIT APPLICATION"
     content << "=" * 50
     content << ""
-    content << "Application ID: #{permit_application.number}"
+    content << "Reference #: #{permit_application.number}"
     content << "Address: #{permit_application.full_address}"
     content << "Submission Date: #{submission_version.created_at&.strftime("%Y-%m-%d")}"
     content << "Applicant: #{applicant_name(permit_application)}"
@@ -705,7 +705,7 @@ class PdfGenerationJob
     content << "STEP CODE CHECKLIST"
     content << "=" * 50
     content << ""
-    content << "Application ID: #{permit_application.number}"
+    content << "Reference #: #{permit_application.number}"
     content << "Address: #{permit_application.full_address}"
     content << ""
 
