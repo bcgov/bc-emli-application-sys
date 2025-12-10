@@ -105,6 +105,19 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
               pr={4}
               position="relative"
               _selected={selectedTabStyles}
+              _focus={{
+                outline: 'none',
+                boxShadow: 'none',
+              }}
+              _focusVisible={{
+                outline: '2px solid',
+                outlineColor: 'theme.blue',
+                outlineOffset: '2px',
+              }}
+              _active={{
+                outline: 'none',
+                boxShadow: 'none',
+              }}
               _after={{
                 content: '""',
                 position: 'absolute',
@@ -127,6 +140,19 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
               pr={4}
               position="relative"
               _selected={selectedTabStyles}
+              _focus={{
+                outline: 'none',
+                boxShadow: 'none',
+              }}
+              _focusVisible={{
+                outline: '2px solid',
+                outlineColor: 'theme.blue',
+                outlineOffset: '2px',
+              }}
+              _active={{
+                outline: 'none',
+                boxShadow: 'none',
+              }}
               _after={{
                 content: '""',
                 position: 'absolute',
@@ -147,6 +173,19 @@ export const ContractorEmployeeIndexScreen = observer(function ContractorEmploye
             <Tab
               pl={4}
               _selected={selectedTabStyles}
+              _focus={{
+                outline: 'none',
+                boxShadow: 'none',
+              }}
+              _focusVisible={{
+                outline: '2px solid',
+                outlineColor: 'theme.blue',
+                outlineOffset: '2px',
+              }}
+              _active={{
+                outline: 'none',
+                boxShadow: 'none',
+              }}
               role="tab"
               aria-selected={tabIndex === 2}
               aria-controls="deactivated-tabpanel"
