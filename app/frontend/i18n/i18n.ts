@@ -1063,7 +1063,7 @@ const options = {
         contractorOnboarding: {
           readyContractor: 'Ready to submit your registration details?',
           confirmationContractor:
-            'By submitting your registration details you confirm that the information you provided was completed to the best of your knowledge and ability',
+            'By submitting your registration details you confirm that the information you provided was completed to the best of your knowledge and ability.',
           submissionSuccess: 'You have submitted your details to the Energy Savings Program.',
           whatsNext: {
             heading: "What's next?",
