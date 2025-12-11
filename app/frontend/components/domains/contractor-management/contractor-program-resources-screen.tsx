@@ -20,50 +20,50 @@ const PROGRAM_RESOURCES: Record<ResourceCategory, ProgramResource[]> = {
     {
       id: 'contractor-rebate-journey',
       title: 'contractor.programResources.resources.contractorRebateJourney',
-      size: 'size',
-      type: 'type',
+      size: '173 KB',
+      type: 'PDF',
       url: 'https://esp.clearesult.ca/contractor/sites/default/files/2025-01/ESP%20Contractor%20Journey.pdf',
     },
     {
       id: 'heat-pump-exception-form',
       title: 'contractor.programResources.resources.heatPumpExceptionForm',
-      size: 'size',
-      type: 'type',
+      size: '429 KB',
+      type: 'PDF',
       url: 'https://esp.clearesult.ca/contractor/sites/default/files/2024-10/CleanBC%20ESP%20Heat%20Pump%20Exception%20Form.pdf',
     },
     {
       id: 'heat-pump-requirements',
       title: 'contractor.programResources.resources.heatPumpRequirements',
-      size: 'size',
-      type: 'type',
+      size: '129 KB',
+      type: 'PDF',
       url: 'https://esp.clearesult.ca/contractor/sites/default/files/2024-10/Heat%20Pump%20Requirements%20Guide.pdf',
     },
     {
       id: 'rebate-eligibility',
       title: 'contractor.programResources.resources.rebateEligibility',
-      size: 'size',
-      type: 'type',
+      size: '604 KB',
+      type: 'PDF',
       url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2025/07/RebateEligibilityRequirements_ESP_15July2025.pdf',
     },
     {
       id: 'insulation-cut-sheet',
       title: 'contractor.programResources.resources.insulationCutSheet',
-      size: 'size',
-      type: 'type',
+      size: '181 KB',
+      type: 'PDF',
       url: 'https://esp.clearesult.ca/contractor/sites/default/files/2024-10/CleanBC%20Energy%20Savings%20Program%20Insulation_Final0925.pdf',
     },
     {
       id: 'windows-doors-cut-sheet',
       title: 'contractor.programResources.resources.windowsDoorsCutSheet',
-      size: 'size',
-      type: 'type',
+      size: '443 KB',
+      type: 'PDF',
       url: 'https://esp.clearesult.ca/contractor/sites/default/files/2024-10/CleanBC%20Energy%20Savings%20Program%20Windows%20and%20Doors_Final0925.pdf',
     },
     {
       id: 'contractor-terms-conditions',
       title: 'contractor.programResources.resources.contractorTermsConditions',
-      size: 'size',
-      type: 'type',
+      size: '257 KB',
+      type: 'PDF',
       url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2025/08/Contractor_TsCs_ESP_July152025.pdf',
     },
   ],
@@ -77,8 +77,7 @@ const PROGRAM_RESOURCES: Record<ResourceCategory, ProgramResource[]> = {
     {
       id: 'air-to-water-heat-pumps',
       title: 'contractor.programResources.resources.airToWaterHeatPumps',
-      description:
-        'For eligible air-to-water heat pumps and combination space and hot water air-to-water heat pumps, the heat pump must be on the product list.',
+      description: 'contractor.programResources.descriptions.airToWaterHeatPumps',
       url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2025/06/Air-to-Water-Eligibility-List-V10.pdf',
     },
     {
@@ -110,50 +109,50 @@ const PROGRAM_RESOURCES: Record<ResourceCategory, ProgramResource[]> = {
     {
       id: 'heat-pump',
       title: 'contractor.programResources.resources.heatPump',
-      size: 'size',
-      type: 'type',
+      size: '233 KB',
+      type: 'PDF',
       url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2024/08/SampleInvoice_ESP_HeatPump.pdf',
     },
     {
       id: 'heat-pump-water-heater',
       title: 'contractor.programResources.resources.heatPumpWaterHeater',
-      size: 'size',
-      type: 'type',
+      size: '1 MB',
+      type: 'PDF',
       url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2021/11/CleanBC-IQP_SampleInvoices_HPWaterheater-Nov2021.pdf',
     },
     {
       id: 'windows-and-doors',
       title: 'contractor.programResources.resources.windowsAndDoors',
-      size: 'size',
-      type: 'type',
+      size: '207 KB',
+      type: 'PDF',
       url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2024/08/SampleInvoice_ESP_WindowDoors.pdf',
     },
     {
       id: 'insulation',
       title: 'contractor.programResources.resources.insulation',
-      size: 'size',
-      type: 'type',
+      size: '268 KB',
+      type: 'PDF',
       url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2025/06/SampleInvoice_ESP_NEWInsulation_062725.pdf',
     },
     {
       id: 'electric-service-upgrade',
       title: 'contractor.programResources.resources.electricServiceUpgrade',
-      size: 'size',
-      type: 'type',
+      size: '201 KB',
+      type: 'PDF',
       url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2024/08/SampleInvoice_ESP_ESU.pdf',
     },
     {
       id: 'ventilation',
       title: 'contractor.programResources.resources.ventilation',
-      size: 'size',
-      type: 'type',
+      size: '198 KB',
+      type: 'PDF',
       url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2024/08/SampleInvoice_ESP_Ventilation.pdf',
     },
     {
       id: 'health-and-safety',
       title: 'contractor.programResources.resources.healthAndSafety',
-      size: 'size',
-      type: 'type',
+      size: '200 KB',
+      type: 'PDF',
       url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2024/08/SampleInvoice_ESP_HealthSafety.pdf',
     },
   ],
@@ -161,22 +160,22 @@ const PROGRAM_RESOURCES: Record<ResourceCategory, ProgramResource[]> = {
     {
       id: 'participant-info-sheet',
       title: 'contractor.programResources.resources.participantInfoSheet',
-      size: 'size',
-      type: 'type',
+      size: '380 KB',
+      type: 'PDF',
       url: 'https://esp.clearesult.ca/contractor/sites/default/files/2024-10/CleanBC%20Better%20Homes%20Energy%20Savings%20Program%20Brochure_Final0925.pdf',
     },
     {
       id: 'rebate-eligibility-requirements',
       title: 'contractor.programResources.resources.rebateEligibilityRequirements',
-      size: 'size',
-      type: 'type',
+      size: '604 KB',
+      type: 'PDF',
       url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2025/07/RebateEligibilityRequirements_ESP_15July2025.pdf',
     },
     {
       id: 'participant-terms-and-conditions',
       title: 'contractor.programResources.resources.participantTermsAndConditions',
-      size: 'size',
-      type: 'type',
+      size: '216 KB',
+      type: 'PDF',
       url: 'https://esp.clearesult.ca/contractor/sites/default/files/2024-10/Contractor_TsCs_ESP_4September2024.pdf',
     },
   ],
@@ -193,7 +192,9 @@ interface ContractorProgramResourcesScreenProps {
   hideBlueSection?: boolean;
 }
 
-export const ContractorProgramResourcesScreen = ({ hideBlueSection = false }: ContractorProgramResourcesScreenProps) => {
+export const ContractorProgramResourcesScreen = ({
+  hideBlueSection = false,
+}: ContractorProgramResourcesScreenProps) => {
   const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<ResourceCategory>('programGuidance');
 
@@ -214,13 +215,23 @@ export const ContractorProgramResourcesScreen = ({ hideBlueSection = false }: Co
   };
 
   return (
-    <Flex as="main" direction="column" w="full" bg={hideBlueSection ? 'white' : 'greys.grey04'} pb={hideBlueSection ? 0 : '16'}>
-
+    <Flex
+      as="main"
+      direction="column"
+      w="full"
+      bg={hideBlueSection ? 'white' : 'greys.grey04'}
+      pb={hideBlueSection ? 0 : '16'}
+    >
       {/* Blue Header Bar */}
       {!hideBlueSection && <BlueTitleBar title={t('contractor.programResources.title')} />}
 
       {/* Main Content */}
-      <Container maxW={hideBlueSection ? 'full' : 'container.lg'} py={hideBlueSection ? 0 : 16} bg="white" px={hideBlueSection ? 0 : 10}>
+      <Container
+        maxW={hideBlueSection ? 'full' : 'container.lg'}
+        py={hideBlueSection ? 0 : 16}
+        bg="white"
+        px={hideBlueSection ? 0 : 10}
+      >
         <Heading as="h1" fontSize="5xl" fontWeight="700" color="greys.grey60" mb={4} mt={hideBlueSection ? 10 : 0}>
           {t('contractor.programResources.programResourcesPrefix')}{' '}
           {t(SIDEBAR_CATEGORIES.find((cat) => cat.key === selectedCategory)?.label || '')}
@@ -318,35 +329,54 @@ export const ContractorProgramResourcesScreen = ({ hideBlueSection = false }: Co
                   borderRadius={selectedCategory === 'qualifiedProductList' ? '4px' : '0'}
                   bg={selectedCategory === 'qualifiedProductList' ? 'greys.white' : 'transparent'}
                 >
-                  <Link
-                    href={resource.url}
-                    color="theme.blueAlt"
-                    textDecoration="underline"
-                    fontWeight="bold"
-                    _hover={{ color: 'theme.blue' }}
-                    _focusVisible={{
-                      outline: '3px solid',
-                      outlineColor: 'theme.blue',
-                      outlineOffset: '2px',
-                      color: 'theme.blue',
-                    }}
-                    sx={{
-                      ...baseTextSx,
-                      '&:focus:not(:focus-visible)': {
-                        outline: 'none',
-                      },
-                    }}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={getResourceAriaLabel(resource)}
-                  >
-                    {t(resource.title)}
-                    {resource.size && resource.type && (
-                      <Text as="span" color="greys.grey60" fontWeight="bold" ml={1} aria-hidden="true">
-                        [{resource.size}, {resource.type}]
-                      </Text>
-                    )}
-                  </Link>
+                  {resource.url === '#' ? (
+                    <Text
+                      fontWeight="bold"
+                      sx={{
+                        ...baseTextSx,
+                        fontSize: 'xl',
+                        color: 'text.link',
+                      }}
+                    >
+                      {t(resource.title)}
+                      {resource.size && resource.type && (
+                        <Text as="span" color="greys.grey60" fontWeight="bold" ml={1} aria-hidden="true">
+                          [{resource.size}, {resource.type}]
+                        </Text>
+                      )}
+                    </Text>
+                  ) : (
+                    <Link
+                      href={resource.url}
+                      textDecoration="underline"
+                      fontWeight="bold"
+                      _hover={{ color: 'theme.blue' }}
+                      _focusVisible={{
+                        outline: '3px solid',
+                        outlineColor: 'theme.blue',
+                        outlineOffset: '2px',
+                        color: 'theme.blue',
+                      }}
+                      sx={{
+                        ...baseTextSx,
+                        fontSize: 'xl',
+                        color: 'text.link',
+                        '&:focus:not(:focus-visible)': {
+                          outline: 'none',
+                        },
+                      }}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={getResourceAriaLabel(resource)}
+                    >
+                      {t(resource.title)}
+                      {resource.size && resource.type && (
+                        <Text as="span" color="greys.grey60" fontWeight="bold" ml={1} aria-hidden="true">
+                          [{resource.size}, {resource.type}]
+                        </Text>
+                      )}
+                    </Link>
+                  )}
                   {resource.description && (
                     <Text sx={baseTextSx} color="greys.grey60" mt={2}>
                       {resource.id === 'mini-split-heat-pumps' ? (
@@ -377,7 +407,6 @@ export const ContractorProgramResourcesScreen = ({ hideBlueSection = false }: Co
                           >
                             {t('contractor.programResources.linkText.qualifyingProductList')}
                           </Link>
-                          {t('contractor.programResources.fileInfo')}
                         </>
                       ) : resource.id === 'air-to-water-heat-pumps' ? (
                         <>
@@ -407,7 +436,7 @@ export const ContractorProgramResourcesScreen = ({ hideBlueSection = false }: Co
                           >
                             {t('contractor.programResources.linkText.productList')}
                           </Link>
-                          {t('contractor.programResources.fileInfo')}
+                          {t('contractor.programResources.fileInfoAirToWater')}
                         </>
                       ) : resource.id === 'heat-pump-water-heater-list' ? (
                         <>
@@ -437,7 +466,7 @@ export const ContractorProgramResourcesScreen = ({ hideBlueSection = false }: Co
                           >
                             {t('contractor.programResources.linkText.eligibleModelsList')}
                           </Link>
-                          {t('contractor.programResources.fileInfo')}
+                          {t('contractor.programResources.fileInfoHPWH')}
                         </>
                       ) : resource.id === 'ventilation-list' ? (
                         <>
@@ -467,9 +496,11 @@ export const ContractorProgramResourcesScreen = ({ hideBlueSection = false }: Co
                           >
                             {t('contractor.programResources.linkText.productList')}
                           </Link>
-                          {t('contractor.programResources.descriptions.ventilationList').split(
-                            t('contractor.programResources.linkText.productList'),
-                          )[1]}
+                          {
+                            t('contractor.programResources.descriptions.ventilationList').split(
+                              t('contractor.programResources.linkText.productList'),
+                            )[1]
+                          }
                         </>
                       ) : resource.id === 'bathroom-fan-product-list' ? (
                         <>
@@ -499,9 +530,11 @@ export const ContractorProgramResourcesScreen = ({ hideBlueSection = false }: Co
                           >
                             {t('contractor.programResources.linkText.productList')}
                           </Link>
-                          {t('contractor.programResources.descriptions.bathroomFanProductList').split(
-                            t('contractor.programResources.linkText.productList'),
-                          )[1]}
+                          {
+                            t('contractor.programResources.descriptions.bathroomFanProductList').split(
+                              t('contractor.programResources.linkText.productList'),
+                            )[1]
+                          }
                         </>
                       ) : (
                         t(resource.description)
