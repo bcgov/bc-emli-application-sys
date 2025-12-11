@@ -224,6 +224,21 @@ crunchy-postgres:
 # See https://github.com/bitnami/charts/blob/main/bitnami/redis/values.yaml
 redis:
   enabled: true
+
+  global:
+    security:
+      allowInsecureImages: true
+
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/redis
+    tag: 8.2.1-debian-12-r0
+
+  replicaCount: 1
+
+  nameOverride: moti-rabbitmq
+  fullnameOverride: moti-rabbitmq
+
   nameOverride: hesp-redis
   fullnameOverride: hesp-redis
   auth:
@@ -232,6 +247,12 @@ redis:
     usePasswordFiles: false # if this is enabeld it will use /opt/bitnami/redis/secrets/redis-password ---> we will instead use /vault/secrets/secrets.env which we have configured to have the password
   sentinel:
     enabled: true
+
+    image:
+      registry: docker.io
+      repository: bitnamilegacy/redis-sentinel
+      tag: 8.2.1-debian-12-r0
+
     masterSet: redisMasterSet
     podSecurityContext:
       enabled: false
@@ -259,6 +280,16 @@ redis:
 # See https://github.com/bitnami/charts/blob/main/bitnami/elasticsearch/values.yaml
 elasticsearch:
   enabled: true
+
+  global:
+    security:
+      allowInsecureImages: true
+
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/elasticsearch
+    tag: 9.1.2-debian-12-r0
+
   fullnameOverride: hesp-elasticsearch
   clusterName: hesp-elasticsearch
   sysctlImage:
