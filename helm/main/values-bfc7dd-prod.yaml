@@ -107,6 +107,8 @@ anycable-rpc:
 crunchy-postgres:
   enabled: true
 
+  postgresVersion: 15
+
   instances:
     replicas: 1
     dataVolumeClaimSpec:
