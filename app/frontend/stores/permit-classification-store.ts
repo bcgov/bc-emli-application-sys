@@ -231,7 +231,7 @@ export const PermitClassificationStoreModel = types
           label: 'contractorOnboarding',
           value: {
             userGroupType: EPermitClassificationCode.contractor,
-            AudienceType: [EPermitClassificationCode.internal],
+            AudienceType: [EPermitClassificationCode.external],
             SubmissionType: [EPermitClassificationCode.onboarding],
             status: [
               EPermitApplicationStatus.submitted, // newly_submitted
