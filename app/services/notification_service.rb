@@ -521,7 +521,7 @@ class NotificationService
         PermitHubMailer.notify_new_participant_welcome(user).deliver_later
         Rails.logger.info "Participant welcome notification queued for user #{user.id} (#{user.email})"
       else
-        # Admin, admin_manager, or system_admin
+        # Non participants including (admim, admin managers and sys-admins) receive a different message
         PermitHubMailer.notify_new_admin_welcome(user).deliver_later
         Rails.logger.info "Admin welcome notification queued for user #{user.id} (#{user.email})"
       end
