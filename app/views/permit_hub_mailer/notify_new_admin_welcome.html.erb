@@ -1,0 +1,11 @@
+<p>Hello <%= @user.first_name %> <%= @user.last_name %>,</p>
+
+<p>Your account has been successfully created.</p>
+
+<p>Next step: You can login using your <%= @user.authentication_method_text %> account by clicking the button below.</p>
+
+<div class="button-row">
+  <a href="<%= FrontendUrlHelper.frontend_url("/login") %>" class="btn-primary" target="_blank">Login</a>
+</div>
+
+<p>Thank you,<br>Energy Savings Program Support</p>

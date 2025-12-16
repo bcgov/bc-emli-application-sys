@@ -510,14 +510,21 @@ class NotificationService
     end
   end
 
-  def self.publish_new_participant_welcome_event(user)
+  def self.publish_new_user_welcome_event(user)
     return unless user&.persisted? && !user.discarded?
 
-    # Email-only notification for new participant welcome
+    # Email-only notification for new user welcome
     # No in-app notification needed as this is a one-time welcome message
     begin
-      PermitHubMailer.notify_new_participant_welcome(user).deliver_later
-      Rails.logger.info "Welcome notification queued for user #{user.id} (#{user.email})"
+      # Send appropriate welcome email based on user role
+      if user.participant?
+        PermitHubMailer.notify_new_participant_welcome(user).deliver_later
+        Rails.logger.info "Participant welcome notification queued for user #{user.id} (#{user.email})"
+      else
+        # Admin, admin_manager, or system_admin
+        PermitHubMailer.notify_new_admin_welcome(user).deliver_later
+        Rails.logger.info "Admin welcome notification queued for user #{user.id} (#{user.email})"
+      end
     rescue => e
       Rails.logger.error "Failed to queue welcome notification for user #{user.id}: #{e.message}"
       # Re-raise in development/test for debugging, but don't break user flow in production

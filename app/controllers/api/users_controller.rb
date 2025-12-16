@@ -120,9 +120,9 @@ class Api::UsersController < Api::ApplicationController
         )
       end
 
-      # Send welcome notification when participant completes account setup
+      # Send welcome notification when user completes account setup
       if current_user.saved_change_to_reviewed? && current_user.reviewed?
-        NotificationService.publish_new_participant_welcome_event(current_user)
+        NotificationService.publish_new_user_welcome_event(current_user)
       end
 
       render_success(
