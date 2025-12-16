@@ -10,7 +10,7 @@ import { LinkClickTrackingPlugin, enableLinkClickTracking } from '@snowplow/brow
 import { FormTrackingPlugin, enableFormTracking } from '@snowplow/browser-plugin-form-tracking';
 
 // BC Gov Snowplow collector endpoint URL
-const BC_GOV_COLLECTOR = 'https://spm.apps.gov.bc.ca';
+const BC_GOV_COLLECTOR = 'https://spt.apps.gov.bc.ca';
 
 // Your application identifier
 const APP_ID = 'Snowplow_standalone';
