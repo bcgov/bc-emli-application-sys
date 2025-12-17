@@ -3157,7 +3157,7 @@ const options = {
                 'For eligible air-to-water heat pumps and combination space and hot water air-to-water heat pumps, the heat pump must be on the product list.',
               heatPumpWaterHeaterList: 'The installed heater must be on Tier 2 or higher of the Eligible Models List.',
               windowsAndDoorsList:
-                'The window must be on the listed under one of the following certifications: Canadian Standards Association (CSA) Certification, CSA Laboratory, Intertek Warnock Hersey, National Fenestration Rating Council.',
+                'The window-door must be listed with one of the following certification bodies: Canadian Standards Association, Intertek Canada, Labtest Certification, QAI Laboratories, National Fenestration Ratings Council.',
               ventilationList:
                 "The installed heat-energy recovery ventilators must be ENERGY STAR® certified and listed on Natural Resources Canada's searchable product list.",
               bathroomFanProductList:
@@ -3169,7 +3169,8 @@ const options = {
               eligibleModelsList: 'Eligible Models List',
               searchableProductList: 'searchable product list',
             },
-            fileInfo: '. [Size, Type]',
+            fileInfoAirToWater: '. [124 KB, PDF]',
+            fileInfoHPWH: '. [423 KB, PDF]',
             qualifiedProductListSubheading:
               'Installations must use items on the relevant qualified product list and/or be certified by the specified body to be eligible for ESP rebates.',
             programResourcesPrefix: 'Program resources:',
