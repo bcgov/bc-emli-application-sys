@@ -788,7 +788,8 @@ en:
       ineligible_notification: 'Application %{number} has been marked as ineligible for %{program_name}'
       ineligible_notification_with_reason: 'Application %{number} has been marked as ineligible for the %{program_name}. The reason is: %{reason}'
       withdrawal_notification: 'Your application %{number} has been withdrawn from the %{program_name}'
-      new_submission_received_notification: 'New application %{number} submitted to %{program_name} on %{submitted_at}'
+      new_submission_received_notification: 'New application %{number} was submitted to the %{program_name} on %{submitted_at}'
+      resubmission_received_notification: 'Application %{number} was resubmitted to the %{program_name} on %{submitted_at}'
       assignment_notification: 'Application %{number} from %{program_name} has been assigned to you'
       participant_incomplete_draft_notification: 'This is a reminder that your application to the %{program_name} is still in draft. You can complete your application by viewing it here'
     support_request:

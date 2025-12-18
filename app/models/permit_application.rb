@@ -726,12 +726,23 @@ class PermitApplication < ApplicationRecord
   end
 
   def new_submission_received_event_notification_data
+    # Use different timestamp and message for resubmissions
+    if resubmitted_at.present?
+      timestamp = resubmitted_at
+      i18n_key =
+        "notification.permit_application.resubmission_received_notification"
+    else
+      timestamp = submitted_at
+      i18n_key =
+        "notification.permit_application.new_submission_received_notification"
+    end
+
     {
       "id" => SecureRandom.uuid,
       "action_type" =>
         Constants::NotificationActionTypes::NEW_SUBMISSION_RECEIVED,
       "action_text" =>
-        "#{I18n.t("notification.permit_application.new_submission_received_notification", number: number, program_name: program_name, submitted_at: I18n.l(submitted_at, format: :long))}",
+        "#{I18n.t(i18n_key, number: number, program_name: program_name, submitted_at: I18n.l(timestamp, format: :long))}",
       "object_data" => {
         "permit_application_id" => id,
         "permit_application_number" => number
