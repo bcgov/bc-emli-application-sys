@@ -29,6 +29,7 @@ import { useMst } from '../../../../setup/root';
 import { TSiteWideMessageConfiguration } from '../../../../types/types';
 import { TextFormControl } from '../../../shared/form/input-form-control';
 import { SectionBox } from '../../home/section-box';
+import { GlobalConfirmationModal } from '../../../shared/modals/global-confirmation-modal';
 
 export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
   const { siteConfigurationStore } = useMst();
@@ -162,7 +163,14 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
         </form>
       </FormProvider>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <GlobalConfirmationModal
+        headerText={currentDisplayValue ? t('ui.publishBanner') : t('ui.removeBanner')}
+        isOpen={isOpen}
+        onSubmit={handleSubmit(onSubmit)}
+        onClose={onClose}
+      />
+
+      {/* <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader color="theme.blueAlt">
@@ -184,7 +192,7 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal>
+      </Modal> */}
     </Container>
   );
 });

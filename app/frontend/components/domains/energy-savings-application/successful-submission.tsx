@@ -33,7 +33,7 @@ export const SuccessfulSubmissionScreen = observer(() => {
   // Use translation with fallback to dynamic message format
   const determinedMessage = t('energySavingsApplication.new.submissionSuccess', {
     submissionType: submissionTypeLabel,
-    defaultValue: `Your ${submissionTypeLabel} form has been submitted!`
+    defaultValue: `Your ${submissionTypeLabel} form has been submitted!`,
   });
 
   // determine "What's Next" content dynamically
@@ -63,7 +63,7 @@ export const SuccessfulSubmissionScreen = observer(() => {
           </Heading>
           <Text fontSize="md" color="greys.grey70" textAlign="center">
             {t('energySavingsApplication.new.confirmationEmail', {
-              defaultValue: 'A confirmation email has been sent to your account.'
+              defaultValue: 'A confirmation email has been sent to your account.',
             })}
           </Text>
           <Tag color="semantic.info" border="1px solid" borderColor="semantic.info" p={2}>
@@ -98,13 +98,15 @@ const WhatsNextBlock = ({ headingKey, lineKeys, email }: WhatsNextBlockProps) =>
 
   // Use default heading if translation is missing or returns "Not found"
   const translatedHeading = t(headingKey as any, { defaultValue: "What's next?" }) as string;
-  const heading = translatedHeading === headingKey || translatedHeading.includes('Not found') ? "What's next?" : translatedHeading;
+  const heading =
+    translatedHeading === headingKey || translatedHeading.includes('Not found') ? "What's next?" : translatedHeading;
 
   // Use default content if translation is missing
-  const defaultContent = "We will review your application. If we need more information or change the status of your application, we will send you an email. Please check your inbox regularly for updates to your application.";
+  const defaultContent =
+    'We will review your application. If we need more information or change the status of your application, we will send you an email. Please check your inbox regularly for updates to your application.';
 
   return (
-    <Box mt={6}  p={8} borderRadius="md" backgroundColor="greys.grey10" width="100%">
+    <Box mt={6} p={8} borderRadius="md" backgroundColor="greys.grey10" width="100%">
       <GreenLineSmall />
       <Text fontSize="2xl" fontWeight="bold" mb={4}>
         {heading}
@@ -115,10 +117,11 @@ const WhatsNextBlock = ({ headingKey, lineKeys, email }: WhatsNextBlockProps) =>
           lineKeys.map((key, index) => {
             const translatedText = t(key as any, { defaultValue: '' }) as string;
             // Check if translation failed (empty, same as key, or contains "Not found")
-            const isTranslationMissing = !translatedText ||
-                                        translatedText.trim().length === 0 ||
-                                        translatedText === key ||
-                                        translatedText.includes('Not found');
+            const isTranslationMissing =
+              !translatedText ||
+              translatedText.trim().length === 0 ||
+              translatedText === key ||
+              translatedText.includes('Not found');
 
             if (isTranslationMissing && index === 0) {
               return (
@@ -169,7 +172,9 @@ const NeedHelpBlock = () => {
   return (
     <Box mb={6} p={8} borderRadius="md" backgroundColor="greys.grey10" width="100%">
       <Text fontSize="md" mb={4}>
-        <Text as="span" fontWeight="bold">{t('energySavingsApplication.new.hearBack', { defaultValue: 'Need help?' })}</Text>{' '}
+        <Text as="span" fontWeight="bold">
+          {t('energySavingsApplication.new.hearBack', { defaultValue: 'Need help?' })}
+        </Text>{' '}
         <Trans
           i18nKey="energySavingsApplication.new.contactInstruction"
           values={{ email }}

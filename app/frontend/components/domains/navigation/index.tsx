@@ -14,7 +14,7 @@ import { ProtectedRoute } from './protected-route';
 import { AdminPortalLogin } from '../admin/login';
 import { ProgramsIndexScreen } from '../programs';
 import { ProgramInviteUserScreen } from '../programs/invite-users';
-import RejectApplicationScreen from '../permit-application/application-rejection-reason';
+import { RejectApplicationScreen } from '../energy-savings-application/application-rejection-reason';
 import { BlankTemplateScreen } from '../requirement-template/screens/blank-template';
 import { ContractorLandingScreen } from '../contractor-landing';
 import { ContractorManagementScreen } from '../contractor-management';
@@ -134,11 +134,25 @@ const SuccessfulSubmissionScreen = lazy(() =>
   })),
 );
 const SuccessfulWithdrawalScreen = lazy(() =>
-  import('../energy-savings-application/successful-withdrawl').then((module) => ({
+  import('../energy-savings-application/successful-action-screens').then((module) => ({
     default: module.SuccessfulWithdrawalScreen,
   })),
 );
-
+const SuccessfulScreenedInScreen = lazy(() =>
+  import('../energy-savings-application/successful-action-screens').then((module) => ({
+    default: module.SuccessfulScreenedInScreen,
+  })),
+);
+const SuccessfulIneligibleScreen = lazy(() =>
+  import('../energy-savings-application/successful-action-screens').then((module) => ({
+    default: module.SuccessfulIneligibleScreen,
+  })),
+);
+const SuccessfulUpdateScreeen = lazy(() =>
+  import('../energy-savings-application/successful-action-screens').then((module) => ({
+    default: module.SuccessfulUpdateScreen,
+  })),
+);
 const NewRequirementTemplateScreen = lazy(() =>
   import('../requirement-template/new-requirement-template-screen').then((module) => ({
     default: module.NewRequirementTemplateScreen,
@@ -286,7 +300,7 @@ const EarlyAccessRequirementsLibraryScreen = lazy(() =>
 const AcceptInvitationScreen = lazy(() =>
   import('../programs/accept-invitation-screen').then((module) => ({ default: module.AcceptInvitationScreen })),
 );
-const InviteScreen = lazy(() => import('../users/invite-screen').then((module) => ({ default: module.InviteScreen })));
+//const InviteScreen = lazy(() => import('../users/invite-screen').then((module) => ({ default: module.InviteScreen })));
 const InviteEmployeeScreen = lazy(() =>
   import('../users/invite-employee-screen').then((module) => ({ default: module.InviteEmployeeScreen })),
 );
@@ -522,11 +536,20 @@ const AppRoutes = observer(() => {
           <Route path="/applications/:permitApplicationId/edit" element={<EditPermitApplicationScreen />}>
             <Route path="step-code" element={<StepCodeForm />} />
           </Route>
-          <Route path="/applications/withdrawl-success" element={<SuccessfulWithdrawalScreen />} />
+          <Route path="/applications/:permitApplicationId/withdrawl-success" element={<SuccessfulWithdrawalScreen />} />
+          <Route
+            path="/applications/:permitApplicationId/ineligible-success"
+            element={<SuccessfulIneligibleScreen />}
+          />
+          <Route
+            path="/applications/:permitApplicationId/screened-in-success"
+            element={<SuccessfulScreenedInScreen />}
+          />
           <Route
             path="/applications/:permitApplicationId/successful-submission"
             element={<SuccessfulSubmissionScreen />}
           />
+          <Route path="/applications/:permitApplicationId/successful-update" element={<SuccessfulUpdateScreeen />} />
         </Route>
 
         <Route element={<ProtectedRoute isAllowed={loggedIn} />}>
@@ -597,7 +620,7 @@ const AppRoutes = observer(() => {
           <Route path="/sys-admin" element={<AdminPortalLogin isSysAdmin />} />
         </Route>
         {/* Public Routes */}
-        <Route path="/rejection-reason/:permitApplicationId/:id" element={<RejectApplicationScreen />} />
+        <Route path="/rejection-reason/:permitApplicationId" element={<RejectApplicationScreen />} />
         <Route path="/programs/:programId/accept-invitation" element={<AcceptInvitationScreen />} />
         {/* <Route path="/accept-invitation" element={<AcceptInvitationScreen />} /> */}
 

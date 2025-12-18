@@ -36,6 +36,8 @@ import ConfirmationModal from '../../shared/modals/confirmation-modal';
 import { RevisionModal } from '../../shared/revisions/revision-modal';
 import SubmissionVersionSelect from '../../shared/select/selectors/submission-version-select';
 import { formatFieldValue } from '../../../utils/field-value-formatter';
+import { EFlashMessageStatus } from '../../../types/enums';
+import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation-modal';
 
 interface IRevisionSideBarProps {
   permitApplication: IEnergySavingsApplication;
@@ -133,6 +135,8 @@ export const RevisionSideBar = observer(
     }, [isMounted]);
 
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: submitIsOpen, onOpen: submitOnOpen, onClose: submitOnClose } = useDisclosure();
+    const { isOpen: cancelIsOpen, onOpen: cancelOnOpen, onClose: cancelOnClose } = useDisclosure();
 
     const onFinalizeRevisions = async () => {
       const ok = await permitApplication.finalizeRevisionRequests();
@@ -202,45 +206,62 @@ export const RevisionSideBar = observer(
           {/* Hide "Send to submitter" button for internal applications and external applications with admin pathway */}
           {permitApplication?.audienceType?.code !== 'internal' &&
             !(permitApplication?.audienceType?.code === 'external' && updatePerformedBy === 'staff') && (
-              <ConfirmationModal
-                isSubmit={true}
-                promptHeader={t('energySavingsApplication.show.revision.confirmHeader')}
-                promptMessage={t('energySavingsApplication.show.revision.confirmMessage')}
-                renderTrigger={(onOpen) => (
-                  <Button
-                    variant="primary"
-                    border={0}
-                    rightIcon={<PaperPlaneTilt />}
-                    onClick={onOpen}
-                    isDisabled={permitApplication.isRevisionsRequested || fields?.length == 0}
-                    sx={{
-                      _disabled: {
-                        bg: 'greys.grey80',
-                        color: 'greys.grey05',
-                        cursor: 'not-allowed',
-                      },
-                    }}
-                  >
-                    {t('energySavingsApplication.show.revision.send')}
-                  </Button>
-                )}
-                onConfirm={onFinalizeRevisions}
-              />
+              <>
+                <Button
+                  variant="primary"
+                  rightIcon={<PaperPlaneTilt />}
+                  onClick={submitOnOpen}
+                  isDisabled={permitApplication.isRevisionsRequested || fields?.length === 0}
+                  sx={{
+                    _disabled: {
+                      bg: 'greys.grey80',
+                      color: 'greys.grey05',
+                      cursor: 'not-allowed',
+                    },
+                  }}
+                >
+                  {t('energySavingsApplication.show.revision.send')}
+                </Button>
+
+                <GlobalConfirmationModal
+                  isOpen={submitIsOpen}
+                  onClose={submitOnClose}
+                  onSubmit={() => {
+                    onFinalizeRevisions();
+                    submitOnClose();
+                  }}
+                  headerText={t('energySavingsApplication.show.revision.confirmHeader')}
+                  bodyText={t('energySavingsApplication.show.revision.confirmMessage')}
+                  confirmText={t('ui.confirm')}
+                  cancelText={t('ui.cancel')}
+                  closeOnOverlayClick={false}
+                />
+              </>
             )}
 
           {/* Cancel button triggers remove updates modal */}
           {onCancel && (
             <>
               {fields.length > 0 || permitApplication.isRevisionsRequested ? (
-                <ConfirmationModal
-                  isSubmit={false}
-                  promptHeader={t('energySavingsApplication.show.revision.cancelRequest')}
-                  promptMessage={t('energySavingsApplication.show.revision.noNotification')}
-                  cancelText={t('ui.cancelRequest')}
-                  onConfirm={() => {
-                    onRevisionsRemoval();
-                  }}
-                />
+                <>
+                  <Button variant="whiteButton" onClick={cancelOnOpen}>
+                    {t('ui.cancelRequest')}
+                  </Button>
+
+                  <GlobalConfirmationModal
+                    isOpen={cancelIsOpen}
+                    onClose={cancelOnClose}
+                    onSubmit={() => {
+                      onRevisionsRemoval();
+                      cancelOnClose();
+                    }}
+                    headerText={t('energySavingsApplication.show.revision.cancelRequest')}
+                    bodyText={t('energySavingsApplication.show.revision.noNotification')}
+                    confirmText={t('ui.confirm')}
+                    cancelText={t('ui.cancel')}
+                    closeOnOverlayClick={false}
+                  />
+                </>
               ) : (
                 <Button
                   variant="whiteButton"

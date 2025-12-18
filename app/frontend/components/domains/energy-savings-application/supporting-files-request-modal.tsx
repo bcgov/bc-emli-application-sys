@@ -23,6 +23,7 @@ import { useTranslation, Trans } from 'react-i18next';
 import { SharedSpinner } from '../../shared/base/shared-spinner';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { useMst } from '../../../setup/root';
+import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation-modal';
 
 export interface ISupportingFilesRequestModalProps {
   permitApplication: IEnergySavingsApplication;
@@ -37,6 +38,11 @@ export const SupportingFilesRequestModal = observer(
 
     const requestDisclosure = useDisclosure();
     const confirmDisclosure = useDisclosure();
+    const {
+      isOpen: requestConfirmIsOpen,
+      onOpen: requestConfirmOnOpen,
+      onClose: requestConfirmOnClose,
+    } = useDisclosure();
 
     // state to track textarea values
     const [note, setNote] = useState('');
@@ -121,11 +127,33 @@ export const SupportingFilesRequestModal = observer(
                 <ModalFooter>
                   <Grid templateColumns="repeat(6, 1fr)" gap={2} justifyContent="center" w="full">
                     <GridItem colStart={3} colSpan={1}>
-                      <PageConfirmationModal
-                        onConfirm={handleConfirm}
-                        applicationNumber={permitApplication.number}
-                        note={note}
-                      />
+                      <>
+                        <Button
+                          variant="primary"
+                          w="full"
+                          type="submit"
+                          disabled={!note?.trim()}
+                          onClick={requestConfirmOnOpen}
+                        >
+                          {t('ui.next')}
+                        </Button>
+                        <GlobalConfirmationModal
+                          isOpen={requestConfirmIsOpen}
+                          onClose={requestConfirmOnClose}
+                          onSubmit={() => {
+                            handleConfirm();
+                            requestConfirmOnClose();
+                          }}
+                          //status={EFlashMessageStatus.info}
+                          headerText={t('energySavingsApplication.show.supportingFilesRequest.confirmationText', {
+                            applicationNumber: permitApplication.number,
+                          })}
+                          bodyText={undefined} // no body, only header text
+                          confirmText={t('ui.confirm')}
+                          cancelText={t('ui.cancel')}
+                          closeOnOverlayClick={false}
+                        />
+                      </>
                     </GridItem>
                     <GridItem colStart={4} colSpan={1}>
                       <Button w="full" variant="secondary" onClick={requestDisclosure.onClose}>

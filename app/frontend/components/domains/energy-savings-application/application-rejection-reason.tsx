@@ -1,21 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Button, Flex, Icon, Text, Textarea, VStack } from '@chakra-ui/react';
-import { WarningCircle } from '@phosphor-icons/react';
+import { WarningCircleIcon } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
-import { useMst } from '../../../setup/root';
 import { EPermitApplicationStatus } from '../../../types/enums';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
 
-const RejectApplicationScreen = observer(() => {
+export const RejectApplicationScreen = observer(() => {
   const { t } = useTranslation();
-  const { id } = useParams();
   const navigate = useNavigate();
 
   const [comment, setComment] = useState('');
-  const { currentPermitApplication, error } = usePermitApplication();
+  const { currentPermitApplication } = usePermitApplication({ review: true });
 
   const handleReject = async () => {
     if (!currentPermitApplication) return;
@@ -27,9 +25,9 @@ const RejectApplicationScreen = observer(() => {
     if (!response.ok) {
       return;
     }
-    navigate(`/applications/${response?.data?.data?.id}/successful-submission`, {
+    navigate(`/applications/${response?.data?.data?.id}/ineligible-success`, {
       state: {
-        message: t('energySavingsApplication.new.markedIneligible'),
+        referenceNumber: currentPermitApplication?.number,
       },
     });
   };
@@ -37,9 +35,11 @@ const RejectApplicationScreen = observer(() => {
   return (
     <VStack spacing={6} p={8} bg="white">
       <VStack spacing={4} align="center" textAlign="center">
-        <Icon as={WarningCircle} boxSize={10} color="orange.400" />
+        <Icon as={WarningCircleIcon} boxSize={10} color="orange.400" />
         <Text fontSize="2xl" fontWeight="bold" color="theme.blueAlt">
-          Bad Screen
+          {t('energySavingsApplication.show.inEligibleDetails', {
+            submissionType: currentPermitApplication?.submissionType.name.toLowerCase(),
+          })}
         </Text>
         <Box
           border="1px"
@@ -50,19 +50,21 @@ const RejectApplicationScreen = observer(() => {
           fontSize="sm"
           color="theme.blueText"
         >
-          {t('energySavingsApplication.show.applicationId')} {id}
+          {t('energySavingsApplication.referenceNumber')} {currentPermitApplication?.number}
         </Box>
         <Box w="100%" mt={4} textAlign="left">
           <Text mb={1} fontSize="sm" color="gray.700">
-            {t('energySavingsApplication.show.inEligibleReason')}
+            {t('energySavingsApplication.show.inEligibleReason', {
+              submissionType: currentPermitApplication?.submissionType.name.toLowerCase(),
+            })}
           </Text>
           <Textarea mt={2} rows={4} w="full" value={comment} onChange={(e) => setComment(e.target.value)} />
         </Box>
         <Flex w="100%" justify="center" gap={4} mt={8}>
-          <Button variant="primary" px={8} onClick={handleReject} isDisabled={!comment}>
+          <Button width={'10rem'} variant="primary" px={8} onClick={handleReject} isDisabled={!comment}>
             {t('ui.confirm')}
           </Button>
-          <Button variant="outline" px={8} onClick={() => navigate(-1)}>
+          <Button width={'10rem'} variant="outline" px={8} onClick={() => navigate(-1)}>
             {t('ui.cancel')}
           </Button>
         </Flex>
@@ -70,5 +72,3 @@ const RejectApplicationScreen = observer(() => {
     </VStack>
   );
 });
-
-export default RejectApplicationScreen;

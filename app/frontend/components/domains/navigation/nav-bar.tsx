@@ -86,8 +86,15 @@ function isSuccessfullSubmissionPath(path: string): boolean {
   return regex.test(path);
 }
 
-function isSuccessfullWithdrawlPath(path: string): boolean {
-  const regex = /withdrawl-success/;
+// function isSuccessfullWithdrawlPath(path: string): boolean {
+//   const regex = /withdrawl-success/;
+//   return regex.test(path);
+// }
+
+function isActionSuccessPath(path: string): boolean {
+  const regex =
+    /applications\/[a-f0-9-]{36}\/(ineligible-success|review-success|withdrawl-success|screened-in-success|successful-update)/i;
+
   return regex.test(path);
 }
 
@@ -113,7 +120,8 @@ function shouldHideSubNavbarForPath(path: string): boolean {
     isApiMappingPath,
     isRejectionPath,
     isSuccessfullSubmissionPath,
-    isSuccessfullWithdrawlPath,
+    // isSuccessfullWithdrawlPath,
+    isActionSuccessPath,
     isblankTemplatePath,
     isContractorDashboardPath,
   ];

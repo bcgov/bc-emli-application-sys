@@ -28,6 +28,8 @@ interface IProps {
   hideActions?: boolean;
   confirmText?: string;
   cancelText?: string;
+  closeOnOverlayClick?: boolean;
+  children?: React.ReactNode;
 }
 
 export const GlobalConfirmationModal = observer(function GlobalConfirmationModal({
@@ -40,6 +42,8 @@ export const GlobalConfirmationModal = observer(function GlobalConfirmationModal
   hideActions,
   confirmText,
   cancelText,
+  closeOnOverlayClick,
+  children,
 }: IProps) {
   const { t } = useTranslation();
 
@@ -70,19 +74,19 @@ export const GlobalConfirmationModal = observer(function GlobalConfirmationModal
   const isStatusMode = Boolean(config);
 
   return (
-    <Modal onClose={onClose} isOpen={isOpen} size="2xl">
+    <Modal onClose={onClose} isOpen={isOpen} size="xl" closeOnOverlayClick={closeOnOverlayClick ?? true}>
       <ModalOverlay />
       <ModalContent border={0} borderColor="background.sandboxBase">
         <ModalHeader>
           <ModalCloseButton fontSize="11px" />
         </ModalHeader>
-        <ModalBody py={6}>
-          <Flex direction="column" gap={8}>
-            <Heading as="h3" fontSize="2xl">
+        <ModalBody py={8} px={8} paddingTop={4}>
+          <Flex direction="column">
+            <Heading as="h3" fontSize="2xl" marginBottom={4}>
               {headerText}
             </Heading>
 
-            {isStatusMode ? (
+            {isStatusMode && (children || bodyText) ? (
               <Box
                 borderRadius="md"
                 border="1px solid"
@@ -95,23 +99,29 @@ export const GlobalConfirmationModal = observer(function GlobalConfirmationModal
                   <Box color={config!.color} alignSelf="start">
                     <config.Icon size={24} aria-label={`${status} icon`} />
                   </Box>
-                  <Text>{bodyText || headerText}</Text>
+
+                  {/* Show children if provided; otherwise show bodyText */}
+                  <Box>{children || <Text>{bodyText}</Text>}</Box>
                 </HStack>
               </Box>
             ) : (
-              <Text>{bodyText || headerText}</Text>
+              <Box py={4} marginBottom={4}>
+                {children ? children : <Text>{bodyText}</Text>}
+              </Box>
             )}
 
             {!hideActions && (
               <Flex justify="center" gap={6}>
                 {onSubmit && (
-                  <Button onClick={onSubmit} variant="primary">
-                    {t('ui.confirm')}
+                  <Button width={'10rem'} onClick={onSubmit} variant="primary">
+                    {confirmText || t('ui.confirm')}
                   </Button>
                 )}
-                <Button onClick={onClose} variant="secondary">
-                  {t('ui.cancel')}
-                </Button>
+                {onClose && (
+                  <Button width={'10rem'} onClick={onClose} variant="secondary">
+                    {cancelText || t('ui.cancel')}
+                  </Button>
+                )}
               </Flex>
             )}
           </Flex>
