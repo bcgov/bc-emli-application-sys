@@ -7,7 +7,9 @@ import { useMst } from '../../../setup/root';
 import { ManageMenuItemButton } from '../base/manage-menu-item';
 import { Can } from './can';
 import { useParams } from 'react-router-dom';
-import { EmployeeActionConfirmationModal } from '../modals/employee-action-confirmation-modal';
+//import { EmployeeActionConfirmationModal } from '../modals/employee-action-confirmation-modal';
+import { GlobalConfirmationModal } from '../modals/global-confirmation-modal';
+import { EFlashMessageStatus } from '../../../types/enums';
 
 // Main component
 interface IManageContractorEmployeeMenuProps {
@@ -21,7 +23,7 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
 }: IManageContractorEmployeeMenuProps) {
   const {
     contractorStore: { currentContractor },
-    userStore: { currentUser, fetchActivePrograms },
+    userStore,
     environment,
   } = useMst();
 
@@ -36,8 +38,8 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
 
   // Fetch active programs on mount
   useEffect(() => {
-    fetchActivePrograms();
-  }, [fetchActivePrograms]);
+    userStore.fetchActivePrograms();
+  }, [userStore.fetchActivePrograms]);
 
   const openModal = (mode: Exclude<EmployeeActionMode, null>) => {
     setModalState({ mode, isLoading: false });
@@ -59,57 +61,12 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
   const handleConfirmAction = async () => {
     if (!modalState.mode) return;
 
-    setModalState((prev) => ({ ...prev, isLoading: true }));
+    const success = await userStore.performContractorEmployeeAction(modalState.mode, {
+      user,
+      contractorId,
+    });
 
-    try {
-      let success = false;
-      switch (modalState.mode) {
-        case 'deactivate':
-          success = await user.deactivateFromContractor(contractorId);
-          break;
-        case 'reactivate':
-          success = await user.reactivateInContractor(contractorId);
-          break;
-        case 'reinvite':
-          // Get program_id from current user's active programs
-          const activePrograms = currentUser?.activePrograms;
-          if (!activePrograms || activePrograms.length === 0) {
-            console.error('No active programs found for current user');
-            break;
-          }
-          const programId = activePrograms[0]?.program?.id;
-          if (!programId) {
-            console.error('Could not extract program ID');
-            break;
-          }
-          const response = await environment.api.reinviteContractorEmployee(contractorId, user.id, programId);
-          if (response.ok) {
-            await user.rootStore.userStore.searchUsers({ reset: false });
-          }
-          success = response.ok;
-          break;
-        case 'revoke':
-          success = await user.revokeContractorInvite(contractorId);
-          break;
-        case 'setPrimaryContact':
-          const setPrimaryResponse = await environment.api.setPrimaryContact(contractorId, user.id);
-          if (setPrimaryResponse.ok) {
-            // Reload contractor to get updated contact information
-            await currentContractor?.reload();
-            // Refresh the employee list to update the UI
-            await user.rootStore.userStore.searchUsers({ reset: false });
-          }
-          success = setPrimaryResponse.ok;
-          break;
-      }
-      if (success) {
-        closeModal();
-      }
-    } catch (error) {
-      console.error(`Failed to ${modalState.mode} employee:`, error);
-    } finally {
-      setModalState((prev) => ({ ...prev, isLoading: false }));
-    }
+    if (success) closeModal();
   };
 
   return (
@@ -176,16 +133,67 @@ export const ManageContractorEmployeeMenu = observer(function ManageContractorEm
         </Menu>
       </Can>
 
-      {modalState.mode && (
-        <EmployeeActionConfirmationModal
-          isOpen={true}
-          onClose={closeModal}
-          onConfirm={handleConfirmAction}
-          user={user}
-          mode={modalState.mode}
-          isLoading={modalState.isLoading}
-        />
-      )}
+      {modalState.mode &&
+        (() => {
+          const userName = user.name || user.firstName || user.lastName || t('contractor.employees.unknownEmployee');
+          const { header, body, confirmText } = employeeActionConfig(modalState.mode, userName);
+
+          return (
+            <GlobalConfirmationModal
+              isOpen={true}
+              onClose={closeModal}
+              onSubmit={handleConfirmAction}
+              headerText={header}
+              bodyText={body}
+              //status={EFlashMessageStatus.warning}
+              confirmText={t('ui.confirm')}
+              cancelText={t('ui.cancel')}
+              closeOnOverlayClick={false}
+            />
+          );
+        })()}
     </>
   );
 });
+
+const employeeActionConfig = (mode: EmployeeActionMode, userName: string) => {
+  return {
+    deactivate: {
+      header: t('contractor.employees.actions.confirmDeactivateTitle', { name: userName }),
+      body: t('contractor.employees.actions.deactivateWarning', {
+        name: userName,
+        defaultValue: `${userName} will not be able to access the application system until you reactivate them.`,
+      }),
+      confirmText: t('ui.confirm'),
+    },
+    reactivate: {
+      header: t('contractor.employees.actions.confirmReactivateTitle', { name: userName }),
+      body: t('contractor.employees.actions.reactivateWarning', {
+        name: userName,
+        defaultValue: `${userName} will be able to access the application system again when you reactivate their account.`,
+      }),
+      confirmText: t('ui.reactivate'),
+    },
+    reinvite: {
+      header: t('contractor.employees.actions.confirmReinviteTitle', { name: userName }),
+      body: t('contractor.employees.actions.reinviteWarning', {
+        name: userName,
+        defaultValue: `${userName} will receive another invite email when you re-invite them.`,
+      }),
+      confirmText: t('ui.reinvite'),
+    },
+    revoke: {
+      header: t('contractor.employees.actions.confirmRevokeTitle', { name: userName }),
+      body: t('contractor.employees.actions.revokeWarning', {
+        name: userName,
+        defaultValue: `${userName} will no longer be able to create an account if you revoke this invite.`,
+      }),
+      confirmText: t('ui.revoke'),
+    },
+    setPrimaryContact: {
+      header: t('contractor.employees.actions.primaryContactTitle', { name: userName }),
+      body: t('contractor.employees.actions.primaryContactText', { name: userName }),
+      confirmText: 'Set Primary Contact',
+    },
+  }[mode];
+};

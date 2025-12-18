@@ -84,24 +84,18 @@ const UpdatePathwayModal = ({ isOpen, onClose, setRevisionMode, setPerformedBy, 
                 {isAdminUser ? (
                   <>
                     <option value={EUpdateRoles.applicant}>
-                      <Trans
-                        i18nKey="energySavingsApplication.show.updatePathwayOptions.participantOption"
-                        values={{
-                          userGroup:
-                            (permitApplication?.userGroupType.code || EPermitClassificationCode.participant)
-                              .charAt(0)
-                              .toUpperCase() +
-                            (permitApplication?.userGroupType.code || EPermitClassificationCode.participant).slice(1),
-                        }}
-                      />
+                      {t('energySavingsApplication.show.updatePathwayOptions.participantOption', {
+                        userGroup:
+                          (permitApplication?.userGroupType.code || EPermitClassificationCode.participant)
+                            .charAt(0)
+                            .toUpperCase() +
+                          (permitApplication?.userGroupType.code || EPermitClassificationCode.participant).slice(1),
+                      })}
                     </option>
                     <option value={EUpdateRoles.staff}>
-                      <Trans
-                        i18nKey="energySavingsApplication.show.updatePathwayOptions.adminOption"
-                        values={{
-                          userGroup: permitApplication?.userGroupType.code || EPermitClassificationCode.participant,
-                        }}
-                      />
+                      {t('energySavingsApplication.show.updatePathwayOptions.adminOption', {
+                        userGroup: permitApplication?.userGroupType.code || EPermitClassificationCode.participant,
+                      })}
                     </option>
                   </>
                 ) : (

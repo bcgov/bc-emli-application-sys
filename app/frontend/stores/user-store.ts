@@ -266,6 +266,57 @@ export const UserStoreModel = types
       }
       self.usersMap.set(userData.id, userData);
     },
+  }))
+  .actions((self) => ({
+    performContractorEmployeeAction: flow(function* performContractorEmployeeAction(mode, { user, contractorId }) {
+      const root = self.rootStore;
+      const environment = root.environment;
+
+      try {
+        switch (mode) {
+          case 'deactivate':
+            return yield user.deactivateFromContractor(contractorId);
+
+          case 'reactivate':
+            return yield user.reactivateInContractor(contractorId);
+
+          case 'reinvite': {
+            const activePrograms = self.currentUser?.activePrograms;
+            if (!activePrograms?.length) return false;
+
+            const programId = activePrograms[0]?.program?.id;
+            if (!programId) return false;
+
+            const response = yield environment.api.reinviteContractorEmployee(contractorId, user.id, programId);
+
+            if (response.ok) {
+              yield self.searchUsers({ reset: false });
+            }
+            return response.ok;
+          }
+
+          case 'revoke':
+            return yield user.revokeContractorInvite(contractorId);
+
+          case 'setPrimaryContact': {
+            const response = yield environment.api.setPrimaryContact(contractorId, user.id);
+
+            if (response.ok) {
+              yield root.contractorStore.currentContractor?.reload();
+              yield self.searchUsers({ reset: false });
+            }
+
+            return response.ok;
+          }
+
+          default:
+            return false;
+        }
+      } catch (err) {
+        console.error(`Error performing employee action '${mode}':`, err);
+        return false;
+      }
+    }),
   }));
 
 export interface IUserStore extends Instance<typeof UserStoreModel> {}

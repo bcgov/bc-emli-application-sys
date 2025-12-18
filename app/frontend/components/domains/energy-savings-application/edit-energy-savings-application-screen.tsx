@@ -29,7 +29,8 @@ import { useCollaborationAssignmentNodes } from './assignment-management/hooks/u
 import { ContactSummaryModal } from './contact-summary-modal';
 import { RevisionSideBar } from './revision-sidebar';
 import { SubmissionDownloadModal } from './submission-download-modal';
-import { WithdrawApplicationModal } from './withdraw-application-modal';
+//import { WithdrawApplicationModal } from './withdraw-application-modal';
+import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation-modal';
 
 interface IEditPermitApplicationScreenProps {}
 
@@ -66,7 +67,8 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
     onClose: onSubmitBlockedModalClose,
   } = useDisclosure();
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  //  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isWithdrawlOpen, onOpen: onWithdrawlOpen, onClose: onWithdrawlClose } = useDisclosure();
 
   const handlePermitApplicationUpdate = (_event: ICustomEventMap[ECustomEvents.handlePermitApplicationUpdate]) => {
     if (formRef.current) {
@@ -136,7 +138,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
     try {
       const response = await currentPermitApplication.destroy();
       if (response.ok) {
-        onClose();
+        onWithdrawlClose();
         navigate('/');
         return true;
       }
@@ -213,14 +215,18 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
   };
 
   const handleClickWithdrawl = async () => {
-    onOpen(); // Open confirmation dialog instead of immediate withdrawal
+    onWithdrawlOpen(); // Open confirmation dialog instead of immediate withdrawal
   };
 
   const handleConfirmWithdrawal = async () => {
     const success = await handleWithdrawl();
     if (success) {
-      onClose();
-      navigate('/applications/withdrawl-success');
+      onWithdrawlClose();
+      navigate(`/applications/${currentPermitApplication?.id}/withdrawl-success`, {
+        state: {
+          submissionType: currentPermitApplication.submissionType.name,
+        },
+      });
     }
   };
 
@@ -463,7 +469,22 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
           />
         );
       })}
-      <WithdrawApplicationModal isOpen={isOpen} onClose={onClose} onConfirm={handleConfirmWithdrawal} />
+      <GlobalConfirmationModal
+        isOpen={isWithdrawlOpen}
+        onClose={onWithdrawlClose}
+        onSubmit={() => {
+          handleConfirmWithdrawal();
+        }}
+        headerText={t('energySavingsApplication.withdraw.confirmTitle', {
+          submissionType: currentPermitApplication.submissionType.name.toLowerCase(),
+        })}
+        bodyText={t('energySavingsApplication.withdraw.confirmMessage', {
+          submissionType: currentPermitApplication.submissionType.name.toLowerCase(),
+        })}
+        confirmText={t('ui.confirm')}
+        cancelText={t('ui.cancel')}
+        closeOnOverlayClick={false}
+      />
     </Box>
   );
 });

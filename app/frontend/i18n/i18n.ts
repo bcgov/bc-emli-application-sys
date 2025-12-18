@@ -980,8 +980,8 @@ const options = {
               'After you’ve submitted your application, local officials will review it. They may ask you to fix issues or show that your application meets requirements before approving it.',
           },
           withdraw: {
-            confirmTitle: 'Are you sure you want to withdraw this application?',
-            confirmMessage: 'By withdrawing this application your draft application will not be saved.',
+            confirmTitle: 'Are you sure you want to withdraw this {{submissionType}} form?',
+            confirmMessage: 'By withdrawing this {{submissionType}} form your draft will not be saved.',
             confirm: 'Withdraw application',
             success: {
               title: 'Your application has been withdrawn.',
@@ -1054,10 +1054,10 @@ const options = {
           },
           review: {
             readyToMarkIneligible: 'Ready to mark ineligible?',
-            confirmIneligible: 'I confirm that this application is ineligible for the Energy Savings Program.',
+            confirmIneligible: 'I confirm that this {{submissionType}} is ineligible for the Energy Savings Program.',
             readyToScreen: 'Ready to screen in?',
-            confirmReview:
-              'I confirm this application has all the required information. This application is ready for review.',
+            confirmReview: 'I confirm this {{submissionType}} has all the required information.',
+            screenedInSuccess: 'You have screened in this {{submissionType}} form to in review.',
           },
         },
         contractorOnboarding: {
@@ -1223,7 +1223,7 @@ const options = {
             startApplication: 'Start an application',
             noTemplate: 'No templates available for this program.',
             sucessfulSubmission: 'Application submitted',
-            viewAllSubmissions: 'Return to home',
+            viewAllSubmissions: 'View all submissions',
             locationHeading: 'Location for permit',
             submitToOwn:
               'Make sure you are submitting to a jurisdiction that you have inbox access to so that you can see it.',
@@ -1263,20 +1263,20 @@ const options = {
             applicationDisclaimerMoreInfo_Link:
               'https://www2.gov.bc.ca/gov/content/governments/local-governments/facts-framework/local-government-maps',
             submitted: 'You sent this application for review.',
-            markedIneligible: 'You have marked this application ineligible.',
+
             submissionSuccess: 'Your {{ submissionType }} form has been submitted!',
             confirmationEmail: 'A confirmation email has been sent to your account.',
             hearBack: 'Need help?',
             contactInstruction:
               'See the status of your application or your application history any time by logging in to the Better Homes Energy Savings Program. Contact <1>{{ email }}</1> if you have any questions about your application.',
             whatsNextTitle: "What's next?",
-            ready: 'Ready to submit this application?',
+            ready: 'Ready to submit this application form?',
             onBehalf: 'Ready to submit on someone’s behalf?',
             bySubmitting: 'By submitting this application',
             confirmationOnBehalf:
               'I confirm that the information provided is accurate to the best of my knowledge. The applicant has given consent for me to submit this application on their behalf.',
             confirmation:
-              'By submitting this application you confirm that the information you provided was completed to the best of your knowledge and ability',
+              'By submitting this {{submissionType}} form you confirm that the information you provided was completed to the best of your knowledge and ability',
             yourReference: 'Reference # {{ number }}',
             noContactsAvailable:
               'This jurisdiction is not ready to accept applications through this tool yet. Please check with your local jurisdiction.',
@@ -1293,6 +1293,24 @@ const options = {
             disclaimer2:
               'After you’ve submitted your application, local officials will review it. They may ask you to fix issues or show that your application meets requirements before approving it.',
           },
+          withdraw: {
+            confirmTitle: 'Are you sure you want to withdraw this {{submissionType}} form?',
+            confirmMessage: 'By withdrawing this {{submissionType}} form your draft will not be saved.',
+            confirm: 'Withdraw application',
+            success: {
+              title: 'Your {{submissionType}} form has been withdrawn.',
+              subtitleEmail: 'You will receive a confirmation email.',
+            },
+          },
+          review: {
+            ineligibleNextSteps: 'An email has been automatically sent to the submitter with the ineligible reason.',
+            markedIneligible: 'You have marked this application ineligible.',
+            readyToMarkIneligible: 'Ready to mark ineligible?',
+            confirmIneligible: 'I confirm that this {{submissionType}} is ineligible for the Energy Savings Program.',
+            readyToScreen: 'Ready to screen in?',
+            confirmReview: 'I confirm this {{submissionType}} has all the required information.',
+            screenedInSuccess: 'You have screened in this {{submissionType}} form to in review.',
+          },
           edit: {
             back: 'Back to My applications',
             saveDraft: 'Save and finish later',
@@ -1302,8 +1320,14 @@ const options = {
             fullAddress: 'Full address',
             pidPin: 'PID / PIN',
             clickToWriteNickname: 'Click to write a nickname',
+            revisionReady: 'Ready to resubmit this {{submissionType}} form?',
+            revisionConfirmation:
+              'You confirm that the information you have provided was completed to the best of your knowledge and ability.',
           },
           show: {
+            update: 'Update',
+            screenIn: 'Screen in',
+            inEligible: 'Ineligible',
             wasSubmitted: 'Application was submitted on {{ date }} to {{ jurisdictionName }}',
             submittingTo: {
               title: "You're applying to the {{ jurisdictionName }}",
@@ -1348,7 +1372,7 @@ const options = {
               confirm: 'Confirm',
               back: 'Back',
             },
-            adminSaveSuccess: 'Application has been successfully updated and resubmitted.',
+            adminSaveSuccess: '{{submissionType}} form has updated.',
             adminSaveError: 'There was an error saving the application updates. Please try again.',
             requestedRevisions: 'Requested revisions',
             pleaseFix: 'Please fix the requested revisions and re-submit your application',
@@ -1362,9 +1386,9 @@ const options = {
             applicationSubmitted: 'Application was submitted on {{date}}',
             clickQuestion: 'Click on the question(s) or requirement(s) you want the submitter to revise.',
             clickQuestionUpdate: 'Click on the question(s) or requirement(s) you want to update.',
-            inEligibleDetails: 'Ineligible application details',
-            applicationId: 'Reference # is',
-            inEligibleReason: 'Reason this application is ineligible:',
+            inEligibleDetails: 'Ineligible {{submissionType}} form details',
+            applicationId: 'Reference # is #',
+            inEligibleReason: 'Reason this {{submissionType}} form is ineligible:',
             revision: {
               newRevision: 'New revision',
               pastRequests: 'Past requests',
@@ -1382,10 +1406,10 @@ const options = {
               useButton: 'Use this reason',
               maxCharacters: 'Maximum 350 characters',
               send: 'Send to submitter',
-              confirmHeader: 'Send this list of update requests to the applicant?',
+              confirmHeader: 'Send this list of update requests to the submitter?',
               originallySubmitted: 'Previously submitted',
               confirmMessage:
-                "The applicant will receive an notification and email about the changes you've requested.",
+                "The submitter will receive an notification and email about the changes you've requested.",
               cancelRequest: 'Are you sure you want to cancel?',
               noNotification:
                 'No notifications will be sent to the applicant and you will lose any current revisions you may have added.',
@@ -3115,6 +3139,8 @@ const options = {
                 '{{name}} will be able to access the application system again when you reactivate their account.',
               revokeWarning: '{{name}} will no longer be able to create an account if you revoke this invite.',
               reinviteWarning: '{{name}} will receive another invite email when\nyou re-invite them.',
+              primaryContactTitle: 'Are you sure you want {{name}} to be the primary contact?',
+              primaryContactText: '{{name}} will receive the main communications for this company.',
             },
           },
           programResources: {

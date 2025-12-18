@@ -1,5 +1,5 @@
 import { Box, Button, Divider, Flex, HStack, Heading, Spacer, Stack, Text, useDisclosure } from '@chakra-ui/react';
-import { CaretDown, CaretRight, CaretUp, CheckCircle, NotePencil, Prohibit, Warning } from '@phosphor-icons/react';
+import { CaretDown, CaretRight, CaretUp, CheckCircleIcon, NotePencilIcon, ProhibitIcon } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -7,7 +7,7 @@ import { useTranslation, Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
 import { useMst } from '../../../setup/root';
-import { ECollaborationType, EPermitApplicationStatus } from '../../../types/enums';
+import { ECollaborationType, EPermitApplicationStatus, EFlashMessageStatus } from '../../../types/enums';
 import { CopyableValue } from '../../shared/base/copyable-value';
 import { ErrorScreen } from '../../shared/base/error-screen';
 import { LoadingScreen } from '../../shared/base/loading-screen';
@@ -19,10 +19,12 @@ import { useCollaborationAssignmentNodes } from './assignment-management/hooks/u
 import { ContactSummaryModal } from './contact-summary-modal';
 import { RevisionSideBar } from './revision-sidebar';
 import { SubmissionDownloadModal } from './submission-download-modal';
-import ApplicationReviewModal from '../../shared/modals/application-review-modal';
+//import ApplicationReviewModal from '../../shared/modals/application-review-modal';
+import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation-modal';
 import UpdatePathwayModal from '../../shared/modals/application-update-pathway';
 import { EnergySavingsApplicationStatusTag } from '../../shared/energy-savings-applications/energy-savings-application-status-tag';
 import { SupportingFilesRequestModal } from './supporting-files-request-modal';
+
 interface IReferenceNumberForm {
   referenceNumber?: string;
 }
@@ -46,7 +48,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
 
   const [completedBlocks, setCompletedBlocks] = useState({});
   const [performedBy, setPerformedBy] = useState(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isIneligibleOpen, onOpen: onIneligibleOpen, onClose: onIneligibleClose } = useDisclosure();
   const { isOpen: isScreenIn, onOpen: onScreenIn, onClose: onScreenInclose } = useDisclosure();
   const { isOpen: isContactsOpen, onOpen: onContactsOpen, onClose: onContactsClose } = useDisclosure();
   const { isOpen: isUpdatePathwayOpen, onOpen: onUpdatePathwayOpen, onClose: onUpdatePathwayClose } = useDisclosure();
@@ -183,9 +185,10 @@ export const ReviewPermitApplicationScreen = observer(() => {
         status: EPermitApplicationStatus.inReview,
       });
       if (response.ok) {
-        navigate(`/applications/${response?.data?.data?.id}/successful-submission`, {
+        navigate(`/applications/${response?.data?.data?.id}/screened-in-success`, {
           state: {
-            message: t('energySavingsApplication.new.submitted'),
+            submissionType: currentPermitApplication.submissionType.name,
+            applicationNumber: currentPermitApplication?.number,
           },
         });
       }
@@ -256,7 +259,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
             top={permitHeaderHeight}
           >
             <Flex width={'sidebar.width'} align="center" gap={2}>
-              <NotePencil size={24} />
+              <NotePencilIcon size={24} />
               <Heading fontSize="lg" mt={2}>
                 {t('energySavingsApplication.show.updatesTracker')}
               </Heading>
@@ -280,43 +283,6 @@ export const ReviewPermitApplicationScreen = observer(() => {
           <SandboxHeader borderTopRadius={0} override sandbox={currentPermitApplication.sandbox} position="sticky" />
         )}
       </Flex>
-      {/* {supportRequestDate && (
-        <Flex direction="column" bg="theme.orangeLight02">
-          <Flex
-            top={permitHeaderHeight}
-            position="sticky"
-            zIndex={11}
-            w="full"
-            px={4}
-            py={2}
-            mt={2}
-            bg="theme.orangeLight02"
-            justify="flex-start"
-            align="left"
-            gap={4}
-          >
-            <Warning size={24} color="var(--chakra-colors-semantic-warning)" aria-label={'Warning icon'} />
-            <Heading fontSize="md">{t('energySavingsApplication.show.supportingFilesRequest.requestedHeader')}</Heading>
-          </Flex>
-          <Flex
-            direction="column"
-            position="sticky"
-            zIndex={11}
-            w="full"
-            px={14}
-            mb={3}
-            bg="theme.orangeLight02"
-            justify="flex-start"
-            align="left"
-            gap={4}
-          >
-            <Trans
-              i18nKey="energySavingsApplication.show.supportingFilesRequest.requestedText"
-              values={{ date: supportRequestDate }}
-            />
-          </Flex>
-        </Flex>
-      )} */}
       <Box id="sidebar-and-form-container" sx={{ '&:after': { content: `""`, display: 'block', clear: 'both' } }}>
         {revisionMode && !hideRevisionList ? (
           <RevisionSideBar
@@ -343,7 +309,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                     <HStack spacing={6}>
                       <Button
                         variant="calloutInverse"
-                        leftIcon={<NotePencil />}
+                        leftIcon={<NotePencilIcon />}
                         px={14}
                         onClick={onUpdatePathwayOpen}
                         borderColor="theme.yellow"
@@ -352,12 +318,12 @@ export const ReviewPermitApplicationScreen = observer(() => {
                           currentPermitApplication?.status === EPermitApplicationStatus.ineligible
                         }
                       >
-                        {t('permitApplication.show.update')}
+                        {t('energySavingsApplication.show.update')}
                       </Button>
 
                       <Button
                         variant="calloutInverse"
-                        leftIcon={<CheckCircle />}
+                        leftIcon={<CheckCircleIcon />}
                         px={14}
                         onClick={onScreenIn}
                         borderColor="green"
@@ -366,20 +332,20 @@ export const ReviewPermitApplicationScreen = observer(() => {
                           currentPermitApplication?.status === EPermitApplicationStatus.inReview
                         }
                       >
-                        {t('permitApplication.show.screenIn')}
+                        {t('energySavingsApplication.show.screenIn')}
                       </Button>
                       <Button
                         variant="calloutInverse"
-                        leftIcon={<Prohibit />}
+                        leftIcon={<ProhibitIcon />}
                         px={14}
-                        onClick={onOpen}
+                        onClick={onIneligibleOpen}
                         borderColor="red"
                         isDisabled={
                           currentPermitApplication?.status === EPermitApplicationStatus.inReview ||
                           currentPermitApplication?.status === EPermitApplicationStatus.ineligible
                         }
                       >
-                        {t('permitApplication.show.inEligible')}
+                        {t('energySavingsApplication.show.inEligible')}
                       </Button>
                     </HStack>
                   )
@@ -394,13 +360,17 @@ export const ReviewPermitApplicationScreen = observer(() => {
           </Flex>
         )}
       </Box>
-      {onOpen && (
-        <ApplicationReviewModal
-          isOpen={isOpen}
-          onClose={onClose}
-          onConfirm={() => navigate(`/rejection-reason/${currentPermitApplication.id}/${number}`)}
-          title={t('permitApplication.review.readyToMarkIneligible')}
-          message={t('permitApplication.review.confirmIneligible')}
+      {onIneligibleOpen && (
+        <GlobalConfirmationModal
+          isOpen={isIneligibleOpen}
+          onClose={onIneligibleClose}
+          onSubmit={() => navigate(`/rejection-reason/${currentPermitApplication.id}`)}
+          headerText={t('permitApplication.review.readyToMarkIneligible')}
+          bodyText={t('permitApplication.review.confirmIneligible', {
+            submissionType: currentPermitApplication?.submissionType?.name?.toLowerCase(),
+          })}
+          confirmText={t('ui.confirm')}
+          cancelText={t('ui.cancel')}
         />
       )}
       {isUpdatePathwayOpen && (
@@ -415,12 +385,16 @@ export const ReviewPermitApplicationScreen = observer(() => {
         />
       )}
       {isScreenIn && (
-        <ApplicationReviewModal
+        <GlobalConfirmationModal
           isOpen={isScreenIn}
           onClose={onScreenInclose}
-          onConfirm={handleConfirm}
-          title={t('permitApplication.review.readyToScreen')}
-          message={t('permitApplication.review.confirmReview')}
+          onSubmit={handleConfirm}
+          headerText={t('permitApplication.review.readyToScreen')}
+          bodyText={t('permitApplication.review.confirmReview', {
+            submissionType: currentPermitApplication?.submissionType?.name?.toLowerCase(),
+          })}
+          confirmText={t('ui.confirm')}
+          cancelText={t('ui.cancel')}
         />
       )}
       {isContactsOpen && (
