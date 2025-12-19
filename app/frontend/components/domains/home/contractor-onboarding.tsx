@@ -6,16 +6,6 @@ import { Flex } from '@chakra-ui/react';
 
 interface IContractorOnboardingScreenProps {}
 
-export type TCreateEnergyApplicationFormData = {
-  user_id: string;
-  nickname: string;
-  user_group_type: string;
-  audience_type: string;
-  submission_type: string;
-  slug: string;
-  template_version_id?: string;
-};
-
 export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScreenProps) => {
   const { permitApplicationStore, userStore, uiStore, contractorStore } = useMst();
   const { currentUser } = userStore;
