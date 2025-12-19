@@ -29,9 +29,13 @@ class PermitClassification < ApplicationRecord
          onboarding
          support_request
          invoice
-         invoice_1
-         invoice_2
-         invoice_3
+         invoice_heat_pump_space
+         invoice_heat_pump_water
+         invoice_insulation
+         invoice_windows_doors
+         invoice_ventilation
+         invoice_electrical_upgrade
+         invoice_health_safety
        ]
 
   def image_url

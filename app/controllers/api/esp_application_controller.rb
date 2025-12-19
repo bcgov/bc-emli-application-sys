@@ -9,6 +9,7 @@ class Api::EspApplicationController < Api::ApplicationController
         user_group_type: @user_group_type,
         audience_type: @audience_type,
         submission_type: @submission_type,
+        submission_variant: @submission_variant,
         program: @program,
         status: :new_draft,
         nickname: @nickname,
@@ -39,6 +40,14 @@ class Api::EspApplicationController < Api::ApplicationController
     @audience_type = AudienceType.find_by(code: app_params[:audience_type])
     @submission_type =
       SubmissionType.find_by(code: app_params[:submission_type])
+    @submission_variant =
+      (
+        if app_params[:submission_variant_id].present?
+          SubmissionVariant.find_by(id: app_params[:submission_variant_id])
+        else
+          nil
+        end
+      )
 
     if [@user_group_type, @audience_type, @submission_type].any?(&:blank?)
       render json: {
