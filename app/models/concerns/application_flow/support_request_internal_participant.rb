@@ -33,17 +33,10 @@ module ApplicationFlow
           &.compact
           &.first
 
-      Rails.logger.info(
-        "Linked parent application number: #{application_number}"
-      )
-
       return unless application_number.present?
 
       parent_application = PermitApplication.find_by(number: application_number)
       unless parent_application
-        Rails.logger.warn(
-          "No parent application found for number #{application_number}"
-        )
         return
       end
 
@@ -55,9 +48,6 @@ module ApplicationFlow
         end
 
       unless requested_by_user
-        Rails.logger.warn(
-          "Could not resolve submitter user for #{application.id}"
-        )
         return
       end
 
@@ -68,13 +58,11 @@ module ApplicationFlow
         additional_text: ""
       )
 
-      #TODO : in app and email notification to participant
-
-      Rails.logger.info(
-        "Created support request linking #{application.id} (#{application.number}) " \
-          "to parent #{parent_application.id} (#{parent_application.number}) " \
-          "requested_by=#{requested_by_user.id}"
-      )
+      # Notify participant that supporting files have been added to their application
+      PermitHubMailer.notify_participant_supporting_files_added(
+        parent_application,
+        admin_user: requested_by_user
+      )&.deliver_later
     end
   end
 end

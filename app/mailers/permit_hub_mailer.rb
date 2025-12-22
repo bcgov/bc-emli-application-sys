@@ -275,6 +275,23 @@ class PermitHubMailer < ApplicationMailer
     )
   end
 
+  def notify_participant_supporting_files_added(
+    permit_application,
+    admin_user:
+  )
+    @permit_application = permit_application
+    @user = permit_application.submitter
+    @admin_user = admin_user
+
+    send_user_mail(
+      email: @user.email,
+      template_key: "notify_participant_supporting_files_added",
+      subject_i18n_params: {
+        permit_application_number: permit_application.number
+      }
+    )
+  end
+
   def notify_new_participant_welcome(user)
     @user = user
 

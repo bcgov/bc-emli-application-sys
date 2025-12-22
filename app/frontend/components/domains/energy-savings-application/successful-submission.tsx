@@ -21,9 +21,14 @@ export const SuccessfulSubmissionScreen = observer(() => {
   if (error) return <ErrorScreen error={error} />;
   if (!currentPermitApplication?.isFullyLoaded) return <LoadingScreen />;
 
-  const { number, submissionType, activity } = currentPermitApplication;
+  const { number, submissionType, activity, isSupportRequest, incomingSupportRequests } = currentPermitApplication;
   const { userStore } = useMst();
   const currentUser = userStore.currentUser;
+
+  // For support requests, show parent application number instead of support request number
+  const displayNumber = isSupportRequest && incomingSupportRequests?.parentApplication?.number
+    ? incomingSupportRequests.parentApplication.number
+    : number;
 
   // Get submission type for the heading - use submissionType.name, fallback to activity.name
   const rawLabel = submissionType?.name || activity?.name || 'application';
@@ -67,7 +72,7 @@ export const SuccessfulSubmissionScreen = observer(() => {
             })}
           </Text>
           <Tag color="semantic.info" border="1px solid" borderColor="semantic.info" p={2}>
-            {t('energySavingsApplication.new.yourReference', { number })}
+            {t('energySavingsApplication.new.yourReference', { number: displayNumber })}
           </Tag>
         </VStack>
 

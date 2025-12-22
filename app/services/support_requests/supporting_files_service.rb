@@ -6,7 +6,8 @@ module SupportRequests
       :participant
     end
     def audience_type_code
-      :external
+      # Use the dynamic audience type code if provided, otherwise default to external
+      @dynamic_audience_type_code || :external
     end
     def submission_type_code
       :support_request

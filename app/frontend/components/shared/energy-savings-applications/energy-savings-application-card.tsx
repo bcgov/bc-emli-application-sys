@@ -16,11 +16,22 @@ interface IEnergySavingsApplicationCardProps {
 }
 
 export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEnergySavingsApplicationCardProps) => {
-  const { id, nickname, permitTypeAndActivity, number, createdAt, updatedAt, viewedAt } = energySavingsApplication;
+  const { id, nickname, permitTypeAndActivity, number, createdAt, updatedAt, viewedAt, isSupportRequest, incomingSupportRequests } = energySavingsApplication;
   const nicknameSplitText = nickname.split(':');
   const { userStore } = useMst();
   const currentUser = userStore.currentUser;
   const { t } = useTranslation();
+
+  // For support requests, show parent application number and special title
+  const displayNumber = isSupportRequest && incomingSupportRequests?.parentApplication?.number
+    ? incomingSupportRequests.parentApplication.number
+    : number;
+  const displayTitle = isSupportRequest
+    ? t('energySavingsApplication.supportRequest.uploadTitle', { defaultValue: 'Upload Supporting files form' })
+    : nicknameSplitText?.[0];
+  const displaySubtitle = isSupportRequest
+    ? ''
+    : nicknameSplitText?.[1];
 
   const isSubmissionCollaboration = energySavingsApplication.submitter?.id !== currentUser?.id;
 
@@ -106,17 +117,19 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
               </Flex>
             )}
             <Text color="text.link" fontSize="lg" fontWeight="bold">
-              {nicknameSplitText?.[0]}
+              {displayTitle}
             </Text>
-            <Text color="text.link" fontSize="lg" fontWeight="bold" flex="1">
-              {nicknameSplitText?.[1]}
-            </Text>
+            {displaySubtitle && (
+              <Text color="text.link" fontSize="lg" fontWeight="bold" flex="1">
+                {displaySubtitle}
+              </Text>
+            )}
             <Show below="md">
               <Text>
                 <Text as="span" fontWeight={700} mr="1">
                   {t('energySavingsApplication.fields.number')}:
                 </Text>
-                {number}
+                {displayNumber}
               </Text>
             </Show>
             <Box flex="1" alignContent="center">
@@ -174,7 +187,7 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
               <Text align="right" variant="tiny_uppercase">
                 {t('energySavingsApplication.fields.number')}
               </Text>
-              <Text align="right">{number}</Text>
+              <Text align="right">{displayNumber}</Text>
             </Box>
           </Show>
           <RouterLinkButton

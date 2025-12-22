@@ -299,7 +299,7 @@ export class Api {
     });
   }
 
-  async requestSupportingFiles(parentId: string, params: { note: string }) {
+  async requestSupportingFiles(parentId: string, params: { note: string; audience_type_code?: string }) {
     return this.client.post<ApiResponse<IEnergySavingsApplication>>(`/support_requests/request_supporting_files`, {
       parent_application_id: parentId,
       ...params,
@@ -433,7 +433,6 @@ export class Api {
   }
 
   async updatePermitApplication(id, params, review?: boolean) {
-    console.log('Updating permit application with params:', params);
     const payload = {
       permit_application: params,
       review,

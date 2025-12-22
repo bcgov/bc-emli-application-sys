@@ -1415,6 +1415,8 @@ const options = {
                 'No notifications will be sent to the applicant and you will lose any current revisions you may have added.',
             },
             supportingFilesRequest: {
+              addSupportingFiles: 'Add supporting files',
+              selectionAction: 'Selection action',
               requestSupportingFiles: 'Request supporting files',
               prompt:
                 'List the required files below, one line per file. Each line will be a bullet point in the email to the participant.',

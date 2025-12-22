@@ -48,7 +48,13 @@ class PermitApplication < ApplicationRecord
     {
       support_requests: [
         :requested_by,
-        { linked_application: :supporting_documents }
+        {
+          linked_application: [
+            :supporting_documents,
+            :audience_type,
+            :submission_type
+          ]
+        }
       ]
     }
   ]
@@ -118,7 +124,7 @@ class PermitApplication < ApplicationRecord
           class_name: "SupportRequest",
           foreign_key: :linked_application_id,
           inverse_of: :linked_application,
-          dependent: :nullify
+          dependent: :destroy
 
   scope :submitted, -> { joins(:submission_versions).distinct }
 
@@ -270,7 +276,6 @@ class PermitApplication < ApplicationRecord
   def form_json(current_user: nil)
     effective_user =
       (submitter.is_a?(Contractor) ? submitter.contact : current_user)
-    Rails.logger.info "Generating form JSON for PermitApplication #{id} with effective user #{effective_user.inspect}"
     result =
       PermitApplication::FormJsonService.new(
         permit_application: self,
@@ -300,6 +305,21 @@ class PermitApplication < ApplicationRecord
       permit_application_params:,
       current_user:
     )
+  end
+
+  def has_draft_support_requests?
+    support_requests.any? do |sr|
+      sr.linked_application&.status == 'new_draft'
+    end
+  end
+
+  def is_support_request_requested_by_participant?
+    # Check if this application is a support request and was requested by a participant
+    return false unless submission_type&.code == 'support_request'
+    return false unless incoming_support_requests.present?
+
+    requested_by_user = incoming_support_requests.requested_by
+    requested_by_user.present? && requested_by_user.participant?
   end
 
   def search_data
@@ -335,7 +355,15 @@ class PermitApplication < ApplicationRecord
         [submitter&.id].compact +
           users_by_collaboration_options(collaboration_type: :submission).pluck(
             :id
-          )
+          ),
+      # Fields for supported applications filtering
+      submitter_role: submitter.is_a?(User) ? submitter.role : nil,
+      user_group_type_code: user_group_type&.code,
+      audience_type_code: audience_type&.code,
+      submission_type_code: submission_type&.code,
+      has_draft_support_requests: has_draft_support_requests?,
+      is_submitted: submitted_at.present?,
+      is_support_request_by_participant: is_support_request_requested_by_participant?
       # sandbox_id: sandbox_id
     }
   end
@@ -397,10 +425,8 @@ class PermitApplication < ApplicationRecord
 
   def using_current_template_version
     current_version = current_published_template_version
-    Rails.logger.debug "Checking template version for permit application #{id}: current=#{template_version.id}, published=#{current_version&.id}"
 
     result = self.template_version.id == current_version&.id
-    Rails.logger.debug "Template version match result: #{result}"
 
     result
   end
@@ -432,19 +458,13 @@ class PermitApplication < ApplicationRecord
     if latest_submission_version.present?
       latest_submission_version.update(viewed_at: Time.current)
       reindex
-    else
-      Rails.logger.warn(
-        "Tried to update viewed_at, but latest_submission_version was nil"
-      )
     end
   end
 
   def set_status(new_status, reason)
     if update(status: new_status, status_update_reason: reason)
-      Rails.logger.debug("Successfully updated: #{self.attributes}")
       self
     else
-      Rails.logger.error("Failed to update: #{errors.full_messages.join(", ")}")
       nil
     end
   end
@@ -1160,9 +1180,6 @@ class PermitApplication < ApplicationRecord
     # Note: This is a simplified approach - in production, you might want to store
     # the job ID and cancel it specifically, but Sidekiq doesn't have built-in
     # job cancellation by content. The job itself has safety checks.
-    Rails.logger.info(
-      "Application #{id} status changed from draft - job will be skipped by safety check"
-    )
   end
 
   def status_changed_from_draft?

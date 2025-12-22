@@ -564,6 +564,11 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
           return true;
         }
 
+        // Allow admin/admin_manager to submit support request applications
+        if (self.isSupportRequest && (user.isAdmin || user.isAdminManager)) {
+          return true;
+        }
+
         return false;
       },
       canUserManageCollaborators(user: IUser, collaborationType: ECollaborationType) {
@@ -629,8 +634,21 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
           new Date(sr.createdAt) > new Date(acc.createdAt) ? sr : acc,
         );
 
+        // Access linkedApplication (camelCase) - supportRequests are frozen objects from API
+        const linkedApp = (latest as any).linkedApplication;
+
         // Only return if not approved
-        if (latest.status === EPermitApplicationStatus.approved) return null;
+        if (linkedApp?.status === EPermitApplicationStatus.approved) return null;
+
+        // Don't show warning if files have already been added
+        if (this.latestSubmittedSupportRequestWithDocuments) return null;
+
+        // Only show warning for external (participant) support requests
+        // Internal (admin) support requests should not show this warning
+        const audienceCode = linkedApp?.audienceType?.code;
+        if (audienceCode === 'internal') {
+          return null;
+        }
 
         return latest.createdAt ? new Date(latest.createdAt) : null;
       },

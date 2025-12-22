@@ -85,7 +85,21 @@ class PermitApplicationBlueprint < Blueprinter::Base
     end
     association :support_requests,
                 blueprint: SupportRequestBlueprint,
-                view: :base
+                view: :base do |pa, options|
+      current_user = options[:current_user]
+
+      # Filter out internal draft support requests from participants
+      # Only show them to staff or after they're submitted
+      if current_user && current_user.participant?
+        filtered = pa.support_requests.reject do |sr|
+          sr.linked_application&.audience_type&.code == 'internal' &&
+          sr.linked_application&.new_draft?
+        end
+        filtered
+      else
+        pa.support_requests
+      end
+    end
   end
 
   view :jurisdiction_review_inbox do

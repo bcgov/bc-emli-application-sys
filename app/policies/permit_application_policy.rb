@@ -2,7 +2,17 @@ class PermitApplicationPolicy < ApplicationPolicy
   # Policy controls whether user can view this permit application
   # Used for: search results, individual record access, list filtering
   def index?
-    return true if user.system_admin? || user.admin_manager? || user.admin?
+    if user.system_admin? || user.admin_manager? || user.admin?
+      return true
+    end
+
+    # Hide internal draft support requests from participants
+    # These are created by admin on behalf of participant and should only be visible after submission
+    if record.submission_type&.code == 'support_request' &&
+       record.audience_type&.code == 'internal' &&
+       record.new_draft?
+      return false
+    end
 
     # polymorphic submitter check
     case record.submitter
@@ -10,7 +20,7 @@ class PermitApplicationPolicy < ApplicationPolicy
       # submitted directly by a user
       record.submitter == user || record.submitted_for == user.id
     when Contractor
-      # submitted by a contractor — allow if the user is that contractor’s contact
+      # submitted by a contractor — allow if the user is that contractor's contact
       record.submitter.contact_id == user.id
     else
       false
@@ -80,8 +90,11 @@ class PermitApplicationPolicy < ApplicationPolicy
   def upload_supporting_document?
     case record.status
     when "new_draft"
-      # Only submitter can upload during creation
-      record.submitter == user
+      # Submitter or admin (same program) can upload during creation
+      is_admin_in_program =
+        (user.admin_manager? || user.admin?) &&
+          user.program_memberships.active.exists?(program_id: record.program_id)
+      record.submitter == user || is_admin_in_program
     when "newly_submitted", "resubmitted"
       # Admin editing phase: submitter OR admin (same program) can upload
       is_admin_in_program =
@@ -94,8 +107,11 @@ class PermitApplicationPolicy < ApplicationPolicy
         record.latest_submission_version&.revision_requests&.first&.performed_by
 
       if performed_by == "staff"
-        # Admin "on behalf": editing complete, no uploads
-        false
+        # Admin "on behalf": admin (same program) can upload
+        is_admin_in_program =
+          (user.admin_manager? || user.admin?) &&
+            user.program_memberships.active.exists?(program_id: record.program_id)
+        is_admin_in_program
       elsif performed_by == "applicant"
         # "Send to submitter": only participant can upload
         record.submitter == user
@@ -110,8 +126,15 @@ class PermitApplicationPolicy < ApplicationPolicy
   end
 
   def destroy?
-    # Submitters can only destroy their own draft applications
-    record.submitter == user && record.draft?
+    # Submitters can withdraw their own draft applications
+    # Admins can withdraw draft support requests
+    is_submitter = record.submitter == user && record.draft?
+    is_admin_withdrawing_support_request =
+      (user.admin_manager? || user.admin?) &&
+      record.submission_type&.code == 'support_request' &&
+      record.draft?
+
+    is_submitter || is_admin_withdrawing_support_request
   end
 
   def submit?
@@ -128,7 +151,12 @@ class PermitApplicationPolicy < ApplicationPolicy
       # Draft applications: Only users with full submission permissions can submit
       permissions =
         record.submission_requirement_block_edit_permissions(user_id: user.id)
-      permissions == :all
+
+      # Allow admin/admin_manager to submit support request applications
+      is_support_request = record.submission_type&.code == 'support_request'
+      is_admin = user.admin_manager? || user.admin?
+
+      permissions == :all || (is_support_request && is_admin)
     else
       # All other states: Only admin users can submit
       user.admin_manager? || user.admin?
