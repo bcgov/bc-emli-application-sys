@@ -447,6 +447,12 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               }
               renderSaveButton={() => !currentPermitApplication?.isIneligible && <SaveButton handleSave={handleSave} />}
               updateCollaborationAssignmentNodes={updateRequirementBlockAssignmentNode}
+              performedBy={
+                (currentUser?.role === 'admin' || currentUser?.role === 'admin_manager') &&
+                currentPermitApplication?.isSupportRequest
+                  ? 'staff'
+                  : undefined
+              }
             />
           </Flex>
         )}

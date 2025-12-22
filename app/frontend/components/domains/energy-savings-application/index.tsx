@@ -10,6 +10,7 @@ import { useSearch } from '../../../hooks/use-search';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { useMst } from '../../../setup/root';
 import {
+  EPermitApplicationStatus,
   EPermitApplicationStatusGroup,
   EPermitApplicationSubmitterSortFields,
   EPermitClassificationCode,
@@ -56,7 +57,7 @@ export const EnergySavingsApplicationIndexScreen = observer(({ skipDefaultFilter
   const query = useQuery();
   const currentUser = userStore.currentUser;
 
-  const { setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, search } = permitApplicationStore;
+  const { setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, setIsSupportedApplicationsPageFilter, search } = permitApplicationStore;
   const requirementTemplateId = query.get('requirementTemplateId');
   const templateVersionId = query.get('templateVersionId');
   const filters = t('energySavingsApplication.filter', { returnObjects: true }) as { [key: string]: string };
@@ -64,36 +65,48 @@ export const EnergySavingsApplicationIndexScreen = observer(({ skipDefaultFilter
   // Only set default filters if skipDefaultFilters is false
   React.useEffect(() => {
     if (!skipDefaultFilters) {
-      setUserGroupFilter(EPermitClassificationCode.participant);
-      setAudienceTypeFilter(
-        currentUser.isParticipant ? EPermitClassificationCode.external : EPermitClassificationCode.internal,
-      );
-      setSubmissionTypeFilter(
-        currentUser.isParticipant
-          ? EPermitClassificationCode.application
-          : [
-              EPermitClassificationCode.application,
-              EPermitClassificationCode.onboarding,
-              EPermitClassificationCode.invoice,
-              EPermitClassificationCode.supportRequest,
-            ],
-      );
-    } else {
-      // console.log('[EnergySavingsApplicationIndexScreen] Skipping default filters, current filters:', {
-      //   submissionType: permitApplicationStore.submissionTypeIdFilter,
-      //   userGroup: permitApplicationStore.userGroupTypeIdFilter,
-      //   audienceType: permitApplicationStore.audienceTypeIdFilter,
-      // });
+      const isSupportedApplicationsPage = location.pathname.endsWith('/supported-applications');
+
+      if (isSupportedApplicationsPage) {
+        // For supported applications, use backend boolean query filter
+        setUserGroupFilter(EPermitClassificationCode.participant);
+        setAudienceTypeFilter([EPermitClassificationCode.external, EPermitClassificationCode.internal]);
+        // Show parent applications (not support requests themselves)
+        setSubmissionTypeFilter([
+          EPermitClassificationCode.application,
+          EPermitClassificationCode.onboarding,
+          EPermitClassificationCode.invoice,
+        ]);
+        setIsSupportedApplicationsPageFilter(true);
+      } else {
+        setUserGroupFilter(EPermitClassificationCode.participant);
+        setAudienceTypeFilter(
+          currentUser.isParticipant ? EPermitClassificationCode.external : EPermitClassificationCode.internal,
+        );
+        setSubmissionTypeFilter(
+          currentUser.isParticipant
+            ? EPermitClassificationCode.application
+            : [
+                EPermitClassificationCode.application,
+                EPermitClassificationCode.onboarding,
+                EPermitClassificationCode.invoice,
+                EPermitClassificationCode.supportRequest,
+              ],
+        );
+        setIsSupportedApplicationsPageFilter(null);
+      }
     }
-  }, [skipDefaultFilters, setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, currentUser.isParticipant, permitApplicationStore]);
+  }, [skipDefaultFilters, setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, setIsSupportedApplicationsPageFilter, currentUser.isParticipant, location.pathname]);
 
   useSearch(permitApplicationStore, [
     requirementTemplateId || '',
     templateVersionId || '',
-    JSON.stringify(currentSandboxId),
+    JSON.stringify(currentSandboxId) || 'null',
   ]);
   useFlashQueryParam();
   const resetQueryParams = useResetQueryParams();
+
+  const displayedApplications = tablePermitApplications;
 
   return (
     <Flex as="main" direction="column" w="full" bg="greys.white" pb="24">
@@ -168,7 +181,7 @@ export const EnergySavingsApplicationIndexScreen = observer(({ skipDefaultFilter
             <Flex py="50" w="full">
               <SharedSpinner h={50} w={50} />
             </Flex>
-          ) : tablePermitApplications.length === 0 ? (
+          ) : displayedApplications.length === 0 ? (
             <Flex direction="column" w="full">
               {customEmptyMessage && (
                 <Box borderBottom="2px solid" borderColor="greys.lightGrey"  mt={4}/>
@@ -178,7 +191,7 @@ export const EnergySavingsApplicationIndexScreen = observer(({ skipDefaultFilter
               </Flex>
             </Flex>
           ) : (
-            tablePermitApplications.map((pa) => (
+            displayedApplications.map((pa) => (
               <EnergySavingsApplicationCard key={pa.id} energySavingsApplication={pa as IEnergySavingsApplication} />
             ))
           )}

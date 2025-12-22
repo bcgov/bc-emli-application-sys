@@ -55,6 +55,7 @@ module Api::Concerns::Search::PermitApplications
           :requirement_template_id,
           :template_version_id,
           :user_group_type_id,
+          :is_supported_applications_page,
           { audience_type_id: [] },
           { submission_type_id: [] },
           { status: [] }
@@ -71,7 +72,6 @@ module Api::Concerns::Search::PermitApplications
     @submission_types =
       SubmissionType
         .where(code: permitted_params[:filters][:submission_type_id])
-        .where.not(code: "support_request")
 
     permitted_params
   end
@@ -119,8 +119,12 @@ module Api::Concerns::Search::PermitApplications
     where =
       if @program
         { program_id: @program.id }
-      else
+      elsif current_user.participant?
+        # Participants can only see applications they have edit permissions for
         { user_ids_with_submission_edit_permissions: current_user.id }
+      else
+        # Admin users can see all applications (no user permission filter)
+        {}
       end
     where.merge!(
       sandbox_id: (current_sandbox&.id unless current_user.system_admin?),
@@ -128,7 +132,53 @@ module Api::Concerns::Search::PermitApplications
       audience_type_id: @audience_types.pluck(:id),
       submission_type_id: @submission_types.pluck(:id)
     ).compact!
-    filters.to_h.deep_symbolize_keys.compact.merge!(where)
+
+    # Add boolean query for supported applications page
+    if filters[:is_supported_applications_page] == true
+      where[:_or] = [
+        # Applications created by admin/admin_manager/system_admin
+        { submitter_role: ['admin', 'admin_manager', 'system_admin'] },
+        # OR submitted participant applications with draft support requests
+        {
+          _and: [
+            { user_group_type_code: 'participant' },
+            { is_submitted: true },
+            { has_draft_support_requests: true }
+          ]
+        },
+        # OR draft internal support requests (admin uploads on behalf of participant)
+        {
+          _and: [
+            { status: 'new_draft' },
+            { submission_type_code: 'support_request' },
+            { audience_type_code: 'internal' }
+          ]
+        }
+      ]
+
+      # Exclude draft external support requests (participant handles these)
+      # Exclude draft support requests requested by participants
+      where[:_not] = {
+        _or: [
+          {
+            _and: [
+              { status: 'new_draft' },
+              { submission_type_code: 'support_request' },
+              { audience_type_code: 'external' }
+            ]
+          },
+          {
+            _and: [
+              { status: 'new_draft' },
+              { submission_type_code: 'support_request' },
+              { is_support_request_by_participant: true }
+            ]
+          }
+        ]
+      }
+    end
+
+    filters.to_h.deep_symbolize_keys.compact.except(:is_supported_applications_page).merge!(where)
   end
 
   def status_priority_map

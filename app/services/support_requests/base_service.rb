@@ -8,23 +8,26 @@ module SupportRequests
   # Subclasses must provide the type codes and nickname that define
   # their particular support request variant.
   class BaseService
-    def initialize(parent_app:, user_context:, note:)
+    def initialize(parent_app:, user_context:, note:, audience_type_code: nil)
       @parent_app = parent_app # The application this support request is linked to
       @program = parent_app.program
       @submitted_for = parent_app.submitter_id
       @user_context = user_context # Current user_context making the request
       @note = note # Optional text entered in the request form
+      @dynamic_audience_type_code = audience_type_code # Optional dynamic audience type code
     end
 
     # Main entry point for the service.
     # Returns the newly created SupportRequest object.
     def call
       requirement = find_requirement!
+
       authorize_requirement!(requirement) # Pundit check: can the user access this requirement? defined in the subclassed service
 
       template = find_published_template!(requirement)
 
       permit_application = create_permit_application!(template)
+
       authorize_application!(permit_application) # Pundit check: can the user create this application? defined in the subclassed service
 
       create_support_request!(permit_application)
@@ -81,8 +84,10 @@ module SupportRequests
 
     # Create the new PermitApplication using the resolved template and type codes.
     def create_permit_application!(template)
-      PermitApplication.create!(
-        submitter: @parent_app.submitter,
+      submitter = @parent_app.submitter_type.constantize.find(@parent_app.submitter_id)
+
+      app = PermitApplication.create!(
+        submitter: submitter,
         user_group_type: UserGroupType.find_by!(code: user_group_type_code),
         audience_type: AudienceType.find_by!(code: audience_type_code),
         submission_type: SubmissionType.find_by!(code: submission_type_code),
@@ -91,6 +96,8 @@ module SupportRequests
         nickname: nickname,
         template_version: template
       )
+
+      app
     end
 
     # Create the SupportRequest that links the parent application to the new one.

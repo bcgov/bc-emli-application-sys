@@ -41,21 +41,28 @@ class Api::SupportRequestsController < Api::ApplicationController
       SupportRequests::SupportingFilesService.new(
         parent_app: parent_app,
         user_context: pundit_user,
-        note: params[:note]
+        note: params[:note],
+        audience_type_code: params[:audience_type_code]&.to_sym
       ).call
 
     # check it actually got created
     if support_request.persisted?
       parent_app.reload
 
-      missing_files =
-        params[:note].to_s.split(/\r?\n/).map(&:strip).reject(&:blank?)
+      # Only send notification for external (participant) pathway
+      # For internal (admin) pathway, admin will upload files themselves
+      is_internal = params[:audience_type_code]&.to_sym == :internal
 
-      NotificationService.publish_supporting_files_requested_event(
-        parent_app,
-        missing_files: missing_files,
-        linked_application_id: support_request.linked_application_id
-      )
+      unless is_internal
+        missing_files =
+          params[:note].to_s.split(/\r?\n/).map(&:strip).reject(&:blank?)
+
+        NotificationService.publish_supporting_files_requested_event(
+          parent_app,
+          missing_files: missing_files,
+          linked_application_id: support_request.linked_application_id
+        )
+      end
 
       render json:
                PermitApplicationBlueprint.render(parent_app, view: :extended),

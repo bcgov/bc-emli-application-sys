@@ -646,7 +646,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
         application_data[:user]
       )&.deliver_later
 
-      # render_success nil, "permit_application.delete_success"
+      render_success nil, "permit_application.delete_success"
     else
       render_error "permit_application.delete_error",
                    message_opts: {

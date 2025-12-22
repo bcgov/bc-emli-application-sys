@@ -1,5 +1,5 @@
 import { Box, Button, Divider, Flex, HStack, Heading, Spacer, Stack, Text, useDisclosure } from '@chakra-ui/react';
-import { CaretDown, CaretRight, CaretUp, CheckCircleIcon, NotePencilIcon, ProhibitIcon } from '@phosphor-icons/react';
+import { CaretDown, CaretRight, CaretUp, CheckCircle, NotePencil, Plus, Prohibit, Warning } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -22,6 +22,7 @@ import { SubmissionDownloadModal } from './submission-download-modal';
 //import ApplicationReviewModal from '../../shared/modals/application-review-modal';
 import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation-modal';
 import UpdatePathwayModal from '../../shared/modals/application-update-pathway';
+import AddSupportingFilesPathwayModal from '../../shared/modals/add-supporting-files-pathway-modal';
 import { EnergySavingsApplicationStatusTag } from '../../shared/energy-savings-applications/energy-savings-application-status-tag';
 import { SupportingFilesRequestModal } from './supporting-files-request-modal';
 
@@ -52,6 +53,11 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const { isOpen: isScreenIn, onOpen: onScreenIn, onClose: onScreenInclose } = useDisclosure();
   const { isOpen: isContactsOpen, onOpen: onContactsOpen, onClose: onContactsClose } = useDisclosure();
   const { isOpen: isUpdatePathwayOpen, onOpen: onUpdatePathwayOpen, onClose: onUpdatePathwayClose } = useDisclosure();
+  const {
+    isOpen: isAddSupportingFilesPathwayOpen,
+    onOpen: onAddSupportingFilesPathwayOpen,
+    onClose: onAddSupportingFilesPathwayClose,
+  } = useDisclosure();
   const {
     isOpen: isRequestSupportingFilesOpen,
     onOpen: onRequestSupportingFilesOpen,
@@ -222,7 +228,10 @@ export const ReviewPermitApplicationScreen = observer(() => {
             </Flex>
           </HStack>
           <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
-            <SupportingFilesRequestModal permitApplication={currentPermitApplication} />
+            <Button variant="primary" onClick={onAddSupportingFilesPathwayOpen}>
+              {t('energySavingsApplication.show.supportingFilesRequest.addSupportingFiles')}
+            </Button>
+            {/* <SupportingFilesRequestModal permitApplication={currentPermitApplication} /> */}
             <SubmissionDownloadModal permitApplication={currentPermitApplication} review />
             <Button variant="primary" rightIcon={<CaretRight />} onClick={() => navigate(`/submission-inbox`)}>
               {t('ui.backToInbox')}
@@ -259,7 +268,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
             top={permitHeaderHeight}
           >
             <Flex width={'sidebar.width'} align="center" gap={2}>
-              <NotePencilIcon size={24} />
+              <NotePencil size={24} />
               <Heading fontSize="lg" mt={2}>
                 {t('energySavingsApplication.show.updatesTracker')}
               </Heading>
@@ -309,7 +318,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                     <HStack spacing={6}>
                       <Button
                         variant="calloutInverse"
-                        leftIcon={<NotePencilIcon />}
+                        leftIcon={<NotePencil />}
                         px={14}
                         onClick={onUpdatePathwayOpen}
                         borderColor="theme.yellow"
@@ -323,7 +332,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
 
                       <Button
                         variant="calloutInverse"
-                        leftIcon={<CheckCircleIcon />}
+                        leftIcon={<CheckCircle />}
                         px={14}
                         onClick={onScreenIn}
                         borderColor="green"
@@ -336,7 +345,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                       </Button>
                       <Button
                         variant="calloutInverse"
-                        leftIcon={<ProhibitIcon />}
+                        leftIcon={<Prohibit />}
                         px={14}
                         onClick={onIneligibleOpen}
                         borderColor="red"
@@ -381,6 +390,13 @@ export const ReviewPermitApplicationScreen = observer(() => {
           setPerformedBy={(performedByValue: string) => {
             setPerformedBy(performedByValue);
           }}
+          permitApplication={currentPermitApplication}
+        />
+      )}
+      {isAddSupportingFilesPathwayOpen && (
+        <AddSupportingFilesPathwayModal
+          isOpen={isAddSupportingFilesPathwayOpen}
+          onClose={onAddSupportingFilesPathwayClose}
           permitApplication={currentPermitApplication}
         />
       )}

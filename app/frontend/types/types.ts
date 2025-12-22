@@ -487,6 +487,10 @@ export interface IEnergySavingsApplicationSearchFilters {
   requirementTemplateId?: string;
   templateVersionId?: string;
   status?: EPermitApplicationStatus[];
+  userGroupTypeId?: string;
+  submissionTypeId?: string[];
+  audienceTypeId?: string[];
+  isSupportedApplicationsPage?: boolean;
 }
 
 export interface ITemplateVersionDiff {

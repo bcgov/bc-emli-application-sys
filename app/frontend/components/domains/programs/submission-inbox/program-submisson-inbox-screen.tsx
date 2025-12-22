@@ -68,13 +68,24 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
     setAudienceTypeFilter(selectedValue?.AudienceType);
     setSubmissionTypeFilter(selectedValue?.SubmissionType);
 
-    // Also set the status filter from the dropdown option
+    // Set the status filter from the dropdown option
     if (selectedValue?.status) {
       setStatusFilter(selectedValue.status);
+    } 
+    else {
+      // Set default status filters
+      setStatusFilter([
+        EPermitApplicationStatus.draft,
+        EPermitApplicationStatus.submitted,
+        EPermitApplicationStatus.inReview,
+        EPermitApplicationStatus.approved,
+        EPermitApplicationStatus.ineligible,
+        EPermitApplicationStatus.revisionsRequested,
+      ]);
     }
 
-    // The EnergySavingsApplicationFilter component will update the status filter
-    // and trigger a new search with the correct statuses for this submission type
+    // Trigger search with the new filters
+    search();
   };
 
   const handleProgramChange = useCallback(async (programId) => {
@@ -105,23 +116,41 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
       });
       setSubmissionOptions(translatedOptions);
 
-      // Set default to participant submissions (set filters but don't search yet)
+      // Set default to participant submissions and trigger initial search
       if (translatedOptions.length > 0) {
         const defaultOption = translatedOptions[0].value;
         methods.setValue('selectedType', defaultOption);
         setUserGroupFilter(defaultOption?.userGroupType);
         setAudienceTypeFilter(defaultOption?.AudienceType);
         setSubmissionTypeFilter(defaultOption?.SubmissionType);
-        // Status filter will be set by EnergySavingsApplicationFilter component
+
+        // Set status filters
+        if (defaultOption?.status) {
+          setStatusFilter(defaultOption.status as EPermitApplicationStatus[]);
+        } else {
+          setStatusFilter([
+            EPermitApplicationStatus.draft,
+            EPermitApplicationStatus.submitted,
+            EPermitApplicationStatus.inReview,
+            EPermitApplicationStatus.approved,
+            EPermitApplicationStatus.ineligible,
+            EPermitApplicationStatus.revisionsRequested,
+          ]);
+        }
+
+        // Trigger initial search with default filters
+        search();
       }
     } catch (error) {
       console.error('Failed to fetch submission options', error);
     }
-  }, [permitClassificationStore, t, setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, methods]);
+  }, [permitClassificationStore, t, setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, setStatusFilter, search, methods]);
 
   const loadProgramOptions = useCallback(async () => {
     try {
       setIsInitialLoading(true);
+      // Clear the supported applications filter when loading submission inbox
+      permitApplicationStore.setIsSupportedApplicationsPageFilter(null);
       await userStore.fetchActivePrograms();
       const activePrograms = userStore.currentUser?.activePrograms ?? [];
       if (activePrograms.length === 0) {
@@ -158,6 +187,11 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
   useEffect(() => {
     loadProgramOptions();
   }, [loadProgramOptions]);
+
+  // Set count per page to 10 for submission inbox
+  useEffect(() => {
+    permitApplicationStore.setCountPerPage(10);
+  }, [permitApplicationStore]);
 
   if (errorMessage) return <ErrorScreen error={errorMessage} />;
   if (!permitClassificationStore.isLoaded || isInitialLoading) return <LoadingScreen />;

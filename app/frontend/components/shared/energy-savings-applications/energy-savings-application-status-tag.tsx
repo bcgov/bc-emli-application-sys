@@ -8,7 +8,7 @@ import { EUserRoles } from '../../../types/enums';
 import { useLocation } from 'react-router-dom';
 
 interface IEnergySavingsApplicationStatusTagProps extends TagProps {
-  energySavingsApplication: IEnergySavingsApplication;
+  energySavingsApplication: IEnergySavingsApplication | null;
   type?: string;
 }
 
@@ -22,6 +22,10 @@ export const EnergySavingsApplicationStatusTag = ({
   const currentUser = userStore.currentUser;
   const { pathname } = useLocation();
   const isSupportedApplication = pathname === '/supported-applications';
+
+  if (!energySavingsApplication) {
+    return null;
+  }
 
   const { status, viewedAt } = energySavingsApplication;
 

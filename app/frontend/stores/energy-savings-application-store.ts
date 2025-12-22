@@ -58,6 +58,7 @@ export const PermitApplicationStoreModel = types
       templateVersionIdFilter: types.maybeNull(types.string),
       requirementTemplateIdFilter: types.maybeNull(types.string),
       assignedUserIdFilter: types.maybeNull(types.string),
+      isSupportedApplicationsPageFilter: types.maybeNull(types.boolean),
     }),
     createSearchModel<EPermitApplicationSortFields>('searchPermitApplications', 'setPermitApplicationFilters'),
   )
@@ -262,6 +263,10 @@ export const PermitApplicationStoreModel = types
       // @ts-ignore
       self.assignedUserIdFilter = userId;
     },
+    setIsSupportedApplicationsPageFilter(isSupportedApplicationsPage: boolean | null) {
+      // @ts-ignore
+      self.isSupportedApplicationsPageFilter = isSupportedApplicationsPage;
+    },
   }))
   .actions((self) => ({
     getEphemeralPermitApplication(
@@ -365,11 +370,11 @@ export const PermitApplicationStoreModel = types
 
       return app;
     },
-    requestSupportingFiles: flow(function* (permitApplicationId: string, note: string) {
+    requestSupportingFiles: flow(function* (permitApplicationId: string, params: { note: string; audience_type_code?: string }) {
       const permitApplication = self.getPermitApplicationById(permitApplicationId);
       if (!permitApplication) return false;
 
-      const { ok, data: response } = yield self.environment.api.requestSupportingFiles(permitApplicationId, note);
+      const { ok, data: response } = yield self.environment.api.requestSupportingFiles(permitApplicationId, params);
       if (ok && response) {
         self.normalizeSubmitter(response);
         self.mergeUpdate(response, 'permitApplicationMap');
@@ -417,6 +422,7 @@ export const PermitApplicationStoreModel = types
           audienceTypeId: self.audienceTypeIdFilter ? [...self.audienceTypeIdFilter] : undefined,
           templateVersionId: self.templateVersionIdFilter,
           requirementTemplateId: self.requirementTemplateIdFilter,
+          isSupportedApplicationsPage: self.isSupportedApplicationsPageFilter,
         },
       } as TSearchParams<EPermitApplicationSortFields, IEnergySavingsApplicationSearchFilters>;
 
@@ -510,7 +516,6 @@ export const PermitApplicationStoreModel = types
           payloadData = payload.data as IPermitBlockStatus;
           self.permitApplicationMap.get(payloadData?.permitApplicationId)?.updatePermitBlockStatus(payloadData);
         default:
-          import.meta.env.DEV && console.log(`Unknown event type ${payload.eventType}`);
       }
     }),
   }));
