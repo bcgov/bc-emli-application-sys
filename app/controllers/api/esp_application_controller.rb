@@ -95,10 +95,13 @@ class Api::EspApplicationController < Api::ApplicationController
       begin
         requirement =
           RequirementTemplate.find_by!(
-            program_id: @program&.id,
-            user_group_type_id: @user_group_type&.id,
-            audience_type_id: @audience_type&.id,
-            submission_type_id: @submission_type&.id
+            {
+              program_id: @program&.id,
+              user_group_type_id: @user_group_type&.id,
+              audience_type_id: @audience_type&.id,
+              submission_type_id: @submission_type&.id,
+              submission_variant_id: @submission_variant&.id
+            }.compact
           )
       rescue ActiveRecord::RecordNotFound
         render_error(

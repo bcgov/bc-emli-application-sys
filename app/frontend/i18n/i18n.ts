@@ -1075,6 +1075,14 @@ const options = {
           },
           returnToDashboard: 'Back to Contractor homepage',
         },
+        invoices: {
+          selection: {
+            pageTitle: 'Select an invoice type',
+            selectAriaLabel: '{{invoiceType}}',
+            errorNoSelection: 'Please select an invoice type before continuing.',
+            noInvoicesFound: 'No invoices found',
+          },
+        },
         energySavingsApplication: {
           submissionBlockModal: {
             title: 'Trying to submit this application?',
@@ -2984,6 +2992,7 @@ const options = {
             supportedApplications: 'View supported applications',
             blankApplications: 'View blank applications',
             newApplication: 'Start an application',
+            newInvoice: 'Select invoice type',
             submissionInbox: 'Submissions inbox',
             configuration: 'Configure jurisdiction',
             sucessfulSubmission: 'Application submitted',

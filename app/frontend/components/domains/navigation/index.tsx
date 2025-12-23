@@ -123,6 +123,11 @@ const NewApplicationScreen = lazy(() =>
     default: module.NewApplicationScreen,
   })),
 );
+const NewInvoiceScreen = lazy(() =>
+  import('../energy-savings-application/new-invoice-screen').then((module) => ({
+    default: module.NewInvoiceScreen,
+  })),
+);
 const ReviewPermitApplicationScreen = lazy(() =>
   import('../energy-savings-application/review-permit-application-screen').then((module) => ({
     default: module.ReviewPermitApplicationScreen,
@@ -529,7 +534,7 @@ const AppRoutes = observer(() => {
         >
           <Route path="/applications" element={<EnergySavingsApplicationIndexScreen />} />
           <Route path="/new-application" element={<NewApplicationScreen />} />
-          <Route path="/new-invoice" element={<NewApplicationScreen />} />
+          <Route path="/new-invoice" element={<NewInvoiceScreen />} />
           <Route path="/blank-applications" element={<NewApplicationScreen />} />
           <Route path="/supported-applications" element={<EnergySavingsApplicationIndexScreen />} />
           <Route path="/contractor-dashboard" element={<ContractorDashboardScreen />} />
