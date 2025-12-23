@@ -9,6 +9,7 @@ class Api::EspApplicationController < Api::ApplicationController
         user_group_type: @user_group_type,
         audience_type: @audience_type,
         submission_type: @submission_type,
+        submission_variant: @submission_variant,
         program: @program,
         status: :new_draft,
         nickname: @nickname,
@@ -39,6 +40,14 @@ class Api::EspApplicationController < Api::ApplicationController
     @audience_type = AudienceType.find_by(code: app_params[:audience_type])
     @submission_type =
       SubmissionType.find_by(code: app_params[:submission_type])
+    @submission_variant =
+      (
+        if app_params[:submission_variant_id].present?
+          SubmissionVariant.find_by(id: app_params[:submission_variant_id])
+        else
+          nil
+        end
+      )
 
     if [@user_group_type, @audience_type, @submission_type].any?(&:blank?)
       render json: {
@@ -86,10 +95,13 @@ class Api::EspApplicationController < Api::ApplicationController
       begin
         requirement =
           RequirementTemplate.find_by!(
-            program_id: @program&.id,
-            user_group_type_id: @user_group_type&.id,
-            audience_type_id: @audience_type&.id,
-            submission_type_id: @submission_type&.id
+            {
+              program_id: @program&.id,
+              user_group_type_id: @user_group_type&.id,
+              audience_type_id: @audience_type&.id,
+              submission_type_id: @submission_type&.id,
+              submission_variant_id: @submission_variant&.id
+            }.compact
           )
       rescue ActiveRecord::RecordNotFound
         render_error(

@@ -43,9 +43,13 @@ export enum EPermitClassificationCode {
   application = 'application',
   supportRequest = 'support_request',
   onboarding = 'onboarding',
-  invoice_1 = 'invoice_1',
-  invoice_2 = 'invoice_2',
-  invoice_3 = 'invoice_3',
+  invoiceHeatPumpSpace = 'invoice_heat_pump_space',
+  invoiceHeatPumpWater = 'invoice_heat_pump_water',
+  invoiceInsulation = 'invoice_insulation',
+  invoiceWindowsDoors = 'invoice_windows_doors',
+  invoiceVentilation = 'invoice_ventilation',
+  invoiceElectricalUpgrade = 'invoice_electrical_upgrade',
+  invoiceHealthSafety = 'invoice_health_safety',
 }
 
 export enum ESubmissionInboxTypes {

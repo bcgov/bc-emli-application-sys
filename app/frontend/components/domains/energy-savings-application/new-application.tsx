@@ -20,6 +20,7 @@ export type TCreateEnergyApplicationFormData = {
   submission_type: string;
   slug: string;
   template_version_id?: string;
+  submission_variant_id?: string;
 };
 
 export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) => {

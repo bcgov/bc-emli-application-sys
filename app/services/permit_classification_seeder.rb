@@ -119,33 +119,70 @@ class PermitClassificationSeeder
       record.update!(attrs)
     end
 
-    # --- Invoice Variants ---
     invoice = SubmissionType.find_by(code: :invoice)
 
-    variants = [
+    invoice_variants = [
       {
-        name: "Invoice 1",
-        code: PermitClassification.codes[:invoice_1],
-        parent: invoice
+        name: "Heat pump (space heating)",
+        code: "invoice_heat_pump_space",
+        description: "",
+        enabled: true,
+        type: "SubmissionVariant",
+        parent_id: invoice.id
       },
       {
-        name: "Invoice 2",
-        code: PermitClassification.codes[:invoice_2],
-        parent: invoice
+        name: "Heat pump water heater (including combined)",
+        code: "invoice_heat_pump_water",
+        description: "",
+        enabled: true,
+        type: "SubmissionVariant",
+        parent_id: invoice.id
       },
       {
-        name: "Invoice 3",
-        code: PermitClassification.codes[:invoice_3],
-        parent: invoice
+        name: "Insulation",
+        code: "invoice_insulation",
+        description: "",
+        enabled: true,
+        type: "SubmissionVariant",
+        parent_id: invoice.id
+      },
+      {
+        name: "Windows and doors",
+        code: "invoice_windows_doors",
+        description: "",
+        enabled: true,
+        type: "SubmissionVariant",
+        parent_id: invoice.id
+      },
+      {
+        name: "Ventilation",
+        code: "invoice_ventilation",
+        description: "",
+        enabled: true,
+        type: "SubmissionVariant",
+        parent_id: invoice.id
+      },
+      {
+        name: "Electrical service upgrade",
+        code: "invoice_electrical_upgrade",
+        description: "",
+        enabled: true,
+        type: "SubmissionVariant",
+        parent_id: invoice.id
+      },
+      {
+        name: "Health and safety remediation",
+        code: "invoice_health_safety",
+        description: "",
+        enabled: true,
+        type: "SubmissionVariant",
+        parent_id: invoice.id
       }
     ]
 
-    variants.each do |attrs|
-      SubmissionVariant.find_or_create_by!(code: attrs[:code]) do |sv|
-        sv.name = attrs[:name]
-        sv.parent = attrs[:parent]
-        sv.enabled = true
-      end
+    invoice_variants.each do |attrs|
+      record = PermitClassification.find_or_initialize_by(code: attrs[:code])
+      record.update!(attrs)
     end
 
     PermitApplication.reindex
