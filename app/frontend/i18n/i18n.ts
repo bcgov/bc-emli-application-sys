@@ -1078,7 +1078,6 @@ const options = {
         invoices: {
           selection: {
             pageTitle: 'Select an invoice type',
-            selectAriaLabel: '{{invoiceType}}',
             errorNoSelection: 'Please select an invoice type before continuing.',
             noInvoicesFound: 'No invoices found',
           },
