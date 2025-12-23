@@ -2,8 +2,8 @@ import { colors } from '../foundations/colors';
 export const Radio = {
   baseStyle: {
     control: {
-      width: '22px',
-      height: '22px',
+      width: '1.375rem',
+      height: '1.375rem',
 
       _checked: {
         bg: 'theme.darkBlue',
