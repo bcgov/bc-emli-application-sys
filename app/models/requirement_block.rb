@@ -88,9 +88,10 @@ class RequirementBlock < ApplicationRecord
     optional_block = requirements.all? { |req| !req.required }
     requirement_map = requirements.map { |r| r.to_form_json(key(section_key)) }
 
-    if optional_block
-      requirement_map.push(optional_block_confirmation_requirement(section_key))
-    end
+    # Don't add confirmation checkbox for optional blocks
+    # if optional_block
+    #   requirement_map.push(optional_block_confirmation_requirement(section_key))
+    # end
 
     requirement_map
   end

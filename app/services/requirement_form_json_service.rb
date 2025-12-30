@@ -508,13 +508,13 @@ class RequirementFormJsonService
           :employee_name,
           requirement_block_key,
           "Employee name",
-          true
+          required
         ),
         get_nested_info_component(
           :employee_email,
           requirement_block_key,
           "Employee email",
-          true,
+          required,
           :email
         )
       ]
