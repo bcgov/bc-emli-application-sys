@@ -10,9 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_13_025026) do
-  create_schema "pgbouncer"
-
+ActiveRecord::Schema[7.1].define(version: 2026_01_06_210043) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -152,6 +150,29 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_13_025026) do
     t.index ["employee_id"], name: "index_contractor_employees_on_employee_id"
   end
 
+  create_table "contractor_infos",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.uuid "contractor_id", null: false
+    t.string "doing_business_as"
+    t.string "license_issuer"
+    t.string "license_number"
+    t.integer "incorporated_year"
+    t.integer "number_of_employees"
+    t.string "gst_number"
+    t.string "worksafebc_number"
+    t.integer "type_of_business", default: [], null: false, array: true
+    t.integer "primary_program_measure", default: [], null: false, array: true
+    t.integer "retrofit_enabling_measures", default: [], array: true
+    t.string "service_languages"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contractor_id"],
+            name: "index_contractor_infos_on_contractor_id",
+            unique: true
+  end
+
   create_table "contractor_onboards",
                id: :uuid,
                default: -> { "gen_random_uuid()" },
@@ -159,11 +180,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_13_025026) do
     t.uuid "contractor_id", null: false
     t.uuid "onboard_application_id", null: false
     t.datetime "deactivated_at"
-    t.text "suspended_reason"
+    t.string "suspended_reason"
     t.datetime "suspended_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "deactivated_reason"
     t.index ["contractor_id"],
             name: "index_contractor_onboards_on_contractor_id"
     t.index ["onboard_application_id"],
@@ -395,6 +415,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_13_025026) do
             name: "index_permit_applications_on_submission_type_id"
     t.index ["submission_variant_id"],
             name: "index_permit_applications_on_submission_variant_id"
+    t.index %w[submitter_type submitter_id],
+            name: "index_permit_applications_on_submitter"
     t.index ["template_version_id"],
             name: "index_permit_applications_on_template_version_id"
     t.index ["user_group_type_id"],
@@ -1019,10 +1041,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_13_025026) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
-  create_table "target_user_id", id: false, force: :cascade do |t|
-    t.uuid "id"
-  end
-
   create_table "template_section_blocks",
                id: :uuid,
                default: -> { "gen_random_uuid()" },
@@ -1171,6 +1189,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_13_025026) do
   add_foreign_key "collaborators", "users"
   add_foreign_key "contractor_employees", "contractors"
   add_foreign_key "contractor_employees", "users", column: "employee_id"
+  add_foreign_key "contractor_infos", "contractors"
   add_foreign_key "contractor_onboards", "contractors"
   add_foreign_key "contractor_onboards",
                   "permit_applications",
