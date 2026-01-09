@@ -1061,6 +1061,7 @@ const options = {
           },
         },
         contractorOnboarding: {
+          contractorId: "Contractor ID",
           readyContractor: 'Ready to submit your registration details?',
           confirmationContractor:
             'By submitting your registration details you confirm that the information you provided was completed to the best of your knowledge and ability.',
@@ -1332,9 +1333,12 @@ const options = {
               'You confirm that the information you have provided was completed to the best of your knowledge and ability.',
           },
           show: {
+
             update: 'Update',
-            screenIn: 'Screen in',
-            inEligible: 'Ineligible',
+            readyForTraining: 'Ready for Training',
+            markIneligible: 'Mark ineligible',
+            //screenIn: 'Screen in',
+            //inEligible: 'Ineligible',
             wasSubmitted: 'Application was submitted on {{ date }} to {{ jurisdictionName }}',
             submittingTo: {
               title: "You're applying to the {{ jurisdictionName }}",

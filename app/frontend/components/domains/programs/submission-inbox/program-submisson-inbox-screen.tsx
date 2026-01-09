@@ -62,12 +62,12 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
     if (!selectedValue) {
       return;
     }
-
+    
     // Set classification filters
     setUserGroupFilter(selectedValue?.userGroupType);
     setAudienceTypeFilter(selectedValue?.AudienceType);
     setSubmissionTypeFilter(selectedValue?.SubmissionType);
-
+  
     // Set the status filter from the dropdown option
     if (selectedValue?.status) {
       setStatusFilter(selectedValue.status);
@@ -351,6 +351,9 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
             <RouterLinkButton variant="primary" to={`/applications/${permitApplication.id}`}>
               {t('ui.view')}
             </RouterLinkButton>
+            {/* <RouterLinkButton variant="primary" to={`/applications_2/${permitApplication.id}`}>      
+              view_new
+            </RouterLinkButton> */}
           </HStack>
         </Stack>
       </SearchGridItem>
