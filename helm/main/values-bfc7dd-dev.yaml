@@ -124,10 +124,11 @@ crunchy-postgres:
         memory: 32Mi
 
   pgBackRest:
-    retention: '1'
+    retention: '3'
+    retentionFullType: time
     repos:
       volume:
-        storage: 256Mi
+        storage: 1Gi
     repoHost:
       requests:
         cpu: 1m
@@ -136,6 +137,15 @@ crunchy-postgres:
       requests:
         cpu: 1m
         memory: 64Mi
+    s3:
+      enabled: true
+      createS3Secret: false
+      s3Secret: hesp # pragma: allowlist secret
+      s3Path: '/pgbackup'
+      s3UriStyle: path
+      bucket: 'hesp-dev-cacentral1-s3pgbackup'
+      endpoint: 's3.ca-central-1.amazonaws.com'
+      region: 'ca-central-1'
 
   patroni:
     postgresql:
