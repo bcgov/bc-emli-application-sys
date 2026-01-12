@@ -1,15 +1,15 @@
-# Requirement Block Sync (TEST → DEV / PROD / LOCAL)
+# Requirement Block Sync (SOURCE → TARGET)
 
-This document describes how to **export and reapply a `requirement_block` and its associated `requirements`** from **TEST** {SOURCE} into another environment (**DEV / PROD / LOCAL**) {TARGET} in a **repeatable and safe way**.
+This document describes how to **export and reapply a `requirement_block` and its associated `requirements`** from **SOURCE** into another environment **TARGET** in a **repeatable and safe way**.
 
-This process is intended for **infrequent, controlled updates** to form definitions maintained by admins in TEST.
+This process is intended for **infrequent, controlled updates** to form definitions maintained by admins in **SOURCE**.
 
 ---
 
 ## Overview
 
-- **TEST** is the **source of truth**
-- **DEV / PROD / LOCAL** may or may not already contain the `requirement_block`
+- **SOURCE** is the **source of truth**
+- **TARGET** may or may not already contain the `requirement_block`
 - Identity is determined by **`sku`**
 - Existing requirements on the target are **always deleted and replaced**
 - UUIDs are resolved dynamically on the target — **no manual editing**
@@ -18,12 +18,12 @@ This process is intended for **infrequent, controlled updates** to form definiti
 
 ## High-Level Flow
 
-1. Run the **generation script** on **TEST**
+1. Run the **generation script** on **SOURCE**
 2. Copy the generated SQL (`DO $$ … $$;`)
-3. Run that SQL on **DEV / PROD / LOCAL**
+3. Run that SQL on **TARGET**
 4. Done
 
-The script is **safe to re-run** and guarantees the target matches TEST.
+The script is **safe to re-run** and guarantees the target matches SOURCE.
 
 ---
 
@@ -36,7 +36,7 @@ The script is **safe to re-run** and guarantees the target matches TEST.
 
 ---
 
-## Step 1 — Generate the Apply Script (Run on TEST)
+## Step 1 — Generate the Apply Script (Run on SOURCE)
 
 > Update the `sku` value.
 
@@ -185,10 +185,10 @@ END $$;
 
 ---
 
-## Step 2 — Apply the Script (Run on DEV / PROD / LOCAL)
+## Step 2 — Apply the Script (Run on TARGET)
 
-1. Copy the `generated_script` output from TEST
-2. Paste it into your SQL client connected to DEV / PROD / LOCAL
+1. Copy the `generated_script` output from SOURCE
+2. Paste it into your SQL client connected to TARGET
 3. Execute it as-is
 
 ### What the script does on the target
@@ -196,13 +196,13 @@ END $$;
 - Looks up the `requirement_block` by `sku`
 - Inserts it if missing
 - Deletes **any existing requirements** for that block
-- Re-inserts the authoritative `requirements` from TEST linked to the `requirement_block`
+- Re-inserts the authoritative `requirements` from SOURCE linked to the `requirement_block`
 
 ---
 
 ## NOTES
 
-> **TEST emits truth** > **Targets reconcile state**
+> **SOURCE emits truth** > **Targets reconcile state**
 
 This is not migrating data — this is **replaying form definitions**.
 
@@ -210,7 +210,7 @@ This is not migrating data — this is **replaying form definitions**.
 
 ## When to Use This
 
-- Admin updates form structure in TEST
+- Admin updates form structure in SOURCE
 - New or changed requirements need to be promoted
 - Environment drift needs to be corrected
 - You want a human-reviewed, auditable process
