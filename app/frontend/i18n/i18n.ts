@@ -1337,8 +1337,8 @@ const options = {
             update: 'Update',
             readyForTraining: 'Ready for Training',
             markIneligible: 'Mark ineligible',
-            //screenIn: 'Screen in',
-            //inEligible: 'Ineligible',
+            screenIn: 'Screen in',
+            inEligible: 'Ineligible',
             wasSubmitted: 'Application was submitted on {{ date }} to {{ jurisdictionName }}',
             submittingTo: {
               title: "You're applying to the {{ jurisdictionName }}",
@@ -1367,6 +1367,7 @@ const options = {
             viewRevisionRequests: 'View revision requests',
             requestingRevisions: 'Requesting revisions',
             updatesTracker: 'Updates tracker',
+            reviewNotes: 'Review notes',
             updatePathway: 'Update pathway',
             performedBy: 'Update performed by',
             updatePathwayOptions: {

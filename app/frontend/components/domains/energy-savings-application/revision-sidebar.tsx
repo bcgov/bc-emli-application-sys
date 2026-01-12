@@ -45,6 +45,7 @@ interface IRevisionSideBarProps {
   sendRevisionContainerRef?: MutableRefObject<HTMLDivElement>;
   forSubmitter?: boolean;
   updatePerformedBy?: string;
+  showRevisionRequestRemove? : boolean
 }
 
 export interface IRevisionRequestForm {
@@ -58,6 +59,8 @@ export const RevisionSideBar = observer(
     sendRevisionContainerRef,
     forSubmitter,
     updatePerformedBy,
+    showRevisionRequestRemove = true
+
   }: IRevisionSideBarProps) => {
     const { t } = useTranslation();
     const isMounted = useMountStatus();
@@ -384,7 +387,7 @@ export const RevisionSideBar = observer(
                     {t('ui.selected')}
                   </Text>
                 </Box>
-                {renderButtons()}
+                {showRevisionRequestRemove ? renderButtons() : null}
               </Flex>
             )}
           </Flex>
@@ -407,7 +410,7 @@ export const RevisionSideBar = observer(
             permitApplication={permitApplication}
           />
         )}
-        {sendRevisionContainerRef && tabIndex == 0 && (
+        {sendRevisionContainerRef && tabIndex == 0 && showRevisionRequestRemove &&  (
           <Portal containerRef={sendRevisionContainerRef}>
             <Flex gap={4} align="center">
               <Box>
