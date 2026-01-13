@@ -93,6 +93,8 @@ class User < ApplicationRecord
            class_name: "Collaborator",
            dependent: :destroy
 
+  has_many :contractor_employees, foreign_key: :employee_id, dependent: :destroy
+
   has_many :application_assignments
   has_many :assigned_permit_applications,
            through: :application_assignments,
@@ -372,6 +374,44 @@ class User < ApplicationRecord
       "authentication_methods.#{omniauth_provider}",
       default: I18n.t("authentication_methods.default")
     )
+  end
+
+  # Check if user should be blocked from access due to contractor deactivation
+  # Returns true if:
+  # - User is a deactivated contractor, OR
+  # - User is an employee of a deactivated contractor
+  def contractor_access_blocked?
+    # Check if user is a contractor (primary contact)
+    if contractor?
+      my_contractor = Contractor.find_by(contact_id: self.id)
+      return true if my_contractor&.deactivated?
+    end
+
+    # Check if user is an employee of a deactivated contractor
+    if contractor_employees.any?
+      return contractor_employees.any? { |ce| ce.contractor&.deactivated? }
+    end
+
+    false
+  end
+
+  # Check if user should see suspended contractor banner and be redirected
+  # Returns true if:
+  # - User is a contractor and their contractor is suspended, OR
+  # - User is an employee of a suspended contractor
+  def contractor_suspended?
+    # Check if user is a contractor (primary contact)
+    if contractor?
+      my_contractor = Contractor.find_by(contact_id: self.id)
+      return true if my_contractor&.suspended?
+    end
+
+    # Check if user is an employee of a suspended contractor
+    if contractor_employees.any?
+      return contractor_employees.any? { |ce| ce.contractor&.suspended? }
+    end
+
+    false
   end
 
   private

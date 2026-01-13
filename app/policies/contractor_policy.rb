@@ -34,8 +34,18 @@ class ContractorPolicy < ApplicationPolicy
     user.system_admin? || user.admin? || user.admin_manager?
   end
 
+  def suspend?
+    # Admin managers and admins can suspend contractors
+    user.admin? || user.admin_manager?
+  end
+
+  def unsuspend?
+    # Admin managers and admins can unsuspend contractors
+    user.admin? || user.admin_manager?
+  end
+
   def deactivate?
-    # Admin managers and admins can deactivate contractor employees
+    # Admin managers and admins can deactivate contractors
     user.admin_manager? || user.admin?
   end
 

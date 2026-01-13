@@ -21,7 +21,7 @@ import {
   Heading,
   Link,
 } from '@chakra-ui/react';
-import { List, Warning } from '@phosphor-icons/react';
+import { List, Warning as WarningIcon } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import * as R from 'ramda';
 import React, { useState } from 'react';
@@ -107,6 +107,11 @@ function isContractorDashboardPath(path: string): boolean {
   return path === '/contractor-dashboard';
 }
 
+function isContractorWorkflowPath(path: string): boolean {
+  const regex = /\/contractor-management\/[a-f\d-]+\/(suspend|unsuspend|remove)/;
+  return regex.test(path);
+}
+
 function shouldHideSubNavbarForPath(path: string): boolean {
   const matchers: Array<(path: string) => boolean> = [
     (path) => path === '/',
@@ -124,6 +129,7 @@ function shouldHideSubNavbarForPath(path: string): boolean {
     isActionSuccessPath,
     isblankTemplatePath,
     isContractorDashboardPath,
+    isContractorWorkflowPath,
   ];
 
   return matchers.some((matcher) => matcher(path));
@@ -321,6 +327,9 @@ export const NavBar = observer(function NavBar() {
       {/* Critical Notifications */}
       {!R.isEmpty(criticalNotifications) && <ActionRequiredBox notification={criticalNotifications[0]} />}
 
+      {/* Suspended Contractor Warning (works for contractors AND employees) */}
+      {loggedIn && currentUser?.contractorSuspended && <SuspendedContractorBanner />}
+
       {/* Sub Navigation */}
       {!shouldHideSubNavbarForPath(path) && loggedIn && <SubNavBar borderBottom={'none'} />}
     </PopoverProvider>
@@ -352,7 +361,7 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
       p={4}
     >
       <Flex align="flex-start" gap={2} whiteSpace="normal">
-        <Warning size={24} color="var(--chakra-colors-semantic-warning)" aria-hidden="true" />
+        <WarningIcon size={24} color="var(--chakra-colors-semantic-warning)" aria-hidden="true" />
         <Flex direction="column" gap={2}>
           <Heading as="h3" fontSize="md">
             {t('ui.actionRequired')}
@@ -527,7 +536,7 @@ const NavBarMenu = observer(function NavBarMenu({ loginPath }: INavBarMenuProps)
                   </Show>
 
                   {/* Role-based menu items */}
-                  {currentUser.isSuperAdmin && <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/programs'} />}
+                  {currentUser?.isSuperAdmin && <NavMenuItem label={t('home.jurisdictionsTitle')} to={'/programs'} />}
                   {currentUser?.isSuperAdmin && superAdminItems}
                   {(currentUser?.isReviewManager || currentUser?.isRegionalReviewManager) && reviewManagerItems}
                   {currentUser?.isReviewer && reviewerItems}
@@ -666,3 +675,43 @@ const NavMenuItemCTA = ({ label, to, onClick }: INavMenuItemCTAProps) => {
     </MenuItem>
   );
 };
+
+// ===== SUSPENDED CONTRACTOR BANNER =====
+const SuspendedContractorBanner = observer(function SuspendedContractorBanner() {
+  const { t } = useTranslation();
+
+  return (
+    <Box bg="theme.orangeLight02" borderBottom="1px solid" borderColor="theme.orange" py={4} px={6} w="full">
+      <Container maxW="1170px" mx="auto" p={0}>
+        <Flex direction="row" align="flex-start" gap={2} w="full">
+          <WarningIcon size={27} weight="fill" color="var(--chakra-colors-theme-orange)" style={{ flexShrink: 0 }} />
+          <Box flex="1">
+            <Box
+              fontFamily="BC Sans"
+              fontWeight="700"
+              fontSize="16px"
+              lineHeight="27px"
+              color="greys.anotherGrey"
+              mb={1}
+            >
+              {t('contractor.suspended.banner.title', 'Account suspended')}
+            </Box>
+            <Box
+              fontFamily="BC Sans"
+              fontWeight="400"
+              fontSize="14px"
+              lineHeight="21px"
+              color="greys.anotherGrey"
+              pl="3px"
+            >
+              {t(
+                'contractor.suspended.banner.message',
+                'You can only view past submissions and access program resources. You can not submit a new invoice until we unsuspend your account.',
+              )}
+            </Box>
+          </Box>
+        </Flex>
+      </Container>
+    </Box>
+  );
+});

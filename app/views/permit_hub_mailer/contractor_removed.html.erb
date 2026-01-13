@@ -1,0 +1,11 @@
+<p>Hello <%= @user.first_name %> <%= @user.last_name %>,</p>
+
+<p>The contractor account for <%= @contractor.business_name %> has been removed from the Energy Savings Program application system.</p>
+
+<% if @contractor.deactivated_reason.present? %>
+  <p>Reason: <%= @contractor.deactivated_reason %></p>
+<% end %>
+
+<p>If you have any questions, please call us at 1-833-856-0333 or email us at <a href="mailto:BetterHomesESP@clearesult.com">BetterHomesESP@clearesult.com</a>.</p>
+
+<p>Thank you,<br>Energy Savings Program Support</p>

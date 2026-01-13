@@ -242,6 +242,51 @@ class PermitHubMailer < ApplicationMailer
     )
   end
 
+  def contractor_suspended(contractor)
+    @contractor = contractor
+    @user = contractor.contact
+
+    return unless @user.present?
+
+    send_user_mail(
+      email: @user.email,
+      template_key: "contractor_suspended",
+      subject_i18n_params: {
+        business_name: contractor.business_name
+      }
+    )
+  end
+
+  def contractor_unsuspended(contractor)
+    @contractor = contractor
+    @user = contractor.contact
+
+    return unless @user.present?
+
+    send_user_mail(
+      email: @user.email,
+      template_key: "contractor_unsuspended",
+      subject_i18n_params: {
+        business_name: contractor.business_name
+      }
+    )
+  end
+
+  def contractor_removed(contractor)
+    @contractor = contractor
+    @user = contractor.contact
+
+    return unless @user.present?
+
+    send_user_mail(
+      email: @user.email,
+      template_key: "contractor_removed",
+      subject_i18n_params: {
+        business_name: contractor.business_name
+      }
+    )
+  end
+
   def notify_participant_incomplete_draft_notification(permit_application)
     @user = permit_application.submitter
     @permit_application = permit_application
@@ -275,10 +320,7 @@ class PermitHubMailer < ApplicationMailer
     )
   end
 
-  def notify_participant_supporting_files_added(
-    permit_application,
-    admin_user:
-  )
+  def notify_participant_supporting_files_added(permit_application, admin_user:)
     @permit_application = permit_application
     @user = permit_application.submitter
     @admin_user = admin_user

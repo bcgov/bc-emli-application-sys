@@ -348,6 +348,70 @@ class Api::PermitApplicationsController < Api::ApplicationController
         current_user
       end
 
+    # NOTE: These checks duplicate PermitApplicationPolicy#create? intentionally.
+    # Reason: Pundit's authorize() returns generic "not authorized" errors.
+    # We need specific error messages explaining why the contractor cannot submit.
+    # Maintenance: Keep these conditions in sync with the policy.
+    if submitter.is_a?(Contractor)
+      if submitter.suspended?
+        return(
+          render json: {
+                   error:
+                     I18n.t(
+                       "contractor.errors.suspended_cannot_submit",
+                       default:
+                         "Your contractor account is suspended and cannot submit applications"
+                     ),
+                   reason: submitter.suspended_reason
+                 },
+                 status: :forbidden
+        )
+      elsif submitter.deactivated?
+        return(
+          render json: {
+                   error:
+                     I18n.t(
+                       "contractor.errors.deactivated_cannot_submit",
+                       default:
+                         "Your contractor account is deactivated and cannot submit applications"
+                     )
+                 },
+                 status: :forbidden
+        )
+      end
+    end
+
+    # Validate current user isn't an employee of a suspended or deactivated contractor
+    if current_user.contractor?
+      user_contractor = current_user.contractor_employees.first&.contractor
+      if user_contractor&.suspended?
+        return(
+          render json: {
+                   error:
+                     I18n.t(
+                       "contractor.errors.suspended_cannot_submit",
+                       default:
+                         "Your account is suspended and cannot submit applications"
+                     ),
+                   reason: user_contractor.suspended_reason
+                 },
+                 status: :forbidden
+        )
+      elsif user_contractor&.deactivated?
+        return(
+          render json: {
+                   error:
+                     I18n.t(
+                       "contractor.errors.deactivated_cannot_submit",
+                       default:
+                         "Your account is deactivated and cannot submit applications"
+                     )
+                 },
+                 status: :forbidden
+        )
+      end
+    end
+
     @permit_application =
       PermitApplication.build(
         permit_application_params.to_h.merge(

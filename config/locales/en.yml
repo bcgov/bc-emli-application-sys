@@ -166,6 +166,9 @@ en:
       notify_new_participant_welcome: 'Welcome to the Better Homes Energy Savings Program'
       notify_new_admin_welcome: 'Welcome to the Better Homes Energy Savings Program'
       notify_participant_supporting_files_requested: 'Supporting files requested for Application %{permit_application_number}'
+      contractor_suspended: '%{business_name} - Access Suspended'
+      contractor_unsuspended: '%{business_name} - Access Restored'
+      contractor_removed: '%{business_name} - Account Removed'
   authentication_methods:
     bcsc: 'BC Services Card Account'
     bceidbasic: 'Basic BCeID'
@@ -296,6 +299,22 @@ en:
         cannot_reinvite_deactivated:
           title: Error
           message: 'Cannot re-invite a deactivated employee. Please reactivate them first.'
+      suspended:
+        title: ''
+        message: 'Contractor suspended successfully'
+      unsuspended:
+        title: ''
+        message: 'Contractor unsuspended successfully'
+      removed:
+        title: ''
+        message: 'Contractor removed successfully'
+      errors:
+        access_blocked:
+          title: ''
+          message: 'Your account has been removed.'
+        no_onboard_record: 'Contractor has no onboarding record'
+        suspended_cannot_submit: 'Your account is suspended and cannot submit applications'
+        deactivated_cannot_submit: 'Your account is deactivated and cannot submit applications'
     user:
       not_confirmed_error:
         title: Failed to login.
@@ -866,3 +885,7 @@ en:
       editContractor: 'Edit Contractor'
       suspendContractor: 'Suspend Contractor'
       removeContractor: 'Remove Contractor'
+    errors:
+      no_onboard_record: 'Contractor has no onboarding record'
+      suspended_cannot_submit: 'Your account is suspended and cannot submit applications'
+      deactivated_cannot_submit: 'Your account is deactivated and cannot submit applications'

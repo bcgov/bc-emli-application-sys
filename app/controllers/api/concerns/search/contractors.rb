@@ -58,7 +58,14 @@ module Api::Concerns::Search::Contractors
   def contractor_search_params
     params.delete(:sort) if params[:sort].nil?
     permitted_params =
-      params.permit(:id, :query, :page, :per_page, sort: %i[field direction])
+      params.permit(
+        :id,
+        :query,
+        :page,
+        :per_page,
+        :status,
+        sort: %i[field direction]
+      )
 
     permitted_params
   end
@@ -75,11 +82,30 @@ module Api::Concerns::Search::Contractors
   end
 
   def contractor_where_clause
-    if current_user.system_admin? || current_user.admin? ||
-         current_user.manager?
-      return {}
+    where_clause = {}
+
+    # Authorization: non-admins can only view contractors where they are the contact
+    unless current_user.system_admin? || current_user.admin? ||
+             current_user.admin_manager?
+      where_clause[:contact_id] = current_user.id
     end
 
-    { contact_id: current_user.id }
+    # Apply status filtering
+    status = search_params[:status]
+    case status
+    when "active"
+      # Active: neither suspended nor deactivated
+      where_clause[:suspended_at] = nil
+      where_clause[:deactivated_at] = nil
+    when "suspended"
+      # Suspended: has suspended_at but not deactivated_at
+      where_clause[:deactivated_at] = nil
+      where_clause[:suspended_at] = { not: nil }
+    when "removed"
+      # Removed: has deactivated_at
+      where_clause[:deactivated_at] = { not: nil }
+    end
+
+    where_clause
   end
 end

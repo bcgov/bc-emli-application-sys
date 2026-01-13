@@ -31,8 +31,16 @@ module ApplicationFlow
     end
 
     def handle_submission
-      # TODO:
       application.update(signed_off_at: Time.current)
+
+      # Create submission version to capture application state at submission time
+      application.submission_versions.create!(
+        form_json: application.form_json,
+        submission_data: application.submission_data
+      )
+
+      application.zip_and_upload_supporting_documents
+      application.send_submit_notifications
     end
   end
 end

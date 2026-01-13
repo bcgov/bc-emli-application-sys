@@ -16,6 +16,14 @@ class Api::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       ).call
     @user = result.user
 
+    # Block deactivated contractors and their employees
+    if @user&.contractor_access_blocked?
+      flash_params =
+        frontend_flash_message("contractor.errors.access_blocked", "error")
+      redirect_to "/welcome/contractor?#{flash_params.to_query}"
+      return
+    end
+
     if @user&.valid? && @user&.persisted?
       sign_in(resource_name, @user, store: false)
       @user.reload # Get fresh data after sign_in

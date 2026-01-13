@@ -23,6 +23,8 @@ class Api::ApplicationController < ActionController::API
   def check_for_archived_user
     if current_user&.discarded?
       render_error("misc.user_not_authorized_error", {}, nil) and return
+    elsif current_user&.contractor_access_blocked?
+      render_error("contractor.errors.access_blocked", {}, nil) and return
     end
   end
 

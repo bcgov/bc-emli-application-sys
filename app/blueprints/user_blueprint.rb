@@ -56,6 +56,36 @@ class UserBlueprint < Blueprinter::Base
     include_view :base
     include_view :current_user
     association :jurisdictions, blueprint: JurisdictionBlueprint, view: :base
+
+    # Include contractor information for contractor users
+    field :contractor do |user, _options|
+      if user.contractor?
+        # Check if user is a contractor contact (primary contact)
+        contractor_as_contact = Contractor.find_by(contact: user)
+        if contractor_as_contact
+          ContractorBlueprint.render_as_hash(contractor_as_contact, view: :base)
+        else
+          # Check if user is an employee
+          contractor_employee = user.contractor_employees.first
+          if contractor_employee
+            ContractorBlueprint.render_as_hash(
+              contractor_employee.contractor,
+              view: :base
+            )
+          end
+        end
+      end
+    end
+
+    # Flag to indicate if user's contractor is suspended (for contractors AND employees)
+    field :contractor_suspended do |user|
+      user.contractor_suspended?
+    end
+
+    # Flag to indicate if user's contractor is deactivated (for contractors AND employees)
+    field :contractor_access_blocked do |user|
+      user.contractor_access_blocked?
+    end
   end
 
   view :invited_user do

@@ -404,6 +404,22 @@ export class Api {
     });
   }
 
+  async suspendContractor(contractorId: string, reason: string) {
+    return this.client.post<ApiResponse<any>>(`/contractors/${contractorId}/suspend`, {
+      reason,
+    });
+  }
+
+  async unsuspendContractor(contractorId: string) {
+    return this.client.post<ApiResponse<any>>(`/contractors/${contractorId}/unsuspend`);
+  }
+
+  async deactivateContractor(contractorId: string, reason: string) {
+    return this.client.post<ApiResponse<any>>(`/contractors/${contractorId}/deactivate`, {
+      reason,
+    });
+  }
+
   async createContractorOnboarding(contractorId: string) {
     return this.client.post<ApiResponse<any>>(`/contractor_onboards`, {
       contractor_id: contractorId,

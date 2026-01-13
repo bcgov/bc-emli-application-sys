@@ -28,15 +28,31 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
     try {
       let onboarding = null;
 
-      // Ensure contractor list is hydrated
+      // Ensure contractor list is hydrated - search ALL statuses to find user's contractor
+      // Critical: Must search active, suspended, AND removed to avoid duplicate contractor creation
       if (contractorStore.contractorsMap.size === 0) {
+        const originalFilter = contractorStore.statusFilter;
+
+        // Search active contractors
+        contractorStore.setStatusWithoutSearch('active');
         await contractorStore.searchContractors({ reset: true });
+
+        // Also search suspended contractors
+        contractorStore.setStatusWithoutSearch('suspended');
+        await contractorStore.searchContractors({ reset: false });
+
+        // Also search removed contractors
+        contractorStore.setStatusWithoutSearch('removed');
+        await contractorStore.searchContractors({ reset: false });
+
+        // Restore original filter
+        contractorStore.setStatusWithoutSearch(originalFilter);
       }
 
       // Find contractor linked to this user
       const contractor = contractorStore.findByContactId(currentUser.id);
 
-      // If contractor record doesn’t exist, create onboarding (which creates contractor)
+      // If contractor record doesn't exist, create onboarding (which creates contractor)
       if (!contractor) {
         onboarding = await contractorStore.createOnboarding(currentUser.id);
         if (onboarding) {
