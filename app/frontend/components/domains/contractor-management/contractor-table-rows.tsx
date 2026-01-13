@@ -1,12 +1,22 @@
 import { Badge, Box, Flex, Menu, MenuButton, MenuItem, MenuList, Link } from '@chakra-ui/react';
-import { Eye, PencilSimple, Envelope, Users, Prohibit, HourglassMedium, Trash } from '@phosphor-icons/react';
+import {
+  Eye,
+  PencilSimple,
+  Envelope,
+  Users,
+  Prohibit,
+  HourglassMedium,
+  Trash,
+  ArrowsLeftRight,
+} from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { IContractor } from '../../../models/contractor';
 import { SearchGridItem } from '../../shared/grid/search-grid-item';
 import { useMst } from '../../../setup/root';
+import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation-modal';
 
 interface ContractorRowProps {
   contractor: IContractor;
@@ -16,6 +26,9 @@ export const ContractorRow = observer(({ contractor }: ContractorRowProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { contractorStore } = useMst();
+  const [isSuspendModalOpen, setIsSuspendModalOpen] = useState(false);
+  const [isUnsuspendModalOpen, setIsUnsuspendModalOpen] = useState(false);
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
 
   const handleEdit = () => {
     navigate(`/contractor-management/${contractor.id}/edit`);
@@ -33,16 +46,37 @@ export const ContractorRow = observer(({ contractor }: ContractorRowProps) => {
     navigate(`/contractor-management/${contractor.id}/employees`);
   };
 
-  const handleSuspend = async () => {
-    if (window.confirm(t('contractor.management.confirmSuspend'))) {
-      // TODO: Implement suspend functionality
+  const handleSuspend = () => {
+    setIsSuspendModalOpen(true);
+  };
+
+  const handleSuspendConfirm = () => {
+    setIsSuspendModalOpen(false);
+    // Navigate to reason page
+    navigate(`/contractor-management/${contractor.id}/suspend/reason`);
+  };
+
+  const handleUnsuspend = () => {
+    setIsUnsuspendModalOpen(true);
+  };
+
+  const handleUnsuspendConfirm = async () => {
+    setIsUnsuspendModalOpen(false);
+    const response = await contractorStore.unsuspendContractor(contractor.id);
+
+    if (response.ok) {
+      navigate(`/contractor-management/${contractor.id}/unsuspend-confirmation`);
     }
   };
 
-  const handleRemove = async () => {
-    if (window.confirm(t('contractor.management.confirmDelete'))) {
-      // TODO: Implement remove functionality
-    }
+  const handleRemove = () => {
+    setIsRemoveModalOpen(true);
+  };
+
+  const handleRemoveConfirm = () => {
+    setIsRemoveModalOpen(false);
+    // Navigate to reason page
+    navigate(`/contractor-management/${contractor.id}/remove/removal-reason`);
   };
 
   const formatDate = (date: Date | null) => {
@@ -111,86 +145,218 @@ export const ContractorRow = observer(({ contractor }: ContractorRowProps) => {
               {t('contractor.actions.manage')}
             </MenuButton>
             <MenuList role="menu" aria-label="Contractor management actions" _focus={{ outline: 'none' }}>
-              <MenuItem
-                icon={<Envelope />}
-                onClick={handleInviteEmployee}
-                role="menuitem"
-                aria-label={`Invite employees for ${contractor.businessName}`}
-                _focus={{ bg: 'blue.50', outline: 'none' }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleInviteEmployee();
-                  }
-                }}
-              >
-                {t('contractor.actions.inviteEmployee')}
-              </MenuItem>
-              <MenuItem
-                icon={<Users />}
-                onClick={handleViewEmployees}
-                role="menuitem"
-                aria-label={`View employees for ${contractor.businessName}`}
-                _focus={{ bg: 'blue.50', outline: 'none' }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleViewEmployees();
-                  }
-                }}
-              >
-                {t('contractor.actions.viewEmployees')}
-              </MenuItem>
-              <MenuItem
-                icon={<PencilSimple />}
-                onClick={handleEdit}
-                role="menuitem"
-                aria-label={`Edit contractor details for ${contractor.businessName}`}
-                _focus={{ bg: 'blue.50', outline: 'none' }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleEdit();
-                  }
-                }}
-              >
-                {t('contractor.actions.editContractor')}
-              </MenuItem>
-              <MenuItem
-                icon={<HourglassMedium />}
-                onClick={handleSuspend}
-                role="menuitem"
-                aria-label={`Suspend contractor ${contractor.businessName}`}
-                _focus={{ bg: 'blue.50', outline: 'none' }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleSuspend();
-                  }
-                }}
-              >
-                {t('contractor.actions.suspendContractor')}
-              </MenuItem>
-              <MenuItem
-                icon={<Trash />}
-                onClick={handleRemove}
-                color="red.500"
-                role="menuitem"
-                aria-label={`Remove contractor ${contractor.businessName}`}
-                _focus={{ bg: 'red.50', outline: 'none' }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleRemove();
-                  }
-                }}
-              >
-                {t('contractor.actions.removeContractor')}
-              </MenuItem>
+              {/* Active contractors: All menu items */}
+              {!contractor.isSuspended && !contractor.isDeactivated && (
+                <>
+                  <MenuItem
+                    icon={<Envelope />}
+                    onClick={handleInviteEmployee}
+                    role="menuitem"
+                    aria-label={`Invite employees for ${contractor.businessName}`}
+                    _focus={{ bg: 'blue.50', outline: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleInviteEmployee();
+                      }
+                    }}
+                  >
+                    {t('contractor.actions.inviteEmployee')}
+                  </MenuItem>
+                  <MenuItem
+                    icon={<Users />}
+                    onClick={handleViewEmployees}
+                    role="menuitem"
+                    aria-label={`View employees for ${contractor.businessName}`}
+                    _focus={{ bg: 'blue.50', outline: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleViewEmployees();
+                      }
+                    }}
+                  >
+                    {t('contractor.actions.viewEmployees')}
+                  </MenuItem>
+                  <MenuItem
+                    icon={<PencilSimple />}
+                    onClick={handleEdit}
+                    role="menuitem"
+                    aria-label={`Edit contractor details for ${contractor.businessName}`}
+                    _focus={{ bg: 'blue.50', outline: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleEdit();
+                      }
+                    }}
+                  >
+                    {t('contractor.actions.editContractor')}
+                  </MenuItem>
+                  <MenuItem
+                    icon={<HourglassMedium />}
+                    onClick={handleSuspend}
+                    role="menuitem"
+                    aria-label={`Suspend contractor ${contractor.businessName}`}
+                    _focus={{ bg: 'blue.50', outline: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleSuspend();
+                      }
+                    }}
+                  >
+                    {t('contractor.actions.suspendContractor')}
+                  </MenuItem>
+                  <MenuItem
+                    icon={<Trash />}
+                    onClick={handleRemove}
+                    color="red.500"
+                    role="menuitem"
+                    aria-label={`Remove contractor ${contractor.businessName}`}
+                    _focus={{ bg: 'red.50', outline: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleRemove();
+                      }
+                    }}
+                  >
+                    {t('contractor.actions.removeContractor')}
+                  </MenuItem>
+                </>
+              )}
+
+              {/* Suspended contractors: Unsuspend, View contractor, Remove */}
+              {contractor.isSuspended && !contractor.isDeactivated && (
+                <>
+                  <MenuItem
+                    icon={<ArrowsLeftRight />}
+                    onClick={handleUnsuspend}
+                    role="menuitem"
+                    aria-label={`Unsuspend contractor ${contractor.businessName}`}
+                    _focus={{ bg: 'blue.50', outline: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleUnsuspend();
+                      }
+                    }}
+                  >
+                    {t('contractor.actions.unsuspendContractor')}
+                  </MenuItem>
+                  <MenuItem
+                    icon={<Eye />}
+                    onClick={handleView}
+                    role="menuitem"
+                    aria-label={`View contractor ${contractor.businessName}`}
+                    _focus={{ bg: 'blue.50', outline: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleView();
+                      }
+                    }}
+                  >
+                    {t('contractor.actions.viewContractor')}
+                  </MenuItem>
+                  <MenuItem
+                    icon={<Trash />}
+                    onClick={handleRemove}
+                    color="red.500"
+                    role="menuitem"
+                    aria-label={`Remove contractor ${contractor.businessName}`}
+                    _focus={{ bg: 'red.50', outline: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleRemove();
+                      }
+                    }}
+                  >
+                    {t('contractor.actions.removeContractor')}
+                  </MenuItem>
+                </>
+              )}
+
+              {/* Removed contractors: View contractor only */}
+              {contractor.isDeactivated && (
+                <MenuItem
+                  icon={<Eye />}
+                  onClick={handleView}
+                  role="menuitem"
+                  aria-label={`View contractor ${contractor.businessName}`}
+                  _focus={{ bg: 'blue.50', outline: 'none' }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleView();
+                    }
+                  }}
+                >
+                  {t('contractor.actions.viewContractor')}
+                </MenuItem>
+              )}
             </MenuList>
           </Menu>
         </Flex>
       </SearchGridItem>
+
+      <GlobalConfirmationModal
+        headerText={t(
+          'contractor.suspend.modal.title',
+          `Are you sure you want to suspend ${contractor.businessName}?`,
+          {
+            name: contractor.businessName,
+          },
+        )}
+        bodyText={t(
+          'contractor.suspend.modal.message',
+          `This will remove ${contractor.businessName}'s access to the Energy Savings Program application system. All employees at ${contractor.businessName} will not be able to upload invoices once suspended.`,
+          { name: contractor.businessName },
+        )}
+        isOpen={isSuspendModalOpen}
+        onClose={() => setIsSuspendModalOpen(false)}
+        onSubmit={handleSuspendConfirm}
+        confirmText={t('contractor.suspend.modal.confirm', 'Confirm')}
+        cancelText={t('contractor.suspend.modal.cancel', 'Cancel')}
+      />
+
+      <GlobalConfirmationModal
+        headerText={t(
+          'contractor.unsuspend.modal.title',
+          `Are you sure you want to unsuspend ${contractor.businessName}?`,
+          {
+            name: contractor.businessName,
+          },
+        )}
+        bodyText={t(
+          'contractor.unsuspend.modal.message',
+          `This will give ${contractor.businessName} access to the Energy Savings Program application system. All employees at ${contractor.businessName} will be able to upload invoices once unsuspended.`,
+          { name: contractor.businessName },
+        )}
+        isOpen={isUnsuspendModalOpen}
+        onClose={() => setIsUnsuspendModalOpen(false)}
+        onSubmit={handleUnsuspendConfirm}
+        confirmText={t('contractor.unsuspend.modal.confirm', 'Confirm')}
+        cancelText={t('contractor.unsuspend.modal.cancel', 'Cancel')}
+      />
+
+      <GlobalConfirmationModal
+        headerText={t('contractor.remove.modal.title', `Are you sure you want to remove ${contractor.businessName}?`, {
+          name: contractor.businessName,
+        })}
+        bodyText={t(
+          'contractor.remove.modal.message',
+          `This will permanently remove ${contractor.businessName} from the system. All employees at ${contractor.businessName} will lose access.`,
+          { name: contractor.businessName },
+        )}
+        isOpen={isRemoveModalOpen}
+        onClose={() => setIsRemoveModalOpen(false)}
+        onSubmit={handleRemoveConfirm}
+        confirmText={t('contractor.remove.modal.confirm', 'Confirm')}
+        cancelText={t('contractor.remove.modal.cancel', 'Cancel')}
+      />
     </Box>
   );
 });

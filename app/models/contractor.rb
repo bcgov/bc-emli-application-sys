@@ -18,6 +18,35 @@ class Contractor < ApplicationRecord
 
   validates :business_name, presence: true
 
+  # Delegate status fields to latest contractor_onboard record
+  def latest_onboard
+    contractor_onboards.order(created_at: :desc).first
+  end
+
+  def suspended_at
+    latest_onboard&.suspended_at
+  end
+
+  def suspended_reason
+    latest_onboard&.suspended_reason
+  end
+
+  def suspended?
+    suspended_at.present?
+  end
+
+  def deactivated_at
+    latest_onboard&.deactivated_at
+  end
+
+  def deactivated_reason
+    latest_onboard&.deactivated_reason
+  end
+
+  def deactivated?
+    deactivated_at.present?
+  end
+
   before_validation :assign_unique_number, on: :create
 
   def search_data
@@ -29,7 +58,9 @@ class Contractor < ApplicationRecord
       contact_id: contact&.id,
       created_at: created_at,
       updated_at: updated_at,
-      number: number
+      number: number,
+      suspended_at: suspended_at,
+      deactivated_at: deactivated_at
     }
   end
 

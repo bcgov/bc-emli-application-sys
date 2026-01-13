@@ -348,6 +348,67 @@ class Api::PermitApplicationsController < Api::ApplicationController
         current_user
       end
 
+    # Validate contractor not suspended or deactivated
+    if submitter.is_a?(Contractor)
+      if submitter.suspended?
+        return(
+          render json: {
+                   error:
+                     I18n.t(
+                       "contractor.errors.suspended_cannot_submit",
+                       default:
+                         "Your contractor account is suspended and cannot submit applications"
+                     ),
+                   reason: submitter.suspended_reason
+                 },
+                 status: :forbidden
+        )
+      elsif submitter.deactivated?
+        return(
+          render json: {
+                   error:
+                     I18n.t(
+                       "contractor.errors.deactivated_cannot_submit",
+                       default:
+                         "Your contractor account is deactivated and cannot submit applications"
+                     )
+                 },
+                 status: :forbidden
+        )
+      end
+    end
+
+    # Validate current user isn't an employee of a suspended or deactivated contractor
+    if current_user.contractor?
+      user_contractor = current_user.contractor_employees.first&.contractor
+      if user_contractor&.suspended?
+        return(
+          render json: {
+                   error:
+                     I18n.t(
+                       "contractor.errors.suspended_cannot_submit",
+                       default:
+                         "Your account is suspended and cannot submit applications"
+                     ),
+                   reason: user_contractor.suspended_reason
+                 },
+                 status: :forbidden
+        )
+      elsif user_contractor&.deactivated?
+        return(
+          render json: {
+                   error:
+                     I18n.t(
+                       "contractor.errors.deactivated_cannot_submit",
+                       default:
+                         "Your account is deactivated and cannot submit applications"
+                     )
+                 },
+                 status: :forbidden
+        )
+      end
+    end
+
     @permit_application =
       PermitApplication.build(
         permit_application_params.to_h.merge(

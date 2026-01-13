@@ -243,6 +243,15 @@ Rails.application.routes.draw do
       # Follow program pattern for contractor users
       post "users/search", on: :member, to: "contractors#search_users"
 
+      # Suspend contractor
+      post "suspend", on: :member, to: "contractors#suspend"
+
+      # Unsuspend contractor
+      post "unsuspend", on: :member, to: "contractors#unsuspend"
+
+      # Deactivate (remove) contractor
+      post "deactivate", on: :member, to: "contractors#deactivate"
+
       resources :employees, controller: "contractor_employees", only: [] do
         collection { post :invite }
         member do

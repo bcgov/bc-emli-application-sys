@@ -31,6 +31,15 @@ export const NewInvoiceScreen = observer(() => {
   const [isCreating, setIsCreating] = useState(false);
   const [showError, setShowError] = useState(false);
 
+  const currentUser = userStore.currentUser;
+
+  // Redirect if contractor is suspended (works for contractors AND employees)
+  React.useEffect(() => {
+    if (currentUser?.contractorSuspended) {
+      navigate('/contractor-dashboard');
+    }
+  }, [currentUser, navigate]);
+
   const invoiceSubmissionTypeId = permitClassificationStore.getSubmissionTypeIdByCode(
     EPermitClassificationCode.invoice,
   );

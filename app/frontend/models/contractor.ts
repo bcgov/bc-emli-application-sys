@@ -18,6 +18,10 @@ export const ContractorModel = types
     employees: types.optional(types.array(types.reference(UserModel)), []),
     onboardings: types.optional(types.array(types.reference(ContractorOnboardModel)), []),
     number: types.maybeNull(types.string),
+    suspendedAt: types.maybeNull(types.Date),
+    suspendedReason: types.maybeNull(types.string),
+    deactivatedAt: types.maybeNull(types.Date),
+    deactivatedReason: types.maybeNull(types.string),
   })
   .extend(withRootStore())
   .extend(withEnvironment())
@@ -32,6 +36,12 @@ export const ContractorModel = types
     },
     get employeeCount() {
       return self.employees.length;
+    },
+    get isSuspended() {
+      return self.suspendedAt !== null;
+    },
+    get isDeactivated() {
+      return self.deactivatedAt !== null;
     },
   }))
   .actions((self) => ({

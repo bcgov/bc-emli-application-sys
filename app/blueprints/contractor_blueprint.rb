@@ -14,7 +14,11 @@ class ContractorBlueprint < Blueprinter::Base
            :onboarded,
            :created_at,
            :updated_at,
-           :number
+           :number,
+           :suspended_at,
+           :suspended_reason,
+           :deactivated_at,
+           :deactivated_reason
 
     association :contact, blueprint: UserBlueprint, view: :minimal
     association :employees, blueprint: UserBlueprint, view: :minimal

@@ -2985,6 +2985,13 @@ const options = {
             edit: 'Edit program',
             users: 'Users',
             contractorManagement: 'Manage contractor details',
+            suspend: 'Suspend contractor',
+            reason: 'Reason for suspension',
+            confirmation: 'Contractor suspended',
+            unsuspendConfirmation: 'Contractor unsuspended',
+            remove: 'Remove contractor',
+            removalReason: 'Reason for removal',
+            removalConfirmation: 'Contractor removed',
             contractorProgramResources: 'Contractor program resources',
             employees: 'View employees',
             editTemplate: 'Edit template',
@@ -3108,9 +3115,92 @@ const options = {
             manage: 'Manage',
             inviteEmployee: 'Invite employees',
             viewEmployees: 'View employees',
+            viewContractor: 'View contractor',
             editContractor: 'Edit contractor',
             suspendContractor: 'Suspend contractor',
+            unsuspendContractor: 'Unsuspend contractor',
             removeContractor: 'Remove contractor',
+          },
+          suspend: {
+            modal: {
+              title: 'Are you sure you want to suspend {{name}}?',
+              message:
+                "This will remove {{name}}'s access to the Energy Savings Program application system. All employees at {{name}} will not be able to upload invoices once suspended.",
+              confirm: 'Confirm',
+              cancel: 'Cancel',
+            },
+            reason: {
+              title: 'Reason for suspension',
+              emailSent: 'A confirmation email will be sent to the contractor contact.',
+              contractorLabel: 'Contractor',
+              label: 'Reason this contractor is suspended',
+              placeholder: 'Enter suspension reason...',
+              required: 'Reason is required',
+              error: 'Failed to suspend contractor',
+              success: 'Contractor suspended successfully',
+              confirm: 'Confirm',
+              cancel: 'Cancel',
+            },
+            confirmed: {
+              title: 'Contractor suspended.',
+              emailSent: 'An email has been automatically sent to the contractor with the suspension reason.',
+              contractorLabel: 'Contractor',
+              backButton: 'Back to Manage contractor details',
+            },
+          },
+          unsuspend: {
+            modal: {
+              title: 'Are you sure you want to unsuspend {{name}}?',
+              message:
+                'This will give {{name}} access to the Energy Savings Program application system. All employees at {{name}} will be able to upload invoices once unsuspended.',
+              confirm: 'Confirm',
+              cancel: 'Cancel',
+            },
+            confirmed: {
+              title: 'Contractor unsuspended',
+              emailSent: 'An email has been automatically sent to the contractor.',
+            },
+          },
+          remove: {
+            modal: {
+              title: 'Are you sure you want to remove {{name}}?',
+              message:
+                'This will remove all employees of {{name}}. If they rejoin, contractors will have to onboard again and their employees will have to create accounts again.',
+              confirm: 'Confirm',
+              cancel: 'Cancel',
+            },
+            reason: {
+              title: 'Reason for removal',
+              emailSent: 'A confirmation email will be sent to the contractor contact.',
+              contractorLabel: 'Contractor',
+              label: 'Reason this contractor is being removed',
+              placeholder: 'Enter removal reason...',
+              required: 'Reason is required',
+              error: 'Failed to remove contractor',
+              success: 'Contractor removed successfully',
+              confirm: 'Confirm',
+              cancel: 'Cancel',
+            },
+            finalConfirm: {
+              title: "This action can't be reversed, are you sure you want to continue?",
+              confirm: 'Confirm',
+              cancel: 'Cancel',
+            },
+            confirmed: {
+              title: 'Contractor removed.',
+              emailSent: 'An email has been automatically sent to the contractor with the removal reason.',
+              contractorLabel: 'Contractor',
+              backButton: 'Back to Manage contractor details',
+            },
+          },
+          suspended: {
+            buttonDisabled: 'Submit invoice - disabled due to suspension',
+            message: 'Your contractor account is suspended. You cannot submit invoices at this time.',
+            banner: {
+              title: 'Account suspended',
+              message:
+                'You can only view past submissions and access program resources. You can not submit a new invoice until we unsuspend your account.',
+            },
           },
           employees: {
             viewEmployees: 'View employees',

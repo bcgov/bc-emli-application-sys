@@ -43,6 +43,8 @@ export const UserModel = types
     mailingAddress: types.maybeNull(AddressModel),
     programMemberships: types.optional(types.array(UserProgramMembershipModel), []),
     activePrograms: types.optional(types.array(types.frozen()), []), // NEW
+    contractorSuspended: types.maybeNull(types.boolean),
+    contractorAccessBlocked: types.maybeNull(types.boolean),
   })
   .extend(withRootStore())
   .extend(withEnvironment())

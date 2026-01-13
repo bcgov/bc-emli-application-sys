@@ -1,7 +1,16 @@
 class Api::ContractorsController < Api::ApplicationController
   include Api::Concerns::Search::Contractors
   include Api::Concerns::Search::ContractorUsers
-  before_action :set_contractor, only: %i[show update destroy search_users]
+  before_action :set_contractor,
+                only: %i[
+                  show
+                  update
+                  destroy
+                  search_users
+                  suspend
+                  unsuspend
+                  deactivate
+                ]
   skip_before_action :authenticate_user!, only: %i[shim]
   skip_after_action :verify_authorized, only: %i[shim]
   skip_after_action :verify_policy_scoped, only: [:index]
@@ -10,7 +19,6 @@ class Api::ContractorsController < Api::ApplicationController
     perform_contractor_search
     contractors = @contractor_search.results
 
-    Rails.logger.info("Contractors: #{contractors.inspect} ")
     render_success contractors,
                    nil,
                    {
@@ -64,12 +72,7 @@ class Api::ContractorsController < Api::ApplicationController
   end
 
   def shim
-    contractor =
-      Contractor.create!(
-        # contact: current_user,
-        business_name: "TBD",
-        onboarded: false
-      )
+    contractor = Contractor.create!(business_name: "TBD", onboarded: false)
     render_success contractor, nil, { blueprint: ContractorBlueprint }
   end
 
@@ -107,6 +110,139 @@ class Api::ContractorsController < Api::ApplicationController
                        view: :accepted_license_agreements
                      }
                    }
+  end
+
+  def suspend
+    authorize @contractor
+
+    onboard = @contractor.latest_onboard
+    unless onboard
+      return(
+        render json: {
+                 error:
+                   I18n.t(
+                     "contractor.errors.no_onboard_record",
+                     default: "Contractor has no onboarding record"
+                   )
+               },
+               status: :unprocessable_entity
+      )
+    end
+
+    # Suspend the contractor (sets suspended_at on contractor_onboard)
+    if onboard.update(
+         suspended_at: Time.current,
+         suspended_reason: params[:reason]
+       )
+      # Send email notification to primary contact
+      # TODO: Re-enable if client wants emails sent
+      # PermitHubMailer.contractor_suspended(@contractor).deliver_later
+
+      # Reindex for Elasticsearch
+      @contractor.reindex
+
+      # Return success
+      render_success @contractor,
+                     "contractor.suspended",
+                     {
+                       blueprint: ContractorBlueprint,
+                       blueprint_opts: {
+                         view: :base
+                       }
+                     }
+    else
+      render json: {
+               error: onboard.errors.full_messages
+             },
+             status: :unprocessable_entity
+    end
+  end
+
+  def unsuspend
+    authorize @contractor
+
+    onboard = @contractor.latest_onboard
+    unless onboard
+      return(
+        render json: {
+                 error:
+                   I18n.t(
+                     "contractor.errors.no_onboard_record",
+                     default: "Contractor has no onboarding record"
+                   )
+               },
+               status: :unprocessable_entity
+      )
+    end
+
+    # Unsuspend the contractor (clears suspended_at and suspended_reason on contractor_onboard)
+    if onboard.update(suspended_at: nil, suspended_reason: nil)
+      # Send email notification to primary contact
+      # TODO: Re-enable if client wants emails sent
+      # PermitHubMailer.contractor_unsuspended(@contractor).deliver_later
+
+      # Reindex for Elasticsearch
+      @contractor.reindex
+
+      render_success @contractor,
+                     "contractor.unsuspended",
+                     {
+                       blueprint: ContractorBlueprint,
+                       blueprint_opts: {
+                         view: :base
+                       }
+                     }
+    else
+      render json: {
+               error: onboard.errors.full_messages
+             },
+             status: :unprocessable_entity
+    end
+  end
+
+  def deactivate
+    authorize @contractor
+
+    onboard = @contractor.latest_onboard
+    unless onboard
+      return(
+        render json: {
+                 error:
+                   I18n.t(
+                     "contractor.errors.no_onboard_record",
+                     default: "Contractor has no onboarding record"
+                   )
+               },
+               status: :unprocessable_entity
+      )
+    end
+
+    # Deactivate the contractor (sets deactivated_at and deactivated_reason on contractor_onboard)
+    if onboard.update(
+         deactivated_at: Time.current,
+         deactivated_reason: params[:reason]
+       )
+      # Send email notification to primary contact
+      # TODO: Re-enable if client wants emails sent
+      # PermitHubMailer.contractor_removed(@contractor).deliver_later
+
+      # Reindex for Elasticsearch
+      @contractor.reindex
+
+      render_success @contractor,
+                     "contractor.removed",
+                     {
+                       blueprint: ContractorBlueprint,
+                       blueprint_opts: {
+                         view: :base
+                       }
+                     }
+    else
+      render json: {
+               error: onboard.errors.full_messages
+             },
+             status: :unprocessable_entity
+    end
   end
 
   private

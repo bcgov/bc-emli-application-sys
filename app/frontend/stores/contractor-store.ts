@@ -107,6 +107,9 @@ export const ContractorStoreModel = types
       // Trigger a new search with the status filter
       (self as any).searchContractors({ reset: true });
     },
+    setStatusWithoutSearch(status: 'active' | 'suspended' | 'removed') {
+      self.statusFilter = status;
+    },
   }))
   .actions((self) => ({
     searchContractors: flow(function* (
@@ -181,6 +184,36 @@ export const ContractorStoreModel = types
         permitApplicationId,
         contractorId: contractorIdReturned,
       };
+    }),
+    suspendContractor: flow(function* (contractorId: string, reason: string) {
+      const response = yield self.environment.api.suspendContractor(contractorId, reason);
+
+      if (response.ok) {
+        // Reload the contractor to get updated status
+        yield self.fetchContractor(contractorId);
+      }
+
+      return response;
+    }),
+    unsuspendContractor: flow(function* (contractorId: string) {
+      const response = yield self.environment.api.unsuspendContractor(contractorId);
+
+      if (response.ok) {
+        // Reload the contractor to get updated status
+        yield self.fetchContractor(contractorId);
+      }
+
+      return response;
+    }),
+    deactivateContractor: flow(function* (contractorId: string, reason: string) {
+      const response = yield self.environment.api.deactivateContractor(contractorId, reason);
+
+      if (response.ok) {
+        // Reload the contractor to get updated status
+        yield self.fetchContractor(contractorId);
+      }
+
+      return response;
     }),
     mergeContractor(contractorData: any) {
       try {

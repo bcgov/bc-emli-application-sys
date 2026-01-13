@@ -30,9 +30,8 @@ export const ContractorManagementScreen = observer(function ContractorManagement
 
   const handleSetTabIndex = (index: number) => {
     setTabIndex(index);
-    // TODO: Implement status filtering when backend support is added
-    // const statusMap = ['active', 'suspended', 'removed'] as const;
-    // contractorStore.setStatusFilter(statusMap[index]);
+    const statusMap = ['active', 'suspended', 'removed'] as const;
+    contractorStore.setStatusFilter(statusMap[index]);
   };
 
   return (

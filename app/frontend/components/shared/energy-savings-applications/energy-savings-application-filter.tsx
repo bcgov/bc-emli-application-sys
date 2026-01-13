@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Checkbox,
   Container,
@@ -217,7 +218,7 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
           ))}
           <Divider borderWidth="1px" />
           {/* Apply and Reset buttons horizontally */}
-          <MenuItem p={2}>
+          <Box p={2}>
             <Flex w="full" gap={2}>
               <Button
                 onClick={handleApplyFilters}
@@ -233,7 +234,7 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
                 {t('energySavingsApplication.reset')}
               </Button>
             </Flex>
-          </MenuItem>
+          </Box>
         </MenuList>
       </Menu>
     </Container>
