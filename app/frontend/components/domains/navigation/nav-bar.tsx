@@ -361,7 +361,7 @@ const ActionRequiredBox: React.FC<IActionRequiredBoxProps> = observer(({ notific
       p={4}
     >
       <Flex align="flex-start" gap={2} whiteSpace="normal">
-        <Warning size={24} color="var(--chakra-colors-semantic-warning)" aria-hidden="true" />
+        <WarningIcon size={24} color="var(--chakra-colors-semantic-warning)" aria-hidden="true" />
         <Flex direction="column" gap={2}>
           <Heading as="h3" fontSize="md">
             {t('ui.actionRequired')}

@@ -348,7 +348,10 @@ class Api::PermitApplicationsController < Api::ApplicationController
         current_user
       end
 
-    # Validate contractor not suspended or deactivated
+    # NOTE: These checks duplicate PermitApplicationPolicy#create? intentionally.
+    # Reason: Pundit's authorize() returns generic "not authorized" errors.
+    # We need specific error messages explaining why the contractor cannot submit.
+    # Maintenance: Keep these conditions in sync with the policy.
     if submitter.is_a?(Contractor)
       if submitter.suspended?
         return(
