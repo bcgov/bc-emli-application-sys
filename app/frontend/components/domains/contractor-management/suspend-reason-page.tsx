@@ -91,6 +91,7 @@ export const SuspendReasonPage = observer(function SuspendReasonPage() {
               if (error) setError('');
             }}
             placeholder={t('contractor.suspend.reason.placeholder', 'Enter suspension reason...')}
+            maxLength={5000}
             h="135px"
             resize="none"
           />

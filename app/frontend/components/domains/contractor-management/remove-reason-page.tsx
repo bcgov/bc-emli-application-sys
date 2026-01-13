@@ -98,6 +98,7 @@ export const RemoveReasonPage = observer(function RemoveReasonPage() {
               if (error) setError('');
             }}
             placeholder={t('contractor.remove.reason.placeholder', 'Enter removal reason...')}
+            maxLength={5000}
             h="135px"
             resize="none"
           />

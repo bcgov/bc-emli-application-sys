@@ -885,3 +885,7 @@ en:
       editContractor: 'Edit Contractor'
       suspendContractor: 'Suspend Contractor'
       removeContractor: 'Remove Contractor'
+    errors:
+      no_onboard_record: 'Contractor has no onboarding record'
+      suspended_cannot_submit: 'Your account is suspended and cannot submit applications'
+      deactivated_cannot_submit: 'Your account is deactivated and cannot submit applications'
