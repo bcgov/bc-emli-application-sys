@@ -84,6 +84,12 @@ module Api::Concerns::Search::Contractors
   def contractor_where_clause
     where_clause = {}
 
+    # Authorization: non-admins can only view contractors where they are the contact
+    unless current_user.system_admin? || current_user.admin? ||
+             current_user.admin_manager?
+      where_clause[:contact_id] = current_user.id
+    end
+
     # Apply status filtering
     status = search_params[:status]
     case status
