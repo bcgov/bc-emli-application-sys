@@ -16,6 +16,9 @@ class Contractor < ApplicationRecord
            as: :account,
            dependent: :destroy
 
+  has_one :contractor_info, dependent: :destroy
+  accepts_nested_attributes_for :contractor_info
+
   validates :business_name, presence: true
 
   # Delegate status fields to latest contractor_onboard record

@@ -43,4 +43,9 @@ class ContractorBlueprint < Blueprinter::Base
   view :extended_api do
     include_view :base
   end
+
+  view :with_info do
+    include_view :minimal
+    association :contractor_info, blueprint: ContractorInfoBlueprint
+  end
 end
