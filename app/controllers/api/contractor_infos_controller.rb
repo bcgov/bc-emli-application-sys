@@ -1,4 +1,4 @@
-class ContractorInfosController < ApplicationController
+class Api::ContractorInfosController < Api::ApplicationController
   before_action :set_contractor
 
   def show
