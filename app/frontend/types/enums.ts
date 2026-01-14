@@ -567,3 +567,20 @@ export enum ELandingTemplateKeys {
   SmallScale = 'small_scale_requirement_template_id',
   // FourPlus = "four_plus_template_version_id",
 }
+
+export enum EOnboardingRevisionFields {
+  BUSINESS_NAME = 'business_name',
+  BUSINESS_EMAIL = 'business_email',
+  DOING_BUSINESS_AS = 'doing_business_as_if_different_from_business_name',
+  BUSINESS_LICENCE_ISSUER = 'business_licence_issuer',
+  BUSINESS_LICENCE_NUMBER = 'business_licence_number',
+  YEAR_INCORPORATED = 'year_the_business_was_incorporated_if_applicable',
+  NUMBER_OF_EMPLOYEES = 'approximate_number_of_employees',
+  GST_NUMBER = 'gst_number',
+  WORKSAFEBC_NUMBER = 'worksafebc_number',
+  TYPE_OF_BUSINESS = 'type_of_business',
+  PRIMARY_PROGRAM_MEASURES = 'primary_program_measures',
+  RETROFIT_ENABLING_MEASURES = 'retrofit_enabling_measures',
+  SERVICE_LANGUAGES = 'what_language_s_does_your_business_provide_services_in',
+  SERVICE_INFO = 'service_info_v2',
+}

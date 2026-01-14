@@ -34,6 +34,7 @@ interface IRequirementFormProps {
   updateCollaborationAssignmentNodes?: () => void;
   performedBy?: string;
   saveEditsCompleted?: boolean;
+  buttonsToDisable?: string[];
 }
 
 export const RequirementForm = observer(
@@ -48,6 +49,7 @@ export const RequirementForm = observer(
     updateCollaborationAssignmentNodes,
     performedBy,
     saveEditsCompleted = false,
+    buttonsToDisable = [],
   }: IRequirementFormProps) => {
     const {
       jurisdiction,
@@ -408,7 +410,17 @@ export const RequirementForm = observer(
 
             // Revision buttons (pencil icons) - disable after Save Edits completion
             if (requirement.key?.includes('-revision-button')) {
-              requirement.disabled = saveEditsCompleted;
+              const requireKeyArray = requirement.key.split('|');
+              let disableButton = false;
+              if (buttonsToDisable.length > 0 && requireKeyArray.length > 0) {
+                const fieldName = requireKeyArray[requireKeyArray.length - 1];
+                console.log('buttons to disabled - FOUND');
+                if (buttonsToDisable.includes(fieldName)) {
+                  disableButton = true;
+                }
+              }
+
+              requirement.disabled = disableButton ? disableButton : saveEditsCompleted;
               return;
             }
 

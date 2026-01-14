@@ -1,5 +1,14 @@
 import { Box, Button, Divider, Flex, HStack, Heading, Spacer, Stack, Text, useDisclosure } from '@chakra-ui/react';
-import { CaretDown, CaretRight, CaretUp, CheckCircle, NotePencil, Plus, Prohibit, Warning } from '@phosphor-icons/react';
+import {
+  CaretDown,
+  CaretRight,
+  CaretUp,
+  CheckCircle,
+  NotePencil,
+  Plus,
+  Prohibit,
+  Warning,
+} from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -25,6 +34,7 @@ import UpdatePathwayModal from '../../shared/modals/application-update-pathway';
 import AddSupportingFilesPathwayModal from '../../shared/modals/add-supporting-files-pathway-modal';
 import { EnergySavingsApplicationStatusTag } from '../../shared/energy-savings-applications/energy-savings-application-status-tag';
 import { SupportingFilesRequestModal } from './supporting-files-request-modal';
+import { EPermitClassificationCode, EUserRoles, EOnboardingRevisionFields, EUpdateRoles } from '../../../types/enums';
 
 interface IReferenceNumberForm {
   referenceNumber?: string;
@@ -36,6 +46,10 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const { currentPermitApplication, error } = usePermitApplication({ review: true });
   const { t } = useTranslation();
   const formRef = useRef(null);
+
+  const onboardingRevisionButtonsToDisable = Object.values(EOnboardingRevisionFields).map(
+    (f) => `${f}-revision-button`,
+  );
 
   const { requirementBlockAssignmentNodes, updateRequirementBlockAssignmentNode } = useCollaborationAssignmentNodes({
     formRef,
@@ -69,6 +83,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const [saveEditsCompleted, setSaveEditsCompleted] = useState(false);
   const [saveEditsDisabled, setSaveEditsDisabled] = useState(false);
   const [supportRequestDate, setSupportRequestDate] = useState(null);
+  const [showEditMode, setShowEditMode] = useState(false);
 
   const sendRevisionContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -185,6 +200,21 @@ export const ReviewPermitApplicationScreen = observer(() => {
 
   const { formattedFormJson, number, revisionMode, setRevisionMode } = currentPermitApplication;
 
+  if (
+    currentPermitApplication.submissionType?.code === EPermitClassificationCode.onboarding &&
+    [EUserRoles.admin, EUserRoles.adminManager].indexOf(currentUser.role) >= 0
+  ) {
+    if (!performedBy) {
+      setPerformedBy(EUpdateRoles.staff);
+      setShowEditMode(true);
+    }
+    setRevisionMode(true);
+  } else {
+    if (showEditMode) {
+      setShowEditMode(false);
+    }
+  }
+
   const handleConfirm = async () => {
     try {
       const response = await currentPermitApplication.updateStatus({
@@ -222,21 +252,34 @@ export const ReviewPermitApplicationScreen = observer(() => {
                 <CopyableValue
                   textTransform={'uppercase'}
                   value={number}
-                  label={t('permitApplication.fields.number')}
+                  label={showEditMode ? t('contractorOnboarding.contractorId') : t('permitApplication.fields.number')}
                 />
               </HStack>
             </Flex>
           </HStack>
           <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
-            <Button variant="primary" onClick={onAddSupportingFilesPathwayOpen}>
-              {t('energySavingsApplication.show.supportingFilesRequest.addSupportingFiles')}
-            </Button>
+            {!showEditMode && (
+              <Button variant="primary" onClick={onAddSupportingFilesPathwayOpen}>
+                {t('energySavingsApplication.show.supportingFilesRequest.addSupportingFiles')}
+              </Button>
+            )}
             {/* <SupportingFilesRequestModal permitApplication={currentPermitApplication} /> */}
-            <SubmissionDownloadModal permitApplication={currentPermitApplication} review />
-            <Button variant="primary" rightIcon={<CaretRight />} onClick={() => navigate(`/submission-inbox`)}>
-              {t('ui.backToInbox')}
+            <SubmissionDownloadModal
+              permitApplication={currentPermitApplication}
+              review
+              {...(showEditMode ? { showIcon: false } : null)}
+            />
+
+            <Button
+              {...(!showEditMode ? { variant: 'primary' } : null)}
+              rightIcon={<CaretRight />}
+              onClick={() => navigate(`/submission-inbox`)}
+            >
+              {showEditMode ? t('ui.back') : t('ui.backToInbox')}
             </Button>
+
             {revisionMode &&
+              !showEditMode &&
               // Show for internal applications (always admin-on-behalf)
               (currentPermitApplication?.audienceType?.code === 'internal' ||
                 // Show for external applications when admin selected "on behalf" pathway
@@ -270,7 +313,9 @@ export const ReviewPermitApplicationScreen = observer(() => {
             <Flex width={'sidebar.width'} align="center" gap={2}>
               <NotePencil size={24} />
               <Heading fontSize="lg" mt={2}>
-                {t('energySavingsApplication.show.updatesTracker')}
+                {showEditMode
+                  ? t('energySavingsApplication.show.reviewNotes')
+                  : t('energySavingsApplication.show.updatesTracker')}
               </Heading>
               <Spacer />
               <Button
@@ -299,6 +344,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
             onCancel={handleRevisionCancel}
             sendRevisionContainerRef={sendRevisionContainerRef}
             updatePerformedBy={performedBy}
+            {...(showEditMode ? { showRevisionRequestRemove: false } : null)}
           />
         ) : (
           <ChecklistSideBar permitApplication={currentPermitApplication} completedBlocks={completedBlocks} />
@@ -312,11 +358,27 @@ export const ReviewPermitApplicationScreen = observer(() => {
               showHelpButton
               performedBy={performedBy}
               saveEditsCompleted={saveEditsCompleted}
+              buttonsToDisable={showEditMode ? onboardingRevisionButtonsToDisable : []}
               renderTopButtons={() => {
                 return (
-                  !revisionMode && (
+                  (!revisionMode || showEditMode) && (
                     <HStack spacing={6}>
-                      <Button
+                      {!showEditMode && (
+                        <Button
+                          variant="calloutInverse"
+                          leftIcon={<NotePencil />}
+                          px={14}
+                          onClick={onUpdatePathwayOpen}
+                          borderColor="theme.yellow"
+                          isDisabled={
+                            currentPermitApplication?.status === EPermitApplicationStatus.inReview ||
+                            currentPermitApplication?.status === EPermitApplicationStatus.ineligible
+                          }
+                        >
+                          {t('energySavingsApplication.show.update')}
+                        </Button>
+                      )}
+                      {/* <Button
                         variant="calloutInverse"
                         leftIcon={<NotePencil />}
                         px={14}
@@ -328,11 +390,11 @@ export const ReviewPermitApplicationScreen = observer(() => {
                         }
                       >
                         {t('energySavingsApplication.show.update')}
-                      </Button>
+                      </Button> */}
 
                       <Button
                         variant="calloutInverse"
-                        leftIcon={<CheckCircle />}
+                        leftIcon={!showEditMode && <CheckCircle />}
                         px={14}
                         onClick={onScreenIn}
                         borderColor="green"
@@ -341,11 +403,13 @@ export const ReviewPermitApplicationScreen = observer(() => {
                           currentPermitApplication?.status === EPermitApplicationStatus.inReview
                         }
                       >
-                        {t('energySavingsApplication.show.screenIn')}
+                        {!showEditMode
+                          ? t('energySavingsApplication.show.screenIn')
+                          : t('energySavingsApplication.show.readyForTraining')}
                       </Button>
                       <Button
                         variant="calloutInverse"
-                        leftIcon={<Prohibit />}
+                        leftIcon={!showEditMode && <Prohibit />}
                         px={14}
                         onClick={onIneligibleOpen}
                         borderColor="red"
@@ -354,7 +418,9 @@ export const ReviewPermitApplicationScreen = observer(() => {
                           currentPermitApplication?.status === EPermitApplicationStatus.ineligible
                         }
                       >
-                        {t('energySavingsApplication.show.inEligible')}
+                        {!showEditMode
+                          ? t('energySavingsApplication.show.inEligible')
+                          : t('energySavingsApplication.show.markIneligible')}
                       </Button>
                     </HStack>
                   )

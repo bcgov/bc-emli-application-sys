@@ -31,12 +31,13 @@ import { createUserSpecificConsumer } from '../../../channels/user_channel';
 
 export interface ISubmissionDownloadModalProps {
   permitApplication: IPermitApplication;
+  showIcon : boolean;
   renderTrigger?: (onOpen: () => void) => React.ReactNode;
   review?: boolean;
 }
 
 export const SubmissionDownloadModal = observer(
-  ({ permitApplication, renderTrigger, review }: ISubmissionDownloadModalProps) => {
+  ({ permitApplication, renderTrigger, review, showIcon = true }: ISubmissionDownloadModalProps) => {
     const { t } = useTranslation();
     const { permitApplicationStore } = useMst();
     const { allSubmissionVersionCompletedSupportingDocuments, zipfileUrl, zipfileName, stepCode } = permitApplication;
@@ -134,9 +135,9 @@ export const SubmissionDownloadModal = observer(
         {renderTrigger ? (
           renderTrigger(onOpen)
         ) : (
-          <Button variant="primary" onClick={onOpen} leftIcon={<Download />}>
-            {t('energySavingsApplication.show.viewApplicationFiles')}
-          </Button>
+          <Button variant="primary" onClick={onOpen} leftIcon={ showIcon ? <Download /> : null}>
+          {t('energySavingsApplication.show.viewApplicationFiles')}
+        </Button>
         )}
 
         <Modal onClose={onClose} isOpen={isOpen} size="md" scrollBehavior="inside">
