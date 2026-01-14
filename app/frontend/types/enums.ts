@@ -568,7 +568,7 @@ export enum ELandingTemplateKeys {
   // FourPlus = "four_plus_template_version_id",
 }
 
-export enum OnboardingRevisionField {
+export enum EOnboardingRevisionFields {
   BUSINESS_NAME = 'business_name',
   BUSINESS_EMAIL = 'business_email',
   DOING_BUSINESS_AS = 'doing_business_as_if_different_from_business_name',
@@ -583,8 +583,4 @@ export enum OnboardingRevisionField {
   RETROFIT_ENABLING_MEASURES = 'retrofit_enabling_measures',
   SERVICE_LANGUAGES = 'what_language_s_does_your_business_provide_services_in',
   SERVICE_INFO = 'service_info_v2',
-  }
-  
-  export const onboardingRevisionButtonsToDisable = Object.values(OnboardingRevisionField).map(
-  (f) => `${f}-revision-button`
-  );
+}

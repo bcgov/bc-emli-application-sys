@@ -34,7 +34,7 @@ interface IRequirementFormProps {
   updateCollaborationAssignmentNodes?: () => void;
   performedBy?: string;
   saveEditsCompleted?: boolean;
-  buttonsToDisable?: [];
+  buttonsToDisable?: string[];
 }
 
 export const RequirementForm = observer(
@@ -49,7 +49,7 @@ export const RequirementForm = observer(
     updateCollaborationAssignmentNodes,
     performedBy,
     saveEditsCompleted = false,
-    buttonsToDisable = []
+    buttonsToDisable = [],
   }: IRequirementFormProps) => {
     const {
       jurisdiction,
@@ -381,9 +381,9 @@ export const RequirementForm = observer(
       });
 
       // Set individual field disabled states based on isEditing (pathway-aware)
-      clonedFormJson.components?.forEach((section: any) => {  
-        section.components?.forEach((block: any) => {    
-          block.components?.forEach((requirement: any) => {        
+      clonedFormJson.components?.forEach((section: any) => {
+        section.components?.forEach((block: any) => {
+          block.components?.forEach((requirement: any) => {
             // Check if field has revision request (per-field calculation)
             const hasRevisionRequestInLatest = revisionRequestKeys.has(requirement.key);
 
@@ -393,7 +393,7 @@ export const RequirementForm = observer(
               requirement.key?.includes('acknowledge') ||
               requirement.key?.includes('signature')
             ) {
-              const isStaffPathway = performedBy === 'staff';         
+              const isStaffPathway = performedBy === 'staff';
 
               // Enable submit for:
               // 1. Draft applications (creation phase)
@@ -407,20 +407,18 @@ export const RequirementForm = observer(
               requirement.disabled = !(participantCanSubmit || staffCanSubmit);
               return;
             }
-          
+
             // Revision buttons (pencil icons) - disable after Save Edits completion
             if (requirement.key?.includes('-revision-button')) {
-             
-               const requireKeyArray = requirement.key.split("|")
-               let disableButton = false
+              const requireKeyArray = requirement.key.split('|');
+              let disableButton = false;
               if (buttonsToDisable.length > 0 && requireKeyArray.length > 0) {
-               
-                const fieldName = requireKeyArray[requireKeyArray.length-1];
+                const fieldName = requireKeyArray[requireKeyArray.length - 1];
                 console.log('buttons to disabled - FOUND');
-                if ( buttonsToDisable.includes(fieldName) ){
+                if (buttonsToDisable.includes(fieldName)) {
                   disableButton = true;
                 }
-               }
+              }
 
               requirement.disabled = disableButton ? disableButton : saveEditsCompleted;
               return;
