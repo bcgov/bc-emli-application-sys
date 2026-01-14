@@ -25,6 +25,7 @@ import UpdatePathwayModal from '../../shared/modals/application-update-pathway';
 import AddSupportingFilesPathwayModal from '../../shared/modals/add-supporting-files-pathway-modal';
 import { EnergySavingsApplicationStatusTag } from '../../shared/energy-savings-applications/energy-savings-application-status-tag';
 import { SupportingFilesRequestModal } from './supporting-files-request-modal';
+import { EPermitClassificationCode, EUserRoles, onboardingRevisionButtonsToDisable } from '../../../types/enums';
 
 interface IReferenceNumberForm {
   referenceNumber?: string;
@@ -70,20 +71,6 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const [saveEditsDisabled, setSaveEditsDisabled] = useState(false);
   const [supportRequestDate, setSupportRequestDate] = useState(null);
   const [showEditMode, setShowEditMode] = useState(false);
-  const onboardingRevisionButtonsToDisable = ['business_name-revision-button', 
-                                             'business_email-revision-button', 
-                                             'doing_business_as_if_different_from_business_name-revision-button',
-                                             'business_licence_issuer-revision-button',
-                                             'business_licence_number-revision-button',
-                                             'year_the_business_was_incorporated_if_applicable-revision-button',
-                                             'approximate_number_of_employees-revision-button',
-                                             'gst_number-revision-button',
-                                             'worksafebc_number-revision-button',
-                                             'type_of_business-revision-button',
-                                             'primary_program_measures-revision-button',
-                                             'retrofit_enabling_measures-revision-button',
-                                             'what_language_s_does_your_business_provide_services_in-revision-button',
-                                             'service_info_v2-revision-button']
 
   const sendRevisionContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -200,7 +187,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
 
   const { formattedFormJson, number, revisionMode, setRevisionMode } = currentPermitApplication;
 
-  if (currentPermitApplication.submissionType?.code === 'onboarding' &&   ['admin', 'admin_manager'].indexOf(currentUser.role) >=0 ) {
+    if (currentPermitApplication.submissionType?.code === EPermitClassificationCode.onboarding && [EUserRoles.admin, EUserRoles.adminManager].indexOf(currentUser.role) >= 0) {
        
     if (!performedBy) { 
           setPerformedBy('staff');
