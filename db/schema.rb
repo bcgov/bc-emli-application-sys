@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_06_210043) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_13_025026) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -180,10 +180,11 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_06_210043) do
     t.uuid "contractor_id", null: false
     t.uuid "onboard_application_id", null: false
     t.datetime "deactivated_at"
-    t.string "suspended_reason"
+    t.text "suspended_reason"
     t.datetime "suspended_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "deactivated_reason"
     t.index ["contractor_id"],
             name: "index_contractor_onboards_on_contractor_id"
     t.index ["onboard_application_id"],
@@ -1180,6 +1181,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_06_210043) do
     t.index ["reset_password_token"],
             name: "index_users_on_reset_password_token",
             unique: true
+  end
+
+  create_table "v_requirement_block_id", id: false, force: :cascade do |t|
+    t.uuid "id"
   end
 
   add_foreign_key "allowlisted_jwts", "users", on_delete: :cascade
