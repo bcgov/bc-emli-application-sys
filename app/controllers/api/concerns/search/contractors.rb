@@ -22,7 +22,10 @@ module Api::Concerns::Search::Contractors
         order: contractor_order,
         page: params[:page],
         per_page: params[:per_page],
-        includes: [:contact]
+        includes: [
+          :contact,
+          { contractor_onboards: %i[suspended_by deactivated_by] }
+        ]
       )
   end
 
