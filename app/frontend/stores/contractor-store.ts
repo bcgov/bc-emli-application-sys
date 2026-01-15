@@ -8,7 +8,7 @@ import { IContractor, ContractorModel } from '../models/contractor';
 import { ContractorOnboardModel } from '../models/contractor-onboard';
 
 export enum EContractorSortFields {
-  id = 'id',
+  id = 'number',
   contactName = 'contact_name',
   contactEmail = 'contact_email',
   businessName = 'business_name',
@@ -16,19 +16,19 @@ export enum EContractorSortFields {
 }
 
 export enum ESuspendedContractorSortFields {
-  id = 'id',
+  id = 'number',
   businessName = 'business_name',
   contactName = 'contact_name',
   suspendedAt = 'suspended_at',
-  suspendedBy = 'suspended_by',
+  suspendedBy = 'suspended_by_name',
 }
 
 export enum ERemovedContractorSortFields {
-  id = 'id',
+  id = 'number',
   businessName = 'business_name',
   contactName = 'contact_name',
   deactivatedAt = 'deactivated_at',
-  deactivatedBy = 'deactivated_by',
+  deactivatedBy = 'deactivated_by_name',
 }
 
 export const ContractorStoreModel = types
