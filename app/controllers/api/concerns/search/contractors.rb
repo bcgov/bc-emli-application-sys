@@ -5,48 +5,25 @@ module Api::Concerns::Search::Contractors
     params = search_params
     query = params[:query].presence || "*"
 
-    # First try exact ID match, then fall back to search including ID field
-    if query != "*" && Contractor.exists?(id: query)
-      # Direct database lookup for exact ID match
-      contractor = Contractor.find(query)
-      @contractor_search =
-        OpenStruct.new(
-          results:
-            policy_scope(Contractor).where(id: contractor.id).includes(
-              :contact
-            ),
-          total_count: 1,
-          total_pages: 1,
-          current_page: 1
-        )
-    else
-      # Check if query looks like partial UUID (hex chars with optional hyphens, 2+ chars)
-      if query != "*" && query.match?(/\A[0-9a-f-]{2,}\z/i) &&
-           !query.include?(" ")
-        # Use prefix search for UUID matching only
-        @contractor_search =
-          Contractor.search("*") do |body|
-            body[:query] = { prefix: { id: query } }
-            body[:size] = params[:per_page] || 25
-            body[:from] = ((params[:page]&.to_i || 1) - 1) *
-              (params[:per_page]&.to_i || 25)
-          end
-      else
-        # Use standard searchkick for text searches
-        @contractor_search =
-          Contractor.search(
-            query,
-            fields: %i[business_name contact_name contact_email],
-            match: :word_middle,
-            misspellings: false,
-            where: contractor_where_clause,
-            order: contractor_order,
-            page: params[:page],
-            per_page: params[:per_page],
-            includes: [:contact]
-          )
-      end
-    end
+    @contractor_search =
+      Contractor.search(
+        query,
+        fields: %i[
+          business_name
+          contact_name
+          contact_email
+          number
+          suspended_by_name
+          deactivated_by_name
+        ],
+        match: :word_middle,
+        misspellings: false,
+        where: contractor_where_clause,
+        order: contractor_order,
+        page: params[:page],
+        per_page: params[:per_page],
+        includes: [:contact]
+      )
   end
 
   private
@@ -57,17 +34,7 @@ module Api::Concerns::Search::Contractors
 
   def contractor_search_params
     params.delete(:sort) if params[:sort].nil?
-    permitted_params =
-      params.permit(
-        :id,
-        :query,
-        :page,
-        :per_page,
-        :status,
-        sort: %i[field direction]
-      )
-
-    permitted_params
+    params.permit(:query, :page, :per_page, :status, sort: %i[field direction])
   end
 
   def contractor_order

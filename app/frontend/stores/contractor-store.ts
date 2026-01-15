@@ -12,8 +12,23 @@ export enum EContractorSortFields {
   contactName = 'contact_name',
   contactEmail = 'contact_email',
   businessName = 'business_name',
-  program = 'program',
   updatedAt = 'updated_at',
+}
+
+export enum ESuspendedContractorSortFields {
+  id = 'id',
+  businessName = 'business_name',
+  contactName = 'contact_name',
+  suspendedAt = 'suspended_at',
+  suspendedBy = 'suspended_by',
+}
+
+export enum ERemovedContractorSortFields {
+  id = 'id',
+  businessName = 'business_name',
+  contactName = 'contact_name',
+  deactivatedAt = 'deactivated_at',
+  deactivatedBy = 'deactivated_by',
 }
 
 export const ContractorStoreModel = types
@@ -30,14 +45,17 @@ export const ContractorStoreModel = types
   .extend(withRootStore())
   .extend(withMerge())
   .views((self) => ({
-    getSortColumnHeader(field: EContractorSortFields) {
+    getSortColumnHeader(field: EContractorSortFields | ESuspendedContractorSortFields | ERemovedContractorSortFields) {
       const fieldMap = {
         [EContractorSortFields.id]: 'contractor.fields.contractorId',
         [EContractorSortFields.contactName]: 'contractor.fields.primaryContactName',
         [EContractorSortFields.contactEmail]: 'contractor.fields.primaryContactEmail',
         [EContractorSortFields.businessName]: 'contractor.fields.doingBusinessAs',
-        [EContractorSortFields.program]: 'contractor.fields.program',
         [EContractorSortFields.updatedAt]: 'contractor.fields.lastUpdated',
+        [ESuspendedContractorSortFields.suspendedAt]: 'contractor.fields.dateSuspended',
+        [ESuspendedContractorSortFields.suspendedBy]: 'contractor.fields.suspendedBy',
+        [ERemovedContractorSortFields.deactivatedAt]: 'contractor.fields.dateRemoved',
+        [ERemovedContractorSortFields.deactivatedBy]: 'contractor.fields.removedBy',
       };
       //@ts-ignore
       return t(fieldMap[field]);
@@ -65,6 +83,16 @@ export const ContractorStoreModel = types
           }
         });
         contractor.employees = contractor.employees.map((emp) => emp.id);
+      }
+      if (contractor && contractor.suspendedBy) {
+        self.rootStore.userStore.mergeUpdate(contractor.suspendedBy, 'usersMap');
+        contractor.suspendedById = contractor.suspendedBy.id;
+        delete contractor.suspendedBy;
+      }
+      if (contractor && contractor.deactivatedBy) {
+        self.rootStore.userStore.mergeUpdate(contractor.deactivatedBy, 'usersMap');
+        contractor.deactivatedById = contractor.deactivatedBy.id;
+        delete contractor.deactivatedBy;
       }
       return contractor;
     },

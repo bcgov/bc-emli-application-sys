@@ -22,6 +22,8 @@ class ContractorBlueprint < Blueprinter::Base
 
     association :contact, blueprint: UserBlueprint, view: :minimal
     association :employees, blueprint: UserBlueprint, view: :minimal
+    association :suspended_by, blueprint: UserBlueprint, view: :minimal
+    association :deactivated_by, blueprint: UserBlueprint, view: :minimal
   end
 
   # minimal view - excludes employees to avoid validation issues with undefined roles
