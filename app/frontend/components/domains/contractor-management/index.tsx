@@ -127,64 +127,67 @@ export const ContractorManagementScreen = observer(function ContractorManagement
             </Tab>
           </TabList>
           <TabPanels as={Flex} direction="column" flex={1} overflowY="auto">
+            {/* Active contractors tab */}
             <TabPanel flex={1} px={0}>
-              <SearchGrid templateColumns="1fr 1fr 1fr 1fr 1fr 1fr 120px">
-                <ContractorGridHeaders />
+              <SearchGrid templateColumns="1fr 1.5fr 1fr 1fr 1fr 120px">
+                <ContractorGridHeaders status="active" />
                 {isSearching ? (
-                  <Flex py="50" gridColumn={'span 7'}>
+                  <Flex py="50" gridColumn={'span 6'}>
                     <SharedSpinner />
                   </Flex>
                 ) : contractorStore.tableContractors.length === 0 ? (
-                  <Flex py="50" gridColumn={'span 7'} justifyContent="center">
+                  <Flex py="50" gridColumn={'span 6'} justifyContent="center">
                     <Text color="gray.500" fontSize="md">
                       {t('errors.noResults')}
                     </Text>
                   </Flex>
                 ) : (
                   contractorStore.tableContractors.map((contractor: IContractor) => {
-                    return <ContractorRow key={contractor.id} contractor={contractor} />;
+                    return <ContractorRow key={contractor.id} contractor={contractor} status="active" />;
                   })
                 )}
               </SearchGrid>
               <TableControls contractorStore={contractorStore} />
             </TabPanel>
+            {/* Suspended contractors tab */}
             <TabPanel flex={1} px={0}>
-              <SearchGrid templateColumns="1fr 1fr 1fr 1fr 1fr 1fr 120px">
-                <ContractorGridHeaders />
+              <SearchGrid templateColumns="1fr 1fr 1.2fr 1fr 1fr 120px">
+                <ContractorGridHeaders status="suspended" />
                 {isSearching ? (
-                  <Flex py="50" gridColumn={'span 7'}>
+                  <Flex py="50" gridColumn={'span 6'}>
                     <SharedSpinner />
                   </Flex>
                 ) : contractorStore.tableContractors.length === 0 ? (
-                  <Flex py="50" gridColumn={'span 7'} justifyContent="center">
+                  <Flex py="50" gridColumn={'span 6'} justifyContent="center">
                     <Text color="gray.500" fontSize="md">
                       {t('errors.noResults')}
                     </Text>
                   </Flex>
                 ) : (
                   contractorStore.tableContractors.map((contractor: IContractor) => {
-                    return <ContractorRow key={contractor.id} contractor={contractor} />;
+                    return <ContractorRow key={contractor.id} contractor={contractor} status="suspended" />;
                   })
                 )}
               </SearchGrid>
               <TableControls contractorStore={contractorStore} />
             </TabPanel>
+            {/* Removed contractors tab */}
             <TabPanel flex={1} px={0}>
-              <SearchGrid templateColumns="1fr 1fr 1fr 1fr 1fr 1fr 120px">
-                <ContractorGridHeaders />
+              <SearchGrid templateColumns="1fr 1fr 1.2fr 1fr 1fr 120px">
+                <ContractorGridHeaders status="removed" />
                 {isSearching ? (
-                  <Flex py="50" gridColumn={'span 7'}>
+                  <Flex py="50" gridColumn={'span 6'}>
                     <SharedSpinner />
                   </Flex>
                 ) : contractorStore.tableContractors.length === 0 ? (
-                  <Flex py="50" gridColumn={'span 7'} justifyContent="center">
+                  <Flex py="50" gridColumn={'span 6'} justifyContent="center">
                     <Text color="gray.500" fontSize="md">
                       {t('errors.noResults')}
                     </Text>
                   </Flex>
                 ) : (
                   contractorStore.tableContractors.map((contractor: IContractor) => {
-                    return <ContractorRow key={contractor.id} contractor={contractor} />;
+                    return <ContractorRow key={contractor.id} contractor={contractor} status="removed" />;
                   })
                 )}
               </SearchGrid>

@@ -20,8 +20,10 @@ export const ContractorModel = types
     number: types.maybeNull(types.string),
     suspendedAt: types.maybeNull(types.Date),
     suspendedReason: types.maybeNull(types.string),
+    suspendedById: types.maybeNull(types.string),
     deactivatedAt: types.maybeNull(types.Date),
     deactivatedReason: types.maybeNull(types.string),
+    deactivatedById: types.maybeNull(types.string),
   })
   .extend(withRootStore())
   .extend(withEnvironment())
@@ -42,6 +44,24 @@ export const ContractorModel = types
     },
     get isDeactivated() {
       return self.deactivatedAt !== null;
+    },
+    get suspendedBy() {
+      if (!self.suspendedById) return null;
+      return self.rootStore.userStore.getUser(self.suspendedById) || null;
+    },
+    get suspendedByName() {
+      const user = this.suspendedBy;
+      if (!user) return '';
+      return `${user.firstName || ''} ${user.lastName || ''}`.trim();
+    },
+    get deactivatedBy() {
+      if (!self.deactivatedById) return null;
+      return self.rootStore.userStore.getUser(self.deactivatedById) || null;
+    },
+    get deactivatedByName() {
+      const user = this.deactivatedBy;
+      if (!user) return '';
+      return `${user.firstName || ''} ${user.lastName || ''}`.trim();
     },
   }))
   .actions((self) => ({

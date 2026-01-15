@@ -1,8 +1,22 @@
 class Contractor < ApplicationRecord
   searchkick(
     callbacks: false,
-    searchable: %i[id business_name contact_name contact_email number],
-    word_middle: %i[business_name contact_name contact_email number]
+    searchable: %i[
+      business_name
+      contact_name
+      contact_email
+      number
+      suspended_by_name
+      deactivated_by_name
+    ],
+    word_middle: %i[
+      business_name
+      contact_name
+      contact_email
+      number
+      suspended_by_name
+      deactivated_by_name
+    ]
   )
 
   belongs_to :contact, class_name: "User", optional: true
@@ -38,6 +52,10 @@ class Contractor < ApplicationRecord
     suspended_at.present?
   end
 
+  def suspended_by
+    latest_onboard&.suspended_by
+  end
+
   def deactivated_at
     latest_onboard&.deactivated_at
   end
@@ -48,6 +66,10 @@ class Contractor < ApplicationRecord
 
   def deactivated?
     deactivated_at.present?
+  end
+
+  def deactivated_by
+    latest_onboard&.deactivated_by
   end
 
   before_validation :assign_unique_number, on: :create
@@ -63,7 +85,9 @@ class Contractor < ApplicationRecord
       updated_at: updated_at,
       number: number,
       suspended_at: suspended_at,
-      deactivated_at: deactivated_at
+      suspended_by_name: suspended_by&.name,
+      deactivated_at: deactivated_at,
+      deactivated_by_name: deactivated_by&.name
     }
   end
 

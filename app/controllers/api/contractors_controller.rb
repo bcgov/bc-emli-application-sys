@@ -132,7 +132,8 @@ class Api::ContractorsController < Api::ApplicationController
     # Suspend the contractor (sets suspended_at on contractor_onboard)
     if onboard.update(
          suspended_at: Time.current,
-         suspended_reason: params[:reason]
+         suspended_reason: params[:reason],
+         suspended_by: current_user
        )
       # Send email notification to primary contact
       # TODO: Re-enable if client wants emails sent
@@ -175,8 +176,12 @@ class Api::ContractorsController < Api::ApplicationController
       )
     end
 
-    # Unsuspend the contractor (clears suspended_at and suspended_reason on contractor_onboard)
-    if onboard.update(suspended_at: nil, suspended_reason: nil)
+    # Unsuspend the contractor (clears suspended_at, suspended_reason, and suspended_by on contractor_onboard)
+    if onboard.update(
+         suspended_at: nil,
+         suspended_reason: nil,
+         suspended_by: nil
+       )
       # Send email notification to primary contact
       # TODO: Re-enable if client wants emails sent
       # PermitHubMailer.contractor_unsuspended(@contractor).deliver_later
@@ -217,10 +222,11 @@ class Api::ContractorsController < Api::ApplicationController
       )
     end
 
-    # Deactivate the contractor (sets deactivated_at and deactivated_reason on contractor_onboard)
+    # Deactivate the contractor (sets deactivated_at, deactivated_reason, and deactivated_by on contractor_onboard)
     if onboard.update(
          deactivated_at: Time.current,
-         deactivated_reason: params[:reason]
+         deactivated_reason: params[:reason],
+         deactivated_by: current_user
        )
       # Send email notification to primary contact
       # TODO: Re-enable if client wants emails sent

@@ -20,9 +20,10 @@ import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation
 
 interface ContractorRowProps {
   contractor: IContractor;
+  status?: 'active' | 'suspended' | 'removed';
 }
 
-export const ContractorRow = observer(({ contractor }: ContractorRowProps) => {
+export const ContractorRow = observer(({ contractor, status = 'active' }: ContractorRowProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { contractorStore } = useMst();
@@ -88,8 +89,9 @@ export const ContractorRow = observer(({ contractor }: ContractorRowProps) => {
     }).format(new Date(date));
   };
 
-  return (
-    <Box key={contractor.number} className="contractor-index-grid-row" role="row" display="contents">
+  // Render columns based on status
+  const renderActiveColumns = () => (
+    <>
       <SearchGridItem fontSize="sm" role="cell">
         <span aria-label={`Contractor ID: ${contractor.number}`}>{contractor.number}</span>
       </SearchGridItem>
@@ -107,13 +109,77 @@ export const ContractorRow = observer(({ contractor }: ContractorRowProps) => {
         <span aria-label={`Doing business as: ${contractor.businessName}`}>{contractor.businessName}</span>
       </SearchGridItem>
       <SearchGridItem fontSize="sm" role="cell">
-        <span aria-label={`Program name: ${t('contractor.fields.programPlaceholder', 'N/A')}`}>
-          {t('contractor.fields.programPlaceholder', 'N/A')}
+        <span aria-label={`Last updated: ${formatDate(contractor.updatedAt)}`}>{formatDate(contractor.updatedAt)}</span>
+      </SearchGridItem>
+    </>
+  );
+
+  const renderSuspendedColumns = () => (
+    <>
+      <SearchGridItem fontSize="sm" role="cell">
+        <span aria-label={`Contractor ID: ${contractor.number}`}>{contractor.number}</span>
+      </SearchGridItem>
+      <SearchGridItem fontSize="sm" maxWidth="300px" sx={{ wordBreak: 'break-word' }} role="cell">
+        <span aria-label={`Doing business as: ${contractor.businessName}`}>{contractor.businessName}</span>
+      </SearchGridItem>
+      <SearchGridItem fontSize="sm" role="cell">
+        <span aria-label={`Primary contact name: ${contractor.contactName || 'Not specified'}`}>
+          {contractor.contactName}
         </span>
       </SearchGridItem>
       <SearchGridItem fontSize="sm" role="cell">
-        <span aria-label={`Last updated: ${formatDate(contractor.updatedAt)}`}>{formatDate(contractor.updatedAt)}</span>
+        <span aria-label={`Date suspended: ${formatDate(contractor.suspendedAt)}`}>
+          {formatDate(contractor.suspendedAt)}
+        </span>
       </SearchGridItem>
+      <SearchGridItem fontSize="sm" role="cell">
+        <span aria-label={`Suspended by: ${contractor.suspendedByName || 'Not specified'}`}>
+          {contractor.suspendedByName || 'N/A'}
+        </span>
+      </SearchGridItem>
+    </>
+  );
+
+  const renderRemovedColumns = () => (
+    <>
+      <SearchGridItem fontSize="sm" role="cell">
+        <span aria-label={`Contractor ID: ${contractor.number}`}>{contractor.number}</span>
+      </SearchGridItem>
+      <SearchGridItem fontSize="sm" maxWidth="300px" sx={{ wordBreak: 'break-word' }} role="cell">
+        <span aria-label={`Doing business as: ${contractor.businessName}`}>{contractor.businessName}</span>
+      </SearchGridItem>
+      <SearchGridItem fontSize="sm" role="cell">
+        <span aria-label={`Primary contact name: ${contractor.contactName || 'Not specified'}`}>
+          {contractor.contactName}
+        </span>
+      </SearchGridItem>
+      <SearchGridItem fontSize="sm" role="cell">
+        <span aria-label={`Date removed: ${formatDate(contractor.deactivatedAt)}`}>
+          {formatDate(contractor.deactivatedAt)}
+        </span>
+      </SearchGridItem>
+      <SearchGridItem fontSize="sm" role="cell">
+        <span aria-label={`Removed by: ${contractor.deactivatedByName || 'Not specified'}`}>
+          {contractor.deactivatedByName || 'N/A'}
+        </span>
+      </SearchGridItem>
+    </>
+  );
+
+  const renderColumns = () => {
+    switch (status) {
+      case 'suspended':
+        return renderSuspendedColumns();
+      case 'removed':
+        return renderRemovedColumns();
+      default:
+        return renderActiveColumns();
+    }
+  };
+
+  return (
+    <Box key={contractor.number} className="contractor-index-grid-row" role="row" display="contents">
+      {renderColumns()}
       <SearchGridItem role="cell">
         <Flex justify="center">
           <Menu>

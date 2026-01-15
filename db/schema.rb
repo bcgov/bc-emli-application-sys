@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_13_025026) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_13_170500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -185,6 +185,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_13_025026) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "deactivated_reason"
+    t.uuid "suspended_by"
+    t.uuid "deactivated_by"
     t.index ["contractor_id"],
             name: "index_contractor_onboards_on_contractor_id"
     t.index ["onboard_application_id"],
@@ -1199,6 +1201,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_13_025026) do
   add_foreign_key "contractor_onboards",
                   "permit_applications",
                   column: "onboard_application_id"
+  add_foreign_key "contractor_onboards", "users", column: "deactivated_by"
+  add_foreign_key "contractor_onboards", "users", column: "suspended_by"
   add_foreign_key "contractors", "users", column: "contact_id"
   add_foreign_key "early_access_previews", "users", column: "previewer_id"
   add_foreign_key "external_api_keys", "jurisdictions"

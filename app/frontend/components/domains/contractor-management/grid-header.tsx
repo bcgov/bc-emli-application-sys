@@ -3,20 +3,43 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMst } from '../../../setup/root';
-import { EContractorSortFields } from '../../../stores/contractor-store';
+import {
+  EContractorSortFields,
+  ESuspendedContractorSortFields,
+  ERemovedContractorSortFields,
+} from '../../../stores/contractor-store';
 import { GridHeader } from '../../shared/grid/grid-header';
 import { SortIcon } from '../../shared/sort-icon';
 import { ModelSearchInput } from '../../shared/base/model-search-input';
 
-export const ContractorGridHeaders = observer(() => {
+interface ContractorGridHeadersProps {
+  status?: 'active' | 'suspended' | 'removed';
+}
+
+export const ContractorGridHeaders = observer(({ status = 'active' }: ContractorGridHeadersProps) => {
   const { t } = useTranslation();
   const { contractorStore } = useMst();
   const { toggleSort, sort, getSortColumnHeader } = contractorStore;
 
+  // Get the appropriate sort fields enum based on status
+  const getSortFields = () => {
+    switch (status) {
+      case 'suspended':
+        return ESuspendedContractorSortFields;
+      case 'removed':
+        return ERemovedContractorSortFields;
+      default:
+        return EContractorSortFields;
+    }
+  };
+
+  const sortFields = getSortFields();
+  const columnCount = 6;
+
   return (
     <Box display={'contents'} role={'rowgroup'}>
       <Box display="contents" role="row">
-        <GridItem as={Flex} gridColumn="span 7" p={6} bg="greys.grey10" alignItems="center">
+        <GridItem as={Flex} gridColumn={`span ${columnCount}`} p={6} bg="greys.grey10" alignItems="center">
           <Flex justifyContent="space-between" w="100%" alignItems="center">
             <Text role={'heading'} fontSize="lg">
               {t('contractor.management.tableHeading')}
@@ -47,8 +70,8 @@ export const ContractorGridHeaders = observer(() => {
         </GridItem>
       </Box>
       <Box display={'contents'} role={'row'}>
-        {Object.keys(EContractorSortFields).map((key) => {
-          const field = EContractorSortFields[key as keyof typeof EContractorSortFields];
+        {Object.keys(sortFields).map((key) => {
+          const field = sortFields[key as keyof typeof sortFields];
 
           return (
             <GridHeader key={key} role={'columnheader'} position="relative">
@@ -73,7 +96,7 @@ export const ContractorGridHeaders = observer(() => {
                 }}
               >
                 <Text textAlign="left">{getSortColumnHeader(field)}</Text>
-                <SortIcon<EContractorSortFields> field={field} currentSort={sort} />
+                <SortIcon field={field} currentSort={sort} />
               </Flex>
             </GridHeader>
           );
