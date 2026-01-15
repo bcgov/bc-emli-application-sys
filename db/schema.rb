@@ -152,6 +152,29 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_13_170500) do
     t.index ["employee_id"], name: "index_contractor_employees_on_employee_id"
   end
 
+  create_table "contractor_infos",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.uuid "contractor_id", null: false
+    t.string "doing_business_as"
+    t.string "license_issuer"
+    t.string "license_number"
+    t.integer "incorporated_year"
+    t.integer "number_of_employees"
+    t.string "gst_number"
+    t.string "worksafebc_number"
+    t.integer "type_of_business", default: [], null: false, array: true
+    t.integer "primary_program_measure", default: [], null: false, array: true
+    t.integer "retrofit_enabling_measures", default: [], array: true
+    t.string "service_languages"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contractor_id"],
+            name: "index_contractor_infos_on_contractor_id",
+            unique: true
+  end
+
   create_table "contractor_onboards",
                id: :uuid,
                default: -> { "gen_random_uuid()" },
@@ -1173,6 +1196,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_13_170500) do
   add_foreign_key "collaborators", "users"
   add_foreign_key "contractor_employees", "contractors"
   add_foreign_key "contractor_employees", "users", column: "employee_id"
+  add_foreign_key "contractor_infos", "contractors"
   add_foreign_key "contractor_onboards", "contractors"
   add_foreign_key "contractor_onboards",
                   "permit_applications",
