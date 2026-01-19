@@ -370,7 +370,10 @@ export const PermitApplicationStoreModel = types
 
       return app;
     },
-    requestSupportingFiles: flow(function* (permitApplicationId: string, params: { note: string; audience_type_code?: string }) {
+    requestSupportingFiles: flow(function* (
+      permitApplicationId: string,
+      params: { note: string; audience_type_code?: string },
+    ) {
       const permitApplication = self.getPermitApplicationById(permitApplicationId);
       if (!permitApplication) return false;
 
@@ -383,11 +386,20 @@ export const PermitApplicationStoreModel = types
       return false;
     }),
     createEnergyApplication: flow(function* (formData: TCreateEnergyApplicationFormData) {
-      const { ok, data: response } = yield self.environment.api.createEnergyApplication(formData);
-      if (ok && response.id) {
-        return response.id;
+      const { ok, status, data: response } = yield self.environment.api.createEnergyApplication(formData);
+
+      // Handle duplicate application error (409 Conflict)
+      if (status === 409 && response?.error === 'duplicate_application') {
+        return {
+          duplicate: true,
+          existingApplication: response.existingApplication,
+        };
       }
-      return false;
+
+      if (ok && response.id) {
+        return { duplicate: false, id: response.id };
+      }
+      return { duplicate: false, id: false };
     }),
     createPermitApplication: flow(function* (formData: TCreatePermitApplicationFormData) {
       const { ok, data: response } = yield self.environment.api.createPermitApplication(formData);
@@ -426,11 +438,14 @@ export const PermitApplicationStoreModel = types
         },
       } as TSearchParams<EPermitApplicationSortFields, IEnergySavingsApplicationSearchFilters>;
 
-
       const currentProgramId = self.rootStore?.programStore?.currentProgram?.id;
 
       // Don't search if we don't have the required filters set
-      if (!searchParams.filters.userGroupTypeId || !searchParams.filters.submissionTypeId || (Array.isArray(searchParams.filters.submissionTypeId) && searchParams.filters.submissionTypeId.length === 0)) {
+      if (
+        !searchParams.filters.userGroupTypeId ||
+        !searchParams.filters.submissionTypeId ||
+        (Array.isArray(searchParams.filters.submissionTypeId) && searchParams.filters.submissionTypeId.length === 0)
+      ) {
         return false;
       }
 

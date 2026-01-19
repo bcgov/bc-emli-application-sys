@@ -14,6 +14,9 @@ class PermitApplication < ApplicationRecord
        },
        _default: 0
 
+  # Statuses that indicate an application is complete (allows new application for same address/program)
+  TERMINAL_STATUSES = %w[ineligible].freeze
+
   include PermitApplicationStatus
 
   include FormSupportingDocuments
@@ -49,10 +52,10 @@ class PermitApplication < ApplicationRecord
       support_requests: [
         :requested_by,
         {
-          linked_application: [
-            :supporting_documents,
-            :audience_type,
-            :submission_type
+          linked_application: %i[
+            supporting_documents
+            audience_type
+            submission_type
           ]
         }
       ]
@@ -177,6 +180,16 @@ class PermitApplication < ApplicationRecord
   scope :unviewed,
         -> do
           where(status: :submitted, viewed_at: nil).order(submitted_at: :asc)
+        end
+
+  # Find blocking applications for duplicate check (participants only)
+  scope :blocking_for_participant,
+        ->(user, program_id, address_nickname) do
+          # Remove this line to block ANY in-progress app for this address/program (not just current user's)
+          where(submitter_type: "User", submitter_id: user.id)
+            .where(program_id: program_id)
+            .where("LOWER(nickname) = LOWER(?)", address_nickname)
+            .where.not(status: TERMINAL_STATUSES)
         end
 
   COMPLETION_SECTION_KEY = "section-completion-key"
@@ -308,14 +321,12 @@ class PermitApplication < ApplicationRecord
   end
 
   def has_draft_support_requests?
-    support_requests.any? do |sr|
-      sr.linked_application&.status == 'new_draft'
-    end
+    support_requests.any? { |sr| sr.linked_application&.status == "new_draft" }
   end
 
   def is_support_request_requested_by_participant?
     # Check if this application is a support request and was requested by a participant
-    return false unless submission_type&.code == 'support_request'
+    return false unless submission_type&.code == "support_request"
     return false unless incoming_support_requests.present?
 
     requested_by_user = incoming_support_requests.requested_by
@@ -363,7 +374,8 @@ class PermitApplication < ApplicationRecord
       submission_type_code: submission_type&.code,
       has_draft_support_requests: has_draft_support_requests?,
       is_submitted: submitted_at.present?,
-      is_support_request_by_participant: is_support_request_requested_by_participant?
+      is_support_request_by_participant:
+        is_support_request_requested_by_participant?
       # sandbox_id: sandbox_id
     }
   end
@@ -462,11 +474,7 @@ class PermitApplication < ApplicationRecord
   end
 
   def set_status(new_status, reason)
-    if update(status: new_status, status_update_reason: reason)
-      self
-    else
-      nil
-    end
+    update(status: new_status, status_update_reason: reason) ? self : nil
   end
 
   def status_display_label
@@ -944,6 +952,21 @@ class PermitApplication < ApplicationRecord
       custom_requirements.any? do |r|
         r.energy_step_required || r.zero_carbon_step_required
       end
+  end
+
+  # Find a blocking application for a participant (used to prevent duplicate applications)
+  def self.find_blocking_application_for_participant(user, program_id)
+    return nil unless user.is_a?(User)
+
+    # Build address from user's physical address (same as frontend)
+    address_nickname = [
+      user.physical_address&.street_address,
+      user.physical_address&.locality
+    ].compact.join(" ").strip
+
+    return nil if address_nickname.blank?
+
+    blocking_for_participant(user, program_id, address_nickname).first
   end
 
   def self.stats_by_template_jurisdiction_and_status

@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Box, Button, Container, Flex, Heading, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Container, Flex, Heading, Link, Text, VStack } from '@chakra-ui/react';
 import { BlueTitleBar } from '../../shared/base/blue-title-bar';
 import { EFlashMessageStatus, EPermitClassificationCode, EUserRoles } from '../../../types/enums';
 import { usePermitClassificationsLoad } from '../../../hooks/resources/use-permit-classifications-load';
 import { VersionTag } from '../../shared/version-tag';
+import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation-modal';
 
 interface INewApplicationScreenProps {}
 
@@ -36,6 +37,10 @@ export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) =>
 
   const [audienceTypeId, setaudienceTypeId] = useState<string | null>(null);
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
+  const [duplicateApp, setDuplicateApp] = useState<{
+    isOpen: boolean;
+    existingApplication: any;
+  }>({ isOpen: false, existingApplication: null });
 
   interface IHandleCreatePermitApplicationParams {
     slug: string;
@@ -73,9 +78,18 @@ export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) =>
       if (isBlank) {
         navigate(`/blank-template/${template.versionId}`);
       } else {
-        const permitApplicationId = await permitApplicationStore.createEnergyApplication(params);
-        if (permitApplicationId) {
-          navigate(`/applications/${permitApplicationId}/edit`);
+        const result = await permitApplicationStore.createEnergyApplication(params);
+
+        if (result.duplicate) {
+          setDuplicateApp({
+            isOpen: true,
+            existingApplication: result.existingApplication,
+          });
+          return;
+        }
+
+        if (result.id) {
+          navigate(`/applications/${result.id}/edit`);
         } else {
           navigate(`/`);
         }
@@ -83,6 +97,16 @@ export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) =>
     },
     [currentUser, permitApplicationStore, navigate, pathname],
   );
+
+  const handleViewExisting = () => {
+    setDuplicateApp({ isOpen: false, existingApplication: null });
+    navigate(`/applications/${duplicateApp.existingApplication?.id}/edit`);
+  };
+
+  const handleCancel = () => {
+    setDuplicateApp({ isOpen: false, existingApplication: null });
+    navigate('/applications');
+  };
   const loadProgramOptions = useCallback(async () => {
     try {
       await userStore.fetchActivePrograms();
@@ -219,6 +243,25 @@ export const NewApplicationScreen = observer(({}: INewApplicationScreenProps) =>
           </Container>
         </>
       )}
+
+      {/* Duplicate Application Modal */}
+      <GlobalConfirmationModal
+        isOpen={duplicateApp.isOpen}
+        onClose={handleCancel}
+        closeOnOverlayClick={false}
+        status={EFlashMessageStatus.error}
+        headerText={t('permitApplication.errors.duplicateHeader')}
+        hideActions={true}
+      >
+        <VStack align="start" spacing={4}>
+          <Text>{t('permitApplication.errors.duplicateBody')}</Text>
+          <Link color="text.link" onClick={handleViewExisting}>
+            {t('permitApplication.errors.viewExisting', {
+              number: duplicateApp.existingApplication?.number,
+            })}
+          </Link>
+        </VStack>
+      </GlobalConfirmationModal>
     </Flex>
   );
 });

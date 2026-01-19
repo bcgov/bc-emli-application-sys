@@ -2,6 +2,27 @@ class Api::EspApplicationController < Api::ApplicationController
   before_action :set_resources, only: [:create]
 
   def create
+    # Check for existing active application (participants only)
+    blocking_app =
+      PermitApplication.find_blocking_application_for_participant(
+        @user,
+        @program.id
+      )
+
+    if blocking_app
+      authorize blocking_app # Ensure user has permission to view the existing application
+      return(
+        render json: {
+                 error: "duplicate_application",
+                 existing_application: {
+                   id: blocking_app.id,
+                   number: blocking_app.number
+                 }
+               },
+               status: :conflict
+      )
+    end
+
     #Rails.logger.info("template: #{@template.inspect}")
     permit_application =
       PermitApplication.create!(

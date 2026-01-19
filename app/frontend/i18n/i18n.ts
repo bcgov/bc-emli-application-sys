@@ -821,6 +821,12 @@ const options = {
           },
         },
         permitApplication: {
+          errors: {
+            duplicateHeader: 'Application in progress',
+            duplicateBody:
+              'You cannot start a new application until your existing application is approved, rejected, or withdrawn.',
+            viewExisting: 'View your existing application: #{{number}}',
+          },
           submissionBlockModal: {
             title: 'Trying to submit this application?',
             description:
@@ -1061,7 +1067,7 @@ const options = {
           },
         },
         contractorOnboarding: {
-          contractorId: "Contractor ID",
+          contractorId: 'Contractor ID',
           readyContractor: 'Ready to submit your registration details?',
           confirmationContractor:
             'By submitting your registration details you confirm that the information you provided was completed to the best of your knowledge and ability.',
@@ -1333,7 +1339,6 @@ const options = {
               'You confirm that the information you have provided was completed to the best of your knowledge and ability.',
           },
           show: {
-
             update: 'Update',
             readyForTraining: 'Ready for Training',
             markIneligible: 'Mark ineligible',
