@@ -95,7 +95,7 @@ export const SuccessfulWithdrawalScreen = observer(() => {
       })}
       primaryButtonLabel={
         currentUser.isParticipant
-          ? t('energySavingsApplication.returnToMain')
+          ? t('energySavingsApplication.returnToDashboard')
           : t('energySavingsApplication.new.viewAllSubmissions')
       }
       primaryButtonTo={currentUser.isParticipant ? '/applications' : '/submission-inbox'}
