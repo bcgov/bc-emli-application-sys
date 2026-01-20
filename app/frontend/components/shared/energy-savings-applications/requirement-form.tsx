@@ -276,6 +276,7 @@ export const RequirementForm = observer(
           state: {
             message: t('energySavingsApplication.new.sucessfulSubmission'),
             performedBy,
+            isEditing,
           },
         });
       }

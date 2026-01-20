@@ -7,28 +7,35 @@ import { usePermitApplication } from '../../../hooks/resources/use-permit-applic
 import { ErrorScreen } from '../../shared/base/error-screen';
 import { LoadingScreen } from '../../shared/base/loading-screen';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
-import { useLocation } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
+import { useLocation } from 'react-router-dom';
 import { GreenLineSmall } from '../../shared/base/decorative/green-line-small';
+import { EUpdateRoles } from '../../../types/enums.ts';
 
 // Successful Submission Screen
 export const SuccessfulSubmissionScreen = observer(() => {
   const { t } = useTranslation();
   const { currentPermitApplication, error } = usePermitApplication();
+  const { userStore } = useMst();
+  const currentUser = userStore.currentUser;
   const location = useLocation();
-  const performedBy = location.state?.performedBy;
+  const isEditing = location.state?.isEditing || false;
+
+  const performedBy =
+    currentUser?.role === 'admin' || currentUser?.role === 'admin_manager'
+      ? EUpdateRoles.staff
+      : EUpdateRoles.applicant;
 
   if (error) return <ErrorScreen error={error} />;
   if (!currentPermitApplication?.isFullyLoaded) return <LoadingScreen />;
 
   const { number, submissionType, activity, isSupportRequest, incomingSupportRequests } = currentPermitApplication;
-  const { userStore } = useMst();
-  const currentUser = userStore.currentUser;
 
   // For support requests, show parent application number instead of support request number
-  const displayNumber = isSupportRequest && incomingSupportRequests?.parentApplication?.number
-    ? incomingSupportRequests.parentApplication.number
-    : number;
+  const displayNumber =
+    isSupportRequest && incomingSupportRequests?.parentApplication?.number
+      ? incomingSupportRequests.parentApplication.number
+      : number;
 
   // Get submission type for the heading - use submissionType.name, fallback to activity.name
   const rawLabel = submissionType?.name || activity?.name || 'application';
@@ -36,10 +43,28 @@ export const SuccessfulSubmissionScreen = observer(() => {
   const submissionTypeLabel = rawLabel.charAt(0).toLowerCase() + rawLabel.slice(1);
 
   // Use translation with fallback to dynamic message format
-  const determinedMessage = t('energySavingsApplication.new.submissionSuccess', {
+  let messageKey: string;
+
+  if (isEditing) {
+    if (performedBy === EUpdateRoles.applicant) {
+      messageKey = 'energySavingsApplication.edit.revisionSubmissionSuccess';
+    } else {
+      messageKey = 'energySavingsApplication.show.adminSaveSuccess';
+    }
+  } else {
+    if (performedBy === EUpdateRoles.staff) {
+      messageKey = 'energySavingsApplication.new.staffSubmissionSuccess';
+    } else {
+      messageKey = 'energySavingsApplication.new.submissionSuccess';
+    }
+  }
+
+  const message = t(messageKey, {
     submissionType: submissionTypeLabel,
-    defaultValue: `Your ${submissionTypeLabel} form has been submitted!`,
   });
+
+  const determinedMessage =
+    performedBy === EUpdateRoles.staff ? message.charAt(0).toUpperCase() + message.slice(1) : message;
 
   // determine "What's Next" content dynamically
 
@@ -66,21 +91,26 @@ export const SuccessfulSubmissionScreen = observer(() => {
           <Heading as="h1" color="theme.blueAlt" textAlign="center">
             {determinedMessage}
           </Heading>
-          <Text fontSize="md" color="greys.grey70" textAlign="center">
-            {t('energySavingsApplication.new.confirmationEmail', {
-              defaultValue: 'A confirmation email has been sent to your account.',
-            })}
-          </Text>
+          {performedBy !== EUpdateRoles.staff && !isEditing && (
+            <Text fontSize="md" color="greys.grey70" textAlign="center">
+              {t('energySavingsApplication.new.confirmationEmail', {
+                defaultValue: 'A confirmation email has been sent to your account.',
+              })}
+            </Text>
+          )}
           <Tag color="semantic.info" border="1px solid" borderColor="semantic.info" p={2}>
             {t('energySavingsApplication.new.yourReference', { number: displayNumber })}
           </Tag>
         </VStack>
-
-        <WhatsNextBlock headingKey={whatsNextHeadingKey} lineKeys={whatsNextLineKeys} email={whatsNextEmail} />
-        <Box px={8} width="100%" backgroundColor="greys.grey10">
-          <Divider borderColor="greys.lightGrey" />
-        </Box>
-        <NeedHelpBlock />
+        {performedBy !== EUpdateRoles.staff && !isEditing && (
+          <>
+            <WhatsNextBlock headingKey={whatsNextHeadingKey} lineKeys={whatsNextLineKeys} email={whatsNextEmail} />
+            <Box px={8} width="100%" backgroundColor="greys.grey10">
+              <Divider borderColor="greys.lightGrey" />
+            </Box>
+            <NeedHelpBlock />
+          </>
+        )}
         <SubmissionReturnButton
           currentUser={currentUser}
           performedBy={performedBy}
@@ -223,10 +253,10 @@ const SubmissionReturnButton = ({
 
   if (currentUser.isParticipant) {
     returnPath = '/applications';
-    returnLabel = t('energySavingsApplication.new.viewAllSubmissions');
-  } else if (performedBy === 'staff') {
+    returnLabel = t('energySavingsApplication.returnToDashboard');
+  } else if (performedBy === EUpdateRoles.staff) {
     returnPath = '/submission-inbox';
-    returnLabel = t('ui.backToInbox');
+    returnLabel = t('energySavingsApplication.new.viewAllSubmissions');
   } else if (currentPermitApplication.isContractorOnboarding) {
     returnPath = '/welcome/contractor';
     returnLabel = t('contractorOnboarding.returnToDashboard');

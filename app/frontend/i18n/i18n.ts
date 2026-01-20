@@ -1061,7 +1061,7 @@ const options = {
           },
         },
         contractorOnboarding: {
-          contractorId: "Contractor ID",
+          contractorId: 'Contractor ID',
           readyContractor: 'Ready to submit your registration details?',
           confirmationContractor:
             'By submitting your registration details you confirm that the information you provided was completed to the best of your knowledge and ability.',
@@ -1084,6 +1084,7 @@ const options = {
           },
         },
         energySavingsApplication: {
+          returnToDashboard: 'Return to Dashboard',
           submissionBlockModal: {
             title: 'Trying to submit this application?',
             description:
@@ -1273,6 +1274,7 @@ const options = {
             submitted: 'You sent this application for review.',
 
             submissionSuccess: 'Your {{ submissionType }} form has been submitted!',
+            staffSubmissionSuccess: '{{ submissionType }} form has been submitted!',
             confirmationEmail: 'A confirmation email has been sent to your account.',
             hearBack: 'Need help?',
             contactInstruction:
@@ -1331,9 +1333,9 @@ const options = {
             revisionReady: 'Ready to resubmit this {{submissionType}} form?',
             revisionConfirmation:
               'You confirm that the information you have provided was completed to the best of your knowledge and ability.',
+            revisionSubmissionSuccess: 'Your {{submissionType}} form has been resubmitted.',
           },
           show: {
-
             update: 'Update',
             readyForTraining: 'Ready for Training',
             markIneligible: 'Mark ineligible',
