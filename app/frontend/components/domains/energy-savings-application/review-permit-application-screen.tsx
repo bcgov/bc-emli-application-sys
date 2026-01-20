@@ -428,7 +428,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
               }}
               isEditing={
                 currentPermitApplication?.status === 'draft' ||
-                ((currentUser?.role === 'admin' || currentUser?.role === 'admin_manager') && revisionMode)
+                ([EUserRoles.admin, EUserRoles.adminManager].indexOf(currentUser.role) >= 0 && revisionMode)
               }
               updateCollaborationAssignmentNodes={updateRequirementBlockAssignmentNode}
             />
@@ -440,7 +440,11 @@ export const ReviewPermitApplicationScreen = observer(() => {
           isOpen={isIneligibleOpen}
           onClose={onIneligibleClose}
           onSubmit={() => navigate(`/rejection-reason/${currentPermitApplication.id}`)}
-          headerText={t('permitApplication.review.readyToMarkIneligible')}
+          headerText={
+            showEditMode
+              ? t('permitApplication.review.contractor.readyToMarkIneligible')
+              : t('permitApplication.review.readyToMarkIneligible')
+          }
           bodyText={t('permitApplication.review.confirmIneligible', {
             submissionType: currentPermitApplication?.submissionType?.name?.toLowerCase(),
           })}

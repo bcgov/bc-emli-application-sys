@@ -28,6 +28,7 @@ export const RejectApplicationScreen = observer(() => {
     navigate(`/applications/${response?.data?.data?.id}/ineligible-success`, {
       state: {
         referenceNumber: currentPermitApplication?.number,
+        submissionType: currentPermitApplication?.submissionType?.code,
       },
     });
   };

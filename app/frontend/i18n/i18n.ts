@@ -1058,6 +1058,9 @@ const options = {
             readyToScreen: 'Ready to screen in?',
             confirmReview: 'I confirm this {{submissionType}} has all the required information.',
             screenedInSuccess: 'You have screened in this {{submissionType}} form to in review.',
+            contractor: {
+              readyToMarkIneligible: 'Ready to mark this contractor ineligible?',
+            },
           },
         },
         contractorOnboarding: {
@@ -1320,6 +1323,9 @@ const options = {
             readyToScreen: 'Ready to screen in?',
             confirmReview: 'I confirm this {{submissionType}} has all the required information.',
             screenedInSuccess: 'You have screened in this {{submissionType}} form to in review.',
+            admin: {
+              markedIneligible: 'You have marked this {{submissionType}} form ineligible.',
+            },
           },
           edit: {
             back: 'Back to My applications',
