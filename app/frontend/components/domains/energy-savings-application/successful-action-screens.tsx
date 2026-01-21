@@ -102,7 +102,9 @@ export const SuccessfulWithdrawalScreen = observer(() => {
       primaryButtonLabel={
         currentUser.isParticipant
           ? t('energySavingsApplication.returnToDashboard')
-          : t('energySavingsApplication.new.viewAllSubmissions')
+          : currentUser.isContractor
+            ? t('contractor.invoiceSuccess.returnToDashboard')
+            : t('energySavingsApplication.new.viewAllSubmissions')
       }
       primaryButtonTo={getReturnPath()}
     />
