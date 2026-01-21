@@ -3109,6 +3109,27 @@ const options = {
             noBusinessName: 'No business name',
             programPlaceholder: 'N/A',
           },
+          submission: {
+            ready: 'Ready to submit this {{submissionType}} form?',
+            confirmation:
+              'By submitting this {{submissionType}} form you confirm that the information you provided was completed to the best of your knowledge and ability.',
+          },
+          invoiceSuccess: {
+            returnToDashboard: 'Return to dashboard',
+            whatsNext: {
+              heading: "What's next?",
+              line1: 'You will receive an email confirming that your invoice was successfully submitted.',
+              line2:
+                'We randomly select some sites for inspection. If we select the site you worked at, we will let you know by email.',
+              line3:
+                "We will review your invoice and supporting information. If your invoice and supporting information are approved, we'll issue the rebate(s) through your selected payment method.",
+            },
+            needHelp: {
+              heading: 'Need help?',
+              message:
+                'You can log into the Better Homes Energy Savings Program to view your submitted forms. Please contact <1>{{email}}</1> for questions related to your form.',
+            },
+          },
           management: {
             title: 'Manage contractor details',
             addButton: 'Add Contractor',

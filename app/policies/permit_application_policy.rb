@@ -176,8 +176,9 @@ class PermitApplicationPolicy < ApplicationPolicy
   end
 
   def generate_missing_pdfs?
-    user.system_admin? || (user.participant? && record.submitter == user) ||
-      ((user.admin_manager? || user.admin?))
+    user.system_admin? ||
+      ((user.participant? || user.contractor?) && record.submitter == user) ||
+      (user.admin_manager? || user.admin?)
   end
 
   def finalize_revision_requests?
