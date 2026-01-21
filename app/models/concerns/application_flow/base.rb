@@ -76,6 +76,11 @@ module ApplicationFlow
       application.submission_versions.count > 1
     end
 
+    def reapproval_flow?
+      aasm.from_state == :approved ||
+        aasm.to_state == :approved && application.submission_versions.count > 1
+    end
+
     # --- Common handlers ---
     def handle_finalize_revision_requests
       application.update(revisions_requested_at: Time.current)

@@ -22,12 +22,18 @@ module ApplicationFlow
       end
 
       event :approve do
-        transitions from: :training_pending, to: :approved
+        transitions from: :training_pending,
+                    to: :approved,
+                    after: :handle_onboarding
       end
 
       event :mark_ineligible do
         transitions from: %i[newly_submitted training_pending], to: :ineligible
       end
+    end
+
+    def handle_onboarding
+      application.process_contractor_onboarding!
     end
 
     def handle_submission

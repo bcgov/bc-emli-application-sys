@@ -103,6 +103,45 @@ class Contractor < ApplicationRecord
     contact&.name
   end
 
+  def update_from_onboarding(attrs)
+    # nly update whitelisted attributes that make sense for Contractor itself
+    # (not ContractorInfo or other child tables)
+    allowed =
+      attrs.slice(
+        :business_name,
+        :business_phone
+        # :business_email,
+        # :street_address,
+        # :city,
+        # :postal_code
+      )
+
+    # Apply the updates atomically
+    update!(allowed)
+  rescue ActiveRecord::RecordInvalid => e
+    Rails.logger.error(
+      "[Contractor##{id}] Onboarding update failed: #{e.message}"
+    )
+    raise
+  end
+
+  # creates or updates ContractorInfo in a single call.
+  # as onboarding have an approval and a re-approval cycle (editing -> re-approved)
+  def upsert_contractor_info(attrs)
+    return if attrs.blank?
+
+    if contractor_info.present?
+      contractor_info.update!(attrs)
+    else
+      create_contractor_info!(attrs)
+    end
+  rescue ActiveRecord::RecordInvalid => e
+    Rails.logger.error(
+      "[Contractor##{id}] ContractorInfo upsert failed: #{e.message}"
+    )
+    raise
+  end
+
   private
 
   def assign_unique_number

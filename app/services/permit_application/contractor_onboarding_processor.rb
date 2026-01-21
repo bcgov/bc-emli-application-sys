@@ -1,0 +1,122 @@
+# app/services/permit_application/contractor_onboarding_processor.rb
+class PermitApplication::ContractorOnboardingProcessor
+  # tnit the processor with an application
+  # this object has the submission_data JSON to be parsed and mapped
+  def initialize(application)
+    @application = application
+    # Parse submission_data into a Hash for traversal.
+    @data = JSON.parse(application.submission_data || "{}")
+  end
+
+  # main entry point for processing.
+  def process!
+    # Extract grouped data for the various target models.
+    contractor_detail_attrs = extract_contractor_details
+    employee_attrs = extract_employees
+    contractor_info_attrs = extract_contractor_info
+
+    # The contractor record should already exist (created earlier in the onboarding flow).
+    # use the submitter_id to fetch the right record.
+    contractor = Contractor.find(@application.submitter_id)
+    contractor.update!(contractor_detail_attrs)
+
+    # contractor_info contains the detailed business information, licenses, etc.
+    # contractor handles the upsert for the _info
+    contractor.upsert_contractor_info(contractor_info_attrs)
+
+    # terate over the parsed employee attributes array and create invitations
+    # Skip if there are no employees in the parsed form
+    return if employee_attrs.blank?
+
+    # re-use existing invitation service
+    inviter =
+      ContractorEmployeeInviter.new(
+        contractor: contractor,
+        program: @application.program,
+        invited_by: @application.submitter # or whatever field represents the admin / owner
+      )
+
+    inviter.invite_employees(employee_attrs)
+
+    Rails.logger.info(
+      "[OnboardingProcessor] Contractor ##{contractor.id}: invited #{inviter.results[:invited].size} employees"
+    )
+
+    # what else needs to happen here notifications?
+  end
+
+  private
+
+  # extracts top-level contractor details (basic contact and address info).
+  def extract_contractor_details
+    {
+      business_name: find_value_by_key_end("business_name"),
+      business_phone: find_value_by_key_end("business_phone"),
+      business_email: find_value_by_key_end("business_email"),
+      street_address: find_value_by_key_end("street_address"),
+      city: find_value_by_key_end("city"),
+      postal_code: find_value_by_key_end("postal_code")
+    }
+  end
+
+  # extract the more detailed company information (licensing, GST, etc.)
+  def extract_contractor_info
+    {
+      doing_business_as:
+        find_value_by_key_end(
+          "doing_business_as_if_different_from_business_name"
+        ),
+      license_issuer: find_value_by_key_end("business_licence_issuer"),
+      license_number: find_value_by_key_end("business_licence_number"),
+      incorporated_year:
+        find_value_by_key_end(
+          "year_the_business_was_incorporated_if_applicable"
+        ),
+      number_of_employees:
+        find_value_by_key_end("approximate_number_of_employees"),
+      gst_number: find_value_by_key_end("gst_number"),
+      worksafe_number: find_value_by_key_end("worksafebc_number"),
+      type_of_business: find_value_by_key_end("type_of_business"),
+      primary_program_measure:
+        find_value_by_key_end("primary_program_measures"),
+      retrofit_enabling_measures:
+        find_value_by_key_end("retrofit_enabling_measures")
+    }
+  end
+
+  # extracts all employee records from the "employee_details" array within the submission data.
+  def extract_employees
+    employees_section =
+      @data
+        .dig("data")
+        &.values
+        &.find do |section|
+          section.is_a?(Hash) &&
+            section.keys.any? { |k| k.include?("employee_details") }
+        end
+    return [] unless employees_section
+
+    # Flatten the nested array of employee hashes and pull out the desired fields.
+    employees_section
+      .values
+      .flatten
+      .map do |row|
+        {
+          name: row.find { |k, _| k.end_with?("employeeName") }&.last,
+          email: row.find { |k, _| k.end_with?("employeeEmail") }&.last
+        }
+      end
+      .compact_blank
+  end
+
+  # utility method that scans through all sections and returns the value of
+  # the first key that ends with the specified string (key_end).
+  # supports dynamic section UUIDs and key prefixes.
+  def find_value_by_key_end(key_end)
+    @data["data"].each_value do |section|
+      next unless section.is_a?(Hash)
+      section.each { |key, value| return value if key.end_with?(key_end) }
+    end
+    nil
+  end
+end
