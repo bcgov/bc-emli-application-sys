@@ -87,6 +87,12 @@ export const SuccessfulWithdrawalScreen = observer(() => {
   const { userStore } = useMst();
   const currentUser = userStore.currentUser;
 
+  const getReturnPath = () => {
+    if (currentUser.isParticipant) return '/applications';
+    if (currentUser.isContractor) return '/contractor-dashboard';
+    return '/submission-inbox';
+  };
+
   return (
     <SuccessfulActionScreen
       icon="success"
@@ -98,7 +104,7 @@ export const SuccessfulWithdrawalScreen = observer(() => {
           ? t('energySavingsApplication.returnToDashboard')
           : t('energySavingsApplication.new.viewAllSubmissions')
       }
-      primaryButtonTo={currentUser.isParticipant ? '/applications' : '/submission-inbox'}
+      primaryButtonTo={getReturnPath()}
     />
   );
 });

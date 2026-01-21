@@ -24,6 +24,8 @@ export const PermitApplicationSubmitModal = observer(function PermitApplicationS
   const { t } = useTranslation();
 
   const isSupportRequest = permitApplication.submissionType.code === 'support_request' ? true : false;
+  const isContractorOnboarding = permitApplication.submissionType.code === 'onboarding' ? true : false;
+  const isInvoiceSubmission = permitApplication.submissionType.code === 'invoice' ? true : false;
   const isBeingRevised = permitApplication.status === 'revisions_requested' ? true : false;
 
   let headingText: string;
@@ -35,10 +37,18 @@ export const PermitApplicationSubmitModal = observer(function PermitApplicationS
       applicationNumber: permitApplication.incomingSupportRequests?.parentApplication?.number,
     });
     bodyText = null;
-  } else if (currentUser.isContractor) {
-    // contractor flow
+  } else if (currentUser.isContractor && isContractorOnboarding) {
+    // contractor onboarding flow
     headingText = t('contractorOnboarding.readyContractor');
     bodyText = t('contractorOnboarding.confirmationContractor');
+  } else if (currentUser.isContractor && isInvoiceSubmission) {
+    // contractor invoice submission flow
+    headingText = t('contractor.submission.ready', {
+      submissionType: permitApplication.submissionType.name.toLowerCase(),
+    });
+    bodyText = t('contractor.submission.confirmation', {
+      submissionType: permitApplication.submissionType.name.toLowerCase(),
+    });
   } else if (currentUser.isParticipant) {
     // participant flow
     if (isBeingRevised) {

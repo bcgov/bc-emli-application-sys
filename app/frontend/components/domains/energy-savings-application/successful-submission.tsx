@@ -30,6 +30,7 @@ export const SuccessfulSubmissionScreen = observer(() => {
   if (!currentPermitApplication?.isFullyLoaded) return <LoadingScreen />;
 
   const { number, submissionType, activity, isSupportRequest, incomingSupportRequests } = currentPermitApplication;
+  const isContractorInvoice = currentUser.isContractor && submissionType?.code === 'invoice';
 
   // For support requests, show parent application number instead of support request number
   const displayNumber =
@@ -81,6 +82,15 @@ export const SuccessfulSubmissionScreen = observer(() => {
       'contractorOnboarding.whatsNext.line3',
     ];
     whatsNextEmail = t('site.support.contractorSupportEmail');
+  } else if (isContractorInvoice) {
+    // Override for contractor invoice
+    whatsNextHeadingKey = 'contractor.invoiceSuccess.whatsNext.heading';
+    whatsNextLineKeys = [
+      'contractor.invoiceSuccess.whatsNext.line1',
+      'contractor.invoiceSuccess.whatsNext.line2',
+      'contractor.invoiceSuccess.whatsNext.line3',
+    ];
+    whatsNextEmail = 'ESPcontractorsupport@clearesult.com';
   }
 
   return (
@@ -115,6 +125,7 @@ export const SuccessfulSubmissionScreen = observer(() => {
           currentUser={currentUser}
           performedBy={performedBy}
           currentPermitApplication={currentPermitApplication}
+          isContractorInvoice={isContractorInvoice}
         />
       </Flex>
     </Container>
@@ -238,12 +249,14 @@ interface SubmissionReturnButtonProps {
   currentUser: any;
   performedBy?: string;
   currentPermitApplication: any;
+  isContractorInvoice: boolean;
 }
 
 const SubmissionReturnButton = ({
   currentUser,
   performedBy,
   currentPermitApplication,
+  isContractorInvoice,
 }: SubmissionReturnButtonProps) => {
   const { t } = useTranslation();
 
@@ -257,6 +270,9 @@ const SubmissionReturnButton = ({
   } else if (performedBy === EUpdateRoles.staff) {
     returnPath = '/submission-inbox';
     returnLabel = t('energySavingsApplication.new.viewAllSubmissions');
+  } else if (isContractorInvoice) {
+    returnPath = '/contractor-dashboard';
+    returnLabel = t('contractor.invoiceSuccess.returnToDashboard');
   } else if (currentPermitApplication.isContractorOnboarding) {
     returnPath = '/welcome/contractor';
     returnLabel = t('contractorOnboarding.returnToDashboard');
