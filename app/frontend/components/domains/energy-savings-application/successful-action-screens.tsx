@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
 import React, { useEffect, useState } from 'react';
+import { EUserRoles } from '../../../types/enums';
 
 /***
  * Base Reusable Success Screen
@@ -30,6 +31,7 @@ export const SuccessfulActionScreen = ({
   primaryButtonLabel,
   primaryButtonTo,
 }: SuccessfulActionScreenProps) => {
+  const { t } = useTranslation();
   const resolveIcon = () => {
     if (React.isValidElement(icon)) return icon;
 
@@ -57,8 +59,16 @@ export const SuccessfulActionScreen = ({
           )}
 
           {referenceNumber && (
-            <Box border="1px solid" borderColor="border.light" px={4} py={2} borderRadius="md" fontSize="sm">
-              Reference # {referenceNumber}
+            <Box
+              border="1px"
+              borderColor="theme.darkBlue"
+              borderRadius="sm"
+              px={3}
+              py={1}
+              fontSize="sm"
+              color="theme.blueText"
+            >
+              {t('energySavingsApplication.referenceNumber')} {referenceNumber}
             </Box>
           )}
         </VStack>
@@ -117,21 +127,26 @@ export const SuccessfulWithdrawalScreen = observer(() => {
 export const SuccessfulIneligibleScreen = observer(() => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { submissionType } = location.state || {};
+  const { submissionType, referenceNumber } = location.state || {};
   const { userStore, permitApplicationStore } = useMst();
   const currentUser = userStore.currentUser;
 
   const { permitApplicationId } = useParams();
 
   const permitApplication = permitApplicationStore.fetchPermitApplication(permitApplicationId);
+  const isUserAdmin = [EUserRoles.admin, EUserRoles.adminManager].indexOf(currentUser.role) >= 0;
   return (
     <SuccessfulActionScreen
       icon="warning"
-      title={t('energySavingsApplication.review.markedIneligible', {
-        submissionType: submissionType?.toLowerCase(),
-      })}
+      title={t(
+        `${isUserAdmin ? 'energySavingsApplication.review.admin.markedIneligible' : 'energySavingsApplication.review.markedIneligible'}`,
+        {
+          // 'energySavingsApplication.review.markedIneligible'
+          submissionType: submissionType?.toLowerCase(),
+        },
+      )}
       subtitle={t('energySavingsApplication.review.ineligibleNextSteps')}
-      referenceNumber={permitApplication?.number}
+      referenceNumber={referenceNumber}
       primaryButtonLabel={
         currentUser.isParticipant
           ? t('energySavingsApplication.returnToMain')
