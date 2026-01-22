@@ -212,3 +212,32 @@ export const SuccessfulUpdateScreen = observer(() => {
     />
   );
 });
+
+/***
+ * Training Pending Success
+ ***/
+export const SuccessfulTrainingPendingScreen = observer(() => {
+  const { t } = useTranslation();
+  const location = useLocation();
+  const { submissionType, applicationNumber } = location.state || {};
+
+  const { userStore } = useMst();
+  const currentUser = userStore.currentUser;
+
+  return (
+    <SuccessfulActionScreen
+      icon="success"
+      title={t('contractorOnboarding.trainingPending.successTitle', {
+        submissionType: submissionType?.toLowerCase(),
+      })}
+      subtitle={t('contractorOnboarding.trainingPending.successMessage')}
+      referenceNumber={applicationNumber}
+      primaryButtonLabel={
+        currentUser.isParticipant
+          ? t('energySavingsApplication.returnToMain')
+          : t('energySavingsApplication.new.viewAllSubmissions')
+      }
+      primaryButtonTo={currentUser.isParticipant ? '/applications' : '/submission-inbox'}
+    />
+  );
+});
