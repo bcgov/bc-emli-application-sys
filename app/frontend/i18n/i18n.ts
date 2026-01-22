@@ -3106,6 +3106,7 @@ const options = {
           unknown_email: 'Unknown email',
         },
         contractor: {
+          contractorLabel: 'Contractor',
           fields: {
             contractorId: 'Contractor ID',
             primaryContactName: 'Primary contact name',
@@ -3170,25 +3171,19 @@ const options = {
               title: 'Are you sure you want to suspend {{name}}?',
               message:
                 "This will remove {{name}}'s access to the Energy Savings Program application system. All employees at {{name}} will not be able to upload invoices once suspended.",
-              confirm: 'Confirm',
-              cancel: 'Cancel',
             },
             reason: {
               title: 'Reason for suspension',
               emailSent: 'A confirmation email will be sent to the contractor contact.',
-              contractorLabel: 'Contractor',
               label: 'Reason this contractor is suspended',
               placeholder: 'Enter suspension reason...',
               required: 'Reason is required',
               error: 'Failed to suspend contractor',
               success: 'Contractor suspended successfully',
-              confirm: 'Confirm',
-              cancel: 'Cancel',
             },
             confirmed: {
               title: 'Contractor suspended.',
               emailSent: 'An email has been automatically sent to the contractor with the suspension reason.',
-              contractorLabel: 'Contractor',
               backButton: 'Back to Manage contractor details',
             },
           },
@@ -3197,8 +3192,6 @@ const options = {
               title: 'Are you sure you want to unsuspend {{name}}?',
               message:
                 'This will give {{name}} access to the Energy Savings Program application system. All employees at {{name}} will be able to upload invoices once unsuspended.',
-              confirm: 'Confirm',
-              cancel: 'Cancel',
             },
             confirmed: {
               title: 'Contractor unsuspended',
@@ -3210,30 +3203,22 @@ const options = {
               title: 'Are you sure you want to remove {{name}}?',
               message:
                 'This will remove all employees of {{name}}. If they rejoin, contractors will have to onboard again and their employees will have to create accounts again.',
-              confirm: 'Confirm',
-              cancel: 'Cancel',
             },
             reason: {
               title: 'Reason for removal',
               emailSent: 'A confirmation email will be sent to the contractor contact.',
-              contractorLabel: 'Contractor',
               label: 'Reason this contractor is being removed',
               placeholder: 'Enter removal reason...',
               required: 'Reason is required',
               error: 'Failed to remove contractor',
               success: 'Contractor removed successfully',
-              confirm: 'Confirm',
-              cancel: 'Cancel',
             },
             finalConfirm: {
               title: "This action can't be reversed, are you sure you want to continue?",
-              confirm: 'Confirm',
-              cancel: 'Cancel',
             },
             confirmed: {
               title: 'Contractor removed.',
               emailSent: 'An email has been automatically sent to the contractor with the removal reason.',
-              contractorLabel: 'Contractor',
               backButton: 'Back to Manage contractor details',
             },
           },

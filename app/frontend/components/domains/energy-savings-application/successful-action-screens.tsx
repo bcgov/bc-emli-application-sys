@@ -1,12 +1,12 @@
-import { Container, Flex, Heading, Icon, Text, VStack, Box } from '@chakra-ui/react';
+import { Container, Flex, Heading, Icon, Text, VStack, Box, Button } from '@chakra-ui/react';
 import { CheckCircleIcon, WarningCircleIcon } from '@phosphor-icons/react';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { SubmissionReturnButton } from '../../shared/energy-savings-applications/submission-action-return-button';
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { EUserRoles } from '../../../types/enums';
 
 /***
@@ -19,8 +19,10 @@ interface SuccessfulActionScreenProps {
   title: string;
   subtitle?: string;
   referenceNumber?: string;
+  referenceNumberLabel?: string;
   primaryButtonLabel: string;
   primaryButtonTo: string;
+  onButtonClick?: () => Promise<void> | void;
 }
 
 export const SuccessfulActionScreen = ({
@@ -28,10 +30,13 @@ export const SuccessfulActionScreen = ({
   title,
   subtitle,
   referenceNumber,
+  referenceNumberLabel,
   primaryButtonLabel,
   primaryButtonTo,
+  onButtonClick,
 }: SuccessfulActionScreenProps) => {
   const { t } = useTranslation();
+
   const resolveIcon = () => {
     if (React.isValidElement(icon)) return icon;
 
@@ -42,9 +47,13 @@ export const SuccessfulActionScreen = ({
     return <Icon as={CheckCircleIcon} boxSize={12} color="green.500" />;
   };
 
+  const referenceLabel = referenceNumberLabel
+    ? t(referenceNumberLabel as any)
+    : t('energySavingsApplication.referenceNumber');
+
   return (
     <Container maxW="container.lg">
-      <Flex direction="column" align="center" my={24} gap={8}>
+      <Flex direction="column" align="center" my={24} gap={8} role="region" aria-live="polite">
         {resolveIcon()}
 
         <VStack spacing={4}>
@@ -68,20 +77,32 @@ export const SuccessfulActionScreen = ({
               fontSize="sm"
               color="theme.blueText"
             >
-              {t('energySavingsApplication.referenceNumber')} {referenceNumber}
+              {referenceLabel} {referenceNumber}
             </Box>
           )}
         </VStack>
 
-        <RouterLinkButton
-          to={primaryButtonTo}
-          bg="theme.darkBlue"
-          color="white"
-          px={8}
-          _hover={{ bg: 'theme.blueButtonHover' }}
-        >
-          {primaryButtonLabel}
-        </RouterLinkButton>
+        {onButtonClick ? (
+          <Button
+            onClick={onButtonClick}
+            bg="theme.darkBlue"
+            color="white"
+            px={8}
+            _hover={{ bg: 'theme.blueButtonHover' }}
+          >
+            {primaryButtonLabel}
+          </Button>
+        ) : (
+          <RouterLinkButton
+            to={primaryButtonTo}
+            bg="theme.darkBlue"
+            color="white"
+            px={8}
+            _hover={{ bg: 'theme.blueButtonHover' }}
+          >
+            {primaryButtonLabel}
+          </RouterLinkButton>
+        )}
       </Flex>
     </Container>
   );
@@ -128,12 +149,9 @@ export const SuccessfulIneligibleScreen = observer(() => {
   const { t } = useTranslation();
   const location = useLocation();
   const { submissionType, referenceNumber } = location.state || {};
-  const { userStore, permitApplicationStore } = useMst();
+  const { userStore } = useMst();
   const currentUser = userStore.currentUser;
 
-  const { permitApplicationId } = useParams();
-
-  const permitApplication = permitApplicationStore.fetchPermitApplication(permitApplicationId);
   const isUserAdmin = [EUserRoles.admin, EUserRoles.adminManager].indexOf(currentUser.role) >= 0;
   return (
     <SuccessfulActionScreen
@@ -238,6 +256,99 @@ export const SuccessfulTrainingPendingScreen = observer(() => {
           : t('energySavingsApplication.new.viewAllSubmissions')
       }
       primaryButtonTo={currentUser.isParticipant ? '/applications' : '/submission-inbox'}
+    />
+  );
+});
+
+/***
+ * Shared hook for contractor confirmation screens
+ ***/
+const useBackToContractorManagement = () => {
+  const { contractorStore } = useMst();
+  const navigate = useNavigate();
+
+  return async () => {
+    contractorStore.setStatusFilter('active');
+    await contractorStore.search();
+    navigate('/contractor-management');
+  };
+};
+
+/***
+ * Contractor Suspend Confirmation Screen
+ ***/
+export const ContractorSuspendConfirmedScreen = observer(() => {
+  const { t } = useTranslation();
+  const { contractorId } = useParams<{ contractorId: string }>();
+  const { contractorStore } = useMst();
+
+  const contractor = contractorStore.contractorsMap.get(contractorId!);
+  const handleBackToManage = useBackToContractorManagement();
+
+  return (
+    <SuccessfulActionScreen
+      icon="warning"
+      title={t('contractor.suspend.confirmed.title')}
+      referenceNumber={contractor?.number ? `#${contractor.number}` : undefined}
+      referenceNumberLabel="contractor.contractorLabel"
+      primaryButtonLabel={t('contractor.suspend.confirmed.backButton')}
+      primaryButtonTo="/contractor-management"
+      onButtonClick={handleBackToManage}
+    />
+  );
+});
+
+/***
+ * Contractor Unsuspend Confirmation Screen
+ ***/
+export const ContractorUnsuspendConfirmedScreen = observer(() => {
+  const { t } = useTranslation();
+  const { contractorId } = useParams<{ contractorId: string }>();
+  const { contractorStore } = useMst();
+
+  const contractor = contractorStore.contractorsMap.get(contractorId!);
+
+  useEffect(() => {
+    if (contractorId && !contractor) {
+      contractorStore.fetchContractor(contractorId);
+    }
+  }, [contractorId, contractor, contractorStore]);
+
+  const handleBackToManage = useBackToContractorManagement();
+
+  return (
+    <SuccessfulActionScreen
+      icon="success"
+      title={t('contractor.unsuspend.confirmed.title')}
+      referenceNumber={contractor?.number ? `#${contractor.number}` : undefined}
+      referenceNumberLabel="contractor.contractorLabel"
+      primaryButtonLabel={t('contractor.suspend.confirmed.backButton')}
+      primaryButtonTo="/contractor-management"
+      onButtonClick={handleBackToManage}
+    />
+  );
+});
+
+/***
+ * Contractor Remove Confirmation Screen
+ ***/
+export const ContractorRemoveConfirmedScreen = observer(() => {
+  const { t } = useTranslation();
+  const { contractorId } = useParams<{ contractorId: string }>();
+  const { contractorStore } = useMst();
+
+  const contractor = contractorStore.contractorsMap.get(contractorId!);
+  const handleBackToManage = useBackToContractorManagement();
+
+  return (
+    <SuccessfulActionScreen
+      icon="warning"
+      title={t('contractor.remove.confirmed.title')}
+      referenceNumber={contractor?.number ? `#${contractor.number}` : undefined}
+      referenceNumberLabel="contractor.contractorLabel"
+      primaryButtonLabel={t('contractor.remove.confirmed.backButton')}
+      primaryButtonTo="/contractor-management"
+      onButtonClick={handleBackToManage}
     />
   );
 });
