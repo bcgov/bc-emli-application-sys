@@ -1078,6 +1078,12 @@ const options = {
             line3: 'If you have any questions, please call us at 1-833-856-0333 or email us at <1>{{email}}</1>.',
           },
           returnToDashboard: 'Back to Contractor homepage',
+          trainingPending: {
+            confirmReadyTitle: 'Ready to mark this contractor as training pending?',
+            confirmReadyMessage: 'I confirm this {{submissionType}} form has all the required information.',
+            successTitle: 'Training pending for contractor.',
+            successMessage: 'Email the contractor with a link to the training materials.',
+          },
         },
         invoices: {
           selection: {

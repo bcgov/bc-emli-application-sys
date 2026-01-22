@@ -86,14 +86,18 @@ function isSuccessfullSubmissionPath(path: string): boolean {
   return regex.test(path);
 }
 
-// function isSuccessfullWithdrawlPath(path: string): boolean {
-//   const regex = /withdrawl-success/;
-//   return regex.test(path);
-// }
-
 function isActionSuccessPath(path: string): boolean {
-  const regex =
-    /applications\/[a-f0-9-]{36}\/(ineligible-success|review-success|withdrawl-success|screened-in-success|successful-update)/i;
+  const successPaths = [
+    'ineligible-success',
+    'review-success',
+    'withdrawl-success',
+    'screened-in-success',
+    'successful-update',
+    'successful-training-pending',
+  ];
+
+  const uuidPattern = '[a-f0-9-]{36}';
+  const regex = new RegExp(`applications/${uuidPattern}/(${successPaths.join('|')})`, 'i');
 
   return regex.test(path);
 }
