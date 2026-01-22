@@ -5,7 +5,9 @@ class PermitApplication::ContractorOnboardingProcessor
   def initialize(application)
     @application = application
     # Parse submission_data into a Hash for traversal.
-    @data = JSON.parse(application.submission_data || "{}")
+    raw_data = application.submission_data
+    Rails.logger.info("Raw Data: #{raw_data}")
+    @data = raw_data.is_a?(String) ? JSON.parse(raw_data) : raw_data || {}
   end
 
   # main entry point for processing.
@@ -51,8 +53,9 @@ class PermitApplication::ContractorOnboardingProcessor
   def extract_contractor_details
     {
       business_name: find_value_by_key_end("business_name"),
-      business_phone: find_value_by_key_end("business_phone"),
-      business_email: find_value_by_key_end("business_email"),
+      email: find_value_by_key_end("business_email"),
+      phone_number: find_value_by_key_end("business_phone"),
+      cellphone_number: find_value_by_key_end("business_mobile_phone"),
       street_address: find_value_by_key_end("street_address"),
       city: find_value_by_key_end("city"),
       postal_code: find_value_by_key_end("postal_code")

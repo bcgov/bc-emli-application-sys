@@ -32,7 +32,7 @@ module ApplicationFlow
       end
     end
 
-    def handle_onboarding
+    def approve!
       application.process_contractor_onboarding!
     end
 
