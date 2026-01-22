@@ -350,3 +350,32 @@ export const ContractorRemoveConfirmedScreen = observer(() => {
     />
   );
 });
+
+/***
+ * Onboarding Approval Success
+ ***/
+export const SuccessfulOnboardingApprovalScreen = observer(() => {
+  const { t } = useTranslation();
+  const location = useLocation();
+  const { submissionType, applicationNumber } = location.state || {};
+
+  const { userStore } = useMst();
+  const currentUser = userStore.currentUser;
+
+  return (
+    <SuccessfulActionScreen
+      icon="success"
+      title={t('contractorOnboarding.approval.successTitle', {
+        submissionType: submissionType?.toLowerCase(),
+      })}
+      subtitle={t('contractorOnboarding.approval.successMessage')}
+      referenceNumber={applicationNumber}
+      primaryButtonLabel={
+        currentUser.isParticipant
+          ? t('energySavingsApplication.returnToMain')
+          : t('energySavingsApplication.new.viewAllSubmissions')
+      }
+      primaryButtonTo={currentUser.isParticipant ? '/applications' : '/submission-inbox'}
+    />
+  );
+});

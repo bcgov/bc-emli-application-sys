@@ -64,6 +64,11 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const { isOpen: isIneligibleOpen, onOpen: onIneligibleOpen, onClose: onIneligibleClose } = useDisclosure();
   const { isOpen: isScreenIn, onOpen: onScreenIn, onClose: onScreenInclose } = useDisclosure();
   const { isOpen: isTrainingPending, onOpen: onTrainingPending, onClose: onTrainingPendingClose } = useDisclosure();
+  const {
+    isOpen: isContractorApproval,
+    onOpen: onContractorApproval,
+    onClose: onContractorApprovalClose,
+  } = useDisclosure();
   const { isOpen: isContactsOpen, onOpen: onContactsOpen, onClose: onContactsClose } = useDisclosure();
   const { isOpen: isUpdatePathwayOpen, onOpen: onUpdatePathwayOpen, onClose: onUpdatePathwayClose } = useDisclosure();
   const {
@@ -201,7 +206,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
 
   if (
     currentPermitApplication.submissionType?.code === EPermitClassificationCode.onboarding &&
-    [EUserRoles.admin, EUserRoles.adminManager].indexOf(currentUser.role) >= 0
+    [(EUserRoles.admin, EUserRoles.adminManager)].indexOf(currentUser.role) >= 0
   ) {
     if (!performedBy) {
       setPerformedBy(EUpdateRoles.staff);
@@ -231,6 +236,25 @@ export const ReviewPermitApplicationScreen = observer(() => {
       // Handle error if needed
     }
     onTrainingPendingClose();
+  };
+
+  const handleOnboardingApproval = async () => {
+    try {
+      const response = await currentPermitApplication.updateStatus({
+        status: EPermitApplicationStatus.approved,
+      });
+      if (response.ok) {
+        navigate(`/applications/${response?.data?.data?.id}/onboarding-approved`, {
+          state: {
+            submissionType: currentPermitApplication.submissionType.name,
+            applicationNumber: currentPermitApplication?.number,
+          },
+        });
+      }
+    } catch (e) {
+      // Handle error if needed
+    }
+    onContractorApprovalClose();
   };
 
   const handleConfirm = async () => {
@@ -281,7 +305,6 @@ export const ReviewPermitApplicationScreen = observer(() => {
                 {t('energySavingsApplication.show.supportingFilesRequest.addSupportingFiles')}
               </Button>
             )}
-            {/* <SupportingFilesRequestModal permitApplication={currentPermitApplication} /> */}
             <SubmissionDownloadModal
               permitApplication={currentPermitApplication}
               review
@@ -396,7 +419,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                           {t('energySavingsApplication.show.update')}
                         </Button>
                       )}
-                      {currentPermitApplication.submissionType?.code !== EPermitClassificationCode.onboarding ? (
+                      {currentPermitApplication.submissionType?.code !== EPermitClassificationCode.onboarding && (
                         <Button
                           variant="calloutInverse"
                           leftIcon={<CheckCircleIcon />}
@@ -410,7 +433,9 @@ export const ReviewPermitApplicationScreen = observer(() => {
                         >
                           {t('energySavingsApplication.show.screenIn')}
                         </Button>
-                      ) : (
+                      )}
+                      {currentPermitApplication.submissionType?.code === EPermitClassificationCode.onboarding &&
+                      currentPermitApplication?.status !== EPermitApplicationStatus.trainingPending ? (
                         <Button
                           variant="calloutInverse"
                           px={14}
@@ -423,6 +448,19 @@ export const ReviewPermitApplicationScreen = observer(() => {
                         >
                           {t('energySavingsApplication.show.readyForTraining')}
                         </Button>
+                      ) : (
+                        <Button
+                          variant="calloutInverse"
+                          px={14}
+                          onClick={onContractorApproval}
+                          borderColor="green"
+                          isDisabled={
+                            currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
+                            currentPermitApplication?.status === EPermitApplicationStatus.approved
+                          }
+                        >
+                          {t('ui.approve')}
+                        </Button>
                       )}
                       <Button
                         variant="calloutInverse"
@@ -432,7 +470,8 @@ export const ReviewPermitApplicationScreen = observer(() => {
                         borderColor="red"
                         isDisabled={
                           currentPermitApplication?.status === EPermitApplicationStatus.inReview ||
-                          currentPermitApplication?.status === EPermitApplicationStatus.ineligible
+                          currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
+                          currentPermitApplication?.status === EPermitApplicationStatus.approved
                         }
                       >
                         {!showEditMode
@@ -507,6 +546,19 @@ export const ReviewPermitApplicationScreen = observer(() => {
           onSubmit={handleReadyForTraining}
           headerText={t('contractorOnboarding.trainingPending.confirmReadyTitle')}
           bodyText={t('contractorOnboarding.trainingPending.confirmReadyMessage', {
+            submissionType: currentPermitApplication?.submissionType?.name?.toLowerCase(),
+          })}
+          confirmText={t('ui.confirm')}
+          cancelText={t('ui.cancel')}
+        />
+      )}
+      {isContractorApproval && (
+        <GlobalConfirmationModal
+          isOpen={isContractorApproval}
+          onClose={onContractorApprovalClose}
+          onSubmit={handleOnboardingApproval}
+          headerText={t('contractorOnboarding.approval.confirmTitle')}
+          bodyText={t('contractorOnboarding.approval.confirmMessage', {
             submissionType: currentPermitApplication?.submissionType?.name?.toLowerCase(),
           })}
           confirmText={t('ui.confirm')}

@@ -94,6 +94,7 @@ function isActionSuccessPath(path: string): boolean {
     'screened-in-success',
     'successful-update',
     'successful-training-pending',
+    'onboarding-approved',
   ];
 
   const uuidPattern = '[a-f0-9-]{36}';
