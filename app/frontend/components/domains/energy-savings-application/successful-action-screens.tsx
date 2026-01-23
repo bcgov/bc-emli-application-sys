@@ -19,7 +19,7 @@ interface SuccessfulActionScreenProps {
   title: string;
   subtitle?: string;
   referenceNumber?: string;
-  referenceNumberLabel?: string;
+  referenceLabel?: string;
   primaryButtonLabel: string;
   primaryButtonTo: string;
   onButtonClick?: () => Promise<void> | void;
@@ -30,7 +30,7 @@ export const SuccessfulActionScreen = ({
   title,
   subtitle,
   referenceNumber,
-  referenceNumberLabel,
+  referenceLabel,
   primaryButtonLabel,
   primaryButtonTo,
   onButtonClick,
@@ -47,9 +47,7 @@ export const SuccessfulActionScreen = ({
     return <Icon as={CheckCircleIcon} boxSize={12} color="green.500" />;
   };
 
-  const referenceLabel = referenceNumberLabel
-    ? t(referenceNumberLabel as any)
-    : t('energySavingsApplication.referenceNumber');
+  const displayLabel = referenceLabel ?? t('energySavingsApplication.referenceNumber');
 
   return (
     <Container maxW="container.lg">
@@ -77,7 +75,7 @@ export const SuccessfulActionScreen = ({
               fontSize="sm"
               color="theme.blueText"
             >
-              {referenceLabel} {referenceNumber}
+              {displayLabel} {referenceNumber}
             </Box>
           )}
         </VStack>
@@ -290,7 +288,7 @@ export const ContractorSuspendConfirmedScreen = observer(() => {
       icon="warning"
       title={t('contractor.suspend.confirmed.title')}
       referenceNumber={contractor?.number ? `#${contractor.number}` : undefined}
-      referenceNumberLabel="contractor.contractorLabel"
+      referenceLabel={t('contractor.contractorLabel')}
       primaryButtonLabel={t('contractor.suspend.confirmed.backButton')}
       primaryButtonTo="/contractor-management"
       onButtonClick={handleBackToManage}
@@ -321,7 +319,7 @@ export const ContractorUnsuspendConfirmedScreen = observer(() => {
       icon="success"
       title={t('contractor.unsuspend.confirmed.title')}
       referenceNumber={contractor?.number ? `#${contractor.number}` : undefined}
-      referenceNumberLabel="contractor.contractorLabel"
+      referenceLabel={t('contractor.contractorLabel')}
       primaryButtonLabel={t('contractor.suspend.confirmed.backButton')}
       primaryButtonTo="/contractor-management"
       onButtonClick={handleBackToManage}
@@ -345,7 +343,7 @@ export const ContractorRemoveConfirmedScreen = observer(() => {
       icon="warning"
       title={t('contractor.remove.confirmed.title')}
       referenceNumber={contractor?.number ? `#${contractor.number}` : undefined}
-      referenceNumberLabel="contractor.contractorLabel"
+      referenceLabel={t('contractor.contractorLabel')}
       primaryButtonLabel={t('contractor.remove.confirmed.backButton')}
       primaryButtonTo="/contractor-management"
       onButtonClick={handleBackToManage}
