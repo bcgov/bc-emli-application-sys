@@ -22,10 +22,10 @@ import { ContractorEmployeeIndexScreen } from '../contractor-management/employee
 import { ContractorProgramResourcesScreen } from '../contractor-management/contractor-program-resources-screen';
 import { ContractorDashboardScreen } from '../contractor-dashboard/contractor-dashboard-screen';
 import { SuspendReasonPage } from '../contractor-management/suspend-reason-page';
-import { SuspendConfirmedPage } from '../contractor-management/suspend-confirmed-page';
-import { UnsuspendConfirmedPage } from '../contractor-management/unsuspend-confirmed-page';
 import { RemoveReasonPage } from '../contractor-management/remove-reason-page';
-import { RemoveConfirmedPage } from '../contractor-management/remove-confirmed-page';
+import { ContractorSuspendConfirmedScreen } from '../energy-savings-application/successful-action-screens';
+import { ContractorUnsuspendConfirmedScreen } from '../energy-savings-application/successful-action-screens';
+import { ContractorRemoveConfirmedScreen } from '../energy-savings-application/successful-action-screens';
 import { trackPageViewEvent } from '../../../utils/snowplow';
 
 const ExternalApiKeysIndexScreen = lazy(() =>
@@ -474,12 +474,18 @@ const AppRoutes = observer(() => {
       <Route path="/contractor-management/:contractorId/employees" element={<ContractorEmployeeIndexScreen />} />
       <Route path="/contractor-management/:contractorId/invite-employee" element={<InviteEmployeeScreen />} />
       <Route path="/contractor-management/:contractorId/suspend/reason" element={<SuspendReasonPage />} />
-      <Route path="/contractor-management/:contractorId/suspend/confirmation" element={<SuspendConfirmedPage />} />
-      <Route path="/contractor-management/:contractorId/unsuspend-confirmation" element={<UnsuspendConfirmedPage />} />
+      <Route
+        path="/contractor-management/:contractorId/suspend/confirmation"
+        element={<ContractorSuspendConfirmedScreen />}
+      />
+      <Route
+        path="/contractor-management/:contractorId/unsuspend-confirmation"
+        element={<ContractorUnsuspendConfirmedScreen />}
+      />
       <Route path="/contractor-management/:contractorId/remove/removal-reason" element={<RemoveReasonPage />} />
       <Route
         path="/contractor-management/:contractorId/remove/removal-confirmation"
-        element={<RemoveConfirmedPage />}
+        element={<ContractorRemoveConfirmedScreen />}
       />
       <Route path="/contractor-program-resources" element={<ContractorProgramResourcesScreen />} />
       // view blank applications and view supported applications to go here

@@ -384,8 +384,8 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
         isOpen={isSuspendModalOpen}
         onClose={() => setIsSuspendModalOpen(false)}
         onSubmit={handleSuspendConfirm}
-        confirmText={t('contractor.suspend.modal.confirm', 'Confirm')}
-        cancelText={t('contractor.suspend.modal.cancel', 'Cancel')}
+        confirmText={t('ui.confirm', 'Confirm')}
+        cancelText={t('ui.cancel', 'Cancel')}
       />
 
       <GlobalConfirmationModal
@@ -404,8 +404,8 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
         isOpen={isUnsuspendModalOpen}
         onClose={() => setIsUnsuspendModalOpen(false)}
         onSubmit={handleUnsuspendConfirm}
-        confirmText={t('contractor.unsuspend.modal.confirm', 'Confirm')}
-        cancelText={t('contractor.unsuspend.modal.cancel', 'Cancel')}
+        confirmText={t('ui.confirm', 'Confirm')}
+        cancelText={t('ui.cancel', 'Cancel')}
       />
 
       <GlobalConfirmationModal
@@ -420,8 +420,8 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
         isOpen={isRemoveModalOpen}
         onClose={() => setIsRemoveModalOpen(false)}
         onSubmit={handleRemoveConfirm}
-        confirmText={t('contractor.remove.modal.confirm', 'Confirm')}
-        cancelText={t('contractor.remove.modal.cancel', 'Cancel')}
+        confirmText={t('ui.confirm', 'Confirm')}
+        cancelText={t('ui.cancel', 'Cancel')}
       />
     </Box>
   );

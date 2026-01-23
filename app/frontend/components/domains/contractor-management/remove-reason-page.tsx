@@ -82,7 +82,7 @@ export const RemoveReasonPage = observer(function RemoveReasonPage() {
           role="status"
           aria-label={`Contractor number ${contractor?.number}`}
         >
-          {t('contractor.remove.reason.contractorLabel', 'Contractor')} #{contractor?.number}
+          {t('contractor.contractorLabel')} #{contractor?.number}
         </Box>
 
         {/* Form */}
@@ -114,10 +114,10 @@ export const RemoveReasonPage = observer(function RemoveReasonPage() {
             isDisabled={isSubmitting}
             isLoading={isSubmitting}
           >
-            {t('contractor.remove.reason.confirm', 'Confirm')}
+            {t('ui.confirm', 'Confirm')}
           </Button>
           <Button variant="secondary" minW="155px" onClick={handleCancel} isDisabled={isSubmitting}>
-            {t('contractor.remove.reason.cancel', 'Cancel')}
+            {t('ui.cancel', 'Cancel')}
           </Button>
         </HStack>
       </VStack>
@@ -131,8 +131,8 @@ export const RemoveReasonPage = observer(function RemoveReasonPage() {
         isOpen={isConfirmModalOpen}
         onClose={() => setIsConfirmModalOpen(false)}
         onSubmit={handleFinalConfirm}
-        confirmText={t('contractor.remove.finalConfirm.confirm', 'Confirm')}
-        cancelText={t('contractor.remove.finalConfirm.cancel', 'Cancel')}
+        confirmText={t('ui.confirm', 'Confirm')}
+        cancelText={t('ui.cancel', 'Cancel')}
       />
     </Container>
   );

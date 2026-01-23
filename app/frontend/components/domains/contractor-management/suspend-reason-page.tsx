@@ -75,7 +75,7 @@ export const SuspendReasonPage = observer(function SuspendReasonPage() {
           role="status"
           aria-label={`Contractor number ${contractor?.number}`}
         >
-          {t('contractor.suspend.reason.contractorLabel', 'Contractor')} #{contractor?.number}
+          {t('contractor.contractorLabel')} #{contractor?.number}
         </Box>
 
         {/* Form */}
@@ -107,10 +107,10 @@ export const SuspendReasonPage = observer(function SuspendReasonPage() {
             isDisabled={isSubmitting}
             isLoading={isSubmitting}
           >
-            {t('contractor.suspend.reason.confirm', 'Confirm')}
+            {t('ui.confirm', 'Confirm')}
           </Button>
           <Button variant="secondary" minW="155px" onClick={handleCancel} isDisabled={isSubmitting}>
-            {t('contractor.suspend.reason.cancel', 'Cancel')}
+            {t('ui.cancel', 'Cancel')}
           </Button>
         </HStack>
       </VStack>
