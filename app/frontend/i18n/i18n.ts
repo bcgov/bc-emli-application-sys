@@ -3174,7 +3174,6 @@ const options = {
             },
             reason: {
               title: 'Reason for suspension',
-              emailSent: 'A confirmation email will be sent to the contractor contact.',
               label: 'Reason this contractor is suspended',
               placeholder: 'Enter suspension reason...',
               required: 'Reason is required',
@@ -3183,7 +3182,6 @@ const options = {
             },
             confirmed: {
               title: 'Contractor suspended.',
-              emailSent: 'An email has been automatically sent to the contractor with the suspension reason.',
               backButton: 'Back to Manage contractor details',
             },
           },
@@ -3195,7 +3193,6 @@ const options = {
             },
             confirmed: {
               title: 'Contractor unsuspended',
-              emailSent: 'An email has been automatically sent to the contractor.',
             },
           },
           remove: {
@@ -3206,7 +3203,6 @@ const options = {
             },
             reason: {
               title: 'Reason for removal',
-              emailSent: 'A confirmation email will be sent to the contractor contact.',
               label: 'Reason this contractor is being removed',
               placeholder: 'Enter removal reason...',
               required: 'Reason is required',
@@ -3218,7 +3214,6 @@ const options = {
             },
             confirmed: {
               title: 'Contractor removed.',
-              emailSent: 'An email has been automatically sent to the contractor with the removal reason.',
               backButton: 'Back to Manage contractor details',
             },
           },
