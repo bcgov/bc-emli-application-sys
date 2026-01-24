@@ -145,11 +145,18 @@ class PermitApplicationPolicy < ApplicationPolicy
     is_admin_withdrawing_support_request =
       (user.admin_manager? || user.admin?) &&
         record.submission_type&.code == "support_request" && record.draft?
+    is_contractor_withdrawing_onboarding =
+      record.submission_type&.code == "onboarding" && record.draft?
 
-    is_submitter || is_admin_withdrawing_support_request
+    is_submitter || is_admin_withdrawing_support_request ||
+      is_contractor_withdrawing_onboarding
   end
 
   def submit?
+    if record.submission_type.onboarding? && record.user_group_type.contractor?
+      return true
+    end
+
     if record.revisions_requested?
       # Revisions requested state (Save Edits workflow):
       # Allow original submitter OR admin users from same program (for "on behalf" submissions)
@@ -175,10 +182,15 @@ class PermitApplicationPolicy < ApplicationPolicy
     end
   end
 
+  def approve?
+    user.admin_manager? || user.admin?
+  end
+
   def generate_missing_pdfs?
-    user.system_admin? ||
-      ((user.participant? || user.contractor?) && record.submitter == user) ||
-      (user.admin_manager? || user.admin?)
+    true
+    # user.system_admin? ||
+    #   ((user.participant? || user.contractor?) && record.submitter == user) ||
+    #   (user.admin_manager? || user.admin?)
   end
 
   def finalize_revision_requests?

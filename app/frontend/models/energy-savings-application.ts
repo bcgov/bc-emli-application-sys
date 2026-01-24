@@ -520,7 +520,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       get currentUserShouldSeeApplicationDiff() {
         const currentUser = self.rootStore.userStore.currentUser;
         return (
-          currentUser?.id === self.submitter?.id ||
+          (currentUser?.id === self.submitter?.id && !currentUser?.isContractor) ||
           currentUser?.id === self?.getCollaborationDelegatee(ECollaborationType.submission)?.collaborator?.user?.id
         );
       },
@@ -942,6 +942,16 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
             { ...permitApplication, revisionMode: true },
             'permitApplicationMap',
           );
+        }
+        self.isLoading = false;
+        return response;
+      }),
+      approve: flow(function* () {
+        self.isLoading = true;
+        const response = yield self.environment.api.approveApplication(self.id);
+        if (response.ok) {
+          const { data: permitApplication } = response.data;
+          self.rootStore.permitApplicationStore.mergeUpdate(permitApplication, 'permitApplicationMap');
         }
         self.isLoading = false;
         return response;

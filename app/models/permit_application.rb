@@ -91,6 +91,9 @@ class PermitApplication < ApplicationRecord
   has_many :application_assignments
   has_many :assigned_users, through: :application_assignments, source: :user
   has_many :permit_block_statuses, dependent: :destroy
+  has_many :contractor_onboards,
+           foreign_key: :onboard_application_id,
+           dependent: :destroy
 
   # Support requests *spawned from this permit application*
   has_many :support_requests,

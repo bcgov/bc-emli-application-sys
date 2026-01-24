@@ -246,18 +246,18 @@ class NotificationService
     end
 
     users_that_can_submit.each do |user|
-      if user.preference&.enable_in_app_application_submission_notification
-        notification_user_hash[
-          user.id
-        ] = permit_application.submit_event_notification_data
-      end
+      #if user.preference&.enable_in_app_application_submission_notification
+      notification_user_hash[
+        user.id
+      ] = permit_application.submit_event_notification_data
+      #end
 
-      if user.preference&.enable_email_application_submission_notification
-        PermitHubMailer.notify_submitter_application_submitted(
-          permit_application,
-          user
-        )&.deliver_later
-      end
+      #if user.preference&.enable_email_application_submission_notification
+      PermitHubMailer.notify_submitter_application_submitted(
+        permit_application,
+        user
+      )&.deliver_later
+      #end
     end
 
     # assignees to be notified
@@ -265,18 +265,18 @@ class NotificationService
       # skip the designated submitter as they have already been added and use a different preference settings
       next if user.id == designated_submitter_user&.id
 
-      if user.preference&.enable_in_app_collaboration_notification
-        notification_user_hash[
-          user.id
-        ] = permit_application.submit_event_notification_data
-      end
+      #if user.preference&.enable_in_app_collaboration_notification
+      notification_user_hash[
+        user.id
+      ] = permit_application.submit_event_notification_data
+      #end
 
-      if user.preference&.enable_email_collaboration_notification
-        PermitHubMailer.notify_submitter_application_submitted(
-          permit_application,
-          user
-        )&.deliver_later
-      end
+      #if user.preference&.enable_email_collaboration_notification
+      PermitHubMailer.notify_submitter_application_submitted(
+        permit_application,
+        user
+      )&.deliver_later
+      #end
     end
 
     unless notification_user_hash.empty?

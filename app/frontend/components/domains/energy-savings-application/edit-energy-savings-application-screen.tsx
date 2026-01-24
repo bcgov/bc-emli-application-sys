@@ -327,11 +327,12 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 }}
                 gap={4}
               >
-                {currentPermitApplication?.status === EPermitApplicationStatus.draft && (
-                  <Button variant="primary" onClick={handleClickWithdrawl}>
-                    {t('energySavingsApplication.edit.withdrawl')}
-                  </Button>
-                )}
+                {currentPermitApplication?.status === EPermitApplicationStatus.draft &&
+                  !currentPermitApplication?.isContractorOnboarding && (
+                    <Button variant="primary" onClick={handleClickWithdrawl}>
+                      {t('energySavingsApplication.edit.withdrawl')}
+                    </Button>
+                  )}
                 {!currentPermitApplication?.isIneligible && (
                   <>
                     <Button variant="primary" onClick={handleClickFinishLater}>
@@ -440,10 +441,11 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               triggerSave={handleSave}
               showHelpButton
               isEditing={
-                currentPermitApplication?.isDraft ||
-                currentPermitApplication?.isRevisionsRequested ||
-                currentUser?.role === 'admin' ||
-                currentUser?.role === 'admin_manager'
+                (currentPermitApplication?.isDraft ||
+                  currentPermitApplication?.isRevisionsRequested ||
+                  currentUser?.role === 'admin' ||
+                  currentUser?.role === 'admin_manager') &&
+                !currentPermitApplication?.isContractorOnboarding
               }
               renderSaveButton={() => !currentPermitApplication?.isIneligible && <SaveButton handleSave={handleSave} />}
               updateCollaborationAssignmentNodes={updateRequirementBlockAssignmentNode}
@@ -475,6 +477,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
           />
         );
       })}
+
       <GlobalConfirmationModal
         isOpen={isWithdrawlOpen}
         onClose={onWithdrawlClose}

@@ -37,8 +37,10 @@ class PermitApplication::ContractorOnboardingProcessor
         program: @application.program,
         invited_by: @application.submitter # or whatever field represents the admin / owner
       )
-
-    inviter.invite_employees(employee_attrs)
+    Rails.logger.info(
+      " Employee Invite details: #{sanitize_employees(employee_attrs)}"
+    )
+    inviter.invite_employees(sanitize_employees(employee_attrs))
 
     Rails.logger.info(
       "[OnboardingProcessor] Contractor ##{contractor.id}: invited #{inviter.results[:invited].size} employees"
@@ -48,6 +50,12 @@ class PermitApplication::ContractorOnboardingProcessor
   end
 
   private
+
+  def sanitize_employees(employees)
+    employees.compact_blank.select do |e|
+      e[:email].present? && e[:name].present?
+    end
+  end
 
   # extracts top-level contractor details (basic contact and address info).
   def extract_contractor_details
@@ -78,12 +86,13 @@ class PermitApplication::ContractorOnboardingProcessor
       number_of_employees:
         find_value_by_key_end("approximate_number_of_employees"),
       gst_number: find_value_by_key_end("gst_number"),
-      worksafe_number: find_value_by_key_end("worksafebc_number"),
-      type_of_business: find_value_by_key_end("type_of_business"),
-      primary_program_measure:
-        find_value_by_key_end("primary_program_measures"),
-      retrofit_enabling_measures:
-        find_value_by_key_end("retrofit_enabling_measures")
+      worksafebc_number: find_value_by_key_end("worksafebc_number")
+      #type_of_business: find_value_by_key_end("type_of_business"),
+      #primary_program_measure:
+      #  find_value_by_key_end("primary_program_measures"),
+      #retrofit_enabling_measures:
+      #  find_value_by_key_end("retrofit_enabling_measures"),
+      #service_languages: find_value_by_key_end("")
     }
   end
 
@@ -116,10 +125,18 @@ class PermitApplication::ContractorOnboardingProcessor
   # the first key that ends with the specified string (key_end).
   # supports dynamic section UUIDs and key prefixes.
   def find_value_by_key_end(key_end)
+    found_value = nil
+
     @data["data"].each_value do |section|
       next unless section.is_a?(Hash)
-      section.each { |key, value| return value if key.end_with?(key_end) }
+
+      section.each do |key, value|
+        if key.include?("|#{key_end}") || key.end_with?(key_end)
+          found_value = value if value.present?
+        end
+      end
     end
-    nil
+
+    found_value
   end
 end

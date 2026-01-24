@@ -240,9 +240,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
 
   const handleOnboardingApproval = async () => {
     try {
-      const response = await currentPermitApplication.updateStatus({
-        status: EPermitApplicationStatus.approved,
-      });
+      const response = await currentPermitApplication.approve();
       if (response.ok) {
         navigate(`/applications/${response?.data?.data?.id}/onboarding-approved`, {
           state: {

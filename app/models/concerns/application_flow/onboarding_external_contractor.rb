@@ -2,6 +2,8 @@
 module ApplicationFlow
   class OnboardingExternalContractor < Base
     aasm column: :status, enum: true, autosave: true do
+      after_all_transitions :persist_state
+
       # --- States ---
       state :new_draft, initial: true
       state :newly_submitted
@@ -24,7 +26,7 @@ module ApplicationFlow
       event :approve do
         transitions from: :training_pending,
                     to: :approved,
-                    after: :handle_onboarding
+                    after: %i[handle_onboarding persist_state]
       end
 
       event :mark_ineligible do
@@ -33,6 +35,7 @@ module ApplicationFlow
     end
 
     def approve!
+      application.update(status: :approved, updated_at: Time.current)
       application.process_contractor_onboarding!
     end
 
