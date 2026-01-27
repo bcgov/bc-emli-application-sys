@@ -35,8 +35,10 @@ module ApplicationFlow
     end
 
     def approve!
-      application.update(status: :approved, updated_at: Time.current)
-      application.process_contractor_onboarding!
+      ApplicationRecord.transaction do
+        application.process_contractor_onboarding!
+        application.update(status: :approved, updated_at: Time.current)
+      end
     end
 
     def handle_submission

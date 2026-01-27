@@ -30,16 +30,23 @@ class PermitApplication::ContractorOnboardingProcessor
     # Skip if there are no employees in the parsed form
     return if employee_attrs.blank?
 
+    # we need to find the primary contact as the inviter for employees
+    contractor = Contractor.find(@application.submitter.id)
+    primary_user = User.find(contractor.contact_id)
+
+    Rails.logger.info(primary_user)
     # re-use existing invitation service
     inviter =
       ContractorEmployeeInviter.new(
         contractor: contractor,
         program: @application.program,
-        invited_by: @application.submitter # or whatever field represents the admin / owner
+        invited_by: primary_user
       )
+
     Rails.logger.info(
       " Employee Invite details: #{sanitize_employees(employee_attrs)}"
     )
+
     inviter.invite_employees(sanitize_employees(employee_attrs))
 
     Rails.logger.info(

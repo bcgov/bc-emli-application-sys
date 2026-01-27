@@ -5,7 +5,13 @@ class ContractorEmployeeInviter
     @contractor = contractor
     @program = program
     @invited_by = invited_by
-    @results = { invited: [], reinvited: [], email_taken_active: [], email_taken_pending: [], email_taken_deactivated: [] }
+    @results = {
+      invited: [],
+      reinvited: [],
+      email_taken_active: [],
+      email_taken_pending: [],
+      email_taken_deactivated: []
+    }
   end
 
   def invite_employees(users_params)
