@@ -11,6 +11,11 @@ class ContractorBlueprint < Blueprinter::Base
     fields :business_name,
            :website,
            :phone_number,
+           :cellphone_number,
+           :street_address,
+           :city,
+           :postal_code,
+           :email,
            :onboarded,
            :created_at,
            :updated_at,
@@ -28,13 +33,21 @@ class ContractorBlueprint < Blueprinter::Base
 
   # minimal view - excludes employees to avoid validation issues with undefined roles
   view :minimal do
+    fields :business_name, :onboarded, :created_at, :updated_at, :number
+
+    field :contact_id do |contractor|
+      contractor.contact_id
+    end
+  end
+
+  view :contact_details do
     fields :business_name,
-           :website,
            :phone_number,
-           :onboarded,
-           :created_at,
-           :updated_at,
-           :number
+           :cellphone_number,
+           :street_address,
+           :city,
+           :postal_code,
+           :email
 
     field :contact_id do |contractor|
       contractor.contact_id

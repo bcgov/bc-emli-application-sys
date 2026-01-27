@@ -6,6 +6,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
                   show
                   update
                   submit
+                  approve
                   upload_supporting_document
                   finalize_revision_requests
                   remove_revision_requests
@@ -448,6 +449,42 @@ class Api::PermitApplicationsController < Api::ApplicationController
     end
   end
 
+  def approve
+    authorize @permit_application, :approve?
+
+    unless @permit_application.may_approve?
+      return(
+        render json: {
+                 success: false,
+                 error:
+                   "Approval not allowed from the current state (#{@permit_application.status})."
+               },
+               status: :unprocessable_entity
+      )
+    end
+
+    begin
+      @permit_application.approve!
+      render_success @permit_application,
+                     nil,
+                     { blueprint_opts: { view: :program_review_extended } }
+    rescue AASM::InvalidTransition => e
+      Rails.logger.error("AASM InvalidTransition: #{e.message}")
+      render json: {
+               success: false,
+               error: "Invalid transition: #{e.message}"
+             },
+             status: :unprocessable_entity
+    rescue StandardError => e
+      Rails.logger.error("PermitApplication approval failed: #{e.message}")
+      render json: {
+               success: false,
+               error: "Unexpected error: #{e.message}"
+             },
+             status: :internal_server_error
+    end
+  end
+
   def create_permit_collaboration
     begin
       @permit_collaboration =
@@ -751,7 +788,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
   def set_permit_application
     @permit_application =
       if current_user.system_admin? || current_user.participant? ||
-           current_user.admin_manager?
+           current_user.admin_manager? || current_user.contractor?
         PermitApplication.find(params[:id])
       else
         PermitApplication.for_sandbox(current_sandbox).find(params[:id])

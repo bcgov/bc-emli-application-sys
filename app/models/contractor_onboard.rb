@@ -1,6 +1,8 @@
 class ContractorOnboard < ApplicationRecord
   belongs_to :contractor
-  belongs_to :onboard_application, class_name: "PermitApplication"
+  belongs_to :onboard_application,
+             class_name: "PermitApplication",
+             foreign_key: :onboard_application_id
   belongs_to :suspended_by,
              class_name: "User",
              foreign_key: :suspended_by,

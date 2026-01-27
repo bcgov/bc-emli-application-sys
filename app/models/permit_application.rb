@@ -22,16 +22,6 @@ class PermitApplication < ApplicationRecord
   include ZipfileUploader.Attachment(:zipfile)
   include Auditable
 
-  # SEARCH_INCLUDES = %i[
-  #   permit_type
-  #   submission_versions
-  #   step_code
-  #   activity
-  #   jurisdiction
-  #   submitter
-  #   permit_collaborations
-  # ]
-
   SEARCH_INCLUDES = [
     :submission_versions,
     :submitter,
@@ -49,10 +39,10 @@ class PermitApplication < ApplicationRecord
       support_requests: [
         :requested_by,
         {
-          linked_application: [
-            :supporting_documents,
-            :audience_type,
-            :submission_type
+          linked_application: %i[
+            supporting_documents
+            audience_type
+            submission_type
           ]
         }
       ]
@@ -101,6 +91,9 @@ class PermitApplication < ApplicationRecord
   has_many :application_assignments
   has_many :assigned_users, through: :application_assignments, source: :user
   has_many :permit_block_statuses, dependent: :destroy
+  has_many :contractor_onboards,
+           foreign_key: :onboard_application_id,
+           dependent: :destroy
 
   # Support requests *spawned from this permit application*
   has_many :support_requests,
@@ -308,14 +301,12 @@ class PermitApplication < ApplicationRecord
   end
 
   def has_draft_support_requests?
-    support_requests.any? do |sr|
-      sr.linked_application&.status == 'new_draft'
-    end
+    support_requests.any? { |sr| sr.linked_application&.status == "new_draft" }
   end
 
   def is_support_request_requested_by_participant?
     # Check if this application is a support request and was requested by a participant
-    return false unless submission_type&.code == 'support_request'
+    return false unless submission_type&.code == "support_request"
     return false unless incoming_support_requests.present?
 
     requested_by_user = incoming_support_requests.requested_by
@@ -363,7 +354,8 @@ class PermitApplication < ApplicationRecord
       submission_type_code: submission_type&.code,
       has_draft_support_requests: has_draft_support_requests?,
       is_submitted: submitted_at.present?,
-      is_support_request_by_participant: is_support_request_requested_by_participant?
+      is_support_request_by_participant:
+        is_support_request_requested_by_participant?
       # sandbox_id: sandbox_id
     }
   end
@@ -462,11 +454,7 @@ class PermitApplication < ApplicationRecord
   end
 
   def set_status(new_status, reason)
-    if update(status: new_status, status_update_reason: reason)
-      self
-    else
-      nil
-    end
+    update(status: new_status, status_update_reason: reason) ? self : nil
   end
 
   def status_display_label
@@ -1022,6 +1010,10 @@ class PermitApplication < ApplicationRecord
 
   def new_draft?
     status == "new_draft"
+  end
+
+  def process_contractor_onboarding!
+    PermitApplication::ContractorOnboardingProcessor.new(self).process!
   end
 
   private

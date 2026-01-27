@@ -576,6 +576,7 @@ const options = {
           start: 'Start',
           publishBanner: 'Ready to publish site-wide banner?',
           removeBanner: 'Ready to remove the site-wide banner?',
+          approve: 'Approve',
         },
         notification: {
           title: 'Notifications',
@@ -1083,6 +1084,12 @@ const options = {
             confirmReadyMessage: 'I confirm this {{submissionType}} form has all the required information.',
             successTitle: 'Training pending for contractor.',
             successMessage: 'Email the contractor with a link to the training materials.',
+          },
+          approval: {
+            confirmTitle: 'Ready to approve this contractor?',
+            confirmMessage: 'I confirm this {{submissionType}} form has all the required information.',
+            successTitle: 'You have marked this contractor as approved.',
+            successMessage: 'An email has been automatically sent to the contractor.',
           },
         },
         invoices: {

@@ -168,6 +168,11 @@ const SuccessfulTrainingPendingScreen = lazy(() =>
     default: module.SuccessfulTrainingPendingScreen,
   })),
 );
+const SuccessfulOnboardingApprovalScreen = lazy(() =>
+  import('../energy-savings-application/successful-action-screens').then((module) => ({
+    default: module.SuccessfulOnboardingApprovalScreen,
+  })),
+);
 const NewRequirementTemplateScreen = lazy(() =>
   import('../requirement-template/new-requirement-template-screen').then((module) => ({
     default: module.NewRequirementTemplateScreen,
@@ -581,6 +586,10 @@ const AppRoutes = observer(() => {
           <Route
             path="/applications/:permitApplicationId/successful-training-pending"
             element={<SuccessfulTrainingPendingScreen />}
+          />
+          <Route
+            path="/applications/:permitApplicationId/onboarding-approved"
+            element={<SuccessfulOnboardingApprovalScreen />}
           />
           <Route path="/applications/:permitApplicationId/successful-update" element={<SuccessfulUpdateScreeen />} />
         </Route>

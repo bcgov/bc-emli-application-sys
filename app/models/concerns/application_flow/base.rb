@@ -55,6 +55,12 @@ module ApplicationFlow
       approved? || approved_pending? || approved_paid?
     end
 
+    # stub default states that may not be
+    #  implemented by sub-classes
+    def revisions_requested?
+      false
+    end
+
     # --- Common guards ---
     def can_submit?
       signed =
@@ -76,6 +82,11 @@ module ApplicationFlow
       application.submission_versions.count > 1
     end
 
+    def reapproval_flow?
+      aasm.from_state == :approved ||
+        aasm.to_state == :approved && application.submission_versions.count > 1
+    end
+
     # --- Common handlers ---
     def handle_finalize_revision_requests
       application.update(revisions_requested_at: Time.current)
@@ -92,6 +103,23 @@ module ApplicationFlow
     def handle_submission
       raise NotImplementedError,
             "#{self.class.name} must implement #handle_submission"
+    end
+
+    # need to gracefully handle predicates that don't exist
+    #  this deals with noisy warnings in the log
+    def respond_to_missing?(method_name, include_private = false)
+      # respond to ?-style predicates even if not defined
+      return true if method_name.to_s.end_with?("?")
+      super
+    end
+
+    def method_missing(method_name, *args, &block)
+      # if it's a missing predicate return false
+      if method_name.to_s.end_with?("?")
+        false
+      else
+        super
+      end
     end
   end
 end

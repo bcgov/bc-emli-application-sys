@@ -68,7 +68,10 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
       // Otherwise, fetch latest onboarding for existing contractor
       onboarding = await contractorStore.fetchOnboarding(contractor.id);
       if (!onboarding) {
-        console.error('No onboarding found; what happens here? why didnt we create one?');
+        // if we got here it means we have a contractor but their onboarding is gone "withdrawn?"
+        // should we even allow withdrawn?
+        console.error('No onboarding found; why didnt we create one or was it withdrawn?');
+
         return;
       }
 
