@@ -44,7 +44,7 @@ The script is **safe to re-run** and guarantees the target matches SOURCE.
 WITH rb AS (
   SELECT *
   FROM requirement_blocks
-  WHERE sku = 'portal_access_for_employees'
+  WHERE sku = 'business_contact_information'
 ),
 reqs AS (
   SELECT *
@@ -97,7 +97,7 @@ BEGIN
       %L,
       %L,
       %L,
-      %s,
+      %L,
       %s
     )
     RETURNING id INTO v_requirement_block_id;
@@ -130,8 +130,6 @@ $sql$,
     rb.sign_off_role,
     rb.reviewer_role,
     rb.custom_validations::text,
-    rb.created_at,
-    rb.updated_at,
     rb.description,
     rb.sku,
     rb.display_name,
@@ -159,8 +157,6 @@ $sql$,
     r.related_content,
     r.required_for_in_person_hint,
     r.required_for_multiple_owners,
-    r.created_at,
-    r.updated_at,
     r.position,
     r.elective,
     CASE
@@ -214,3 +210,7 @@ This is not migrating data — this is **replaying form definitions**.
 - New or changed requirements need to be promoted
 - Environment drift needs to be corrected
 - You want a human-reviewed, auditable process
+
+IN ('e57a68a9-b489-4066-af30-d035e3e35e94', '3b437c18-6c5d-4960-8113-011e0f2ae175', 'f0c5f3e3-e99c-454a-8bcd-c265efb50832', 'c2e403ea-7485-4c4c-88ef-644148c5c1b6')
+
+IN ('71253c0b-da7f-4ab8-9d72-1194c313c5e5', '80084da9-7f97-4c62-97a9-48c3c5546378', '09ccb956-9543-4943-8cdc-127db59e0ad9', '2d4dfb80-daa9-443a-9b24-6179648b085b', '99027839-e133-4b35-8a7b-91542dafab5f')
