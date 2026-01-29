@@ -12,7 +12,7 @@ class Api::ContractorsController < Api::ApplicationController
                   deactivate
                 ]
   skip_before_action :authenticate_user!, only: %i[shim]
-  skip_after_action :verify_authorized, only: %i[shim]
+  skip_after_action :verify_authorized, only: %i[shim by_user]
   skip_after_action :verify_policy_scoped, only: [:index]
 
   def index
@@ -252,7 +252,7 @@ class Api::ContractorsController < Api::ApplicationController
   end
 
   def by_user
-    Rails.logger.info("finding by user")
+    #authorize Contractor, :by_user?
 
     contractor =
       Contractor
@@ -263,13 +263,11 @@ class Api::ContractorsController < Api::ApplicationController
         )
         .distinct
         .first
-    Rails.logger.info("Contractor: #{contractor}")
-    authorize contractor if contractor
 
     if contractor
       render json: ContractorBlueprint.render(contractor, view: :minimal)
     else
-      render json: { contractor: nil }
+      render json: { contractor: nil }, status: :unprocessable_entity
     end
   end
 

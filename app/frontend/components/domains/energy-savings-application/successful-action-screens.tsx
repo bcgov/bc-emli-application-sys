@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
 import React, { useEffect } from 'react';
-import { EUserRoles } from '../../../types/enums';
+import { EUserRoles, EPermitClassificationCode } from '../../../types/enums';
 
 /***
  * Base Reusable Success Screen
@@ -161,7 +161,11 @@ export const SuccessfulIneligibleScreen = observer(() => {
           submissionType: submissionType?.toLowerCase(),
         },
       )}
-      subtitle={t('energySavingsApplication.review.ineligibleNextSteps')}
+      subtitle={
+        submissionType !== EPermitClassificationCode.onboarding
+          ? t('energySavingsApplication.review.ineligibleNextSteps')
+          : ''
+      }
       referenceNumber={referenceNumber}
       primaryButtonLabel={
         currentUser.isParticipant

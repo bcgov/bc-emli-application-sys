@@ -590,6 +590,13 @@ class NotificationService
     end
   end
 
+  def self.contractor_onboarding_sumbitted_event(application, contractor)
+    PermitHubMailer.contractor_onboarding_submitted(
+      application,
+      contractor
+    )&.deliver_later
+  end
+
   # this is just a wrapper around the activity's metadata methods
   # since in the case of a single instance it returns a specific return type (eg. Integer)
   # but in the case of multiple user_ids the activity is a hash object

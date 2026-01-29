@@ -295,6 +295,18 @@ class PermitHubMailer < ApplicationMailer
     send_user_mail(email: @user.email, template_key: "contractor_approved")
   end
 
+  def contractor_onboarding_submitted(application, contractor)
+    @user = contractor.contact
+    @application_number = application.number
+
+    return unless @user.present?
+
+    send_user_mail(
+      email: @user.email,
+      template_key: "contractor_onboarding_submitted"
+    )
+  end
+
   def notify_participant_incomplete_draft_notification(permit_application)
     @user = permit_application.submitter
     @permit_application = permit_application

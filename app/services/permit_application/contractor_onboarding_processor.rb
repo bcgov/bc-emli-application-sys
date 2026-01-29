@@ -6,7 +6,6 @@ class PermitApplication::ContractorOnboardingProcessor
     @application = application
     # Parse submission_data into a Hash for traversal.
     raw_data = application.submission_data
-    Rails.logger.info("Raw Data: #{raw_data}")
     @data = raw_data.is_a?(String) ? JSON.parse(raw_data) : raw_data || {}
   end
 

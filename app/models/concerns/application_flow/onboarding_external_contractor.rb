@@ -42,16 +42,17 @@ module ApplicationFlow
     end
 
     def handle_submission
-      application.update(signed_off_at: Time.current)
+      ApplicationRecord.transaction do
+        application.submission_versions.create!(
+          form_json: application.form_json,
+          submission_data: application.submission_data
+        )
 
-      # Create submission version to capture application state at submission time
-      application.submission_versions.create!(
-        form_json: application.form_json,
-        submission_data: application.submission_data
-      )
+        application.zip_and_upload_supporting_documents
+        application.process_contractor_submission!
 
-      application.zip_and_upload_supporting_documents
-      application.send_submit_notifications
+        application.update(signed_off_at: Time.current)
+      end
     end
   end
 end
