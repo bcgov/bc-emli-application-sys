@@ -251,6 +251,28 @@ class Api::ContractorsController < Api::ApplicationController
     end
   end
 
+  def by_user
+    Rails.logger.info("finding by user")
+
+    contractor =
+      Contractor
+        .left_joins(:contractor_employees)
+        .where(
+          "contractors.contact_id = :user_id OR contractor_employees.employee_id = :user_id",
+          user_id: params[:user_id]
+        )
+        .distinct
+        .first
+    Rails.logger.info("Contractor: #{contractor}")
+    authorize contractor if contractor
+
+    if contractor
+      render json: ContractorBlueprint.render(contractor, view: :minimal)
+    else
+      render json: { contractor: nil }
+    end
+  end
+
   private
 
   def set_contractor

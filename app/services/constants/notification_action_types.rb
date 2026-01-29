@@ -27,5 +27,6 @@ module Constants
     NEW_PARTICIPANT_WELCOME = "new_participant_welcome"
     SUPPORTING_FILES_UPLOADED = "supporting_files_uploaded"
     SUPPORTING_FILES_REQUESTED = "supporting_files_requested"
+    CONTRACTOR_ONBOARDING_APPROVED = "contractor_onboarding_approved"
   end
 end

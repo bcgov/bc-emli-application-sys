@@ -215,6 +215,10 @@ class User < ApplicationRecord
     role&.include?("participant")
   end
 
+  def contractor?
+    role&.include?("contractor")
+  end
+
   def role_name
     role&.gsub("_", " ")
   end

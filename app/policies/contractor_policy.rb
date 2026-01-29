@@ -74,6 +74,10 @@ class ContractorPolicy < ApplicationPolicy
     user.admin_manager? || user.admin?
   end
 
+  def by_user?
+    true
+  end
+
   class Scope < ApplicationPolicy::Scope
     def resolve
       if user.system_admin? || user.admin? || user.admin_manager?

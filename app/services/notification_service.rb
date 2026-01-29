@@ -520,6 +520,11 @@ class NotificationService
       if user.participant?
         PermitHubMailer.notify_new_participant_welcome(user).deliver_later
         Rails.logger.info "Participant welcome notification queued for user #{user.id} (#{user.email})"
+      elsif user.contractor?
+        PermitHubMailer.notify_new_contractor_employee_welcome(
+          user
+        ).deliver_later
+        Rails.logger.info "Contractor Employee welcome notification queued for user #{user.id} (#{user.email})"
       else
         # Non participants including (admim, admin managers and sys-admins) receive a different message
         PermitHubMailer.notify_new_admin_welcome(user).deliver_later
@@ -565,6 +570,20 @@ class NotificationService
     notification_user_hash[
       user.id
     ] = permit_application.publish_supporting_files_sumbitted__data
+
+    unless notification_user_hash.empty?
+      NotificationPushJob.perform_async(notification_user_hash)
+    end
+  end
+
+  def self.contractor_onboarding_approved_event(contractor)
+    notification_user_hash = {}
+
+    notification_user_hash[
+      contractor.contact.id
+    ] = contractor.publish_onboarding_approval__data
+
+    PermitHubMailer.contractor_approved(contractor)&.deliver_later
 
     unless notification_user_hash.empty?
       NotificationPushJob.perform_async(notification_user_hash)

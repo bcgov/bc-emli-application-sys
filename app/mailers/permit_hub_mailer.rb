@@ -287,6 +287,14 @@ class PermitHubMailer < ApplicationMailer
     )
   end
 
+  def contractor_approved(contractor)
+    @user = contractor.contact
+
+    return unless @user.present?
+
+    send_user_mail(email: @user.email, template_key: "contractor_approved")
+  end
+
   def notify_participant_incomplete_draft_notification(permit_application)
     @user = permit_application.submitter
     @permit_application = permit_application
@@ -347,5 +355,14 @@ class PermitHubMailer < ApplicationMailer
     @user = user
 
     send_user_mail(email: @user.email, template_key: "notify_new_admin_welcome")
+  end
+
+  def notify_new_contractor_employee_welcome(user)
+    @user = user
+
+    send_user_mail(
+      email: @user.email,
+      template_key: "notify_new_contractor_employee_welcome"
+    )
   end
 end

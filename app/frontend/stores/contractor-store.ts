@@ -38,6 +38,7 @@ export const ContractorStoreModel = types
       tableContractors: types.array(types.reference(ContractorModel)),
       currentContractor: types.maybeNull(types.safeReference(ContractorModel)),
       statusFilter: types.optional(types.enumeration(['active', 'suspended', 'removed']), 'active'),
+      isResolvingMembership: false,
     }),
     createSearchModel<EContractorSortFields>('searchContractors'),
   )
@@ -130,6 +131,13 @@ export const ContractorStoreModel = types
     findByContactId(contactId: string) {
       return Array.from(self.contractorsMap.values()).find((contractor) => contractor.contactId === contactId) || null;
     },
+    findByUserId(userId: string) {
+      return (
+        Array.from(self.contractorsMap.values()).find(
+          (contractor) => contractor.contactId === userId || contractor.employees.some((e) => e.id === userId),
+        ) || null
+      );
+    },
     setStatusFilter(status: 'active' | 'suspended' | 'removed') {
       self.statusFilter = status;
       // Trigger a new search with the status filter
@@ -174,6 +182,23 @@ export const ContractorStoreModel = types
         self.countPerPage = opts.countPerPage ?? self.countPerPage;
       }
       return response.ok;
+    }),
+    resolveContractorForUser: flow(function* (userId: string) {
+      self.isResolvingMembership = true;
+
+      try {
+        const response = yield self.environment.api.findContractorByUser(userId);
+
+        if (response.ok) {
+          self.mergeUpdate(response.data, 'contractorsMap');
+          return response.data;
+        }
+
+        self.currentContractor = undefined;
+        return null;
+      } finally {
+        self.isResolvingMembership = false;
+      }
     }),
     createContractor: flow(function* (formData) {
       const response = yield self.environment.api.createContractor(formData);

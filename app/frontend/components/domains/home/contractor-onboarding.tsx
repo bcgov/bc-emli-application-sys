@@ -50,7 +50,8 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
       }
 
       // Find contractor linked to this user
-      const contractor = contractorStore.findByContactId(currentUser.id);
+      //const contractor = contractorStore.findByUserId(currentUser.id);
+      const contractor = await contractorStore.resolveContractorForUser(currentUser.id);
 
       // If contractor record doesn't exist, create onboarding (which creates contractor)
       if (!contractor) {
