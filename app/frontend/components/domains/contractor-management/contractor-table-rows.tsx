@@ -32,7 +32,17 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
 
   const handleEdit = () => {
-    navigate(`/contractor-management/${contractor.id}/edit`);
+    contractorStore.fetchOnboarding(contractor.id).then((onboarding) => {
+      if (onboarding) {
+        navigate(`/applications/${onboarding?.onboardApplicationId}`, {
+          state: {
+            mode: 'edit-contractor',
+            backToPage: '/contractor-management',
+            businessName: contractor.businessName,
+          },
+        });
+      }
+    });
   };
 
   const handleView = () => {

@@ -35,6 +35,7 @@ interface IRequirementFormProps {
   performedBy?: string;
   saveEditsCompleted?: boolean;
   buttonsToDisable?: string[];
+  showSiteWarning: boolean;
 }
 
 export const RequirementForm = observer(
@@ -50,6 +51,7 @@ export const RequirementForm = observer(
     performedBy,
     saveEditsCompleted = false,
     buttonsToDisable = [],
+    showSiteWarning = true,
   }: IRequirementFormProps) => {
     const {
       jurisdiction,
@@ -574,14 +576,16 @@ export const RequirementForm = observer(
             />
           )}
 
-          <Box bg="greys.grey03" p={3} borderRadius="sm">
-            <Trans
-              i18nKey="site.foippaWarning"
-              components={{
-                link: <Link href={`mailto:${t('site.contactEmail')}`}>{t('site.contactEmail')}</Link>,
-              }}
-            />
-          </Box>
+          {showSiteWarning && (
+            <Box bg="greys.grey03" p={3} borderRadius="sm">
+              <Trans
+                i18nKey="site.foippaWarning"
+                components={{
+                  link: <Link href={`mailto:${t('site.contactEmail')}`}>{t('site.contactEmail')}</Link>,
+                }}
+              />
+            </Box>
+          )}
           <Form
             key={permitApplication.formFormatKey}
             form={processedFormJson}

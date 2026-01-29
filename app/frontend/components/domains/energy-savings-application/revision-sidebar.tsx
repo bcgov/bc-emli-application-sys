@@ -38,6 +38,7 @@ import SubmissionVersionSelect from '../../shared/select/selectors/submission-ve
 import { formatFieldValue } from '../../../utils/field-value-formatter';
 import { EFlashMessageStatus } from '../../../types/enums';
 import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation-modal';
+import { ERevisionSideBarItems } from '../../../types/enums';
 
 interface IRevisionSideBarProps {
   permitApplication: IEnergySavingsApplication;
@@ -45,7 +46,8 @@ interface IRevisionSideBarProps {
   sendRevisionContainerRef?: MutableRefObject<HTMLDivElement>;
   forSubmitter?: boolean;
   updatePerformedBy?: string;
-  showRevisionRequestRemove? : boolean
+  showRevisionRequestRemove?: boolean;
+  showRevisionItems: Array<string>;
 }
 
 export interface IRevisionRequestForm {
@@ -59,8 +61,12 @@ export const RevisionSideBar = observer(
     sendRevisionContainerRef,
     forSubmitter,
     updatePerformedBy,
-    showRevisionRequestRemove = true
-
+    showRevisionItems = [
+      ERevisionSideBarItems.SELECTED_ITEMS_TOP_ALIGN,
+      ERevisionSideBarItems.SUBMIT_TOP_ALIGN,
+      ERevisionSideBarItems.SELECTED_ITEMS_BOTTOM_ALIGN,
+      ERevisionSideBarItems.SUBMIT_BOTTOM_ALIGN,
+    ],
   }: IRevisionSideBarProps) => {
     const { t } = useTranslation();
     const isMounted = useMountStatus();
@@ -379,15 +385,17 @@ export const RevisionSideBar = observer(
                 bg="theme.yellowLight"
                 flex={1}
               >
-                <Box>
-                  <Text as="span" fontWeight="bold">
-                    {fields.length}
-                  </Text>{' '}
-                  <Text as="span" color="text.secondary">
-                    {t('ui.selected')}
-                  </Text>
-                </Box>
-                {showRevisionRequestRemove ? renderButtons() : null}
+                {showRevisionItems.indexOf(ERevisionSideBarItems.SELECTED_ITEMS_BOTTOM_ALIGN) >= 0 && (
+                  <Box>
+                    <Text as="span" fontWeight="bold">
+                      {fields.length}
+                    </Text>{' '}
+                    <Text as="span" color="text.secondary">
+                      {t('ui.selected')}
+                    </Text>
+                  </Box>
+                )}
+                {showRevisionItems.indexOf(ERevisionSideBarItems.SUBMIT_BOTTOM_ALIGN) >= 0 && renderButtons()}
               </Flex>
             )}
           </Flex>
@@ -410,18 +418,20 @@ export const RevisionSideBar = observer(
             permitApplication={permitApplication}
           />
         )}
-        {sendRevisionContainerRef && tabIndex == 0 && showRevisionRequestRemove &&  (
+        {sendRevisionContainerRef && tabIndex == 0 && showRevisionItems.length > 0 && (
           <Portal containerRef={sendRevisionContainerRef}>
             <Flex gap={4} align="center">
-              <Box>
-                <Text as="span" fontWeight="bold">
-                  {fields.length}
-                </Text>{' '}
-                <Text as="span" color="text.secondary">
-                  {t('ui.selected')}
-                </Text>
-              </Box>
-              {renderButtons()}
+              {showRevisionItems.indexOf(ERevisionSideBarItems.SELECTED_ITEMS_TOP_ALIGN) >= 0 && (
+                <Box>
+                  <Text as="span" fontWeight="bold">
+                    {fields.length}
+                  </Text>{' '}
+                  <Text as="span" color="text.secondary">
+                    {t('ui.selected')}
+                  </Text>
+                </Box>
+              )}
+              {showRevisionItems.indexOf(ERevisionSideBarItems.SUBMIT_TOP_ALIGN) >= 0 && renderButtons()}
             </Flex>
           </Portal>
         )}

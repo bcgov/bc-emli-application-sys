@@ -32,8 +32,15 @@ import UpdatePathwayModal from '../../shared/modals/application-update-pathway';
 import AddSupportingFilesPathwayModal from '../../shared/modals/add-supporting-files-pathway-modal';
 import { EnergySavingsApplicationStatusTag } from '../../shared/energy-savings-applications/energy-savings-application-status-tag';
 import { SupportingFilesRequestModal } from './supporting-files-request-modal';
-import { EPermitClassificationCode, EUserRoles, EOnboardingRevisionFields, EUpdateRoles } from '../../../types/enums';
-
+import {
+  EPermitClassificationCode,
+  EUserRoles,
+  EOnboardingRevisionFields,
+  EContractorRevisionFields,
+  EUpdateRoles,
+  ERevisionSideBarItems,
+} from '../../../types/enums';
+import { useLocation } from 'react-router-dom';
 interface IReferenceNumberForm {
   referenceNumber?: string;
 }
@@ -43,11 +50,14 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const currentUser = userStore.currentUser;
   const { currentPermitApplication, error } = usePermitApplication({ review: true });
   const { t } = useTranslation();
+  const location = useLocation();
+  const { mode, businessName, backToPage } = location.state || {};
   const formRef = useRef(null);
+  const isEditContractor = mode === 'edit-contractor';
 
-  const onboardingRevisionButtonsToDisable = Object.values(EOnboardingRevisionFields).map(
-    (f) => `${f}-revision-button`,
-  );
+  const revisionButtonsToDisable = Object.values(
+    isEditContractor ? EContractorRevisionFields : EOnboardingRevisionFields,
+  ).map((f) => `${f}-revision-button`);
 
   const { requirementBlockAssignmentNodes, updateRequirementBlockAssignmentNode } = useCollaborationAssignmentNodes({
     formRef,
@@ -206,7 +216,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
 
   if (
     currentPermitApplication.submissionType?.code === EPermitClassificationCode.onboarding &&
-    [(EUserRoles.admin, EUserRoles.adminManager)].indexOf(currentUser.role) >= 0
+    [EUserRoles.admin, EUserRoles.adminManager].indexOf(currentUser.role) >= 0
   ) {
     if (!performedBy) {
       setPerformedBy(EUpdateRoles.staff);
@@ -282,17 +292,21 @@ export const ReviewPermitApplicationScreen = observer(() => {
       <Flex id="permitHeader" direction="column" position="sticky" top={0} zIndex={12} ref={permitHeaderRef}>
         <Flex w="full" px={6} py={3} bg="theme.blue" justify="space-between" color="greys.white">
           <HStack gap={4} flex={1}>
-            <EnergySavingsApplicationStatusTag energySavingsApplication={currentPermitApplication} />
+            {!isEditContractor && (
+              <EnergySavingsApplicationStatusTag energySavingsApplication={currentPermitApplication} />
+            )}
             <Flex direction="column" w="full">
               <Heading fontSize="xl" as="h3">
                 {currentPermitApplication.fullAddress}
               </Heading>
-              <Text noOfLines={1}>{currentPermitApplication.nickname}</Text>
+              <Text noOfLines={1}>{isEditContractor ? businessName : currentPermitApplication.nickname}</Text>
               <HStack>
                 <CopyableValue
                   textTransform={'uppercase'}
                   value={number}
-                  label={showEditMode ? t('contractorOnboarding.contractorId') : t('permitApplication.fields.number')}
+                  label={
+                    isEditContractor ? t('permitApplication.fields.number') : t('contractorOnboarding.contractorId')
+                  }
                 />
               </HStack>
             </Flex>
@@ -310,30 +324,30 @@ export const ReviewPermitApplicationScreen = observer(() => {
             />
 
             <Button
-              {...(!showEditMode ? { variant: 'primary' } : null)}
+              variant="primary"
               rightIcon={<CaretRightIcon />}
-              onClick={() => navigate(`/submission-inbox`)}
+              onClick={() => navigate(`${isEditContractor ? backToPage : '/submission-inbox'} `)}
             >
               {showEditMode ? t('ui.back') : t('ui.backToInbox')}
             </Button>
 
-            {revisionMode &&
-              !showEditMode &&
-              // Show for internal applications (always admin-on-behalf)
-              (currentPermitApplication?.audienceType?.code === 'internal' ||
-                // Show for external applications when admin selected "on behalf" pathway
-                (currentPermitApplication?.audienceType?.code === 'external' && performedBy === 'staff')) && (
-                <Button
-                  bg="white"
-                  color="text.primary"
-                  border="1px solid"
-                  borderColor="border.light"
-                  isDisabled={!hasUnsavedEdits || saveEditsDisabled}
-                  onClick={handleSaveEdits}
-                >
-                  {t('energySavingsApplication.show.saveEdits')}
-                </Button>
-              )}
+            {(revisionMode && !showEditMode) ||
+              (isEditContractor &&
+                // Show for internal applications (always admin-on-behalf)
+                (currentPermitApplication?.audienceType?.code === 'internal' ||
+                  // Show for external applications when admin selected "on behalf" pathway
+                  (currentPermitApplication?.audienceType?.code === 'external' && performedBy === 'staff')) && (
+                  <Button
+                    bg="white"
+                    color="text.primary"
+                    border="1px solid"
+                    borderColor="border.light"
+                    isDisabled={!hasUnsavedEdits || saveEditsDisabled}
+                    onClick={handleSaveEdits}
+                  >
+                    {t('energySavingsApplication.show.saveEdits')}
+                  </Button>
+                ))}
           </Stack>
         </Flex>
         {revisionMode && (
@@ -383,7 +397,16 @@ export const ReviewPermitApplicationScreen = observer(() => {
             onCancel={handleRevisionCancel}
             sendRevisionContainerRef={sendRevisionContainerRef}
             updatePerformedBy={performedBy}
-            {...(showEditMode ? { showRevisionRequestRemove: false } : null)}
+            {...(isEditContractor
+              ? {
+                  showRevisionItems: [
+                    ERevisionSideBarItems.SELECTED_ITEMS_TOP_ALIGN,
+                    ERevisionSideBarItems.SELECTED_ITEMS_BOTTOM_ALIGN,
+                  ],
+                }
+              : showEditMode
+                ? { showRevisionItems: [ERevisionSideBarItems.SELECTED_ITEMS_BOTTOM_ALIGN] }
+                : null)}
           />
         ) : (
           <ChecklistSideBar permitApplication={currentPermitApplication} completedBlocks={completedBlocks} />
@@ -397,10 +420,12 @@ export const ReviewPermitApplicationScreen = observer(() => {
               showHelpButton
               performedBy={performedBy}
               saveEditsCompleted={saveEditsCompleted}
-              buttonsToDisable={showEditMode ? onboardingRevisionButtonsToDisable : []}
+              buttonsToDisable={showEditMode ? revisionButtonsToDisable : []}
+              showSiteWarning={false}
               renderTopButtons={() => {
                 return (
-                  (!revisionMode || showEditMode) && (
+                  (!revisionMode || showEditMode) &&
+                  !isEditContractor && (
                     <HStack spacing={6}>
                       {!showEditMode && (
                         <Button
