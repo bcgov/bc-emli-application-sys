@@ -15,25 +15,26 @@ class PermitApplication::ContractorOnboardingProcessor
     contractor_detail_attrs = extract_contractor_details
     employee_attrs = extract_employees
     contractor_info_attrs = extract_contractor_info
-
+    Rails.logger.info("Process! after form extraction")
     # The contractor record should already exist (created earlier in the onboarding flow).
     # use the submitter_id to fetch the right record.
     contractor = Contractor.find(@application.submitter_id)
     contractor.update!(contractor_detail_attrs)
 
+    Rails.logger.info("after contractor find and update")
     # contractor_info contains the detailed business information, licenses, etc.
     # contractor handles the upsert for the _info
     contractor.upsert_contractor_info(contractor_info_attrs)
 
+    Rails.logger.info("Process! after contractor info upsert")
     # terate over the parsed employee attributes array and create invitations
     # Skip if there are no employees in the parsed form
     return if employee_attrs.blank?
 
     # we need to find the primary contact as the inviter for employees
-    contractor = Contractor.find(@application.submitter.id)
     primary_user = User.find(contractor.contact_id)
 
-    Rails.logger.info(primary_user)
+    Rails.logger.info("Process! after find primary contact user")
     # re-use existing invitation service
     inviter =
       ContractorEmployeeInviter.new(
@@ -43,7 +44,7 @@ class PermitApplication::ContractorOnboardingProcessor
       )
 
     inviter.invite_employees(sanitize_employees(employee_attrs))
-
+    Rails.logger.info("Process! after employee invite")
     # fire the approval notification to the primary contact
     NotificationService.contractor_onboarding_approved_event(contractor)
   end
