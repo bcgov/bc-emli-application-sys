@@ -584,3 +584,19 @@ export enum EOnboardingRevisionFields {
   SERVICE_LANGUAGES = 'what_language_s_does_your_business_provide_services_in',
   SERVICE_INFO = 'service_info_v2',
 }
+
+export enum EContractorRevisionFields {
+  BUSINESS_NAME = 'business_name',
+  BUSINESS_EMAIL = 'business_email',
+  DOING_BUSINESS_AS = 'doing_business_as_if_different_from_business_name',
+  SERVICE_INFO = 'service_info_v2',
+}
+
+export enum ERevisionSideBarItems {
+  SELECTED_ITEMS = 'selected_items',
+  SUBMIT = 'submit',
+  SELECTED_ITEMS_TOP_ALIGN = 'selected_items_top_align',
+  SUBMIT_TOP_ALIGN = 'Submit_top_align',
+  SELECTED_ITEMS_BOTTOM_ALIGN = 'selected_items_bottom_align',
+  SUBMIT_BOTTOM_ALIGN = 'Submit_bottom_align',
+}
