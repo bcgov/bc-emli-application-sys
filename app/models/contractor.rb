@@ -142,6 +142,16 @@ class Contractor < ApplicationRecord
     raise
   end
 
+  def publish_onboarding_approval__data
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::CONTRACTOR_ONBOARDING_APPROVED,
+      "action_text" =>
+        "#{I18n.t("notification.contractor.onboarding_approved")}"
+    }
+  end
+
   private
 
   def assign_unique_number

@@ -12,7 +12,7 @@ class Api::ContractorsController < Api::ApplicationController
                   deactivate
                 ]
   skip_before_action :authenticate_user!, only: %i[shim]
-  skip_after_action :verify_authorized, only: %i[shim]
+  skip_after_action :verify_authorized, only: %i[shim by_user]
   skip_after_action :verify_policy_scoped, only: [:index]
 
   def index
@@ -248,6 +248,26 @@ class Api::ContractorsController < Api::ApplicationController
                error: onboard.errors.full_messages
              },
              status: :unprocessable_entity
+    end
+  end
+
+  def by_user
+    #authorize Contractor, :by_user?
+
+    contractor =
+      Contractor
+        .left_joins(:contractor_employees)
+        .where(
+          "contractors.contact_id = :user_id OR contractor_employees.employee_id = :user_id",
+          user_id: params[:user_id]
+        )
+        .distinct
+        .first
+
+    if contractor
+      render json: ContractorBlueprint.render(contractor, view: :minimal)
+    else
+      render json: { contractor: nil }, status: :unprocessable_entity
     end
   end
 

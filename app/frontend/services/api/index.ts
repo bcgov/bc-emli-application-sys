@@ -433,6 +433,10 @@ export class Api {
     return this.client.get<ApiResponse<any>>(`/contractor_onboards/${contractorId}`);
   }
 
+  async findContractorByUser(userId: string) {
+    return this.client.get<ApiResponse<any>>(`/contractors/by-user/${userId}`);
+  }
+
   async updateUserRole(id: string, role: string) {
     return this.client.patch<ApiResponse<IUser>>(`/users/${id}/role`, { role });
   }

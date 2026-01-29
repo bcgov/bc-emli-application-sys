@@ -1016,6 +1016,11 @@ class PermitApplication < ApplicationRecord
     PermitApplication::ContractorOnboardingProcessor.new(self).process!
   end
 
+  def process_contractor_submission!
+    contractor = Contractor.find(self.submitter_id)
+    NotificationService.contractor_onboarding_sumbitted_event(self, contractor)
+  end
+
   private
 
   def submission_variant_consistency

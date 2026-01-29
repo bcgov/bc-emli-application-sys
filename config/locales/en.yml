@@ -814,6 +814,8 @@ en:
     support_request:
       supporting_files_uploaded: 'Supporting files added to application %{application_number} on %{uploaded_date}'
       supporting_files_requested: 'Supporting files requested for form %{parent_application_number} on %{created_date}'
+    contractor:
+      onboarding_approved: 'Congratulations! You are now a registered contractor for the Better Homes Energy Savings Program. You can now submit invoices and explore program resources.'
     user:
       account_update_notification: 'Your account was updated on %{updated_at}. Changes: %{changed_fields}. If you did not make this change, please contact support immediately.'
     permit_collaboration:

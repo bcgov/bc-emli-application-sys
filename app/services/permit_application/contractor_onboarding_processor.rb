@@ -6,7 +6,6 @@ class PermitApplication::ContractorOnboardingProcessor
     @application = application
     # Parse submission_data into a Hash for traversal.
     raw_data = application.submission_data
-    Rails.logger.info("Raw Data: #{raw_data}")
     @data = raw_data.is_a?(String) ? JSON.parse(raw_data) : raw_data || {}
   end
 
@@ -43,17 +42,10 @@ class PermitApplication::ContractorOnboardingProcessor
         invited_by: primary_user
       )
 
-    Rails.logger.info(
-      " Employee Invite details: #{sanitize_employees(employee_attrs)}"
-    )
-
     inviter.invite_employees(sanitize_employees(employee_attrs))
 
-    Rails.logger.info(
-      "[OnboardingProcessor] Contractor ##{contractor.id}: invited #{inviter.results[:invited].size} employees"
-    )
-
-    # what else needs to happen here notifications?
+    # fire the approval notification to the primary contact
+    NotificationService.contractor_onboarding_approved_event(contractor)
   end
 
   private

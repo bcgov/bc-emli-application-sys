@@ -239,6 +239,9 @@ Rails.application.routes.draw do
       get "current_contractor/license_agreements",
           on: :collection,
           to: "contractors#license_agreements"
+
+      get "by-user/:user_id", on: :collection, to: "contractors#by_user"
+
       post "shim", on: :collection, to: "contractors#shim"
 
       # Follow program pattern for contractor users
