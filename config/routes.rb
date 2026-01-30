@@ -337,10 +337,11 @@ Rails.application.routes.draw do
 
   scope module: :external_api, path: :external_api do
     namespace :v1 do
+      post "applications/search", to: "permit_applications#index"
+      get "applications/summary", to: "permit_applications#summary"
       get "applications/:id",
           to: "permit_applications#show",
           as: :external_api_application
-      post "applications/search", to: "permit_applications#index"
 
       resources :versions, as: "template_versions", only: [] do
         get "integration_mapping",

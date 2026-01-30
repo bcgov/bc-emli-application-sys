@@ -91,10 +91,11 @@ class PermitApplicationBlueprint < Blueprinter::Base
       # Filter out internal draft support requests from participants
       # Only show them to staff or after they're submitted
       if current_user && current_user.participant?
-        filtered = pa.support_requests.reject do |sr|
-          sr.linked_application&.audience_type&.code == 'internal' &&
-          sr.linked_application&.new_draft?
-        end
+        filtered =
+          pa.support_requests.reject do |sr|
+            sr.linked_application&.audience_type&.code == "internal" &&
+              sr.linked_application&.new_draft?
+          end
         filtered
       else
         pa.support_requests
@@ -257,6 +258,46 @@ class PermitApplicationBlueprint < Blueprinter::Base
 
     field :submission_type, name: :submission_type do |obj|
       obj.submission_type&.code
+    end
+  end
+
+  view :submission_summary do
+    exclude :id
+
+    field :app_id do |pa|
+      pa.number
+    end
+
+    field :submission_date do |pa|
+      pa.submitted_at&.iso8601
+    end
+
+    field :primary_heating_system do |pa|
+      pa.extract_heating_system_from_submission_data(:primary)
+    end
+
+    field :secondary_heating_system do |pa|
+      pa.extract_heating_system_from_submission_data(:secondary)
+    end
+
+    field :address do |pa|
+      pa.extract_address_from_submission_data
+    end
+
+    field :first_name do |pa|
+      pa.extract_first_name_from_submission_data
+    end
+
+    field :last_name do |pa|
+      pa.extract_last_name_from_submission_data
+    end
+
+    field :phone_number do |pa|
+      pa.extract_phone_from_submission_data
+    end
+
+    field :email do |pa|
+      pa.extract_email_from_submission_data
     end
   end
 

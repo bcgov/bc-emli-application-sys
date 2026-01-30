@@ -899,6 +899,38 @@ class PermitApplication < ApplicationRecord
     { first_name: first_name, last_name: last_name }
   end
 
+  # External API summary field extraction - delegates to service
+  def summary_fields_for_external_use
+    SubmissionDataExtractorService.new(self).extract_summary_fields
+  end
+
+  def extract_address_from_submission_data
+    summary_fields_for_external_use[:address]
+  end
+
+  def extract_phone_from_submission_data
+    summary_fields_for_external_use[:phone_number]
+  end
+
+  def extract_first_name_from_submission_data
+    summary_fields_for_external_use[:first_name]
+  end
+
+  def extract_last_name_from_submission_data
+    summary_fields_for_external_use[:last_name]
+  end
+
+  def extract_heating_system_from_submission_data(type)
+    case type
+    when :primary
+      summary_fields_for_external_use[:primary_heating_system]
+    when :secondary
+      summary_fields_for_external_use[:secondary_heating_system]
+    else
+      nil
+    end
+  end
+
   def step_code_requirements
     return [] unless jurisdiction
     jurisdiction.permit_type_required_steps.where(permit_type_id:)
