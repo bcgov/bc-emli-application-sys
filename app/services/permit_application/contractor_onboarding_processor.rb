@@ -40,7 +40,6 @@ class PermitApplication::ContractorOnboardingProcessor
       )
 
     inviter.invite_employees(sanitize_employees(employee_attrs))
-
     # fire the approval notification to the primary contact
     NotificationService.contractor_onboarding_approved_event(contractor)
   end
@@ -102,20 +101,22 @@ class PermitApplication::ContractorOnboardingProcessor
           section.is_a?(Hash) &&
             section.keys.any? { |k| k.include?("employee_details") }
         end
-
     return [] unless employees_section
 
     # Flatten the nested array of employee hashes and pull out the desired fields.
     employees_section
       .values
       .flatten
-      .map do |row|
-        {
-          name: row.find { |k, _| k.end_with?("employeeName") }&.last,
-          email: row.find { |k, _| k.end_with?("employeeEmail") }&.last
-        }
+      .each_with_object([]) do |row, acc|
+        next unless row.is_a?(Hash)
+
+        name = row.find { |k, _| k.end_with?("employeeName") }&.last
+        email = row.find { |k, _| k.end_with?("employeeEmail") }&.last
+
+        next if name.blank? || email.blank?
+
+        acc << { name:, email: }
       end
-      .compact_blank
   end
 
   # utility method that scans through all sections and returns the value of
