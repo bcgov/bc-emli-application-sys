@@ -15,18 +15,15 @@ class PermitApplication::ContractorOnboardingProcessor
     contractor_detail_attrs = extract_contractor_details
     employee_attrs = extract_employees
     contractor_info_attrs = extract_contractor_info
-    Rails.logger.info("Process! after form extraction")
     # The contractor record should already exist (created earlier in the onboarding flow).
     # use the submitter_id to fetch the right record.
     contractor = Contractor.find(@application.submitter_id)
     contractor.update!(contractor_detail_attrs)
 
-    Rails.logger.info("after contractor find and update")
     # contractor_info contains the detailed business information, licenses, etc.
     # contractor handles the upsert for the _info
     contractor.upsert_contractor_info(contractor_info_attrs)
 
-    Rails.logger.info("Process! after contractor info upsert")
     # terate over the parsed employee attributes array and create invitations
     # Skip if there are no employees in the parsed form
     return if employee_attrs.blank?
@@ -34,7 +31,6 @@ class PermitApplication::ContractorOnboardingProcessor
     # we need to find the primary contact as the inviter for employees
     primary_user = User.find(contractor.contact_id)
 
-    Rails.logger.info("Process! after find primary contact user")
     # re-use existing invitation service
     inviter =
       ContractorEmployeeInviter.new(
@@ -44,7 +40,6 @@ class PermitApplication::ContractorOnboardingProcessor
       )
 
     inviter.invite_employees(sanitize_employees(employee_attrs))
-    Rails.logger.info("Process! after employee invite")
     # fire the approval notification to the primary contact
     NotificationService.contractor_onboarding_approved_event(contractor)
   end
@@ -112,13 +107,16 @@ class PermitApplication::ContractorOnboardingProcessor
     employees_section
       .values
       .flatten
-      .map do |row|
-        {
-          name: row.find { |k, _| k.end_with?("employeeName") }&.last,
-          email: row.find { |k, _| k.end_with?("employeeEmail") }&.last
-        }
+      .each_with_object([]) do |row, acc|
+        next unless row.is_a?(Hash)
+
+        name = row.find { |k, _| k.end_with?("employeeName") }&.last
+        email = row.find { |k, _| k.end_with?("employeeEmail") }&.last
+
+        next if name.blank? || email.blank?
+
+        acc << { name:, email: }
       end
-      .compact_blank
   end
 
   # utility method that scans through all sections and returns the value of
