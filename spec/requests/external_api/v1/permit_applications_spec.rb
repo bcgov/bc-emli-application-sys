@@ -264,4 +264,171 @@ RSpec.describe "external_api/v1/applications",
       end
     end
   end
+
+  path "/applications/summary" do
+    get "This endpoint retrieves a summary of applications filtered by submission date. Returns lightweight application data with only essential fields (application id, submission date, heating systems, address, contact info). Pagination is optional - omit page parameter to retrieve all results." do
+      tags "Applications"
+      produces "application/json"
+
+      parameter name: :submitted_from,
+                in: :query,
+                schema: {
+                  type: :string,
+                  format: :date
+                },
+                description:
+                  "Filter applications submitted on or after this date (YYYY-MM-DD)",
+                required: false
+
+      parameter name: :submitted_to,
+                in: :query,
+                schema: {
+                  type: :string,
+                  format: :date
+                },
+                description:
+                  "Filter applications submitted on or before this date (YYYY-MM-DD)",
+                required: false
+
+      parameter name: :page,
+                in: :query,
+                schema: {
+                  type: :integer,
+                  default: 1,
+                  minimum: 1
+                },
+                description:
+                  "Page number (optional). Omit to retrieve all results without pagination.",
+                required: false
+
+      parameter name: :per_page,
+                in: :query,
+                schema: {
+                  type: :integer,
+                  default: 25,
+                  minimum: 1,
+                  maximum: 100
+                },
+                description:
+                  "Number of results per page (optional). Only used when page parameter is provided.",
+                required: false
+
+      response(200, "Successful") do
+        schema type: :object,
+               properties: {
+                 data: {
+                   type: :array,
+                   description:
+                     "Application summaries. Returns all results when page parameter is omitted, or paginated results when page parameter is provided.",
+                   items: {
+                     type: :object,
+                     description:
+                       "Lightweight summary of application with essential fields only. Extracted from submission data.",
+                     properties: {
+                       app_id: {
+                         type: :string,
+                         description:
+                           "The application number displayed to the user."
+                       },
+                       submission_date: {
+                         type: :string,
+                         format: "date-time",
+                         description:
+                           "ISO 8601 timestamp when the application was submitted.",
+                         nullable: true
+                       },
+                       primary_heating_system: {
+                         type: :string,
+                         description:
+                           "The primary heating system from the application submission data.",
+                         nullable: true
+                       },
+                       secondary_heating_system: {
+                         type: :string,
+                         description:
+                           "The secondary/backup heating system from the application submission data.",
+                         nullable: true
+                       },
+                       address: {
+                         type: :string,
+                         description:
+                           "The formatted address from the application submission data (unit number, street, city, postal code).",
+                         nullable: true
+                       },
+                       first_name: {
+                         type: :string,
+                         description:
+                           "The first name from the application submission data.",
+                         nullable: true
+                       },
+                       last_name: {
+                         type: :string,
+                         description:
+                           "The last name from the application submission data.",
+                         nullable: true
+                       },
+                       phone_number: {
+                         type: :string,
+                         description:
+                           "The phone number from the application submission data.",
+                         nullable: true
+                       },
+                       email: {
+                         type: :string,
+                         description:
+                           "The email address from the application submission data.",
+                         nullable: true
+                       }
+                     },
+                     required: %w[app_id]
+                   }
+                 },
+                 meta: {
+                   type: :object,
+                   properties: {
+                     total_pages: {
+                       type: :integer,
+                       description:
+                         "Total number of pages available for the current filter and pagination settings."
+                     },
+                     total_count: {
+                       type: :integer,
+                       description:
+                         "Total number of applications matching the filter criteria."
+                     },
+                     current_page: {
+                       type: :integer,
+                       description:
+                         "Current page number in the paginated result set."
+                     },
+                     per_page: {
+                       type: :integer,
+                       description: "Number of applications returned per page."
+                     }
+                   },
+                   required: %w[total_count total_pages current_page per_page]
+                 }
+               },
+               required: %w[data meta]
+
+        run_test! do |res|
+          data = JSON.parse(res.body)
+          expect(data.dig("data").length).to eq(
+            submitted_permit_applications.length
+          )
+          expect(data.dig("meta", "total_count")).to eq(
+            submitted_permit_applications.length
+          )
+        end
+      end
+
+      response(
+        429,
+        "Rate limit exceeded. Note: The rate limit is 100 requests per minute per API key and 300 requests per IP in a 3 minute interval"
+      ) do
+        schema "$ref" => "#/components/schemas/ResponseError"
+        run_test!
+      end
+    end
+  end
 end

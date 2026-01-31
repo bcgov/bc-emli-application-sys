@@ -2,13 +2,7 @@ module ExternalApi::Concerns::Search::PermitApplications
   extend ActiveSupport::Concern
 
   def perform_permit_application_search
-    # This search should always be scoped to a program via the api key.
-    # The following condition should never be true, but is an added reduncy
-    # for security purposes.
-    if current_external_api_key.blank? ||
-         current_external_api_key.program_id.blank?
-      raise Pundit::NotAuthorizedError
-    end
+    ensure_external_api_key_authorized!
 
     search_conditions = {
       order: permit_application_order,
@@ -34,6 +28,16 @@ module ExternalApi::Concerns::Search::PermitApplications
   end
 
   private
+
+  def ensure_external_api_key_authorized!
+    # This search should always be scoped to a program via the api key.
+    # The following condition should never be true, but is an added redundancy
+    # for security purposes.
+    if current_external_api_key.blank? ||
+         current_external_api_key.program_id.blank?
+      raise Pundit::NotAuthorizedError
+    end
+  end
 
   def permit_application_search_params
     params.permit(
@@ -70,8 +74,10 @@ module ExternalApi::Concerns::Search::PermitApplications
       # sandbox_id: current_sandbox&.id
     }
 
-    where[:status] = %i[in_review] if constraints.blank? ||
-      constraints[:status].blank?
+    # Default: filter to in_review status (for search endpoint)
+    if constraints.blank? || constraints[:status].blank?
+      where[:status] = %i[in_review]
+    end
 
     where.merge!(constraints.to_h.deep_symbolize_keys) if constraints.present?
 

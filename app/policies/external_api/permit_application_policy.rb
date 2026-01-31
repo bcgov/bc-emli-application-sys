@@ -8,6 +8,10 @@ class ExternalApi::PermitApplicationPolicy < ExternalApi::ApplicationPolicy
     index?
   end
 
+  def summary?
+    index?
+  end
+
   def show_integration_mapping?
     external_api_key.program == record.program
   end
