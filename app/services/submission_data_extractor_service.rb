@@ -87,7 +87,7 @@ class SubmissionDataExtractorService
   def extract_email
     data = latest_submission_data
     return nil unless data
-    find_field_by_suffix(data, "email")
+    find_field_by_contains(data, "email")
   end
 
   def find_field_by_suffix(submission_data, suffix)
@@ -98,6 +98,26 @@ class SubmissionDataExtractorService
         return field_value if field_key.end_with?("|#{suffix}")
       end
     end
+    nil
+  end
+
+  # Flexible field matching - finds fields containing keyword
+  # Used for email where field naming varies across templates
+  def find_field_by_contains(submission_data, keyword)
+    return nil unless submission_data.is_a?(Hash)
+
+    submission_data.each do |_section_key, section_value|
+      next unless section_value.is_a?(Hash)
+
+      section_value.each do |field_key, field_value|
+        # Match if key contains keyword AND value looks like email
+        if field_key.downcase.include?(keyword.downcase) &&
+             field_value.is_a?(String) && field_value.include?("@")
+          return field_value
+        end
+      end
+    end
+
     nil
   end
 end

@@ -114,10 +114,10 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
     where[:status] = { not: :new_draft }
 
     # Only return participant applications (not contractor onboarding, invoices, etc.)
-    participant_type = UserGroupType.find_by(code: "participant")
-    application_type = SubmissionType.find_by(code: "application")
-    where[:user_group_type_id] = participant_type.id if participant_type
-    where[:submission_type_id] = application_type.id if application_type
+    participant_type = UserGroupType.find_by!(code: "participant")
+    application_type = SubmissionType.find_by!(code: "application")
+    where[:user_group_type_id] = participant_type.id
+    where[:submission_type_id] = application_type.id
 
     # Merge date constraints if present
     where.merge!(constraints.to_h.deep_symbolize_keys) if constraints
