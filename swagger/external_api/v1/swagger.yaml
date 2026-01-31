@@ -314,18 +314,23 @@ paths:
                     properties:
                       total_pages:
                         type: integer
-                        description: Total number of pages (only present when page
-                          parameter is provided)
+                        description: Total number of pages available for the current
+                          filter and pagination settings.
                       total_count:
                         type: integer
                         description: Total number of applications matching the filter
-                          criteria
+                          criteria.
                       current_page:
                         type: integer
-                        description: Current page number (only present when page parameter
-                          is provided)
+                        description: Current page number in the paginated result set.
+                      per_page:
+                        type: integer
+                        description: Number of applications returned per page.
                     required:
                     - total_count
+                    - total_pages
+                    - current_page
+                    - per_page
                 required:
                 - data
                 - meta

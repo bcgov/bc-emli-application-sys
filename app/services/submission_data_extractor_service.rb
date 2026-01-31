@@ -87,7 +87,7 @@ class SubmissionDataExtractorService
   def extract_email
     data = latest_submission_data
     return nil unless data
-    find_field_by_suffix(data, "email_address")
+    find_field_by_suffix(data, "email")
   end
 
   def find_field_by_suffix(submission_data, suffix)

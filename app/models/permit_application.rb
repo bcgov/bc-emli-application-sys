@@ -845,28 +845,7 @@ class PermitApplication < ApplicationRecord
   end
 
   def extract_email_from_submission_data
-    return nil unless submission_versions.any?
-
-    # Get the latest submission version data
-    latest_data = submission_versions.last.submission_data
-    return nil unless latest_data&.dig("data")
-
-    # Search through all sections and fields for email
-    latest_data
-      .dig("data")
-      .each do |section_key, section_data|
-        next unless section_data.is_a?(Hash)
-
-        section_data.each do |field_key, field_value|
-          # Look for field keys that contain 'email'
-          if field_key.include?("email") && field_value.is_a?(String) &&
-               field_value.include?("@")
-            return field_value
-          end
-        end
-      end
-
-    nil
+    summary_fields_for_external_use[:email]
   end
 
   def extract_participant_name_from_submission_data
@@ -901,7 +880,8 @@ class PermitApplication < ApplicationRecord
 
   # External API summary field extraction - delegates to service
   def summary_fields_for_external_use
-    SubmissionDataExtractorService.new(self).extract_summary_fields
+    @summary_fields_for_external_use ||=
+      SubmissionDataExtractorService.new(self).extract_summary_fields
   end
 
   def extract_address_from_submission_data

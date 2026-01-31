@@ -389,20 +389,24 @@ RSpec.describe "external_api/v1/applications",
                      total_pages: {
                        type: :integer,
                        description:
-                         "Total number of pages (only present when page parameter is provided)"
+                         "Total number of pages available for the current filter and pagination settings."
                      },
                      total_count: {
                        type: :integer,
                        description:
-                         "Total number of applications matching the filter criteria"
+                         "Total number of applications matching the filter criteria."
                      },
                      current_page: {
                        type: :integer,
                        description:
-                         "Current page number (only present when page parameter is provided)"
+                         "Current page number in the paginated result set."
+                     },
+                     per_page: {
+                       type: :integer,
+                       description: "Number of applications returned per page."
                      }
                    },
-                   required: %w[total_count]
+                   required: %w[total_count total_pages current_page per_page]
                  }
                },
                required: %w[data meta]

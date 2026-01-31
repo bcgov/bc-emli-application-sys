@@ -46,7 +46,7 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
                          view: :submission_summary
                        }
                      }
-    rescue Searchkick::InvalidQueryError => e
+    rescue Searchkick::InvalidQueryError
       render json: { error: "Invalid query parameters." }, status: 400
     end
   end
