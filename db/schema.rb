@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_22_175531) do
+ActiveRecord::Schema[7.1].define(version: 2026_02_05_000410) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -148,6 +148,27 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_22_175531) do
     t.index ["contractor_id"],
             name: "index_contractor_employees_on_contractor_id"
     t.index ["employee_id"], name: "index_contractor_employees_on_employee_id"
+  end
+
+  create_table "contractor_imports",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.jsonb "payload", null: false
+    t.string "invite_code", null: false
+    t.datetime "consumed_at"
+    t.uuid "consumed_by_user_id"
+    t.uuid "contractor_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["consumed_at"], name: "index_contractor_imports_on_consumed_at"
+    t.index ["contractor_id"], name: "index_contractor_imports_on_contractor_id"
+    t.index ["invite_code"],
+            name: "index_contractor_imports_on_invite_code",
+            unique: true
+    t.index ["payload"],
+            name: "index_contractor_imports_on_payload",
+            using: :gin
   end
 
   create_table "contractor_infos",
