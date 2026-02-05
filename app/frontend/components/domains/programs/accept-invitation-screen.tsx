@@ -34,7 +34,12 @@ export const AcceptInvitationScreen = observer(() => {
       const result = await fetchInvitedUser(invitationToken, programId);
 
       if (!result?.isOk) {
-        const updateInvitationResponse = { ...invitationUserResponse, isInvalidToken: true, status: result.status };
+        const updateInvitationResponse = {
+          ...invitationUserResponse,
+          isInvalidToken: true,
+          status: result.status,
+        };
+
         setInvitationUserResponse(updateInvitationResponse);
       }
     };
