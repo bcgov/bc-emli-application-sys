@@ -2276,8 +2276,15 @@ const options = {
           invitationIntent:
             'This invitation is intended for <strong>{{email}}</strong>, if this is incorrect please contact the sender above.',
           invalidInvitationToken: {
-            title: 'Invalid invite',
-            message: 'Please contact your jurisdiction to request a new invitation link.',
+            message:
+              'If you have any questions, please ask your primary contact to call us at 1-833-856-0333 or email us at ',
+            mailTo: 'ESPcontractorsupport@clearesult.com',
+            invalid: {
+              title: 'Invalid Invitation',
+            },
+            expired: {
+              title: 'Expired Invitation',
+            },
           },
           createAccount: 'Proceed with your account creation',
           omniauthProviders: {
