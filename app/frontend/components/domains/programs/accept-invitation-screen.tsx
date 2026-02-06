@@ -1,4 +1,4 @@
-import { Button, Container, Divider, Flex, Heading, Text, VStack } from '@chakra-ui/react';
+import { Button, Container, Divider, Flex, Heading, Text, VStack, Link } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { observer } from 'mobx-react-lite';
 import React, { Suspense, useEffect, useState } from 'react';
@@ -19,7 +19,10 @@ import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 export const AcceptInvitationScreen = observer(() => {
   const { userStore } = useMst();
   const { invitedUser, fetchInvitedUser } = userStore;
-  const [invalidToken, setInvalidToken] = useState(false);
+  const [invitationUserResponse, setInvitationUserResponse] = useState({
+    isInvalidToken: false,
+    status: null,
+  });
 
   const { programId } = useParams();
   const [searchParams] = useSearchParams();
@@ -30,14 +33,28 @@ export const AcceptInvitationScreen = observer(() => {
     const fetch = async () => {
       const result = await fetchInvitedUser(invitationToken, programId);
 
-      if (!result) setInvalidToken(true);
+      if (!result?.isOk) {
+        const updateInvitationResponse = {
+          ...invitationUserResponse,
+          isInvalidToken: true,
+          status: result.status,
+        };
+
+        setInvitationUserResponse(updateInvitationResponse);
+      }
     };
     fetch();
   }, []);
 
   return (
     <Suspense fallback={<LoadingScreen />}>
-      {invitedUser ? <Content invitedUser={invitedUser} /> : invalidToken && <InvalidTokenMessage />}
+      {invitedUser ? (
+        <Content invitedUser={invitedUser} />
+      ) : (
+        invitationUserResponse?.isInvalidToken && (
+          <InvalidTokenMessage invitationStatus={invitationUserResponse?.status} />
+        )
+      )}
     </Suspense>
   );
 });
@@ -123,15 +140,27 @@ const Content = observer(function Content({ invitedUser }: Readonly<IProps>) {
   );
 });
 
-function InvalidTokenMessage() {
+function InvalidTokenMessage({ invitationStatus }) {
+  const invalidInvitationTitle = () => {
+    switch (invitationStatus) {
+      case 'not_acceptable':
+        return t('user.invalidInvitationToken.expired.title');
+      default:
+        return t('user.invalidInvitationToken.invalid.title');
+    }
+  };
+
   return (
     <Container maxW="container.lg">
       <VStack gap={12} my="20" mb="40">
         <VStack>
           <Heading as="h1" mb={0}>
-            {t('user.invalidInvitationToken.title')}
+            {invalidInvitationTitle()}
           </Heading>
           <Text>{t('user.invalidInvitationToken.message')}</Text>
+          <Link href={'mailto:' + t('user.invalidInvitationToken.mailTo')}>
+            {t('user.invalidInvitationToken.mailTo')}
+          </Link>
         </VStack>
         <RouterLinkButton to="/">{t('site.pageNotFoundCTA')}</RouterLinkButton>
         <Text>

@@ -129,7 +129,11 @@ export const UserStoreModel = types
         self.mergeUpdate(response.data, 'usersMap');
         self.invitedUser = response.data.id;
       }
-      return ok;
+
+      return {
+        isOk: ok,
+        status: response?.status ?? null,
+      };
     }),
     updateProfile: flow(function* (formData) {
       const { ok, data: response } = yield self.environment.api.updateProfile(formData);

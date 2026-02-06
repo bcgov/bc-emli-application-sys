@@ -25,7 +25,8 @@ class Api::InvitationsController < ApplicationController
 
   def show
     @program = Program.find(params[:program_id])
-    if @invited_user
+    case @invite_status
+    when :valid
       render_success @invited_user,
                      nil,
                      {
@@ -35,8 +36,24 @@ class Api::InvitationsController < ApplicationController
                          program: @program
                        }
                      }
+    when :expired
+      render json: {
+               error: :expired_token,
+               status: :not_acceptable
+             },
+             status: :unprocessable_entity
+    when :accepted
+      render json: {
+               error: :already_accepted,
+               status: :accepted
+             },
+             status: :unprocessable_entity
     else
-      render json: { error: :invalid_token }, status: :not_found
+      render json: {
+               error: :invalid_token,
+               status: :invalid
+             },
+             status: :not_found
     end
   end
 
@@ -63,7 +80,20 @@ class Api::InvitationsController < ApplicationController
   end
 
   def find_invited_user
-    @invited_user = User.find_by_invitation_token(params[:id], true)
+    token = params[:id].to_s.strip
+
+    @invited_user = User.find_by_invitation_token(token, false)
+    @invitation_sent_on =
+      DateTime.parse(@invited_user.invitation_sent_at.inspect)
+    @invitation_expires_on = @invitation_sent_on + 14
+
+    if @invited_user == nil
+      @invite_status = :invalid
+    elsif @invitation_expires_on <= DateTime.now
+      @invite_status = :expired
+    else
+      @invite_status = :valid
+    end
   end
 
   def render_accept_invite_error(resource)
