@@ -270,6 +270,10 @@ Rails.application.routes.draw do
 
     resources :contractor_onboards, only: %i[create update show]
 
+    resources :contractor_import, only: %i[create] do
+      get "validate/:token", on: :collection, to: "contractor_import#validate"
+    end
+
     resources :audit_logs, only: %i[index] do
       get "filter_options", on: :collection
     end

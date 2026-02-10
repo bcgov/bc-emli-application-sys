@@ -87,7 +87,7 @@ def normalize_value(key, value):
 
     return value
 
-# Load Excel
+# Load the contractors spreadsheet
 df = pd.read_excel("esp_contractor_data.xlsx")
 df = df.dropna(how="all")
 

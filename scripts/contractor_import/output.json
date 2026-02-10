@@ -1,6 +1,6 @@
 [
   {
-    "username": "Pridegasheating@yahoo.ca",
+    "username": "test.example1@fakeemail.com",
     "status": "Approved",
     "business": {
       "name": "Pride Gas and Heating Ltd",
@@ -93,7 +93,7 @@
     }
   },
   {
-    "username": "marklandelectric@gmail.com",
+    "username": "test.example2@fakeemail.com",
     "status": "Approved",
     "business": {
       "name": "Markland Electric Ltd",
@@ -153,7 +153,7 @@
     }
   },
   {
-    "username": "dan@authenticinstallations.com",
+    "username": "test.example3@fakeemail.com",
     "status": "Approved",
     "business": {
       "name": "Authentic Installation Inc",
@@ -209,7 +209,7 @@
     }
   },
   {
-    "username": "valleysidehvac@gmail.com",
+    "username": "test.example4@fakeemail.com",
     "status": "Approved",
     "business": {
       "name": "Valleyside Heating & Air Conditioning",
@@ -280,7 +280,7 @@
     }
   },
   {
-    "username": "Devon@harbourhazmat.ca",
+    "username": "test.example5@fakeemail.com",
     "status": "Approved",
     "business": {
       "name": "Harbour Hazmat Inc",

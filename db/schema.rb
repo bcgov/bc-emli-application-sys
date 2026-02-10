@@ -156,6 +156,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_05_000410) do
                force: :cascade do |t|
     t.jsonb "payload", null: false
     t.string "invite_code", null: false
+    t.datetime "invite_email_sent_at"
     t.datetime "consumed_at"
     t.uuid "consumed_by_user_id"
     t.uuid "contractor_id"
@@ -166,6 +167,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_05_000410) do
     t.index ["invite_code"],
             name: "index_contractor_imports_on_invite_code",
             unique: true
+    t.index ["invite_email_sent_at"],
+            name: "index_contractor_imports_on_invite_email_sent_at"
     t.index ["payload"],
             name: "index_contractor_imports_on_payload",
             using: :gin

@@ -4,6 +4,9 @@ class CreateContractorImports < ActiveRecord::Migration[7.1]
       t.jsonb :payload, null: false
       t.string :invite_code, null: false
 
+      # invitation email tracking
+      t.datetime :invite_email_sent_at
+
       # ownership / lifecycle tracking
       t.datetime :consumed_at
       t.uuid :consumed_by_user_id
@@ -14,6 +17,7 @@ class CreateContractorImports < ActiveRecord::Migration[7.1]
 
     add_index :contractor_imports, :invite_code, unique: true
     add_index :contractor_imports, :payload, using: :gin
+    add_index :contractor_imports, :invite_email_sent_at
     add_index :contractor_imports, :consumed_at
     add_index :contractor_imports, :contractor_id
   end

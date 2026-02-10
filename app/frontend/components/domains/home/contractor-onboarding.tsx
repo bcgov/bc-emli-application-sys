@@ -1,8 +1,10 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { useMst } from '../../../setup/root';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SharedSpinner } from '../../shared/base/shared-spinner';
 import { Flex } from '@chakra-ui/react';
+import { useSessionStorage } from '../../../hooks/use-session-state';
+import { contractorOnboardingImportTokenKey } from '../../../constants';
 
 interface IContractorOnboardingScreenProps {}
 
@@ -10,6 +12,8 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
   const { permitApplicationStore, userStore, uiStore, contractorStore } = useMst();
   const { currentUser } = userStore;
   const navigate = useNavigate();
+  const [importToken, setImportToken] = useSessionStorage(contractorOnboardingImportTokenKey, null);
+  const [importHandled, setImportHandled] = useState(false);
 
   useEffect(() => {
     contractorStore.searchContractors();
@@ -49,18 +53,27 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
         contractorStore.setStatusWithoutSearch(originalFilter);
       }
 
+      if (importToken && !importHandled) {
+        setImportHandled(true); // immediate fuse
+
+        try {
+          await contractorStore.importContractor(importToken, currentUser.id);
+          setImportToken(null); // persistent cleanup
+        } catch (e) {
+          console.error(e);
+          // setImportHandled(false) for potential retry semantics?
+        }
+      }
+
       // Find contractor linked to this user
-      //const contractor = contractorStore.findByUserId(currentUser.id);
       const contractor = await contractorStore.resolveContractorForUser(currentUser.id);
 
-      // If contractor record doesn't exist, create onboarding (which creates contractor)
       if (!contractor) {
+        // fallback to normal onboarding flow
         onboarding = await contractorStore.createOnboarding(currentUser.id);
         if (onboarding) {
-          console.log(`Created onboarding app ${onboarding.permitApplicationId}`);
           navigate(`/applications/${onboarding.permitApplicationId}/edit`);
         } else {
-          console.error('Failed to create onboarding; redirecting to welcome');
           navigate('/welcome');
         }
         return;
