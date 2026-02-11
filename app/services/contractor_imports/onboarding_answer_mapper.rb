@@ -5,6 +5,13 @@
 # defined in DOMAIN_TO_REQUIREMENT_MAP
 module ContractorImports
   class OnboardingAnswerMapper
+    # Normalize labels for case-insensitive, whitespace-tolerant matching
+    def self.normalize_label(label)
+      return "" if label.nil?
+
+      label.to_s.strip.downcase.gsub(/\s+/, " ") # normalize multiple spaces to single space
+    end
+
     # this mapping defines how each domain key in the import data maps to a requirement code in the onboarding template,
     # as well as any transformations that need to be applied to the raw values from the import data to
     # match the expected format for the submission JSON. The transform lambdas take the raw value and the requirement object
@@ -79,11 +86,14 @@ module ContractorImports
           "what_language_s_does_your_business_provide_services_in",
         checkbox: true,
         transform: ->(values, requirement) do
-          values = Array(values)
+          normalized_values =
+            Array(values).map { |v| OnboardingAnswerMapper.normalize_label(v) }
 
           options = requirement.input_options["value_options"]
           options.each_with_object({}) do |opt, acc|
-            acc[opt["value"]] = values.include?(opt["label"])
+            acc[opt["value"]] = normalized_values.include?(
+              OnboardingAnswerMapper.normalize_label(opt["label"])
+            )
           end
         end
       },
@@ -91,11 +101,14 @@ module ContractorImports
         requirement_code: "primary_program_measures",
         checkbox: true,
         transform: ->(values, requirement) do
-          values = Array(values)
+          normalized_values =
+            Array(values).map { |v| OnboardingAnswerMapper.normalize_label(v) }
 
           options = requirement.input_options["value_options"]
           options.each_with_object({}) do |opt, acc|
-            acc[opt["value"]] = values.include?(opt["label"])
+            acc[opt["value"]] = normalized_values.include?(
+              OnboardingAnswerMapper.normalize_label(opt["label"])
+            )
           end
         end
       },
@@ -103,11 +116,14 @@ module ContractorImports
         requirement_code: "retrofit_enabling_measures",
         checkbox: true,
         transform: ->(values, requirement) do
-          values = Array(values)
+          normalized_values =
+            Array(values).map { |v| OnboardingAnswerMapper.normalize_label(v) }
 
           options = requirement.input_options["value_options"]
           options.each_with_object({}) do |opt, acc|
-            acc[opt["value"]] = values.include?(opt["label"])
+            acc[opt["value"]] = normalized_values.include?(
+              OnboardingAnswerMapper.normalize_label(opt["label"])
+            )
           end
         end
       }
