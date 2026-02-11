@@ -5,7 +5,11 @@
 <p>Click below to log in and get started:</p>
 
 <div class="button-row">
-  <a href="<%= "#{@root_url}programs/#{@program_id}/accept-invitation?invitation_token=#{@token}" %>" class="btn-primary" target="_blank">Accept Invitation</a>
+  <% if @program_id.present? %>
+    <a href="<%= "#{@root_url}programs/#{@program_id}/accept-invitation?invitation_token=#{@token}" %>" class="btn-primary" target="_blank">Accept Invitation</a>
+  <% else %>
+    <a href="<%= "#{@root_url}accept-invitation?invitation_token=#{@token}" %>" class="btn-primary" target="_blank">Accept Invitation</a>
+  <% end %>
 </div>
 
 <p>Thank you,<br>
