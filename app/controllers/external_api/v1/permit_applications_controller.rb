@@ -6,7 +6,7 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
 
   def index
     perform_permit_application_search
-    return if performed? # Stop if date validation failed
+    return if performed?
 
     authorized_results =
       apply_search_authorization(@permit_application_search.results)
