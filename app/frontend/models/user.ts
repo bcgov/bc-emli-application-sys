@@ -251,8 +251,8 @@ export const UserModel = types
       }
       return response.ok;
     }),
-    reinvite: flow(function* () {
-      const response = yield self.environment.api.reinviteUser(self.id);
+    reinvite: flow(function* (programId?: string) {
+      const response = yield self.environment.api.reinviteUser(self.id, programId);
       if (response.ok) {
         self.rootStore.userStore.mergeUpdate(response.data.data, 'usersMap');
       }

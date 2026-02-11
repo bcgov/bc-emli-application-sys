@@ -117,8 +117,9 @@ export class Api {
     return this.client.post<ApiResponse<IUser>>(`/users/${userId}/resend_confirmation`);
   }
 
-  async reinviteUser(userId: string) {
-    return this.client.post<ApiResponse<IUser>>(`/users/${userId}/reinvite`);
+  async reinviteUser(userId: string, programId?: string) {
+    const payload = programId ? { program_id: programId } : {};
+    return this.client.post<ApiResponse<IUser>>(`/users/${userId}/reinvite`, payload);
   }
 
   async logout() {

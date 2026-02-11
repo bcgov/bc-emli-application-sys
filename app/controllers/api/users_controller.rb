@@ -258,11 +258,21 @@ class Api::UsersController < Api::ApplicationController
 
   def reinvite
     authorize @user
-    @user.invite!(current_user)
+
+    # Check if program_id is provided for program-specific invites
+    options = {}
+    program = nil
+    if params[:program_id].present?
+      program = Program.find(params[:program_id])
+      options[:program_id] = program.id
+      options[:role_text] = User.human_attribute_name("roles.#{@user.role}")
+    end
+
+    @user.invite!(current_user, options)
     render_success(
       @user,
       "user.reinvited",
-      { blueprint_opts: { view: :invited_user } }
+      { blueprint_opts: { view: :invited_user, program: program } }
     )
   end
 

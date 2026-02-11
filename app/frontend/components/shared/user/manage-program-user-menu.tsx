@@ -30,8 +30,11 @@ interface IFormProps {
 const ReinviteUserForm = ({ user }: IFormProps) => {
   const { handleSubmit, formState } = useForm();
   const { isSubmitting } = formState;
+  const {
+    programStore: { currentProgram },
+  } = useMst();
 
-  const onSubmit = async () => await user.reinvite();
+  const onSubmit = async () => await user.reinvite(currentProgram?.id);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
