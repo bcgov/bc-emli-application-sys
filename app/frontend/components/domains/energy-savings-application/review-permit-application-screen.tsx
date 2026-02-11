@@ -41,6 +41,7 @@ import {
   ERevisionSideBarItems,
 } from '../../../types/enums';
 import { useLocation } from 'react-router-dom';
+import { useSessionStorage } from '../../../hooks/use-session-state';
 interface IReferenceNumberForm {
   referenceNumber?: string;
 }
@@ -98,7 +99,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const [saveEditsDisabled, setSaveEditsDisabled] = useState(false);
   const [supportRequestDate, setSupportRequestDate] = useState(null);
   const [showEditMode, setShowEditMode] = useState(false);
-
+  const [fromPage] = useSessionStorage('fromPage', null);
   const sendRevisionContainerRef = useRef<HTMLDivElement | null>(null);
 
   const permitHeaderRef = useRef();
@@ -326,7 +327,9 @@ export const ReviewPermitApplicationScreen = observer(() => {
             <Button
               variant="primary"
               rightIcon={<CaretRightIcon />}
-              onClick={() => navigate(`${isEditContractor ? backToPage : '/submission-inbox'} `)}
+              onClick={() => {
+                navigate(`${isEditContractor ? backToPage : (fromPage.name ?? '/submission-inbox')} `);
+              }}
             >
               {showEditMode ? t('ui.back') : t('ui.backToInbox')}
             </Button>
