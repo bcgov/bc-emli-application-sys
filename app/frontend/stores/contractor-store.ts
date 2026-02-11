@@ -268,6 +268,18 @@ export const ContractorStoreModel = types
 
       return response;
     }),
+    validateImportToken: flow(function* (token: string) {
+      const response = yield self.environment.api.validateContractorImportToken(token);
+      return response;
+    }),
+    importContractor: flow(function* (importToken: string, userId: string) {
+      const response = yield self.environment.api.importContractor(importToken, userId);
+      if (response.ok) {
+        const contractorData = response.data.data;
+        self.mergeUpdate(contractorData, 'contractorsMap');
+      }
+      return response;
+    }),
     mergeContractor(contractorData: any) {
       try {
         // Clone the data to avoid mutating the original

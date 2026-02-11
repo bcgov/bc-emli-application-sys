@@ -15,6 +15,8 @@ class PermitApplication::ContractorOnboardingProcessor
     contractor_detail_attrs = extract_contractor_details
     employee_attrs = extract_employees
     contractor_info_attrs = extract_contractor_info
+
+    Rails.logger.debug("Extracted contractor info: #{contractor_info_attrs}")
     # The contractor record should already exist (created earlier in the onboarding flow).
     # use the submitter_id to fetch the right record.
     contractor = Contractor.find(@application.submitter_id)
@@ -26,20 +28,21 @@ class PermitApplication::ContractorOnboardingProcessor
 
     # terate over the parsed employee attributes array and create invitations
     # Skip if there are no employees in the parsed form
-    return if employee_attrs.blank?
+    if employee_attrs.present?
+      # we need to find the primary contact as the inviter for employees
+      primary_user = User.find(contractor.contact_id)
 
-    # we need to find the primary contact as the inviter for employees
-    primary_user = User.find(contractor.contact_id)
+      # re-use existing invitation service
+      inviter =
+        ContractorEmployeeInviter.new(
+          contractor: contractor,
+          program: @application.program,
+          invited_by: primary_user
+        )
 
-    # re-use existing invitation service
-    inviter =
-      ContractorEmployeeInviter.new(
-        contractor: contractor,
-        program: @application.program,
-        invited_by: primary_user
-      )
+      inviter.invite_employees(sanitize_employees(employee_attrs))
+    end
 
-    inviter.invite_employees(sanitize_employees(employee_attrs))
     # fire the approval notification to the primary contact
     NotificationService.contractor_onboarding_approved_event(contractor)
   end
@@ -81,13 +84,16 @@ class PermitApplication::ContractorOnboardingProcessor
       number_of_employees:
         find_value_by_key_end("approximate_number_of_employees"),
       gst_number: find_value_by_key_end("gst_number"),
-      worksafebc_number: find_value_by_key_end("worksafebc_number")
-      #type_of_business: find_value_by_key_end("type_of_business"),
-      #primary_program_measure:
-      #  find_value_by_key_end("primary_program_measures"),
-      #retrofit_enabling_measures:
-      #  find_value_by_key_end("retrofit_enabling_measures"),
-      #service_languages: find_value_by_key_end("")
+      worksafebc_number: find_value_by_key_end("worksafebc_number"),
+      type_of_business: extract_selected_checkbox_values("type_of_business"),
+      primary_program_measure:
+        extract_selected_checkbox_values("primary_program_measures"),
+      retrofit_enabling_measures:
+        extract_selected_checkbox_values("retrofit_enabling_measures"),
+      service_languages:
+        extract_selected_checkbox_values(
+          "what_language_s_does_your_business_provide_services_in"
+        )
     }
   end
 
@@ -117,6 +123,16 @@ class PermitApplication::ContractorOnboardingProcessor
 
         acc << { name:, email: }
       end
+  end
+
+  # utility method to extract the value of a selected checkbox from the submission data.
+  # it looks for keys that end with the specified key_end string and checks if their value
+  # is true, returning the first matching key (which represents the selected option).
+  def extract_selected_checkbox_values(key_end)
+    hash = find_value_by_key_end(key_end)
+    return [] unless hash.is_a?(Hash)
+
+    hash.select { |_k, v| v == true }.keys
   end
 
   # utility method that scans through all sections and returns the value of

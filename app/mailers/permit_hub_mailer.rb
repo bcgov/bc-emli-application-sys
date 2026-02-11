@@ -199,11 +199,11 @@ class PermitHubMailer < ApplicationMailer
   end
 
   def send_user_mail(*args, **kwargs)
-    return if @user.discarded? || !@user.confirmed?
+    if @user.present?
+      return if @user.discarded? || !@user.confirmed?
+    end
 
-    result = send_mail(*args, **kwargs)
-
-    result
+    send_mail(*args, **kwargs)
   end
 
   def notify_application_ineligible(permit_application)
@@ -376,5 +376,15 @@ class PermitHubMailer < ApplicationMailer
       email: @user.email,
       template_key: "notify_new_contractor_employee_welcome"
     )
+  end
+
+  def contractor_invite(import)
+    email = import.payload["username"]
+    Rails.logger.info("Sending contractor invite to #{email}")
+    return unless email.present?
+
+    @token = import.invite_code
+
+    send_user_mail(email: email, template_key: "imported_contractor_invite")
   end
 end

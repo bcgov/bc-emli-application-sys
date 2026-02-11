@@ -21,6 +21,7 @@ import { ContractorManagementScreen } from '../contractor-management';
 import { ContractorEmployeeIndexScreen } from '../contractor-management/employees';
 import { ContractorProgramResourcesScreen } from '../contractor-management/contractor-program-resources-screen';
 import { ContractorDashboardScreen } from '../contractor-dashboard/contractor-dashboard-screen';
+import { ContractorOnboardingImport } from '../contractor-landing/import';
 import { SuspendReasonPage } from '../contractor-management/suspend-reason-page';
 import { RemoveReasonPage } from '../contractor-management/remove-reason-page';
 import { ContractorSuspendConfirmedScreen } from '../energy-savings-application/successful-action-screens';
@@ -670,6 +671,7 @@ const AppRoutes = observer(() => {
         <Route path="/confirmed" element={<EmailConfirmedScreen />} />
         <Route path="/welcome" element={<LandingScreen />} />
         <Route path="/welcome/contractor" element={<ContractorLandingScreen />} />
+        <Route path="/welcome/contractor/invite" element={<ContractorOnboardingImport />} />
         <Route path="/terms" element={<EULAScreen withClose />} />
         <Route path="/check-eligible" element={<EligibilityCheck />} />
         <Route path="/get-support" element={<SupportScreen />} />

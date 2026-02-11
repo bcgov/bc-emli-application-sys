@@ -437,6 +437,17 @@ export class Api {
     return this.client.get<ApiResponse<any>>(`/contractors/by-user/${userId}`);
   }
 
+  async validateContractorImportToken(token: string) {
+    return this.client.get<ApiResponse<any>>(`/contractor_import/validate/${token}`);
+  }
+
+  async importContractor(token: string, userId: string) {
+    return this.client.post<ApiResponse<any>>(`/contractor_import`, {
+      token,
+      user_id: userId,
+    });
+  }
+
   async updateUserRole(id: string, role: string) {
     return this.client.patch<ApiResponse<IUser>>(`/users/${id}/role`, { role });
   }
