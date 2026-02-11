@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_02_05_000410) do
+ActiveRecord::Schema[7.1].define(version: 2026_02_11_071705) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -186,10 +186,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_05_000410) do
     t.integer "number_of_employees"
     t.string "gst_number"
     t.string "worksafebc_number"
-    t.integer "type_of_business", default: [], null: false, array: true
-    t.integer "primary_program_measure", default: [], null: false, array: true
-    t.integer "retrofit_enabling_measures", default: [], array: true
-    t.string "service_languages"
+    t.text "type_of_business", default: [], null: false, array: true
+    t.text "primary_program_measure", default: [], null: false, array: true
+    t.text "retrofit_enabling_measures", default: [], array: true
+    t.text "service_languages", default: [], array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["contractor_id"],

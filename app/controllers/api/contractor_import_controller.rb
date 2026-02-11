@@ -89,9 +89,6 @@ class Api::ContractorImportController < Api::ApplicationController
     }
     ActiveRecord::Base.transaction do
       contractor = Contractor.create(contractor_params)
-      Rails.logger.info(
-        "Created contractor with ID #{contractor.id} for invite data #{invite_data}"
-      )
 
       program = Program.find_by!(slug: "energy-savings-program")
 
@@ -125,9 +122,7 @@ class Api::ContractorImportController < Api::ApplicationController
         status: :approved
       )
 
-      Rails.logger.info(
-        "Created ContractorOnboard application ID #{onboarding_form.id}"
-      )
+      onboarding_form.process_contractor_onboarding!
 
       # Mark the invite as consumed
       invite.consume!(user: current_user, contractor: contractor)

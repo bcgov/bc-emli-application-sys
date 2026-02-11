@@ -14,13 +14,15 @@ module ContractorImports
         requirement_code: "type_of_business",
         checkbox: true,
         transform: ->(value, requirement) do
-          # normalize to string
-          selected = value.to_s
+          selected = value.to_s.downcase
 
-          options = requirement.input_options["value_options"]
+          requirement.input_options["value_options"].each_with_object(
+            {}
+          ) do |opt, acc|
+            opt_value = opt["value"].to_s.downcase
 
-          options.each_with_object({}) do |opt, acc|
-            acc[opt["value"]] = (opt["value"] == selected)
+            acc[opt["value"]] = opt_value.include?(selected) ||
+              selected.include?(opt_value)
           end
         end
       },
