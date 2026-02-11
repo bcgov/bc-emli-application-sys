@@ -153,8 +153,37 @@ paths:
                   JSON with all requirement blocks and field values.
         '400':
           description: Bad Request - Invalid date format
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                required:
+                - error
         '401':
           description: Unauthorized - Invalid or missing API token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                  meta:
+                    type: object
+                    properties:
+                      message:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          message:
+                            type: string
+                          type:
+                            type: string
         '429':
           description: Rate limit exceeded
           content:
@@ -284,8 +313,37 @@ paths:
                 - meta
         '400':
           description: Bad Request - Invalid date format
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                required:
+                - error
         '401':
           description: Unauthorized - Invalid or missing API token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                  meta:
+                    type: object
+                    properties:
+                      message:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          message:
+                            type: string
+                          type:
+                            type: string
         '429':
           description: Rate limit exceeded
           content:

@@ -118,8 +118,8 @@ class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
       PermitApplication
         .for_sandbox(current_sandbox)
         .where(
-          submission_type: SubmissionType.find_by(code: "invoice"),
-          user_group_type: UserGroupType.find_by(code: "contractor")
+          submission_type: SubmissionType.find_by!(code: "invoice"),
+          user_group_type: UserGroupType.find_by!(code: "contractor")
         )
         .find(params[:id])
   end

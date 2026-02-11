@@ -102,6 +102,15 @@ RSpec.describe "external_api/v1/invoices",
       end
 
       response(400, "Bad Request - Invalid date format") do
+        schema type: :object,
+               properties: {
+                 error: {
+                   type: :string,
+                   description: "Error message"
+                 }
+               },
+               required: %w[error]
+
         let(:submitted_from) { "invalid-date" }
 
         run_test! do |response|
@@ -112,6 +121,32 @@ RSpec.describe "external_api/v1/invoices",
       end
 
       response(401, "Unauthorized - Invalid or missing API token") do
+        schema type: :object,
+               properties: {
+                 data: {
+                   type: :object
+                 },
+                 meta: {
+                   type: :object,
+                   properties: {
+                     message: {
+                       type: :object,
+                       properties: {
+                         title: {
+                           type: :string
+                         },
+                         message: {
+                           type: :string
+                         },
+                         type: {
+                           type: :string
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
+
         let(:Authorization) { "Bearer invalid_token" }
         run_test! { |response| expect(response.status).to eq(401) }
       end
@@ -285,6 +320,15 @@ RSpec.describe "external_api/v1/invoices",
       end
 
       response(400, "Bad Request - Invalid date format") do
+        schema type: :object,
+               properties: {
+                 error: {
+                   type: :string,
+                   description: "Error message"
+                 }
+               },
+               required: %w[error]
+
         let(:submitted_from) { "invalid-date" }
 
         run_test! do |response|
@@ -295,6 +339,32 @@ RSpec.describe "external_api/v1/invoices",
       end
 
       response(401, "Unauthorized - Invalid or missing API token") do
+        schema type: :object,
+               properties: {
+                 data: {
+                   type: :object
+                 },
+                 meta: {
+                   type: :object,
+                   properties: {
+                     message: {
+                       type: :object,
+                       properties: {
+                         title: {
+                           type: :string
+                         },
+                         message: {
+                           type: :string
+                         },
+                         type: {
+                           type: :string
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
+
         let(:Authorization) { "Bearer invalid_token" }
         run_test! { |response| expect(response.status).to eq(401) }
       end
