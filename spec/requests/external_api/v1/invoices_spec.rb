@@ -207,7 +207,7 @@ RSpec.describe "external_api/v1/invoices",
                          description: "Invoice status",
                          example: "newly_submitted"
                        },
-                       invoice_variant: {
+                       invoice_type: {
                          type: :string,
                          description:
                            "Type of invoice (heat pump, insulation, etc.)",
@@ -219,10 +219,10 @@ RSpec.describe "external_api/v1/invoices",
                          description: "Invoice total amount",
                          example: "5000.00"
                        },
-                       project_address: {
+                       installation_address: {
                          type: :string,
                          nullable: true,
-                         description: "Project address",
+                         description: "Installation address",
                          example: "123 Main St, Victoria, BC V8V 1A1"
                        },
                        homeowner_name: {

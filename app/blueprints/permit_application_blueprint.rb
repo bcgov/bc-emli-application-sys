@@ -319,7 +319,7 @@ class PermitApplicationBlueprint < Blueprinter::Base
       pa.status
     end
 
-    field :invoice_variant do |pa|
+    field :invoice_type do |pa|
       pa.submission_variant&.name
     end
 
@@ -328,7 +328,7 @@ class PermitApplicationBlueprint < Blueprinter::Base
       pa.extract_invoice_amount_from_submission_data
     end
 
-    field :project_address do |pa|
+    field :installation_address do |pa|
       pa.extract_installation_address_from_submission_data
     end
 

@@ -3,6 +3,7 @@ class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
 
   def index
     perform_invoice_search
+    return if performed? # Stop if date validation failed
 
     authorized_results = apply_search_authorization(@invoice_search.results)
 
@@ -19,6 +20,7 @@ class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
 
   def summary
     perform_invoice_search
+    return if performed? # Stop if date validation failed
 
     authorized_results = apply_search_authorization(@invoice_search.results)
 
@@ -63,6 +65,7 @@ class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
 
     permitted = params.permit(:submitted_from, :submitted_to, :page, :per_page)
     constraints = build_date_constraints(permitted)
+    return if performed? # Stop if date validation failed
     where = build_invoice_where_clause(constraints)
 
     @invoice_search =
