@@ -14,7 +14,11 @@ class SubmissionDataExtractorService
       first_name: extract_first_name,
       last_name: extract_last_name,
       phone_number: extract_phone,
-      email: extract_email
+      email: extract_email,
+      # Invoice-specific fields (return nil for non-invoices)
+      invoice_amount: extract_invoice_amount,
+      homeowner_name: extract_homeowner_name,
+      installation_address: extract_installation_address
     }
   end
 
@@ -88,6 +92,57 @@ class SubmissionDataExtractorService
     data = latest_submission_data
     return nil unless data
     find_field_by_contains(data, "email")
+  end
+
+  # Invoice-specific extractions
+  def extract_invoice_amount
+    data = latest_submission_data
+    return nil unless data
+    # All invoice templates use 'total_cost' as the requirement_code
+    find_field_by_suffix(data, "total_cost")
+  end
+
+  def extract_customer_first_name
+    data = latest_submission_data
+    return nil unless data
+    find_field_by_suffix(data, "customer_first_name")
+  end
+
+  def extract_customer_last_name
+    data = latest_submission_data
+    return nil unless data
+    find_field_by_suffix(data, "customer_last_name")
+  end
+
+  def extract_homeowner_name
+    first = extract_customer_first_name
+    last = extract_customer_last_name
+    return nil unless first.present? || last.present?
+    [first, last].compact.join(" ")
+  end
+
+  def extract_installation_address
+    data = latest_submission_data
+    return nil unless data
+
+    unit_number = find_field_by_suffix(data, "unit_number")
+    installation_address = find_field_by_suffix(data, "installation_address")
+    city_town = find_field_by_suffix(data, "city_town")
+    postal_code = find_field_by_suffix(data, "postal_code")
+
+    address_parts = []
+    if unit_number.present?
+      address_parts << "#{unit_number} #{installation_address}".strip
+    elsif installation_address.present?
+      address_parts << installation_address
+    end
+
+    if city_town.present? || postal_code.present?
+      address_parts << [city_town, postal_code].compact.join(" ")
+    end
+
+    result = address_parts.join(", ")
+    result.present? ? result : nil
   end
 
   def find_field_by_suffix(submission_data, suffix)

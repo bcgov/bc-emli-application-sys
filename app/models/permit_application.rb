@@ -900,6 +900,29 @@ class PermitApplication < ApplicationRecord
     summary_fields_for_external_use[:last_name]
   end
 
+  # Invoice-specific extraction wrappers
+  def extract_invoice_amount_from_submission_data
+    summary_fields_for_external_use[:invoice_amount]
+  end
+
+  def extract_homeowner_name_from_submission_data
+    summary_fields_for_external_use[:homeowner_name]
+  end
+
+  def extract_installation_address_from_submission_data
+    summary_fields_for_external_use[:installation_address]
+  end
+
+  def contractor_business_name
+    if submitter.is_a?(Contractor)
+      submitter.business_name
+    elsif submitter.is_a?(User)
+      contractor = Contractor.find_by(contact_id: submitter.id)
+      contractor&.business_name ||
+        "#{submitter.first_name} #{submitter.last_name}".strip
+    end
+  end
+
   def extract_heating_system_from_submission_data(type)
     case type
     when :primary

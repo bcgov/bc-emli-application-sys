@@ -301,6 +301,42 @@ class PermitApplicationBlueprint < Blueprinter::Base
     end
   end
 
+  # Invoice summary view - lightweight invoice data for external API
+  view :invoice_summary do
+    field :invoice_number do |pa|
+      pa.number
+    end
+
+    field :contractor_business_name do |pa|
+      pa.contractor_business_name
+    end
+
+    field :submission_date do |pa|
+      pa.submitted_at&.iso8601
+    end
+
+    field :status do |pa|
+      pa.status
+    end
+
+    field :invoice_type do |pa|
+      pa.submission_variant&.name
+    end
+
+    # Extract from submission_data
+    field :total_amount do |pa|
+      pa.extract_invoice_amount_from_submission_data
+    end
+
+    field :installation_address do |pa|
+      pa.extract_installation_address_from_submission_data
+    end
+
+    field :homeowner_name do |pa|
+      pa.extract_homeowner_name_from_submission_data
+    end
+  end
+
   view :supporting_docs_update do
     identifier :id
 

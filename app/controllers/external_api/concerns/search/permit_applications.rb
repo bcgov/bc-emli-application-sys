@@ -29,16 +29,6 @@ module ExternalApi::Concerns::Search::PermitApplications
 
   private
 
-  def ensure_external_api_key_authorized!
-    # This search should always be scoped to a program via the api key.
-    # The following condition should never be true, but is an added redundancy
-    # for security purposes.
-    if current_external_api_key.blank? ||
-         current_external_api_key.program_id.blank?
-      raise Pundit::NotAuthorizedError
-    end
-  end
-
   def permit_application_search_params
     params.permit(
       :page,

@@ -175,7 +175,7 @@ in this document.
                 enum: %w[application onboarding support_request invoice],
                 description: "The submission type of the application"
               },
-              account_holder: {
+              submitter: {
                 "$ref" => "#/components/schemas/AccountHolder"
               },
               application_version: {

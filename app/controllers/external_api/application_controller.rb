@@ -28,9 +28,31 @@ class ExternalApi::ApplicationController < ActionController::API
     }
   end
 
+  def validate_date_param(value, param_name)
+    return nil unless value.present?
+    Date.iso8601(value)
+    value
+  rescue Date::Error, ArgumentError
+    render json: {
+             error: "Invalid date format for #{param_name}. Use YYYY-MM-DD."
+           },
+           status: :bad_request
+    nil
+  end
+
   def apply_search_authorization(results, policy_action = action_name)
     results.select do |result|
       policy([:external_api, result]).send("#{policy_action}?".to_sym)
+    end
+  end
+
+  def ensure_external_api_key_authorized!
+    # This search should always be scoped to a program via the api key.
+    # The following condition should never be true, but is an added redundancy
+    # for security purposes.
+    if current_external_api_key.blank? ||
+         current_external_api_key.program_id.blank?
+      raise Pundit::NotAuthorizedError
     end
   end
 
