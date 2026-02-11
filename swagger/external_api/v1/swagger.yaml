@@ -69,6 +69,270 @@ webhooks:
           description: The external integrator should return a 200 status to indicate
             that the data was received successfully.
 paths:
+  "/invoices":
+    get:
+      summary: This endpoint retrieves a list of contractor invoices with complete
+        submission data. Returns full JSON payload for each invoice, suitable for
+        daily batch retrieval. Supports date filtering to retrieve invoices submitted
+        within a specific time range (e.g., previous day).
+      tags:
+      - Invoices
+      parameters:
+      - name: submitted_from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Filter invoices submitted on or after this date (YYYY-MM-DD).
+          Use this to retrieve invoices from the previous day.
+        required: false
+      - name: submitted_to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Filter invoices submitted on or before this date (YYYY-MM-DD)
+        required: false
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+        description: Page number (optional). Omit to retrieve all results without
+          pagination.
+        required: false
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+          default: 25
+          minimum: 1
+          maximum: 100
+        description: Number of results per page (optional). Only used when page parameter
+          is provided.
+        required: false
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    description: List of contractor invoices with full submission
+                      data
+                    items:
+                      "$ref": "#/components/schemas/Application"
+                  meta:
+                    type: object
+                    properties:
+                      total_pages:
+                        type: integer
+                        description: Total number of pages
+                      total_count:
+                        type: integer
+                        description: Total number of invoices
+                      current_page:
+                        type: integer
+                        description: Current page number
+                      per_page:
+                        type: integer
+                        description: Results per page
+                    required:
+                    - total_pages
+                    - total_count
+                    - current_page
+                    - per_page
+                required:
+                - data
+                - meta
+                description: Each invoice in the data array includes complete submission_data
+                  JSON with all requirement blocks and field values.
+        '401':
+          description: Unauthorized - Invalid or missing API token
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ResponseError"
+  "/invoices/summary":
+    get:
+      summary: This endpoint retrieves a summary of contractor invoices filtered by
+        submission date. Returns lightweight invoice data with only essential fields
+        (invoice number, contractor name, submission date, status, amounts, homeowner
+        info). Pagination is optional - omit page parameter to retrieve all results.
+      tags:
+      - Invoices
+      parameters:
+      - name: submitted_from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Filter invoices submitted on or after this date (YYYY-MM-DD)
+        required: false
+      - name: submitted_to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Filter invoices submitted on or before this date (YYYY-MM-DD)
+        required: false
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+        description: Page number (optional). Omit to retrieve all results without
+          pagination.
+        required: false
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+          default: 25
+          minimum: 1
+          maximum: 100
+        description: Number of results per page (optional). Only used when page parameter
+          is provided.
+        required: false
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    description: List of contractor invoices
+                    items:
+                      type: object
+                      properties:
+                        invoice_number:
+                          type: string
+                          description: Invoice number
+                          example: 001-002-003
+                        contractor_business_name:
+                          type: string
+                          description: Contractor business name
+                          example: ABC Heating & Cooling
+                        submission_date:
+                          type: string
+                          format: date-time
+                          description: ISO8601 submission timestamp
+                          example: '2025-01-15T10:30:00Z'
+                        status:
+                          type: string
+                          description: Invoice status
+                          example: newly_submitted
+                        invoice_variant:
+                          type: string
+                          description: Type of invoice (heat pump, insulation, etc.)
+                          example: Heat pump (space heating)
+                        total_amount:
+                          type: string
+                          nullable: true
+                          description: Invoice total amount
+                          example: '5000.00'
+                        project_address:
+                          type: string
+                          nullable: true
+                          description: Project address
+                          example: 123 Main St, Victoria, BC V8V 1A1
+                        homeowner_name:
+                          type: string
+                          nullable: true
+                          description: Homeowner full name
+                          example: John Doe
+                        homeowner_email:
+                          type: string
+                          nullable: true
+                          description: Homeowner email address
+                          example: john@example.com
+                      required:
+                      - invoice_number
+                      - contractor_business_name
+                      - submission_date
+                      - status
+                  meta:
+                    type: object
+                    properties:
+                      total_pages:
+                        type: integer
+                        description: Total number of pages
+                      total_count:
+                        type: integer
+                        description: Total number of invoices
+                      current_page:
+                        type: integer
+                        description: Current page number
+                      per_page:
+                        type: integer
+                        description: Results per page
+                    required:
+                    - total_pages
+                    - total_count
+                    - current_page
+                    - per_page
+                required:
+                - data
+                - meta
+        '401':
+          description: Unauthorized - Invalid or missing API token
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ResponseError"
+  "/invoices/{id}":
+    get:
+      summary: This endpoint retrieves detailed information about a specific contractor
+        invoice using its unique identifier (ID). Returns the complete invoice with
+        full submission data JSON payload. Please note that requests to this endpoint
+        are subject to rate limiting to ensure optimal performance and fair usage.
+      parameters:
+      - name: id
+        in: path
+        description: Invoice ID (UUID)
+        required: true
+        schema:
+          type: string
+      tags:
+      - Invoices
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    "$ref": "#/components/schemas/Application"
+                required:
+                - data
+                description: Returns full invoice details using the same Application
+                  schema, with submission_type='invoice' and user_group_type='contractor'
+        '401':
+          description: Unauthorized - Invalid or missing API token
+        '403':
+          description: Forbidden - Accessing an invoice from unauthorized program
+        '404':
+          description: Not Found - Invoice does not exist
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ResponseError"
   "/applications/search":
     post:
       summary: This endpoint retrieves a list of applications in a paginated format.

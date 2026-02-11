@@ -54,6 +54,10 @@ class ContractorBlueprint < Blueprinter::Base
     end
   end
 
+  view :external_api do
+    fields :business_name, :email
+  end
+
   # extended_api is also same as base for now, used in API
   view :extended_api do
     include_view :base

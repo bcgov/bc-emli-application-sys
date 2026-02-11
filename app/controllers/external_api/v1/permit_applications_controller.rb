@@ -31,24 +31,20 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
   end
 
   def summary
-    begin
-      perform_permit_application_summary
+    perform_permit_application_summary
 
-      authorized_results =
-        apply_search_authorization(@permit_application_search.results)
+    authorized_results =
+      apply_search_authorization(@permit_application_search.results)
 
-      render_success authorized_results,
-                     nil,
-                     {
-                       meta: page_meta(@permit_application_search),
-                       blueprint: PermitApplicationBlueprint,
-                       blueprint_opts: {
-                         view: :submission_summary
-                       }
+    render_success authorized_results,
+                   nil,
+                   {
+                     meta: page_meta(@permit_application_search),
+                     blueprint: PermitApplicationBlueprint,
+                     blueprint_opts: {
+                       view: :submission_summary
                      }
-    rescue Searchkick::InvalidQueryError
-      render json: { error: "Invalid query parameters." }, status: 400
-    end
+                   }
   end
 
   def show
@@ -95,15 +91,15 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
     # Transform simple date parameters to constraints format
     permitted = params.permit(:submitted_from, :submitted_to, :page, :per_page)
 
+    from = validate_date_param(permitted[:submitted_from], :submitted_from)
+    to = validate_date_param(permitted[:submitted_to], :submitted_to)
+    return if performed?
+
     constraints = nil
-    if permitted[:submitted_from].present? || permitted[:submitted_to].present?
+    if from.present? || to.present?
       submitted_at = {}
-      submitted_at[:gte] = permitted[:submitted_from] if permitted[
-        :submitted_from
-      ].present?
-      submitted_at[:lte] = permitted[:submitted_to] if permitted[
-        :submitted_to
-      ].present?
+      submitted_at[:gte] = from if from.present?
+      submitted_at[:lte] = to if to.present?
       constraints = { submitted_at: submitted_at }
     end
 

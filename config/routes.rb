@@ -347,6 +347,11 @@ Rails.application.routes.draw do
         get "integration_mapping",
             to: "permit_applications#show_integration_mapping"
       end
+
+      # Contractor Invoice API endpoints
+      get "invoices", to: "invoices#index"
+      get "invoices/summary", to: "invoices#summary"
+      get "invoices/:id", to: "invoices#show", as: :external_api_invoice
     end
   end
 
