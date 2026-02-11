@@ -151,6 +151,8 @@ paths:
                 - meta
                 description: Each invoice in the data array includes complete submission_data
                   JSON with all requirement blocks and field values.
+        '400':
+          description: Bad Request - Invalid date format
         '401':
           description: Unauthorized - Invalid or missing API token
         '429':
@@ -234,6 +236,7 @@ paths:
                           example: newly_submitted
                         invoice_type:
                           type: string
+                          nullable: true
                           description: Type of invoice (heat pump, insulation, etc.)
                           example: Heat pump (space heating)
                         total_amount:
@@ -279,6 +282,8 @@ paths:
                 required:
                 - data
                 - meta
+        '400':
+          description: Bad Request - Invalid date format
         '401':
           description: Unauthorized - Invalid or missing API token
         '429':

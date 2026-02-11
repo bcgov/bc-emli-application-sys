@@ -101,6 +101,16 @@ RSpec.describe "external_api/v1/invoices",
         end
       end
 
+      response(400, "Bad Request - Invalid date format") do
+        let(:submitted_from) { "invalid-date" }
+
+        run_test! do |response|
+          expect(response.status).to eq(400)
+          data = JSON.parse(response.body)
+          expect(data["error"]).to include("Invalid date format")
+        end
+      end
+
       response(401, "Unauthorized - Invalid or missing API token") do
         let(:Authorization) { "Bearer invalid_token" }
         run_test! { |response| expect(response.status).to eq(401) }
@@ -209,6 +219,7 @@ RSpec.describe "external_api/v1/invoices",
                        },
                        invoice_type: {
                          type: :string,
+                         nullable: true,
                          description:
                            "Type of invoice (heat pump, insulation, etc.)",
                          example: "Heat pump (space heating)"
@@ -270,6 +281,16 @@ RSpec.describe "external_api/v1/invoices",
           expect(data).to have_key("data")
           expect(data).to have_key("meta")
           expect(data["data"]).to be_an(Array)
+        end
+      end
+
+      response(400, "Bad Request - Invalid date format") do
+        let(:submitted_from) { "invalid-date" }
+
+        run_test! do |response|
+          expect(response.status).to eq(400)
+          data = JSON.parse(response.body)
+          expect(data["error"]).to include("Invalid date format")
         end
       end
 
