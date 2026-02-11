@@ -32,6 +32,7 @@ import { AsyncDropdown } from '../../../shared/base/inputs/async-dropdown';
 import { FormProvider, useForm, Controller } from 'react-hook-form';
 import { useProgram } from '../../../../hooks/resources/use-program';
 import { IMinimalFrozenUser, IOption } from '../../../../types/types';
+import { useSessionStorage } from '../../../../hooks/use-session-state';
 
 export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionInbox() {
   const { isLoaded: isPermitClassificationsLoaded } = usePermitClassificationsLoad();
@@ -52,7 +53,7 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
   const [submissionOptions, setSubmissionOptions] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-
+  const [fromPage, setFromPage] = useSessionStorage('fromPage', null);
   const { currentPage, totalPages, totalCount, countPerPage, handleCountPerPageChange, handlePageChange, isSearching } =
     permitApplicationStore;
 
@@ -62,17 +63,16 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
     if (!selectedValue) {
       return;
     }
-    
+
     // Set classification filters
     setUserGroupFilter(selectedValue?.userGroupType);
     setAudienceTypeFilter(selectedValue?.AudienceType);
     setSubmissionTypeFilter(selectedValue?.SubmissionType);
-  
+
     // Set the status filter from the dropdown option
     if (selectedValue?.status) {
       setStatusFilter(selectedValue.status);
-    } 
-    else {
+    } else {
       // Set default status filters
       setStatusFilter([
         EPermitApplicationStatus.draft,
@@ -88,10 +88,13 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
     search();
   };
 
-  const handleProgramChange = useCallback(async (programId) => {
-    await programStore.fetchProgram(programId);
-    programStore.setCurrentProgram(programId);
-  }, [programStore]);
+  const handleProgramChange = useCallback(
+    async (programId) => {
+      await programStore.fetchProgram(programId);
+      programStore.setCurrentProgram(programId);
+    },
+    [programStore],
+  );
 
   // Fetch submission options and program options separately
   const fetchSubmissionOptions = useCallback(async () => {
@@ -118,7 +121,7 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
 
       // Set default to participant submissions and trigger initial search
       if (translatedOptions.length > 0) {
-        const defaultOption = translatedOptions[0].value;
+        const defaultOption = fromPage?.info ?? translatedOptions[0].value;
         methods.setValue('selectedType', defaultOption);
         setUserGroupFilter(defaultOption?.userGroupType);
         setAudienceTypeFilter(defaultOption?.AudienceType);
@@ -144,7 +147,16 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
     } catch (error) {
       console.error('Failed to fetch submission options', error);
     }
-  }, [permitClassificationStore, t, setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, setStatusFilter, search, methods]);
+  }, [
+    permitClassificationStore,
+    t,
+    setUserGroupFilter,
+    setAudienceTypeFilter,
+    setSubmissionTypeFilter,
+    setStatusFilter,
+    search,
+    methods,
+  ]);
 
   const loadProgramOptions = useCallback(async () => {
     try {
@@ -218,14 +230,14 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
                       handleProgramChange(value);
                     }}
                   />
-                       <Box w={'full'}>
-          <Heading as="h2" color="theme.blueAlt" mt={8}>
-            Participant Submissions
-          </Heading>
-          <Text mt={2} color="greys.grey70">
-            {t('energySavingsApplication.submissionInbox.chooseSubmissionInbox')}
-          </Text>
-        </Box>
+                  <Box w={'full'}>
+                    <Heading as="h2" color="theme.blueAlt" mt={8}>
+                      Participant Submissions
+                    </Heading>
+                    <Text mt={2} color="greys.grey70">
+                      {t('energySavingsApplication.submissionInbox.chooseSubmissionInbox')}
+                    </Text>
+                  </Box>
                   {submissionOptions.length > 0 && (
                     <AsyncDropdown
                       mt={4}
@@ -233,6 +245,11 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
                       fieldName="selectedType"
                       useBoxWrapper={false}
                       onValueChange={(value) => {
+                        setFromPage({
+                          name: '/submission-inbox',
+                          info: value,
+                        });
+
                         handleChange(value);
                       }}
                     />
@@ -242,8 +259,6 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
             </FormProvider>
           </Box>
         </Flex>
-
-   
 
         <SearchGrid templateColumns="1.5fr repeat(6, 1fr)" mt={4}>
           <GridHeaders />
