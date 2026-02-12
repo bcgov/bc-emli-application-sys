@@ -1,0 +1,40 @@
+# Default values for maintenance chart
+
+replicaCount: 2
+
+image:
+  repository: ""  # Will be set by CI/CD pipeline
+  pullPolicy: IfNotPresent
+  tag: ""  # Will be set by CI/CD pipeline
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 101
+  fsGroup: 101
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+
+service:
+  type: ClusterIP
+  port: 8080
+
+route:
+  enabled: false
+  host: ""  # Set this to your app's hostname when needed
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 64Mi
+  requests:
+    cpu: 50m
+    memory: 32Mi
