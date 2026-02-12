@@ -169,6 +169,10 @@ en:
       contractor_suspended: '%{business_name} - Access Suspended'
       contractor_unsuspended: '%{business_name} - Access Restored'
       contractor_removed: '%{business_name} - Account Removed'
+      contractor_approved: 'Contractor onboarding approved'
+      contractor_onboarding_submitted: 'Contractor onboarding application submitted'
+      imported_contractor_invite: 'You have been invited as a contractor'
+      notify_new_contractor_employee: 'You have been added as an employee to a contractor account'
   authentication_methods:
     bcsc: 'BC Services Card Account'
     bceidbasic: 'Basic BCeID'
