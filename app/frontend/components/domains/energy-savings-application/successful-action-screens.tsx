@@ -157,14 +157,13 @@ export const SuccessfulIneligibleScreen = observer(() => {
       title={t(
         `${isUserAdmin ? 'energySavingsApplication.review.admin.markedIneligible' : 'energySavingsApplication.review.markedIneligible'}`,
         {
-          // 'energySavingsApplication.review.markedIneligible'
           submissionType: submissionType?.toLowerCase(),
         },
       )}
       subtitle={
         submissionType !== EPermitClassificationCode.onboarding
           ? t('energySavingsApplication.review.ineligibleNextSteps')
-          : ''
+          : t('energySavingsApplication.review.inEligibleReasonReminder')
       }
       referenceNumber={referenceNumber}
       primaryButtonLabel={

@@ -1336,6 +1336,7 @@ const options = {
             readyToScreen: 'Ready to screen in?',
             confirmReview: 'I confirm this {{submissionType}} has all the required information.',
             screenedInSuccess: 'You have screened in this {{submissionType}} form to in review.',
+            inEligibleReasonReminder: 'Email the contractor with a reason for ineligibility.',
             admin: {
               markedIneligible: 'You have marked this {{submissionType}} form ineligible.',
             },
