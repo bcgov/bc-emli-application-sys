@@ -614,6 +614,12 @@ en:
       outdated_error:
         title: Error
         message: 'Please refresh the page. A new template version is available.'
+      revision_request_created:
+        title: ''
+        message: 'Revision request created'
+      no_submission_version_error:
+        title: Error
+        message: 'No submission version found for this application'
       revision_request_finalize_success:
         title: ''
         message: 'Revision requests have been finalized successfully!'
