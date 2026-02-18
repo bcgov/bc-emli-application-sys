@@ -16,7 +16,52 @@ module ApplicationFlow
       event :submit do
         transitions from: :new_draft,
                     to: :newly_submitted,
+                    guard: :can_submit?,
                     after: :handle_submission
+
+        transitions from: :revisions_requested,
+                    to: :resubmitted,
+                    guard: :can_submit?,
+                    after: :handle_submission
+      end
+
+      event :finalize_revision_requests do
+        transitions from: %i[
+                      newly_submitted
+                      resubmitted
+                      in_review
+                      revisions_requested
+                    ],
+                    to: :revisions_requested,
+                    guard: :can_finalize_requests?,
+                    after: :handle_finalize_revision_requests
+      end
+
+      event :cancel_revision_requests do
+        transitions from: :revisions_requested,
+                    to: :newly_submitted,
+                    guard: :was_originally_newly_submitted?
+        transitions from: :revisions_requested,
+                    to: :resubmitted,
+                    guard: :was_originally_resubmitted?
+      end
+
+      event :review do
+        transitions from: %i[newly_submitted resubmitted], to: :in_review
+      end
+
+      event :approve do
+        transitions from: :in_review, to: :approved_pending
+      end
+
+      event :approve_paid do
+        transitions from: :approved_pending, to: :approved_paid
+      end
+
+      event :reject do
+        transitions from: :in_review,
+                    to: :ineligible,
+                    after: :handle_ineligible_status
       end
     end
 
