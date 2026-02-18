@@ -160,9 +160,13 @@ class Api::PermitApplicationsController < Api::ApplicationController
     authorize @permit_application
 
     latest_version = @permit_application.latest_submission_version
-    if latest_version&.update(revision_request_params)
+    if latest_version.nil?
+      return render_error("permit_application.no_submission_version_error")
+    end
+
+    if latest_version.update(revision_request_params)
       render_success @permit_application,
-                     "permit_application.save_success",
+                     "permit_application.revision_request_created",
                      {
                        blueprint: PermitApplicationBlueprint,
                        blueprint_opts: {
