@@ -6,6 +6,7 @@ import {
   EEnergyStepCodeDependencyRequirementCode,
   EGovFeedbackResponseNoReason,
   ENumberUnit,
+  EPermitClassificationCode,
   ERequirementContactFieldItemType,
   ERequirementType,
 } from '../types/enums';
@@ -62,6 +63,17 @@ export const datefnsTableDateFormat = 'yyyy-MM-dd';
 export const vancouverTimeZone = 'America/Vancouver'; // Vancouver time zone
 
 export const contractorOnboardingImportTokenKey = 'contractorImportToken';
+
+export const INVOICE_SUBMISSION_TYPES = new Set<EPermitClassificationCode>([
+  EPermitClassificationCode.invoice,
+  EPermitClassificationCode.invoiceHeatPumpSpace,
+  EPermitClassificationCode.invoiceHeatPumpWater,
+  EPermitClassificationCode.invoiceInsulation,
+  EPermitClassificationCode.invoiceWindowsDoors,
+  EPermitClassificationCode.invoiceVentilation,
+  EPermitClassificationCode.invoiceElectricalUpgrade,
+  EPermitClassificationCode.invoiceHealthSafety,
+]);
 
 export function getRequirementTypeLabel(
   requirementType: ERequirementType,

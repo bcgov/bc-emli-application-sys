@@ -35,6 +35,7 @@ module PermitApplicationStatus
       submit
       review
       approve
+      approve_paid
       reject
       finalize_revision_requests
       cancel_revision_requests

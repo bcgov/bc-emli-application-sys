@@ -1366,6 +1366,8 @@ const options = {
           show: {
             update: 'Update',
             readyForTraining: 'Ready for Training',
+            approvePending: 'Approve Pending',
+            markPaid: 'Mark Paid',
             markIneligible: 'Mark ineligible',
             screenIn: 'Screen in',
             inEligible: 'Ineligible',
