@@ -47,6 +47,12 @@ class PermitApplication::ContractorOnboardingProcessor
     NotificationService.contractor_onboarding_approved_event(contractor)
   end
 
+  # Syncs updated submission_data back to the contractor record (used after Save Edits on approved contractors)
+  def sync_to_contractor(contractor)
+    contractor.update!(extract_contractor_details)
+    contractor.upsert_contractor_info(extract_contractor_info)
+  end
+
   private
 
   def sanitize_employees(employees)
@@ -145,7 +151,7 @@ class PermitApplication::ContractorOnboardingProcessor
       next unless section.is_a?(Hash)
 
       section.each do |key, value|
-        if key.include?("|#{key_end}") || key.end_with?(key_end)
+        if key.end_with?("|#{key_end}")
           found_value = value if value.present?
         end
       end

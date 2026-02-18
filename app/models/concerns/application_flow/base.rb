@@ -71,7 +71,11 @@ module ApplicationFlow
     end
 
     def can_finalize_requests?
-      application.latest_submission_version.revision_requests.any?
+      application
+        .latest_submission_version
+        .revision_requests
+        .where(resolved_at: nil)
+        .any?
     end
 
     def was_originally_newly_submitted?
@@ -99,10 +103,36 @@ module ApplicationFlow
       NotificationService.publish_application_ineligible_event(application)
     end
 
+    # Apply revision requests without changing state (for admin-on-behalf workflows)
+    def apply_revision_requests_without_state_change!
+      return false unless can_finalize_requests?
+
+      application.latest_submission_version.revision_requests.update_all(
+        resolved_at: Time.current
+      )
+
+      if application.status == "approved" &&
+           application.submission_type&.code == "onboarding"
+        sync_approved_contractor_data
+      end
+
+      true
+    end
+
     # --- Abstract methods ---
     def handle_submission
       raise NotImplementedError,
             "#{self.class.name} must implement #handle_submission"
+    end
+
+    private
+
+    # Sync submission_data to contractors table for approved contractors
+    def sync_approved_contractor_data
+      processor =
+        PermitApplication::ContractorOnboardingProcessor.new(application)
+      contractor = Contractor.find(application.submitter_id)
+      processor.sync_to_contractor(contractor)
     end
 
     # need to gracefully handle predicates that don't exist

@@ -197,6 +197,10 @@ class PermitApplicationPolicy < ApplicationPolicy
     user.admin_manager? || user.admin?
   end
 
+  def apply_revision_requests_without_state_change?
+    user.admin_manager? || user.admin?
+  end
+
   def create_permit_collaboration?
     permit_collaboration = record
 

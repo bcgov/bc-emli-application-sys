@@ -590,6 +590,7 @@ export enum EContractorRevisionFields {
   BUSINESS_EMAIL = 'business_email',
   DOING_BUSINESS_AS = 'doing_business_as_if_different_from_business_name',
   SERVICE_INFO = 'service_info_v2',
+  CONFIRMATION = 'confirmation',
 }
 
 export enum ERevisionSideBarItems {

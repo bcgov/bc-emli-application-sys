@@ -9,6 +9,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
                   approve
                   upload_supporting_document
                   finalize_revision_requests
+                  apply_revision_requests_without_state_change
                   remove_revision_requests
                   mark_as_viewed
                   change_status
@@ -128,8 +129,10 @@ class Api::PermitApplicationsController < Api::ApplicationController
                          current_user: current_user
                        }
                      }
-    elsif @permit_application.submitted? &&
-          @permit_application.update(submitted_permit_application_params)
+    elsif (
+          @permit_application.submitted? || @permit_application.approved? ||
+            @permit_application.training_pending?
+        ) && @permit_application.update(submitted_permit_application_params)
       render_success @permit_application,
                      ("permit_application.save_success"),
                      {
@@ -624,6 +627,23 @@ class Api::PermitApplicationsController < Api::ApplicationController
     end
   end
 
+  def apply_revision_requests_without_state_change
+    authorize @permit_application
+    if @permit_application.apply_revision_requests_without_state_change!
+      render_success @permit_application,
+                     "permit_application.apply_revision_requests_success",
+                     {
+                       blueprint: PermitApplicationBlueprint,
+                       blueprint_opts: {
+                         view: :extended,
+                         current_user: current_user
+                       }
+                     }
+    else
+      render_error "permit_application.apply_revision_requests_error"
+    end
+  end
+
   def remove_revision_requests
     authorize @permit_application
     latest_version = @permit_application.latest_submission_version
@@ -889,6 +909,8 @@ class Api::PermitApplicationsController < Api::ApplicationController
     last_name = nil
 
     submission_data&.each do |section_key, section_data|
+      next unless section_data.is_a?(Hash)
+
       section_data.each do |field_key, field_value|
         if field_key.include?("firstName")
           first_name = field_value

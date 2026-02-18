@@ -529,6 +529,7 @@ export interface IRevisionRequest {
   user?: IMinimalFrozenUser;
   createdAt: number;
   performedBy?: string;
+  resolvedAt?: number;
 }
 
 export interface IMinimalFrozenUser {

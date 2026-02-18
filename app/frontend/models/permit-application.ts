@@ -166,7 +166,16 @@ export const PermitApplicationModel = types.snapshotProcessor(
         return selectedIndex > 0 ? self.sortedSubmissionVersions[selectedIndex - 1] : null;
       },
       get latestRevisionRequests() {
-        return (self.latestSubmissionVersion?.revisionRequests || []).slice().sort((a, b) => a.createdAt - b.createdAt);
+        return (self.latestSubmissionVersion?.revisionRequests || [])
+          .filter((rr) => !rr.resolvedAt)
+          .slice()
+          .sort((a, b) => a.createdAt - b.createdAt);
+      },
+      get resolvedRevisionRequests() {
+        return (self.latestSubmissionVersion?.revisionRequests || [])
+          .filter((rr) => rr.resolvedAt)
+          .slice()
+          .sort((a, b) => (b.resolvedAt || 0) - (a.resolvedAt || 0));
       },
     }))
     .views((self) => ({

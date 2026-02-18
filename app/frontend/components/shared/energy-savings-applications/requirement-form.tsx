@@ -417,7 +417,6 @@ export const RequirementForm = observer(
               let disableButton = false;
               if (buttonsToDisable.length > 0 && requireKeyArray.length > 0) {
                 const fieldName = requireKeyArray[requireKeyArray.length - 1];
-                console.log('buttons to disabled - FOUND');
                 if (buttonsToDisable.includes(fieldName)) {
                   disableButton = true;
                 }

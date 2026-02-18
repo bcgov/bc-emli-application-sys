@@ -32,6 +32,7 @@ import {
   combineRevisionAnnotations,
   combineRevisionButtons,
   processFieldsForEphemeral,
+  traverseFormIORequirements,
 } from '../utils/formio-component-traversal';
 
 import { format } from 'date-fns';
@@ -230,7 +231,16 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         return selectedIndex > 0 ? self.sortedSubmissionVersions[selectedIndex - 1] : null;
       },
       get latestRevisionRequests() {
-        return (self.latestSubmissionVersion?.revisionRequests || []).slice().sort((a, b) => a.createdAt - b.createdAt);
+        return (self.latestSubmissionVersion?.revisionRequests || [])
+          .filter((rr) => !rr.resolvedAt)
+          .slice()
+          .sort((a, b) => a.createdAt - b.createdAt);
+      },
+      get resolvedRevisionRequests() {
+        return (self.latestSubmissionVersion?.revisionRequests || [])
+          .filter((rr) => rr.resolvedAt)
+          .slice()
+          .sort((a, b) => (b.resolvedAt || 0) - (a.resolvedAt || 0));
       },
     }))
     .views((self) => ({
@@ -314,6 +324,15 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
                 self.revisionMode || self.isRevisionsRequested,
               )
             : diffColoredFormJson;
+        // Hide submit button for contractor onboarding when admin is editing post-submission
+        if (self.isContractorOnboarding && self.status !== EPermitApplicationStatus.draft) {
+          traverseFormIORequirements(revisionModeFormJson, (requirement) => {
+            if (requirement.key === 'submit') {
+              requirement.customConditional = 'show = false';
+            }
+          });
+        }
+
         return revisionModeFormJson;
       },
       sectionKey(sectionId) {
@@ -990,6 +1009,15 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
           self.revisionMode = true;
           self.status = EPermitApplicationStatus.revisionsRequested;
           self.rootStore.permitApplicationStore.mergeUpdate(self, 'permitApplicationMap');
+        }
+        return response.ok;
+      }),
+      applyRevisionRequestsWithoutStateChange: flow(function* () {
+        const response = yield self.environment.api.applyRevisionRequestsWithoutStateChange(self.id);
+        if (response.ok) {
+          let { data: permitApplication } = response.data;
+          permitApplication = self.rootStore.permitApplicationStore.normalizeSubmitter(permitApplication);
+          self.rootStore.permitApplicationStore.mergeUpdate(permitApplication, 'permitApplicationMap');
         }
         return response.ok;
       }),
