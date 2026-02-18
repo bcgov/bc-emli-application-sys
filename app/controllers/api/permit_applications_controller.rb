@@ -88,7 +88,12 @@ class Api::PermitApplicationsController < Api::ApplicationController
 
     # always reset the submission section keys until actual submission
     # Skip this reset for admin users doing Save Edits (they want to preserve signed status)
-    unless current_user.review_staff? && @permit_application.submitted?
+    unless current_user.review_staff? &&
+             (
+               @permit_application.submitted? ||
+                 @permit_application.approved? ||
+                 @permit_application.training_pending?
+             )
       submission_section =
         permit_application_params.dig(
           "submission_data",

@@ -107,9 +107,11 @@ module ApplicationFlow
     def apply_revision_requests_without_state_change!
       return false unless can_finalize_requests?
 
-      application.latest_submission_version.revision_requests.update_all(
-        resolved_at: Time.current
-      )
+      application
+        .latest_submission_version
+        .revision_requests
+        .where(resolved_at: nil)
+        .update_all(resolved_at: Time.current)
 
       if application.status == "approved" &&
            application.submission_type&.code == "onboarding"
