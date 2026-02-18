@@ -12,6 +12,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation, Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { IContractor } from '../../../models/contractor';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
 import { useMst } from '../../../setup/root';
 import { ECollaborationType, EPermitApplicationStatus, EFlashMessageStatus } from '../../../types/enums';
@@ -57,9 +58,8 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const isEditContractor =
     currentPermitApplication?.submissionType?.code === EPermitClassificationCode.onboarding && isAdminUser;
 
-  // Fallback for business name display
   const displayName = isEditContractor
-    ? currentPermitApplication?.submissionData?.data?.business_name || currentPermitApplication?.nickname
+    ? (currentPermitApplication?.submitter as IContractor)?.businessName || currentPermitApplication?.nickname
     : currentPermitApplication?.nickname;
 
   // Fallback for back navigation
