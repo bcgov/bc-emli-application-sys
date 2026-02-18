@@ -408,9 +408,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                     ERevisionSideBarItems.SELECTED_ITEMS_BOTTOM_ALIGN,
                   ],
                 }
-              : isEditContractor
-                ? { showRevisionItems: [ERevisionSideBarItems.SELECTED_ITEMS_BOTTOM_ALIGN] }
-                : null)}
+              : null)}
           />
         ) : (
           <ChecklistSideBar permitApplication={currentPermitApplication} completedBlocks={completedBlocks} />
