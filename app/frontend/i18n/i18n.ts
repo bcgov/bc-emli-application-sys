@@ -1224,6 +1224,11 @@ const options = {
             chooseProgram: 'Choose a program from the drop down list.',
             chooseSubmissionInbox: 'Choose a submission inbox from the drop down list.',
             participantSubmission: 'Participant submission inbox',
+            titles: {
+              participant: 'Participant submissions',
+              contractor: 'Contractor submissions',
+              contractorOnboarding: 'Contractor onboarding submissions',
+            },
             contractorSubmission: 'Contractor submission inbox',
             contractorOnboarding: 'Contractor onboarding submission inbox',
             assignedTo: 'Assigned to me',

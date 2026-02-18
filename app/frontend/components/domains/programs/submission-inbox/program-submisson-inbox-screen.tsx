@@ -104,15 +104,20 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
       // Translate the labels
       const translatedOptions = result.map((option) => {
         let translatedLabel = option.label;
+        let translatedTitle = '';
         if (option.label === 'participantSubmission') {
           translatedLabel = t('energySavingsApplication.submissionInbox.participantSubmission');
+          translatedTitle = t('energySavingsApplication.submissionInbox.titles.participant');
         } else if (option.label === 'contractorSubmission') {
           translatedLabel = t('energySavingsApplication.submissionInbox.contractorSubmission');
+          translatedTitle = t('energySavingsApplication.submissionInbox.titles.contractor');
         } else if (option.label === 'contractorOnboarding') {
           translatedLabel = t('energySavingsApplication.submissionInbox.contractorOnboarding');
+          translatedTitle = t('energySavingsApplication.submissionInbox.titles.contractorOnboarding');
         }
         const translatedOption = {
           ...option,
+          value: { ...option.value, title: translatedTitle },
           label: translatedLabel,
         };
         return translatedOption;
@@ -232,7 +237,7 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
                   />
                   <Box w={'full'}>
                     <Heading as="h2" color="theme.blueAlt" mt={8}>
-                      Participant Submissions
+                      {fromPage?.info?.title ?? t('energySavingsApplication.submissionInbox.titles.participant')}
                     </Heading>
                     <Text mt={2} color="greys.grey70">
                       {t('energySavingsApplication.submissionInbox.chooseSubmissionInbox')}
