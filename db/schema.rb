@@ -10,7 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_02_11_071705) do
+ActiveRecord::Schema[7.1].define(version: 2026_02_14_005201) do
+  create_schema "pgbouncer"
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -447,8 +449,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_11_071705) do
             name: "index_permit_applications_on_submission_type_id"
     t.index ["submission_variant_id"],
             name: "index_permit_applications_on_submission_variant_id"
-    t.index %w[submitter_type submitter_id],
-            name: "index_permit_applications_on_submitter"
     t.index ["template_version_id"],
             name: "index_permit_applications_on_template_version_id"
     t.index ["user_group_type_id"],
@@ -753,6 +753,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_11_071705) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "performed_by"
+    t.datetime "resolved_at"
     t.index ["submission_version_id"],
             name: "index_revision_requests_on_submission_version_id"
     t.index ["user_id"], name: "index_revision_requests_on_user_id"
@@ -1071,6 +1072,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_11_071705) do
     t.datetime "updated_at", null: false
     t.integer "taggings_count", default: 0
     t.index ["name"], name: "index_tags_on_name", unique: true
+  end
+
+  create_table "target_user_id", id: false, force: :cascade do |t|
+    t.uuid "id"
   end
 
   create_table "template_section_blocks",
