@@ -38,6 +38,7 @@ module PermitApplicationStatus
       reject
       finalize_revision_requests
       cancel_revision_requests
+      apply_revision_requests_without_state_change
     ].freeze
 
     AASM_EVENTS.each do |event|

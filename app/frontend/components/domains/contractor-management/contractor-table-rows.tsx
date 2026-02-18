@@ -36,9 +36,7 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
       if (onboarding) {
         navigate(`/applications/${onboarding?.onboardApplicationId}`, {
           state: {
-            mode: 'edit-contractor',
             backToPage: '/contractor-management',
-            businessName: contractor.businessName,
           },
         });
       }

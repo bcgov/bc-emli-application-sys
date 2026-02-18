@@ -209,6 +209,10 @@ Rails.application.routes.draw do
       post "revision_requests/finalize",
            on: :member,
            to: "permit_applications#finalize_revision_requests"
+      post "revision_requests/apply_without_state_change",
+           on: :member,
+           to:
+             "permit_applications#apply_revision_requests_without_state_change"
       post "revision_requests/remove",
            on: :member,
            to: "permit_applications#remove_revision_requests"

@@ -53,8 +53,14 @@ class PermitApplication::SubmissionDataService
       ]&.each do |section_key, section_values|
         merged_submission_data["data"][section_key] ||= {}
 
-        section_values.each do |key, value|
-          merged_submission_data["data"][section_key][key] = value
+        # Handle both nested hashes (standard) and flat values (contractor onboarding)
+        if section_values.is_a?(Hash)
+          section_values.each do |key, value|
+            merged_submission_data["data"][section_key][key] = value
+          end
+        else
+          # For flat values, store the value directly
+          merged_submission_data["data"][section_key] = section_values
         end
       end
 
@@ -82,6 +88,9 @@ class PermitApplication::SubmissionDataService
     return { "data" => {} } if permissions.blank?
 
     formatted_data["data"].each do |_section_key, section_values|
+      # Handle both nested hashes (standard) and flat values (contractor onboarding)
+      next unless section_values.is_a?(Hash)
+
       section_values.delete_if do |key, _value|
         requirement_block_id = key[/\|RB([^|]+)/, 1]
         !permissions.include?(requirement_block_id)

@@ -299,10 +299,14 @@ export const RevisionSideBar = observer(
     };
 
     const sortedPastRevisionRequests = useMemo(() => {
-      return Array.from((selectedPastSubmissionVersion?.revisionRequests as IRevisionRequest[]) ?? []).sort((a, b) => {
+      const pastVersionRequests = Array.from(
+        (selectedPastSubmissionVersion?.revisionRequests as IRevisionRequest[]) ?? [],
+      );
+      const resolvedFromCurrent = permitApplication.resolvedRevisionRequests ?? [];
+      return [...pastVersionRequests, ...resolvedFromCurrent].sort((a, b) => {
         return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       });
-    }, [selectedPastSubmissionVersion?.revisionRequests]);
+    }, [selectedPastSubmissionVersion?.revisionRequests, permitApplication.resolvedRevisionRequests]);
 
     return (
       <>

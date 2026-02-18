@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_02_11_071705) do
+ActiveRecord::Schema[7.1].define(version: 2026_02_14_005201) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -753,6 +753,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_11_071705) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "performed_by"
+    t.datetime "resolved_at"
     t.index ["submission_version_id"],
             name: "index_revision_requests_on_submission_version_id"
     t.index ["user_id"], name: "index_revision_requests_on_user_id"

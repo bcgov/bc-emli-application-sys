@@ -609,6 +609,12 @@ export class Api {
     );
   }
 
+  async applyRevisionRequestsWithoutStateChange(id: string) {
+    return this.client.post<ApiResponse<IEnergySavingsApplication>>(
+      `/permit_applications/${id}/revision_requests/apply_without_state_change`,
+    );
+  }
+
   async removeRevisionRequests(id) {
     return this.client.post<ApiResponse<IEnergySavingsApplication>>(
       `/permit_applications/${id}/revision_requests/remove`,
