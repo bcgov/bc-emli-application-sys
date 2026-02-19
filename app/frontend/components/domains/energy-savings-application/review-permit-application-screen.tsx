@@ -401,6 +401,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
             onCancel={handleRevisionCancel}
             sendRevisionContainerRef={sendRevisionContainerRef}
             updatePerformedBy={performedBy}
+            isEditContractor={isEditContractor}
             {...(isEditContractor
               ? {
                   showRevisionItems: [

@@ -1091,6 +1091,9 @@ const options = {
             successTitle: 'You have marked this contractor as approved.',
             successMessage: 'An email has been automatically sent to the contractor.',
           },
+          revision: {
+            updateReason: 'Contractor Onboarding Form',
+          },
         },
         invoices: {
           selection: {
