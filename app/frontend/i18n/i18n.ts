@@ -2861,8 +2861,9 @@ const options = {
             emailTitle: 'Email',
             emailAddress: 'betterhomesep@clearesult.com',
             groundOrientedTitle: 'Ground-oriented home types',
-            groundOrientedEmail: 'BetterHomesESP@clearesult.com',
-            groundOrientedEmailAriaLabel: 'Email us about ground-oriented home types at BetterHomesESP@clearesult.com',
+            groundOrientedEmail: 'ESPcontractorsupport@clearesult.com',
+            groundOrientedEmailAriaLabel:
+              'Call us at 1-833-856-0333 from 9 am to 5 pm, Monday - Friday (excluding statutory holidays) or email us at ESPcontractorsupport@clearesult.com.',
             multiUnitTitle: 'Multi-unit home types',
             multiUnitEmail: 'ESPcondoapartment@CLEAResult.com',
             multiUnitEmailAriaLabel: 'Email us about multi-unit home types at ESPcondoapartment@CLEAResult.com',
