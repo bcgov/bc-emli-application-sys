@@ -16,22 +16,31 @@ interface IEnergySavingsApplicationCardProps {
 }
 
 export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEnergySavingsApplicationCardProps) => {
-  const { id, nickname, permitTypeAndActivity, number, createdAt, updatedAt, viewedAt, isSupportRequest, incomingSupportRequests } = energySavingsApplication;
+  const {
+    id,
+    nickname,
+    permitTypeAndActivity,
+    number,
+    createdAt,
+    updatedAt,
+    viewedAt,
+    isSupportRequest,
+    incomingSupportRequests,
+  } = energySavingsApplication;
   const nicknameSplitText = nickname.split(':');
   const { userStore } = useMst();
   const currentUser = userStore.currentUser;
   const { t } = useTranslation();
 
   // For support requests, show parent application number and special title
-  const displayNumber = isSupportRequest && incomingSupportRequests?.parentApplication?.number
-    ? incomingSupportRequests.parentApplication.number
-    : number;
+  const displayNumber =
+    isSupportRequest && incomingSupportRequests?.parentApplication?.number
+      ? incomingSupportRequests.parentApplication.number
+      : number;
   const displayTitle = isSupportRequest
     ? t('energySavingsApplication.supportRequest.uploadTitle', { defaultValue: 'Upload Supporting files form' })
     : nicknameSplitText?.[0];
-  const displaySubtitle = isSupportRequest
-    ? ''
-    : nicknameSplitText?.[1];
+  const displaySubtitle = isSupportRequest ? '' : nicknameSplitText?.[1];
 
   const isSubmissionCollaboration = energySavingsApplication.submitter?.id !== currentUser?.id;
 
@@ -45,7 +54,9 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
         energySavingsApplication.isInReview,
       ].some(Boolean)
     ) {
-      return t('energySavingsApplication.card.viewApplication');
+      return t('energySavingsApplication.card.viewActionButton', {
+        submissionType: energySavingsApplication.submissionType?.name,
+      });
     }
 
     return isSubmissionCollaboration ? t('energySavingsApplication.card.collaborateButton') : t('ui.continue');
