@@ -1128,6 +1128,7 @@ const options = {
           reviewCustomizedMessage: 'Filters have been applied. Please review the draft applications below.',
           newVersionPublished: 'New version of template has been published - please review changes',
           card: {
+            viewActionButton: 'View {{submissionType}}',
             viewApplication: 'View application',
             continueButton: 'Continue',
             collaborateButton: 'Collaborate',
@@ -1427,7 +1428,7 @@ const options = {
             backToInbox: 'Back to inbox',
             locateRevisions: 'Locate each requested revision by clicking the links below.',
             revisionsWereRequested: 'Updates to this application were requested on {{date}}',
-            applicationSubmitted: 'Application was submitted on {{date}}',
+            applicationSubmitted: '{{submissionType}} was submitted on {{date}}',
             clickQuestion: 'Click on the question(s) or requirement(s) you want the submitter to revise.',
             clickQuestionUpdate: 'Click on the question(s) or requirement(s) you want to update.',
             inEligibleDetails: 'Ineligible {{submissionType}} form details',

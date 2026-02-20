@@ -51,11 +51,15 @@ module ApplicationFlow
       end
 
       event :approve do
-        transitions from: :in_review, to: :approved_pending
+        transitions from: :in_review,
+                    to: :approved_pending,
+                    after: :approve_invoice
       end
 
       event :approve_paid do
-        transitions from: :approved_pending, to: :approved_paid
+        transitions from: :approved_pending,
+                    to: :approved_paid,
+                    after: :mark_invoice_as_paid
       end
 
       event :reject do
@@ -63,6 +67,14 @@ module ApplicationFlow
                     to: :ineligible,
                     after: :handle_ineligible_status
       end
+    end
+
+    def approve_invoice
+      application.update(approved_at: Time.current)
+    end
+
+    def mark_invoice_as_paid
+      application.update(paid_at: Time.current)
     end
 
     def handle_submission
