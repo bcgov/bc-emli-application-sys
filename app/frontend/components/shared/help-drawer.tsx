@@ -30,7 +30,6 @@ export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) 
   const btnRef = useRef<HTMLButtonElement>(null);
 
   const groundOrientedEmailHref = `mailto:${t('site.helpDrawer.groundOrientedEmail')}`;
-  const multiUnitEmailHref = `mailto:${t('site.helpDrawer.multiUnitEmail')}`;
 
   const baseTextSx = { fontSize: '16px', lineHeight: '27px', color: 'greys.homeScreenGrey' };
   const iconBoxSx = {
@@ -43,7 +42,6 @@ export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) 
     alignItems: 'center',
   };
   const linkSx = { ...baseTextSx, textDecoration: 'underline', mb: 2, display: 'block' };
-  const listBoxSx = { as: 'ul', listStyleType: 'disc', pl: 4, color: 'greys.homeScreenGrey' };
 
   return (
     <>
