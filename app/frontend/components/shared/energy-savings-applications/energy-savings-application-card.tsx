@@ -59,7 +59,11 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
       });
     }
 
-    return isSubmissionCollaboration ? t('energySavingsApplication.card.collaborateButton') : t('ui.continue');
+    return isSubmissionCollaboration
+      ? t('energySavingsApplication.card.collaborateButton')
+      : t('ui.continue', {
+          submissionType: energySavingsApplication.submissionType?.name,
+        });
   })();
 
   return (
@@ -123,7 +127,9 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
                 </Box>
                 <Text fontSize="sm" ml={2}>
                   <b>{t(`energySavingsApplication.card.actionRequired`)}</b>{' '}
-                  {t(`energySavingsApplication.card.reviewApplication`)}
+                  {t(`energySavingsApplication.card.reviewActionText`, {
+                    submissionType: energySavingsApplication.submissionType?.name.toLowerCase(),
+                  })}
                 </Text>
               </Flex>
             )}

@@ -482,7 +482,7 @@ const options = {
           feedbackLink: 'Tell us what you think',
           sortBy: 'Sort by',
           resume: 'Resume',
-          continue: 'Continue application',
+          continue: 'Continue {{submissionType}}',
           cancel: 'Cancel',
           cancelRequest: 'Cancel request',
           remove: 'Remove',
@@ -1136,8 +1136,8 @@ const options = {
               '<1>{{authorName}} has assigned you to this permit.</1> Collaborate on this permit application.',
             collaborationCalloutSubmitted: '<1>{{authorName}} assigned you to this permit.</1>',
             actionRequired: 'Action required:',
-            reviewApplication:
-              'An agent has reviewed your application and needs more information. Please review and update your application.',
+            reviewActionText:
+              'An agent has reviewed your {{submissionType}} and needs more information. Please review and update your {{submissionType}}.',
           },
           referenceNumber: 'Reference #',
           pdf: {
