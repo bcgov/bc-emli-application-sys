@@ -70,10 +70,27 @@ module Api::Concerns::Search::PermitApplications
     @audience_types =
       AudienceType.where(code: permitted_params[:filters][:audience_type_id])
     @submission_types =
-      SubmissionType
-        .where(code: permitted_params[:filters][:submission_type_id])
+      SubmissionType.where(
+        code: permitted_params[:filters][:submission_type_id]
+      )
+
+    normalize_contractor_invoice_audience_filter!
 
     permitted_params
+  end
+
+  def normalize_contractor_invoice_audience_filter!
+    return unless @user_group_type&.code == "contractor"
+    return unless @submission_types.exists?(code: "invoice")
+    return unless @audience_types.pluck(:code).include?("internal")
+
+    external_audience = AudienceType.find_by(code: "external")
+    return unless external_audience
+
+    @audience_types =
+      AudienceType.where(
+        id: (@audience_types.pluck(:id) + [external_audience.id])
+      )
   end
 
   def permit_application_order
@@ -137,11 +154,11 @@ module Api::Concerns::Search::PermitApplications
     if filters[:is_supported_applications_page] == true
       where[:_or] = [
         # Applications created by admin/admin_manager/system_admin
-        { submitter_role: ['admin', 'admin_manager', 'system_admin'] },
+        { submitter_role: %w[admin admin_manager system_admin] },
         # OR submitted participant applications with draft support requests
         {
           _and: [
-            { user_group_type_code: 'participant' },
+            { user_group_type_code: "participant" },
             { is_submitted: true },
             { has_draft_support_requests: true }
           ]
@@ -149,9 +166,9 @@ module Api::Concerns::Search::PermitApplications
         # OR draft internal support requests (admin uploads on behalf of participant)
         {
           _and: [
-            { status: 'new_draft' },
-            { submission_type_code: 'support_request' },
-            { audience_type_code: 'internal' }
+            { status: "new_draft" },
+            { submission_type_code: "support_request" },
+            { audience_type_code: "internal" }
           ]
         }
       ]
@@ -162,15 +179,15 @@ module Api::Concerns::Search::PermitApplications
         _or: [
           {
             _and: [
-              { status: 'new_draft' },
-              { submission_type_code: 'support_request' },
-              { audience_type_code: 'external' }
+              { status: "new_draft" },
+              { submission_type_code: "support_request" },
+              { audience_type_code: "external" }
             ]
           },
           {
             _and: [
-              { status: 'new_draft' },
-              { submission_type_code: 'support_request' },
+              { status: "new_draft" },
+              { submission_type_code: "support_request" },
               { is_support_request_by_participant: true }
             ]
           }
@@ -178,7 +195,12 @@ module Api::Concerns::Search::PermitApplications
       }
     end
 
-    filters.to_h.deep_symbolize_keys.compact.except(:is_supported_applications_page).merge!(where)
+    filters
+      .to_h
+      .deep_symbolize_keys
+      .compact
+      .except(:is_supported_applications_page)
+      .merge!(where)
   end
 
   def status_priority_map
