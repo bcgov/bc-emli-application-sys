@@ -205,6 +205,34 @@ export const SuccessfulScreenedInScreen = observer(() => {
 });
 
 /***
+ * Approved-Pending Success Screen
+ ***/
+export const SuccessfulApprovedPendingScreen = observer(() => {
+  const { t } = useTranslation();
+  const location = useLocation();
+  const { submissionType, applicationNumber } = location.state || {};
+
+  const { userStore } = useMst();
+  const currentUser = userStore.currentUser;
+
+  return (
+    <SuccessfulActionScreen
+      icon="success"
+      title={t('energySavingsApplication.review.approvedPendingSuccess', {
+        submissionType: submissionType?.toLowerCase(),
+      })}
+      referenceNumber={applicationNumber}
+      primaryButtonLabel={
+        currentUser.isParticipant
+          ? t('energySavingsApplication.returnToMain')
+          : t('energySavingsApplication.new.viewAllSubmissions')
+      }
+      primaryButtonTo={currentUser.isParticipant ? '/applications' : '/submission-inbox'}
+    />
+  );
+});
+
+/***
  * Updated Application Success Screen
  ***/
 export const SuccessfulUpdateScreen = observer(() => {
