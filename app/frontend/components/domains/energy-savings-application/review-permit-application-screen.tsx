@@ -342,7 +342,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
             </Flex>
           </HStack>
           <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
-            {!isEditContractor && (
+            {!isEditContractor && !isInvoiceSubmission && (
               <Button variant="primary" onClick={onAddSupportingFilesPathwayOpen}>
                 {t('energySavingsApplication.show.supportingFilesRequest.addSupportingFiles')}
               </Button>
@@ -469,8 +469,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                         </Button>
                       )}
                       {currentPermitApplication.submissionType?.code !== EPermitClassificationCode.onboarding &&
-                        (!isInvoiceSubmission ||
-                          currentPermitApplication?.status !== EPermitApplicationStatus.inReview) && (
+                        !isInvoiceSubmission && (
                           <Button
                             variant="calloutInverse"
                             leftIcon={<CheckCircleIcon />}
