@@ -975,6 +975,28 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         self.isLoading = false;
         return response;
       }),
+      approvePendingInvoice: flow(function* () {
+        self.isLoading = true;
+        const response = yield self.environment.api.approvePendingApplication(self.id);
+        if (response.ok) {
+          let { data: permitApplication } = response.data;
+          permitApplication = self.rootStore.permitApplicationStore.normalizeSubmitter(permitApplication);
+          self.rootStore.permitApplicationStore.mergeUpdate(permitApplication, 'permitApplicationMap');
+        }
+        self.isLoading = false;
+        return response;
+      }),
+      approvePaidInvoice: flow(function* () {
+        self.isLoading = true;
+        const response = yield self.environment.api.approvePaidApplication(self.id);
+        if (response.ok) {
+          let { data: permitApplication } = response.data;
+          permitApplication = self.rootStore.permitApplicationStore.normalizeSubmitter(permitApplication);
+          self.rootStore.permitApplicationStore.mergeUpdate(permitApplication, 'permitApplicationMap');
+        }
+        self.isLoading = false;
+        return response;
+      }),
       fetchDiff: flow(function* () {
         const diffData = yield self.publishedTemplateVersion.fetchTemplateVersionCompare(self.templateVersion.id);
         self.diff = diffData.data;

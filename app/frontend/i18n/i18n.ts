@@ -1055,6 +1055,7 @@ const options = {
           },
           review: {
             readyToMarkIneligible: 'Ready to mark ineligible?',
+            readyToApprovePending: 'Ready to mark approved - pending?',
             confirmIneligible: 'I confirm that this {{submissionType}} is ineligible for the Energy Savings Program.',
             readyToScreen: 'Ready to screen in?',
             confirmReview: 'I confirm this {{submissionType}} has all the required information.',
@@ -1345,6 +1346,7 @@ const options = {
             readyToScreen: 'Ready to screen in?',
             confirmReview: 'I confirm this {{submissionType}} has all the required information.',
             screenedInSuccess: 'You have screened in this {{submissionType}} form to in review.',
+            approvedPendingSuccess: 'You have marked this {{submissionType}} form approved - pending.',
             inEligibleReasonReminder: 'Email the contractor with a reason for ineligibility.',
             admin: {
               markedIneligible: 'You have marked this {{submissionType}} form ineligible.',

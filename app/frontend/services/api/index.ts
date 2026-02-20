@@ -171,6 +171,12 @@ export class Api {
   async approveApplication(id) {
     return this.client.post<ApiResponse<IEnergySavingsApplication>>(`/permit_applications/${id}/approve`);
   }
+  async approvePendingApplication(id) {
+    return this.client.post<ApiResponse<IEnergySavingsApplication>>(`/permit_applications/${id}/approve_pending`);
+  }
+  async approvePaidApplication(id) {
+    return this.client.post<ApiResponse<IEnergySavingsApplication>>(`/permit_applications/${id}/approve_paid`);
+  }
   async fetchLocalityTypeOptions() {
     return this.client.get<IOptionResponse>(`/jurisdictions/locality_type_options`);
   }

@@ -154,6 +154,11 @@ const SuccessfulScreenedInScreen = lazy(() =>
     default: module.SuccessfulScreenedInScreen,
   })),
 );
+const SuccessfulApprovedPendingScreen = lazy(() =>
+  import('../energy-savings-application/successful-action-screens').then((module) => ({
+    default: module.SuccessfulApprovedPendingScreen,
+  })),
+);
 const SuccessfulIneligibleScreen = lazy(() =>
   import('../energy-savings-application/successful-action-screens').then((module) => ({
     default: module.SuccessfulIneligibleScreen,
@@ -579,6 +584,10 @@ const AppRoutes = observer(() => {
           <Route
             path="/applications/:permitApplicationId/screened-in-success"
             element={<SuccessfulScreenedInScreen />}
+          />
+          <Route
+            path="/applications/:permitApplicationId/approved-pending-success"
+            element={<SuccessfulApprovedPendingScreen />}
           />
           <Route
             path="/applications/:permitApplicationId/successful-submission"

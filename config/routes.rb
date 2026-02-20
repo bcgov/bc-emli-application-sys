@@ -201,6 +201,10 @@ Rails.application.routes.draw do
       post "mark_as_viewed", on: :member
       post "change_status", on: :member
       post "approve", on: :member, to: "permit_applications#approve"
+      post "approve_pending",
+           on: :member,
+           to: "permit_applications#approve_pending"
+      post "approve_paid", on: :member, to: "permit_applications#approve_paid"
       patch "upload_supporting_document", on: :member
       patch "update_version", on: :member
       patch "revision_requests",

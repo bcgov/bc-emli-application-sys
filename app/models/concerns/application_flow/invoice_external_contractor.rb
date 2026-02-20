@@ -70,11 +70,11 @@ module ApplicationFlow
     end
 
     def approve_invoice
-      application.update(approved_at: Time.current)
+      application.update(updated_at: Time.current)
     end
 
     def mark_invoice_as_paid
-      application.update(paid_at: Time.current)
+      application.update(updated_at: Time.current)
     end
 
     def handle_submission
