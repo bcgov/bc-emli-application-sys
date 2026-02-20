@@ -48,6 +48,7 @@ interface IRevisionSideBarProps {
   updatePerformedBy?: string;
   showRevisionRequestRemove?: boolean;
   showRevisionItems: Array<string>;
+  isEditContractor?: boolean;
 }
 
 export interface IRevisionRequestForm {
@@ -61,6 +62,7 @@ export const RevisionSideBar = observer(
     sendRevisionContainerRef,
     forSubmitter,
     updatePerformedBy,
+    isEditContractor,
     showRevisionItems = [
       ERevisionSideBarItems.SELECTED_ITEMS_TOP_ALIGN,
       ERevisionSideBarItems.SUBMIT_TOP_ALIGN,
@@ -420,6 +422,7 @@ export const RevisionSideBar = observer(
             disableInput={forSubmitter || isViewingPastRequests}
             updatePerformedBy={updatePerformedBy}
             permitApplication={permitApplication}
+            isEditContractor={isEditContractor}
           />
         )}
         {sendRevisionContainerRef && tabIndex == 0 && showRevisionItems.length > 0 && (

@@ -42,7 +42,10 @@ export interface IRevisionModalProps extends Partial<ReturnType<typeof useDisclo
   disableInput?: boolean;
   updatePerformedBy?: string;
   permitApplication?: any;
+  isEditContractor?: boolean;
 }
+
+const CONTRACTOR_REASON_CODE = 'contractor_onboarding_form';
 
 export const RevisionModal: React.FC<IRevisionModalProps> = ({
   requirementJson,
@@ -58,10 +61,11 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
   disableInput,
   updatePerformedBy,
   permitApplication,
+  isEditContractor,
 }) => {
   const { t } = useTranslation();
   const [reasonCode, setReasonCode] = useState<string>(
-    revisionRequestDefault?.reasonCode ?? revisionRequest?.reasonCode ?? '',
+    isEditContractor ? CONTRACTOR_REASON_CODE : revisionRequestDefault?.reasonCode ?? revisionRequest?.reasonCode ?? '',
   );
   const [comment, setComment] = useState<string>(revisionRequestDefault?.comment ?? revisionRequest?.comment ?? '');
 
@@ -170,11 +174,15 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
                 {updatePerformedBy === 'staff'
                   ? t('energySavingsApplication.show.revision.reasonForUpdate')
                   : t('energySavingsApplication.show.revision.reasonFor')}
-                <Text as="span" color="red.500" ml={1}>
-                  *
-                </Text>
+                {!isEditContractor && (
+                  <Text as="span" color="red.500" ml={1}>
+                    *
+                  </Text>
+                )}
               </FormLabel>
-              {isRevisionsRequested ? (
+              {isEditContractor ? (
+                <Text>{t('contractorOnboarding.revision.updateReason')}</Text>
+              ) : isRevisionsRequested ? (
                 <Textarea disabled={true}>{selectedLabel}</Textarea>
               ) : (
                 <Select
@@ -182,11 +190,13 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
                   value={reasonCode}
                   onChange={(e) => setReasonCode(e.target.value)}
                 >
-                  {revisionReasonOptions.map((opt) => (
-                    <option value={opt.value} key={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
+                  {revisionReasonOptions
+                    ?.filter((opt) => opt.value !== CONTRACTOR_REASON_CODE)
+                    .map((opt) => (
+                      <option value={opt.value} key={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
                 </Select>
               )}
             </FormControl>
