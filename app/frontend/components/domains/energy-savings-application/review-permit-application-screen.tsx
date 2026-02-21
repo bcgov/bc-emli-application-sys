@@ -87,6 +87,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
     onOpen: onApprovePendingOpen,
     onClose: onApprovePendingClose,
   } = useDisclosure();
+  const { isOpen: isMarkPaidOpen, onOpen: onMarkPaidOpen, onClose: onMarkPaidClose } = useDisclosure();
   const { isOpen: isTrainingPending, onOpen: onTrainingPending, onClose: onTrainingPendingClose } = useDisclosure();
   const {
     isOpen: isContractorApproval,
@@ -291,10 +292,19 @@ export const ReviewPermitApplicationScreen = observer(() => {
 
   const handleMarkPaid = async () => {
     try {
-      await currentPermitApplication.approvePaidInvoice();
+      const response = await currentPermitApplication.approvePaidInvoice();
+      if (response?.ok) {
+        navigate(`/applications/${response?.data?.data?.id}/approved-paid-success`, {
+          state: {
+            submissionType: currentPermitApplication.submissionType.name,
+            applicationNumber: currentPermitApplication?.number,
+          },
+        });
+      }
     } catch (e) {
       // Handle error if needed
     }
+    onMarkPaidClose();
   };
 
   const handleConfirm = async () => {
@@ -479,7 +489,12 @@ export const ReviewPermitApplicationScreen = observer(() => {
                           </Button>
                         )}
                       {currentPermitApplication.submissionType?.code !== EPermitClassificationCode.onboarding &&
-                        currentPermitApplication?.status !== EPermitApplicationStatus.inReview && (
+                        ![
+                          EPermitApplicationStatus.inReview,
+                          EPermitApplicationStatus.approved,
+                          EPermitApplicationStatus.approvedPending,
+                          EPermitApplicationStatus.approvedPaid,
+                        ].includes(currentPermitApplication?.status) && (
                           <Button
                             variant="calloutInverse"
                             leftIcon={<CheckCircleIcon />}
@@ -526,14 +541,14 @@ export const ReviewPermitApplicationScreen = observer(() => {
                           <Button
                             variant="calloutInverse"
                             px={14}
-                            onClick={handleMarkPaid}
+                            onClick={onMarkPaidOpen}
                             borderColor="green"
                             isDisabled={
                               currentPermitApplication?.status !== EPermitApplicationStatus.approvedPending ||
                               currentPermitApplication?.status === EPermitApplicationStatus.ineligible
                             }
                           >
-                            {t('energySavingsApplication.show.markPaid')}
+                            {t('energySavingsApplication.show.approvePaid')}
                           </Button>
                         ) : currentPermitApplication?.status === EPermitApplicationStatus.inReview ? (
                           <Button
@@ -550,26 +565,26 @@ export const ReviewPermitApplicationScreen = observer(() => {
                           </Button>
                         ) : null
                       ) : null}
-                      <Button
-                        variant="calloutInverse"
-                        leftIcon={!isEditContractor && <ProhibitIcon />}
-                        px={14}
-                        onClick={onIneligibleOpen}
-                        borderColor="red"
-                        isDisabled={
-                          hasUnsavedEdits ||
-                          (currentPermitApplication?.status === EPermitApplicationStatus.inReview &&
-                            !isInvoiceSubmission) ||
-                          currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
-                          currentPermitApplication?.status === EPermitApplicationStatus.approved ||
-                          currentPermitApplication?.status === EPermitApplicationStatus.approvedPending ||
-                          currentPermitApplication?.status === EPermitApplicationStatus.approvedPaid
-                        }
-                      >
-                        {!isEditContractor
-                          ? t('energySavingsApplication.show.inEligible')
-                          : t('energySavingsApplication.show.markIneligible')}
-                      </Button>
+                      {!hasUnsavedEdits &&
+                        !(
+                          currentPermitApplication?.status === EPermitApplicationStatus.inReview && !isInvoiceSubmission
+                        ) &&
+                        currentPermitApplication?.status !== EPermitApplicationStatus.ineligible &&
+                        currentPermitApplication?.status !== EPermitApplicationStatus.approved &&
+                        currentPermitApplication?.status !== EPermitApplicationStatus.approvedPending &&
+                        currentPermitApplication?.status !== EPermitApplicationStatus.approvedPaid && (
+                          <Button
+                            variant="calloutInverse"
+                            leftIcon={!isEditContractor && <ProhibitIcon />}
+                            px={14}
+                            onClick={onIneligibleOpen}
+                            borderColor="red"
+                          >
+                            {!isEditContractor
+                              ? t('energySavingsApplication.show.inEligible')
+                              : t('energySavingsApplication.show.markIneligible')}
+                          </Button>
+                        )}
                     </HStack>
                   )
                 );
@@ -636,7 +651,20 @@ export const ReviewPermitApplicationScreen = observer(() => {
           isOpen={isApprovePendingOpen}
           onClose={onApprovePendingClose}
           onSubmit={handleApprovePending}
-          headerText={`${t('permitApplication.review.readyToApprovePending')}?`}
+          headerText={`${t('permitApplication.review.readyToApprovePending')}`}
+          bodyText={t('permitApplication.review.confirmReview', {
+            submissionType: currentPermitApplication?.submissionType?.name?.toLowerCase(),
+          })}
+          confirmText={t('ui.confirm')}
+          cancelText={t('ui.cancel')}
+        />
+      )}
+      {isMarkPaidOpen && (
+        <GlobalConfirmationModal
+          isOpen={isMarkPaidOpen}
+          onClose={onMarkPaidClose}
+          onSubmit={handleMarkPaid}
+          headerText={t('permitApplication.review.readyToMarkPaid')}
           bodyText={t('permitApplication.review.confirmReview', {
             submissionType: currentPermitApplication?.submissionType?.name?.toLowerCase(),
           })}

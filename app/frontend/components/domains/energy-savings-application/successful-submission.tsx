@@ -10,7 +10,7 @@ import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { useMst } from '../../../setup/root';
 import { useLocation } from 'react-router-dom';
 import { GreenLineSmall } from '../../shared/base/decorative/green-line-small';
-import { EUpdateRoles } from '../../../types/enums.ts';
+import { EPermitApplicationStatus, EUpdateRoles } from '../../../types/enums';
 
 // Successful Submission Screen
 export const SuccessfulSubmissionScreen = observer(() => {
@@ -43,26 +43,24 @@ export const SuccessfulSubmissionScreen = observer(() => {
   // Ensure first letter is lowercase
   const submissionTypeLabel = rawLabel.charAt(0).toLowerCase() + rawLabel.slice(1);
 
-  // Use translation with fallback to dynamic message format
-  let messageKey: string;
+  const isRevisionSubmission = isEditing && currentPermitApplication?.status !== EPermitApplicationStatus.submitted;
 
-  if (isEditing) {
-    if (performedBy === EUpdateRoles.applicant) {
-      messageKey = 'energySavingsApplication.edit.revisionSubmissionSuccess';
-    } else {
-      messageKey = 'energySavingsApplication.show.adminSaveSuccess';
-    }
-  } else {
-    if (performedBy === EUpdateRoles.staff) {
-      messageKey = 'energySavingsApplication.new.staffSubmissionSuccess';
-    } else {
-      messageKey = 'energySavingsApplication.new.submissionSuccess';
-    }
-  }
-
-  const message = t(messageKey, {
-    submissionType: submissionTypeLabel,
-  });
+  const message =
+    isRevisionSubmission && performedBy === EUpdateRoles.applicant
+      ? t('energySavingsApplication.edit.revisionSubmissionSuccess', {
+          submissionType: submissionTypeLabel,
+        })
+      : isRevisionSubmission && performedBy === EUpdateRoles.staff
+        ? t('energySavingsApplication.show.adminSaveSuccess', {
+            submissionType: submissionTypeLabel,
+          })
+        : performedBy === EUpdateRoles.staff
+          ? t('energySavingsApplication.new.staffSubmissionSuccess', {
+              submissionType: submissionTypeLabel,
+            })
+          : t('energySavingsApplication.new.submissionSuccess', {
+              submissionType: submissionTypeLabel,
+            });
 
   const determinedMessage =
     performedBy === EUpdateRoles.staff ? message.charAt(0).toUpperCase() + message.slice(1) : message;
@@ -90,7 +88,7 @@ export const SuccessfulSubmissionScreen = observer(() => {
       'contractor.invoiceSuccess.whatsNext.line2',
       'contractor.invoiceSuccess.whatsNext.line3',
     ];
-    whatsNextEmail = 'ESPcontractorsupport@clearesult.com';
+    whatsNextEmail = t('site.support.contractorSupportEmail');
   }
 
   return (
@@ -101,7 +99,7 @@ export const SuccessfulSubmissionScreen = observer(() => {
           <Heading as="h1" color="theme.blueAlt" textAlign="center">
             {determinedMessage}
           </Heading>
-          {performedBy !== EUpdateRoles.staff && !isEditing && (
+          {performedBy !== EUpdateRoles.staff && !isRevisionSubmission && (
             <Text fontSize="md" color="greys.grey70" textAlign="center">
               {t('energySavingsApplication.new.confirmationEmail', {
                 defaultValue: 'A confirmation email has been sent to your account.',
@@ -112,13 +110,13 @@ export const SuccessfulSubmissionScreen = observer(() => {
             {t('energySavingsApplication.new.yourReference', { number: displayNumber })}
           </Tag>
         </VStack>
-        {performedBy !== EUpdateRoles.staff && !isEditing && (
+        {performedBy !== EUpdateRoles.staff && !isRevisionSubmission && (
           <>
             <WhatsNextBlock headingKey={whatsNextHeadingKey} lineKeys={whatsNextLineKeys} email={whatsNextEmail} />
             <Box px={8} width="100%" backgroundColor="greys.grey10">
               <Divider borderColor="greys.lightGrey" />
             </Box>
-            <NeedHelpBlock />
+            {currentUser.isContractor ? <NeedHelpContractorBlock /> : <NeedHelpBlock />}
           </>
         )}
         <SubmissionReturnButton
@@ -225,6 +223,39 @@ const NeedHelpBlock = () => {
           i18nKey="energySavingsApplication.new.contactInstruction"
           values={{ email }}
           defaults="See the status of your application or your application history any time by logging in to the Better Homes Energy Savings Program. Contact <1>{{email}}</1> if you have any questions about your application."
+          components={{
+            1: (
+              <Button
+                as="a"
+                href={`mailto:${email}`}
+                variant="link"
+                color="theme.blueAlt"
+                textDecoration="underline"
+                p={0}
+                h="auto"
+                fontSize="md"
+              />
+            ),
+          }}
+        />
+      </Text>
+    </Box>
+  );
+};
+
+const NeedHelpContractorBlock = () => {
+  const { t } = useTranslation();
+  const email = t('site.support.contractorSupportEmail');
+
+  return (
+    <Box mb={6} p={8} borderRadius="md" backgroundColor="greys.grey10" width="100%">
+      <Text fontSize="md" mb={4}>
+        <Text as="span" fontWeight="bold">
+          {t('energySavingsApplication.new.hearBack', { defaultValue: 'Need help?' })}
+        </Text>{' '}
+        <Trans
+          i18nKey="energySavingsApplication.new.contractorContactInstruction"
+          values={{ email }}
           components={{
             1: (
               <Button

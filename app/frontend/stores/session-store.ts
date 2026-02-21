@@ -67,7 +67,15 @@ export const SessionStoreModel = types
         self.resetAuth();
       }
       const origin = window.location.origin;
-      const finalRedirect = `${origin}${self.entryPoint === 'isAdmin' ? '/admin' : '/'}`;
+      let finalRedirect = origin;
+      if (self.entryPoint === 'isAdmin') {
+        finalRedirect += '/admin';
+      } else if (self.entryPoint === 'isContractor') {
+        finalRedirect += '/welcome/contractor';
+      } else {
+        finalRedirect += '/';
+      }
+      //const finalRedirect = `${origin}${self.entryPoint === 'isAdmin' ? '/admin' : '/'}`;
       // logout of siteminder / keycloak as well
       window.location.href = finalRedirect; //`${import.meta.env.VITE_SITEMINDER_LOGOUT_URL}?retnow=1&returl=${finalRedirect}?redirect_uri=${import.meta.env.VITE_POST_LOGOUT_REDIRECT_URL}`;
     }),
