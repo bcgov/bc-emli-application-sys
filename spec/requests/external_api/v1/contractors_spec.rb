@@ -119,6 +119,10 @@ RSpec.describe "external_api/v1/contractors",
                          items: {
                            type: :object,
                            properties: {
+                             id: {
+                               type: :string,
+                               format: :uuid
+                             },
                              first_name: {
                                type: :string
                              },
@@ -315,7 +319,158 @@ RSpec.describe "external_api/v1/contractors",
                properties: {
                  data: {
                    type: :object,
-                   description: "Contractor profile"
+                   description: "Contractor profile",
+                   properties: {
+                     id: {
+                       type: :string,
+                       format: :uuid,
+                       description: "Contractor UUID"
+                     },
+                     business_name: {
+                       type: :string,
+                       description: "Contractor business name"
+                     },
+                     number: {
+                       type: :string,
+                       nullable: true,
+                       description: "Contractor number"
+                     },
+                     email: {
+                       type: :string,
+                       nullable: true,
+                       description: "Contractor email"
+                     },
+                     phone_number: {
+                       type: :string,
+                       nullable: true,
+                       description: "Business phone number"
+                     },
+                     cellphone_number: {
+                       type: :string,
+                       nullable: true,
+                       description: "Business mobile phone number"
+                     },
+                     street_address: {
+                       type: :string,
+                       nullable: true,
+                       description: "Street address"
+                     },
+                     city: {
+                       type: :string,
+                       nullable: true,
+                       description: "City"
+                     },
+                     postal_code: {
+                       type: :string,
+                       nullable: true,
+                       description: "Postal code"
+                     },
+                     website: {
+                       type: :string,
+                       nullable: true,
+                       description: "Business website"
+                     },
+                     created_at: {
+                       type: :string,
+                       format: "date-time",
+                       description: "Record creation timestamp"
+                     },
+                     onboarded: {
+                       type: :boolean,
+                       description:
+                         "Whether the contractor has completed onboarding"
+                     },
+                     employees: {
+                       type: :array,
+                       description: "Contractor employees",
+                       items: {
+                         type: :object,
+                         properties: {
+                           id: {
+                             type: :string,
+                             format: :uuid
+                           },
+                           first_name: {
+                             type: :string
+                           },
+                           last_name: {
+                             type: :string
+                           },
+                           email: {
+                             type: :string
+                           }
+                         }
+                       }
+                     },
+                     contractor_info: {
+                       type: :object,
+                       nullable: true,
+                       description: "Contractor profile details",
+                       properties: {
+                         id: {
+                           type: :string,
+                           format: :uuid
+                         },
+                         doing_business_as: {
+                           type: :string,
+                           nullable: true
+                         },
+                         license_issuer: {
+                           type: :string,
+                           nullable: true
+                         },
+                         license_number: {
+                           type: :string,
+                           nullable: true
+                         },
+                         incorporated_year: {
+                           type: :integer,
+                           nullable: true
+                         },
+                         number_of_employees: {
+                           type: :integer,
+                           nullable: true
+                         },
+                         gst_number: {
+                           type: :string,
+                           nullable: true
+                         },
+                         worksafebc_number: {
+                           type: :string,
+                           nullable: true
+                         },
+                         type_of_business: {
+                           type: :array,
+                           items: {
+                             type: :string
+                           },
+                           nullable: true
+                         },
+                         primary_program_measure: {
+                           type: :array,
+                           items: {
+                             type: :string
+                           },
+                           nullable: true
+                         },
+                         retrofit_enabling_measures: {
+                           type: :array,
+                           items: {
+                             type: :string
+                           },
+                           nullable: true
+                         },
+                         service_languages: {
+                           type: :array,
+                           items: {
+                             type: :string
+                           },
+                           nullable: true
+                         }
+                       }
+                     }
+                   },
+                   required: %w[id business_name onboarded created_at]
                  }
                },
                required: %w[data]
