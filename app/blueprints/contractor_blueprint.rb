@@ -58,6 +58,22 @@ class ContractorBlueprint < Blueprinter::Base
     fields :business_name, :email
   end
 
+  view :external_api_profile do
+    fields :business_name,
+           :number,
+           :email,
+           :phone_number,
+           :cellphone_number,
+           :street_address,
+           :city,
+           :postal_code,
+           :website,
+           :created_at,
+           :onboarded
+    association :contractor_info, blueprint: ContractorInfoBlueprint
+    association :employees, blueprint: UserBlueprint, view: :external_api
+  end
+
   # extended_api is also same as base for now, used in API
   view :extended_api do
     include_view :base

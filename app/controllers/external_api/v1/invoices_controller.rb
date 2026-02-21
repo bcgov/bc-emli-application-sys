@@ -1,4 +1,5 @@
 class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
+  before_action :ensure_external_api_key_authorized!
   before_action :set_invoice, only: :show
 
   def index
@@ -51,8 +52,6 @@ class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
   private
 
   def perform_invoice_search
-    ensure_external_api_key_authorized!
-
     permitted = params.permit(:submitted_from, :submitted_to, :page, :per_page)
     constraints = build_date_constraints(permitted)
     return if performed? # Stop if date validation failed

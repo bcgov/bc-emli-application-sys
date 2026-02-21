@@ -360,6 +360,12 @@ Rails.application.routes.draw do
       get "invoices", to: "invoices#index"
       get "invoices/summary", to: "invoices#summary"
       get "invoices/:id", to: "invoices#show", as: :external_api_invoice
+
+      # Contractor data API endpoints
+      get "contractors", to: "contractors#index"
+      get "contractors/:id",
+          to: "contractors#show",
+          as: :external_api_contractor
     end
   end
 
