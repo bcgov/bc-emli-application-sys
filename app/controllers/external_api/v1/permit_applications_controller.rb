@@ -101,7 +101,7 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
     if from.present? || to.present?
       submitted_at = {}
       submitted_at[:gte] = from if from.present?
-      submitted_at[:lte] = to if to.present?
+      submitted_at[:lte] = to.end_of_day if to.present?
       constraints = { submitted_at: submitted_at }
     end
 
