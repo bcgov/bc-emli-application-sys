@@ -12,6 +12,7 @@ class ContractorInfoBlueprint < Blueprinter::Base
     :type_of_business,
     :primary_program_measure,
     :retrofit_enabling_measures,
-    :service_languages
+    :service_languages,
+    :updated_at
   )
 end
