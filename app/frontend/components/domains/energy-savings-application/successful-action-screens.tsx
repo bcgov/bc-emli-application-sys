@@ -1,7 +1,6 @@
 import { Container, Flex, Heading, Icon, Text, VStack, Box, Button } from '@chakra-ui/react';
 import { CheckCircleIcon, WarningCircleIcon } from '@phosphor-icons/react';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
-import { SubmissionReturnButton } from '../../shared/energy-savings-applications/submission-action-return-button';
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
@@ -221,6 +220,35 @@ export const SuccessfulApprovedPendingScreen = observer(() => {
       title={t('energySavingsApplication.review.approvedPendingSuccess', {
         submissionType: submissionType?.toLowerCase(),
       })}
+      referenceNumber={applicationNumber}
+      primaryButtonLabel={
+        currentUser.isParticipant
+          ? t('energySavingsApplication.returnToMain')
+          : t('energySavingsApplication.new.viewAllSubmissions')
+      }
+      primaryButtonTo={currentUser.isParticipant ? '/applications' : '/submission-inbox'}
+    />
+  );
+});
+
+/***
+ * Approved-Paid Success Screen
+ ***/
+export const SuccessfulApprovedPaidScreen = observer(() => {
+  const { t } = useTranslation();
+  const location = useLocation();
+  const { submissionType, applicationNumber } = location.state || {};
+
+  const { userStore } = useMst();
+  const currentUser = userStore.currentUser;
+
+  return (
+    <SuccessfulActionScreen
+      icon="success"
+      title={t('energySavingsApplication.review.approvedPaidSuccess', {
+        submissionType: submissionType?.toLowerCase(),
+      })}
+      subtitle={t('energySavingsApplication.review.approvedPaidSuccessSubtitle')}
       referenceNumber={applicationNumber}
       primaryButtonLabel={
         currentUser.isParticipant
