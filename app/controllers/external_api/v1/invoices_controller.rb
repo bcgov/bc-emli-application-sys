@@ -89,7 +89,7 @@ class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
 
     submitted_at = {}
     submitted_at[:gte] = from if from.present?
-    submitted_at[:lte] = to if to.present?
+    submitted_at[:lte] = to.end_of_day if to.present?
 
     { submitted_at: submitted_at }
   end

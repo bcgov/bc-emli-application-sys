@@ -233,6 +233,10 @@ paths:
                               items:
                                 type: string
                               nullable: true
+                            updated_at:
+                              type: string
+                              format: date-time
+                              description: Timestamp of approval or last update
                       required:
                       - id
                       - business_name
@@ -420,6 +424,10 @@ paths:
                             items:
                               type: string
                             nullable: true
+                          updated_at:
+                            type: string
+                            format: date-time
+                            description: Timestamp of approval or last update
                     required:
                     - id
                     - business_name

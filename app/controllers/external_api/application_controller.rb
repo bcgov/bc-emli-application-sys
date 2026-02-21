@@ -31,7 +31,6 @@ class ExternalApi::ApplicationController < ActionController::API
   def validate_date_param(value, param_name)
     return nil unless value.present?
     Date.iso8601(value)
-    value
   rescue Date::Error, ArgumentError
     render json: {
              error: "Invalid date format for #{param_name}. Use YYYY-MM-DD."

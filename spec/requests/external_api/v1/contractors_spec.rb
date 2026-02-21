@@ -209,6 +209,11 @@ RSpec.describe "external_api/v1/contractors",
                                type: :string
                              },
                              nullable: true
+                           },
+                           updated_at: {
+                             type: :string,
+                             format: "date-time",
+                             description: "Timestamp of approval or last update"
                            }
                          }
                        }
@@ -466,6 +471,11 @@ RSpec.describe "external_api/v1/contractors",
                              type: :string
                            },
                            nullable: true
+                         },
+                         updated_at: {
+                           type: :string,
+                           format: "date-time",
+                           description: "Timestamp of approval or last update"
                          }
                        }
                      }
