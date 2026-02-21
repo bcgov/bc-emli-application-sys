@@ -20,7 +20,7 @@ class PermitApplication::ContractorOnboardingProcessor
     # The contractor record should already exist (created earlier in the onboarding flow).
     # use the submitter_id to fetch the right record.
     contractor = Contractor.find(@application.submitter_id)
-    contractor.update!(contractor_detail_attrs)
+    contractor.update!(contractor_detail_attrs.merge(onboarded: true))
 
     # contractor_info contains the detailed business information, licenses, etc.
     # contractor handles the upsert for the _info
