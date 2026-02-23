@@ -854,6 +854,16 @@ class PermitApplication < ApplicationRecord
     }
   end
 
+  def publish_invoice_ineligible__data
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::CONTRACTOR_INVOICE_INELIGIBLE,
+      "action_text" =>
+        "#{I18n.t("notification.contractor.invoice_ineligible", number: number)}"
+    }
+  end
+
   def extract_email_from_submission_data
     summary_fields_for_external_use[:email]
   end
@@ -1085,6 +1095,18 @@ class PermitApplication < ApplicationRecord
     return if contractor.nil?
 
     NotificationService.contractor_invoice_updated_event(
+      self,
+      primary_contact,
+      employee_contact
+    )
+  end
+
+  def process_contractor_invoice_ineligible!
+    contractor, primary_contact, employee_contact =
+      invoice_submission_recipients
+    return if contractor.nil?
+
+    NotificationService.contractor_invoice_ineligible_event(
       self,
       primary_contact,
       employee_contact

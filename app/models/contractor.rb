@@ -161,15 +161,6 @@ class Contractor < ApplicationRecord
     }
   end
 
-  def publish_invoice_ineligible__data
-    {
-      "id" => SecureRandom.uuid,
-      "action_type" =>
-        Constants::NotificationActionTypes::CONTRACTOR_INVOICE_INELIGIBLE,
-      "action_text" => "#{I18n.t("notification.contractor.invoice_ineligible")}"
-    }
-  end
-
   def publish_invoice_approved__data
     {
       "id" => SecureRandom.uuid,

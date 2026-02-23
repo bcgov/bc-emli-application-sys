@@ -84,7 +84,9 @@ module ApplicationFlow
     end
 
     def handle_ineligible_status
-      application.update(ineligible_at: Time.current)
+      application.update(updated_at: Time.current)
+
+      application.process_contractor_invoice_ineligible!
     end
 
     def handle_submission

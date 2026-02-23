@@ -411,4 +411,17 @@ class PermitHubMailer < ApplicationMailer
 
     send_mail(email: @user.email, template_key: "contractor_invoice_updated")
   end
+
+  def contractor_invoice_ineligible(application, user)
+    @application = application
+    @user = user
+    @invoice_number = application.number
+    @invoice_id = application.id
+    @ineligible_reason = application.status_update_reason
+
+    return unless @user.present?
+    return unless @user.email.present?
+
+    send_mail(email: @user.email, template_key: "contractor_invoice_ineligible")
+  end
 end
