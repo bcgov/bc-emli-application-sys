@@ -153,7 +153,9 @@ class PermitApplicationPolicy < ApplicationPolicy
   end
 
   def submit?
-    if record.submission_type.onboarding? && record.user_group_type.contractor?
+    if record.submission_type.onboarding? &&
+         record.user_group_type.contractor? ||
+         record.submission_type.invoice? && record.user_group_type.contractor?
       return true
     end
 

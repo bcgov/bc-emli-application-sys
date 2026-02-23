@@ -28,5 +28,10 @@ module Constants
     SUPPORTING_FILES_UPLOADED = "supporting_files_uploaded"
     SUPPORTING_FILES_REQUESTED = "supporting_files_requested"
     CONTRACTOR_ONBOARDING_APPROVED = "contractor_onboarding_approved"
+    CONTRACTOR_INVOICE_SUBMITTED = "invoice_submitted"
+    CONTRACTOR_INVOICE_UPDATED = "invoice_updated"
+    CONTRACTOR_INVOICE_INELIGIBLE = "invoice_ineligible"
+    CONTRACTOR_INVOICE_APPROVED = "invoice_approved"
+    CONTRACTOR_INVOICE_PAID = "invoice_paid"
   end
 end

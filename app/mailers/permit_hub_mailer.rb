@@ -387,4 +387,28 @@ class PermitHubMailer < ApplicationMailer
 
     send_user_mail(email: email, template_key: "imported_contractor_invite")
   end
+
+  def contractor_invoice_submission(application, user)
+    @application = application
+    @user = user
+    @invoice_number = application.number
+    @invoice_id = application.id
+
+    return unless @user.present?
+    return unless @user.email.present?
+
+    send_mail(email: @user.email, template_key: "contractor_invoice_submission")
+  end
+
+  def contractor_invoice_updated(application, user)
+    @application = application
+    @user = user
+    @invoice_number = application.number
+    @invoice_id = application.id
+
+    return unless @user.present?
+    return unless @user.email.present?
+
+    send_mail(email: @user.email, template_key: "contractor_invoice_updated")
+  end
 end

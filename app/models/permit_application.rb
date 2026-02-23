@@ -844,6 +844,16 @@ class PermitApplication < ApplicationRecord
     }
   end
 
+  def publish_invoice_updated__data
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::CONTRACTOR_INVOICE_UPDATED,
+      "action_text" =>
+        "#{I18n.t("notification.contractor.invoice_updated", number: number)}"
+    }
+  end
+
   def extract_email_from_submission_data
     summary_fields_for_external_use[:email]
   end
@@ -1056,7 +1066,53 @@ class PermitApplication < ApplicationRecord
     NotificationService.contractor_onboarding_sumbitted_event(self, contractor)
   end
 
+  def process_contractor_invoice_submission!
+    contractor, primary_contact, employee_contact =
+      invoice_submission_recipients
+    return if contractor.nil?
+
+    NotificationService.contractor_invoice_submission_event(
+      self,
+      contractor,
+      primary_contact,
+      employee_contact
+    )
+  end
+
+  def process_contractor_invoice_updated!
+    contractor, primary_contact, employee_contact =
+      invoice_submission_recipients
+    return if contractor.nil?
+
+    NotificationService.contractor_invoice_updated_event(
+      self,
+      primary_contact,
+      employee_contact
+    )
+  end
+
   private
+
+  def invoice_submission_recipients
+    # first find if the user is an employee
+    employee = ContractorEmployee.find_by(employee_id: submitter_id)
+    if employee.nil?
+      # if not an employee, find if they are the primary contractor
+      contractor = Contractor.find_by(contact_id: submitter_id)
+    else
+      # find contractor through employee
+      contractor = Contractor.find(employee.contractor_id)
+    end
+
+    # failsafe
+    return nil, nil, nil if contractor.nil?
+
+    # need to load the primary contact and employee
+    primary_contact = User.find(contractor.contact_id)
+    employee_contact = User.find(employee.employee_id) if employee
+
+    [contractor, primary_contact, employee_contact]
+  end
 
   def submission_variant_consistency
     return if submission_variant.nil?

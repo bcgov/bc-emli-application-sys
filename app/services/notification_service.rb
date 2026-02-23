@@ -326,19 +326,19 @@ class NotificationService
     # Temporarily disabled - view notifications
     return
 
-    notification_user_hash = {}
-    notification_user_hash[
-      permit_application.submitter_id
-    ] = permit_application.application_view_event_notification_data
-    preference = permit_application.submitter.preference
-    if preference.enable_email_application_view_notification
-      PermitHubMailer.notify_application_viewed(
-        permit_application
-      )&.deliver_later
-    end
-    if preference.enable_in_app_application_view_notification
-      NotificationPushJob.perform_async(notification_user_hash)
-    end
+    # notification_user_hash = {}
+    # notification_user_hash[
+    #   permit_application.submitter_id
+    # ] = permit_application.application_view_event_notification_data
+    # preference = permit_application.submitter.preference
+    # if preference.enable_email_application_view_notification
+    #   PermitHubMailer.notify_application_viewed(
+    #     permit_application
+    #   )&.deliver_later
+    # end
+    # if preference.enable_in_app_application_view_notification
+    #   NotificationPushJob.perform_async(notification_user_hash)
+    # end
   end
 
   def self.publish_application_ineligible_event(permit_application)
@@ -595,6 +595,51 @@ class NotificationService
       application,
       contractor
     )&.deliver_later
+  end
+
+  def self.contractor_invoice_submission_event(
+    application,
+    contractor,
+    primary_contact,
+    employee_contact
+  )
+    notification_user_hash = {}
+    notification_data = contractor.publish_invoice_submission__data
+    recipients = [primary_contact, employee_contact].compact.uniq(&:id)
+
+    recipients.each do |recipient|
+      notification_user_hash[recipient.id] = notification_data
+      PermitHubMailer.contractor_invoice_submission(
+        application,
+        recipient
+      )&.deliver_later
+    end
+
+    unless notification_user_hash.empty?
+      NotificationPushJob.perform_async(notification_user_hash)
+    end
+  end
+
+  def self.contractor_invoice_updated_event(
+    application,
+    primary_contact,
+    employee_contact
+  )
+    notification_user_hash = {}
+    notification_data = application.publish_invoice_updated__data
+    recipients = [primary_contact, employee_contact].compact.uniq(&:id)
+
+    recipients.each do |recipient|
+      notification_user_hash[recipient.id] = notification_data
+      PermitHubMailer.contractor_invoice_updated(
+        application,
+        recipient
+      )&.deliver_later
+    end
+
+    unless notification_user_hash.empty?
+      NotificationPushJob.perform_async(notification_user_hash)
+    end
   end
 
   # this is just a wrapper around the activity's metadata methods

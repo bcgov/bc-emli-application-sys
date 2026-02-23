@@ -22,7 +22,7 @@ module ApplicationFlow
         transitions from: :revisions_requested,
                     to: :resubmitted,
                     guard: :can_submit?,
-                    after: :handle_submission
+                    after: :handle_resubmission
       end
 
       event :finalize_revision_requests do
@@ -77,10 +77,33 @@ module ApplicationFlow
       application.update(updated_at: Time.current)
     end
 
+    def handle_finalize_revision_requests
+      application.update(revisions_requested_at: Time.current)
+
+      application.process_contractor_invoice_updated!
+    end
+
+    def handle_ineligible_status
+      application.update(ineligible_at: Time.current)
+    end
+
     def handle_submission
       application.update(signed_off_at: Time.current)
 
       # Create submission version to capture application state at submission time
+      application.submission_versions.create!(
+        form_json: application.form_json,
+        submission_data: application.submission_data
+      )
+
+      application.zip_and_upload_supporting_documents
+
+      application.process_contractor_invoice_submission!
+    end
+
+    def handle_resubmission
+      application.update(signed_off_at: Time.current)
+
       application.submission_versions.create!(
         form_json: application.form_json,
         submission_data: application.submission_data
