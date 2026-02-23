@@ -152,6 +152,15 @@ class Contractor < ApplicationRecord
     }
   end
 
+  def publish_invoice_submission__data
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::CONTRACTOR_INVOICE_SUBMITTED,
+      "action_text" => "#{I18n.t("notification.contractor.invoice_submitted")}"
+    }
+  end
+
   private
 
   def assign_unique_number

@@ -387,4 +387,65 @@ class PermitHubMailer < ApplicationMailer
 
     send_user_mail(email: email, template_key: "imported_contractor_invite")
   end
+
+  def contractor_invoice_submission(application, user)
+    @application = application
+    @user = user
+    @invoice_number = application.number
+    @invoice_id = application.id
+
+    return unless @user.present?
+    return unless @user.email.present?
+
+    send_mail(email: @user.email, template_key: "contractor_invoice_submission")
+  end
+
+  def contractor_invoice_updated(application, user)
+    @application = application
+    @user = user
+    @invoice_number = application.number
+    @invoice_id = application.id
+
+    return unless @user.present?
+    return unless @user.email.present?
+
+    send_mail(email: @user.email, template_key: "contractor_invoice_updated")
+  end
+
+  def contractor_invoice_ineligible(application, user)
+    @application = application
+    @user = user
+    @invoice_number = application.number
+    @invoice_id = application.id
+    @ineligible_reason = application.status_update_reason
+
+    return unless @user.present?
+    return unless @user.email.present?
+
+    send_mail(email: @user.email, template_key: "contractor_invoice_ineligible")
+  end
+
+  def contractor_invoice_approved(application, user)
+    @application = application
+    @user = user
+    @invoice_number = application.number
+    @invoice_id = application.id
+
+    return unless @user.present?
+    return unless @user.email.present?
+
+    send_mail(email: @user.email, template_key: "contractor_invoice_approved")
+  end
+
+  def contractor_invoice_paid(application, user)
+    @application = application
+    @user = user
+    @invoice_number = application.number
+    @invoice_id = application.id
+
+    return unless @user.present?
+    return unless @user.email.present?
+
+    send_mail(email: @user.email, template_key: "contractor_invoice_paid")
+  end
 end

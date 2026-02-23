@@ -482,7 +482,7 @@ const options = {
           feedbackLink: 'Tell us what you think',
           sortBy: 'Sort by',
           resume: 'Resume',
-          continue: 'Continue application',
+          continue: 'Continue {{submissionType}}',
           cancel: 'Cancel',
           cancelRequest: 'Cancel request',
           remove: 'Remove',
@@ -1055,6 +1055,8 @@ const options = {
           },
           review: {
             readyToMarkIneligible: 'Ready to mark ineligible?',
+            readyToApprovePending: 'Ready to mark approved - pending?',
+            readyToMarkPaid: 'Ready to mark approve - paid?',
             confirmIneligible: 'I confirm that this {{submissionType}} is ineligible for the Energy Savings Program.',
             readyToScreen: 'Ready to screen in?',
             confirmReview: 'I confirm this {{submissionType}} has all the required information.',
@@ -1073,7 +1075,7 @@ const options = {
           whatsNext: {
             heading: "What's next?",
             line1:
-              'Please wait while we assess your registration details. We will email you once your registration is approved. If we need more information we will reach out via email.',
+              'Please wait while we assess your registration details. On review of your registration details, we will email you with next steps. If we need more information, we will reach out to the email you registered with.',
             line2:
               'If you need to add, edit, or remove employees from your account in the future you will need to call us.',
             line3: 'If you have any questions, please call us at 1-833-856-0333 or email us at <1>{{email}}</1>.',
@@ -1128,6 +1130,7 @@ const options = {
           reviewCustomizedMessage: 'Filters have been applied. Please review the draft applications below.',
           newVersionPublished: 'New version of template has been published - please review changes',
           card: {
+            viewActionButton: 'View {{submissionType}}',
             viewApplication: 'View application',
             continueButton: 'Continue',
             collaborateButton: 'Collaborate',
@@ -1135,8 +1138,8 @@ const options = {
               '<1>{{authorName}} has assigned you to this permit.</1> Collaborate on this permit application.',
             collaborationCalloutSubmitted: '<1>{{authorName}} assigned you to this permit.</1>',
             actionRequired: 'Action required:',
-            reviewApplication:
-              'An agent has reviewed your application and needs more information. Please review and update your application.',
+            reviewActionText:
+              'An agent has reviewed your {{submissionType}} and needs more information. Please review and update your {{submissionType}}.',
           },
           referenceNumber: 'Reference #',
           pdf: {
@@ -1303,6 +1306,8 @@ const options = {
             hearBack: 'Need help?',
             contactInstruction:
               'See the status of your application or your application history any time by logging in to the Better Homes Energy Savings Program. Contact <1>{{ email }}</1> if you have any questions about your application.',
+            contractorContactInstruction:
+              'If you need to add, edit, or remove employees from your account in the future you will need to email the program at <1>{{ email }}</1>',
             whatsNextTitle: "What's next?",
             ready: 'Ready to submit this application form?',
             onBehalf: 'Ready to submit on someone’s behalf?',
@@ -1344,6 +1349,9 @@ const options = {
             readyToScreen: 'Ready to screen in?',
             confirmReview: 'I confirm this {{submissionType}} has all the required information.',
             screenedInSuccess: 'You have screened in this {{submissionType}} form to in review.',
+            approvedPendingSuccess: 'You have marked this {{submissionType}} form approved - pending.',
+            approvedPaidSuccess: 'You have marked this {{submissionType}} form approved - paid.',
+            approvedPaidSuccessSubtitle: 'An email has been automatically sent to the submitter.',
             inEligibleReasonReminder: 'Email the contractor with a reason for ineligibility.',
             admin: {
               markedIneligible: 'You have marked this {{submissionType}} form ineligible.',
@@ -1365,7 +1373,9 @@ const options = {
           },
           show: {
             update: 'Update',
-            readyForTraining: 'Ready for Training',
+            readyForTraining: 'Ready for training',
+            approvePending: 'Approve pending',
+            approvePaid: 'Approve paid',
             markIneligible: 'Mark ineligible',
             screenIn: 'Screen in',
             inEligible: 'Ineligible',
@@ -1425,7 +1435,7 @@ const options = {
             backToInbox: 'Back to inbox',
             locateRevisions: 'Locate each requested revision by clicking the links below.',
             revisionsWereRequested: 'Updates to this application were requested on {{date}}',
-            applicationSubmitted: 'Application was submitted on {{date}}',
+            applicationSubmitted: '{{submissionType}} was submitted on {{date}}',
             clickQuestion: 'Click on the question(s) or requirement(s) you want the submitter to revise.',
             clickQuestionUpdate: 'Click on the question(s) or requirement(s) you want to update.',
             inEligibleDetails: 'Ineligible {{submissionType}} form details',

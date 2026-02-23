@@ -173,6 +173,11 @@ en:
       contractor_onboarding_submitted: 'Contractor onboarding application submitted'
       imported_contractor_invite: 'You have been invited as a contractor'
       notify_new_contractor_employee: 'You have been added as an employee to a contractor account'
+      contractor_invoice_submission: 'Invoice received'
+      contractor_invoice_updated: 'Update needed to invoice'
+      contractor_invoice_ineligible: 'Update on your invoice'
+      contractor_invoice_approved: 'Invoice approved'
+      contractor_invoice_paid: 'Invoice paid'
   authentication_methods:
     bcsc: 'BC Services Card Account'
     bceidbasic: 'Basic BCeID'
@@ -832,6 +837,11 @@ en:
       supporting_files_requested: 'Supporting files requested for form %{parent_application_number} on %{created_date}'
     contractor:
       onboarding_approved: 'Congratulations! You are now a registered contractor for the Better Homes Energy Savings Program. You can now submit invoices and explore program resources.'
+      invoice_submitted: 'Thank you for your invoice submission. If we need more information we will contact you by email.'
+      invoice_updated: 'We need more information to process invoice %{number}. Please update your submission.'
+      invoice_ineligible: 'Invoice submission %{number} has been processed and is not eligible. Check the submission to see why.'
+      invoice_approved: 'We approved invoice %{number}. You will get an email when we issue your payment.'
+      invoice_paid: 'Rebate payment for invoice %{number} will be deposited in 3-5 business days.'
     user:
       account_update_notification: 'Your account was updated on %{updated_at}. Changes: %{changed_fields}. If you did not make this change, please contact support immediately.'
     permit_collaboration:
