@@ -161,24 +161,6 @@ class Contractor < ApplicationRecord
     }
   end
 
-  def publish_invoice_approved__data
-    {
-      "id" => SecureRandom.uuid,
-      "action_type" =>
-        Constants::NotificationActionTypes::CONTRACTOR_INVOICE_APPROVED,
-      "action_text" => "#{I18n.t("notification.contractor.invoice_approved")}"
-    }
-  end
-
-  def publish_invoice_paid__data
-    {
-      "id" => SecureRandom.uuid,
-      "action_type" =>
-        Constants::NotificationActionTypes::CONTRACTOR_INVOICE_PAID,
-      "action_text" => "#{I18n.t("notification.contractor.invoice_paid")}"
-    }
-  end
-
   private
 
   def assign_unique_number

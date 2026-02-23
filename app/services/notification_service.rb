@@ -664,6 +664,50 @@ class NotificationService
     end
   end
 
+  def self.contractor_invoice_approved_event(
+    application,
+    primary_contact,
+    employee_contact
+  )
+    notification_user_hash = {}
+    notification_data = application.publish_invoice_approved__data
+    recipients = [primary_contact, employee_contact].compact.uniq(&:id)
+
+    recipients.each do |recipient|
+      notification_user_hash[recipient.id] = notification_data
+      PermitHubMailer.contractor_invoice_approved(
+        application,
+        recipient
+      )&.deliver_later
+    end
+
+    unless notification_user_hash.empty?
+      NotificationPushJob.perform_async(notification_user_hash)
+    end
+  end
+
+  def self.contractor_invoice_approve_paid_event(
+    application,
+    primary_contact,
+    employee_contact
+  )
+    notification_user_hash = {}
+    notification_data = application.publish_invoice_paid__data
+    recipients = [primary_contact, employee_contact].compact.uniq(&:id)
+
+    recipients.each do |recipient|
+      notification_user_hash[recipient.id] = notification_data
+      PermitHubMailer.contractor_invoice_paid(
+        application,
+        recipient
+      )&.deliver_later
+    end
+
+    unless notification_user_hash.empty?
+      NotificationPushJob.perform_async(notification_user_hash)
+    end
+  end
+
   # this is just a wrapper around the activity's metadata methods
   # since in the case of a single instance it returns a specific return type (eg. Integer)
   # but in the case of multiple user_ids the activity is a hash object

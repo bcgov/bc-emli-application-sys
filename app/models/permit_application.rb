@@ -864,6 +864,26 @@ class PermitApplication < ApplicationRecord
     }
   end
 
+  def publish_invoice_approved__data
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::CONTRACTOR_INVOICE_APPROVED,
+      "action_text" =>
+        "#{I18n.t("notification.contractor.invoice_approved", number: number)}"
+    }
+  end
+
+  def publish_invoice_paid__data
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::CONTRACTOR_INVOICE_PAID,
+      "action_text" =>
+        "#{I18n.t("notification.contractor.invoice_paid", number: number)}"
+    }
+  end
+
   def extract_email_from_submission_data
     summary_fields_for_external_use[:email]
   end
@@ -1107,6 +1127,30 @@ class PermitApplication < ApplicationRecord
     return if contractor.nil?
 
     NotificationService.contractor_invoice_ineligible_event(
+      self,
+      primary_contact,
+      employee_contact
+    )
+  end
+
+  def process_contractor_invoice_approved!
+    contractor, primary_contact, employee_contact =
+      invoice_submission_recipients
+    return if contractor.nil?
+
+    NotificationService.contractor_invoice_approved_event(
+      self,
+      primary_contact,
+      employee_contact
+    )
+  end
+
+  def process_contractor_invoice_approve_paid!
+    contractor, primary_contact, employee_contact =
+      invoice_submission_recipients
+    return if contractor.nil?
+
+    NotificationService.contractor_invoice_approve_paid_event(
       self,
       primary_contact,
       employee_contact

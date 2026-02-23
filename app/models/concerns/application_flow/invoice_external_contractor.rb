@@ -71,10 +71,14 @@ module ApplicationFlow
 
     def approve_invoice
       application.update(updated_at: Time.current)
+
+      application.process_contractor_invoice_approved!
     end
 
     def mark_invoice_as_paid
       application.update(updated_at: Time.current)
+
+      application.process_contractor_invoice_approve_paid!
     end
 
     def handle_finalize_revision_requests
