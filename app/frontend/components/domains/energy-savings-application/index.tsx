@@ -44,6 +44,7 @@ export const EnergySavingsApplicationIndexScreen = observer(
     customButtonLink,
     customEmptyMessage,
   }: IEnergySavingsApplicationIndexScreenProps) => {
+    const SUBMIT_INVOICE_DISABLED = import.meta.env.VITE_SUBMIT_INVOICE_DISABLED === 'true';
     const { t } = useTranslation();
     const { permitApplicationStore, sandboxStore, userStore } = useMst();
     const {
@@ -181,6 +182,7 @@ export const EnergySavingsApplicationIndexScreen = observer(
                       ? `${customButtonText} - start a new invoice submission`
                       : t('energySavingsApplication.start')
                   }
+                  isDisabled={SUBMIT_INVOICE_DISABLED}
                 >
                   {customButtonText || t('energySavingsApplication.start')}
                 </RouterLinkButton>
