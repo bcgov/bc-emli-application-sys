@@ -1161,6 +1161,7 @@ const options = {
           usePid: "Use '{{ inputValue }}' as PID",
           indexTitle: 'My applications',
           start: 'Start an application',
+          newInvoiceSubmission: 'start a new invoice submission',
           drafts: 'Draft Permits',
           startedOn: 'Started',
           lastUpdated: 'Last updated',

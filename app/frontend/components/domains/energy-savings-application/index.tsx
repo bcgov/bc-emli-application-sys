@@ -179,7 +179,7 @@ export const EnergySavingsApplicationIndexScreen = observer(
                   w={{ base: 'full', md: 'fit-content' }}
                   aria-label={
                     customButtonText
-                      ? `${customButtonText} - start a new invoice submission`
+                      ? `${customButtonText} - ${t('energySavingsApplication.newInvoiceSubmission')}`
                       : t('energySavingsApplication.start')
                   }
                   isDisabled={SUBMIT_INVOICE_DISABLED}
