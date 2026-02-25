@@ -2300,6 +2300,7 @@ const options = {
             mailTo: 'ESPcontractorsupport@clearesult.com',
             expired: {
               title: 'Expired Invitation',
+              adminBody: 'Contact your manager to re-issue the invite.',
               cta: 'Back to Contractor homepage',
             },
             consumed: {

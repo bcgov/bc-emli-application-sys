@@ -86,12 +86,12 @@ function InvalidTokenMessage({ invitationStatus, role }: { invitationStatus: str
 
   if (!isContractor) {
     return (
-      <Container maxW="container.lg">
-        <VStack gap={12} my="20" mb="40">
-          <Heading as="h1" mb={0}>
+      <Container maxW="900px">
+        <VStack gap={8} my="20" mb={10}>
+          <Heading as="h1" color="theme.blueAlt">
             {t('user.invalidInvitationToken.expired.title')}
           </Heading>
-          <RouterLinkButton to="/">{t('site.pageNotFoundCTA')}</RouterLinkButton>
+          <Text>{t('user.invalidInvitationToken.expired.adminBody')}</Text>
         </VStack>
       </Container>
     );
