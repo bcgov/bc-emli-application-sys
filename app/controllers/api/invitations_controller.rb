@@ -39,13 +39,15 @@ class Api::InvitationsController < ApplicationController
     when :expired
       render json: {
                error: :expired_token,
-               status: :not_acceptable
+               status: :not_acceptable,
+               role: @invited_user.role
              },
              status: :unprocessable_entity
     when :accepted
       render json: {
                error: :already_accepted,
-               status: :accepted
+               status: :accepted,
+               role: @invited_user.role
              },
              status: :unprocessable_entity
     else
@@ -81,15 +83,23 @@ class Api::InvitationsController < ApplicationController
 
   def find_invited_user
     token = params[:id].to_s.strip
-
     @invited_user = User.find_by_invitation_token(token, false)
-    @invitation_sent_on =
-      DateTime.parse(@invited_user.invitation_sent_at.inspect)
-    @invitation_expires_on = @invitation_sent_on + 14
 
-    if @invited_user == nil
+    unless @invited_user.persisted?
       @invite_status = :invalid
-    elsif @invitation_expires_on <= DateTime.now
+      return
+    end
+
+    if @invited_user.invitation_accepted_at.present?
+      @invite_status = :accepted
+      return
+    end
+
+    if @invited_user.invitation_created_at.blank? ||
+         (
+           Devise.invite_for.positive? &&
+             @invited_user.invitation_created_at < Devise.invite_for.ago
+         )
       @invite_status = :expired
     else
       @invite_status = :valid

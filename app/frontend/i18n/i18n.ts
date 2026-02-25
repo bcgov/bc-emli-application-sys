@@ -2296,13 +2296,22 @@ const options = {
             'This invitation is intended for <strong>{{email}}</strong>, if this is incorrect please contact the sender above.',
           invalidInvitationToken: {
             message:
-              'If you have any questions, please ask your primary contact to call us at 1-833-856-0333 or email us at ',
+              'If you have any questions, please ask your primary contact to call us at 1-833-856-0333 or email us at:',
             mailTo: 'ESPcontractorsupport@clearesult.com',
-            invalid: {
-              title: 'Invalid Invitation',
-            },
             expired: {
               title: 'Expired Invitation',
+              cta: 'Back to Contractor homepage',
+            },
+            consumed: {
+              title: 'Someone already used this link.',
+              body1: 'Someone from your company has already transferred this account to the new portal.',
+              body2:
+                "If you're an employee who needs access, reach out to your company's primary contact for the account. They can request your access from within the portal.",
+            },
+            contact: {
+              heading: "Your company's primary contact can reach out if you need help:",
+              phone: '1-833-856-0333',
+              email: 'ESPContractorSupport@clearesult.com',
             },
           },
           createAccount: 'Proceed with your account creation',

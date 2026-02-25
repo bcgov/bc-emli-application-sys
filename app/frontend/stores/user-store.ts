@@ -125,14 +125,15 @@ export const UserStoreModel = types
     fetchInvitedUser: flow(function* (token: string, programId) {
       const { ok, data: response } = yield* toGenerator(self.environment.api.fetchInvitedUser(token, programId));
       if (ok) {
-        console.log(response.data);
         self.mergeUpdate(response.data, 'usersMap');
         self.invitedUser = response.data.id;
       }
 
+      const errorBody = response as unknown as { status?: string; role?: string };
       return {
         isOk: ok,
-        status: response?.status ?? null,
+        status: errorBody?.status ?? null,
+        role: errorBody?.role ?? null,
       };
     }),
     updateProfile: flow(function* (formData) {
