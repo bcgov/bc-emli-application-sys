@@ -643,7 +643,7 @@ class PermitApplication < ApplicationRecord
       "action_type" =>
         Constants::NotificationActionTypes::APPLICATION_SUBMISSION,
       "action_text" =>
-        "#{I18n.t(i18n_key, number: number, jurisdiction_name: program_name)}",
+        "#{I18n.t(i18n_key, number: number, jurisdiction_name: program_name, **submission_type_interpolation_values)}",
       "object_data" => {
         "permit_application_id" => id
       }
@@ -658,13 +658,15 @@ class PermitApplication < ApplicationRecord
           "notification.permit_application.ineligible_notification_with_reason",
           number: number,
           program_name: program_name,
-          reason: status_update_reason
+          reason: status_update_reason,
+          **submission_type_interpolation_values
         )
       else
         I18n.t(
           "notification.permit_application.ineligible_notification",
           number: number,
-          program_name: program_name
+          program_name: program_name,
+          **submission_type_interpolation_values
         )
       end
 
@@ -686,7 +688,7 @@ class PermitApplication < ApplicationRecord
       "action_type" =>
         Constants::NotificationActionTypes::APPLICATION_REVISIONS_REQUEST,
       "action_text" =>
-        "#{I18n.t("notification.permit_application.revisions_request_notification", number: number, program_name: program_name)}",
+        "#{I18n.t("notification.permit_application.revisions_request_notification", number: number, program_name: program_name, **submission_type_interpolation_values)}",
       "object_data" => {
         "permit_application_id" => id,
         "permit_application_number" => number
@@ -699,7 +701,7 @@ class PermitApplication < ApplicationRecord
       "id" => SecureRandom.uuid,
       "action_type" => Constants::NotificationActionTypes::APPLICATION_VIEW,
       "action_text" =>
-        "#{I18n.t("notification.permit_application.view_notification", number: number, program_name: program_name)}",
+        "#{I18n.t("notification.permit_application.view_notification", number: number, program_name: program_name, **submission_type_interpolation_values)}",
       "object_data" => {
         "permit_application_id" => id
       }
@@ -725,7 +727,7 @@ class PermitApplication < ApplicationRecord
       "action_type" =>
         Constants::NotificationActionTypes::APPLICATION_WITHDRAWAL,
       "action_text" =>
-        "#{I18n.t("notification.permit_application.withdrawal_notification", number: number, program_name: program_name)}",
+        "#{I18n.t("notification.permit_application.withdrawal_notification", number: number, program_name: program_name, **submission_type_interpolation_values)}",
       "object_data" => {
         "permit_application_id" => id,
         "permit_application_number" => number
@@ -750,7 +752,7 @@ class PermitApplication < ApplicationRecord
       "action_type" =>
         Constants::NotificationActionTypes::NEW_SUBMISSION_RECEIVED,
       "action_text" =>
-        "#{I18n.t(i18n_key, number: number, program_name: program_name, submitted_at: I18n.l(timestamp, format: :long))}",
+        "#{I18n.t(i18n_key, number: number, program_name: program_name, submitted_at: I18n.l(timestamp, format: :long), **submission_type_interpolation_values)}",
       "object_data" => {
         "permit_application_id" => id,
         "permit_application_number" => number
@@ -809,7 +811,7 @@ class PermitApplication < ApplicationRecord
       "action_type" =>
         Constants::NotificationActionTypes::APPLICATION_ASSIGNMENT,
       "action_text" =>
-        "#{I18n.t("notification.permit_application.assignment_notification", number: number, program_name: program_name)}",
+        "#{I18n.t("notification.permit_application.assignment_notification", number: number, program_name: program_name, **submission_type_interpolation_values)}",
       "object_data" => {
         "permit_application_id" => id,
         "permit_application_number" => number
@@ -836,7 +838,7 @@ class PermitApplication < ApplicationRecord
       "action_type" =>
         Constants::NotificationActionTypes::PARTICIPANT_INCOMPLETE_DRAFT_NOTIFICATION,
       "action_text" =>
-        "#{I18n.t("notification.permit_application.participant_incomplete_draft_notification", number: number, program_name: program_name)}",
+        "#{I18n.t("notification.permit_application.participant_incomplete_draft_notification", number: number, program_name: program_name, **submission_type_interpolation_values)}",
       "object_data" => {
         "permit_application_id" => id,
         "permit_application_number" => number
@@ -1155,6 +1157,12 @@ class PermitApplication < ApplicationRecord
       primary_contact,
       employee_contact
     )
+  end
+
+  def submission_type_interpolation_values
+    code = submission_type_code.to_s.downcase
+
+    { submission_type: code, submission_type_upper: code.capitalize }
   end
 
   private

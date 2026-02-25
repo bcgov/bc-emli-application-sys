@@ -2,6 +2,7 @@ import pandas as pd
 import json
 
 COLUMN_MAP = {
+    "UID": "metadata.unique_code",
     "Username": "username",
     "User Status": "status",
 
@@ -45,8 +46,6 @@ COLUMN_MAP = {
 
     "Review Comments": "review.comments",
     "Reviewed By": "review.reviewed_by",
-
-    "Unique Code": "metadata.unique_code",
 }
 
 def set_nested(d, path, value):
