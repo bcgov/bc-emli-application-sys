@@ -1,19 +1,12 @@
-import { Button, Container, Divider, Flex, Heading, Text, VStack, Link } from '@chakra-ui/react';
+import { Container, Heading, ListItem, Text, UnorderedList, VStack, Link } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { observer } from 'mobx-react-lite';
 import React, { Suspense, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Trans } from 'react-i18next';
 import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { IUser } from '../../../models/user';
 import { useMst } from '../../../setup/root';
-import { EUserRoles } from '../../../types/enums';
 import { LoadingScreen } from '../../shared/base/loading-screen';
-import { BusinessBCeIDInfo } from '../../shared/bceid/business';
-import { CenterContainer } from '../../shared/containers/center-container';
-import { AdminPortalLogin, LoginForm } from '../admin/login';
-import { RouterLink } from '../../shared/navigation/router-link';
-import { storeEntryPoint } from '../../shared/store-entry-point';
+import { AdminPortalLogin } from '../admin/login';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 
 export const AcceptInvitationScreen = observer(() => {
@@ -22,10 +15,12 @@ export const AcceptInvitationScreen = observer(() => {
   const [invitationUserResponse, setInvitationUserResponse] = useState({
     isInvalidToken: false,
     status: null,
+    role: null,
   });
 
   const { programId } = useParams();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const invitationToken = searchParams.get('invitation_token');
 
@@ -34,13 +29,23 @@ export const AcceptInvitationScreen = observer(() => {
       const result = await fetchInvitedUser(invitationToken, programId);
 
       if (!result?.isOk) {
-        const updateInvitationResponse = {
-          ...invitationUserResponse,
+        if (result.status === 'invalid') {
+          navigate('/not-found');
+          return;
+        }
+
+        // Consumed users with a known admin role already have an account — redirect silently to login
+        const knownAdminRoles = ['admin', 'admin_manager', 'system_admin'];
+        if (result.status === 'accepted' && knownAdminRoles.includes(result.role)) {
+          navigate('/login');
+          return;
+        }
+
+        setInvitationUserResponse({
           isInvalidToken: true,
           status: result.status,
-        };
-
-        setInvitationUserResponse(updateInvitationResponse);
+          role: result.role,
+        });
       }
     };
     fetch();
@@ -51,8 +56,8 @@ export const AcceptInvitationScreen = observer(() => {
       {invitedUser ? (
         <Content invitedUser={invitedUser} />
       ) : (
-        invitationUserResponse?.isInvalidToken && (
-          <InvalidTokenMessage invitationStatus={invitationUserResponse?.status} />
+        invitationUserResponse.isInvalidToken && (
+          <InvalidTokenMessage invitationStatus={invitationUserResponse.status} role={invitationUserResponse.role} />
         )
       )}
     </Suspense>
@@ -63,133 +68,74 @@ interface IProps {
   invitedUser: IUser;
 }
 const Content = observer(function Content({ invitedUser }: Readonly<IProps>) {
-  const { sessionStore } = useMst();
-  const { loggedIn } = sessionStore;
-
-  const { invitedByEmail, invitedToProgram, email, role } = invitedUser;
-
-  const loginScreenProps = {
-    isAdmin: role === 'admin',
-    isAdminMgr: role === 'admin_manager',
-    isSysAdmin: role === 'system_admin',
-    isContractor: role === 'contractor',
-  };
-
-  // const loginKey = Object.keys(loginScreenProps).find((key) => loginScreenProps[key as keyof typeof loginScreenProps]);
-
-  // const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault(); // Prevent the default form submission
-
-  //   // Store the entry point in the session
-  //   await storeEntryPoint(loginKey);
-
-  //   // Submit the form after storing the entry point
-  //   (event.target as HTMLFormElement).submit();
-  // };
-
+  const { role } = invitedUser;
   return (
     <AdminPortalLogin
-      isAdmin={loginScreenProps.isAdmin}
-      isAdminMgr={loginScreenProps.isAdminMgr}
-      isSysAdmin={loginScreenProps.isSysAdmin}
-      isContractor={loginScreenProps.isContractor}
+      isAdmin={role === 'admin'}
+      isAdminMgr={role === 'admin_manager'}
+      isSysAdmin={role === 'system_admin'}
+      isContractor={role === 'contractor'}
     />
-    // <CenterContainer>
-    //   <Flex
-    //     direction="column"
-    //     gap={6}
-    //     maxW="500px"
-    //     p={10}
-    //     border="solid 1px"
-    //     borderColor="border.light"
-    //     bg="greys.white"
-    //   >
-    //     <Heading as="h1">{t('user.acceptInvitation')}</Heading>
-    //     <>
-    //       <Text>
-    //         <Trans i18nKey="user.invitedBy" values={{ email: invitedByEmail }} />
-    //       </Text>
-
-    //       <VStack spacing={4} w="full" p={4} bg="theme.blueLight" rounded="sm" textAlign="center">
-    //         <Heading as="h2" m={0}>
-    //           {invitedToProgram.programName}
-    //         </Heading>
-    //         <Text>{t('user.invitedAs')}</Text>
-    //         <Text fontWeight="bold">{t(`user.roles.${role as EUserRoles}`)}</Text>
-    //       </VStack>
-    //     </>
-
-    //     <Text fontStyle="italic" fontSize="sm" textAlign="center">
-    //       <Trans i18nKey="user.invitationIntent" values={{ email }} />
-    //     </Text>
-
-    //     <Divider my={4} />
-
-    //     {loggedIn ? (
-    //       <AcceptInviteForm />
-    //     ) : (
-    //       <>
-    //         <Heading as="h3" textAlign="center">
-    //           {t('user.createAccount')}
-    //         </Heading>
-    //         <LoginForm handleSubmit={handleSubmit} />
-    //       </>
-    //     )}
-    //   </Flex>
-    // </CenterContainer>
   );
 });
 
-function InvalidTokenMessage({ invitationStatus }) {
-  const invalidInvitationTitle = () => {
-    switch (invitationStatus) {
-      case 'not_acceptable':
-        return t('user.invalidInvitationToken.expired.title');
-      default:
-        return t('user.invalidInvitationToken.invalid.title');
-    }
-  };
+function InvalidTokenMessage({ invitationStatus, role }: { invitationStatus: string | null; role: string | null }) {
+  const isContractor = role === 'contractor';
+  const isConsumed = invitationStatus === 'accepted' && isContractor;
+  const isExpired = invitationStatus === 'not_acceptable' && isContractor;
 
-  return (
-    <Container maxW="container.lg">
-      <VStack gap={12} my="20" mb="40">
-        <VStack>
-          <Heading as="h1" mb={0}>
-            {invalidInvitationTitle()}
+  if (!isContractor) {
+    return (
+      <Container maxW="900px">
+        <VStack gap={8} my="20" mb={10}>
+          <Heading as="h1" color="theme.blueAlt">
+            {t('user.invalidInvitationToken.expired.title')}
           </Heading>
+          <Text>{t('user.invalidInvitationToken.expired.adminBody')}</Text>
+        </VStack>
+      </Container>
+    );
+  }
+
+  if (isExpired) {
+    return (
+      <Container maxW="container.lg">
+        <VStack gap={6} my="20" mb="40">
+          <Heading as="h1">{t('user.invalidInvitationToken.expired.title')}</Heading>
           <Text>{t('user.invalidInvitationToken.message')}</Text>
           <Link href={'mailto:' + t('user.invalidInvitationToken.mailTo')}>
             {t('user.invalidInvitationToken.mailTo')}
           </Link>
+          <RouterLinkButton to="/welcome/contractor">{t('user.invalidInvitationToken.expired.cta')}</RouterLinkButton>
         </VStack>
-        <RouterLinkButton to="/">{t('site.pageNotFoundCTA')}</RouterLinkButton>
-        <Text>
-          {t('site.pageNotFoundContactInstructions')} <RouterLink to="/contact">{t('site.contact')}</RouterLink>
-        </Text>
-      </VStack>
-    </Container>
-  );
+      </Container>
+    );
+  }
+
+  if (isConsumed) {
+    return (
+      <Container maxW="900px">
+        <VStack gap={8} my="20" mb={10} align="start" fontSize="lg">
+          <Heading as="h1" color="theme.blueAlt">
+            {t('user.invalidInvitationToken.consumed.title')}
+          </Heading>
+          <Text>{t('user.invalidInvitationToken.consumed.body1')}</Text>
+          <Text>{t('user.invalidInvitationToken.consumed.body2')}</Text>
+          <Text>{t('user.invalidInvitationToken.contact.heading')}</Text>
+          <UnorderedList>
+            <ListItem>Phone: {t('user.invalidInvitationToken.contact.phone')}</ListItem>
+            <ListItem>
+              Email:{' '}
+              <Link href={`mailto:${t('user.invalidInvitationToken.contact.email')}`}>
+                {t('user.invalidInvitationToken.contact.email')}
+              </Link>
+            </ListItem>
+          </UnorderedList>
+        </VStack>
+      </Container>
+    );
+  }
+
+  // Safety net — invalid tokens are redirected to /not-found before reaching here
+  return null;
 }
-
-const AcceptInviteForm = observer(function AcceptInviteForm() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const { userStore, uiStore } = useMst();
-  const { updateRmJurisdictionSelectKey } = uiStore;
-  const { currentUser } = userStore;
-  const { handleSubmit, formState } = useForm();
-  const { isSubmitting } = formState;
-
-  const onSubmit = async () => {
-    updateRmJurisdictionSelectKey();
-    await currentUser.acceptInvitation(searchParams.get('invitation_token'));
-    navigate('/');
-  };
-  return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Button variant="primary" w="full" type="submit" isDisabled={isSubmitting}>
-        {t('user.acceptInvitation')}
-      </Button>
-    </form>
-  );
-});
