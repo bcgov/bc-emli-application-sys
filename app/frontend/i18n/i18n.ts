@@ -2297,7 +2297,7 @@ const options = {
           invalidInvitationToken: {
             message:
               'If you have any questions, please ask your primary contact to call us at 1-833-856-0333 or email us at:',
-            mailTo: 'ESPcontractorsupport@clearesult.com',
+            mailTo: 'ESPContractorSupport@clearesult.com',
             expired: {
               title: 'Expired Invitation',
               adminBody: 'Contact your manager to re-issue the invite.',
