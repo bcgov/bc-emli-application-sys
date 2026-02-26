@@ -27,6 +27,7 @@ import { SortSelect } from '../../shared/select/selectors/sort-select';
 import { PermitApplicationStatusTabs } from '../../shared/energy-savings-applications/permit-application-status-tabs';
 import { EnergySavingsApplicationFilter } from '../../shared/energy-savings-applications/energy-savings-application-filter';
 import { useLocation } from 'react-router-dom';
+import { getRuntimeBooleanMetaValue } from '../../../utils/utility-functions';
 
 interface IEnergySavingsApplicationIndexScreenProps {
   skipDefaultFilters?: boolean;
@@ -44,10 +45,7 @@ export const EnergySavingsApplicationIndexScreen = observer(
     customButtonLink,
     customEmptyMessage,
   }: IEnergySavingsApplicationIndexScreenProps) => {
-    const SUBMIT_INVOICE_ENABLED =
-      String(import.meta.env.VITE_SUBMIT_INVOICE_ENABLED ?? 'true')
-        .trim()
-        .toLowerCase() === 'true';
+    const SUBMIT_INVOICE_ENABLED = getRuntimeBooleanMetaValue('submit-invoice-enabled', true);
     const { t } = useTranslation();
     const { permitApplicationStore, sandboxStore, userStore } = useMst();
     const {
