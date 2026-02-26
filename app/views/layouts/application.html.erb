@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" charset="UTF-8">
   <meta name="deployment-tag" content="<%= ENV.fetch('DEPLOYMENT_TAG', 'localdev') %>">
   <meta name="deployment-timestamp" content="<%= ENV.fetch('DEPLOYMENT_TIMESTAMP', Time.now.utc.iso8601) %>">
+  <meta name="submit-invoice-enabled" content="<%= ENV.fetch('VITE_SUBMIT_INVOICE_ENABLED', 'true') %>">
   
   <!-- Open Graph metadata -->
   <meta property="og:title" content="Energy Savings Program">
