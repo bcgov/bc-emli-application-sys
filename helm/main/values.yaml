@@ -51,7 +51,7 @@ app:
       memory: 512Mi
 
   env:
-    'VITE_SUBMIT_INVOICE_DISABLED': 'false'
+    'VITE_SUBMIT_INVOICE_ENABLED': 'true'
     'ANYCABLE_REDIS_URL': 'redis://hesp-redis:6379/'
     'BUNDLE_PATH': '/usr/local/bundle'
     'CACHE_DEV_REDIS_URL': 'redis://hesp-redis:6379/4'
