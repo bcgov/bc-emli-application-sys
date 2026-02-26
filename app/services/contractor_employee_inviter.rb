@@ -45,7 +45,8 @@ class ContractorEmployeeInviter
   end
 
   def employee_exists?(user)
-    ContractorEmployee.find_by(contractor: contractor, employee: user)
+    ContractorEmployee.exists?(employee: user) ||
+      Contractor.exists?(contact_id: user.id)
   end
 
   def handle_email_taken(user)
