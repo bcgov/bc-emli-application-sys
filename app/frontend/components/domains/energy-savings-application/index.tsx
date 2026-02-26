@@ -44,7 +44,10 @@ export const EnergySavingsApplicationIndexScreen = observer(
     customButtonLink,
     customEmptyMessage,
   }: IEnergySavingsApplicationIndexScreenProps) => {
-    const SUBMIT_INVOICE_ENABLED = import.meta.env.VITE_SUBMIT_INVOICE_ENABLED === 'true';
+    const SUBMIT_INVOICE_ENABLED =
+      String(import.meta.env.VITE_SUBMIT_INVOICE_ENABLED ?? 'true')
+        .trim()
+        .toLowerCase() === 'true';
     const { t } = useTranslation();
     const { permitApplicationStore, sandboxStore, userStore } = useMst();
     const {
