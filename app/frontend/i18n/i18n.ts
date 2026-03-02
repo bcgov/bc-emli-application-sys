@@ -1140,6 +1140,8 @@ const options = {
             actionRequired: 'Action required:',
             reviewActionText:
               'An agent has reviewed your {{submissionType}} and needs more information. Please review and update your {{submissionType}}.',
+            supportingFileSubmissionText: 'An admin has submitted supporting files on your behalf.',
+            uploadFilesText: 'Please upload... {{additionalText}}',
           },
           referenceNumber: 'Reference #',
           pdf: {

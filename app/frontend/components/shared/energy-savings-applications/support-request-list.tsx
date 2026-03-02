@@ -96,8 +96,10 @@ export default function SupportRequestList({ supportRequests }: SupportRequestLi
                     <Text fontSize="sm" mt={2}>
                       {sr.linkedApplication?.status === 'newly_submitted' ||
                       sr.linkedApplication?.status === 'submitted'
-                        ? `Thank you for uploading your file(s). For reference, we requested: ${formatFiles(sr.additionalText)}`
-                        : `Please upload... ${formatFiles(sr.additionalText)}`}
+                        ? t('energySavingsApplication.card.supportingFileSubmissionText')
+                        : t('energySavingsApplication.card.uploadFilesText', {
+                            additionalText: formatFiles(sr.additionalText),
+                          })}
                     </Text>
                   </Flex>
                   <Flex
