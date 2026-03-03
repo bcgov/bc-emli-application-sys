@@ -317,7 +317,19 @@ const options = {
             'The account numbers on your energy utility bills',
             'The number of adults living in your home',
             'Proof of income for all adults in your home',
+            'If you currently rent your home, a Landlord Consent Form [318KB PDF]',
+            'If you live in a condo, stacked townhouse or equity co-op building, a Strata and Equity Co-up Consent Form [296KB PDF]',
           ],
+          linkInfo: {
+            landordConsentForm: {
+              text: 'Landlord Consent Form [318KB PDF]',
+              url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2025/07/CondoApartment_LandlordConsentForm_July152025.pdf',
+            },
+            strataEquityConsentForm: {
+              text: 'Strata and Equity Co-up Consent Form [296KB PDF]',
+              url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2025/07/CondoApartment_StrataEquityCoopConsentForm_July2025.pdf',
+            },
+          },
           contractor: {
             title: ' Energy Savings Program',
             titleDesc: 'registered contractor portal',
