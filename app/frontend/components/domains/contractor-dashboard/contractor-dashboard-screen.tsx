@@ -1,15 +1,4 @@
-import {
-  Box,
-  Container,
-  Flex,
-  Skeleton,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  VStack,
-} from '@chakra-ui/react';
+import { Box, Container, Flex, Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs, VStack } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,7 +32,16 @@ export const ContractorDashboardScreen = observer(function ContractorDashboard()
       <BlueTitleBar title={t('landing.contractor.dashboard.title', 'Contractor portal')} />
 
       <Container maxW="container.lg" pb={4} flex="1">
-        <Tabs index={tabIndex} onChange={setTabIndex} variant="unstyled" w="full" pt={6} h="full" display="flex" flexDirection="column">
+        <Tabs
+          index={tabIndex}
+          onChange={setTabIndex}
+          variant="unstyled"
+          w="full"
+          pt={6}
+          h="full"
+          display="flex"
+          flexDirection="column"
+        >
           <TabList borderBottom="2px solid" borderColor="greys.grey20">
             <Tab
               px={4}
@@ -87,9 +85,7 @@ export const ContractorDashboardScreen = observer(function ContractorDashboard()
               <EnergySavingsApplicationIndexScreen
                 skipDefaultFilters={true}
                 hideBlueSection={true}
-                customButtonText={t('landing.contractor.dashboard.submitInvoice', 'Submit invoice')}
-                customButtonLink="/new-invoice"
-                customEmptyMessage={t('landing.contractor.dashboard.uploadInfo', 'You will need to upload your invoice and supporting documentation. Have them ready before you begin.')}
+                isContractorDashboard={true}
               />
             </TabPanel>
 

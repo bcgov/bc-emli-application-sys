@@ -32,20 +32,17 @@ import { getRuntimeBooleanMetaValue } from '../../../utils/utility-functions';
 interface IEnergySavingsApplicationIndexScreenProps {
   skipDefaultFilters?: boolean;
   hideBlueSection?: boolean;
-  customButtonText?: string;
-  customButtonLink?: string;
-  customEmptyMessage?: string;
+  isContractorDashboard?: boolean;
 }
 
 export const EnergySavingsApplicationIndexScreen = observer(
   ({
     skipDefaultFilters = false,
     hideBlueSection = false,
-    customButtonText,
-    customButtonLink,
-    customEmptyMessage,
+    isContractorDashboard = false,
   }: IEnergySavingsApplicationIndexScreenProps) => {
     const SUBMIT_INVOICE_ENABLED = getRuntimeBooleanMetaValue('submit-invoice-enabled', true);
+
     const { t } = useTranslation();
     const { permitApplicationStore, sandboxStore, userStore } = useMst();
     const {
@@ -133,6 +130,8 @@ export const EnergySavingsApplicationIndexScreen = observer(
 
     const displayedApplications = tablePermitApplications;
 
+    const isSubmitInvoiceDisabled = !SUBMIT_INVOICE_ENABLED || isContractorSuspended || isContractorDeactivated;
+
     return (
       <Flex as="main" direction="column" w="full" bg="greys.white" pb="24">
         {/* <PermitApplicationStatusTabs /> */}
@@ -153,39 +152,28 @@ export const EnergySavingsApplicationIndexScreen = observer(
               justify="space-between"
               direction={{ base: 'column', md: 'row' }}
             >
-              {isContractorSuspended || isContractorDeactivated ? (
-                <Button
-                  w={{ base: 'full', md: 'fit-content' }}
-                  minW="135px"
-                  isDisabled={true}
-                  aria-label={t('contractor.suspended.buttonDisabled', 'Submit invoice - disabled due to suspension')}
-                  bg="greys.grey80"
-                  color="text.secondary"
-                  cursor="not-allowed"
-                  _hover={{}}
-                  _active={{}}
-                  _focus={{}}
-                  _disabled={{
-                    bg: 'greys.grey80',
-                    color: 'text.secondary',
-                    opacity: 1,
-                  }}
-                >
-                  {customButtonText || t('energySavingsApplication.start')}
-                </Button>
-              ) : (
+              {isContractorDashboard ? (
                 <RouterLinkButton
-                  to={customButtonLink || '/new-application'}
+                  to={'/new-invoice'}
                   variant="primary"
                   w={{ base: 'full', md: 'fit-content' }}
                   aria-label={
-                    customButtonText
-                      ? `${customButtonText} - ${t('energySavingsApplication.newInvoiceSubmission')}`
-                      : t('energySavingsApplication.start')
+                    isSubmitInvoiceDisabled
+                      ? t('contractor.suspended.buttonDisabled')
+                      : `${t('landing.contractor.dashboard.submitInvoice')} - ${t('energySavingsApplication.newInvoiceSubmission')}`
                   }
-                  isDisabled={!SUBMIT_INVOICE_ENABLED}
+                  isDisabled={isSubmitInvoiceDisabled}
                 >
-                  {customButtonText || t('energySavingsApplication.start')}
+                  {t('landing.contractor.dashboard.submitInvoice')}
+                </RouterLinkButton>
+              ) : (
+                <RouterLinkButton
+                  to={'/new-application'}
+                  variant="primary"
+                  w={{ base: 'full', md: 'fit-content' }}
+                  aria-label={t('energySavingsApplication.start')}
+                >
+                  {t('energySavingsApplication.start')}
                 </RouterLinkButton>
               )}
               <Flex
@@ -235,15 +223,17 @@ export const EnergySavingsApplicationIndexScreen = observer(
               </Flex>
             ) : displayedApplications.length === 0 ? (
               <Flex direction="column" w="full">
-                {customEmptyMessage && <Box borderBottom="2px solid" borderColor="greys.lightGrey" mt={4} />}
+                {t('landing.contractor.dashboard.uploadInfo') && (
+                  <Box borderBottom="2px solid" borderColor="greys.lightGrey" mt={4} />
+                )}
                 <Flex
                   py="10"
                   w="full"
-                  justify={customEmptyMessage ? 'flex-start' : 'center'}
+                  justify={t('landing.contractor.dashboard.uploadInfo') ? 'flex-start' : 'center'}
                   role="status"
                   aria-live="polite"
                 >
-                  {customEmptyMessage || t('errors.noResults')}
+                  {t('landing.contractor.dashboard.uploadInfo') || t('errors.noResults')}
                 </Flex>
               </Flex>
             ) : (
