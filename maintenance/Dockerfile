@@ -2,22 +2,17 @@
 FROM nginx:alpine
 
 # Remove default nginx static assets
-RUN rm -rf /usr/share/nginx/html/*
+RUN rm -rf /usr/share/nginx/html/* && \
+    mkdir -p /tmp/nginx/client_temp /tmp/nginx/proxy_temp /tmp/nginx/fastcgi_temp /tmp/nginx/uwsgi_temp /tmp/nginx/scgi_temp && \
+    chgrp -R 0 /usr/share/nginx/html /etc/nginx /var/cache/nginx /var/log/nginx /var/run /tmp/nginx && \
+    chmod -R g=u /usr/share/nginx/html /etc/nginx /var/cache/nginx /var/log/nginx /var/run /tmp/nginx
 
 # Copy custom nginx configuration
+COPY nginx-main.conf /etc/nginx/nginx.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy maintenance page
 COPY index.html /usr/share/nginx/html/
-
-# Use non-root user for security
-RUN chown -R nginx:nginx /usr/share/nginx/html && \
-    chown -R nginx:nginx /var/cache/nginx && \
-    chown -R nginx:nginx /var/log/nginx && \
-    touch /var/run/nginx.pid && \
-    chown -R nginx:nginx /var/run/nginx.pid
-
-USER nginx
 
 # Expose port 8080 (non-privileged port)
 EXPOSE 8080

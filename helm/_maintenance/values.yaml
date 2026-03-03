@@ -3,25 +3,23 @@
 replicaCount: 2
 
 image:
-  repository: ""  # Will be set by CI/CD pipeline
+  repository: '' # Will be set by CI/CD pipeline
   pullPolicy: IfNotPresent
-  tag: ""  # Will be set by CI/CD pipeline
+  tag: '' # Will be set by CI/CD pipeline
 
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+fullnameOverride: ''
 
-podSecurityContext:
-  runAsNonRoot: true
-  runAsUser: 101
-  fsGroup: 101
+podSecurityContext: {}
 
 securityContext:
+  runAsNonRoot: true
   allowPrivilegeEscalation: false
   capabilities:
     drop:
-    - ALL
-  readOnlyRootFilesystem: true
+      - ALL
+  readOnlyRootFilesystem: false
 
 service:
   type: ClusterIP
@@ -29,7 +27,7 @@ service:
 
 route:
   enabled: false
-  host: ""  # Set this to your app's hostname when needed
+  host: '' # Set this to your app's hostname when needed
 
 resources:
   limits:
