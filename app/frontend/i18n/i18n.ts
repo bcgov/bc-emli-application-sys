@@ -308,7 +308,7 @@ const options = {
             'You’re a tenant paying your own energy utility bills and you want to help your landlord install energy-saving upgrades to your rental property',
           ],
           iNeed: 'See full eligibility details on Better Homes.',
-          iNeedLink: 'https://www.betterhomesbc.ca/rebates/energy-savings-program/',
+          iNeedLink: 'https://www.betterhomesbc.ca/learn-about-programs/energy-savings-program/',
           whatToApply: 'What do I need to apply?',
           beforeApply: 'Before you apply, you will need to log in with your BC Services Card account.',
           useServiceCard: 'Learn more about how to use BC Services Card account.',
@@ -2937,7 +2937,7 @@ const options = {
             contractorEmail: 'ESPcontractorSupport@CLEAResult.com',
             groundOrientedLabel: 'Single family dwellings, rowhouses and other ground-oriented home types:',
             multiUnitLabel: 'Condo, apartment and other multi-unit home types:',
-            contractorLabel: 'Suppot for contractors:',
+            contractorLabel: 'Support for contractors:',
             learnMoreTitleShort: 'Learn more about the Energy Savings Program',
             learnMoreDescriptionShort:
               "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It's part of the Province of B.C.'s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
