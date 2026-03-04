@@ -3310,7 +3310,8 @@ const options = {
             resourcesForCustomers: 'Resources for your customers',
             noResources: 'No resources available in this category.',
             resources: {
-              formToAddEmployees: 'Form to add employees',
+              createEmployeesAccounts: 'Step 1: Create employee accounts',
+              formToAddEmployees: 'Step 2: Form to add employees',
               contractorRebateJourney: 'Contractor rebate journey',
               heatPumpExceptionForm: 'Heat pump exception form',
               heatPumpRequirements: 'Heat pump requirements guide',
@@ -3343,8 +3344,9 @@ const options = {
               bathroomFanProductList: 'Bathroom fan product list',
             },
             descriptions: {
+              createEmployeesAccounts: 'To create accounts for employees, login to the BCeID website.',
               formToAddEmployees:
-                'Allow your employees to log into the contractor portal. This lets them submit invoices and access program resources. \n\nFirst create their Business BCeID user accounts. Then submit this form with their information. They will get an invite to log into the portal using their BCeID.',
+                'Complete this form to allow your employees to log into the contractor portal. <strong>You must use their Business BCeIDs</strong> when you complete the form.',
               miniSplitHeatPumps:
                 'The installed heat pump must have an AHRI certified reference number and must be on the Qualifying Product List.',
               airToWaterHeatPumps:
@@ -3362,7 +3364,6 @@ const options = {
               productList: 'product list',
               eligibleModelsList: 'Eligible Models List',
               searchableProductList: 'searchable product list',
-              createNewUserAccount: 'create their Business BCeID user accounts.',
             },
             fileInfoAirToWater: '. [124 KB, PDF]',
             fileInfoHPWH: '. [423 KB, PDF]',

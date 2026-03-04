@@ -12,7 +12,7 @@ interface ProgramResource {
   url: string;
   description?: string;
   textStyling?: object;
-  details?: object;
+  renderHTMLTag: boolean;
 }
 
 type ResourceCategory =
@@ -25,17 +25,17 @@ type ResourceCategory =
 const PROGRAM_RESOURCES: Record<ResourceCategory, ProgramResource[]> = {
   addEmployees: [
     {
+      id: 'create-employees,accounts',
+      title: 'contractor.programResources.resources.createEmployeesAccounts',
+      description: 'contractor.programResources.descriptions.createEmployeesAccounts',
+      url: 'https://www.bceid.ca/',
+    },
+    {
       id: 'form-to-add-employees',
       title: 'contractor.programResources.resources.formToAddEmployees',
       description: 'contractor.programResources.descriptions.formToAddEmployees',
-      details: {
-        createNewAccountUrl:
-          'https://www.bceid.ca/aboutbceid/faqs.aspx#:~:text=creating%20new%20accounts%20for%20your%20employees',
-      },
       url: 'https://submit.digital.gov.bc.ca/app/form/submit?f=eaa33ef3-f969-4987-9186-993f5385c6de',
-      textStyling: {
-        whiteSpace: 'pre-line',
-      },
+      renderHTMLTag: true,
     },
   ],
   programGuidance: [
@@ -449,8 +449,16 @@ export const ContractorProgramResourcesScreen = ({
                       )}
                     </Link>
                   )}
-                  {resource.description && (
-                    <Text sx={{ ...baseTextSx, ...resource.textStyling }} color="greys.grey60" mt={2}>
+
+                  {resource.description && resource.renderHTMLTag ? (
+                    <Text
+                      sx={{ ...baseTextSx }}
+                      dangerouslySetInnerHTML={{ __html: t(resource.description) }}
+                      color="greys.grey60"
+                      mt={2}
+                    />
+                  ) : (
+                    <Text sx={{ ...baseTextSx }} color="greys.grey60" mt={2}>
                       {resource.id === 'mini-split-heat-pumps' ? (
                         <>
                           {
@@ -605,40 +613,6 @@ export const ContractorProgramResourcesScreen = ({
                           {
                             t('contractor.programResources.descriptions.bathroomFanProductList').split(
                               t('contractor.programResources.linkText.productList'),
-                            )[1]
-                          }
-                        </>
-                      ) : resource.id === 'form-to-add-employees' ? (
-                        <>
-                          {
-                            t('contractor.programResources.descriptions.formToAddEmployees').split(
-                              t('contractor.programResources.linkText.createNewUserAccount'),
-                            )[0]
-                          }
-                          <Link
-                            href={resource.details.createNewAccountUrl}
-                            color="theme.blueAlt"
-                            textDecoration="underline"
-                            _hover={{ color: 'theme.blue' }}
-                            _focusVisible={{
-                              outline: '3px solid',
-                              outlineColor: 'theme.blue',
-                              outlineOffset: '2px',
-                            }}
-                            sx={{
-                              '&:focus:not(:focus-visible)': {
-                                outline: 'none',
-                              },
-                            }}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            // aria-label=""
-                          >
-                            {t('contractor.programResources.linkText.createNewUserAccount')}
-                          </Link>
-                          {
-                            t('contractor.programResources.descriptions.formToAddEmployees').split(
-                              t('contractor.programResources.linkText.createNewUserAccount'),
                             )[1]
                           }
                         </>
