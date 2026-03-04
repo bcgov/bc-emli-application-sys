@@ -1,8 +1,8 @@
-## Database Restore Procedure - Restoring from File System
+# Database Restore Procedure
 
-This guide describes how to restore a PostgreSQL database using `pgBackRest`.
+This guide describes how to copy and validate `pgBackRest` backups locally, and how to restore PostgreSQL from backup.
 
-### Prerequisites
+## Prerequisites
 
 - PostgreSQL installed and configured.
 - `pgBackRest` installed and configured with the correct stanza.
@@ -10,110 +10,152 @@ This guide describes how to restore a PostgreSQL database using `pgBackRest`.
 - Appropriate permissions to run PostgreSQL and `pgBackRest` commands.
 - The target database service should be stopped before restoring.
 
----
+## Install pgBackRest on Ubuntu/Debian
 
-### Steps
+```bash
+sudo apt update
+sudo apt install pgbackrest
+```
 
-1. **Stop the PostgreSQL Service**
+## Copy Backup Repo to Local and Verify
+
+Use this process to copy the backup repository from OpenShift to your local machine and inspect backups.
+
+1. **Create a local destination directory**
+
+   `pgbackrest` requires an absolute repository path.
+
+   ```bash
+   mkdir -p $PWD/pgbackrest/repo1
+   ```
+
+2. **Copy repo files from OpenShift repo host pod**
+
+   ```bash
+   oc cp -n bfc7dd-<env> hesp-crunchydb-repo-host-0:/pgbackrest/repo1 $PWD/pgbackrest/repo1 -c pgbackrest
+   ```
+
+   Example for DEV:
+
+   ```bash
+   oc cp -n bfc7dd-dev hesp-crunchydb-repo-host-0:/pgbackrest/repo1 $PWD/pgbackrest/repo1 -c pgbackrest
+   ```
+
+3. **Inspect backups locally using `info`**
+
+   ```bash
+   pgbackrest --stanza=db --repo1-path=$PWD/pgbackrest/repo1 info
+   ```
+
+   If you receive `missing stanza path`, check whether the copy created an extra `repo1` level and point to that path instead:
+
+   ```bash
+   pgbackrest --stanza=db --repo1-path=$PWD/pgbackrest/repo1/repo1 info
+   ```
+
+## Restore PostgreSQL from File System Backup
+
+1. **Stop the PostgreSQL service**
 
    ```bash
    pg_ctl stop
    ```
 
-   This ensures the database is not running during the restore process.
-
-2. **Run pgBackRest Restore**
+2. **Run `pgBackRest` restore**
 
    ```bash
    pgbackrest --stanza=db restore --repo=1 --type=default --delta
    ```
 
-   **Explanation of options:**
+   Option summary:
 
-   - `--stanza=db`: The stanza name defined in your `pgBackRest` configuration.
-   - `--repo=1`: Specifies the backup repository number.
-   - `--type=default`: Restores the default backup type.
-   - `--delta`: Restores only the changes since the last backup (faster when possible).
+   - `--stanza=db`: Stanza name defined in your `pgBackRest` configuration.
+   - `--repo=1`: Backup repository number.
+   - `--type=default`: Default restore type.
+   - `--delta`: Restore only changed files when possible.
 
-3. **Start the PostgreSQL Service**
+3. **Start the PostgreSQL service**
 
    ```bash
    pg_ctl start
    ```
 
-4. **Update the `postgres` User Password**
-
-   Log into PostgreSQL:
+4. **Update the `postgres` user password**
 
    ```bash
    psql -U postgres -d hesp-crunchydb
    ```
 
-   Then run:
-
    ```sql
    ALTER USER postgres WITH PASSWORD '<new_password>';
    ```
 
-   Replace `<new_password>` with your desired secure password.
-
 ## Restore Cluster from Backup PVC
 
-**Confirm pgBackRest sees backups (sanity check)**
+1. **Confirm `pgBackRest` sees backups (sanity check)**
 
-oc exec -n bfc7dd-<env> $(oc get pods | grep crunchydb-repo-host ) -- pgbackrest info
+   ```bash
+   oc exec -n bfc7dd-<env> $(oc get pods -n bfc7dd-<env> | grep crunchydb-repo-host | awk '{print $1}') -- pgbackrest info
+   ```
 
-This will output the _stanza_ and _one or more full/incr backups_
+   This should output the stanza and one or more full/incremental backups.
 
-If Yes then continue
+2. **Shut down the cluster (operator-native)**
 
-**Scale down the cluster**
+   ```bash
+   oc patch -n bfc7dd-<env> postgrescluster hesp-crunchydb \
+     -p '{"spec":{"shutdown":true}}' --type=merge
+   ```
 
-oc scale -n bfc7dd-<env> postgrescluster hesp-crunchydb --replicas=0
-(you may need to delete the pod depending on how the cluster reacts or where it's failing)
+   Wait for PostgreSQL pods to terminate before continuing.
 
-**Delete the pgdata PVC**
+3. **Delete the pgdata PVC**
 
-**NOTE**: this is not deleting the backups or the pgBackrest repo
+   Note: this does **not** delete the backup repo PVC.
 
-oc get pvc -n bfc7dd-<env>
+   ```bash
+   oc get pvc -n bfc7dd-<env>
+   oc delete pvc -n bfc7dd-<env> <pgdata_pvc_name>
+   ```
 
-verify the name of that data pvc i.e. hesp-crunchydb-ha-abc1-pgdata
+4. **Edit the cluster to restore from `pgBackRest`**
 
-delete only that pvc
+   ```bash
+   oc edit postgrescluster hesp-crunchydb -n bfc7dd-<env>
+   ```
 
-oc delete pvc -n bfc7dd-<env> <pvc_name>
+   Add or update:
 
-**Edit the cluster to restore from pgBackrest**
+   ```yaml
+   spec:
+     dataSource:
+       pgbackrest:
+         stanza: db
+         repo:
+           name: repo1
+   ```
 
-oc edit postgrescluster hesp-crunchydb -n bfc7dd-<env>
-**NOTE** opens in VI, I key to Insert mode, ESC to exit Insert mode, SHIFT+: to enter command mode, in command mode qw to (quit + write)
+5. **Start the cluster to trigger restore**
 
-Add (or update if existing) dataSource.pgBackrest
+   ```bash
+   oc patch -n bfc7dd-<env> postgrescluster hesp-crunchydb \
+     -p '{"spec":{"shutdown":false}}' --type=merge
+   ```
 
-spec:
-dataSource:
-pgbackrest:
-stanza: db
-repo:
-name: repo1
+   Expected behavior:
 
-Save and Exit VI (see note above)
+   - Operator creates a new pgdata PVC.
+   - New pgdata directory is initialized.
+   - `pgBackRest` restore runs.
+   - Pod may start as replica and then promote.
+   - PostgreSQL completes startup.
 
-**Let the cluster restore**
+6. **Watch restore logs**
 
-oc scale -n bfc7dd-<env> postgrescluster hesp-crunchydb --replicas=1
+   ```bash
+   oc logs -n bfc7dd-<env> -f $(oc get pods -n bfc7dd-<env> | grep hesp-crunchydb-ha | awk '{print $1}')
+   ```
 
-- The operator should create a new pgdata PVC
-- initialize a new pgdata directory
-- runs pgBackrest to restore
-- pod may start as a secondary and promote to master
-- postgres completes the startup
+7. **Verify in application**
 
-You can watch the restore with
-
-oc logs -n bfc7dd-<env> -f $(oc get pods | grep hesp-crunchydb-ha | awk '{print $1}')
-
-**Verify Using Application**
-
-Login to the application.
+   Log in to the application and validate expected data/state.
