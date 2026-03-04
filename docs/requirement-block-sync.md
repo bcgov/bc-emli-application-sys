@@ -10,7 +10,7 @@ This process is intended for **infrequent, controlled updates** to form definiti
 
 - **SOURCE** is the **source of truth**
 - **TARGET** may or may not already contain the `requirement_block`
-- Identity is determined by **`sku`**
+- Requirement blocks are selected by **template id**, then applied by **`sku`**
 - Existing requirements on the target are **always deleted and replaced**
 - UUIDs are resolved dynamically on the target — **no manual editing**
 
@@ -31,34 +31,47 @@ The script is **safe to re-run** and guarantees the target matches SOURCE.
 
 - The `requirement_block` **may or may not exist on the target** they are the containers that hold the `requirements`
 - `requirements` are treated as **disposable** as they contain that logic that changes.
-- `sku` is used as the **stable identifier**
+- Each generated script still uses `sku` as the **stable identifier** on TARGET
 - UUIDs are an **implementation detail**
 
 ---
 
 ## Step 1 — Generate the Apply Script (Run on SOURCE)
 
-> Update the `sku` value.
+> Update the `requirement_template_id` value. This will generate one script per block in that template.
 
 ```sql
-WITH rb AS (
-  SELECT *
-  FROM requirement_blocks
-  WHERE sku = 'business_contact_information'
+WITH params AS (
+  SELECT '00000000-0000-0000-0000-000000000000'::uuid AS requirement_template_id
+),
+template_blocks AS (
+  SELECT DISTINCT rb.id AS requirement_block_id, rb.sku
+  FROM requirement_template_sections rts
+  JOIN template_section_blocks tsb
+    ON tsb.requirement_template_section_id = rts.id
+  JOIN requirement_blocks rb
+    ON rb.id = tsb.requirement_block_id
+  JOIN params p
+    ON rts.requirement_template_id = p.requirement_template_id
+),
+rb AS (
+  SELECT rb.*
+  FROM requirement_blocks rb
+  JOIN template_blocks tb
+    ON tb.requirement_block_id = rb.id
 ),
 reqs AS (
-  SELECT *
-  FROM requirements
-  WHERE requirement_block_id = (SELECT id FROM rb)
-  ORDER BY position
+  SELECT r.*
+  FROM requirements r
+  WHERE r.requirement_block_id IN (SELECT id FROM rb)
 )
-SELECT string_agg(line, E'\n') AS generated_script
+SELECT rb.sku,
+       string_agg(parts.line, E'\n' ORDER BY parts.sort_key) AS generated_script
 FROM (
-
-  /* =======================
-     HEADER + BLOCK LOGIC
-     ======================= */
-  SELECT format($sql$
+  -- HEADER
+  SELECT rb.id AS requirement_block_id,
+         1 AS sort_key,
+         format($sql$
 DO $$
 DECLARE
   v_requirement_block_id uuid;
@@ -135,48 +148,54 @@ $sql$,
     rb.display_name,
     rb.display_description,
     rb.first_nations,
-    COALESCE(rb.discarded_at::text, 'NULL'),
+    null,
     rb.visibility
   ) AS line
   FROM rb
 
   UNION ALL
 
-  /* =======================
-     REQUIREMENTS
-     ======================= */
-  SELECT format(
-    '    (%L::uuid, %L, %L, %s, %L, %L, %L, %L, %L, %L, now(), now(), v_requirement_block_id, %s, %L)%s',
-    r.id,
-    r.requirement_code,
-    r.label,
-    r.input_type,
-    r.input_options::text,
-    r.hint,
-    r.required,
-    r.related_content,
-    r.required_for_in_person_hint,
-    r.required_for_multiple_owners,
-    r.position,
-    r.elective,
-    CASE
-      WHEN r.position = (SELECT max(position) FROM reqs)
-      THEN E'\n'
-      ELSE E',\n'
-    END
-  ) AS line
+  -- REQUIREMENTS
+  SELECT r.requirement_block_id AS requirement_block_id,
+         2 + r.position AS sort_key,
+         format(
+           '    (%L::uuid, %L, %L, %s, %L, %L, %L, %L, %L, %L, now(), now(), v_requirement_block_id, %s, %L)%s',
+           r.id,
+           r.requirement_code,
+           r.label,
+           r.input_type,
+           r.input_options::text,
+           r.hint,
+           r.required,
+           r.related_content,
+           r.required_for_in_person_hint,
+           r.required_for_multiple_owners,
+           r.position,
+           r.elective,
+           CASE
+             WHEN r.position = (
+               SELECT max(position) FROM reqs r2
+               WHERE r2.requirement_block_id = r.requirement_block_id
+             )
+             THEN E'\n'
+             ELSE E',\n'
+           END
+         ) AS line
   FROM reqs r
 
   UNION ALL
 
-  /* =======================
-     FOOTER
-     ======================= */
-  SELECT E';
+  -- FOOTER
+  SELECT rb.id AS requirement_block_id,
+         1000000 AS sort_key,
+         E';
 END $$;
 ' AS line
-
-) parts;
+  FROM rb
+) parts
+JOIN rb ON rb.id = parts.requirement_block_id
+GROUP BY rb.sku
+ORDER BY rb.sku;
 ```
 
 ---
@@ -189,10 +208,17 @@ END $$;
 
 ### What the script does on the target
 
-- Looks up the `requirement_block` by `sku`
+- Looks up each `requirement_block` by `sku`
 - Inserts it if missing
 - Deletes **any existing requirements** for that block
 - Re-inserts the authoritative `requirements` from SOURCE linked to the `requirement_block`
+
+---
+
+## DBeaver Notes
+
+- `\set` is a psql-only meta-command and will error in DBeaver.
+- Use the `params` CTE shown above to set the `requirement_template_id` inline.
 
 ---
 
@@ -210,7 +236,3 @@ This is not migrating data — this is **replaying form definitions**.
 - New or changed requirements need to be promoted
 - Environment drift needs to be corrected
 - You want a human-reviewed, auditable process
-
-IN ('e57a68a9-b489-4066-af30-d035e3e35e94', '3b437c18-6c5d-4960-8113-011e0f2ae175', 'f0c5f3e3-e99c-454a-8bcd-c265efb50832', 'c2e403ea-7485-4c4c-88ef-644148c5c1b6')
-
-IN ('71253c0b-da7f-4ab8-9d72-1194c313c5e5', '80084da9-7f97-4c62-97a9-48c3c5546378', '09ccb956-9543-4943-8cdc-127db59e0ad9', '2d4dfb80-daa9-443a-9b24-6179648b085b', '99027839-e133-4b35-8a7b-91542dafab5f')
