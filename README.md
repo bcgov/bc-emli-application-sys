@@ -1,6 +1,6 @@
-# BC EMLI Application System
+# BC Home Energy Savings Program - Application System
 
-A full-stack web application supporting the BC Energy & Mines Low-Income (EMLI) Program. The system manages permit applications, requirement blocks, file uploads, user authorization, and real-time notifications, deployed on OpenShift/Kubernetes via Helm.
+A full-stack web application supporting the BC Home Energy Savings Program (BCHESP) Program. The system manages applications, requirement blocks, file uploads, user authorization, and real-time notifications, deployed on OpenShift/Kubernetes via Helm.
 
 ---
 
@@ -30,7 +30,7 @@ A full-stack web application supporting the BC Energy & Mines Low-Income (EMLI) 
 
 ## Overview
 
-The BC EMLI Application System is a permits/applications management platform for BC Energy & Mines. It allows permit applicants and reviewers to manage applications through structured workflows, with requirement blocks, file attachments, state-machine-driven status transitions, policy-based authorization, and real-time UI updates via WebSockets.
+The BC Home Energy Savings Program Application System is a applications/invoicing management platform. It allows permit applicants and reviewers to manage applications through structured workflows, with requirement blocks, file attachments, state-machine-driven status transitions, policy-based authorization, and real-time UI updates via WebSockets.
 
 ---
 
