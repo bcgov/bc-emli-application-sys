@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { useMst } from '../../../setup/root';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SharedSpinner } from '../../shared/base/shared-spinner';
@@ -9,11 +9,13 @@ import { contractorOnboardingImportTokenKey } from '../../../constants';
 interface IContractorOnboardingScreenProps {}
 
 export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScreenProps) => {
-  const { permitApplicationStore, userStore, uiStore, contractorStore } = useMst();
+  const { permitApplicationStore, userStore, uiStore, contractorStore, sessionStore } = useMst();
   const { currentUser } = userStore;
   const navigate = useNavigate();
   const [importToken, setImportToken] = useSessionStorage(contractorOnboardingImportTokenKey, null);
   const [importHandled, setImportHandled] = useState(false);
+  const cancelledRef = useRef(false);
+  const deepLinkHandledRef = useRef(false);
 
   useEffect(() => {
     contractorStore.searchContractors();
@@ -21,11 +23,24 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
 
   // Core onboarding logic wrapped in useCallback
   const checkOnboarding = useCallback(async () => {
+    const safeNavigate = (path: string) => {
+      if (!cancelledRef.current) navigate(path);
+    };
+
+    if (deepLinkHandledRef.current) return;
     if (!currentUser) return;
+
+    // If afterLoginPath is set, the router will handle navigation after login — don't interfere.
+    // Read from sessionStorage directly because MobX may not have rehydrated the store yet.
+    const afterLoginPath = sessionStorage.getItem('afterLoginPath') || sessionStore.afterLoginPath;
+    if (afterLoginPath) {
+      deepLinkHandledRef.current = true;
+      return;
+    }
 
     // Only contractors are allowed here
     if (!currentUser.isContractor) {
-      navigate('/welcome');
+      safeNavigate('/welcome');
       return;
     }
 
@@ -71,6 +86,7 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
       if (!contractor) {
         // fallback to normal onboarding flow
         onboarding = await contractorStore.createOnboarding(currentUser.id);
+        if (cancelledRef.current) return;
         if (onboarding) {
           navigate(`/applications/${onboarding.permitApplicationId}/edit`);
         } else {
@@ -81,6 +97,7 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
 
       // Otherwise, fetch latest onboarding for existing contractor
       onboarding = await contractorStore.fetchOnboarding(contractor.id);
+      if (cancelledRef.current) return;
       if (!onboarding) {
         // if we got here it means we have a contractor but their onboarding is gone "withdrawn?"
         // should we even allow withdrawn?
@@ -91,15 +108,16 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
 
       // Optional: suspension/deactivation checks
       if (onboarding.suspendedAt) {
-        navigate('/onboarding/suspended');
+        safeNavigate('/onboarding/suspended');
         return;
       }
       if (onboarding.deactivatedAt) {
-        navigate('/onboarding/deactivated');
+        safeNavigate('/onboarding/deactivated');
         return;
       }
 
       // Route based on onboarding status
+      if (cancelledRef.current) return;
       const { onboardApplicationId, status } = onboarding;
       switch (status) {
         case 'new_draft':
@@ -117,13 +135,17 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
       }
     } catch (err) {
       console.error('Onboarding init failed:', err);
-      navigate('/welcome');
+      safeNavigate('/welcome');
     }
-  }, [contractorStore, currentUser, navigate]);
+  }, [contractorStore, currentUser, navigate, sessionStore]);
 
   // Run the check on every page load or route revisit
   useEffect(() => {
+    cancelledRef.current = false;
     checkOnboarding();
+    return () => {
+      cancelledRef.current = true;
+    };
   }, [checkOnboarding, location.pathname]);
 
   return (
