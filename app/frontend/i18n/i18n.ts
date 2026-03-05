@@ -1105,7 +1105,7 @@ const options = {
           },
         },
         energySavingsApplication: {
-          returnToDashboard: 'Return to Dashboard',
+          returnToDashboard: 'Return to dashboard',
           submissionBlockModal: {
             title: 'Trying to submit this application?',
             description:
