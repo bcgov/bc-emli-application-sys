@@ -416,7 +416,6 @@ const AppRoutes = observer(() => {
     if (tokenExpired) {
       resetAuth();
       setAfterLoginPath(location.pathname);
-      console.log('entry point value:', entryPoint);
       if (entryPoint) {
         navigate('/admin');
       } else {
@@ -427,9 +426,11 @@ const AppRoutes = observer(() => {
   }, [tokenExpired]);
 
   useEffect(() => {
-    if (loggedIn && afterLoginPath) {
+    const storedPath = sessionStorage.getItem('afterLoginPath') || afterLoginPath;
+    if (loggedIn && storedPath) {
+      sessionStorage.removeItem('afterLoginPath');
       setAfterLoginPath(null);
-      navigate(afterLoginPath);
+      navigate(storedPath);
     }
   }, [afterLoginPath, loggedIn]);
 
@@ -570,6 +571,18 @@ const AppRoutes = observer(() => {
           <Route path="/" element={<RedirectScreen path="/welcome" />} />
         )}
         <Route
+          element={
+            <ProtectedRoute
+              isAllowed={loggedIn && !mustAcceptEula}
+              redirectPath={mustAcceptEula ? '/' : '/contractor'}
+            />
+          }
+        >
+          <Route path="/contractor-dashboard" element={<ContractorDashboardScreen />} />
+          <Route path="/contractor/applications/:permitApplicationId/edit" element={<EditPermitApplicationScreen />} />
+        </Route>
+
+        <Route
           element={<ProtectedRoute isAllowed={loggedIn && !mustAcceptEula} redirectPath={mustAcceptEula && '/'} />}
         >
           <Route path="/applications" element={<EnergySavingsApplicationIndexScreen />} />
@@ -577,7 +590,6 @@ const AppRoutes = observer(() => {
           <Route path="/new-invoice" element={<NewInvoiceScreen />} />
           <Route path="/blank-applications" element={<NewApplicationScreen />} />
           <Route path="/supported-applications" element={<EnergySavingsApplicationIndexScreen />} />
-          <Route path="/contractor-dashboard" element={<ContractorDashboardScreen />} />
           <Route path="/applications/:permitApplicationId/edit" element={<EditPermitApplicationScreen />}>
             <Route path="step-code" element={<StepCodeForm />} />
           </Route>
