@@ -10,16 +10,17 @@ A full-stack web application supporting the BC Home Energy Savings Program (BCHE
 - [Technology Stack](#technology-stack)
 - [Architecture](#architecture)
 - [Domain Concepts](#domain-concepts)
+- [Authentication](#authentication)
 - [Local Development Setup](#local-development-setup)
-  - [Prerequisites](#prerequisites)
-  - [First-Time Setup](#first-time-setup)
-  - [Running the Application](#running-the-application)
-  - [Docker Compose (Alternative)](#docker-compose-alternative)
+  - [Docker Compose](#docker-compose)
+  - [Local Object Storage (Minio)](#local-object-storage-minio)
 - [Background Jobs](#background-jobs)
 - [Real-Time (AnyCable)](#real-time-anycable)
+- [Search (Elasticsearch)](#search-elasticsearch)
 - [File Uploads & Virus Scanning](#file-uploads--virus-scanning)
 - [Email](#email)
 - [Testing](#testing)
+- [Formatting & Linting](#formatting--linting)
 - [Helm & Deployment](#helm--deployment)
 - [Release Workflow](#release-workflow)
 - [Additional Documentation](#additional-documentation)
@@ -36,24 +37,31 @@ The BC Home Energy Savings Program Application System is a applications/invoicin
 
 ## Technology Stack
 
-| Layer                   | Technology                                                        |
-| ----------------------- | ----------------------------------------------------------------- |
-| Language (backend)      | Ruby (see [.ruby-version](.ruby-version))                         |
-| Framework               | Ruby on Rails                                                     |
-| Frontend                | React (TypeScript), served via Vite                               |
-| Database                | PostgreSQL                                                        |
-| Background Jobs         | Sidekiq + Redis                                                   |
-| Real-Time               | AnyCable (gRPC RPC server + anycable-go WebSocket gateway)        |
-| File Storage            | CarrierWave (object storage in production)                        |
-| Virus Scanning          | ClamAV                                                            |
-| Authorization           | Pundit (policy objects)                                           |
-| State Machines          | AASM                                                              |
-| Serialization           | Blueprinter                                                       |
-| Email                   | CHES (BC Common Hosted Email Service) via custom delivery adapter |
-| Container Orchestration | OpenShift / Kubernetes                                            |
-| Helm                    | Helm v3 (umbrella chart pattern)                                  |
-| CI/CD                   | GitHub Actions (workflows under `.github/workflows/`)             |
-| Node Version            | See [.nvmrc](.nvmrc)                                              |
+| Layer                   | Technology                                                                                                     |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Language (backend)      | Ruby (see [.ruby-version](.ruby-version))                                                                      |
+| Framework               | Ruby on Rails                                                                                                  |
+| Frontend                | React (TypeScript), served via Vite                                                                            |
+| UI Component Library    | Chakra UI                                                                                                      |
+| State Management        | MobX + MobX State Tree                                                                                         |
+| Form Builder            | Formio (dynamic requirement block forms)                                                                       |
+| Internationalisation    | i18next                                                                                                        |
+| Analytics               | Snowplow (BC Government analytics — session tracking, page views)                                              |
+| Database                | PostgreSQL (Crunchy Postgres operator in production, with pgBouncer connection pooling and pgBackRest backups) |
+| Background Jobs         | Sidekiq + Redis                                                                                                |
+| Real-Time               | AnyCable (gRPC RPC server + anycable-go WebSocket gateway)                                                     |
+| File Storage            | Shrine 3.5.0 (AWS S3 `ca-central-1` in production)                                                             |
+| Virus Scanning          | ClamAV                                                                                                         |
+| Search                  | Elasticsearch (via Searchkick gem)                                                                             |
+| Authorization           | Pundit (policy objects)                                                                                        |
+| Authentication          | Keycloak / BCeID (BC Government SSO via `loginproxy.gov.bc.ca`)                                                |
+| State Machines          | AASM                                                                                                           |
+| Serialization           | Blueprinter                                                                                                    |
+| Email                   | CHES (BC Common Hosted Email Service) via custom delivery adapter                                              |
+| Container Orchestration | OpenShift / Kubernetes                                                                                         |
+| Helm                    | Helm v3 (umbrella chart pattern)                                                                               |
+| CI/CD                   | GitHub Actions (workflows under `.github/workflows/`)                                                          |
+| Node Version            | See [.nvmrc](.nvmrc)                                                                                           |
 
 ---
 
@@ -71,11 +79,13 @@ The application follows a standard Rails monolith pattern with the frontend embe
 │  Rails (Puma)  ─────────────────────────────────►  AnyCable RPC   │
 │       │                                           (Rails process) │
 │       ├── ActiveRecord ──► PostgreSQL                             │
-│       ├── CarrierWave  ──► Object Storage                         │
+│       ├── Shrine       ──► Object Storage (S3)                    │
+│       ├── Searchkick   ──► Elasticsearch                          │
 │       └── Sidekiq      ──► Redis                                  │
 │                │                                                  │
 │           Background Jobs                                         │
-│           (virus scan, email, sync, etc.)                         │
+│           ├── ClamAV (virus scanning)                             │
+│           └── (email, sync, etc.)                                 │
 └───────────────────────────────────────────────────────────────────┘
 ```
 
@@ -173,61 +183,21 @@ new_draft → newly_submitted → in_review → approved
 
 ---
 
+## Authentication
+
+The application uses **Keycloak** for single sign-on, integrated with BC Government's **BCeID** identity provider via `loginproxy.gov.bc.ca`. All user authentication is handled through OAuth 2.0 / OIDC flows managed by Keycloak.
+
+To run locally, the `KEYCLOAK_CLIENT`, `KEYCLOAK_SECRET`, and `KEYCLOAK_AUTH_URL` values in `.env.docker_compose` must be filled in — these are the OAuth client credentials the app uses to communicate with Keycloak. Contact the team to obtain these values for the development realm. User accounts (BCeID or Keycloak realm accounts) are managed separately.
+
+---
+
 ## Local Development Setup
 
-### Prerequisites
+The team develops using Docker Compose. The native (non-Docker) setup is not maintained and is not recommended.
 
-- **Ruby** – version specified in [.ruby-version](.ruby-version)
-- **Node.js** – version specified in [.nvmrc](.nvmrc)
-- **PostgreSQL** – running locally or via Docker
-- **Redis** – running locally or via Docker
-- **Foreman** or **[overmind](https://github.com/DarthSim/overmind)** – for running the `Procfile.dev` process list
+### Docker Compose
 
-[asdf](https://asdf-vm.com/) is the recommended version manager. All runtime versions are pinned in [.tool-versions](.tool-versions).
-
-### First-Time Setup
-
-```bash
-# Install Ruby and Node via asdf
-asdf install
-
-# Install Ruby gems
-bundle install
-
-# Install JS dependencies
-npm install
-
-# Configure environment
-cp .env_example .env
-# Edit .env and fill in required values (see comments in .env_example)
-
-# Setup the database (create, migrate, seed)
-bin/setup
-```
-
-### Running the Application
-
-The [Procfile.dev](Procfile.dev) defines all development processes. Use `foreman` or `overmind`:
-
-```bash
-foreman start -f Procfile.dev
-# or
-overmind start -f Procfile.dev
-```
-
-This starts:
-
-- **Rails (Puma)** on `http://localhost:3000`
-- **Vite dev server** (HMR frontend)
-- **Sidekiq** worker
-- **AnyCable RPC** server
-- **anycable-go** WebSocket gateway
-
-The frontend is served through Rails with Vite handling hot-module replacement in development.
-
-### Docker Compose (Alternative)
-
-A Docker Compose setup is available for running the full stack in containers. Copy the Docker-specific env file and bring services up:
+Copy the Docker-specific env file and bring services up:
 
 ```bash
 cp .env_example.docker_compose .env.docker_compose
@@ -244,24 +214,24 @@ docker compose exec app bundle exec rails db:migrate
 docker compose exec app bundle exec rails db:seed
 ```
 
-This starts Rails, Sidekiq, AnyCable, ClamAV, PostgreSQL, and Redis as a coordinated stack. See [docker-compose.yml](docker-compose.yml) for full service definitions.
+This starts Rails, Sidekiq, AnyCable, ClamAV, Elasticsearch, PostgreSQL, and Redis as a coordinated stack. See [docker-compose.yml](docker-compose.yml) for full service definitions.
 
 **Notes:**
 
 - A minimal set of ENV vars for local services (Redis, Postgres, etc.) are defaulted in `docker-compose.yml`. Additional vars for CHES email, Keycloak, and object storage must be set in `.env.docker_compose`.
 - To attach a debugger (e.g. `binding.pry`), run `docker compose attach app`.
-- Email previews via `letter_opener` do not function inside Docker.
+- Email previews via `letter_opener` are accessible at `http://localhost:3000/letter_opener`.
 
 ### Local Object Storage (Minio)
 
-To test the full file upload flow locally without Docker, run a local [Minio](https://min.io/) instance to emulate S3-compatible object storage:
+To test the full file upload flow locally, run a local [Minio](https://min.io/) instance to emulate S3-compatible object storage:
 
 ```bash
 brew install minio
 minio server --address 127.0.0.1:9001 ~/path/to/storage
 ```
 
-Set the following in your `.env`:
+Set the following in your `.env.docker_compose`:
 
 ```
 BCGOV_OBJECT_STORAGE_ENDPOINT=http://127.0.0.1:9001
@@ -287,7 +257,7 @@ Notable job categories:
 - **Email dispatch** – Asynchronous delivery via CHES
 - **Requirement block sync** – Propagating template changes to applications (see [docs/requirement-block-sync.md](docs/requirement-block-sync.md))
 
-> **Note:** Production environments use HA Redis via Sentinels. The required ENV vars differ from the simple `REDIS_URL` used locally.
+> **Note:** Redis serves 5 separate logical databases, each with its own ENV var: Sidekiq (`REDIS_URL`), AnyCable (`ANYCABLE_REDIS_URL`), rate limiting (`RATE_LIMIT_DEV_REDIS_URL`), activity feed (`SIMPLE_FEED_DEV_REDIS_URL`), and Rails cache (`CACHE_DEV_REDIS_URL`). Production environments use HA Redis via Sentinels — the required ENV vars differ from the simple `REDIS_URL` used locally.
 
 ---
 
@@ -300,13 +270,21 @@ The application uses [AnyCable](https://anycable.io/) for scalable WebSocket sup
 
 Configuration: [config/anycable.yml](config/anycable.yml), [config/cable.yml](config/cable.yml).
 
-In development, both processes are started via `Procfile.dev`. It is recommended to use a separate Redis DB for AnyCable (e.g. `ANYCABLE_REDIS_URL=redis://localhost:6379/2`) to avoid interference with Sidekiq queues.
+In development, both processes are started via Docker Compose. It is recommended to use a separate Redis DB for AnyCable (e.g. `ANYCABLE_REDIS_URL=redis://localhost:6379/2`) to avoid interference with Sidekiq queues.
+
+---
+
+## Search (Elasticsearch)
+
+Full-text and filtered search is powered by Elasticsearch via the [Searchkick](https://github.com/ankane/searchkick) gem. Models that support search (applications, users, contractors, requirement blocks, templates, jurisdictions, etc.) define `searchkick` in their model and are indexed in Elasticsearch.
+
+In development, Elasticsearch runs as a Docker Compose service on port `9200`. The `ELASTICSEARCH_URL` env var controls the connection.
 
 ---
 
 ## File Uploads & Virus Scanning
 
-Files are uploaded via CarrierWave (see [app/uploaders](app/uploaders)). All uploaded files are queued for virus scanning by ClamAV before they are made available.
+Files are uploaded via Shrine 3.5.0 (see [app/uploaders](app/uploaders)). All uploaded files are queued for virus scanning by ClamAV before they are made available.
 
 The scan flow:
 
@@ -323,7 +301,7 @@ See [docs/file-upload-flow.md](docs/file-upload-flow.md) and [docs/virus-scannin
 
 Outbound email is delivered via the **BC Common Hosted Email Service (CHES)**. A custom delivery adapter is implemented in [lib/ches_email_delivery.rb](lib/ches_email_delivery.rb). Mailers are under [app/mailers](app/mailers).
 
-Email delivery is always performed asynchronously via Sidekiq. In local non-Docker development, `letter_opener` is used to preview emails in the browser.
+Email delivery is always performed asynchronously via Sidekiq. In development, `letter_opener` is used to preview emails in the browser at `http://localhost:3000/letter_opener`.
 
 ---
 
@@ -367,10 +345,15 @@ helm/
 ├── _app/               ← Rails application sub-chart
 ├── _sidekiq/           ← Sidekiq worker sub-chart
 ├── _anycable-rpc/      ← AnyCable RPC sub-chart
-└── _clamav/            ← ClamAV sub-chart
+├── _clamav/            ← ClamAV sub-chart
+└── _maintenance/       ← Maintenance pod sub-chart
 ```
 
 Each sub-chart is prefixed with `_` to indicate it is a dependency of the umbrella `main` chart and not deployed independently.
+
+### Secrets Management
+
+Production secrets are managed via **Vault** (`global.vault` in helm values). Developers working on deployments or environment configuration should refer to the team's Vault setup for the appropriate secret paths and access policies.
 
 ### Deploying
 
