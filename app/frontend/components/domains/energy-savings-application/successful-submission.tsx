@@ -70,6 +70,7 @@ export const SuccessfulSubmissionScreen = observer(() => {
   let whatsNextHeadingKey: string = 'whatsNext.heading';
   let whatsNextLineKeys: string[] = ['whatsNext.line1'];
   let whatsNextEmail: string | null = null;
+  let shouldBulletWhatsNextLines = false;
 
   // Override for contractor onboarding
   if (currentPermitApplication.isContractorOnboarding) {
@@ -89,6 +90,7 @@ export const SuccessfulSubmissionScreen = observer(() => {
       'contractor.invoiceSuccess.whatsNext.line3',
     ];
     whatsNextEmail = t('site.support.contractorSupportEmail');
+    shouldBulletWhatsNextLines = true;
   }
 
   return (
@@ -112,11 +114,22 @@ export const SuccessfulSubmissionScreen = observer(() => {
         </VStack>
         {performedBy !== EUpdateRoles.staff && !isRevisionSubmission && (
           <>
-            <WhatsNextBlock headingKey={whatsNextHeadingKey} lineKeys={whatsNextLineKeys} email={whatsNextEmail} />
+            <WhatsNextBlock
+              headingKey={whatsNextHeadingKey}
+              lineKeys={whatsNextLineKeys}
+              email={whatsNextEmail}
+              bulletLineKeys={shouldBulletWhatsNextLines}
+            />
             <Box px={8} width="100%" backgroundColor="greys.grey10">
               <Divider borderColor="greys.lightGrey" />
             </Box>
-            {currentUser.isContractor ? <NeedHelpContractorBlock /> : <NeedHelpBlock />}
+            {isContractorInvoice ? (
+              <NeedHelpContractorInvoiceBlock />
+            ) : currentUser.isContractor ? (
+              <NeedHelpContractorBlock />
+            ) : (
+              <NeedHelpBlock />
+            )}
           </>
         )}
         <SubmissionReturnButton
@@ -135,9 +148,10 @@ interface WhatsNextBlockProps {
   headingKey: string;
   lineKeys: string[];
   email?: string | null;
+  bulletLineKeys?: boolean;
 }
 
-const WhatsNextBlock = ({ headingKey, lineKeys, email }: WhatsNextBlockProps) => {
+const WhatsNextBlock = ({ headingKey, lineKeys, email, bulletLineKeys = false }: WhatsNextBlockProps) => {
   const { t } = useTranslation();
 
   // Use default heading if translation is missing or returns "Not found"
@@ -156,7 +170,13 @@ const WhatsNextBlock = ({ headingKey, lineKeys, email }: WhatsNextBlockProps) =>
         {heading}
       </Text>
 
-      <VStack align="start" spacing={4}>
+      <VStack
+        as={bulletLineKeys ? 'ul' : undefined}
+        align="start"
+        spacing={4}
+        pl={bulletLineKeys ? 6 : 0}
+        listStyleType={bulletLineKeys ? 'disc' : 'none'}
+      >
         {lineKeys.length > 0 ? (
           lineKeys.map((key, index) => {
             const translatedText = t(key as any, { defaultValue: '' }) as string;
@@ -169,13 +189,13 @@ const WhatsNextBlock = ({ headingKey, lineKeys, email }: WhatsNextBlockProps) =>
 
             if (isTranslationMissing && index === 0) {
               return (
-                <Text fontSize="md" key={key}>
+                <Text as={bulletLineKeys ? 'li' : undefined} fontSize="md" key={key}>
                   {defaultContent}
                 </Text>
               );
             }
             return !isTranslationMissing ? (
-              <Text fontSize="md" key={key}>
+              <Text as={bulletLineKeys ? 'li' : undefined} fontSize="md" key={key}>
                 <Trans
                   i18nKey={key as any}
                   values={{ email: email ?? '' }}
@@ -255,6 +275,39 @@ const NeedHelpContractorBlock = () => {
         </Text>{' '}
         <Trans
           i18nKey="energySavingsApplication.new.contractorContactInstruction"
+          values={{ email }}
+          components={{
+            1: (
+              <Button
+                as="a"
+                href={`mailto:${email}`}
+                variant="link"
+                color="theme.blueAlt"
+                textDecoration="underline"
+                p={0}
+                h="auto"
+                fontSize="md"
+              />
+            ),
+          }}
+        />
+      </Text>
+    </Box>
+  );
+};
+
+const NeedHelpContractorInvoiceBlock = () => {
+  const { t } = useTranslation();
+  const email = t('site.support.contractorSupportEmail');
+
+  return (
+    <Box mb={6} p={8} borderRadius="md" backgroundColor="greys.grey10" width="100%">
+      <Text fontSize="md" mb={4}>
+        <Text as="span" fontWeight="bold">
+          {t('energySavingsApplication.new.hearBack', { defaultValue: 'Need help?' })}
+        </Text>{' '}
+        <Trans
+          i18nKey="energySavingsApplication.new.contractorInvoiceContactInstruction"
           values={{ email }}
           components={{
             1: (
