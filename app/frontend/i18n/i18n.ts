@@ -1311,6 +1311,8 @@ const options = {
               'See the status of your application or your application history any time by logging in to the Better Homes Energy Savings Program. Contact <1>{{ email }}</1> if you have any questions about your application.',
             contractorContactInstruction:
               'If you need to add, edit, or remove employees from your account in the future you will need to email the program at <1>{{ email }}</1>',
+            contractorInvoiceContactInstruction:
+              'You can log into the Better Homes Energy Savings Program to view your submitted forms. Please contact <1>{{ email }}</1> for questions related to your form.',
             whatsNextTitle: "What's next?",
             ready: 'Ready to submit this application form?',
             onBehalf: 'Ready to submit on someone’s behalf?',
