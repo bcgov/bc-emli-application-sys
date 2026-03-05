@@ -1,6 +1,6 @@
 # Default values for maintenance chart
 
-replicaCount: 2
+replicaCount: 1
 
 image:
   repository: '' # Will be set by CI/CD pipeline
