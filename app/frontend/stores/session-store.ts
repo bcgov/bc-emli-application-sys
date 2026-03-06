@@ -63,14 +63,24 @@ export const SessionStoreModel = types
     logout: flow(function* () {
       self.isLoggingOut = true;
       const response: any = yield self.environment.api.logout();
+
+      const isContractorFlow =
+        self.entryPoint === 'isContractor' ||
+        self.rootStore.userStore.currentUser?.isContractor ||
+        sessionStorage.getItem('isContractorFlow') === 'true' ||
+        window.location.pathname.startsWith('/contractor');
+
+      const isAdminFlow = self.entryPoint === 'isAdmin';
+
       if (response.ok) {
         self.resetAuth();
       }
+
       const origin = window.location.origin;
       let finalRedirect = origin;
-      if (self.entryPoint === 'isAdmin') {
+      if (isAdminFlow) {
         finalRedirect += '/admin';
-      } else if (self.entryPoint === 'isContractor') {
+      } else if (isContractorFlow) {
         finalRedirect += '/welcome/contractor';
       } else {
         finalRedirect += '/';

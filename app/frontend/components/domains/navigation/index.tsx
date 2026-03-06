@@ -414,16 +414,32 @@ const AppRoutes = observer(() => {
 
   useEffect(() => {
     if (tokenExpired) {
+      const isContractorFlow =
+        entryPoint === 'isContractor' ||
+        currentUser?.isContractor ||
+        sessionStorage.getItem('isContractorFlow') === 'true' ||
+        location.pathname.startsWith('/contractor');
+
+      const isAdminFlow =
+        entryPoint === 'isAdmin' ||
+        entryPoint === 'isAdminMgr' ||
+        entryPoint === 'isSysAdmin' ||
+        currentUser?.isAdmin ||
+        currentUser?.isAdminManager ||
+        currentUser?.isSystemAdmin;
+
       resetAuth();
       setAfterLoginPath(location.pathname);
-      if (entryPoint) {
+      if (isContractorFlow) {
+        navigate('/contractor');
+      } else if (isAdminFlow) {
         navigate('/admin');
       } else {
         navigate('/login');
       }
       uiStore.flashMessage.show(EFlashMessageStatus.warning, t('auth.tokenExpired'), null);
     }
-  }, [tokenExpired]);
+  }, [tokenExpired, entryPoint, currentUser, location.pathname, navigate, resetAuth, setAfterLoginPath, t, uiStore]);
 
   useEffect(() => {
     const storedPath = sessionStorage.getItem('afterLoginPath') || afterLoginPath;
