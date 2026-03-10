@@ -255,7 +255,7 @@ Notable job categories:
 
 - **Virus scan callbacks** – ClamAV results trigger document status updates
 - **Email dispatch** – Asynchronous delivery via CHES
-- **Requirement block sync** – Propagating template changes to applications (see [docs/requirement-block-sync.md](docs/requirement-block-sync.md))
+- **Requirement template sync** – Propagating template structure changes across environments (see [docs/requirement-template-sync.md](docs/requirement-template-sync.md))
 
 > **Note:** Redis serves 5 separate logical databases, each with its own ENV var: Sidekiq (`REDIS_URL`), AnyCable (`ANYCABLE_REDIS_URL`), rate limiting (`RATE_LIMIT_DEV_REDIS_URL`), activity feed (`SIMPLE_FEED_DEV_REDIS_URL`), and Rails cache (`CACHE_DEV_REDIS_URL`). Production environments use HA Redis via Sentinels — the required ENV vars differ from the simple `REDIS_URL` used locally.
 
@@ -375,16 +375,16 @@ For OpenShift-specific notes and legacy template history, see [openshift/Readme.
 
 ## Additional Documentation
 
-| Document                                                                         | Description                            |
-| -------------------------------------------------------------------------------- | -------------------------------------- |
-| [docs/system-architecture-diagram.md](docs/system-architecture-diagram.md)       | System architecture overview           |
-| [docs/file-upload-flow.md](docs/file-upload-flow.md)                             | File upload and storage flow           |
-| [docs/virus-scanning-update-flow.md](docs/virus-scanning-update-flow.md)         | ClamAV scan lifecycle                  |
-| [docs/requirement-block-sync.md](docs/requirement-block-sync.md)                 | Requirement block template sync design |
-| [docs/database-restore.md](docs/database-restore.md)                             | Database restore procedures            |
-| [docs/test-and-prod-release-workflow.md](docs/test-and-prod-release-workflow.md) | Release process                        |
-| [docs/hotfix-branch-tag-workflow.md](docs/hotfix-branch-tag-workflow.md)         | Hotfix process                         |
-| [devops/README.md](devops/README.md)                                             | DevOps and infrastructure notes        |
+| Document                                                                         | Description                      |
+| -------------------------------------------------------------------------------- | -------------------------------- |
+| [docs/system-architecture-diagram.md](docs/system-architecture-diagram.md)       | System architecture overview     |
+| [docs/file-upload-flow.md](docs/file-upload-flow.md)                             | File upload and storage flow     |
+| [docs/virus-scanning-update-flow.md](docs/virus-scanning-update-flow.md)         | ClamAV scan lifecycle            |
+| [docs/requirement-template-sync.md](docs/requirement-template-sync.md)           | Requirement template sync design |
+| [docs/database-restore.md](docs/database-restore.md)                             | Database restore procedures      |
+| [docs/test-and-prod-release-workflow.md](docs/test-and-prod-release-workflow.md) | Release process                  |
+| [docs/hotfix-branch-tag-workflow.md](docs/hotfix-branch-tag-workflow.md)         | Hotfix process                   |
+| [devops/README.md](devops/README.md)                                             | DevOps and infrastructure notes  |
 
 ---
 
