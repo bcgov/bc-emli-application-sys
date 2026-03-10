@@ -363,6 +363,7 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
               <Text sx={baseTextSx}>{t('contractor.programResources.checkEligibilityCode_description')}</Text>
               <Flex gap={2} align="center" w="full">
                 <Input
+                  aria-label={t('contractor.programResources.checkEligibilityCode')}
                   placeholder={t('contractor.programResources.checkEligibilityCode_inputPlaceholder')}
                   value={eligibilityCode}
                   onChange={(e) => {
@@ -387,8 +388,9 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
               </Flex>
               {checkResult?.valid &&
                 (() => {
-                  const isExpired =
-                    !!checkResult.expiryDate && new Date(checkResult.expiryDate) < new Date(new Date().toDateString());
+                  const today = new Date();
+                  const todayUTC = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+                  const isExpired = !!checkResult.expiryDate && new Date(checkResult.expiryDate) < todayUTC;
 
                   if (isExpired) {
                     return (
