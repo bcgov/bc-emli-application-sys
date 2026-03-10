@@ -3307,6 +3307,17 @@ const options = {
           programResources: {
             title: 'Contractor program resources',
             pageHeading: 'Program resources: Program guidance',
+            checkEligibilityCode: 'Check eligibility code',
+            checkEligibilityCode_description:
+              "You can only receive payment for eligible work. Check your customer's eligibility code before providing a quote or starting any work. Each eligibility code can only be used for work completed at the approved address.",
+            checkEligibilityCode_inputPlaceholder: 'Code e.g. ESP3-Dkecnc99hV02e99',
+            checkEligibilityCode_search: 'Search',
+            checkEligibilityCode_validWithExpiry: 'Valid until {{date}}.',
+            checkEligibilityCode_validExpired: 'Eligibility code expired on {{date}}.',
+            checkEligibilityCode_validNoExpiry: 'This code is valid.',
+            checkEligibilityCode_invalidFormat: 'Incorrect format ESP#-######',
+            checkEligibilityCode_invalid: 'Invalid eligibility code',
+            checkEligibilityCode_error: 'Could not check eligibility code. Please try again.',
             programGuidance: 'Program guidance',
             qualifiedProductList: 'Qualified product list',
             sampleInvoices: 'Sample invoices',

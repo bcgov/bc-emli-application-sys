@@ -933,4 +933,8 @@ export class Api {
   async fetchCurrentUserAcceptedEulas() {
     return this.client.get<ApiResponse<IUser>>(`/users/current_user/license_agreements`);
   }
+
+  async checkEligibilityCode(code: string) {
+    return this.client.get<{ valid: boolean; expiryDate?: string }>(`/eligibility_codes/${encodeURIComponent(code)}`);
+  }
 }
