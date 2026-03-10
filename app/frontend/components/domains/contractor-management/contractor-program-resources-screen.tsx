@@ -1,6 +1,10 @@
-import { Box, Container, Flex, Heading, Link, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Container, Flex, Heading, Input, Link, Text, VStack } from '@chakra-ui/react';
+import { CheckCircle } from '@phosphor-icons/react';
+import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useMst } from '../../../setup/root';
+import CustomAlert from '../../shared/base/custom-alert';
 import { BlueTitleBar } from '../../shared/base/blue-title-bar';
 import { SubNavBar } from '../navigation/sub-nav-bar';
 
@@ -13,9 +17,15 @@ interface ProgramResource {
   description?: string;
 }
 
-type ResourceCategory = 'programGuidance' | 'qualifiedProductList' | 'sampleInvoices' | 'resourcesForCustomers';
+type ResourceCategory =
+  | 'checkEligibilityCode'
+  | 'programGuidance'
+  | 'qualifiedProductList'
+  | 'sampleInvoices'
+  | 'resourcesForCustomers';
+type ResourceListCategory = Exclude<ResourceCategory, 'checkEligibilityCode'>;
 
-const PROGRAM_RESOURCES: Record<ResourceCategory, ProgramResource[]> = {
+const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
   programGuidance: [
     {
       id: 'contractor-rebate-journey',
@@ -181,7 +191,18 @@ const PROGRAM_RESOURCES: Record<ResourceCategory, ProgramResource[]> = {
   ],
 };
 
+const ELIGIBILITY_CODE_REGEX = /^ESP\d-[A-Za-z0-9]+$/;
+
+const formatExpiryDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  const day = date.getUTCDate().toString().padStart(2, '0');
+  const month = date.toLocaleString('en-CA', { month: 'short', timeZone: 'UTC' });
+  const year = date.getUTCFullYear();
+  return `${day}. ${month}, ${year}`;
+};
+
 const SIDEBAR_CATEGORIES: { key: ResourceCategory; label: string }[] = [
+  { key: 'checkEligibilityCode', label: 'contractor.programResources.checkEligibilityCode' },
   { key: 'programGuidance', label: 'contractor.programResources.programGuidance' },
   { key: 'qualifiedProductList', label: 'contractor.programResources.qualifiedProductList' },
   { key: 'sampleInvoices', label: 'contractor.programResources.sampleInvoices' },
@@ -192,11 +213,38 @@ interface ContractorProgramResourcesScreenProps {
   hideBlueSection?: boolean;
 }
 
-export const ContractorProgramResourcesScreen = ({
+export const ContractorProgramResourcesScreen = observer(function ContractorProgramResourcesScreen({
   hideBlueSection = false,
-}: ContractorProgramResourcesScreenProps) => {
+}: ContractorProgramResourcesScreenProps) {
   const { t } = useTranslation();
+  const { environment } = useMst();
   const [selectedCategory, setSelectedCategory] = useState<ResourceCategory>('programGuidance');
+  const [eligibilityCode, setEligibilityCode] = useState('');
+  const [checkResult, setCheckResult] = useState<{
+    valid: boolean;
+    expiryDate?: string;
+    invalidFormat?: boolean;
+  } | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [checkError, setCheckError] = useState(false);
+
+  const handleCheckEligibility = async () => {
+    const code = eligibilityCode.trim();
+    if (!ELIGIBILITY_CODE_REGEX.test(code)) {
+      setCheckResult({ valid: false, invalidFormat: true });
+      return;
+    }
+    setChecking(true);
+    setCheckResult(null);
+    setCheckError(false);
+    const response = await environment.api.checkEligibilityCode(code);
+    setChecking(false);
+    if (response.ok) {
+      setCheckResult(response.data);
+    } else {
+      setCheckError(true);
+    }
+  };
 
   const baseTextSx = { fontSize: '16px', lineHeight: '27px', color: 'text.primary' };
 
@@ -233,7 +281,7 @@ export const ContractorProgramResourcesScreen = ({
         px={hideBlueSection ? 0 : 10}
       >
         <Heading as="h1" fontSize="5xl" fontWeight="700" color="greys.grey60" mb={4} mt={hideBlueSection ? 10 : 0}>
-          {t('contractor.programResources.programResourcesPrefix')}{' '}
+          {selectedCategory !== 'checkEligibilityCode' && `${t('contractor.programResources.programResourcesPrefix')} `}
           {t(SIDEBAR_CATEGORIES.find((cat) => cat.key === selectedCategory)?.label || '')}
         </Heading>
         {selectedCategory === 'qualifiedProductList' && (
@@ -301,256 +349,337 @@ export const ContractorProgramResourcesScreen = ({
             </VStack>
           </Box>
 
-          {/* Right Content Area - Resource List */}
-          <VStack
-            flex={1}
-            align="flex-start"
-            spacing={3}
-            id="resource-panel"
-            role="tabpanel"
-            aria-labelledby={`tab-${selectedCategory}`}
-            border={selectedCategory === 'qualifiedProductList' ? 'none' : '1px solid'}
-            borderColor={selectedCategory === 'qualifiedProductList' ? 'transparent' : '#D8D8D8'}
-            borderRadius={selectedCategory === 'qualifiedProductList' ? '0' : '8px'}
-            bg={selectedCategory === 'qualifiedProductList' ? 'transparent' : 'greys.white'}
-            p={selectedCategory === 'qualifiedProductList' ? 0 : 6}
-            tabIndex={-1}
-          >
-            {PROGRAM_RESOURCES[selectedCategory].length > 0 ? (
-              PROGRAM_RESOURCES[selectedCategory].map((resource) => (
-                <Box
-                  key={resource.id}
-                  w="full"
-                  mb={resource.description ? 4 : 0}
-                  p={selectedCategory === 'qualifiedProductList' ? 8 : 0}
-                  pb={selectedCategory === 'qualifiedProductList' ? 16 : undefined}
-                  border={selectedCategory === 'qualifiedProductList' ? '1px solid' : 'none'}
-                  borderColor={selectedCategory === 'qualifiedProductList' ? '#D8D8D8' : 'transparent'}
-                  borderRadius={selectedCategory === 'qualifiedProductList' ? '4px' : '0'}
-                  bg={selectedCategory === 'qualifiedProductList' ? 'greys.white' : 'transparent'}
+          {/* Right Content Area */}
+          {selectedCategory === 'checkEligibilityCode' ? (
+            <VStack
+              flex={1}
+              align="flex-start"
+              spacing={4}
+              id="resource-panel"
+              role="tabpanel"
+              aria-labelledby="tab-checkEligibilityCode"
+              tabIndex={-1}
+            >
+              <Text sx={baseTextSx}>{t('contractor.programResources.checkEligibilityCode_description')}</Text>
+              <Flex gap={2} align="center" w="full">
+                <Input
+                  aria-label={t('contractor.programResources.checkEligibilityCode')}
+                  placeholder={t('contractor.programResources.checkEligibilityCode_inputPlaceholder')}
+                  value={eligibilityCode}
+                  onChange={(e) => {
+                    setEligibilityCode(e.target.value);
+                    setCheckResult(null);
+                    setCheckError(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && eligibilityCode.trim()) handleCheckEligibility();
+                  }}
+                  maxW="400px"
+                  borderColor="border.input"
+                />
+                <Button
+                  onClick={handleCheckEligibility}
+                  isDisabled={!eligibilityCode.trim() || checking}
+                  isLoading={checking}
+                  variant="primary"
                 >
-                  {resource.url === '#' ? (
-                    <Text
-                      fontWeight="bold"
-                      sx={{
-                        ...baseTextSx,
-                        fontSize: 'xl',
-                        color: 'text.link',
-                      }}
-                    >
-                      {t(resource.title)}
-                      {resource.size && resource.type && (
-                        <Text as="span" color="greys.grey60" fontWeight="bold" ml={1} aria-hidden="true">
-                          [{resource.size}, {resource.type}]
-                        </Text>
-                      )}
-                    </Text>
-                  ) : (
-                    <Link
-                      href={resource.url}
-                      textDecoration="underline"
-                      fontWeight="bold"
-                      _hover={{ color: 'theme.blue' }}
-                      _focusVisible={{
-                        outline: '3px solid',
-                        outlineColor: 'theme.blue',
-                        outlineOffset: '2px',
-                        color: 'theme.blue',
-                      }}
-                      sx={{
-                        ...baseTextSx,
-                        fontSize: 'xl',
-                        color: 'text.link',
-                        '&:focus:not(:focus-visible)': {
-                          outline: 'none',
-                        },
-                      }}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={getResourceAriaLabel(resource)}
-                    >
-                      {t(resource.title)}
-                      {resource.size && resource.type && (
-                        <Text as="span" color="greys.grey60" fontWeight="bold" ml={1} aria-hidden="true">
-                          [{resource.size}, {resource.type}]
-                        </Text>
-                      )}
-                    </Link>
+                  {t('contractor.programResources.checkEligibilityCode_search')}
+                </Button>
+              </Flex>
+              {checkResult?.valid &&
+                (() => {
+                  const today = new Date();
+                  const todayUTC = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+                  const isExpired = !!checkResult.expiryDate && new Date(checkResult.expiryDate) < todayUTC;
+
+                  if (isExpired) {
+                    return (
+                      <CustomAlert
+                        description={t('contractor.programResources.checkEligibilityCode_validExpired', {
+                          date: formatExpiryDate(checkResult.expiryDate),
+                        })}
+                      />
+                    );
+                  }
+
+                  return (
+                    <CustomAlert
+                      description={
+                        !checkResult.expiryDate
+                          ? t('contractor.programResources.checkEligibilityCode_validNoExpiry')
+                          : t('contractor.programResources.checkEligibilityCode_validWithExpiry', {
+                              date: formatExpiryDate(checkResult.expiryDate),
+                            })
+                      }
+                      icon={<CheckCircle size={27} />}
+                      borderColor="success"
+                      backgroundColor="semantic.successLight"
+                      iconColor="green"
+                    />
+                  );
+                })()}
+              {checkResult && !checkResult.valid && (
+                <CustomAlert
+                  description={t(
+                    checkResult.invalidFormat
+                      ? 'contractor.programResources.checkEligibilityCode_invalidFormat'
+                      : 'contractor.programResources.checkEligibilityCode_invalid',
                   )}
-                  {resource.description && (
-                    <Text sx={baseTextSx} color="greys.grey60" mt={2}>
-                      {resource.id === 'mini-split-heat-pumps' ? (
-                        <>
-                          {
-                            t('contractor.programResources.descriptions.miniSplitHeatPumps').split(
-                              t('contractor.programResources.linkText.qualifyingProductList'),
-                            )[0]
-                          }
-                          <Link
-                            href={resource.url}
-                            color="theme.blueAlt"
-                            textDecoration="underline"
-                            _hover={{ color: 'theme.blue' }}
-                            _focusVisible={{
-                              outline: '3px solid',
-                              outlineColor: 'theme.blue',
-                              outlineOffset: '2px',
-                            }}
-                            sx={{
-                              '&:focus:not(:focus-visible)': {
-                                outline: 'none',
-                              },
-                            }}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Open Qualifying Product List in new tab"
-                          >
-                            {t('contractor.programResources.linkText.qualifyingProductList')}
-                          </Link>
-                        </>
-                      ) : resource.id === 'air-to-water-heat-pumps' ? (
-                        <>
-                          {
-                            t('contractor.programResources.descriptions.airToWaterHeatPumps').split(
-                              t('contractor.programResources.linkText.productList'),
-                            )[0]
-                          }
-                          <Link
-                            href={resource.url}
-                            color="theme.blueAlt"
-                            textDecoration="underline"
-                            _hover={{ color: 'theme.blue' }}
-                            _focusVisible={{
-                              outline: '3px solid',
-                              outlineColor: 'theme.blue',
-                              outlineOffset: '2px',
-                            }}
-                            sx={{
-                              '&:focus:not(:focus-visible)': {
-                                outline: 'none',
-                              },
-                            }}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Open product list PDF in new tab"
-                          >
-                            {t('contractor.programResources.linkText.productList')}
-                          </Link>
-                          {t('contractor.programResources.fileInfoAirToWater')}
-                        </>
-                      ) : resource.id === 'heat-pump-water-heater-list' ? (
-                        <>
-                          {
-                            t('contractor.programResources.descriptions.heatPumpWaterHeaterList').split(
-                              t('contractor.programResources.linkText.eligibleModelsList'),
-                            )[0]
-                          }
-                          <Link
-                            href={resource.url}
-                            color="theme.blueAlt"
-                            textDecoration="underline"
-                            _hover={{ color: 'theme.blue' }}
-                            _focusVisible={{
-                              outline: '3px solid',
-                              outlineColor: 'theme.blue',
-                              outlineOffset: '2px',
-                            }}
-                            sx={{
-                              '&:focus:not(:focus-visible)': {
-                                outline: 'none',
-                              },
-                            }}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Open Eligible Models List PDF in new tab"
-                          >
-                            {t('contractor.programResources.linkText.eligibleModelsList')}
-                          </Link>
-                          {t('contractor.programResources.fileInfoHPWH')}
-                        </>
-                      ) : resource.id === 'ventilation-list' ? (
-                        <>
-                          {
-                            t('contractor.programResources.descriptions.ventilationList').split(
-                              t('contractor.programResources.linkText.productList'),
-                            )[0]
-                          }
-                          <Link
-                            href={resource.url}
-                            color="theme.blueAlt"
-                            textDecoration="underline"
-                            _hover={{ color: 'theme.blue' }}
-                            _focusVisible={{
-                              outline: '3px solid',
-                              outlineColor: 'theme.blue',
-                              outlineOffset: '2px',
-                            }}
-                            sx={{
-                              '&:focus:not(:focus-visible)': {
-                                outline: 'none',
-                              },
-                            }}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Open Natural Resources Canada product list in new tab"
-                          >
-                            {t('contractor.programResources.linkText.productList')}
-                          </Link>
-                          {
-                            t('contractor.programResources.descriptions.ventilationList').split(
-                              t('contractor.programResources.linkText.productList'),
-                            )[1]
-                          }
-                        </>
-                      ) : resource.id === 'bathroom-fan-product-list' ? (
-                        <>
-                          {
-                            t('contractor.programResources.descriptions.bathroomFanProductList').split(
-                              t('contractor.programResources.linkText.productList'),
-                            )[0]
-                          }
-                          <Link
-                            href={resource.url}
-                            color="theme.blueAlt"
-                            textDecoration="underline"
-                            _hover={{ color: 'theme.blue' }}
-                            _focusVisible={{
-                              outline: '3px solid',
-                              outlineColor: 'theme.blue',
-                              outlineOffset: '2px',
-                            }}
-                            sx={{
-                              '&:focus:not(:focus-visible)': {
-                                outline: 'none',
-                              },
-                            }}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Open EPA and DOE product list in new tab"
-                          >
-                            {t('contractor.programResources.linkText.productList')}
-                          </Link>
-                          {
-                            t('contractor.programResources.descriptions.bathroomFanProductList').split(
-                              t('contractor.programResources.linkText.productList'),
-                            )[1]
-                          }
-                        </>
-                      ) : (
-                        t(resource.description)
-                      )}
-                    </Text>
-                  )}
-                </Box>
-              ))
-            ) : (
-              <Text sx={baseTextSx} color="greys.grey60" fontStyle="italic">
-                {t('contractor.programResources.noResources')}
-              </Text>
-            )}
-          </VStack>
+                />
+              )}
+              {checkError && <CustomAlert description={t('contractor.programResources.checkEligibilityCode_error')} />}
+            </VStack>
+          ) : (
+            <VStack
+              flex={1}
+              align="flex-start"
+              spacing={3}
+              id="resource-panel"
+              role="tabpanel"
+              aria-labelledby={`tab-${selectedCategory}`}
+              border={selectedCategory === 'qualifiedProductList' ? 'none' : '1px solid'}
+              borderColor={selectedCategory === 'qualifiedProductList' ? 'transparent' : '#D8D8D8'}
+              borderRadius={selectedCategory === 'qualifiedProductList' ? '0' : '8px'}
+              bg={selectedCategory === 'qualifiedProductList' ? 'transparent' : 'greys.white'}
+              p={selectedCategory === 'qualifiedProductList' ? 0 : 6}
+              tabIndex={-1}
+            >
+              {PROGRAM_RESOURCES[selectedCategory as ResourceListCategory].length > 0 ? (
+                PROGRAM_RESOURCES[selectedCategory as ResourceListCategory].map((resource) => (
+                  <Box
+                    key={resource.id}
+                    w="full"
+                    mb={resource.description ? 4 : 0}
+                    p={selectedCategory === 'qualifiedProductList' ? 8 : 0}
+                    pb={selectedCategory === 'qualifiedProductList' ? 16 : undefined}
+                    border={selectedCategory === 'qualifiedProductList' ? '1px solid' : 'none'}
+                    borderColor={selectedCategory === 'qualifiedProductList' ? '#D8D8D8' : 'transparent'}
+                    borderRadius={selectedCategory === 'qualifiedProductList' ? '4px' : '0'}
+                    bg={selectedCategory === 'qualifiedProductList' ? 'greys.white' : 'transparent'}
+                  >
+                    {resource.url === '#' ? (
+                      <Text
+                        fontWeight="bold"
+                        sx={{
+                          ...baseTextSx,
+                          fontSize: 'xl',
+                          color: 'text.link',
+                        }}
+                      >
+                        {t(resource.title)}
+                        {resource.size && resource.type && (
+                          <Text as="span" color="greys.grey60" fontWeight="bold" ml={1} aria-hidden="true">
+                            [{resource.size}, {resource.type}]
+                          </Text>
+                        )}
+                      </Text>
+                    ) : (
+                      <Link
+                        href={resource.url}
+                        textDecoration="underline"
+                        fontWeight="bold"
+                        _hover={{ color: 'theme.blue' }}
+                        _focusVisible={{
+                          outline: '3px solid',
+                          outlineColor: 'theme.blue',
+                          outlineOffset: '2px',
+                          color: 'theme.blue',
+                        }}
+                        sx={{
+                          ...baseTextSx,
+                          fontSize: 'xl',
+                          color: 'text.link',
+                          '&:focus:not(:focus-visible)': {
+                            outline: 'none',
+                          },
+                        }}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={getResourceAriaLabel(resource)}
+                      >
+                        {t(resource.title)}
+                        {resource.size && resource.type && (
+                          <Text as="span" color="greys.grey60" fontWeight="bold" ml={1} aria-hidden="true">
+                            [{resource.size}, {resource.type}]
+                          </Text>
+                        )}
+                      </Link>
+                    )}
+                    {resource.description && (
+                      <Text sx={baseTextSx} color="greys.grey60" mt={2}>
+                        {resource.id === 'mini-split-heat-pumps' ? (
+                          <>
+                            {
+                              t('contractor.programResources.descriptions.miniSplitHeatPumps').split(
+                                t('contractor.programResources.linkText.qualifyingProductList'),
+                              )[0]
+                            }
+                            <Link
+                              href={resource.url}
+                              color="theme.blueAlt"
+                              textDecoration="underline"
+                              _hover={{ color: 'theme.blue' }}
+                              _focusVisible={{
+                                outline: '3px solid',
+                                outlineColor: 'theme.blue',
+                                outlineOffset: '2px',
+                              }}
+                              sx={{
+                                '&:focus:not(:focus-visible)': {
+                                  outline: 'none',
+                                },
+                              }}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label="Open Qualifying Product List in new tab"
+                            >
+                              {t('contractor.programResources.linkText.qualifyingProductList')}
+                            </Link>
+                          </>
+                        ) : resource.id === 'air-to-water-heat-pumps' ? (
+                          <>
+                            {
+                              t('contractor.programResources.descriptions.airToWaterHeatPumps').split(
+                                t('contractor.programResources.linkText.productList'),
+                              )[0]
+                            }
+                            <Link
+                              href={resource.url}
+                              color="theme.blueAlt"
+                              textDecoration="underline"
+                              _hover={{ color: 'theme.blue' }}
+                              _focusVisible={{
+                                outline: '3px solid',
+                                outlineColor: 'theme.blue',
+                                outlineOffset: '2px',
+                              }}
+                              sx={{
+                                '&:focus:not(:focus-visible)': {
+                                  outline: 'none',
+                                },
+                              }}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label="Open product list PDF in new tab"
+                            >
+                              {t('contractor.programResources.linkText.productList')}
+                            </Link>
+                            {t('contractor.programResources.fileInfoAirToWater')}
+                          </>
+                        ) : resource.id === 'heat-pump-water-heater-list' ? (
+                          <>
+                            {
+                              t('contractor.programResources.descriptions.heatPumpWaterHeaterList').split(
+                                t('contractor.programResources.linkText.eligibleModelsList'),
+                              )[0]
+                            }
+                            <Link
+                              href={resource.url}
+                              color="theme.blueAlt"
+                              textDecoration="underline"
+                              _hover={{ color: 'theme.blue' }}
+                              _focusVisible={{
+                                outline: '3px solid',
+                                outlineColor: 'theme.blue',
+                                outlineOffset: '2px',
+                              }}
+                              sx={{
+                                '&:focus:not(:focus-visible)': {
+                                  outline: 'none',
+                                },
+                              }}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label="Open Eligible Models List PDF in new tab"
+                            >
+                              {t('contractor.programResources.linkText.eligibleModelsList')}
+                            </Link>
+                            {t('contractor.programResources.fileInfoHPWH')}
+                          </>
+                        ) : resource.id === 'ventilation-list' ? (
+                          <>
+                            {
+                              t('contractor.programResources.descriptions.ventilationList').split(
+                                t('contractor.programResources.linkText.productList'),
+                              )[0]
+                            }
+                            <Link
+                              href={resource.url}
+                              color="theme.blueAlt"
+                              textDecoration="underline"
+                              _hover={{ color: 'theme.blue' }}
+                              _focusVisible={{
+                                outline: '3px solid',
+                                outlineColor: 'theme.blue',
+                                outlineOffset: '2px',
+                              }}
+                              sx={{
+                                '&:focus:not(:focus-visible)': {
+                                  outline: 'none',
+                                },
+                              }}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label="Open Natural Resources Canada product list in new tab"
+                            >
+                              {t('contractor.programResources.linkText.productList')}
+                            </Link>
+                            {
+                              t('contractor.programResources.descriptions.ventilationList').split(
+                                t('contractor.programResources.linkText.productList'),
+                              )[1]
+                            }
+                          </>
+                        ) : resource.id === 'bathroom-fan-product-list' ? (
+                          <>
+                            {
+                              t('contractor.programResources.descriptions.bathroomFanProductList').split(
+                                t('contractor.programResources.linkText.productList'),
+                              )[0]
+                            }
+                            <Link
+                              href={resource.url}
+                              color="theme.blueAlt"
+                              textDecoration="underline"
+                              _hover={{ color: 'theme.blue' }}
+                              _focusVisible={{
+                                outline: '3px solid',
+                                outlineColor: 'theme.blue',
+                                outlineOffset: '2px',
+                              }}
+                              sx={{
+                                '&:focus:not(:focus-visible)': {
+                                  outline: 'none',
+                                },
+                              }}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label="Open EPA and DOE product list in new tab"
+                            >
+                              {t('contractor.programResources.linkText.productList')}
+                            </Link>
+                            {
+                              t('contractor.programResources.descriptions.bathroomFanProductList').split(
+                                t('contractor.programResources.linkText.productList'),
+                              )[1]
+                            }
+                          </>
+                        ) : (
+                          t(resource.description)
+                        )}
+                      </Text>
+                    )}
+                  </Box>
+                ))
+              ) : (
+                <Text sx={baseTextSx} color="greys.grey60" fontStyle="italic">
+                  {t('contractor.programResources.noResources')}
+                </Text>
+              )}
+            </VStack>
+          )}
         </Flex>
       </Container>
     </Flex>
   );
-};
+});

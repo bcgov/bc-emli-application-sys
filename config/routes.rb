@@ -169,6 +169,8 @@ Rails.application.routes.draw do
       post "permit_classification_options", on: :collection
     end
 
+    resources :eligibility_codes, only: %i[show]
+
     resources :geocoder, only: %i[] do
       get "site_options", on: :collection
       get "pids", on: :collection
