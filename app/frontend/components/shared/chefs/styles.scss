@@ -1,13 +1,13 @@
-@import url("https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
+@import url('https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 // Font Awesome icons for: "fa-plus-square, fa-minus-square, fa-cloud
-@import url("https://unpkg.com/@phosphor-icons/web@2.0.3/src/fill/style.css");
+@import url('https://unpkg.com/@phosphor-icons/web@2.0.3/src/fill/style.css');
 // Phosphor icon for the compliance lightning
-@import "bootstrap/dist/css/bootstrap.min.css";
-@import "formiojs/dist/formio.form.css";
-@import "../../../styles/global-theme-variables.scss";
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'formiojs/dist/formio.form.css';
+@import '../../../styles/global-theme-variables.scss';
 
 :root {
-  --bs-font-sans-serif: "BC Sans";
+  --bs-font-sans-serif: 'BC Sans';
   --bs-body-color: $bcgov-font;
 }
 
@@ -29,7 +29,7 @@
 
   // Typography
   .v-application {
-    font-family: "BCSans", sans-serif !important;
+    font-family: 'BCSans', sans-serif !important;
     line-height: 1.4;
     font-size: 0.875rem;
   }
@@ -99,7 +99,7 @@
   ///////
 
   // layout
-  div[class^="col-"]:nth-child(n + 1) {
+  div[class^='col-']:nth-child(n + 1) {
     padding-top: 0; // make nested columns line up vertically alongside components in non-nested adjacent columns
   }
 
@@ -116,11 +116,11 @@
     }
 
     .fa-minus-square-o::before {
-      content: "\f106";
+      content: '\f106';
     }
 
     .fa-plus-square-o::before {
-      content: "\f107";
+      content: '\f107';
     }
   }
 
@@ -191,7 +191,7 @@
   .form-control,
   .form-check-input:not(:checked) {
     &:disabled,
-    &[disabled="disabled"] {
+    &[disabled='disabled'] {
       background-color: var(--chakra-colors-greys-grey03);
       border-color: var(--chakra-colors-greys-grey02);
       cursor: not-allowed;
@@ -236,8 +236,8 @@
     }
 
     &:disabled,
-    &[disabled="disabled"],
-    &[disabled="disabled"] &:hover {
+    &[disabled='disabled'],
+    &[disabled='disabled'] &:hover {
       cursor: default;
       text-decoration: none;
       background-color: rgba(0, 0, 0, 0.12);
@@ -287,7 +287,7 @@
   // hide asterisks after input in Data Grid when labels appear as table headers
   .formio-component-datagrid {
     label.field-required.control-label--hidden::after {
-      content: "";
+      content: '';
     }
   }
 
@@ -456,7 +456,7 @@
 
   // adds optional text for non required input labels
   .col-form-label:not(.field-required):not(.formio-section-container > .col-form-label):after {
-    content: "(optional)";
+    content: '(optional)';
   }
 
   .compliance {
@@ -474,7 +474,7 @@
       position: relative;
 
       &:after {
-        content: "";
+        content: '';
         display: inline-block;
         position: absolute;
         left: var(--chakra-space-2);
@@ -548,6 +548,19 @@
       &:hover {
         background-color: var(--chakra-colors-semantic-infoLight);
       }
+
+      .sr-only,
+      .visually-hidden {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+      }
     }
 
     .file {
@@ -557,7 +570,7 @@
       font-size: var(--chakra-fontSizes-sm);
 
       .fileName {
-        [ref="fileStatusRemove"] {
+        [ref='fileStatusRemove'] {
           color: $bcgov-font-error;
           margin: 0 var(--chakra-space-1);
           padding: 6px;
@@ -580,7 +593,7 @@
     font-weight: 700;
 
     &:before {
-      content: "";
+      content: '';
       display: block;
       height: 1px;
       background-color: gray;
@@ -653,7 +666,7 @@
       // Hide plus icon
       i.fa-plus,
       .fa-plus,
-      i[class*="fa-plus"] {
+      i[class*='fa-plus'] {
         display: none !important;
       }
 
@@ -674,7 +687,7 @@
       }
 
       i:before {
-        content: "+";
+        content: '+';
         font-size: var(--chakra-fontSizes-xl);
         margin-right: var(--chakra-space-1);
       }
@@ -689,12 +702,11 @@
       align-items: center;
 
       i:before {
-        content: "\2715";
+        content: '\2715';
         font-size: var(--chakra-fontSizes-xs);
         margin-right: var(--chakra-space-2);
       }
     }
-
 
     @media (min-width: 766px) {
       .formio-button-remove-row {
@@ -702,7 +714,7 @@
       }
 
       .formio-button-remove-row:after {
-        content: "Remove";
+        content: 'Remove';
       }
     }
   }
@@ -750,8 +762,8 @@
       padding-left: 35px; // Adjust padding to make space for the icon
 
       &::before {
-        content: "\f2ba"; // This is the content code for a specific icon, example here
-        font-family: "FontAwesome"; // Ensure you are using the correct font-family
+        content: '\f2ba'; // This is the content code for a specific icon, example here
+        font-family: 'FontAwesome'; // Ensure you are using the correct font-family
         position: absolute;
         font-weight: 200;
         left: 10px; // Adjust based on padding and size
@@ -778,8 +790,8 @@
     }
 
     &::before {
-      content: "\f044"; // This is the content code for a specific icon, example here
-      font-family: "FontAwesome"; // Ensure you are using the correct font-family
+      content: '\f044'; // This is the content code for a specific icon, example here
+      font-family: 'FontAwesome'; // Ensure you are using the correct font-family
       position: absolute;
       font-weight: 200;
       left: 10px; // Adjust based on padding and size
@@ -807,7 +819,7 @@
       color: var(--chakra-colors-text-primary);
       text-transform: uppercase;
       text-decoration: underline;
-      content: "Answer changed";
+      content: 'Answer changed';
       position: absolute;
       font-weight: 200;
       top: 0;
@@ -817,7 +829,7 @@
       padding-bottom: 4px;
       transform: translateY(-50%);
       font-size: 14px;
-      width: "fit-content";
+      width: 'fit-content';
       white-space: nowrap;
       overflow: hidden;
       clip-path: polygon(0% 50%, 10% 0%, 100% 0%, 100% 100%, 10% 100%);
@@ -841,7 +853,7 @@
       color: var(--chakra-colors-text-primary);
       text-transform: uppercase;
       text-decoration: underline;
-      content: "Update requested";
+      content: 'Update requested';
       position: absolute;
       font-weight: 200;
       top: 0;
@@ -851,7 +863,7 @@
       padding-bottom: 4px;
       transform: translateY(-50%) translateX(-5%);
       font-size: 14px;
-      width: "fit-content";
+      width: 'fit-content';
       white-space: nowrap;
       overflow: hidden;
       clip-path: polygon(0% 50%, 10% 0%, 100% 0%, 100% 100%, 10% 100%);
@@ -873,7 +885,7 @@
     // to keep the input fields looking the same size
 
     &::before {
-      content: "➤";
+      content: '➤';
       font-weight: bold;
       color: $bcgov-font-error;
       position: absolute;
@@ -893,7 +905,7 @@
   }
 
   // in a block with button, don't display the padding and border if there are no help content
-  [ref="buttonMessageContainer"] .help-block:empty {
+  [ref='buttonMessageContainer'] .help-block:empty {
     padding: 0;
     border: 0;
   }
@@ -907,13 +919,13 @@
   }
 
   // style default error box that to look similar to our floating error alert box
-  [id^="error-list-"].alert.alert-danger {
+  [id^='error-list-'].alert.alert-danger {
     padding-top: var(--chakra-space-7);
     padding-left: var(--chakra-space-6);
     padding-right: var(--chakra-space-6);
 
     &::before {
-      content: "!";
+      content: '!';
       font-size: 32px;
       font-weight: bold;
       display: inline-block;
@@ -1024,27 +1036,27 @@
 }
 
 .removed-in-diff::before {
-  @include diff-tag-styles("Removed");
+  @include diff-tag-styles('Removed');
 }
 
 .changed-in-diff::before {
-  @include diff-tag-styles("Changed");
+  @include diff-tag-styles('Changed');
 }
 
 .added-in-diff::before {
-  @include diff-tag-styles("Added");
+  @include diff-tag-styles('Added');
 }
 
 .removed-in-diff.formio-hidden::after {
-  @include hidden-diff-explainer("A hidden field has been removed and is no longer required for your application.");
+  @include hidden-diff-explainer('A hidden field has been removed and is no longer required for your application.');
 }
 
 .changed-in-diff.formio-hidden::after {
-  @include hidden-diff-explainer("A hidden field has been changed but is currently not required for your application.");
+  @include hidden-diff-explainer('A hidden field has been changed but is currently not required for your application.');
 }
 
 .added-in-diff.formio-hidden::after {
-  @include hidden-diff-explainer("A hidden field has been added that is currently not required for your application.");
+  @include hidden-diff-explainer('A hidden field has been added that is currently not required for your application.');
 }
 
 .single-requirement-form {
