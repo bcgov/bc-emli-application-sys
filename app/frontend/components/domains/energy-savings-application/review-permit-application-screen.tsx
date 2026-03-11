@@ -514,6 +514,8 @@ export const ReviewPermitApplicationScreen = observer(() => {
                             onClick={onTrainingPending}
                             borderColor="theme.darkGreen"
                             bg="theme.lightGreen"
+                            _hover={{ bg: 'theme.lightGreen' }}
+                            _active={{ bg: 'theme.lightGreen' }}
                             isDisabled={
                               hasUnsavedEdits ||
                               currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
@@ -581,6 +583,8 @@ export const ReviewPermitApplicationScreen = observer(() => {
                             onClick={onIneligibleOpen}
                             borderColor="semantic.errorDark"
                             bg="theme.softRose"
+                            _hover={{ bg: 'theme.softRose' }}
+                            _active={{ bg: 'theme.softRose' }}
                           >
                             {!isEditContractor
                               ? t('energySavingsApplication.show.inEligible')
