@@ -296,13 +296,14 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
             as="aside"
             w={{ base: '100%', lg: '280px' }}
             flexShrink={0}
+            overflow="visible"
             role="navigation"
             aria-label="Resource categories"
             id="main-content"
             tabIndex={-1}
             bg="greys.white"
           >
-            <VStack align="stretch" spacing={0} role="tablist">
+            <VStack align="stretch" spacing={0} role="tablist" overflow="visible">
               {SIDEBAR_CATEGORIES.map((category) => (
                 <Box
                   key={category.key}
@@ -332,6 +333,8 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
                     outline: '3px solid',
                     outlineColor: 'theme.blue',
                     outlineOffset: '2px',
+                    zIndex: 1,
+                    position: 'relative',
                   }}
                   _first={{
                     borderTop: 'none',

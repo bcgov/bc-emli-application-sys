@@ -57,6 +57,13 @@ export const HomeScreenBox = observer(
           backgroundColor: 'theme.BlueLight',
           cursor: isDisabled ? 'not-allowed' : 'pointer',
         }}
+        onKeyDown={(e: React.KeyboardEvent) => {
+          if (!isDisabled && e.key === 'Enter') {
+            e.preventDefault();
+            const link = e.currentTarget.querySelector('a, button') as HTMLElement;
+            link?.click();
+          }
+        }}
         {...rest}
       >
         {isMarked && <SandboxHeader />}
