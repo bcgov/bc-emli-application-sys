@@ -1067,7 +1067,7 @@ const options = {
           },
         },
         contractorOnboarding: {
-          contractorId: 'Contractor ID',
+          contractorId: 'Reference #',
           readyContractor: 'Ready to submit your registration details?',
           confirmationContractor:
             'By submitting your registration details you confirm that the information you provided was completed to the best of your knowledge and ability.',
