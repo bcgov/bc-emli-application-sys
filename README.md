@@ -23,6 +23,7 @@ A full-stack web application supporting the BC Home Energy Savings Program (BCHE
 - [Formatting & Linting](#formatting--linting)
 - [Helm & Deployment](#helm--deployment)
 - [Release Workflow](#release-workflow)
+- [AWS Credential Rotation](#aws-credential-rotation)
 - [Additional Documentation](#additional-documentation)
 - [Contributing](#contributing)
 - [License](#license)
@@ -373,6 +374,20 @@ For OpenShift-specific notes and legacy template history, see [openshift/Readme.
 
 ---
 
+## AWS Credential Rotation
+
+AWS S3 credentials are rotated automatically by Lambda every 2 days and synced to the database via Sidekiq. If OpenShift goes down during a rotation window, credentials can become stale and file uploads will fail.
+
+For the full rotation procedure and automated script, see [docs/aws-credential-refresh.md](docs/aws-credential-refresh.md).
+
+**Quick fix:**
+
+```bash
+./scripts/aws-credential-refresh.sh <env> "<access_key_id>" "<secret_access_key>"
+```
+
+---
+
 ## Additional Documentation
 
 | Document                                                                         | Description                      |
@@ -385,6 +400,7 @@ For OpenShift-specific notes and legacy template history, see [openshift/Readme.
 | [docs/test-and-prod-release-workflow.md](docs/test-and-prod-release-workflow.md) | Release process                  |
 | [docs/hotfix-branch-tag-workflow.md](docs/hotfix-branch-tag-workflow.md)         | Hotfix process                   |
 | [devops/README.md](devops/README.md)                                             | DevOps and infrastructure notes  |
+| [docs/aws-credential-refresh.md](docs/aws-credential-refresh.md)                 | AWS S3 credential rotation       |
 
 ---
 
