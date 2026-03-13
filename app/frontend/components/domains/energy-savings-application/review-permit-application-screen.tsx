@@ -529,7 +529,10 @@ export const ReviewPermitApplicationScreen = observer(() => {
                             variant="calloutInverse"
                             px={14}
                             onClick={onContractorApproval}
-                            borderColor="green"
+                            borderColor="theme.darkGreen"
+                            bg="theme.lightGreen"
+                            _hover={{ bg: 'theme.lightGreen' }}
+                            _active={{ bg: 'theme.lightGreen' }}
                             isDisabled={
                               hasUnsavedEdits ||
                               currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
