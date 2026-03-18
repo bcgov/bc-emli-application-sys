@@ -23,7 +23,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
 import { EmailFormControl } from '../../shared/form/email-form-control';
 import { TextFormControl } from '../../shared/form/input-form-control';
-import CustomAlert, { InformationAlert } from '../../shared/base/custom-alert';
+import CustomAlert, { InformationAlert, DescriptionPart } from '../../shared/base/custom-alert';
 import { useCurrentUserLicenseAgreements } from '../../../hooks/resources/user-license-agreements';
 import { format } from 'date-fns';
 import { EulaViewModal } from '../../shared/modals/eula-view-modal';
@@ -155,9 +155,11 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                     {t('user.sameAddress')}
                   </Checkbox>
                   <InformationAlert
-                    description={t('user.changeBcsc.info')}
-                    descLinkHref={t('user.changeBcsc.link')}
-                    descLinkText={t('user.changeBcsc.linkText')}
+                    descriptionParts={
+                      t('user.changeBcsc.descriptionParts', {
+                        returnObjects: true,
+                      }) as Array<DescriptionPart>
+                    }
                   />
                 </>
               ) : null}
@@ -170,9 +172,11 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
               ) : null}
               {currentUser.isParticipant && currentUser.isBasicBCEID ? (
                 <InformationAlert
-                  description={t('user.changeBasic.info')}
-                  descLinkHref={t('user.changeBasic.link')}
-                  descLinkText={t('user.changeBasic.linkText')}
+                  descriptionParts={
+                    t('user.changeBasic.descriptionParts', {
+                      returnObjects: true,
+                    }) as Array<DescriptionPart>
+                  }
                 />
               ) : null}
               {currentUser.isUnconfirmed && !currentUser.confirmationSentAt ? (
@@ -296,20 +300,31 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                         {t('user.changeEmail')}
                       </Button>
                     ))}
+                  <InformationAlert
+                    descriptionParts={
+                      t('user.changePrimaryContact.descriptionParts', {
+                        returnObjects: true,
+                      }) as Array<DescriptionPart>
+                    }
+                  />
                 </>
               )}
               {currentUser.isBusBCEID ? (
                 <InformationAlert
-                  description={t('user.changeBceid.info')}
-                  descLinkHref={t('user.changeBceid.link')}
-                  descLinkText={t('user.changeBceid.linkText')}
+                  descriptionParts={
+                    t('user.changeBceid.descriptionParts', {
+                      returnObjects: true,
+                    }) as Array<DescriptionPart>
+                  }
                 />
               ) : null}
               {currentUser.isIDIR ? (
                 <InformationAlert
-                  description={t('user.changeIdir.info')}
-                  descLinkHref={t('user.changeIdir.link')}
-                  descLinkText={t('user.changeIdir.linkText')}
+                  descriptionParts={
+                    t('user.changeIdir.descriptionParts', {
+                      returnObjects: true,
+                    }) as Array<DescriptionPart>
+                  }
                 />
               ) : null}
             </Section>

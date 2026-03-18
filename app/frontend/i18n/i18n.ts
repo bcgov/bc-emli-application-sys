@@ -2328,24 +2328,63 @@ const options = {
             bcsc: 'BCSC',
           },
           changeBceid: {
-            info: 'The information above is from your Business BCeID account. To change your Business BCeID account information, click ',
-            link: 'https://www.bceid.ca/aboutbceid/faqs.aspx',
-            linkText: 'here',
+            descriptionParts: [
+              {
+                type: 'text',
+                content:
+                  'The information above is from your Business BCeID account. To change your Business BCeID account information, click ',
+              },
+              { type: 'link', text: 'here', href: 'https://www.bceid.ca/aboutbceid/faqs.aspx' },
+            ],
           },
           changeIdir: {
-            info: 'If your IDIR details are incorrect, please contact your business area or program administrator to request an update.',
-            link: '',
-            linkText: '',
+            descriptionParts: [
+              {
+                type: 'text',
+                content:
+                  'If your IDIR details are incorrect, please contact your business area or program administrator to request an update.',
+              },
+            ],
           },
           changeBasic: {
-            info: 'The information above is from your Basic BCeID account. To change your Basic BCeID account information, click ',
-            link: 'https://www.bceid.ca/aboutbceid/faqs.aspx',
-            linkText: 'here',
+            descriptionParts: [
+              {
+                type: 'text',
+                content:
+                  'The information above is from your Basic BCeID account. To change your Basic BCeID account information, click ',
+              },
+              { type: 'link', text: 'here', href: 'https://www.bceid.ca/aboutbceid/faqs.aspx' },
+            ],
           },
           changeBcsc: {
-            info: 'The information above is from your BC Services account. To change your BC Services Card information, click ',
-            link: 'https://www2.gov.bc.ca/gov/content/governments/government-id/bc-services-card/your-card/change-personal-information',
-            linkText: 'here',
+            descriptionParts: [
+              {
+                type: 'text',
+                content:
+                  'The information above is from your BC Services account. To change your BC Services Card information, click ',
+              },
+              {
+                type: 'link',
+                text: 'here',
+                href: 'https://www2.gov.bc.ca/gov/content/governments/government-id/bc-services-card/your-card/change-personal-information',
+              },
+            ],
+          },
+          changePrimaryContact: {
+            descriptionParts: [
+              {
+                type: 'text',
+                content:
+                  'The above information is from your Business BCeID Account. To manage this information, click ',
+              },
+              { type: 'link', text: 'here', href: 'https://www.bceid.ca/' },
+              {
+                type: 'text',
+                content:
+                  '. <b>All notifications will be sent to the above email, the primary contact</b>. Call us to change the primary contact.',
+                renderHTMLTag: true,
+              },
+            ],
           },
           //changeBceid: 'If you want to change your BCeID information, please go to ',
           //changeBceidLinkText: 'bceid.ca',
