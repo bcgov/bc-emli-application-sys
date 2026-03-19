@@ -360,6 +360,8 @@ Rails.application.routes.draw do
       resources :versions, as: "template_versions", only: [] do
         get "integration_mapping",
             to: "permit_applications#show_integration_mapping"
+        get "schema", to: "template_versions#show"
+        collection { get "schema", to: "template_versions#index" }
       end
 
       # Contractor Invoice API endpoints
