@@ -39,4 +39,44 @@ class TemplateVersionBlueprint < Blueprinter::Base
              :early_access,
              :public
   end
+
+  view :schema do
+    excludes :deprecation_reason,
+             :created_at,
+             :updated_at,
+             :label,
+             :first_nations,
+             :early_access,
+             :public
+
+    field :nickname do |tv|
+      tv.requirement_template.nickname.presence || ""
+    end
+
+    field :description do |tv|
+      tv.requirement_template.description
+    end
+
+    field :requirement_blocks do |tv, _options|
+      tv.requirement_blocks_json.map do |_block_id, block|
+        {
+          requirement_block_code: block["sku"],
+          name: block["name"],
+          requirements:
+            block["requirements"].map do |req|
+              entry = {
+                requirement_code: req["requirement_code"],
+                label: req["label"],
+                input_type: req["input_type"]
+              }
+              entry[:value_options] = req.dig(
+                "input_options",
+                "value_options"
+              ) if req.dig("input_options", "value_options").present?
+              entry
+            end
+        }
+      end
+    end
+  end
 end
