@@ -113,20 +113,10 @@ export const NewInvoiceScreen = observer(() => {
                     _focusWithin={{ outline: '2px solid', outlineColor: 'theme.blue', outlineOffset: '2px' }}
                     transition="all 0.2s"
                   >
-                    <Radio
-                      value={variant.id}
-                      size="lg"
-                      sx={{
-                        '& .chakra-radio__label': {
-                          fontWeight: '700',
-                          fontSize: 'xl',
-                          lineHeight: '34px',
-                          color: 'greys.homeScreenGrey',
-                          width: '100%',
-                        },
-                      }}
-                    >
-                      {variant.name}
+                    <Radio value={variant.id} size="lg">
+                      <Text fontWeight="700" fontSize="xl" lineHeight="34px" color="greys.homeScreenGrey" width="100%">
+                        {variant.name}
+                      </Text>
                     </Radio>
                   </Box>
                 ))
