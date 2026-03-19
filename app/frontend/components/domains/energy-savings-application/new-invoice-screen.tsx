@@ -114,7 +114,14 @@ export const NewInvoiceScreen = observer(() => {
                     transition="all 0.2s"
                   >
                     <Radio value={variant.id} size="lg">
-                      <Text fontWeight="700" fontSize="xl" lineHeight="34px" color="greys.homeScreenGrey" width="100%">
+                      <Text
+                        as="span"
+                        fontWeight="700"
+                        fontSize="xl"
+                        lineHeight="34px"
+                        color="greys.homeScreenGrey"
+                        width="100%"
+                      >
                         {variant.name}
                       </Text>
                     </Radio>
