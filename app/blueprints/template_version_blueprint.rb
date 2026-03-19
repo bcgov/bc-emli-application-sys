@@ -50,7 +50,7 @@ class TemplateVersionBlueprint < Blueprinter::Base
              :public
 
     field :nickname do |tv|
-      tv.requirement_template.nickname
+      tv.requirement_template.nickname.presence || ""
     end
 
     field :description do |tv|

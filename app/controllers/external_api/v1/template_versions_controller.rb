@@ -6,13 +6,13 @@ class ExternalApi::V1::TemplateVersionsController < ExternalApi::ApplicationCont
     results =
       policy_scope([:external_api, TemplateVersion]).includes(
         :requirement_template
-      )
+      ).to_a
 
     render_success results,
                    nil,
                    {
                      meta: {
-                       total_count: results.count
+                       total_count: results.size
                      },
                      blueprint: TemplateVersionBlueprint,
                      blueprint_opts: {
