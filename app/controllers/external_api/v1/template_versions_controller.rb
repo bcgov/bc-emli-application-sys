@@ -3,7 +3,10 @@ class ExternalApi::V1::TemplateVersionsController < ExternalApi::ApplicationCont
   before_action :set_template_version, only: :show
 
   def index
-    results = policy_scope([:external_api, TemplateVersion])
+    results =
+      policy_scope([:external_api, TemplateVersion]).includes(
+        :requirement_template
+      )
 
     render_success results,
                    nil,

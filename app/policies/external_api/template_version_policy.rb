@@ -17,8 +17,9 @@ class ExternalApi::TemplateVersionPolicy < ExternalApi::ApplicationPolicy
         "template_versions.version_date = (
             SELECT MAX(tv2.version_date) FROM template_versions tv2
             WHERE tv2.requirement_template_id = template_versions.requirement_template_id
-            AND tv2.status = 1
-          )"
+            AND tv2.status = ?
+          )",
+        TemplateVersion.statuses[:published]
       )
     end
   end
