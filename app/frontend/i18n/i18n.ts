@@ -2327,16 +2327,6 @@ const options = {
             bceidbusiness: 'Business BCeID',
             bcsc: 'BCSC',
           },
-          changeBceid: {
-            descriptionParts: [
-              {
-                type: 'text',
-                content:
-                  'The information above is from your Business BCeID account. To change your Business BCeID account information, click ',
-              },
-              { type: 'link', text: 'here', href: 'https://www.bceid.ca/aboutbceid/faqs.aspx' },
-            ],
-          },
           changeIdir: {
             descriptionParts: [
               {
@@ -2353,7 +2343,7 @@ const options = {
                 content:
                   'The information above is from your Basic BCeID account. To change your Basic BCeID account information, click ',
               },
-              { type: 'link', text: 'here', href: 'https://www.bceid.ca/aboutbceid/faqs.aspx' },
+              { type: 'link', content: { text: 'here', href: 'https://www.bceid.ca/aboutbceid/faqs.aspx' } },
             ],
           },
           changeBcsc: {
@@ -2365,8 +2355,10 @@ const options = {
               },
               {
                 type: 'link',
-                text: 'here',
-                href: 'https://www2.gov.bc.ca/gov/content/governments/government-id/bc-services-card/your-card/change-personal-information',
+                content: {
+                  text: 'here',
+                  href: 'https://www2.gov.bc.ca/gov/content/governments/government-id/bc-services-card/your-card/change-personal-information',
+                },
               },
             ],
           },
@@ -2377,12 +2369,14 @@ const options = {
                 content:
                   'The above information is from your Business BCeID Account. To manage this information, click ',
               },
-              { type: 'link', text: 'here', href: 'https://www.bceid.ca/' },
+              { type: 'link', content: { text: 'here', href: 'https://www.bceid.ca/' } },
+              {
+                type: 'bold',
+                content: '. All notifications will be sent to the above email, the primary contact. ',
+              },
               {
                 type: 'text',
-                content:
-                  '. <b>All notifications will be sent to the above email, the primary contact</b>. Call us to change the primary contact.',
-                renderHTMLTag: true,
+                content: 'Call us to change the primary contact.',
               },
             ],
           },

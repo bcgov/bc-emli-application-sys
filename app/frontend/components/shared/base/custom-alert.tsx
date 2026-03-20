@@ -10,8 +10,14 @@ import {
   Text,
   UnorderedList,
 } from '@chakra-ui/react';
-import { ArrowSquareOutIcon, WarningCircleIcon, InfoIcon } from '@phosphor-icons/react';
+import { ArrowSquareOutIcon, WarningCircleIcon, Info } from '@phosphor-icons/react';
 import React, { FC, ReactElement } from 'react';
+
+type linkType = {
+  text: string;
+  href: string;
+  isExternal?: boolean;
+};
 
 type BaseAlertProps = {
   title?: string;
@@ -32,9 +38,16 @@ type CustomAlertProps = BaseAlertProps & {
   linkHref?: string; // Optional link URL
 };
 
+enum EDescriptionPartType {
+  Text = 'text',
+  Bold = 'bold',
+  Link = 'link',
+}
+
 export type DescriptionPart =
-  | { type: 'text'; content: string; renderHTMLTag?: boolean }
-  | { type: 'link'; text: string; href: string; isExternal?: boolean };
+  | { type: EDescriptionPartType.Text; content: string }
+  | { type: EDescriptionPartType.Bold; content: string }
+  | { type: EDescriptionPartType.Link; content: linkType };
 
 // Extend by adding more properties
 type CustomInformationAlertProps = BaseAlertProps & {
@@ -67,7 +80,7 @@ const CustomAlert: FC<CustomAlertProps> = ({
       align="stretch"
     >
       <Alert status="error" variant="subtle" bg="transparent" alignItems="start" p={0}>
-        <InfoIcon
+        <Icon
           variant="ghost"
           icon={icon}
           zIndex={1}
@@ -114,7 +127,7 @@ const CustomAlert: FC<CustomAlertProps> = ({
 export const InformationAlert: FC<CustomInformationAlertProps> = ({
   title,
   descriptionParts,
-  icon = <InfoIcon />, // Default icon
+  icon = <Info />, // Default icon
   borderColor = 'theme.darkBlue',
   backgroundColor = 'greys.offWhite',
   iconColor = 'theme.darkBlue',
@@ -152,20 +165,24 @@ export const InformationAlert: FC<CustomInformationAlertProps> = ({
             <AlertDescription fontSize="md" fontWeight="normal" lineHeight="normal">
               <Text mb={2}>
                 {descriptionParts.map((part, index) =>
-                  part.type === 'link' ? (
+                  part.type === EDescriptionPartType.Link ? (
                     <Link
                       key={index}
-                      href={part.href}
-                      isExternal={part.isExternal ?? true}
+                      href={part.content?.href}
+                      isExternal={part.content?.isExternal ?? true}
                       fontSize="md"
                       fontWeight="normal"
                     >
-                      {part.text}
+                      {part.content?.text}
                     </Link>
-                  ) : part.renderHTMLTag ? (
-                    <Text as="span" dangerouslySetInnerHTML={{ __html: part.content }} />
                   ) : (
-                    <React.Fragment key={index}>{part.content}</React.Fragment>
+                    <Text
+                      as="span"
+                      key={index}
+                      {...(part.type === EDescriptionPartType.Bold && { fontWeight: 'bold' })}
+                    >
+                      {part.content}
+                    </Text>
                   ),
                 )}
               </Text>
