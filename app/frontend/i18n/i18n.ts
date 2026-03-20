@@ -2377,12 +2377,14 @@ const options = {
                 content:
                   'The above information is from your Business BCeID Account. To manage this information, click ',
               },
-              { type: 'link', text: 'here', href: 'https://www.bceid.ca/' },
+              { type: 'link', content: { text: 'here', href: 'https://www.bceid.ca/' } },
+              {
+                type: 'bold',
+                content: '. All notifications will be sent to the above email, the primary contact. ',
+              },
               {
                 type: 'text',
-                content:
-                  '. <b>All notifications will be sent to the above email, the primary contact</b>. Call us to change the primary contact.',
-                renderHTMLTag: true,
+                content: 'Call us to change the primary contact.',
               },
             ],
           },
