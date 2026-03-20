@@ -2327,16 +2327,6 @@ const options = {
             bceidbusiness: 'Business BCeID',
             bcsc: 'BCSC',
           },
-          changeBceid: {
-            descriptionParts: [
-              {
-                type: 'text',
-                content:
-                  'The information above is from your Business BCeID account. To change your Business BCeID account information, click ',
-              },
-              { type: 'link', text: 'here', href: 'https://www.bceid.ca/aboutbceid/faqs.aspx' },
-            ],
-          },
           changeIdir: {
             descriptionParts: [
               {
@@ -2353,7 +2343,7 @@ const options = {
                 content:
                   'The information above is from your Basic BCeID account. To change your Basic BCeID account information, click ',
               },
-              { type: 'link', text: 'here', href: 'https://www.bceid.ca/aboutbceid/faqs.aspx' },
+              { type: 'link', content: { text: 'here', href: 'https://www.bceid.ca/aboutbceid/faqs.aspx' } },
             ],
           },
           changeBcsc: {
@@ -2365,8 +2355,10 @@ const options = {
               },
               {
                 type: 'link',
-                text: 'here',
-                href: 'https://www2.gov.bc.ca/gov/content/governments/government-id/bc-services-card/your-card/change-personal-information',
+                content: {
+                  text: 'here',
+                  href: 'https://www2.gov.bc.ca/gov/content/governments/government-id/bc-services-card/your-card/change-personal-information',
+                },
               },
             ],
           },

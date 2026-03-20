@@ -300,24 +300,17 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                         {t('user.changeEmail')}
                       </Button>
                     ))}
-                  <InformationAlert
-                    descriptionParts={
-                      t('user.changePrimaryContact.descriptionParts', {
-                        returnObjects: true,
-                      }) as Array<DescriptionPart>
-                    }
-                  />
+                  {currentUser.isBusBCEID ? (
+                    <InformationAlert
+                      descriptionParts={
+                        t('user.changePrimaryContact.descriptionParts', {
+                          returnObjects: true,
+                        }) as Array<DescriptionPart>
+                      }
+                    />
+                  ) : null}
                 </>
               )}
-              {currentUser.isBusBCEID ? (
-                <InformationAlert
-                  descriptionParts={
-                    t('user.changeBceid.descriptionParts', {
-                      returnObjects: true,
-                    }) as Array<DescriptionPart>
-                  }
-                />
-              ) : null}
               {currentUser.isIDIR ? (
                 <InformationAlert
                   descriptionParts={

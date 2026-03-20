@@ -176,7 +176,11 @@ export const InformationAlert: FC<CustomInformationAlertProps> = ({
                       {part.content?.text}
                     </Link>
                   ) : (
-                    <Text as="span" {...(part.type === EDescriptionPartType.Bold && { fontWeight: 'bold' })}>
+                    <Text
+                      as="span"
+                      key={index}
+                      {...(part.type === EDescriptionPartType.Bold && { fontWeight: 'bold' })}
+                    >
                       {part.content}
                     </Text>
                   ),
