@@ -23,10 +23,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
 import { EmailFormControl } from '../../shared/form/email-form-control';
 import { TextFormControl } from '../../shared/form/input-form-control';
-import CustomAlert, { InformationAlert, DescriptionPart } from '../../shared/base/custom-alert';
+import CustomAlert, { InformationAlert } from '../../shared/base/custom-alert';
 import { useCurrentUserLicenseAgreements } from '../../../hooks/resources/user-license-agreements';
 import { format } from 'date-fns';
 import { EulaViewModal } from '../../shared/modals/eula-view-modal';
+import { DescriptionPart } from '../../../types/types';
 
 interface IProfileScreenProps {}
 

@@ -7,7 +7,8 @@ import { useMst } from '../../../setup/root';
 import CustomAlert from '../../shared/base/custom-alert';
 import { BlueTitleBar } from '../../shared/base/blue-title-bar';
 import { SubNavBar } from '../navigation/sub-nav-bar';
-
+import { EDescriptionPartType } from '../../../types/enums';
+import { DescriptionPart } from '../../../types/types';
 interface ProgramResource {
   id: string;
   title: string;
@@ -15,10 +16,12 @@ interface ProgramResource {
   type?: string;
   url: string;
   description?: string;
+  descriptionPart?: string;
 }
 
 type ResourceCategory =
   | 'checkEligibilityCode'
+  | 'addEmployees'
   | 'programGuidance'
   | 'qualifiedProductList'
   | 'sampleInvoices'
@@ -26,6 +29,20 @@ type ResourceCategory =
 type ResourceListCategory = Exclude<ResourceCategory, 'checkEligibilityCode'>;
 
 const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
+  addEmployees: [
+    {
+      id: 'step-1-create-employees-accounts',
+      title: 'contractor.programResources.resources.createEmployeesAccounts',
+      description: 'contractor.programResources.descriptions.createEmployeesAccounts',
+      url: 'https://www.bceid.ca/',
+    },
+    {
+      id: 'step-2-form-to-add-employees',
+      title: 'contractor.programResources.resources.formToAddEmployees',
+      url: 'https://submit.digital.gov.bc.ca/app/form/submit?f=eaa33ef3-f969-4987-9186-993f5385c6de',
+      descriptionPart: 'contractor.programResources.descriptionPart.formToAddEmployees',
+    },
+  ],
   programGuidance: [
     {
       id: 'contractor-rebate-journey',
@@ -70,11 +87,32 @@ const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
       url: 'https://esp.clearesult.ca/contractor/sites/default/files/2024-10/CleanBC%20Energy%20Savings%20Program%20Windows%20and%20Doors_Final0925.pdf',
     },
     {
-      id: 'contractor-terms-conditions',
-      title: 'contractor.programResources.resources.contractorTermsConditions',
-      size: '257 KB',
+      id: 'contractor-terms-conditions-ground-oriented',
+      title: 'contractor.programResources.resources.contractorTermsConditionsgroundOriented',
+      size: '250 KB',
       type: 'PDF',
-      url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2025/08/Contractor_TsCs_ESP_July152025.pdf',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/ESP_Contractor_TsCs_10November2025.pdf',
+    },
+    {
+      id: 'contractor-terms-conditions-condo-apartament',
+      title: 'contractor.programResources.resources.contractorTermsConditionsCondoApartment',
+      size: '248 KB',
+      type: 'PDF',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/CondoApartment_Contractor_TsCs_July152025.pdf',
+    },
+    {
+      id: 'rebate-eligibility-ground-oriented',
+      title: 'contractor.programResources.resources.rebateElibilityGroundOriented',
+      size: '650 KB',
+      type: 'PDF',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/03/RebateEligibilityRequirements_ESP_10Nov2025V2.pdf',
+    },
+    {
+      id: 'rebate-eligibility-condo-apartment',
+      title: 'contractor.programResources.resources.rebateElibilityCondoApartment',
+      size: '380 KB',
+      type: 'PDF',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/03/CondoApartment_RebateEligibilityRequirements_July152025V2.pdf',
     },
   ],
   qualifiedProductList: [
@@ -88,7 +126,7 @@ const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
       id: 'air-to-water-heat-pumps',
       title: 'contractor.programResources.resources.airToWaterHeatPumps',
       description: 'contractor.programResources.descriptions.airToWaterHeatPumps',
-      url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2025/06/Air-to-Water-Eligibility-List-V10.pdf',
+      url: 'https://www.betterhomesbc.ca/qualified-product-list-air-to-water-heat-pumps-PDF',
     },
     {
       id: 'heat-pump-water-heater-list',
@@ -119,51 +157,65 @@ const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
     {
       id: 'heat-pump',
       title: 'contractor.programResources.resources.heatPump',
-      size: '233 KB',
+      size: '281 KB',
       type: 'PDF',
-      url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2024/08/SampleInvoice_ESP_HeatPump.pdf',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/SampleInvoice_ESP_HeatPump_20251124.pdf',
+    },
+    {
+      id: 'heat-pump-condo-apartament',
+      title: 'contractor.programResources.resources.heatPumpCondoApartment',
+      size: '270 MB',
+      type: 'PDF',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/CondoApartment_SampleInvoiceHeatpump_July152025.pdf',
+    },
+    {
+      id: 'heat-pump-water-condo-apartament',
+      title: 'contractor.programResources.resources.heatPumpWaterCondoApartment',
+      size: '258 MB',
+      type: 'PDF',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/CondoApartment_SampleInvoiceHPWaterheater_July152025.pdf',
     },
     {
       id: 'heat-pump-water-heater',
       title: 'contractor.programResources.resources.heatPumpWaterHeater',
-      size: '1 MB',
+      size: '1027 KB',
       type: 'PDF',
-      url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2021/11/CleanBC-IQP_SampleInvoices_HPWaterheater-Nov2021.pdf',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/ESP_Sample_Invoice_HPWaterheater.pdf',
     },
     {
       id: 'windows-and-doors',
       title: 'contractor.programResources.resources.windowsAndDoors',
-      size: '207 KB',
+      size: '292 KB',
       type: 'PDF',
-      url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2024/08/SampleInvoice_ESP_WindowDoors.pdf',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/SampleInvoice_ESP_WindowDoors_20251124.pdf',
     },
     {
       id: 'insulation',
       title: 'contractor.programResources.resources.insulation',
-      size: '268 KB',
+      size: '273 KB',
       type: 'PDF',
-      url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2025/06/SampleInvoice_ESP_NEWInsulation_062725.pdf',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/SampleInvoice_ESP_Insulation_20251124.pdf',
     },
     {
       id: 'electric-service-upgrade',
       title: 'contractor.programResources.resources.electricServiceUpgrade',
-      size: '201 KB',
+      size: '276 KB',
       type: 'PDF',
-      url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2024/08/SampleInvoice_ESP_ESU.pdf',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/SampleInvoice_ESP_ESU_20251124.pdf',
     },
     {
       id: 'ventilation',
       title: 'contractor.programResources.resources.ventilation',
-      size: '198 KB',
+      size: '269 KB',
       type: 'PDF',
-      url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2024/08/SampleInvoice_ESP_Ventilation.pdf',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/SampleInvoice_ESP_Ventilation_20251124.pdf',
     },
     {
       id: 'health-and-safety',
       title: 'contractor.programResources.resources.healthAndSafety',
-      size: '200 KB',
+      size: '253 KB',
       type: 'PDF',
-      url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2024/08/SampleInvoice_ESP_HealthSafety.pdf',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/SampleInvoice_ESP_HealthSafety_20251124.pdf',
     },
   ],
   resourcesForCustomers: [
@@ -175,18 +227,28 @@ const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
       url: 'https://esp.clearesult.ca/contractor/sites/default/files/2024-10/CleanBC%20Better%20Homes%20Energy%20Savings%20Program%20Brochure_Final0925.pdf',
     },
     {
-      id: 'rebate-eligibility-requirements',
-      title: 'contractor.programResources.resources.rebateEligibilityRequirements',
-      size: '604 KB',
-      type: 'PDF',
-      url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2025/07/RebateEligibilityRequirements_ESP_15July2025.pdf',
+      id: 'rebate-eligibility-ground-oriented',
+      title: 'contractor.programResources.resources.rebateElibilityGroundOriented',
+      url: 'https://betterhomesbc.ca/learn-about-programs/energy-savings-program/energy-savings-program-requirements/',
     },
     {
-      id: 'participant-terms-and-conditions',
-      title: 'contractor.programResources.resources.participantTermsAndConditions',
-      size: '216 KB',
+      id: 'rebate-eligibility-condo-apartment',
+      title: 'contractor.programResources.resources.rebateElibilityCondoApartment',
+      url: 'https://betterhomesbc.ca/learn-about-programs/energy-savings-program/energy-savings-program-condo-and-apartment-rebate-requirements/',
+    },
+    {
+      id: 'participant-terms-conditions-ground-oriented',
+      title: 'contractor.programResources.resources.participantTermsConditionsgroundOriented',
+      size: '173 KB',
       type: 'PDF',
-      url: 'https://esp.clearesult.ca/contractor/sites/default/files/2024-10/Contractor_TsCs_ESP_4September2024.pdf',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/ESP_Participant_TsCs_10November2025.pdf',
+    },
+    {
+      id: 'participant-terms-conditions-condo-apartament',
+      title: 'contractor.programResources.resources.participantTermsConditionsCondoApartment',
+      size: '172 KB',
+      type: 'PDF',
+      url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/CondoApartment_Participant_TsCs_July152025.pdf',
     },
   ],
 };
@@ -203,6 +265,7 @@ const formatExpiryDate = (dateStr: string) => {
 
 const SIDEBAR_CATEGORIES: { key: ResourceCategory; label: string }[] = [
   { key: 'checkEligibilityCode', label: 'contractor.programResources.checkEligibilityCode' },
+  { key: 'addEmployees', label: 'contractor.programResources.addEmployees' },
   { key: 'programGuidance', label: 'contractor.programResources.programGuidance' },
   { key: 'qualifiedProductList', label: 'contractor.programResources.qualifiedProductList' },
   { key: 'sampleInvoices', label: 'contractor.programResources.sampleInvoices' },
@@ -218,7 +281,7 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
 }: ContractorProgramResourcesScreenProps) {
   const { t } = useTranslation();
   const { environment } = useMst();
-  const [selectedCategory, setSelectedCategory] = useState<ResourceCategory>('programGuidance');
+  const [selectedCategory, setSelectedCategory] = useState<ResourceCategory>('addEmployees');
   const [eligibilityCode, setEligibilityCode] = useState('');
   const [checkResult, setCheckResult] = useState<{
     valid: boolean;
@@ -260,6 +323,34 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
     const type = resource.type === 'type' ? 'PDF' : resource.type || 'document';
     const size = resource.size === 'size' ? '' : resource.size || '';
     return `Download ${title} ${type}${size ? ` (${size})` : ''}`;
+  };
+
+  const returnDescriptionParts = (translationName) => {
+    debugger;
+    const descriptionParts = t(translationName, {
+      returnObjects: true,
+    }) as Array<DescriptionPart>;
+    return (
+      <Text sx={baseTextSx} color="greys.grey60" mt={2}>
+        {descriptionParts.map((part, index) =>
+          part.type === EDescriptionPartType.Link ? (
+            <Link
+              key={index}
+              href={part.content?.href}
+              isExternal={part.content?.isExternal ?? true}
+              fontSize="md"
+              fontWeight="normal"
+            >
+              {part.content?.text}
+            </Link>
+          ) : (
+            <Text as="span" key={index} {...(part.type === EDescriptionPartType.Bold && { fontWeight: 'bold' })}>
+              {part.content}
+            </Text>
+          ),
+        )}
+      </Text>
+    );
   };
 
   return (
@@ -508,7 +599,7 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
                         )}
                       </Link>
                     )}
-                    {resource.description && (
+                    {resource.description ? (
                       <Text sx={baseTextSx} color="greys.grey60" mt={2}>
                         {resource.id === 'mini-split-heat-pumps' ? (
                           <>
@@ -671,6 +762,8 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
                           t(resource.description)
                         )}
                       </Text>
+                    ) : (
+                      resource.descriptionPart && returnDescriptionParts(resource.descriptionPart)
                     )}
                   </Box>
                 ))

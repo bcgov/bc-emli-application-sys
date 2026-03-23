@@ -308,7 +308,7 @@ const options = {
             'You’re a tenant paying your own energy utility bills and you want to help your landlord install energy-saving upgrades to your rental property',
           ],
           iNeed: 'See full eligibility details on Better Homes.',
-          iNeedLink: 'https://www.betterhomesbc.ca/rebates/energy-savings-program/',
+          iNeedLink: 'https://www.betterhomesbc.ca/learn-about-programs/energy-savings-program/',
           whatToApply: 'What do I need to apply?',
           beforeApply: 'Before you apply, you will need to log in with your BC Services Card account.',
           useServiceCard: 'Learn more about how to use BC Services Card account.',
@@ -325,8 +325,8 @@ const options = {
             itWorks: 'How it works',
             itWorksDesc:
               'Based on your customer’s household income, the Better Homes Energy Savings Program (ESP) offers rebates to make energy-saving home upgrades more affordable. Program participants work with registered contractors to complete eligible upgrades. Rebates that cover 60-100% of upgrade costs are paid directly to registered contractors and passed onto their customers.',
-            learnMore: 'Learn more about the Energy Savings Program (ESP) for homeowners.',
-            learnMoreLink: 'https://www.betterhomesbc.ca/rebates/energy-savings-program/',
+            learnMore: 'Learn more about the Energy Savings Program (ESP) for individuals.',
+            learnMoreLink: 'https://www.betterhomesbc.ca/learn-about-programs/energy-savings-program/',
             registeredContractor: 'Become a registered contractor',
             needId: 'You will need a Business BCeID to create an account.',
             typeOfContractors: 'Heat pump, insulation, or windows and doors contractors',
@@ -2972,7 +2972,7 @@ const options = {
             contractorEmail: 'ESPcontractorSupport@CLEAResult.com',
             groundOrientedLabel: 'Single family dwellings, rowhouses and other ground-oriented home types:',
             multiUnitLabel: 'Condo, apartment and other multi-unit home types:',
-            contractorLabel: 'Suppot for contractors:',
+            contractorLabel: 'Support for contractors:',
             learnMoreTitleShort: 'Learn more about the Energy Savings Program',
             learnMoreDescriptionShort:
               "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It's part of the Province of B.C.'s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
@@ -3340,6 +3340,7 @@ const options = {
           programResources: {
             title: 'Contractor program resources',
             pageHeading: 'Program resources: Program guidance',
+            addEmployees: 'Add Employees',
             checkEligibilityCode: 'Check eligibility code',
             checkEligibilityCode_description:
               "You can only receive payment for eligible work. Check your customer's eligibility code before providing a quote or starting any work. Each eligibility code can only be used for work completed at the approved address.",
@@ -3357,15 +3358,24 @@ const options = {
             resourcesForCustomers: 'Resources for your customers',
             noResources: 'No resources available in this category.',
             resources: {
+              createEmployeesAccounts: 'Step 1: Create employee accounts',
+              formToAddEmployees: 'Step 2: Form to add employees',
               contractorRebateJourney: 'Contractor rebate journey',
               heatPumpExceptionForm: 'Heat pump exception form',
               heatPumpRequirements: 'Heat pump requirements guide',
               rebateEligibility: 'Rebate eligibility requirements',
               insulationCutSheet: 'Insulation cut sheet',
               windowsDoorsCutSheet: 'Windows and doors cut sheet',
-              contractorTermsConditions: 'Contractor terms and conditions',
+              contractorTermsConditionsCondoApartment: 'Contractor terms and conditions - condos and apartments',
+              contractorTermsConditionsgroundOriented: 'Contractor terms and conditions - ground oriented homes',
+              participantTermsConditionsCondoApartment: 'Participant terms and conditions - condos and apartments',
+              participantTermsConditionsgroundOriented: 'Participant terms and conditions - ground oriented homes',
+              rebateElibilityGroundOriented: 'Rebate eligibility requirement - ground oriented homes',
+              rebateElibilityCondoApartment: 'Rebate eligibility requirements - condo and apartment',
               heatPump: 'Heat pump',
               heatPumpWaterHeater: 'Heat pump water heater',
+              heatPumpCondoApartment: 'Heat pump - condo and apartment',
+              heatPumpWaterCondoApartment: 'Heat pump water - condo and apartment',
               windowsAndDoors: 'Windows and doors',
               insulation: 'Insulation',
               electricServiceUpgrade: 'Electric service upgrade',
@@ -3382,6 +3392,9 @@ const options = {
               bathroomFanProductList: 'Bathroom fan product list',
             },
             descriptions: {
+              createEmployeesAccounts: 'To create accounts for employees, login to the BCeID website.',
+              // formToAddEmployees:
+              //   'Complete this form to allow your employees to log into the contractor portal. <strong>You must use their Business BCeIDs</strong> when you complete the form.',
               miniSplitHeatPumps:
                 'The installed heat pump must have an AHRI certified reference number and must be on the Qualifying Product List.',
               airToWaterHeatPumps:
@@ -3399,6 +3412,22 @@ const options = {
               productList: 'product list',
               eligibleModelsList: 'Eligible Models List',
               searchableProductList: 'searchable product list',
+            },
+            descriptionPart: {
+              formToAddEmployees: [
+                {
+                  type: 'text',
+                  content: 'Complete this form to allow your employees to log into the contractor portal. ',
+                },
+                {
+                  type: 'bold',
+                  content: ' You must use their Business BCeIDs ',
+                },
+                {
+                  type: 'text',
+                  content: ' when you complete the form.',
+                },
+              ],
             },
             fileInfoAirToWater: '. [124 KB, PDF]',
             fileInfoHPWH: '. [423 KB, PDF]',
