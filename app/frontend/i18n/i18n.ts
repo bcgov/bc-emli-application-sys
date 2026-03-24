@@ -3370,8 +3370,8 @@ const options = {
               contractorTermsConditionsgroundOriented: 'Contractor terms and conditions - ground oriented homes',
               participantTermsConditionsCondoApartment: 'Participant terms and conditions - condos and apartments',
               participantTermsConditionsgroundOriented: 'Participant terms and conditions - ground oriented homes',
-              rebateElibilityGroundOriented: 'Rebate eligibility requirement - ground oriented homes',
-              rebateElibilityCondoApartment: 'Rebate eligibility requirements - condo and apartment',
+              rebateEligibilityGroundOriented: 'Rebate eligibility requirement - ground oriented homes',
+              rebateEligibilityCondoApartment: 'Rebate eligibility requirements - condo and apartment',
               heatPump: 'Heat pump',
               heatPumpWaterHeater: 'Heat pump water heater',
               heatPumpCondoApartment: 'Heat pump - condo and apartment',
@@ -3393,8 +3393,6 @@ const options = {
             },
             descriptions: {
               createEmployeesAccounts: 'To create accounts for employees, login to the BCeID website.',
-              // formToAddEmployees:
-              //   'Complete this form to allow your employees to log into the contractor portal. <strong>You must use their Business BCeIDs</strong> when you complete the form.',
               miniSplitHeatPumps:
                 'The installed heat pump must have an AHRI certified reference number and must be on the Qualifying Product List.',
               airToWaterHeatPumps:

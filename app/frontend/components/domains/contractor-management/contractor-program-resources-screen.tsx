@@ -102,14 +102,14 @@ const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
     },
     {
       id: 'rebate-eligibility-ground-oriented',
-      title: 'contractor.programResources.resources.rebateElibilityGroundOriented',
+      title: 'contractor.programResources.resources.rebateEligibilityGroundOriented',
       size: '650 KB',
       type: 'PDF',
       url: 'https://betterhomesbc.ca/wp-content/uploads/2026/03/RebateEligibilityRequirements_ESP_10Nov2025V2.pdf',
     },
     {
       id: 'rebate-eligibility-condo-apartment',
-      title: 'contractor.programResources.resources.rebateElibilityCondoApartment',
+      title: 'contractor.programResources.resources.rebateEligibilityCondoApartment',
       size: '380 KB',
       type: 'PDF',
       url: 'https://betterhomesbc.ca/wp-content/uploads/2026/03/CondoApartment_RebateEligibilityRequirements_July152025V2.pdf',
@@ -228,12 +228,12 @@ const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
     },
     {
       id: 'rebate-eligibility-ground-oriented',
-      title: 'contractor.programResources.resources.rebateElibilityGroundOriented',
+      title: 'contractor.programResources.resources.rebateEligibilityGroundOriented',
       url: 'https://betterhomesbc.ca/learn-about-programs/energy-savings-program/energy-savings-program-requirements/',
     },
     {
       id: 'rebate-eligibility-condo-apartment',
-      title: 'contractor.programResources.resources.rebateElibilityCondoApartment',
+      title: 'contractor.programResources.resources.rebateEligibilityCondoApartment',
       url: 'https://betterhomesbc.ca/learn-about-programs/energy-savings-program/energy-savings-program-condo-and-apartment-rebate-requirements/',
     },
     {
@@ -326,7 +326,6 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
   };
 
   const returnDescriptionParts = (translationName) => {
-    debugger;
     const descriptionParts = t(translationName, {
       returnObjects: true,
     }) as Array<DescriptionPart>;
