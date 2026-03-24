@@ -31,7 +31,7 @@ import { createUserSpecificConsumer } from '../../../channels/user_channel';
 
 export interface ISubmissionDownloadModalProps {
   permitApplication: IPermitApplication;
-  showIcon : boolean;
+  showIcon?: boolean;
   renderTrigger?: (onOpen: () => void) => React.ReactNode;
   review?: boolean;
 }
@@ -135,9 +135,9 @@ export const SubmissionDownloadModal = observer(
         {renderTrigger ? (
           renderTrigger(onOpen)
         ) : (
-          <Button variant="primary" onClick={onOpen} leftIcon={ showIcon ? <Download /> : null}>
-          {t('energySavingsApplication.show.viewApplicationFiles')}
-        </Button>
+          <Button variant="primary" onClick={onOpen} leftIcon={showIcon ? <Download /> : null}>
+            {t('energySavingsApplication.show.viewApplicationFiles')}
+          </Button>
         )}
 
         <Modal onClose={onClose} isOpen={isOpen} size="md" scrollBehavior="inside">
