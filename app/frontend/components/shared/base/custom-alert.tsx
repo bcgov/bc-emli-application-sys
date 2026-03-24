@@ -12,12 +12,8 @@ import {
 } from '@chakra-ui/react';
 import { ArrowSquareOutIcon, WarningCircleIcon, Info } from '@phosphor-icons/react';
 import React, { FC, ReactElement } from 'react';
-
-type linkType = {
-  text: string;
-  href: string;
-  isExternal?: boolean;
-};
+import { DescriptionPart } from '../../../types/types';
+import { EDescriptionPartType } from '../../../types/enums';
 
 type BaseAlertProps = {
   title?: string;
@@ -37,17 +33,6 @@ type CustomAlertProps = BaseAlertProps & {
   linkText?: string; // Optional link text
   linkHref?: string; // Optional link URL
 };
-
-enum EDescriptionPartType {
-  Text = 'text',
-  Bold = 'bold',
-  Link = 'link',
-}
-
-export type DescriptionPart =
-  | { type: EDescriptionPartType.Text; content: string }
-  | { type: EDescriptionPartType.Bold; content: string }
-  | { type: EDescriptionPartType.Link; content: linkType };
 
 // Extend by adding more properties
 type CustomInformationAlertProps = BaseAlertProps & {

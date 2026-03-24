@@ -601,3 +601,9 @@ export enum ERevisionSideBarItems {
   SELECTED_ITEMS_BOTTOM_ALIGN = 'selected_items_bottom_align',
   SUBMIT_BOTTOM_ALIGN = 'Submit_bottom_align',
 }
+
+export enum EDescriptionPartType {
+  Text = 'text',
+  Bold = 'bold',
+  Link = 'link',
+}

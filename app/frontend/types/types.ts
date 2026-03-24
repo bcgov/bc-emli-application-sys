@@ -10,6 +10,7 @@ import {
   ECollaborationType,
   ECollaboratorType,
   EDeactivatedUserSortFields,
+  EDescriptionPartType,
   EDoorsPerformanceType,
   EEnabledElectiveFieldReason,
   EEnergyStep,
@@ -467,7 +468,6 @@ export type TAutoComplianceModuleConfigurations = {
 
 export type TAutoComplianceModuleConfiguration =
   TAutoComplianceModuleConfigurations[keyof TAutoComplianceModuleConfigurations];
-
 export interface IJurisdictionFilters {
   name?: string;
   type?: EJurisdictionTypes;
@@ -519,6 +519,16 @@ export interface ILinkData {
   text: string;
   href: string;
 }
+
+//extending ILinkData
+type linkType = ILinkData & {
+  isExternal?: boolean;
+};
+
+export type DescriptionPart =
+  | { type: EDescriptionPartType.Text; content: string }
+  | { type: EDescriptionPartType.Bold; content: string }
+  | { type: EDescriptionPartType.Link; content: linkType };
 
 export interface IRevisionRequest {
   id: string;
