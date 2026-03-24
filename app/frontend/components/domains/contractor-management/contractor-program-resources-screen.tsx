@@ -94,7 +94,7 @@ const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
       url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/ESP_Contractor_TsCs_10November2025.pdf',
     },
     {
-      id: 'contractor-terms-conditions-condo-apartament',
+      id: 'contractor-terms-conditions-condo-apartment',
       title: 'contractor.programResources.resources.contractorTermsConditionsCondoApartment',
       size: '248 KB',
       type: 'PDF',
@@ -162,14 +162,14 @@ const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
       url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/SampleInvoice_ESP_HeatPump_20251124.pdf',
     },
     {
-      id: 'heat-pump-condo-apartament',
+      id: 'heat-pump-condo-apartment',
       title: 'contractor.programResources.resources.heatPumpCondoApartment',
       size: '270 MB',
       type: 'PDF',
       url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/CondoApartment_SampleInvoiceHeatpump_July152025.pdf',
     },
     {
-      id: 'heat-pump-water-condo-apartament',
+      id: 'heat-pump-water-condo-apartment',
       title: 'contractor.programResources.resources.heatPumpWaterCondoApartment',
       size: '258 MB',
       type: 'PDF',
@@ -244,7 +244,7 @@ const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
       url: 'https://betterhomesbc.ca/wp-content/uploads/2026/02/ESP_Participant_TsCs_10November2025.pdf',
     },
     {
-      id: 'participant-terms-conditions-condo-apartament',
+      id: 'participant-terms-conditions-condo-apartment',
       title: 'contractor.programResources.resources.participantTermsConditionsCondoApartment',
       size: '172 KB',
       type: 'PDF',
