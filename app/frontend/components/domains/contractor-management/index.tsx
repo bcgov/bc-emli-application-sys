@@ -16,7 +16,8 @@ import { PerPageSelect } from '../../shared/base/inputs/per-page-select';
 export const ContractorManagementScreen = observer(function ContractorManagement() {
   const { t } = useTranslation();
   const { contractorStore } = useMst();
-  const [tabIndex, setTabIndex] = useState(0);
+  const statusToIndex = { active: 0, suspended: 1, removed: 2 };
+  const [tabIndex, setTabIndex] = useState(statusToIndex[contractorStore.statusFilter] ?? 0);
 
   const { isSearching } = contractorStore;
 

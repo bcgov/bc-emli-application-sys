@@ -46,6 +46,8 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
   const formRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const isAdminViewingContractorOnboarding =
+    currentPermitApplication?.isContractorOnboarding && currentUser?.isReviewStaff;
   const [applicationNumber, setApplicationNumber] = useState(null); //used only when admin linking a support request
 
   const getDefaultPermitApplicationMetadataValues = () => ({ nickname: currentPermitApplication?.nickname });
@@ -309,21 +311,19 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               </Flex>
             </HStack>
 
-            {isSubmitted || isIneligible || isInReview || currentPermitApplication?.isContractorOnboarding ? (
+            {isSubmitted || isIneligible || isInReview || isAdminViewingContractorOnboarding ? (
               <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
                 <SubmissionDownloadModal permitApplication={currentPermitApplication} />
                 <Button
                   rightIcon={<CaretRight />}
                   onClick={() =>
                     navigate(
-                      currentPermitApplication?.isContractorOnboarding
-                        ? location.state?.backToPage || '/contractor-management'
-                        : '/',
+                      isAdminViewingContractorOnboarding ? location.state?.backToPage || '/contractor-management' : '/',
                     )
                   }
                 >
                   {t(
-                    currentPermitApplication?.isContractorOnboarding
+                    isAdminViewingContractorOnboarding
                       ? 'ui.back'
                       : currentUser.isParticipant
                         ? 'energySavingsApplication.edit.back'
@@ -340,7 +340,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 gap={4}
               >
                 {currentPermitApplication?.status === EPermitApplicationStatus.draft &&
-                  !currentPermitApplication?.isContractorOnboarding && (
+                  !isAdminViewingContractorOnboarding && (
                     <Button variant="primary" onClick={handleClickWithdrawl}>
                       {t('energySavingsApplication.edit.withdrawl')}
                     </Button>
@@ -457,11 +457,11 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                   currentPermitApplication?.isRevisionsRequested ||
                   currentUser?.role === 'admin' ||
                   currentUser?.role === 'admin_manager') &&
-                !currentPermitApplication?.isContractorOnboarding
+                !isAdminViewingContractorOnboarding
               }
               renderSaveButton={() =>
                 !currentPermitApplication?.isIneligible &&
-                !currentPermitApplication?.isContractorOnboarding && <SaveButton handleSave={handleSave} />
+                !isAdminViewingContractorOnboarding && <SaveButton handleSave={handleSave} />
               }
               updateCollaborationAssignmentNodes={updateRequirementBlockAssignmentNode}
               performedBy={
