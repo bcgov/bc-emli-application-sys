@@ -44,7 +44,15 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
   };
 
   const handleView = () => {
-    navigate(`/contractor-management/${contractor.id}`);
+    contractorStore.fetchOnboarding(contractor.id).then((onboarding) => {
+      if (onboarding) {
+        navigate(`/applications/${onboarding?.onboardApplicationId}/edit`, {
+          state: {
+            backToPage: '/contractor-management',
+          },
+        });
+      }
+    });
   };
 
   const handleInviteEmployee = () => {

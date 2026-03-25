@@ -7,7 +7,7 @@ import * as R from 'ramda';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { requirementTypeToFormioType } from '../../../constants';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
 import { useInterval } from '../../../hooks/use-interval';
@@ -45,6 +45,9 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
   const { t } = useTranslation();
   const formRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAdminViewingContractorOnboarding =
+    currentPermitApplication?.isContractorOnboarding && currentUser?.isReviewStaff;
   const [applicationNumber, setApplicationNumber] = useState(null); //used only when admin linking a support request
 
   const getDefaultPermitApplicationMetadataValues = () => ({ nickname: currentPermitApplication?.nickname });
@@ -308,14 +311,23 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               </Flex>
             </HStack>
 
-            {isSubmitted || isIneligible || isInReview ? (
+            {isSubmitted || isIneligible || isInReview || isAdminViewingContractorOnboarding ? (
               <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
                 <SubmissionDownloadModal permitApplication={currentPermitApplication} />
-                <Button rightIcon={<CaretRight />} onClick={() => navigate('/')}>
+                <Button
+                  rightIcon={<CaretRight />}
+                  onClick={() =>
+                    navigate(
+                      isAdminViewingContractorOnboarding ? location.state?.backToPage || '/contractor-management' : '/',
+                    )
+                  }
+                >
                   {t(
-                    currentUser.isParticipant
-                      ? 'energySavingsApplication.edit.back'
-                      : 'energySavingsApplication.show.backToInbox',
+                    isAdminViewingContractorOnboarding
+                      ? 'ui.back'
+                      : currentUser.isParticipant
+                        ? 'energySavingsApplication.edit.back'
+                        : 'energySavingsApplication.show.backToInbox',
                   )}
                 </Button>
               </Stack>
@@ -328,7 +340,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                 gap={4}
               >
                 {currentPermitApplication?.status === EPermitApplicationStatus.draft &&
-                  !currentPermitApplication?.isContractorOnboarding && (
+                  !isAdminViewingContractorOnboarding && (
                     <Button variant="primary" onClick={handleClickWithdrawl}>
                       {t('energySavingsApplication.edit.withdrawl')}
                     </Button>
@@ -445,9 +457,12 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
                   currentPermitApplication?.isRevisionsRequested ||
                   currentUser?.role === 'admin' ||
                   currentUser?.role === 'admin_manager') &&
-                !currentPermitApplication?.isContractorOnboarding
+                !isAdminViewingContractorOnboarding
               }
-              renderSaveButton={() => !currentPermitApplication?.isIneligible && <SaveButton handleSave={handleSave} />}
+              renderSaveButton={() =>
+                !currentPermitApplication?.isIneligible &&
+                !isAdminViewingContractorOnboarding && <SaveButton handleSave={handleSave} />
+              }
               updateCollaborationAssignmentNodes={updateRequirementBlockAssignmentNode}
               performedBy={
                 (currentUser?.role === 'admin' || currentUser?.role === 'admin_manager') &&

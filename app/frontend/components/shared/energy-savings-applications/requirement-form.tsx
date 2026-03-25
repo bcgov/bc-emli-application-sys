@@ -448,7 +448,7 @@ export const RequirementForm = observer(
               (isDraftApplication ||
                 (isRevisionsRequested && (hasRevisionRequestInLatest || (isIncomeField && householdHasRevision))));
             const adminCanEdit =
-              isDraftApplication ||
+              (isDraftApplication && isEditing) ||
               (hasRevisionRequestInLatest && isEditing && performedBy === 'staff' && !saveEditsCompleted) ||
               (isIncomeField && householdHasRevision && isEditing && performedBy === 'staff' && !saveEditsCompleted);
 
