@@ -150,6 +150,7 @@ export const EligibilityCheck = observer(() => {
     const eligibility =
       !isNullOrEmpty(homeType) &&
       homeTypeEligible &&
+      !isNullOrEmpty(assessedValue) &&
       propertyValueEligible &&
       !isNullOrEmpty(paysBills) &&
       paymentEligible &&
@@ -244,7 +245,7 @@ export const EligibilityCheck = observer(() => {
                   t('auth.checkEligibility.alert.propertyValueHighSingleTitle'),
                   t('auth.checkEligibility.alert.propertyValueHighSingleNotEligible'),
                 )}
-              {/* Single-family homes: Unsure shows warning */}
+              {/* Non-multi-unit homes: Unsure shows warning */}
               {!isMultiUnitHome(formData.homeType) &&
                 formData.assessedValue === optionValues.propertyValueUnsure &&
                 renderAlert(
