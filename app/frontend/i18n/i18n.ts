@@ -1713,6 +1713,7 @@ const options = {
             stepCodePackageFile: 'Design package file for energy step code',
             pidInfo: 'Pid Info',
             serviceInformation: 'Employee Information',
+            utilityAccountNumber: 'Utility Account Number',
           },
           contactFieldItemLabels: {
             firstName: 'First name',

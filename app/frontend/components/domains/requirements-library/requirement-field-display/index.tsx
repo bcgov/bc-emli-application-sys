@@ -336,6 +336,10 @@ const requirementsComponentMap = {
     return <GenericContactDisplay contactFieldItems={contactFieldItemTypes} {...props} />;
   },
 
+  [ERequirementType.utilityAccountNumber](props: TRequirementFieldDisplayProps) {
+    return <GenericFieldDisplay inputDisplay={<Input bg={'white'} />} {...props} />;
+  },
+
   [ERequirementType.serviceInformation](props: TRequirementFieldDisplayProps) {
     const serviceInfoFieldItemTypes: Array<{
       type: ERequirementType;

@@ -27,7 +27,8 @@ class Requirement < ApplicationRecord
          general_contact: 17,
          professional_contact: 18,
          pid_info: 19,
-         service_information: 20
+         service_information: 20,
+         utility_account_number: 21
        },
        _prefix: true
 
