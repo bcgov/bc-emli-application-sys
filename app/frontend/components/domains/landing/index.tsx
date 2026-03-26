@@ -18,6 +18,57 @@ export const LandingScreen = observer(() => {
   const applyNeeds = i18next.t('landing.applyNeeds', { returnObjects: true }) as string[];
   const applicationSteps = i18next.t('landing.applicationSteps', { returnObjects: true }) as string[];
 
+  const returnItem = (itemText) => {
+    const landordConsentFormText = t('landing.linkInfo.landordConsentForm.text');
+    const strataEquityConsentFormText = t('landing.linkInfo.strataEquityConsentForm.text');
+
+    let linkTranslationText = '';
+    let linkTranslationURL = '';
+
+    if (itemText.indexOf(landordConsentFormText) >= 0) {
+      linkTranslationText = 'landing.linkInfo.landordConsentForm.text';
+      linkTranslationURL = 'landing.linkInfo.landordConsentForm.url';
+    } else if (itemText.indexOf(strataEquityConsentFormText) >= 0) {
+      linkTranslationText = 'landing.linkInfo.strataEquityConsentForm.text';
+      linkTranslationURL = 'landing.linkInfo.strataEquityConsentForm.url';
+    }
+
+    return linkTranslationText && linkTranslationURL
+      ? returnLink(itemText, linkTranslationText, linkTranslationURL)
+      : itemText;
+  };
+
+  const returnLink = (fullText, translationLinkName, linkTranslationURL) => {
+    const linkName = t(translationLinkName);
+    debugger;
+    return (
+      <>
+        {fullText.split(linkName)[0]}
+        <Link
+          href={t(linkTranslationURL)}
+          color="theme.blueAlt"
+          textDecoration="underline"
+          _hover={{ color: 'theme.blue' }}
+          _focusVisible={{
+            outline: '3px solid',
+            outlineColor: 'theme.blue',
+            outlineOffset: '2px',
+          }}
+          sx={{
+            '&:focus:not(:focus-visible)': {
+              outline: 'none',
+            },
+          }}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={linkName}
+        >
+          {linkName}
+        </Link>
+      </>
+    );
+  };
+
   return (
     <Flex direction="column" w="full" bg="greys.white">
       {/* Hero Section */}
@@ -249,7 +300,7 @@ export const LandingScreen = observer(() => {
           <UnorderedList spacing={1} pl={4} color="greys.anotherGrey" mb={4}>
             {applyNeeds.map((str) => (
               <ListItem key={str} fontSize="16px">
-                {str}
+                {returnItem(str)}
               </ListItem>
             ))}
           </UnorderedList>
