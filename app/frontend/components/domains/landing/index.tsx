@@ -2,14 +2,13 @@ import { Box, Container, Flex, Heading, Hide, Link, ListItem, Show, Text, Unorde
 import { ArrowSquareOut, CaretRight } from '@phosphor-icons/react';
 import i18next from 'i18next';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
 import { colors } from '../../../styles/theme/foundations/colors';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { DescriptionPart } from '../../../types/types';
-import { useCallback } from 'react';
 import { EDescriptionPartType } from '../../../types/enums';
 
 export const LandingScreen = observer(() => {
@@ -18,7 +17,7 @@ export const LandingScreen = observer(() => {
   const { currentUser } = userStore;
 
   const whoFor = i18next.t('landing.whoFor', { returnObjects: true }) as string[];
-  const applyNeeds = i18next.t('landing.applyNeeds', { returnObjects: true }) as Array<DescriptionPart>;
+  const applyNeeds = i18next.t('landing.applyNeeds', { returnObjects: true }) as DescriptionPart[][];
   const applicationSteps = i18next.t('landing.applicationSteps', { returnObjects: true }) as string[];
 
   const returnItem = useCallback((descriptionParts: Array<DescriptionPart>) => {
@@ -270,8 +269,10 @@ export const LandingScreen = observer(() => {
             {t('landing.duringApplication')}
           </Text>
           <UnorderedList spacing={1} pl={4} color="greys.anotherGrey" mb={4}>
-            {applyNeeds.map((item) => (
-              <ListItem fontSize="16px">{returnItem(item)}</ListItem>
+            {applyNeeds.map((item, index) => (
+              <ListItem key={index} fontSize="16px">
+                {returnItem(item)}
+              </ListItem>
             ))}
           </UnorderedList>
           <Text fontSize="16px" lineHeight="27px" color="greys.anotherGrey">

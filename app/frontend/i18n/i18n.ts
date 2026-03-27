@@ -338,7 +338,6 @@ const options = {
                 },
               },
             ],
-            ,
           ],
           contractor: {
             title: ' Energy Savings Program',
