@@ -29,6 +29,7 @@ export const LandingScreen = observer(() => {
           isExternal={part.content?.isExternal ?? true}
           fontSize="md"
           fontWeight="normal"
+          aria-label={part.content?.text ? `${part.content.text} — opens in a new tab` : 'Opens in a new tab'}
         >
           {part.content?.text}
         </Link>
