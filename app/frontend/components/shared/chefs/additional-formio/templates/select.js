@@ -20,7 +20,9 @@ export function overrideSelectTemplate(ctx) {
     attrString += `\n  ${attr}="${ctx.input.attr[attr]}"`;
   }
 
-  const idAttr = !ctx.input.attr.id ? `\n  id="${ctx.instance.id}-${ctx.component.key}"` : '';
+  const idAttr = Object.prototype.hasOwnProperty.call(ctx.input.attr, 'id')
+    ? ''
+    : `\n  id="${ctx.instance.id}-${ctx.component.key}"`;
 
   const describedByAttr = ctx.component.description
     ? `\n  aria-describedby="d-${ctx.instance.id}-${ctx.component.key}"`
@@ -31,13 +33,14 @@ export function overrideSelectTemplate(ctx) {
       ? ctx.input.component.validate?.required
       : ctx.component.fields?.[ctx.input.ref]?.required;
 
+  const ariaRequiredAttr = typeof required === 'undefined' ? '' : `\n  aria-required="${required ? 'true' : 'false'}"`;
+
   return `<select
   ref="${refAttr}"
   ${multipleAttr}
   ${attrString}
   ${idAttr}
-  ${describedByAttr}
-  aria-required="${required}"
+  ${describedByAttr}${ariaRequiredAttr}
 >${ctx.selectOptions}</select>
 <input type="text"
        class="formio-select-autocomplete-input"
