@@ -314,23 +314,32 @@ const options = {
           beforeApply: 'Before you apply, you will need to log in with your BC Services Card account.',
           useServiceCard: 'Learn more about how to use BC Services Card account.',
           applyNeeds: [
-            'Information about your home',
-            'The account numbers on your energy utility bills',
-            'The number of adults living in your home',
-            'Proof of income for all adults in your home',
-            'If you currently rent your home, a Landlord Consent Form [335KB PDF]',
-            'If you live in a condo, stacked townhouse or equity co-op building, a Strata and Equity Co-up Consent Form [260KB PDF]',
+            [{ type: 'text', content: 'Information about your home' }],
+            [{ type: 'text', content: 'The account numbers on your energy utility bills' }],
+            [{ type: 'text', content: 'The number of adults living in your home' }],
+            [{ type: 'text', content: 'Proof of income for all adults in your home' }],
+            [
+              { type: 'text', content: 'If you currently rent your home, a' },
+              {
+                type: 'link',
+                content: {
+                  text: ' Landlord Consent Form [335KB PDF]',
+                  href: 'https://www.betterhomesbc.ca/esp-landlord-consent-form-PDF',
+                },
+              },
+            ],
+            [
+              { type: 'text', content: 'If you live in a condo, stacked townhouse or equity co-op building, a' },
+              {
+                type: 'link',
+                content: {
+                  text: ' Strata and Equity Co-up Consent Form [260KB PDF]',
+                  href: 'https://www.betterhomesbc.ca/esp-strata-equity-co-op-consent-form-PDF',
+                },
+              },
+            ],
+            ,
           ],
-          linkInfo: {
-            landordConsentForm: {
-              text: 'Landlord Consent Form [335KB PDF]',
-              url: 'https://betterhomesbc.ca/wp-content/uploads/2026/03/CleanBCESP_LandlordConsentForm.pdf',
-            },
-            strataEquityConsentForm: {
-              text: 'Strata and Equity Co-up Consent Form [260KB PDF]',
-              url: 'https://betterhomesbc.ca/wp-content/uploads/2026/03/CleanBCESP_StrataEquityCoopConsentForm.pdf',
-            },
-          },
           contractor: {
             title: ' Energy Savings Program',
             titleDesc: 'registered contractor portal',

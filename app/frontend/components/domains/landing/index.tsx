@@ -8,6 +8,9 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
 import { colors } from '../../../styles/theme/foundations/colors';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
+import { DescriptionPart } from '../../../types/types';
+import { useCallback } from 'react';
+import { EDescriptionPartType } from '../../../types/enums';
 
 export const LandingScreen = observer(() => {
   const { t } = useTranslation();
@@ -15,60 +18,29 @@ export const LandingScreen = observer(() => {
   const { currentUser } = userStore;
 
   const whoFor = i18next.t('landing.whoFor', { returnObjects: true }) as string[];
-  const applyNeeds = i18next.t('landing.applyNeeds', { returnObjects: true }) as string[];
+  const applyNeeds = i18next.t('landing.applyNeeds', { returnObjects: true }) as Array<DescriptionPart>;
   const applicationSteps = i18next.t('landing.applicationSteps', { returnObjects: true }) as string[];
 
-  const returnItem = (itemText) => {
-    const landordConsentFormText = t('landing.linkInfo.landordConsentForm.text');
-    const strataEquityConsentFormText = t('landing.linkInfo.strataEquityConsentForm.text');
-
-    let linkTranslationText = '';
-    let linkTranslationURL = '';
-
-    if (itemText.indexOf(landordConsentFormText) >= 0) {
-      linkTranslationText = 'landing.linkInfo.landordConsentForm.text';
-      linkTranslationURL = 'landing.linkInfo.landordConsentForm.url';
-    } else if (itemText.indexOf(strataEquityConsentFormText) >= 0) {
-      linkTranslationText = 'landing.linkInfo.strataEquityConsentForm.text';
-      linkTranslationURL = 'landing.linkInfo.strataEquityConsentForm.url';
-    }
-
-    return linkTranslationText && linkTranslationURL
-      ? returnLink(itemText, linkTranslationText, linkTranslationURL)
-      : itemText;
-  };
-
-  const returnLink = (fullText, translationLinkName, linkTranslationURL) => {
-    const linkName = t(translationLinkName);
-    debugger;
-    return (
-      <>
-        {fullText.split(linkName)[0]}
+  const returnItem = useCallback((descriptionParts: Array<DescriptionPart>) => {
+    const itemToReturn = descriptionParts.map((part, index) =>
+      part.type === EDescriptionPartType.Link ? (
         <Link
-          href={t(linkTranslationURL)}
-          color="theme.blueAlt"
-          textDecoration="underline"
-          _hover={{ color: 'theme.blue' }}
-          _focusVisible={{
-            outline: '3px solid',
-            outlineColor: 'theme.blue',
-            outlineOffset: '2px',
-          }}
-          sx={{
-            '&:focus:not(:focus-visible)': {
-              outline: 'none',
-            },
-          }}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={linkName}
+          key={index}
+          href={part.content?.href}
+          isExternal={part.content?.isExternal ?? true}
+          fontSize="md"
+          fontWeight="normal"
         >
-          {linkName}
+          {part.content?.text}
         </Link>
-      </>
+      ) : (
+        <Text as="span" key={index} {...(part.type === EDescriptionPartType.Bold && { fontWeight: 'bold' })}>
+          {part.content}
+        </Text>
+      ),
     );
-  };
-
+    return itemToReturn;
+  }, []);
   return (
     <Flex direction="column" w="full" bg="greys.white">
       {/* Hero Section */}
@@ -298,10 +270,8 @@ export const LandingScreen = observer(() => {
             {t('landing.duringApplication')}
           </Text>
           <UnorderedList spacing={1} pl={4} color="greys.anotherGrey" mb={4}>
-            {applyNeeds.map((str) => (
-              <ListItem key={str} fontSize="16px">
-                {returnItem(str)}
-              </ListItem>
+            {applyNeeds.map((item) => (
+              <ListItem fontSize="16px">{returnItem(item)}</ListItem>
             ))}
           </UnorderedList>
           <Text fontSize="16px" lineHeight="27px" color="greys.anotherGrey">
