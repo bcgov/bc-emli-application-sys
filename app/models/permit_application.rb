@@ -58,8 +58,9 @@ class PermitApplication < ApplicationRecord
     user_group_type
   ]
 
-  # Separate includes for invoice endpoints — submitter is always a Contractor,
-  # so we can safely eager load contractor-specific associations.
+  # Separate includes for invoice endpoints — invoice submissions always use a Contractor
+  # as the submitter (set via contractor_id param in the controller), so we can safely
+  # eager load contractor-specific associations here.
   # Do NOT merge into API_SEARCH_INCLUDES — participant app queries have a User submitter.
   INVOICE_API_SEARCH_INCLUDES = [
     :program,
@@ -978,11 +979,13 @@ class PermitApplication < ApplicationRecord
   end
 
   def contractor_for_invoice
-    if submitter.is_a?(Contractor)
-      submitter
-    elsif submitter.is_a?(User)
-      submitter.contractor_employees.first&.contractor
-    end
+    @contractor_for_invoice ||=
+      if submitter.is_a?(Contractor)
+        submitter
+      elsif submitter.is_a?(User)
+        Contractor.find_by(contact_id: submitter.id) ||
+          submitter.contractor_employees.order(:id).first&.contractor
+      end
   end
 
   def contractor_id

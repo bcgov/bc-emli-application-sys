@@ -253,8 +253,10 @@ class PermitApplicationBlueprint < Blueprinter::Base
     end
 
     field :contractor do |pa, _options|
-      c = pa.contractor_for_invoice
-      ContractorBlueprint.render_as_hash(c, view: :external_api) if c
+      if pa.submission_type&.code == "invoice"
+        c = pa.contractor_for_invoice
+        ContractorBlueprint.render_as_hash(c, view: :external_api) if c
+      end
     end
 
     field :user_group_type, name: :user_group_type do |obj|

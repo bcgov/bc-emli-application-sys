@@ -452,7 +452,7 @@ in this document.
           AccountHolder: {
             type: :object,
             description:
-              "The account holder of the application. For contractor invoices, this is a Contractor object with additional identification fields.",
+              "The account holder (invoice submitter) of the application. For contractor invoices, the submitter is always a Contractor entity. Contractor-specific identification fields (such as business_name, number, contact_name, phone_number, and contractor_info) are populated only when the submitter is a Contractor; for User submitters these fields may be null or absent.",
             properties: {
               id: {
                 type: :string,
