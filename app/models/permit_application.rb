@@ -58,6 +58,24 @@ class PermitApplication < ApplicationRecord
     user_group_type
   ]
 
+  # Separate includes for invoice endpoints — submitter is always a Contractor,
+  # so we can safely eager load contractor-specific associations.
+  # Do NOT merge into API_SEARCH_INCLUDES — participant app queries have a User submitter.
+  INVOICE_API_SEARCH_INCLUDES = [
+    :program,
+    :template_version,
+    :submission_versions,
+    :submission_type,
+    :user_group_type,
+    {
+      submitter: [
+        :contractor_info,
+        :contact,
+        { contractor_employees: { contractor: :contractor_info } }
+      ]
+    }
+  ]
+
   searchkick word_middle: %i[
                number
                permit_classifications
@@ -956,13 +974,39 @@ class PermitApplication < ApplicationRecord
   end
 
   def contractor_business_name
+    contractor_for_invoice&.business_name
+  end
+
+  def contractor_for_invoice
     if submitter.is_a?(Contractor)
-      submitter.business_name
+      submitter
     elsif submitter.is_a?(User)
-      contractor = Contractor.find_by(contact_id: submitter.id)
-      contractor&.business_name ||
-        "#{submitter.first_name} #{submitter.last_name}".strip
+      submitter.contractor_employees.first&.contractor
     end
+  end
+
+  def contractor_id
+    contractor_for_invoice&.id
+  end
+
+  def contractor_uid
+    contractor_for_invoice&.number
+  end
+
+  def contractor_contact_name
+    contractor_for_invoice&.contact_name
+  end
+
+  def contractor_license_number
+    contractor_for_invoice&.contractor_info&.license_number
+  end
+
+  def contractor_gst_number
+    contractor_for_invoice&.contractor_info&.gst_number
+  end
+
+  def contractor_worksafebc_number
+    contractor_for_invoice&.contractor_info&.worksafebc_number
   end
 
   def extract_heating_system_from_submission_data(type)

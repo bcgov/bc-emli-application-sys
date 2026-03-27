@@ -178,6 +178,12 @@ in this document.
               submitter: {
                 "$ref" => "#/components/schemas/AccountHolder"
               },
+              contractor: {
+                :nullable => true,
+                :description =>
+                  "The contractor associated with this invoice. Present for invoice submissions only. Populated regardless of whether the submitter is the contractor account holder or an employee.",
+                "$ref" => "#/components/schemas/AccountHolder"
+              },
               application_version: {
                 "$ref" => "#/components/schemas/ApplicationVersion"
               },
@@ -445,7 +451,8 @@ in this document.
           },
           AccountHolder: {
             type: :object,
-            description: "The account holder of the application.",
+            description:
+              "The account holder of the application. For contractor invoices, this is a Contractor object with additional identification fields.",
             properties: {
               id: {
                 type: :string,
@@ -462,6 +469,66 @@ in this document.
               last_name: {
                 type: :string,
                 description: "The last name of the account holder."
+              },
+              business_name: {
+                type: :string,
+                nullable: true,
+                description:
+                  "Contractor business name. Present for contractor invoice submitters only."
+              },
+              number: {
+                type: :string,
+                nullable: true,
+                description:
+                  "Contractor system number (e.g. '00042'). Present for contractor invoice submitters only."
+              },
+              contact_name: {
+                type: :string,
+                nullable: true,
+                description:
+                  "Contractor contact person full name. Present for contractor invoice submitters only."
+              },
+              phone_number: {
+                type: :string,
+                nullable: true,
+                description:
+                  "Contractor phone number. Present for contractor invoice submitters only."
+              },
+              contractor_info: {
+                type: :object,
+                nullable: true,
+                description:
+                  "Contractor registration details. Present for contractor invoice submitters only.",
+                properties: {
+                  license_number: {
+                    type: :string,
+                    nullable: true,
+                    description: "Contractor trade/contractor license number."
+                  },
+                  gst_number: {
+                    type: :string,
+                    nullable: true,
+                    description: "GST registration number."
+                  },
+                  worksafebc_number: {
+                    type: :string,
+                    nullable: true,
+                    description: "WorkSafeBC registration number."
+                  },
+                  doing_business_as: {
+                    type: :string,
+                    nullable: true,
+                    description: "Alternative trading name."
+                  },
+                  type_of_business: {
+                    type: :array,
+                    nullable: true,
+                    items: {
+                      type: :string
+                    },
+                    description: "Business categories."
+                  }
+                }
               }
             }
           },

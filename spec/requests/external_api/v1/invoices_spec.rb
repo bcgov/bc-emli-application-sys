@@ -276,6 +276,43 @@ RSpec.describe "external_api/v1/invoices",
                          nullable: true,
                          description: "Homeowner full name",
                          example: "John Doe"
+                       },
+                       contractor_id: {
+                         type: :string,
+                         nullable: true,
+                         description: "Contractor UUID",
+                         example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+                       },
+                       contractor_uid: {
+                         type: :string,
+                         nullable: true,
+                         description: "Contractor system number",
+                         example: "00042"
+                       },
+                       contractor_contact_name: {
+                         type: :string,
+                         nullable: true,
+                         description: "Contractor contact person full name",
+                         example: "Jane Smith"
+                       },
+                       contractor_license_number: {
+                         type: :string,
+                         nullable: true,
+                         description: "Contractor trade license number",
+                         example: "LIC-12345"
+                       },
+                       contractor_gst_number: {
+                         type: :string,
+                         nullable: true,
+                         description: "Contractor GST registration number",
+                         example: "123456789"
+                       },
+                       contractor_worksafebc_number: {
+                         type: :string,
+                         nullable: true,
+                         description:
+                           "Contractor WorkSafeBC registration number",
+                         example: "WS-98765"
                        }
                      },
                      required: %w[

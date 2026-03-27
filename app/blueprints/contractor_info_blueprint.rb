@@ -15,4 +15,14 @@ class ContractorInfoBlueprint < Blueprinter::Base
     :service_languages,
     :updated_at
   )
+
+  view :external_api do
+    exclude :incorporated_year
+    exclude :primary_program_measure
+    exclude :retrofit_enabling_measures
+    exclude :service_languages
+    exclude :number_of_employees
+    exclude :license_issuer
+    exclude :updated_at
+  end
 end
