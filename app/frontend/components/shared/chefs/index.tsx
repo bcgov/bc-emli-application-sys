@@ -6,6 +6,7 @@ import { t } from 'i18next';
 import ChefsFormioComponents from './additional-formio';
 import { overridePanelTemplate } from './additional-formio/templates/panel';
 import { overrideFileTemplate } from './additional-formio/templates/file';
+import { overrideSelectTemplate } from './additional-formio/templates/select';
 
 import { FILE_UPLOAD_MAX_SIZE } from './additional-formio/constant';
 
@@ -24,6 +25,9 @@ Templates.current = {
   },
   file: {
     form: (ctx) => overrideFileTemplate(ctx),
+  },
+  select: {
+    form: (ctx) => overrideSelectTemplate(ctx),
   },
   button: {
     form: (ctx) => {
