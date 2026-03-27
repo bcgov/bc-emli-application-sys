@@ -630,6 +630,7 @@ paths:
                           example: 001-002-003
                         contractor_business_name:
                           type: string
+                          nullable: true
                           description: Contractor business name
                           example: ABC Heating & Cooling
                         submission_date:
@@ -661,9 +662,38 @@ paths:
                           nullable: true
                           description: Homeowner full name
                           example: John Doe
+                        contractor_id:
+                          type: string
+                          nullable: true
+                          description: Contractor UUID
+                          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+                        contractor_uid:
+                          type: string
+                          nullable: true
+                          description: Contractor system number
+                          example: '00042'
+                        contractor_contact_name:
+                          type: string
+                          nullable: true
+                          description: Contractor contact person full name
+                          example: Jane Smith
+                        contractor_license_number:
+                          type: string
+                          nullable: true
+                          description: Contractor trade license number
+                          example: LIC-12345
+                        contractor_gst_number:
+                          type: string
+                          nullable: true
+                          description: Contractor GST registration number
+                          example: '123456789'
+                        contractor_worksafebc_number:
+                          type: string
+                          nullable: true
+                          description: Contractor WorkSafeBC registration number
+                          example: WS-98765
                       required:
                       - invoice_number
-                      - contractor_business_name
                       - submission_date
                       - status
                   meta:
@@ -1378,6 +1408,12 @@ components:
           description: The submission type of the application
         submitter:
           "$ref": "#/components/schemas/AccountHolder"
+        contractor:
+          nullable: true
+          description: The contractor associated with this invoice. Present for invoice
+            submissions only. Populated regardless of whether the submitter is the
+            contractor account holder or an employee.
+          "$ref": "#/components/schemas/Contractor"
         application_version:
           "$ref": "#/components/schemas/ApplicationVersion"
         submission_data:
@@ -1443,6 +1479,7 @@ components:
                   - professional_contact
                   - pid_info
                   - service_information
+                  - utility_account_number
                   description: The input type for this requirement.
                 value:
                   description: The submitted value for this requirement.
@@ -1605,7 +1642,13 @@ components:
           description: The signed URL to download the file.
     AccountHolder:
       type: object
-      description: The account holder of the application.
+      description: The account holder (invoice submitter) of the application. The
+        submitter may be either a Contractor account holder or an employee User. Contractor-specific
+        identification fields (such as business_name, number, contact_name, phone_number,
+        and contractor_info) are populated when the submitter is a Contractor; for
+        User submitters these fields may be null or absent. The top-level contractor
+        field on the invoice always refers to the associated Contractor entity regardless
+        of submitter type.
       properties:
         id:
           type: string
@@ -1619,6 +1662,116 @@ components:
         last_name:
           type: string
           description: The last name of the account holder.
+        business_name:
+          type: string
+          nullable: true
+          description: Contractor business name. Present for contractor invoice submitters
+            only.
+        number:
+          type: string
+          nullable: true
+          description: Contractor system number (e.g. '00042'). Present for contractor
+            invoice submitters only.
+        contact_name:
+          type: string
+          nullable: true
+          description: Contractor contact person full name. Present for contractor
+            invoice submitters only.
+        phone_number:
+          type: string
+          nullable: true
+          description: Contractor phone number. Present for contractor invoice submitters
+            only.
+        contractor_info:
+          type: object
+          nullable: true
+          description: Contractor registration details. Present for contractor invoice
+            submitters only.
+          properties:
+            id:
+              type: string
+              description: Contractor info UUID.
+            license_number:
+              type: string
+              nullable: true
+              description: Contractor trade/contractor license number.
+            gst_number:
+              type: string
+              nullable: true
+              description: GST registration number.
+            worksafebc_number:
+              type: string
+              nullable: true
+              description: WorkSafeBC registration number.
+            doing_business_as:
+              type: string
+              nullable: true
+              description: Alternative trading name.
+            type_of_business:
+              type: array
+              nullable: true
+              items:
+                type: string
+              description: Business categories.
+    Contractor:
+      type: object
+      description: A contractor entity. Rendered from ContractorBlueprint :external_api.
+        Always refers to the Contractor regardless of whether the invoice was submitted
+        by the contractor account holder or an employee.
+      properties:
+        id:
+          type: string
+          description: Contractor UUID.
+        business_name:
+          type: string
+          nullable: true
+          description: Contractor business name.
+        email:
+          type: string
+          nullable: true
+          description: Contractor email address.
+        number:
+          type: string
+          nullable: true
+          description: Contractor system number (e.g. '00042').
+        contact_name:
+          type: string
+          nullable: true
+          description: Contractor contact person full name.
+        phone_number:
+          type: string
+          nullable: true
+          description: Contractor phone number.
+        contractor_info:
+          type: object
+          nullable: true
+          description: Contractor registration details.
+          properties:
+            id:
+              type: string
+              description: Contractor info UUID.
+            doing_business_as:
+              type: string
+              nullable: true
+              description: Alternative trading name.
+            license_number:
+              type: string
+              nullable: true
+              description: Contractor trade/contractor license number.
+            gst_number:
+              type: string
+              nullable: true
+              description: GST registration number.
+            worksafebc_number:
+              type: string
+              nullable: true
+              description: WorkSafeBC registration number.
+            type_of_business:
+              type: array
+              nullable: true
+              items:
+                type: string
+              description: Business categories.
     ResponseError:
       type: object
       properties:

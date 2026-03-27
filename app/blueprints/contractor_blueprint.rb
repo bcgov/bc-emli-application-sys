@@ -55,7 +55,10 @@ class ContractorBlueprint < Blueprinter::Base
   end
 
   view :external_api do
-    fields :business_name, :email
+    fields :business_name, :email, :number, :contact_name, :phone_number
+    association :contractor_info,
+                blueprint: ContractorInfoBlueprint,
+                view: :external_api
   end
 
   view :external_api_profile do
