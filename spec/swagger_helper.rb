@@ -452,7 +452,7 @@ in this document.
           AccountHolder: {
             type: :object,
             description:
-              "The account holder (invoice submitter) of the application. For contractor invoices, the submitter is always a Contractor entity. Contractor-specific identification fields (such as business_name, number, contact_name, phone_number, and contractor_info) are populated only when the submitter is a Contractor; for User submitters these fields may be null or absent.",
+              "The account holder (invoice submitter) of the application. The submitter may be either a Contractor account holder or an employee User. Contractor-specific identification fields (such as business_name, number, contact_name, phone_number, and contractor_info) are populated when the submitter is a Contractor; for User submitters these fields may be null or absent. The top-level contractor field on the invoice always refers to the associated Contractor entity regardless of submitter type.",
             properties: {
               id: {
                 type: :string,
@@ -500,6 +500,10 @@ in this document.
                 description:
                   "Contractor registration details. Present for contractor invoice submitters only.",
                 properties: {
+                  id: {
+                    type: :string,
+                    description: "Contractor info UUID."
+                  },
                   license_number: {
                     type: :string,
                     nullable: true,

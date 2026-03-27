@@ -984,7 +984,11 @@ class PermitApplication < ApplicationRecord
         submitter
       elsif submitter.is_a?(User)
         Contractor.find_by(contact_id: submitter.id) ||
-          submitter.contractor_employees.order(:id).first&.contractor
+          if submitter.contractor_employees.loaded?
+            submitter.contractor_employees.min_by(&:id)&.contractor
+          else
+            submitter.contractor_employees.order(:id).first&.contractor
+          end
       end
   end
 
