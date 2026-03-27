@@ -238,6 +238,7 @@ RSpec.describe "external_api/v1/invoices",
                        },
                        contractor_business_name: {
                          type: :string,
+                         nullable: true,
                          description: "Contractor business name",
                          example: "ABC Heating & Cooling"
                        },
@@ -315,12 +316,7 @@ RSpec.describe "external_api/v1/invoices",
                          example: "WS-98765"
                        }
                      },
-                     required: %w[
-                       invoice_number
-                       contractor_business_name
-                       submission_date
-                       status
-                     ]
+                     required: %w[invoice_number submission_date status]
                    }
                  },
                  meta: {
