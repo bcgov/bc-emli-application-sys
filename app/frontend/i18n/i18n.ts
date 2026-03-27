@@ -333,7 +333,7 @@ const options = {
               {
                 type: 'link',
                 content: {
-                  text: ' Strata and Equity Co-up Consent Form [260KB PDF]',
+                  text: ' Strata and Equity Co-op Consent Form [260KB PDF]',
                   href: 'https://www.betterhomesbc.ca/esp-strata-equity-co-op-consent-form-PDF',
                 },
               },
