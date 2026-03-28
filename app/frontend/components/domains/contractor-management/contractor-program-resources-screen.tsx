@@ -164,14 +164,14 @@ const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
     {
       id: 'heat-pump-condo-apartment',
       title: 'contractor.programResources.resources.heatPumpCondoApartment',
-      size: '270 MB',
+      size: '270 KB',
       type: 'PDF',
       url: 'https://www.betterhomesbc.ca/esp-sample-invoice-heat-pump-condo-apartment',
     },
     {
       id: 'heat-pump-water-condo-apartment',
       title: 'contractor.programResources.resources.heatPumpWaterCondoApartment',
-      size: '258 MB',
+      size: '258 KB',
       type: 'PDF',
       url: 'https://www.betterhomesbc.ca/esp-sample-invoice-heat-pump-water-heater-condo-apartment',
     },

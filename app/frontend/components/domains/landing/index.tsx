@@ -29,7 +29,15 @@ export const LandingScreen = observer(() => {
           isExternal={part.content?.isExternal ?? true}
           fontSize="md"
           fontWeight="normal"
-          aria-label={part.content?.text ? part.content.text : null}
+          color="theme.blueAlt"
+          textDecoration="underline"
+          _hover={{ color: 'theme.blue' }}
+          _focusVisible={{
+            outline: '3px solid',
+            outlineColor: 'theme.blue',
+            outlineOffset: '2px',
+          }}
+          sx={{ '&:focus:not(:focus-visible)': { outline: 'none' } }}
         >
           {part.content?.text}
         </Link>
