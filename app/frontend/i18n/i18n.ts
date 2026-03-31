@@ -172,7 +172,7 @@ const options = {
             propertyAssesmentQuestion: 'What is your property’s total assessed value? *',
             assesmentText: 'You can find the assessed value of your property on',
             BCAssessment: 'BC Assessment.',
-            assesedValues: ['$1,820,000 or lower', 'Over $1,820,000', 'Unsure'],
+            assesedValues: ['$1,200,000 or lower', 'Over $1,200,000', 'Unsure'],
             assesedValuesMultiUnit: ['$772,000 or lower', 'Over $772,000', 'Unsure'],
 
             paymentQuestion: 'Do you or a family member pay your own electricity and heating bills? *',
@@ -184,7 +184,7 @@ const options = {
             // Option value keys for consistent comparisons
             optionValues: {
               homeTypeOther: 'Other',
-              propertyValueHighSingle: 'Over $1,820,000',
+              propertyValueHighSingle: 'Over $1,200,000',
               propertyValueHighMulti: 'Over $772,000',
               propertyValueUnsure: 'Unsure',
               paymentYes: 'Yes',
@@ -266,9 +266,9 @@ const options = {
                 'Multi-unit households valued over $772,000 are not currently eligible for Energy Savings Program rebates.',
               multiUnitUnsure:
                 'This information is necessary to determine your rebate eligibility. It can be difficult to determine property value for some types of multi-unit buildings. Program administrators help when you apply.',
-              propertyValueHighSingleTitle: 'Your home is not currently eligible.',
+              propertyValueHighSingleTitle: "Your property's assessed value determines your rebate eligibility.",
               propertyValueHighSingleNotEligible:
-                'Households valued over $1,820,000 are not eligible for Energy Savings Program rebates.',
+                'Households valued between $1,200,000 and $1,820,000 are only eligible for some Energy Savings Program rebates.',
               currentlyEligibleHome: 'Home types currently eligible for the Energy Savings Program are:',
               typesOfhome: [
                 'Single-family homes or secondary suites in a single-family home',

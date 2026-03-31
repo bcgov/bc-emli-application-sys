@@ -136,8 +136,8 @@ export const EligibilityCheck = observer(() => {
       // Group B (multi-unit): Over $772,000 makes ineligible
       propertyValueEligible = assessedValue !== optionValues.propertyValueHighMulti;
     } else {
-      // Group A (non-multi-unit): Over $1,820,000 makes ineligible
-      propertyValueEligible = assessedValue !== optionValues.propertyValueHighSingle;
+      // Group A (non-multi-unit): Over $1,200,000 shows warning but remains eligible
+      propertyValueEligible = true;
     }
 
     // Calculate payment eligibility
@@ -238,12 +238,13 @@ export const EligibilityCheck = observer(() => {
                 />
               </FormControl>
               {/* Property Value Alerts - Different logic for single-family vs multi-unit */}
-              {/* Non-multi-unit homes: Over $1,820,000 is ineligible (hard block) */}
+              {/* Non-multi-unit homes: Over $1,200,000 shows warning, still eligible */}
               {!isMultiUnitHome(formData.homeType) &&
                 formData.assessedValue === optionValues.propertyValueHighSingle &&
                 renderAlert(
                   t('auth.checkEligibility.alert.propertyValueHighSingleTitle'),
                   t('auth.checkEligibility.alert.propertyValueHighSingleNotEligible'),
+                  true,
                 )}
               {/* Non-multi-unit homes: Unsure shows warning */}
               {!isMultiUnitHome(formData.homeType) &&
