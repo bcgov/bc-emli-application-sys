@@ -5,16 +5,22 @@
 // autofill targets this input and injects the user's country value
 // ("Canada") into SELECT fields that have no country option.
 //
-// autocomplete="off" was tested on prod and Chrome ignores it for
-// address autofill.
+// autocomplete="off" was tested on prod — Chrome ignores it for address
+// autofill. Retained as a fallback for other browsers.
 //
-// style="display: none;" was deployed to prod and did NOT work. Form.io
-// injects templates as HTML strings — the attribute is parsed into the DOM
-// but the CSSOM style object stays empty, so the CSS class display:block wins.
+// style="display: none;" was deployed to prod and did NOT prevent autofill.
+// Form.io injects templates as HTML strings and the inline style on this
+// bridge input was not preserved as an effective element.style rule in the
+// final rendered DOM — it was stripped or overwritten by Form.io's runtime
+// behaviour — so the input remained a visible autofill target.
+// Retained as a fallback in case Form.io's runtime behaviour changes.
 //
-// The `hidden` boolean attribute operates at the browser UA stylesheet level
-// and bypasses the CSSOM entirely. Chrome's autofill scanner skips hidden
-// elements.
+// The `hidden` boolean attribute is applied by the browser's UA stylesheet
+// and is respected by Chrome's autofill scanner, which skips elements
+// marked as hidden. This is the fix that works.
+//
+// All three are intentionally present. One of these should work.
+// Display and autofill didn't appear to resolve this. Hidden is my final attempt.
 //
 // BCHEP-618
 
