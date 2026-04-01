@@ -6,8 +6,15 @@
 // ("Canada") into SELECT fields that have no country option.
 //
 // autocomplete="off" was tested on prod and Chrome ignores it for
-// address autofill. display: none removes the bridge input from
-// Chrome's DOM scanner entirely, preventing the injection.
+// address autofill.
+//
+// style="display: none;" was deployed to prod and did NOT work. Form.io
+// injects templates as HTML strings — the attribute is parsed into the DOM
+// but the CSSOM style object stays empty, so the CSS class display:block wins.
+//
+// The `hidden` boolean attribute operates at the browser UA stylesheet level
+// and bypasses the CSSOM entirely. Chrome's autofill scanner skips hidden
+// elements.
 //
 // BCHEP-618
 
@@ -45,6 +52,8 @@ export function overrideSelectTemplate(ctx) {
 <input type="text"
        class="formio-select-autocomplete-input"
        ref="autocompleteInput"
+       hidden
+       autocomplete="off"
        style="display: none;"
        tabindex="-1"
        aria-label="${ctx.t('autocomplete')}"
