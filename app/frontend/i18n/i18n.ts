@@ -291,7 +291,7 @@ const options = {
               annualHouseholdDesc:
                 'Energy Savings Program eligibility is based on how many people live in the home and your combined annual income.',
               assessedValDescription:
-                "Your property's assessed value must be $1,820,000 or lower to be eligible for the Energy Savings Program. Properties valued between $1,200,000 and $1,820,000 are only eligible for some Energy Savings Program rebates.",
+                'Your property’s assessed value must be $1,820,000 or lower to be eligible for the Energy Savings Program. Properties valued between $1,200,000 and $1,820,000 are only eligible for some Energy Savings Program rebates.',
             },
           },
         },
