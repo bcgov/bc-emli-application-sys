@@ -268,7 +268,7 @@ const options = {
                 'This information is necessary to determine your rebate eligibility. It can be difficult to determine property value for some types of multi-unit buildings. Program administrators help when you apply.',
               propertyValueHighSingleTitle: "Your property's assessed value determines your rebate eligibility.",
               propertyValueHighSingleNotEligible:
-                'Households valued between $1,200,000 and $1,820,000 are only eligible for some Energy Savings Program rebates.',
+                'Properties valued between $1,200,000 and $1,820,000 are only eligible for some Energy Savings Program rebates.',
               currentlyEligibleHome: 'Home types currently eligible for the Energy Savings Program are:',
               typesOfhome: [
                 'Single-family homes or secondary suites in a single-family home',
@@ -291,7 +291,7 @@ const options = {
               annualHouseholdDesc:
                 'Energy Savings Program eligibility is based on how many people live in the home and your combined annual income.',
               assessedValDescription:
-                'Your property’s assessed value must be $1,820,000 or lower to be eligible for the Energy Savings Program.',
+                'Your property’s assessed value must be $1,820,000 or lower to be eligible for the Energy Savings Program. Properties valued between $1,200,000 and $1,820,000 are only eligible for some Energy Savings Program rebates.',
             },
           },
         },
