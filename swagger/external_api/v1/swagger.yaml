@@ -1392,6 +1392,12 @@ components:
             request. Note: there might be multiple resubmissions for an application,
             but this date is the last resubmission date.'
           nullable: true
+        updated_at:
+          type: number
+          format: int64
+          description: Datetime in milliseconds since the epoch (Unix time). This
+            is the timestamp of the last update to the application record.
+          nullable: true
         user_group_type:
           type: string
           enum:
