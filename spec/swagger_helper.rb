@@ -169,8 +169,7 @@ in this document.
                 type: :number,
                 format: :int64,
                 description:
-                  "Datetime in milliseconds since the epoch (Unix time). This is the timestamp of the last update to the application record.",
-                nullable: true
+                  "Datetime in milliseconds since the epoch (Unix time). This is the timestamp of the last update to the application record."
               },
               user_group_type: {
                 type: :string,

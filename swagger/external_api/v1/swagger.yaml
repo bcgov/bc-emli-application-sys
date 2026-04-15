@@ -1397,7 +1397,6 @@ components:
           format: int64
           description: Datetime in milliseconds since the epoch (Unix time). This
             is the timestamp of the last update to the application record.
-          nullable: true
         user_group_type:
           type: string
           enum:
