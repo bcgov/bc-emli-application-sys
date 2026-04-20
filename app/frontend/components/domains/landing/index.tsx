@@ -2,12 +2,14 @@ import { Box, Container, Flex, Heading, Hide, Link, ListItem, Show, Text, Unorde
 import { ArrowSquareOut, CaretRight } from '@phosphor-icons/react';
 import i18next from 'i18next';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
 import { colors } from '../../../styles/theme/foundations/colors';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
+import { DescriptionPart } from '../../../types/types';
+import { EDescriptionPartType } from '../../../types/enums';
 
 export const LandingScreen = observer(() => {
   const { t } = useTranslation();
@@ -15,9 +17,38 @@ export const LandingScreen = observer(() => {
   const { currentUser } = userStore;
 
   const whoFor = i18next.t('landing.whoFor', { returnObjects: true }) as string[];
-  const applyNeeds = i18next.t('landing.applyNeeds', { returnObjects: true }) as string[];
+  const applyNeeds = i18next.t('landing.applyNeeds', { returnObjects: true }) as DescriptionPart[][];
   const applicationSteps = i18next.t('landing.applicationSteps', { returnObjects: true }) as string[];
 
+  const returnItem = useCallback((descriptionParts: Array<DescriptionPart>) => {
+    const itemToReturn = descriptionParts.map((part, index) =>
+      part.type === EDescriptionPartType.Link ? (
+        <Link
+          key={index}
+          href={part.content?.href}
+          isExternal={part.content?.isExternal ?? true}
+          fontSize="md"
+          fontWeight="normal"
+          color="theme.blueAlt"
+          textDecoration="underline"
+          _hover={{ color: 'theme.blue' }}
+          _focusVisible={{
+            outline: '3px solid',
+            outlineColor: 'theme.blue',
+            outlineOffset: '2px',
+          }}
+          sx={{ '&:focus:not(:focus-visible)': { outline: 'none' } }}
+        >
+          {part.content?.text}
+        </Link>
+      ) : (
+        <Text as="span" key={index} {...(part.type === EDescriptionPartType.Bold && { fontWeight: 'bold' })}>
+          {part.content}
+        </Text>
+      ),
+    );
+    return itemToReturn;
+  }, []);
   return (
     <Flex direction="column" w="full" bg="greys.white">
       {/* Hero Section */}
@@ -247,9 +278,9 @@ export const LandingScreen = observer(() => {
             {t('landing.duringApplication')}
           </Text>
           <UnorderedList spacing={1} pl={4} color="greys.anotherGrey" mb={4}>
-            {applyNeeds.map((str) => (
-              <ListItem key={str} fontSize="16px">
-                {str}
+            {applyNeeds.map((item, index) => (
+              <ListItem key={index} fontSize="16px">
+                {returnItem(item)}
               </ListItem>
             ))}
           </UnorderedList>

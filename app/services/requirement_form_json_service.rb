@@ -82,6 +82,9 @@ class RequirementFormJsonService
       title: I18n.t("formio.requirement_template.energy_step_code"),
       label: I18n.t("formio.requirement_template.energy_step_code"),
       custom: "document.dispatchEvent(new Event('openStepCode'));"
+    },
+    utility_account_number: {
+      type: "simpletextfield"
     }
   }
 
@@ -124,6 +127,19 @@ class RequirementFormJsonService
     json.merge!({ description: requirement.hint }) if requirement.hint
 
     json.merge!({ validate: { required: true } }) if requirement.required
+
+    if requirement.input_type_utility_account_number?
+      json[:validate] = (json[:validate] || {}).merge(
+        {
+          maxLength: 12,
+          pattern: "^[0-9]{1,12}$",
+          customMessage:
+            I18n.t(
+              "formio.requirement.utility_account_number.validation_message"
+            )
+        }
+      )
+    end
 
     # assume all electives use a customConditional that defaults to false.  The customConditional works in tandem with the conditionals
     json.merge!({ elective: requirement.elective }) if requirement.elective

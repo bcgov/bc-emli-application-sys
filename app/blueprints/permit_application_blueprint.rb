@@ -237,7 +237,12 @@ class PermitApplicationBlueprint < Blueprinter::Base
 
   view :external_api do
     identifier :id
-    fields :status, :number, :full_address, :submitted_at, :resubmitted_at
+    fields :status,
+           :number,
+           :full_address,
+           :submitted_at,
+           :resubmitted_at,
+           :updated_at
 
     field :submission_data do |pa, _options|
       pa.formatted_submission_data_for_external_use
@@ -250,6 +255,13 @@ class PermitApplicationBlueprint < Blueprinter::Base
 
     field :submitter do |pa, options|
       SubmitterBlueprint.render(pa.submitter, view: :external_api)
+    end
+
+    field :contractor do |pa, _options|
+      if pa.submission_type&.code == "invoice"
+        c = pa.contractor_for_invoice
+        ContractorBlueprint.render_as_hash(c, view: :external_api) if c
+      end
     end
 
     field :user_group_type, name: :user_group_type do |obj|
@@ -309,6 +321,30 @@ class PermitApplicationBlueprint < Blueprinter::Base
 
     field :contractor_business_name do |pa|
       pa.contractor_business_name
+    end
+
+    field :contractor_id do |pa|
+      pa.contractor_id
+    end
+
+    field :contractor_uid do |pa|
+      pa.contractor_uid
+    end
+
+    field :contractor_contact_name do |pa|
+      pa.contractor_contact_name
+    end
+
+    field :contractor_license_number do |pa|
+      pa.contractor_license_number
+    end
+
+    field :contractor_gst_number do |pa|
+      pa.contractor_gst_number
+    end
+
+    field :contractor_worksafebc_number do |pa|
+      pa.contractor_worksafebc_number
     end
 
     field :submission_date do |pa|

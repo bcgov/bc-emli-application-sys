@@ -467,6 +467,10 @@ const requirementsComponentMap = {
     );
   },
 
+  [ERequirementType.utilityAccountNumber]: function <TFieldValues>(props: TRequirementEditProps<TFieldValues>) {
+    return <EditableGroup editableInput={<Input bg={'white'} isReadOnly />} {...props} />;
+  },
+
   [ERequirementType.serviceInformation]: function <TFieldValues>({
     editableLabelProps,
     isOptionalCheckboxProps,

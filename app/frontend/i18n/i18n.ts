@@ -172,7 +172,7 @@ const options = {
             propertyAssesmentQuestion: 'What is your property’s total assessed value? *',
             assesmentText: 'You can find the assessed value of your property on',
             BCAssessment: 'BC Assessment.',
-            assesedValues: ['$1,230,000 or lower', 'Over $1,230,000', 'Unsure'],
+            assesedValues: ['$1,200,000 or lower', 'Over $1,200,000', 'Unsure'],
             assesedValuesMultiUnit: ['$772,000 or lower', 'Over $772,000', 'Unsure'],
 
             paymentQuestion: 'Do you or a family member pay your own electricity and heating bills? *',
@@ -184,7 +184,7 @@ const options = {
             // Option value keys for consistent comparisons
             optionValues: {
               homeTypeOther: 'Other',
-              propertyValueHighSingle: 'Over $1,230,000',
+              propertyValueHighSingle: 'Over $1,200,000',
               propertyValueHighMulti: 'Over $772,000',
               propertyValueUnsure: 'Unsure',
               paymentYes: 'Yes',
@@ -266,8 +266,9 @@ const options = {
                 'Multi-unit households valued over $772,000 are not currently eligible for Energy Savings Program rebates.',
               multiUnitUnsure:
                 'This information is necessary to determine your rebate eligibility. It can be difficult to determine property value for some types of multi-unit buildings. Program administrators help when you apply.',
-              propertyValueWarning:
-                "Your property's assessed value determines your rebate eligibility. Households valued over $1,230,000 are only eligible for some Energy Savings Program rebates.",
+              propertyValueHighSingleTitle: "Your property's assessed value determines your rebate eligibility.",
+              propertyValueHighSingleNotEligible:
+                'Properties valued between $1,200,000 and $1,820,000 are only eligible for some Energy Savings Program rebates.',
               currentlyEligibleHome: 'Home types currently eligible for the Energy Savings Program are:',
               typesOfhome: [
                 'Single-family homes or secondary suites in a single-family home',
@@ -280,7 +281,7 @@ const options = {
               provideInformation: 'You must provide this information when you apply for rebates.',
               propertyValueHigh: 'Your property’s assessed value is too high.',
               propertyValueHighDesc:
-                'Your property’s assessed value must be $1,230,000 or lower to be eligible for the Energy Savings Program.',
+                'Your property’s assessed value must be $1,820,000 or lower to be eligible for the Energy Savings Program.',
               mustPay: 'You or a family member must pay your home’s electricity and energy bills.',
               mustPayDesc:
                 'The person who pays the electricity and heating bills for this address must be the one to apply for the Energy Savings Program. If a tenant pays, their name must be listed in the tenancy agreement.',
@@ -290,7 +291,7 @@ const options = {
               annualHouseholdDesc:
                 'Energy Savings Program eligibility is based on how many people live in the home and your combined annual income.',
               assessedValDescription:
-                'Your property’s assessed value must be $1,230,000 or lower to be eligible for the Energy Savings Program.',
+                'Your property’s assessed value must be $1,820,000 or lower to be eligible for the Energy Savings Program. Properties valued between $1,200,000 and $1,820,000 are only eligible for some Energy Savings Program rebates.',
             },
           },
         },
@@ -313,10 +314,30 @@ const options = {
           beforeApply: 'Before you apply, you will need to log in with your BC Services Card account.',
           useServiceCard: 'Learn more about how to use BC Services Card account.',
           applyNeeds: [
-            'Information about your home',
-            'The account numbers on your energy utility bills',
-            'The number of adults living in your home',
-            'Proof of income for all adults in your home',
+            [{ type: 'text', content: 'Information about your home' }],
+            [{ type: 'text', content: 'The account numbers on your energy utility bills' }],
+            [{ type: 'text', content: 'The number of adults living in your home' }],
+            [{ type: 'text', content: 'Proof of income for all adults in your home' }],
+            [
+              { type: 'text', content: 'If you currently rent your home, a' },
+              {
+                type: 'link',
+                content: {
+                  text: ' Landlord Consent Form [335KB PDF]',
+                  href: 'https://www.betterhomesbc.ca/esp-landlord-consent-form-PDF',
+                },
+              },
+            ],
+            [
+              { type: 'text', content: 'If you live in a condo, stacked townhouse or equity co-op building, a' },
+              {
+                type: 'link',
+                content: {
+                  text: ' Strata and Equity Co-op Consent Form [260KB PDF]',
+                  href: 'https://www.betterhomesbc.ca/esp-strata-equity-co-op-consent-form-PDF',
+                },
+              },
+            ],
           ],
           contractor: {
             title: ' Energy Savings Program',
@@ -1700,6 +1721,7 @@ const options = {
             stepCodePackageFile: 'Design package file for energy step code',
             pidInfo: 'Pid Info',
             serviceInformation: 'Employee Information',
+            utilityAccountNumber: 'Utility Account Number',
           },
           contactFieldItemLabels: {
             firstName: 'First name',

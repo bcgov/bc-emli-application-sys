@@ -136,7 +136,7 @@ export const EligibilityCheck = observer(() => {
       // Group B (multi-unit): Over $772,000 makes ineligible
       propertyValueEligible = assessedValue !== optionValues.propertyValueHighMulti;
     } else {
-      // Group A (single-family): Over $1,230,000 shows warning but still eligible
+      // Group A (non-multi-unit): Over $1,200,000 shows warning but remains eligible
       propertyValueEligible = true;
     }
 
@@ -150,6 +150,7 @@ export const EligibilityCheck = observer(() => {
     const eligibility =
       !isNullOrEmpty(homeType) &&
       homeTypeEligible &&
+      !isNullOrEmpty(assessedValue) &&
       propertyValueEligible &&
       !isNullOrEmpty(paysBills) &&
       paymentEligible &&
@@ -237,15 +238,15 @@ export const EligibilityCheck = observer(() => {
                 />
               </FormControl>
               {/* Property Value Alerts - Different logic for single-family vs multi-unit */}
-              {/* Single-family homes: Over $1,230,000 shows warning but still eligible */}
+              {/* Non-multi-unit homes: Over $1,200,000 shows warning, still eligible */}
               {!isMultiUnitHome(formData.homeType) &&
                 formData.assessedValue === optionValues.propertyValueHighSingle &&
                 renderAlert(
-                  t('auth.checkEligibility.alert.provideInformation'),
-                  t('auth.checkEligibility.alert.propertyValueWarning'),
+                  t('auth.checkEligibility.alert.propertyValueHighSingleTitle'),
+                  t('auth.checkEligibility.alert.propertyValueHighSingleNotEligible'),
                   true,
                 )}
-              {/* Single-family homes: Unsure shows warning */}
+              {/* Non-multi-unit homes: Unsure shows warning */}
               {!isMultiUnitHome(formData.homeType) &&
                 formData.assessedValue === optionValues.propertyValueUnsure &&
                 renderAlert(

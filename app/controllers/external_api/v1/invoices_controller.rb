@@ -77,7 +77,7 @@ class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
               nil
             end
           ),
-        includes: PermitApplication::API_SEARCH_INCLUDES
+        includes: PermitApplication::INVOICE_API_SEARCH_INCLUDES
       )
   end
 

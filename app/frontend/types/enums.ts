@@ -283,6 +283,7 @@ export enum ERequirementType {
   generalContact = 'general_contact',
   professionalContact = 'professional_contact',
   serviceInformation = 'service_information',
+  utilityAccountNumber = 'utility_account_number',
 }
 
 export enum ENumberUnit {
