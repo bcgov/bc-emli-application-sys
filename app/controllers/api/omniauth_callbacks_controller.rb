@@ -8,13 +8,29 @@ class Api::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
     origin_query =
       Rack::Utils.parse_nested_query(URI(request.env["omniauth.origin"]).query)
-    result =
-      OmniauthUserResolver.new(
-        auth: request.env["omniauth.auth"],
-        invitation_token: origin_query["invitation_token"],
-        entry_point: entry_point
-      ).call
+    Rails.logger.info "OmniAuth keycloak callback: origin=#{request.env["omniauth.origin"]}, entry_point=#{entry_point}, invitation_token=#{origin_query["invitation_token"].present? ? "[present]" : "[absent]"}"
+    begin
+      Rails.logger.info "OmniAuth auth uid=#{request.env["omniauth.auth"]&.uid}, provider=#{request.env["omniauth.auth"]&.provider}"
+    rescue StandardError
+      nil
+    end
+    begin
+      result =
+        OmniauthUserResolver.new(
+          auth: request.env["omniauth.auth"],
+          invitation_token: origin_query["invitation_token"],
+          entry_point: entry_point
+        ).call
+    rescue => e
+      Rails.logger.error "OmniauthUserResolver raised #{e.class}: #{e.message}"
+      Rails.logger.error e.backtrace.first(10).join("\n")
+      redirect_to login_path(
+                    frontend_flash_message("omniauth.failure", "error")
+                  )
+      return
+    end
     @user = result.user
+    Rails.logger.info "OmniauthUserResolver result: user=#{@user&.id} (#{@user&.email}), error_key=#{result.error_key}"
 
     # Block deactivated contractors and their employees
     if @user&.contractor_access_blocked?
@@ -61,6 +77,13 @@ class Api::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   end
 
   def failure
+    error = env["omniauth.error"]
+    error_type = env["omniauth.error.type"]
+    error_strategy = env["omniauth.error.strategy"]&.name
+    Rails.logger.error "OmniAuth failure: type=#{error_type}, strategy=#{error_strategy}, error=#{error&.class}: #{error&.message}"
+    if error&.backtrace
+      Rails.logger.error error&.backtrace&.first(5)&.join("\n")
+    end
     redirect_to login_path(frontend_flash_message("omniauth.failure", "error"))
   end
 end
