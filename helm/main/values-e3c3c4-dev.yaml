@@ -99,13 +99,14 @@ app:
 
   env:
     'VITE_SUBMIT_INVOICE_ENABLED': 'true'
-    'ANYCABLE_URL': 'wss://hesp-dev.apps.gold.devops.gov.bc.ca/cable'
+    'ANYCABLE_URL': 'wss://dev-hesp.apps.gold.devops.gov.bc.ca/cable'
     'IS_APP_SERVER': true
     # Note: Shared config like APP_DOMAIN, KEYCLOAK_AUTH_URL, S3/AWS settings
     # are now provided via hesp-config ConfigMap
 
   route:
-    enabled: false # Route will be handled by nginx proxy
+    enabled: true # Route will be handled by nginx proxy
+    host: 'dev-hesp.apps.gold.devops.gov.bc.ca' # DEV on GOLD cluster domain
 
 # ============================================================================
 # BACKGROUND JOB PROCESSING - DEV
@@ -489,7 +490,7 @@ anycableGo:
     anycableRedisSentinels: 'hesp-redis-headless:26379'
 
   route:
-    enabled: false # Route handled by nginx proxy
+    enabled: true # Route handled by nginx proxy
 
   ingress:
     enable: false
@@ -531,7 +532,7 @@ clamav:
 # ============================================================================
 
 nginxProxy:
-  enabled: true # DEV: Enable for testing CBC cipher compatibility
+  enabled: false # DEV: Enable for testing CBC cipher compatibility
 
   image:
     repository: docker.io/nginx
@@ -588,7 +589,7 @@ sharedConfig:
     bucket: esp-dev-cacentral1-bucket
 
   app:
-    domain: bcenergysavingsprogram-dev.ca
+    domain: dev-hesp.apps.gold.devops.gov.bc.ca
     clamscanEnabled: 'false'
 
   anycable:
@@ -597,8 +598,8 @@ sharedConfig:
     redisSentinels: 'hesp-redis-headless:26379'
 
   auth:
-    keycloakUrl: https://loginproxy-dev.gov.bc.ca
-    keycloakLogoutUrl: https://loginproxy-dev.gov.bc.ca/auth/realms/standard/protocol/openid-connect/logout
+    keycloakUrl: https://dev.loginproxy.gov.bc.ca/
+    keycloakLogoutUrl: https://dev.loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/logout
     siteminderLogoutUrl: https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi
     bceidUrl: https://www.development.bceid.ca
     bceidBusinessRegistrationUrl: https://www.development.bceid.ca/register/business/getting_started/getting_started.aspx
