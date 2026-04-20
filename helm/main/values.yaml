@@ -18,8 +18,7 @@ global:
       # vault.hashicorp.com/agent-limits-cpu: 100m
       # vault.hashicorp.com/agent-requests-mem: 32Mi
       # vault.hashicorp.com/agent-limits-mem: 64Mi
-  imagePullSecrets:
-    - name: bfc7dd-artifactory-credentials
+  imagePullSecrets: []
   env:
     'REDIS_SENTINEL_HEADLESS': 'hesp-redis-headless'
     'REDIS_SENTINEL_MASTER_SET_NAME': 'redisMasterSet'
@@ -30,6 +29,8 @@ global:
 
   envSecretName: hesp # pragma: allowlist secret
   serviceAccountName: bfc7dd-vault
+  sharedConfig:
+    enabled: true
 
 nameOverride: hesp
 fullnameOverride: hesp
@@ -52,7 +53,6 @@ app:
 
   env:
     'VITE_SUBMIT_INVOICE_ENABLED': 'true'
-    'ANYCABLE_REDIS_URL': 'redis://hesp-redis:6379/'
     'BUNDLE_PATH': '/usr/local/bundle'
     'CACHE_DEV_REDIS_URL': 'redis://hesp-redis:6379/4'
     'ELASTICSEARCH_URL': 'http://hesp-elasticsearch:9200'
@@ -67,14 +67,6 @@ app:
     'SIMPLE_FEED_DEV_REDIS_URL': 'redis://hesp-redis:6379/3'
     'VITE_RUBY_HOST': 'vite'
     'WEB_CONCURRENCY': '2'
-    'APP_DOMAIN': ''
-    'ANYCABLE_URL': ''
-    'KEYCLOAK_AUTH_URL': ''
-    'VITE_SITEMINDER_LOGOUT_URL': ''
-    'VITE_BCEID_URL': ''
-    'VITE_BUSINESS_BCEID_REGISTRATION_URL': ''
-    'VITE_KEYCLOAK_LOGOUT_URL': ''
-    'VITE_POST_LOGOUT_REDIRECT_URL': ''
     'IS_APP_SERVER': true
 
 sidekiq:
@@ -401,3 +393,100 @@ clamav:
     enabled: true
     storageClass: netapp-file-standard
     size: 512Mi
+# ============================================================================
+# NGINX PROXY - CBC Cipher Compatibility
+# ============================================================================
+# Configure this when ingress controller does not support legacy ciphers
+# Provides TLS 1.2 with specific CBC ciphers for older client compatibility
+
+nginxProxy:
+  enabled: false  # Set to true to enable nginx proxy for CBC compatibility
+  configVersion: "2"  # Bump this to force pod restart when nginx.conf template changes
+
+  image:
+    repository: docker.io/nginx
+    tag: 'alpine'
+    pullPolicy: IfNotPresent
+
+  replicas: 2  # HA by default
+
+  # Upstream services
+  upstreamHost: 'hesp-app'  # Main app service
+  upstreamPort: 3000
+  websocketUpstreamHost: 'hesp-anycable-go'  # WebSocket service
+  websocketUpstreamPort: 8080
+
+  # TLS certificate (secret must be created beforehand)
+  tlsSecretName: 'nginx-tls'
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - nginx-proxy
+            topologyKey: kubernetes.io/hostname
+
+  service:
+    type: ClusterIP
+
+  route:
+    host: 'hesp.apps.dev.devops.gov.bc.ca'  # Override in environment-specific values
+
+# ============================================================================
+# SHARED CONFIGURATION (via ConfigMap)
+# ============================================================================
+# All environment variables that are shared across multiple components
+# (app, sidekiq, anycable-rpc, anycable-go) are centralized here.
+# Override these in environment-specific values files (dev/gold).
+# This ConfigMap is mounted via envFrom in deployment templates.
+# ============================================================================
+
+sharedConfig:
+  enabled: true
+
+  redis:
+    sentinelHeadless: hesp-redis-headless
+    sentinelPort: '26379'
+    masterSetName: redisMasterSet
+    sidekiqDb: '0'
+
+  aws:
+    region: ca-central-1
+    defaultRegion: ca-central-1
+
+  s3:
+    region: ca-central-1
+    endpoint: https://s3.ca-central-1.amazonaws.com
+    publicEndpoint: https://s3.ca-central-1.amazonaws.com
+    bucket: esp-dev-cacentral1-bucket
+
+  app:
+    domain: bcenergysavingsprogram-dev.ca
+    clamscanEnabled: 'false'
+
+  anycable:
+    rpcHost: hesp-anycable-rpc:50051
+    redisUrl: 'redis://redisMasterSet:6379/1'
+    redisSentinels: 'hesp-redis-headless:26379'
+
+  auth:
+    keycloakUrl: https://dev.loginproxy.gov.bc.ca/
+    keycloakLogoutUrl: https://dev.loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/logout
+    siteminderLogoutUrl: https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi
+    bceidUrl: https://www.development.bceid.ca
+    bceidBusinessRegistrationUrl: https://www.development.bceid.ca/register/business/getting_started/getting_started.aspx
+    postLogoutRedirectUrl: https://hesp-dev.apps.dev.devops.gov.bc.ca

@@ -1,0 +1,619 @@
+# e3c3c4 Testing Environment - Medium Availability Values
+# Testing environment with increased resources and replicas vs DEV, but lighter than PROD
+# Deploy to e3c3c4-test namespace for QA/integration testing
+# Use with: helm upgrade --install hesp ./helm/main \
+#           -f helm/main/values.yaml \
+#           -f helm/main/values-e3c3c4-test.yaml \
+#           -n e3c3c4-test
+
+global:
+  licencePlate: e3c3c4
+
+  # VAULT: Optional - only if using Vault for secret management
+  # If using OpenShift Secrets only, leave vault config empty or comment out
+  vault:
+    role: ''
+    subPath: ''
+    podAnnotations: {}
+      # VAULT DISABLED FOR TEST - Using OS Secrets
+      # vault.hashicorp.com/agent-inject: "true"
+      # vault.hashicorp.com/role: e3c3c4-test
+
+  imagePullSecrets: []
+
+  env:
+    'SECRET_KEY_BASE': '1'
+
+  envSecretName: hesp
+  serviceAccountName: e3c3c4-vault
+
+nameOverride: hesp
+fullnameOverride: hesp
+
+# ============================================================================
+# APPLICATION TIER - TEST (Medium HA)
+# ============================================================================
+
+app:
+  enabled: true
+
+  # TEST: 2 replicas (medium HA - survives single pod failure)
+  replicaCount: 2
+
+  image:
+    repository: ghcr.io/bcgov/hesp-app
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 400m
+      memory: 768Mi
+    requests:
+      cpu: 200m
+      memory: 384Mi
+
+  dependencyWait:
+    enabled: true
+    services:
+      - host: hesp-crunchydb-pgbouncer
+        port: 5432
+      - host: hesp-redis
+        port: 6379
+
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - hesp-app
+            topologyKey: kubernetes.io/hostname
+
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 3000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 3000
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 2
+
+  env:
+    'VITE_SUBMIT_INVOICE_ENABLED': 'true'
+    'ANYCABLE_URL': 'wss://hesp-anycable.apps.test.devops.gov.bc.ca/cable'
+    'IS_APP_SERVER': true
+
+  route:
+    enabled: false # Route will be handled by nginx proxy
+
+# ============================================================================
+# BACKGROUND JOB PROCESSING - TEST
+# ============================================================================
+
+sidekiq:
+  enabled: true
+
+  replicaCount: 2 # TEST: 2 replicas for redundancy
+
+  image:
+    repository: ghcr.io/bcgov/hesp-app
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 300m
+      memory: 384Mi
+    requests:
+      cpu: 150m
+      memory: 192Mi
+
+  dependencyWait:
+    enabled: true
+    services:
+      - host: hesp-crunchydb-pgbouncer
+        port: 5432
+      - host: hesp-redis
+        port: 6379
+
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+  env:
+    'FROM_EMAIL': 'no-reply@gov.bc.ca'
+    'SIDEKIQ_CONCURRENCY': '10'
+
+# ============================================================================
+# ANYCABLE RPC - TEST
+# ============================================================================
+
+anycable-rpc:
+  enabled: true
+
+  replicaCount: 2 # TEST: 2 replicas
+
+  image:
+    repository: ghcr.io/bcgov/hesp-app
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 300m
+      memory: 384Mi
+    requests:
+      cpu: 150m
+      memory: 192Mi
+
+  dependencyWait:
+    enabled: true
+    services:
+      - host: hesp-crunchydb-pgbouncer
+        port: 5432
+      - host: hesp-redis
+        port: 6379
+
+  env: {}
+
+# ============================================================================
+# DATABASE - TEST (Medium HA)
+# ============================================================================
+
+crunchy-postgres:
+  enabled: true
+
+  postgresVersion: 16
+
+  # TEST: 2 replicas (one primary + one replica)
+  instances:
+    name: ha
+    replicaCount: 2
+
+    livenessProbe:
+      exec:
+        command: ['pg_isready', '-U', 'postgres']
+      initialDelaySeconds: 10
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 6
+
+    dataVolumeClaimSpec:
+      storage: 4Gi # TEST: Medium storage
+      storageClassName: netapp-block-standard
+
+    requests:
+      cpu: 75m
+      memory: 384Mi
+
+    replicaCertCopy:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+
+  # pgBackRest configuration - TEST with basic backups
+  pgBackRest:
+    image:
+
+    retention: '2' # Keep 2 backups
+    retentionFullType: time
+
+    repos:
+      schedules:
+        # TEST: Daily full backup at 2 AM
+        full: '0 2 * * *'
+        # TEST: No incremental backups (full is sufficient for test)
+        incremental: '0 0 1 1 *'
+
+      volume:
+        accessModes: 'ReadWriteOnce'
+        storage: 2Gi # TEST: Moderate backup storage
+        storageClassName: netapp-file-backup
+
+    repoHost:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+        livenessProbe:
+          exec:
+            command:
+              - pgbackrest
+              - server-ping
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+          periodSeconds: 10
+          failureThreshold: 6
+
+    sidecars:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+
+    # TEST: S3 backups enabled (for testing backup process)
+    s3:
+      enabled: true
+      createS3Secret: false
+      s3Secret: pgbackrest-s3-credentials
+      s3Path: '/pgbackup-test'
+      s3UriStyle: path
+      bucket: 'esp-test-pgbackrest-backup'
+      endpoint: 's3.ca-central-1.amazonaws.com'
+      region: 'ca-central-1'
+      key: ''
+      keySecret: ''
+
+  patroni:
+    postgresql:
+      pg_hba: 'host all all 0.0.0.0/0 md5'
+      parameters:
+        shared_buffers: 128MB # TEST: Medium
+        wal_buffers: '64kB'
+        min_wal_size: 32MB
+        max_wal_size: 128MB
+        max_slot_wal_keep_size: 256MB
+        wal_level: replica
+        max_wal_senders: 10
+        max_replication_slots: 10
+        hot_standby: 'on'
+        hot_standby_feedback: 'on'
+        wal_retrieve_retry_interval: '5s'
+
+  proxy:
+    pgBouncer:
+      image:
+      replicas: 1
+      requests:
+        cpu: 50m
+        memory: 64Mi
+
+  pgmonitor:
+    enabled: false # TEST: Disable monitoring
+
+# ============================================================================
+# CACHE - TEST (Medium HA)
+# ============================================================================
+
+redis:
+  enabled: true
+
+  global:
+    security:
+      allowInsecureImages: true
+
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/redis
+    tag: 8.2.1-debian-12-r0
+
+  replicaCount: 2 # TEST: 2 replicas (master + 1)
+
+  fullnameOverride: hesp-redis
+
+  auth:
+    enabled: false
+    sentinel: false
+    usePasswordFiles: false
+
+  sentinel:
+    enabled: true
+
+    image:
+      registry: docker.io
+      repository: bitnamilegacy/redis-sentinel
+      tag: 8.2.1-debian-12-r0
+
+    masterSet: redisMasterSet
+
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 25m
+
+    replicas: 2
+
+  master:
+    persistence:
+      enabled: true
+      size: 256Mi
+      storageClass: netapp-block-standard
+
+  replica:
+    replicaCount: 1
+    shareProcessNamespace: true
+
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+
+    persistence:
+      enabled: true
+      size: 256Mi
+      storageClassName: netapp-block-standard
+
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 25m
+
+# ============================================================================
+# SEARCH - TEST (Medium)
+# ============================================================================
+
+elasticsearch:
+  enabled: true
+
+  global:
+    security:
+      allowInsecureImages: true
+
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/elasticsearch
+    tag: 9.1.2-debian-12-r0
+
+  fullnameOverride: hesp-elasticsearch
+  clusterName: hesp-elasticsearch
+
+  master:
+    replicaCount: 2 # TEST: 2 masters
+    heapSize: 256m
+
+    networkPolicy:
+      enabled: false
+      allowExternal: false
+
+    resources:
+      requests:
+        cpu: 50m
+        memory: 384Mi
+      limits:
+        cpu: 150m
+        memory: 768Mi
+
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 512Mi
+      storageClassName: netapp-block-standard
+
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 1200
+      periodSeconds: 15
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
+
+  data:
+    replicaCount: 2 # TEST: 2 data nodes
+    heapSize: 256m
+
+    networkPolicy:
+      enabled: false
+      allowExternal: false
+
+    resources:
+      requests:
+        cpu: 50m
+        memory: 384Mi
+      limits:
+        cpu: 150m
+        memory: 768Mi
+
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 512Mi
+      storageClassName: netapp-block-standard
+
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 1200
+      periodSeconds: 15
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
+
+  coordinating:
+    replicaCount: 0
+  ingest:
+    replicaCount: 0
+
+  security:
+    enabled: false
+    fipsMode: false
+    tls:
+      restEncryption: false
+      autoGenerated: false
+
+  metrics:
+    enabled: false
+
+# ============================================================================
+# WEBSOCKET SERVER - TEST
+# ============================================================================
+
+anycableGo:
+  enabled: true
+
+  nameOverride: hesp-anycable-go
+  fullnameOverride: hesp-anycable-go
+
+  replicas: 2 # TEST: 2 replicas for redundancy
+
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - hesp-anycable-go
+            topologyKey: kubernetes.io/hostname
+
+  env:
+    anycableRpcHost: hesp-anycable-rpc:50051
+    anycableRedisUrl: 'redis://redisMasterSet:6379/1'
+    anycableRedisSentinels: 'hesp-redis-headless:26379'
+
+  route:
+    enabled: false # Route handled by nginx proxy
+
+  ingress:
+    enable: false
+
+  resources:
+    requests:
+      cpu: 30m
+      memory: 192Mi
+    limits:
+      cpu: 150m
+      memory: 384Mi
+
+# ============================================================================
+# ANTIVIRUS - TEST
+# ============================================================================
+
+clamav:
+  enabled: false # TEST: Disabled (like DEV, not like PROD)
+
+  image:
+    repository: ghcr.io/bcgov/hesp-clamav
+    pullPolicy: IfNotPresent
+
+  nameOverride: hesp-clamav
+  fullnameOverride: hesp-clamav
+
+  persistence:
+    enabled: true
+    storageClass: netapp-block-standard
+    size: 128Mi
+
+  virusScanTempVolume:
+    enabled: true
+    storageClass: netapp-file-standard
+    size: 256Mi
+
+# ============================================================================
+# NGINX PROXY - CBC Cipher Compatibility
+# ============================================================================
+
+nginxProxy:
+  enabled: true # TEST: Enable for testing CBC cipher compatibility
+
+  image:
+    repository: docker.io/nginx
+    tag: 'alpine'
+    pullPolicy: IfNotPresent
+
+  replicas: 2 # TEST: 2 replicas for redundancy
+
+  upstreamHost: 'hesp-app'
+  upstreamPort: 3000
+  websocketUpstreamHost: 'hesp-anycable-go'
+  websocketUpstreamPort: 8080
+
+  tlsSecretName: 'hesp-tls' # Must be created in e3c3c4-test namespace
+
+  resources:
+    requests:
+      cpu: 75m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 384Mi
+
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - nginx-proxy
+            topologyKey: kubernetes.io/hostname
+
+  service:
+    type: ClusterIP
+
+  route:
+    host: 'hesp-test.apps.test.devops.gov.bc.ca' # TEST route
+
+# ============================================================================
+# SHARED CONFIGURATION OVERRIDES - TEST
+# ============================================================================
+
+sharedConfig:
+  enabled: true
+
+  redis:
+    sentinelHeadless: hesp-redis-headless
+    sentinelPort: '26379'
+    masterSetName: redisMasterSet
+    sidekiqDb: '0'
+
+  aws:
+    region: ca-central-1
+    defaultRegion: ca-central-1
+
+  s3:
+    region: ca-central-1
+    endpoint: https://s3.ca-central-1.amazonaws.com
+    publicEndpoint: https://s3.ca-central-1.amazonaws.com
+    bucket: esp-test-cacentral1-bucket
+
+  app:
+    domain: bcenergysavingsprogram-test.ca
+    clamscanEnabled: 'false' # TEST: ClamAV disabled (like DEV)
+
+  anycable:
+    rpcHost: hesp-anycable-rpc:50051
+    redisUrl: 'redis://redisMasterSet:6379/1'
+    redisSentinels: 'hesp-redis-headless:26379'
+
+  auth:
+    keycloakUrl: https://loginproxy-test.gov.bc.ca
+    keycloakLogoutUrl: https://loginproxy-test.gov.bc.ca/auth/realms/standard/protocol/openid-connect/logout
+    siteminderLogoutUrl: https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi
+    bceidUrl: https://www.development.bceid.ca
+    bceidBusinessRegistrationUrl: https://www.development.bceid.ca/register/business/getting_started/getting_started.aspx
+    postLogoutRedirectUrl: https://hesp-test.apps.test.devops.gov.bc.ca
