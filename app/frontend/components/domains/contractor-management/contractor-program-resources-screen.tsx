@@ -229,12 +229,16 @@ const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
     {
       id: 'rebate-eligibility-ground-oriented',
       title: 'contractor.programResources.resources.rebateEligibilityGroundOriented',
-      url: 'https://betterhomesbc.ca/learn-about-programs/energy-savings-program/energy-savings-program-requirements/',
+      size: '650 KB',
+      type: 'PDF',
+      url: 'https://www.betterhomesbc.ca/esp-requirements-ground-oriented-PDF',
     },
     {
       id: 'rebate-eligibility-condo-apartment',
       title: 'contractor.programResources.resources.rebateEligibilityCondoApartment',
-      url: 'https://betterhomesbc.ca/learn-about-programs/energy-savings-program/energy-savings-program-condo-and-apartment-rebate-requirements/',
+      size: '380 KB',
+      type: 'PDF',
+      url: 'https://www.betterhomesbc.ca/esp-requirements-condo-and-apartment-PDF',
     },
     {
       id: 'participant-terms-conditions-ground-oriented',
