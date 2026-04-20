@@ -165,6 +165,12 @@ in this document.
                   "Datetime in milliseconds since the epoch (Unix time). This is the timestamp when the application was last resubmitted due to a revision request. Note: there might be multiple resubmissions for an application, but this date is the last resubmission date.",
                 nullable: true
               },
+              updated_at: {
+                type: :number,
+                format: :int64,
+                description:
+                  "Datetime in milliseconds since the epoch (Unix time). This is the timestamp of the last update to the application record."
+              },
               user_group_type: {
                 type: :string,
                 enum: %w[participant contractor],
