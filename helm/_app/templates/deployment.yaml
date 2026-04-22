@@ -38,6 +38,23 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.dependencyWait.enabled }}
+      initContainers:
+        - name: wait-for-dependencies
+          image: "{{ .Values.dependencyWait.image.repository }}:{{ .Values.dependencyWait.image.tag }}"
+          imagePullPolicy: {{ .Values.dependencyWait.image.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              {{- range .Values.dependencyWait.services }}
+              echo "Waiting for {{ .host }}:{{ .port }}"
+              until nc -z {{ .host }} {{ .port }}; do
+                echo "Still waiting for {{ .host }}:{{ .port }}"
+                sleep 2
+              done
+              {{- end }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -74,8 +91,13 @@ spec:
           {{- if .Values.envSecretName }}
             {{- $envSecrets = append $envSecrets .Values.envSecretName }}
           {{- end }}
-          {{- if $envSecrets }}
+          {{- if or $envSecrets .Values.global.sharedConfig.enabled }}
           envFrom:
+            {{- if .Values.global.sharedConfig.enabled }}
+            - configMapRef:
+                name: hesp-config
+                optional: true
+            {{- end }}
             {{- range $envSecrets }}
             - secretRef:
                 name: {{ . }}

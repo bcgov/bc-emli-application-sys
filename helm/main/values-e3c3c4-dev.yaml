@@ -1,0 +1,618 @@
+# e3c3c4 Development Environment - High Availability Values
+# Deploy to e3c3c4-dev namespace for initial testing
+# Use with: helm upgrade --install hesp ./helm/main \
+#           -f helm/main/values.yaml \
+#           -f helm/main/values-e3c3c4-dev.yaml \
+#           -n e3c3c4-dev
+
+global:
+  licencePlate: e3c3c4
+
+  # VAULT: Optional - only if using Vault for secret management
+  # If using OpenShift Secrets only, leave vault config empty or comment out
+  vault:
+    # Leave empty to disable Vault Agent injection
+    role: ''
+    subPath: ''
+    podAnnotations: {}
+      # VAULT DISABLED FOR DEV - Using OS Secrets
+      # vault.hashicorp.com/agent-inject: "true"
+      # vault.hashicorp.com/role: e3c3c4-dev
+
+  imagePullSecrets: []
+
+  env:
+    'SECRET_KEY_BASE': '1'
+
+  envSecretName: hesp # Reference to OS Secret containing env vars
+  serviceAccountName: e3c3c4-vault # Or just use default
+
+nameOverride: hesp
+fullnameOverride: hesp
+
+# ============================================================================
+# APPLICATION TIER - DEV (Reduced HA)
+# ============================================================================
+
+app:
+  enabled: true
+
+  # DEV: 2 replicas (still HA but resource-light)
+  replicaCount: 2
+
+  image:
+    repository: ghcr.io/bcgov/hesp-app
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 300m
+      memory: 512Mi
+    requests:
+      cpu: 150m
+      memory: 256Mi
+
+  dependencyWait:
+    enabled: true
+    services:
+      - host: hesp-crunchydb-pgbouncer
+        port: 5432
+      - host: hesp-redis
+        port: 6379
+
+  # DEV: Pod Disruption Budget (minimum 1)
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+  # DEV: Pod Anti-Affinity (preferred, not required)
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - hesp-app
+            topologyKey: kubernetes.io/hostname
+
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 3000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 3000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  env:
+    'VITE_SUBMIT_INVOICE_ENABLED': 'true'
+    'ANYCABLE_URL': 'wss://dev-hesp.apps.gold.devops.gov.bc.ca/cable'
+    'IS_APP_SERVER': true
+    # Note: AWS_REGION, AWS_DEFAULT_REGION, AWS_PARAMETER_BASE_PATH, APP_DOMAIN,
+    # KEYCLOAK_AUTH_URL, S3/AWS settings are provided via hesp-config ConfigMap
+
+  route:
+    enabled: true # Route will be handled by nginx proxy
+    host: 'dev-hesp.apps.gold.devops.gov.bc.ca' # DEV on GOLD cluster domain
+
+# ============================================================================
+# BACKGROUND JOB PROCESSING - DEV
+# ============================================================================
+
+sidekiq:
+  enabled: true
+
+  replicaCount: 1 # DEV: Single replica
+
+  image:
+    repository: ghcr.io/bcgov/hesp-app
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  dependencyWait:
+    enabled: true
+    services:
+      - host: hesp-crunchydb-pgbouncer
+        port: 5432
+      - host: hesp-redis
+        port: 6379
+
+  podDisruptionBudget:
+    enabled: false # DEV: May cause issues with single replica
+
+  env:
+    'SIDEKIQ_CONCURRENCY': '5'
+    # Note: FROM_EMAIL, AWS_REGION, AWS_DEFAULT_REGION, AWS_PARAMETER_BASE_PATH
+    # and other shared config are provided via hesp-config ConfigMap
+
+# ============================================================================
+# ANYCABLE RPC - DEV
+# ============================================================================
+
+anycable-rpc:
+  enabled: true
+
+  replicaCount: 1 # DEV: Single replica
+
+  image:
+    repository: ghcr.io/bcgov/hesp-app
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  dependencyWait:
+    enabled: true
+    services:
+      - host: hesp-crunchydb-pgbouncer
+        port: 5432
+      - host: hesp-redis
+        port: 6379
+
+  env: {}
+  # Note: AWS_PARAMETER_BASE_PATH, AWS_REGION, AWS_DEFAULT_REGION and all shared
+  # S3/AWS config are provided via hesp-config ConfigMap
+
+# ============================================================================
+# DATABASE - DEV (Reduced HA)
+# ============================================================================
+
+crunchy-postgres:
+  enabled: true
+
+  postgresVersion: 16
+
+  # DEV: 2 replicas (still HA but smaller)
+  instances:
+    name: ha
+    replicas: 2 # DEV: Scale down from 3
+
+    livenessProbe:
+      exec:
+        command: ['pg_isready', '-U', 'postgres']
+      initialDelaySeconds: 10
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 6
+
+    dataVolumeClaimSpec:
+      storage: 2Gi # DEV: Lean POC storage
+      storageClassName: netapp-block-standard
+
+    requests:
+      cpu: 50m # DEV: Reduced
+      memory: 256Mi
+
+    replicaCertCopy:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+
+  # pgBackRest configuration - DEV minimal footprint (no automated backups)
+  pgBackRest:
+    image:
+
+    retention: '1' # Minimal retention for DEV
+    retentionFullType: time
+
+    repos:
+      schedules:
+        # DEV: no scheduled backups; reseed workflow is primary
+        full: '0 0 1 1 *' # once per year (effectively disabled for day-to-day DEV)
+        incremental: '0 0 1 1 *' # once per year (effectively disabled for day-to-day DEV)
+
+      volume:
+        accessModes: 'ReadWriteOnce'
+        storage: 1Gi # DEV: Minimal backup footprint
+        storageClassName: netapp-file-backup
+
+    repoHost:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+        livenessProbe:
+          exec:
+            command:
+              - pgbackrest
+              - server-ping
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+          periodSeconds: 10
+          failureThreshold: 6
+
+    sidecars:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+
+    # DEV: off-site backup disabled
+    s3:
+      enabled: false
+      createS3Secret: false
+      s3Secret: pgbackrest-s3-credentials
+      s3Path: '/pgbackup-dev'
+      s3UriStyle: path
+      bucket: 'hesp-dev-cacentral1-s3pgbackup'
+      endpoint: 's3.ca-central-1.amazonaws.com'
+      region: 'ca-central-1'
+      # Credentials intentionally unused in DEV
+      key: ''
+      keySecret: ''
+
+  patroni:
+    postgresql:
+      pg_hba: 'host all all 0.0.0.0/0 md5'
+      parameters:
+        shared_buffers: 64MB # DEV: Reduced
+        wal_buffers: '64kB'
+        min_wal_size: 32MB
+        max_wal_size: 64MB
+        max_slot_wal_keep_size: 128MB
+        wal_level: replica
+        max_wal_senders: 10
+        max_replication_slots: 10
+        hot_standby: 'on'
+        hot_standby_feedback: 'on'
+        wal_retrieve_retry_interval: '5s'
+
+  proxy:
+    pgBouncer:
+      image:
+      replicas: 1 # DEV: Single PgBouncer
+      requests:
+        cpu: 50m
+        memory: 64Mi
+
+  pgmonitor:
+    enabled: false # DEV: Disable monitoring
+
+# ============================================================================
+# CACHE - DEV (Reduced HA)
+# ============================================================================
+
+redis:
+  enabled: true
+
+  global:
+    security:
+      allowInsecureImages: true
+
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/redis
+    tag: 8.2.1-debian-12-r0
+
+  replicaCount: 2 # DEV: 2 replicas (master + 1)
+
+  fullnameOverride: hesp-redis
+
+  auth:
+    enabled: false
+    sentinel: false
+    usePasswordFiles: false
+
+  sentinel:
+    enabled: true
+
+    image:
+      registry: docker.io
+      repository: bitnamilegacy/redis-sentinel
+      tag: 8.2.1-debian-12-r0
+
+    masterSet: redisMasterSet
+
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 20m
+
+    replicas: 2 # DEV: 2 sentinels
+
+  master:
+    persistence:
+      enabled: true
+      size: 128Mi
+      storageClass: netapp-block-standard
+
+  replica:
+    replicaCount: 1 # DEV: 1 replica (master + 1 replica)
+    shareProcessNamespace: true
+
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+
+    persistence:
+      enabled: true
+      size: 128Mi
+      storageClassName: netapp-block-standard
+
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 20m
+
+# ============================================================================
+# SEARCH - DEV (Minimal)
+# ============================================================================
+
+elasticsearch:
+  enabled: true
+
+  global:
+    security:
+      allowInsecureImages: true
+
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/elasticsearch
+    tag: 9.1.2-debian-12-r0
+
+  fullnameOverride: hesp-elasticsearch
+  clusterName: hesp-elasticsearch
+  clusterHealthCheckParams: 'wait_for_status=yellow&timeout=5s'
+
+  master:
+    replicaCount: 1 # DEV: Single master
+    heapSize: 512m
+
+    networkPolicy:
+      enabled: false
+      allowExternal: false
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 768Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 256Mi
+      storageClassName: netapp-block-standard
+
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 1200
+      periodSeconds: 15
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
+
+  data:
+    replicaCount: 1 # DEV: Single data node
+    heapSize: 512m
+
+    networkPolicy:
+      enabled: false
+      allowExternal: false
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 768Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 256Mi
+      storageClassName: netapp-block-standard
+
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 1200
+      periodSeconds: 15
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
+
+  coordinating:
+    replicaCount: 0
+  ingest:
+    replicaCount: 0
+
+  security:
+    enabled: false
+    fipsMode: false
+    tls:
+      restEncryption: false
+      autoGenerated: false
+
+  metrics:
+    enabled: false
+
+# ============================================================================
+# WEBSOCKET SERVER - DEV
+# ============================================================================
+
+anycableGo:
+  enabled: true
+
+  nameOverride: hesp-anycable-go
+  fullnameOverride: hesp-anycable-go
+
+  replicas: 1 # DEV: Single replica
+
+  affinity: {} # DEV: No anti-affinity rules needed
+
+  dependencyWait:
+    enabled: true
+    services:
+      - host: hesp-redis
+        port: 26379
+      - host: hesp-redis
+        port: 6379
+
+  env:
+    anycableRpcHost: hesp-anycable-rpc:50051
+    anycableRedisUrl: 'redis://redisMasterSet:6379/1'
+    anycableRedisSentinels: 'hesp-redis:26379'
+
+  route:
+    enabled: true # Route handled by nginx proxy
+
+  ingress:
+    enable: false
+
+  resources:
+    requests:
+      cpu: 20m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+
+# ============================================================================
+# ANTIVIRUS - DEV
+# ============================================================================
+
+clamav:
+  enabled: false # DEV: Disabled for faster testing
+
+  image:
+    repository: ghcr.io/bcgov/hesp-clamav
+    pullPolicy: IfNotPresent
+
+  nameOverride: hesp-clamav
+  fullnameOverride: hesp-clamav
+
+  persistence:
+    enabled: true
+    storageClass: netapp-block-standard
+    size: 128Mi
+
+  virusScanTempVolume:
+    enabled: true
+    storageClass: netapp-file-standard
+    size: 256Mi
+
+# ============================================================================
+# NGINX PROXY - CBC Cipher Compatibility
+# ============================================================================
+
+nginxProxy:
+  enabled: false # DEV: Enable for testing CBC cipher compatibility
+
+  image:
+    repository: docker.io/nginx
+    tag: 'alpine'
+    pullPolicy: IfNotPresent
+
+  replicas: 1 # DEV: Single replica
+
+  upstreamHost: 'hesp-app'
+  upstreamPort: 3000
+  websocketUpstreamHost: 'hesp-anycable-go'
+  websocketUpstreamPort: 8080
+
+  tlsSecretName: 'hesp-tls' # Must be created in e3c3c4-dev namespace
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+  affinity: {} # DEV: No anti-affinity needed
+
+  service:
+    type: ClusterIP
+
+  route:
+    host: 'dev-hesp.apps.gold.devops.gov.bc.ca' # DEV on GOLD cluster domain
+# ============================================================================
+# SHARED CONFIGURATION OVERRIDES - DEV
+# ============================================================================
+# These override the base values in helm/main/values.yaml
+# and are rendered into the hesp-config ConfigMap
+
+sharedConfig:
+  enabled: true
+
+  redis:
+    sentinelHeadless: hesp-redis
+    sentinelPort: '26379'
+    masterSetName: redisMasterSet
+    sidekiqDb: '0'
+
+  aws:
+    region: ca-central-1
+    defaultRegion: ca-central-1
+    parameterBasePath: '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
+
+  s3:
+    region: ca-central-1
+    endpoint: https://s3.ca-central-1.amazonaws.com
+    publicEndpoint: https://s3.ca-central-1.amazonaws.com
+    bucket: esp-dev-cacentral1-bucket
+
+  app:
+    domain: dev-hesp.apps.gold.devops.gov.bc.ca
+    clamscanEnabled: 'false'
+    fromEmail: 'no-reply@gov.bc.ca'
+    clamavHost: 'hesp-clamav'
+    clamavPort: '3310'
+
+  anycable:
+    rpcHost: hesp-anycable-rpc:50051
+    redisUrl: 'redis://redisMasterSet:6379/1'
+    redisSentinels: 'hesp-redis:26379'
+
+  auth:
+    keycloakUrl: https://dev.loginproxy.gov.bc.ca/
+    keycloakLogoutUrl: https://dev.loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/logout
+    siteminderLogoutUrl: https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi
+    bceidUrl: https://www.development.bceid.ca
+    bceidBusinessRegistrationUrl: https://www.development.bceid.ca/register/business/getting_started/getting_started.aspx
+    postLogoutRedirectUrl: https://dev-hesp.apps.gold.devops.gov.bc.ca

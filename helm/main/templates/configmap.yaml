@@ -1,0 +1,56 @@
+{{- if .Values.sharedConfig.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hesp-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: hesp-config
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  # ============================================================================
+  # Shared Redis Configuration
+  # ============================================================================
+  REDIS_SENTINEL_HEADLESS: {{ .Values.sharedConfig.redis.sentinelHeadless | quote }}
+  REDIS_SENTINEL_PORT: {{ .Values.sharedConfig.redis.sentinelPort | quote }}
+  REDIS_SENTINEL_MASTER_SET_NAME: {{ .Values.sharedConfig.redis.masterSetName | quote }}
+  SIDEKIQ_REDIS_DB: {{ .Values.sharedConfig.redis.sidekiqDb | quote }}
+
+  # ============================================================================
+  # Shared AWS/S3 Configuration
+  # ============================================================================
+  AWS_REGION: {{ .Values.sharedConfig.aws.region | quote }}
+  AWS_DEFAULT_REGION: {{ .Values.sharedConfig.aws.defaultRegion | quote }}
+  AWS_PARAMETER_BASE_PATH: {{ .Values.sharedConfig.aws.parameterBasePath | quote }}
+  BCGOV_OBJECT_STORAGE_REGION: {{ .Values.sharedConfig.s3.region | quote }}
+  BCGOV_OBJECT_STORAGE_ENDPOINT: {{ .Values.sharedConfig.s3.endpoint | quote }}
+  BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT: {{ .Values.sharedConfig.s3.publicEndpoint | quote }}
+  BCGOV_OBJECT_STORAGE_BUCKET: {{ .Values.sharedConfig.s3.bucket | quote }}
+
+  # ============================================================================
+  # Shared Application Configuration
+  # ============================================================================
+  APP_DOMAIN: {{ .Values.sharedConfig.app.domain | quote }}
+  CLAMAV_ENABLED: {{ .Values.sharedConfig.app.clamscanEnabled | quote }}
+  FROM_EMAIL: {{ .Values.sharedConfig.app.fromEmail | quote }}
+  CLAMAV_HOST: {{ .Values.sharedConfig.app.clamavHost | quote }}
+  CLAMAV_PORT: {{ .Values.sharedConfig.app.clamavPort | quote }}
+
+  # ============================================================================
+  # Shared Anycable Configuration
+  # ============================================================================
+  ANYCABLE_RPC_HOST: {{ .Values.sharedConfig.anycable.rpcHost | quote }}
+  ANYCABLE_REDIS_URL: {{ .Values.sharedConfig.anycable.redisUrl | quote }}
+  ANYCABLE_REDIS_SENTINELS: {{ .Values.sharedConfig.anycable.redisSentinels | quote }}
+
+  # ============================================================================
+  # Shared Authentication Configuration
+  # ============================================================================
+  KEYCLOAK_AUTH_URL: {{ .Values.sharedConfig.auth.keycloakUrl | quote }}
+  VITE_KEYCLOAK_LOGOUT_URL: {{ .Values.sharedConfig.auth.keycloakLogoutUrl | quote }}
+  VITE_SITEMINDER_LOGOUT_URL: {{ .Values.sharedConfig.auth.siteminderLogoutUrl | quote }}
+  VITE_BCEID_URL: {{ .Values.sharedConfig.auth.bceidUrl | quote }}
+  VITE_BUSINESS_BCEID_REGISTRATION_URL: {{ .Values.sharedConfig.auth.bceidBusinessRegistrationUrl | quote }}
+  VITE_POST_LOGOUT_REDIRECT_URL: {{ .Values.sharedConfig.auth.postLogoutRedirectUrl | quote }}
+{{- end }}

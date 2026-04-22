@@ -1,0 +1,734 @@
+# e3c3c4 PRODUCTION Environment - High Availability Values
+# This file contains all PROD-specific overrides for full HA deployment
+# Use with: helm upgrade --install hesp ./helm/main \
+#           -f helm/main/values.yaml \
+#           -f helm/main/values-e3c3c4-prod.yaml \
+#           -n e3c3c4-prod
+
+global:
+  licencePlate: e3c3c4
+
+  vault:
+    role: ''
+    subPath: ''
+    podAnnotations: {}
+      # VAULT DISABLED - Using OS Secrets instead
+      # vault.hashicorp.com/agent-inject: "true"
+      # vault.hashicorp.com/role: e3c3c4-prod
+
+  imagePullSecrets: []
+
+  env:
+    'SECRET_KEY_BASE': '1'
+
+  envSecretName: hesp
+  serviceAccountName: e3c3c4-vault
+
+nameOverride: hesp
+fullnameOverride: hesp
+
+# ============================================================================
+# APPLICATION TIER - HIGH AVAILABILITY
+# ============================================================================
+
+app:
+  enabled: true
+
+  # HA: 2 replicas (tolerates 1 pod failure)
+  replicaCount: 2
+
+  image:
+    repository: ghcr.io/bcgov/hesp-app
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 300m
+      memory: 512Mi
+
+  dependencyWait:
+    enabled: true
+    services:
+      - host: hesp-crunchydb-pgbouncer
+        port: 5432
+      - host: hesp-redis
+        port: 6379
+
+  # HA: Pod Disruption Budget - keep minimum 2 app pods running
+  # This prevents cluster maintenance from taking down all app pods
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+    # Alternative: maxUnavailable: 1
+
+  # HA: Pod Anti-Affinity - spread replicas across nodes
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - hesp-app
+            topologyKey: kubernetes.io/hostname
+
+  # HA: Liveness & Readiness probes (standard from base)
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 3000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 3000
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 2
+
+  # GOLD-specific environment variables
+  env:
+    'VITE_SUBMIT_INVOICE_ENABLED': 'true'
+    'ANYCABLE_URL': 'wss://hesp-anycable.apps.gold.devops.gov.bc.ca/cable'
+    # Note: AWS_REGION, AWS_DEFAULT_REGION, AWS_PARAMETER_BASE_PATH, CLAMAV_HOST/PORT,
+    # APP_DOMAIN, KEYCLOAK_AUTH_URL, S3/AWS region/endpoint, FROM_EMAIL
+    # are provided via hesp-config ConfigMap
+    'CLAMAV_TIMEOUT': '30'
+    'VIRUS_SCAN_TEMP_DIR': '/tmp/virus_scan'
+    'UPLOAD_VIRUS_SCAN_TIMEOUT': '45'
+    'IS_APP_SERVER': true
+
+  route:
+    enabled: true # Route handled by nginx proxy
+    host: hesp.apps.gold.devops.gov.bc.ca
+
+  # HA: Init container for data migration (if needed)
+  initContainers: []
+    # - name: db-migration
+    #   image: ghcr.io/bcgov/hesp-app:latest
+    #   command: ["bundle", "exec", "rails", "db:migrate"]
+    #   env:
+    #     - name: DATABASE_URL
+    #       valueFrom:
+    #         secretKeyRef:
+    #           name: hesp-db-credentials
+    #           key: url
+
+# ============================================================================
+# BACKGROUND JOB PROCESSING - HIGH AVAILABILITY
+# ============================================================================
+
+sidekiq:
+  enabled: true
+
+  # HA: Scale to 2 replicas for background job resilience
+  replicaCount: 2
+
+  image:
+    repository: ghcr.io/bcgov/hesp-app
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 400m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+  dependencyWait:
+    enabled: true
+    services:
+      - host: hesp-crunchydb-pgbouncer
+        port: 5432
+      - host: hesp-redis
+        port: 6379
+
+  # HA: Pod Disruption Budget
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+  # HA: Pod Anti-Affinity
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - hesp-sidekiq
+            topologyKey: kubernetes.io/hostname
+
+  env:
+    'SIDEKIQ_CONCURRENCY': '25'
+    # Note: FROM_EMAIL, AWS_REGION, AWS_DEFAULT_REGION, AWS_PARAMETER_BASE_PATH,
+    # CLAMAV_HOST/PORT and other shared config are provided via hesp-config ConfigMap
+
+# ============================================================================
+# ANYCABLE RPC - HIGH AVAILABILITY
+# ============================================================================
+
+anycable-rpc:
+  enabled: true
+
+  # HA: Scale to 2 replicas
+  replicaCount: 2
+
+  image:
+    repository: ghcr.io/bcgov/hesp-app
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 400m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+  dependencyWait:
+    enabled: true
+    services:
+      - host: hesp-crunchydb-pgbouncer
+        port: 5432
+      - host: hesp-redis
+        port: 6379
+
+  # HA: Pod Anti-Affinity
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - hesp-anycable-rpc
+            topologyKey: kubernetes.io/hostname
+
+  env: {}
+  # Note: AWS_PARAMETER_BASE_PATH, AWS_REGION, AWS_DEFAULT_REGION and all shared
+  # S3/AWS config are provided via hesp-config ConfigMap
+
+# ============================================================================
+# DATABASE - HIGH AVAILABILITY (Crunchy PostgreSQL with Patroni)
+# ============================================================================
+
+crunchy-postgres:
+  enabled: true
+
+  postgresVersion: 16
+
+  # HA: Configure 3 replicas (1 primary + 2 replicas)
+  # Patroni manages automatic leader election and failover
+  instances:
+    name: ha # Name reflects HA configuration
+    replicas: 3 # UPGRADED from 1 (default) to 3
+
+    livenessProbe:
+      exec:
+        command: ['pg_isready', '-U', 'postgres']
+      initialDelaySeconds: 10
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 6
+
+    # Storage configuration for HA
+    dataVolumeClaimSpec:
+      storage: 20Gi # Matches Silver prod (actual usage ~2Gi)
+      storageClassName: netapp-block-standard
+
+    requests:
+      cpu: 100m # UPGRADED from 10m for HA
+      memory: 512Mi # UPGRADED from 256Mi for HA
+
+    replicaCertCopy:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+
+  # pgBackRest configuration for automated backups
+  pgBackRest:
+    image:
+
+    # HA: Longer retention for production
+    retention: '7' # Keep 7 days of backups for GOLD
+    retentionFullType: time # Time-based retention
+
+    repos:
+      schedules:
+        # NEW BACKUP STRATEGY:
+        # - Full backups every 12 hours (0:00 and 12:00 UTC)
+        # - Skip incremental on full backup hours, run hourly incremental at all other hours
+        full: '0 0,12 * * *' # Full backups at midnight and noon
+        incremental: '0 1-11,13-23 * * *' # Hourly incremental all other hours
+
+      volume:
+        accessModes: 'ReadWriteOnce'
+        storage: 10Gi # Matches Silver prod (actual usage ~3.5Gi)
+        storageClassName: netapp-file-backup
+
+    repoHost:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+        livenessProbe:
+          exec:
+            command:
+              - pgbackrest
+              - server-ping
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+          periodSeconds: 10
+          failureThreshold: 6
+
+    sidecars:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+
+    # S3 backup for off-site storage (AWS off-site backup)
+    s3:
+      enabled: true # ENABLED for GOLD production
+      createS3Secret: false # Use OS Secret instead of creating one
+      s3Secret: pgbackrest-s3-credentials # Reference existing OS Secret
+      s3Path: '/pgbackup-prod'
+      s3UriStyle: path
+      bucket: 'hesp-prod-cacentral1-s3pgbackup'
+      endpoint: 's3.ca-central-1.amazonaws.com'
+      region: 'ca-central-1'
+      key: '' # Leave empty - use OS Secret
+      keySecret: '' # Leave empty - use OS Secret
+
+  # Patroni configuration for cluster orchestration
+  patroni:
+    postgresql:
+      pg_hba: 'host all all 0.0.0.0/0 md5'
+      parameters:
+        # HA: Tuned for high availability
+        shared_buffers: 128MB # UPGRADED from 16MB for HA
+        wal_buffers: '64kB'
+        min_wal_size: 64MB # UPGRADED from 32MB
+        max_wal_size: 128MB # UPGRADED from 64MB
+        max_slot_wal_keep_size: 256MB # UPGRADED from 128MB - prevents replicas from falling behind
+
+        # Replication settings for HA
+        wal_level: replica
+        max_wal_senders: 10
+        max_replication_slots: 10
+        hot_standby: 'on'
+        hot_standby_feedback: 'on'
+        wal_retrieve_retry_interval: '5s'
+
+  # PgBouncer configuration for connection pooling
+  proxy:
+    pgBouncer:
+      image:
+      replicas: 2 # Maintains 2 replicas for HA
+      requests:
+        cpu: 50m
+        memory: 128Mi # UPGRADED from 64Mi
+
+  # Monitoring (optional but recommended for production)
+  pgmonitor:
+    enabled: true # UPGRADED from false for GOLD
+    exporter:
+      image:
+      requests:
+        cpu: 10m
+        memory: 128Mi
+
+# ============================================================================
+# CACHE - HIGH AVAILABILITY (Redis with Sentinel)
+# ============================================================================
+
+redis:
+  enabled: true
+
+  global:
+    security:
+      allowInsecureImages: true
+
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/redis
+    tag: 8.2.1-debian-12-r0
+
+  # HA: Master + 2 replicas (requires 3 nodes minimum)
+  # Can tolerate 1 node failure, Sentinel handles failover
+  replicaCount: 3 # UPGRADED from 1 to support HA
+
+  fullnameOverride: hesp-redis
+
+  auth:
+    enabled: false
+    sentinel: false
+    usePasswordFiles: false
+
+  # Redis Sentinel configuration for HA
+  sentinel:
+    enabled: true
+
+    image:
+      registry: docker.io
+      repository: bitnamilegacy/redis-sentinel
+      tag: 8.2.1-debian-12-r0
+
+    masterSet: redisMasterSet
+
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+
+    resources:
+      requests:
+        memory: 64Mi
+        cpu: 25m
+
+    # HA: Number of Sentinels for quorum (must be odd)
+    # Default: 3 (requires quorum of 2)
+    replicas: 3
+
+  # HA: Replica configuration
+  replica:
+    replicaCount: 2 # UPGRADED from 1 to 2 (can tolerate 1 loss)
+    shareProcessNamespace: true
+
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+
+    persistence:
+      enabled: true
+      size: 512Mi
+      storageClassName: netapp-block-standard
+
+    resources:
+      requests:
+        memory: 64Mi
+        cpu: 25m
+
+# ============================================================================
+# SEARCH - HIGH AVAILABILITY (Elasticsearch)
+# ============================================================================
+
+elasticsearch:
+  enabled: true
+
+  global:
+    security:
+      allowInsecureImages: true
+
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/elasticsearch
+    tag: 9.1.2-debian-12-r0
+
+  fullnameOverride: hesp-elasticsearch
+  clusterName: hesp-elasticsearch
+  clusterHealthCheckParams: 'wait_for_status=yellow&timeout=5s'
+
+  # HA: 2 master nodes
+  master:
+    replicaCount: 2
+    heapSize: 256m # UPGRADED from 128m
+
+    networkPolicy:
+      enabled: false
+      allowExternal: false
+
+    resources:
+      requests:
+        cpu: 100m # UPGRADED from 20m
+        memory: 512Mi # UPGRADED from 256Mi
+      limits:
+        cpu: 200m
+        memory: 1Gi
+
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 512Mi # UPGRADED from 256Mi
+      storageClassName: netapp-block-standard
+
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 1200
+      periodSeconds: 15
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
+
+  # HA: 2+ data nodes for search workload distribution
+  data:
+    replicaCount: 2
+    heapSize: 384m
+
+    networkPolicy:
+      enabled: false
+      allowExternal: false
+
+    resources:
+      requests:
+        cpu: 200m
+        memory: 768Mi
+      limits:
+        cpu: 400m
+        memory: 2Gi
+
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi # UPGRADED from 256Mi
+      storageClassName: netapp-block-standard
+
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 1200
+      periodSeconds: 15
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
+
+  # Coordinating nodes (optional, set to 0 if not needed)
+  coordinating:
+    replicaCount: 0
+
+  # Ingest nodes (optional, set to 0 if not needed)
+  ingest:
+    replicaCount: 0
+
+  # Security (not needed for internal cluster-only traffic)
+  security:
+    enabled: false
+    fipsMode: false
+    tls:
+      restEncryption: false
+      autoGenerated: false
+
+  metrics:
+    enabled: false
+
+# ============================================================================
+# WEBSOCKET SERVER - HIGH AVAILABILITY (AnyCable-Go)
+# ============================================================================
+
+anycableGo:
+  enabled: true
+
+  nameOverride: hesp-anycable-go
+  fullnameOverride: hesp-anycable-go
+
+  # HA: Scale websocket connections across multiple pods
+  replicas: 2
+
+  dependencyWait:
+    enabled: true
+    services:
+      - host: hesp-redis
+        port: 26379
+      - host: hesp-redis
+        port: 6379
+
+  # Pod Anti-Affinity to spread replicas
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - hesp-anycable-go
+            topologyKey: kubernetes.io/hostname
+
+  env:
+    anycableRpcHost: hesp-anycable-rpc:50051
+    anycableRedisUrl: 'redis://redisMasterSet:6379/1'
+    anycableRedisSentinels: 'hesp-redis:26379'
+
+  route:
+    enabled: true
+    host: hesp-anycable.apps.gold.devops.gov.bc.ca
+
+  ingress:
+    enable: true
+    path: /cable
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi
+
+# ============================================================================
+# ANTIVIRUS - PRODUCTION READINESS
+# ============================================================================
+
+clamav:
+  enabled: true
+
+  image:
+    repository: ghcr.io/bcgov/hesp-clamav
+    pullPolicy: IfNotPresent
+
+  nameOverride: hesp-clamav
+  fullnameOverride: hesp-clamav
+
+  # HA: ClamAV typically runs as single service
+  # Define resource limits for production workloads
+  resources:
+    requests:
+      cpu: 200m
+      memory: 1536Mi
+    limits:
+      cpu: 500m
+      memory: 2Gi
+
+  persistence:
+    enabled: true
+    storageClass: netapp-block-standard
+    size: 512Mi # UPGRADED from 256Mi for virus definition updates
+
+  virusScanTempVolume:
+    enabled: true
+    storageClass: netapp-file-standard
+    size: 1Gi # UPGRADED from 512Mi
+
+# ============================================================================
+# NGINX PROXY - CBC Cipher Compatibility
+# ============================================================================
+
+nginxProxy:
+  enabled: false # GOLD: Enable for legacy client compatibility
+
+  image:
+    repository: docker.io/nginx
+    tag: 'alpine'
+    pullPolicy: IfNotPresent
+
+  replicas: 3 # PROD: 3 replicas for full HA
+
+  upstreamHost: 'hesp-app'
+  upstreamPort: 3000
+  websocketUpstreamHost: 'hesp-anycable-go'
+  websocketUpstreamPort: 8080
+
+  tlsSecretName: 'hesp-tls' # Must be created in e3c3c4-prod namespace
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - nginx-proxy
+            topologyKey: kubernetes.io/hostname
+
+  service:
+    type: ClusterIP
+
+  route:
+    host: 'hesp.apps.gold.devops.gov.bc.ca' # PROD route
+
+# ============================================================================
+# SHARED CONFIGURATION OVERRIDES - GOLD
+# ============================================================================
+# These override the base values in helm/main/values.yaml
+# and are rendered into the hesp-config ConfigMap
+
+sharedConfig:
+  enabled: true
+
+  redis:
+    sentinelHeadless: hesp-redis
+    sentinelPort: '26379'
+    masterSetName: redisMasterSet
+    sidekiqDb: '0'
+
+  aws:
+    region: ca-central-1
+    defaultRegion: ca-central-1
+    parameterBasePath: '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
+
+  s3:
+    region: ca-central-1
+    endpoint: https://s3.ca-central-1.amazonaws.com
+    publicEndpoint: https://s3.ca-central-1.amazonaws.com
+    bucket: hesp-prod-cacentral1-bucket
+
+  app:
+    domain: hesp.apps.gold.devops.gov.bc.ca
+    clamscanEnabled: 'true' # GOLD: ClamAV enabled for production
+    fromEmail: 'no-reply@gov.bc.ca'
+    clamavHost: 'hesp-clamav'
+    clamavPort: '3310'
+
+  anycable:
+    rpcHost: hesp-anycable-rpc:50051
+    redisUrl: 'redis://redisMasterSet:6379/1'
+    redisSentinels: 'hesp-redis:26379'
+
+  auth:
+    keycloakUrl: https://loginproxy.gov.bc.ca
+    keycloakLogoutUrl: https://loginproxy.gov.bc.ca/auth/realms/standard/protocol/openid-connect/logout
+    siteminderLogoutUrl: https://logon7.gov.bc.ca/clp-cgi/logoff.cgi
+    bceidUrl: https://www.bceid.ca
+    bceidBusinessRegistrationUrl: https://www.bceid.ca/register/business/getting_started/getting_started.aspx
+    postLogoutRedirectUrl: https://hesp.apps.gold.devops.gov.bc.ca
+
+# ============================================================================
+# S3 KEY ROTATION
+# ============================================================================
+s3KeyRotation:
+  enabled: true
+  schedule: '0 */6 * * *' # AWS SSM path where Lambda stores rotated credentials
+  # e.g. /hesp/prod/aws-credentials  — check with: oc exec deploy/hesp-app -- env | grep PARAM
+  parameterStorePath: ''

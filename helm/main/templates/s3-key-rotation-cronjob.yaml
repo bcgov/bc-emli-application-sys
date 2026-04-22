@@ -1,0 +1,202 @@
+{{- if .Values.s3KeyRotation.enabled }}
+---
+# ServiceAccount used exclusively by the S3 key rotation CronJob
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "main.fullname" . }}-s3-key-rotation
+  labels:
+    {{- include "main.labels" . | nindent 4 }}
+---
+# Role: allow the CronJob to read/patch the hesp secret and patch pgbackrest-s3-credentials
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "main.fullname" . }}-s3-key-rotation
+  labels:
+    {{- include "main.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: [{{ .Values.global.envSecretName | quote }}, "pgbackrest-s3-credentials"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "main.fullname" . }}-s3-key-rotation
+  labels:
+    {{- include "main.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "main.fullname" . }}-s3-key-rotation
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "main.fullname" . }}-s3-key-rotation
+---
+# ConfigMap: Python script to fetch credentials from SSM using stdlib Sig4 auth.
+# Stored separately to avoid bash heredoc issues inside YAML block scalars.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "main.fullname" . }}-s3-rotation-script
+  labels:
+    {{- include "main.labels" . | nindent 4 }}
+data:
+  fetch_ssm.py: |
+    import hmac as _hmac, hashlib, json, os, sys
+    from datetime import datetime, timezone
+    from urllib.request import urlopen, Request
+    from urllib.error import URLError
+
+    key_id    = os.environ["BOOT_KEY_ID"]
+    secret    = os.environ["BOOT_SECRET"]
+    region    = os.environ.get("AWS_REGION", "ca-central-1")
+    param     = os.environ["PARAMETER_STORE_PATH"]
+    service   = "ssm"
+    host      = "{}.{}.amazonaws.com".format(service, region)
+    endpoint  = "https://{}/".format(host)
+
+    now       = datetime.now(timezone.utc)
+    amzdate   = now.strftime("%Y%m%dT%H%M%SZ")
+    datestamp = now.strftime("%Y%m%d")
+
+    payload   = json.dumps({"Name": param, "WithDecryption": True}).encode()
+    ph        = hashlib.sha256(payload).hexdigest()
+    hdr_canon = "content-type:application/x-amz-json-1.1\nhost:{}\nx-amz-date:{}\nx-amz-target:AmazonSSM.GetParameter\n".format(host, amzdate)
+    s_headers = "content-type;host;x-amz-date;x-amz-target"
+    canonical = "\n".join(["POST", "/", "", hdr_canon, s_headers, ph])
+    algo      = "AWS4-HMAC-SHA256"
+    scope     = "{}/{}/{}/aws4_request".format(datestamp, region, service)
+    sts       = "\n".join([algo, amzdate, scope, hashlib.sha256(canonical.encode()).hexdigest()])
+
+    def sign(key, msg):
+        return _hmac.new(key, msg.encode(), hashlib.sha256).digest()
+
+    sk  = sign(sign(sign(sign(("AWS4" + secret).encode(), datestamp), region), service), "aws4_request")
+    sig = _hmac.new(sk, sts.encode(), hashlib.sha256).hexdigest()
+    auth = "{} Credential={}/{}, SignedHeaders={}, Signature={}".format(algo, key_id, scope, s_headers, sig)
+
+    req = Request(endpoint, data=payload, headers={
+        "Content-Type": "application/x-amz-json-1.1",
+        "X-Amz-Date": amzdate,
+        "X-Amz-Target": "AmazonSSM.GetParameter",
+        "Authorization": auth,
+    })
+
+    try:
+        resp       = json.loads(urlopen(req).read())
+        creds_json = json.loads(resp["Parameter"]["Value"])
+        current    = creds_json.get("current", {})
+        kid  = current.get("AccessKeyID") or current.get("access_key_id")
+        ksec = current.get("SecretAccessKey") or current.get("secret_access_key")
+        if not kid or not ksec:
+            print("ERROR: No current credentials in Parameter Store", file=sys.stderr)
+            sys.exit(1)
+        print(kid)
+        print(ksec)
+    except URLError as e:
+        print("ERROR: SSM request failed: {}".format(e), file=sys.stderr)
+        sys.exit(1)
+    except (KeyError, json.JSONDecodeError) as e:
+        print("ERROR: Failed to parse SSM response: {}".format(e), file=sys.stderr)
+        sys.exit(1)
+---
+# CronJob: every 6 hours, fetch current credentials from AWS SSM Parameter Store
+# (where the BC Gov Lambda rotation function stores them), then sync into both
+# the hesp secret and pgbackrest-s3-credentials.
+# Falls back to hesp secret directly if parameterStorePath is not set or SSM fails.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "main.fullname" . }}-s3-key-rotation
+  labels:
+    {{- include "main.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.s3KeyRotation.schedule | default "0 */6 * * *" | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      template:
+        spec:
+          serviceAccountName: {{ include "main.fullname" . }}-s3-key-rotation
+          restartPolicy: OnFailure
+          volumes:
+            - name: scripts
+              configMap:
+                name: {{ include "main.fullname" . }}-s3-rotation-script
+          containers:
+            - name: rotate
+              image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+              env:
+                - name: PARAMETER_STORE_PATH
+                  value: {{ .Values.s3KeyRotation.parameterStorePath | default "" | quote }}
+                - name: AWS_REGION
+                  value: "ca-central-1"
+                - name: BOOT_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.global.envSecretName | quote }}
+                      key: BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID
+                - name: BOOT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.global.envSecretName | quote }}
+                      key: BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+              command:
+                - /bin/bash
+                - -euo
+                - pipefail
+                - -c
+                - |
+                  echo "Bootstrap credentials loaded (key ID: ${BOOT_KEY_ID:0:8}...)"
+
+                  if [ -n "$PARAMETER_STORE_PATH" ]; then
+                    echo "Fetching current credentials from SSM: $PARAMETER_STORE_PATH"
+                    if python3 /scripts/fetch_ssm.py > /tmp/creds 2>/tmp/creds_err; then
+                      KEY_ID=$(head -1 /tmp/creds)
+                      KEY_SECRET=$(tail -1 /tmp/creds)
+                      echo "SSM credentials fetched OK (key ID: ${KEY_ID:0:8}...)"
+                    else
+                      echo "WARNING: SSM fetch failed, falling back to hesp secret"
+                      cat /tmp/creds_err || true
+                      KEY_ID="$BOOT_KEY_ID"
+                      KEY_SECRET="$BOOT_SECRET"
+                    fi
+                  else
+                    echo "No parameterStorePath set — using hesp secret credentials directly"
+                    KEY_ID="$BOOT_KEY_ID"
+                    KEY_SECRET="$BOOT_SECRET"
+                  fi
+
+                  echo "Updating secrets with key ID: ${KEY_ID:0:8}..."
+
+                  S3_CONF=$(printf '[global]\nrepo2-s3-key=%s\nrepo2-s3-key-secret=%s\n' "$KEY_ID" "$KEY_SECRET" | base64 -w 0)
+
+                  oc patch secret pgbackrest-s3-credentials \
+                    --type='json' \
+                    -p="[{\"op\":\"replace\",\"path\":\"/data/s3.conf\",\"value\":\"${S3_CONF}\"}]"
+                  echo "pgbackrest-s3-credentials patched successfully."
+
+                  KEY_ID_B64=$(echo -n "$KEY_ID" | base64 -w 0)
+                  KEY_SECRET_B64=$(echo -n "$KEY_SECRET" | base64 -w 0)
+
+                  oc patch secret {{ .Values.global.envSecretName | quote }} \
+                    --type='json' \
+                    -p="[{\"op\":\"replace\",\"path\":\"/data/BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID\",\"value\":\"${KEY_ID_B64}\"},{\"op\":\"replace\",\"path\":\"/data/BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY\",\"value\":\"${KEY_SECRET_B64}\"}]"
+                  echo "hesp secret patched successfully."
+              resources:
+                requests:
+                  cpu: 25m
+                  memory: 64Mi
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
+{{- end }}
