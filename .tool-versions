@@ -6,3 +6,4 @@ kubectl 1.32.2
 helm 4.0.2
 terraform 1.11.1
 kube-linter 0.7.5
+awscli 2.34.34

@@ -92,17 +92,17 @@ app:
     httpGet:
       path: /health
       port: 3000
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 3
-    failureThreshold: 2
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
 
   env:
     'VITE_SUBMIT_INVOICE_ENABLED': 'true'
     'ANYCABLE_URL': 'wss://dev-hesp.apps.gold.devops.gov.bc.ca/cable'
     'IS_APP_SERVER': true
-    # Note: Shared config like APP_DOMAIN, KEYCLOAK_AUTH_URL, S3/AWS settings
-    # are now provided via hesp-config ConfigMap
+    # Note: AWS_REGION, AWS_DEFAULT_REGION, AWS_PARAMETER_BASE_PATH, APP_DOMAIN,
+    # KEYCLOAK_AUTH_URL, S3/AWS settings are provided via hesp-config ConfigMap
 
   route:
     enabled: true # Route will be handled by nginx proxy
@@ -141,10 +141,9 @@ sidekiq:
     enabled: false # DEV: May cause issues with single replica
 
   env:
-    'FROM_EMAIL': 'no-reply@gov.bc.ca'
     'SIDEKIQ_CONCURRENCY': '5'
-    # Note: Shared config like APP_DOMAIN, S3/AWS settings, CLAMAV_ENABLED
-    # are now provided via hesp-config ConfigMap
+    # Note: FROM_EMAIL, AWS_REGION, AWS_DEFAULT_REGION, AWS_PARAMETER_BASE_PATH
+    # and other shared config are provided via hesp-config ConfigMap
 
 # ============================================================================
 # ANYCABLE RPC - DEV
@@ -176,7 +175,8 @@ anycable-rpc:
         port: 6379
 
   env: {}
-    # Note: Shared S3/AWS config is now provided via hesp-config ConfigMap
+  # Note: AWS_PARAMETER_BASE_PATH, AWS_REGION, AWS_DEFAULT_REGION and all shared
+  # S3/AWS config are provided via hesp-config ConfigMap
 
 # ============================================================================
 # DATABASE - DEV (Reduced HA)
@@ -190,7 +190,7 @@ crunchy-postgres:
   # DEV: 2 replicas (still HA but smaller)
   instances:
     name: ha
-    replicaCount: 2 # DEV: Scale down from 3
+    replicas: 2 # DEV: Scale down from 3
 
     livenessProbe:
       exec:
@@ -257,7 +257,7 @@ crunchy-postgres:
       s3Secret: pgbackrest-s3-credentials
       s3Path: '/pgbackup-dev'
       s3UriStyle: path
-      bucket: 'esp-dev-pgbackrest-backup'
+      bucket: 'hesp-dev-cacentral1-s3pgbackup'
       endpoint: 's3.ca-central-1.amazonaws.com'
       region: 'ca-central-1'
       # Credentials intentionally unused in DEV
@@ -484,10 +484,18 @@ anycableGo:
 
   affinity: {} # DEV: No anti-affinity rules needed
 
+  dependencyWait:
+    enabled: true
+    services:
+      - host: hesp-redis
+        port: 26379
+      - host: hesp-redis
+        port: 6379
+
   env:
     anycableRpcHost: hesp-anycable-rpc:50051
     anycableRedisUrl: 'redis://redisMasterSet:6379/1'
-    anycableRedisSentinels: 'hesp-redis-headless:26379'
+    anycableRedisSentinels: 'hesp-redis:26379'
 
   route:
     enabled: true # Route handled by nginx proxy
@@ -573,7 +581,7 @@ sharedConfig:
   enabled: true
 
   redis:
-    sentinelHeadless: hesp-redis-headless
+    sentinelHeadless: hesp-redis
     sentinelPort: '26379'
     masterSetName: redisMasterSet
     sidekiqDb: '0'
@@ -581,6 +589,7 @@ sharedConfig:
   aws:
     region: ca-central-1
     defaultRegion: ca-central-1
+    parameterBasePath: '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
 
   s3:
     region: ca-central-1
@@ -591,11 +600,14 @@ sharedConfig:
   app:
     domain: dev-hesp.apps.gold.devops.gov.bc.ca
     clamscanEnabled: 'false'
+    fromEmail: 'no-reply@gov.bc.ca'
+    clamavHost: 'hesp-clamav'
+    clamavPort: '3310'
 
   anycable:
     rpcHost: hesp-anycable-rpc:50051
     redisUrl: 'redis://redisMasterSet:6379/1'
-    redisSentinels: 'hesp-redis-headless:26379'
+    redisSentinels: 'hesp-redis:26379'
 
   auth:
     keycloakUrl: https://dev.loginproxy.gov.bc.ca/
