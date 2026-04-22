@@ -15,6 +15,7 @@ class SubmissionDataExtractorService
       last_name: extract_last_name,
       phone_number: extract_phone,
       email: extract_email,
+      home_type: extract_home_type,
       # Invoice-specific fields (return nil for non-invoices)
       invoice_amount: extract_invoice_amount,
       homeowner_name: extract_homeowner_name,
@@ -95,6 +96,12 @@ class SubmissionDataExtractorService
   end
 
   # Invoice-specific extractions
+  def extract_home_type
+    data = latest_submission_data
+    return nil unless data
+    find_field_by_suffix(data, "what_type_of_home_do_you_live_in")
+  end
+
   def extract_invoice_amount
     data = latest_submission_data
     return nil unless data

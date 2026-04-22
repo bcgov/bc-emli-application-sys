@@ -284,6 +284,10 @@ class PermitApplicationBlueprint < Blueprinter::Base
       pa.submitted_at&.iso8601
     end
 
+    field :home_type do |pa|
+      pa.extract_home_type_from_submission_data
+    end
+
     field :primary_heating_system do |pa|
       pa.extract_heating_system_from_submission_data(:primary)
     end

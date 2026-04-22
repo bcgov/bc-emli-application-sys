@@ -337,6 +337,12 @@ RSpec.describe "external_api/v1/applications",
                            "ISO 8601 timestamp when the application was submitted.",
                          nullable: true
                        },
+                       home_type: {
+                         type: :string,
+                         description:
+                           "The type of home from the application submission data.",
+                         nullable: true
+                       },
                        primary_heating_system: {
                          type: :string,
                          description:
