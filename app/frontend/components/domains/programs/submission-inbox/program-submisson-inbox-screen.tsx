@@ -328,8 +328,8 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
       </SearchGridItem>
       <SearchGridItem>
         <Flex direction="column">
-          <Text>{format(permitApplication.createdAt, 'yyyy-MM-dd')}</Text>
-          <Text>{format(permitApplication.createdAt, 'HH:mm')}</Text>
+          <Text>{permitApplication.submittedAt ? format(permitApplication.submittedAt, 'yyyy-MM-dd') : ''}</Text>
+          <Text>{permitApplication.submittedAt ? format(permitApplication.submittedAt, 'HH:mm') : ''}</Text>
         </Flex>
       </SearchGridItem>
       <SearchGridItem>
