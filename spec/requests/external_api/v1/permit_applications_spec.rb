@@ -266,7 +266,7 @@ RSpec.describe "external_api/v1/applications",
   end
 
   path "/applications/summary" do
-    get "This endpoint retrieves a summary of applications filtered by submission date. Returns lightweight application data with only essential fields (application id, submission date, heating systems, address, contact info). Pagination is optional - omit page parameter to retrieve all results." do
+    get "This endpoint retrieves a summary of applications filtered by submission date. Returns lightweight application data with only essential fields (application id, submission date, home type, heating systems, address, contact info). Pagination is optional - omit page parameter to retrieve all results." do
       tags "Applications"
       produces "application/json"
 
@@ -335,6 +335,12 @@ RSpec.describe "external_api/v1/applications",
                          format: "date-time",
                          description:
                            "ISO 8601 timestamp when the application was submitted.",
+                         nullable: true
+                       },
+                       home_type: {
+                         type: :string,
+                         description:
+                           "The type of home from the application submission data.",
                          nullable: true
                        },
                        primary_heating_system: {
