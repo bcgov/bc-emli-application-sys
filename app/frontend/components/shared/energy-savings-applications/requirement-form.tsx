@@ -120,25 +120,21 @@ export const RequirementForm = observer(
         statuses.push({
           label: t('energySavingsApplication.show.applicationCreated', {
             submissionType: permitApplication?.submissionType.name,
-            date: permitApplication?.createdAt
-              ? format(new Date(permitApplication.createdAt), 'MMM d, yyyy h:mm a')
-              : 'N/A',
+            date: permitApplication?.createdAt ? format(permitApplication.createdAt, 'MMM d, yyyy h:mm a') : t('ui.na'),
           }),
         });
         statuses.push({
           label: t('energySavingsApplication.show.applicationSubmitted', {
             submissionType: permitApplication?.submissionType.name,
             date: permitApplication?.submittedAt
-              ? format(new Date(permitApplication.submittedAt), 'MMM d, yyyy h:mm a')
-              : 'N/A',
+              ? format(permitApplication.submittedAt, 'MMM d, yyyy h:mm a')
+              : t('ui.na'),
           }),
         });
         statuses.push({
           label: t('energySavingsApplication.show.applicationUpdated', {
             submissionType: permitApplication?.submissionType.name,
-            date: permitApplication?.updatedAt
-              ? format(new Date(permitApplication.updatedAt), 'MMM d, yyyy h:mm a')
-              : 'N/A',
+            date: permitApplication?.updatedAt ? format(permitApplication.updatedAt, 'MMM d, yyyy h:mm a') : t('ui.na'),
           }),
         });
       }
