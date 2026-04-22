@@ -1462,6 +1462,8 @@ const options = {
             locateRevisions: 'Locate each requested revision by clicking the links below.',
             revisionsWereRequested: 'Updates to this application were requested on {{date}}',
             applicationSubmitted: '{{submissionType}} was submitted on {{date}}',
+            applicationCreated: '{{submissionType}} was created on {{date}}',
+            applicationUpdated: '{{submissionType}} was last updated on {{date}}',
             clickQuestion: 'Click on the question(s) or requirement(s) you want the submitter to revise.',
             clickQuestionUpdate: 'Click on the question(s) or requirement(s) you want to update.',
             inEligibleDetails: 'Ineligible {{submissionType}} form details',
