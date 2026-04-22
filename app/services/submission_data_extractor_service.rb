@@ -95,13 +95,13 @@ class SubmissionDataExtractorService
     find_field_by_contains(data, "email")
   end
 
-  # Invoice-specific extractions
   def extract_home_type
     data = latest_submission_data
     return nil unless data
     find_field_by_suffix(data, "what_type_of_home_do_you_live_in")
   end
 
+  # Invoice-specific extractions
   def extract_invoice_amount
     data = latest_submission_data
     return nil unless data

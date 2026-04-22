@@ -961,13 +961,13 @@ class PermitApplication < ApplicationRecord
     summary_fields_for_external_use[:last_name]
   end
 
+  def extract_home_type_from_submission_data
+    summary_fields_for_external_use[:home_type]
+  end
+
   # Invoice-specific extraction wrappers
   def extract_invoice_amount_from_submission_data
     summary_fields_for_external_use[:invoice_amount]
-  end
-
-  def extract_home_type_from_submission_data
-    summary_fields_for_external_use[:home_type]
   end
 
   def extract_homeowner_name_from_submission_data
