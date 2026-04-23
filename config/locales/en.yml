@@ -842,8 +842,8 @@ en:
       invoice_submitted: 'Thank you for your invoice submission. If we need more information we will contact you by email.'
       invoice_updated: 'We need more information to process invoice %{number}. Please update your submission.'
       invoice_ineligible: 'Invoice submission #%{number} has been processed and is not eligible. Check the submission to see why.'
-      invoice_approved: 'We approved invoice %{number}. You will get an email when we issue your payment.'
-      invoice_paid: 'Rebate payment for invoice %{number} will be deposited in 3-5 business days.'
+      invoice_approved: 'We approved invoice #%{number}. You will get an email when we issue your payment. Review the submission.'
+      invoice_paid: 'Rebate payment for invoice #%{number} will be deposited in 3-5 business days.'
     user:
       account_update_notification: 'Your account was updated on %{updated_at}. Changes: %{changed_fields}. If you did not make this change, please contact support immediately.'
     permit_collaboration:
