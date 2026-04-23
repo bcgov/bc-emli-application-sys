@@ -58,10 +58,9 @@ class PermitApplication < ApplicationRecord
     user_group_type
   ]
 
-  # Separate includes for invoice endpoints — invoice submissions always use a Contractor
-  # as the submitter (set via contractor_id param in the controller), so we can safely
-  # eager load contractor-specific associations here.
-  # Do NOT merge into API_SEARCH_INCLUDES — participant app queries have a User submitter.
+  # Separate includes for invoice endpoints — invoice submissions use a User as the submitter
+  # (via EspApplicationController). Eager load contractor-specific associations here.
+  # Do NOT merge into API_SEARCH_INCLUDES — participant app queries have a different submitter context.
   INVOICE_API_SEARCH_INCLUDES = [
     :program,
     :template_version,
@@ -881,7 +880,10 @@ class PermitApplication < ApplicationRecord
       "action_type" =>
         Constants::NotificationActionTypes::CONTRACTOR_INVOICE_INELIGIBLE,
       "action_text" =>
-        "#{I18n.t("notification.contractor.invoice_ineligible", number: number)}"
+        "#{I18n.t("notification.contractor.invoice_ineligible", number: number)}",
+      "object_data" => {
+        "permit_application_id" => id
+      }
     }
   end
 

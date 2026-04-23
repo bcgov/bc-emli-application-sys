@@ -139,6 +139,8 @@ module Api::Concerns::Search::PermitApplications
       elsif current_user.participant?
         # Participants can only see applications they have edit permissions for
         { user_ids_with_submission_edit_permissions: current_user.id }
+      elsif current_user.contractor?
+        { submitter_id: current_user.id }
       else
         # Admin users can see all applications (no user permission filter)
         {}
