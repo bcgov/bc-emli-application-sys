@@ -529,6 +529,7 @@ export enum ENotificationActionType {
   templatePublished = 'template_published',
   newSupportingFilesRequested = 'supporting_files_requested',
   newSupportingFilesUploaded = 'supporting_files_uploaded',
+  contractorInvoiceIneligible = 'invoice_ineligible',
 }
 
 export enum ECollaboratorableType {
