@@ -37,6 +37,11 @@ app:
   # HA: 2 replicas (tolerates 1 pod failure)
   replicaCount: 2
 
+  # Recreate avoids Vite chunk hash mismatches during rolling deploys (white screen).
+  # Trade-off: ~30s downtime on deploy. Acceptable for planned deployments.
+  strategy:
+    type: Recreate
+
   image:
     repository: ghcr.io/bcgov/hesp-app
     pullPolicy: IfNotPresent
@@ -61,7 +66,7 @@ app:
   # This prevents cluster maintenance from taking down all app pods
   podDisruptionBudget:
     enabled: true
-    minAvailable: 2
+    minAvailable: 1
     # Alternative: maxUnavailable: 1
 
   # HA: Pod Anti-Affinity - spread replicas across nodes
@@ -110,20 +115,8 @@ app:
     'IS_APP_SERVER': true
 
   route:
-    enabled: true # Route handled by nginx proxy
+    enabled: true # disable to have route handled by nginx proxy
     host: hesp.apps.gold.devops.gov.bc.ca
-
-  # HA: Init container for data migration (if needed)
-  initContainers: []
-    # - name: db-migration
-    #   image: ghcr.io/bcgov/hesp-app:latest
-    #   command: ["bundle", "exec", "rails", "db:migrate"]
-    #   env:
-    #     - name: DATABASE_URL
-    #       valueFrom:
-    #         secretKeyRef:
-    #           name: hesp-db-credentials
-    #           key: url
 
 # ============================================================================
 # BACKGROUND JOB PROCESSING - HIGH AVAILABILITY
@@ -174,10 +167,23 @@ sidekiq:
                     - hesp-sidekiq
             topologyKey: kubernetes.io/hostname
 
+  # Restart Sidekiq if it loses its Redis/Sentinel connection.
+  # failureThreshold * periodSeconds = ~3 min of unreachable Redis before restart.
+  # Kubernetes CrashLoopBackOff provides exponential back-off, avoiding infinite tight loops.
+  livenessProbe:
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - bundle exec rails runner "Sidekiq.redis { |r| r.ping }"
+    initialDelaySeconds: 60
+    periodSeconds: 60
+    failureThreshold: 3
+    timeoutSeconds: 10
+
   env:
     'SIDEKIQ_CONCURRENCY': '25'
-    # Note: FROM_EMAIL, AWS_REGION, AWS_DEFAULT_REGION, AWS_PARAMETER_BASE_PATH,
-    # CLAMAV_HOST/PORT and other shared config are provided via hesp-config ConfigMap
+    # other shared config are provided via hesp-config ConfigMap
 
 # ============================================================================
 # ANYCABLE RPC - HIGH AVAILABILITY
@@ -224,8 +230,7 @@ anycable-rpc:
             topologyKey: kubernetes.io/hostname
 
   env: {}
-  # Note: AWS_PARAMETER_BASE_PATH, AWS_REGION, AWS_DEFAULT_REGION and all shared
-  # S3/AWS config are provided via hesp-config ConfigMap
+  # config are provided via hesp-config ConfigMap
 
 # ============================================================================
 # DATABASE - HIGH AVAILABILITY (Crunchy PostgreSQL with Patroni)
@@ -311,7 +316,7 @@ crunchy-postgres:
       s3Secret: pgbackrest-s3-credentials # Reference existing OS Secret
       s3Path: '/pgbackup-prod'
       s3UriStyle: path
-      bucket: 'hesp-prod-cacentral1-s3pgbackup'
+      bucket: 'esp-prod-cacentral1-s3pgbackup'
       endpoint: 's3.ca-central-1.amazonaws.com'
       region: 'ca-central-1'
       key: '' # Leave empty - use OS Secret
@@ -323,11 +328,11 @@ crunchy-postgres:
       pg_hba: 'host all all 0.0.0.0/0 md5'
       parameters:
         # HA: Tuned for high availability
-        shared_buffers: 128MB # UPGRADED from 16MB for HA
+        shared_buffers: 128MB
         wal_buffers: '64kB'
-        min_wal_size: 64MB # UPGRADED from 32MB
-        max_wal_size: 128MB # UPGRADED from 64MB
-        max_slot_wal_keep_size: 256MB # UPGRADED from 128MB - prevents replicas from falling behind
+        min_wal_size: 64MB
+        max_wal_size: 128MB
+        max_slot_wal_keep_size: 256MB # prevents replicas from falling behind
 
         # Replication settings for HA
         wal_level: replica
@@ -344,11 +349,11 @@ crunchy-postgres:
       replicas: 2 # Maintains 2 replicas for HA
       requests:
         cpu: 50m
-        memory: 128Mi # UPGRADED from 64Mi
+        memory: 128Mi
 
   # Monitoring (optional but recommended for production)
   pgmonitor:
-    enabled: true # UPGRADED from false for GOLD
+    enabled: true
     exporter:
       image:
       requests:
@@ -373,7 +378,7 @@ redis:
 
   # HA: Master + 2 replicas (requires 3 nodes minimum)
   # Can tolerate 1 node failure, Sentinel handles failover
-  replicaCount: 3 # UPGRADED from 1 to support HA
+  replicaCount: 3 # support HA
 
   fullnameOverride: hesp-redis
 
@@ -409,7 +414,7 @@ redis:
 
   # HA: Replica configuration
   replica:
-    replicaCount: 2 # UPGRADED from 1 to 2 (can tolerate 1 loss)
+    replicaCount: 2 # from 1 to 2 (can tolerate 1 loss)
     shareProcessNamespace: true
 
     podSecurityContext:
@@ -450,7 +455,7 @@ elasticsearch:
   # HA: 2 master nodes
   master:
     replicaCount: 2
-    heapSize: 256m # UPGRADED from 128m
+    heapSize: 256m
 
     networkPolicy:
       enabled: false
@@ -458,8 +463,8 @@ elasticsearch:
 
     resources:
       requests:
-        cpu: 100m # UPGRADED from 20m
-        memory: 512Mi # UPGRADED from 256Mi
+        cpu: 100m
+        memory: 512Mi
       limits:
         cpu: 200m
         memory: 1Gi
@@ -468,7 +473,7 @@ elasticsearch:
       enabled: true
       accessModes:
         - ReadWriteOnce
-      size: 512Mi # UPGRADED from 256Mi
+      size: 512Mi
       storageClassName: netapp-block-standard
 
     podSecurityContext:
@@ -505,7 +510,7 @@ elasticsearch:
       enabled: true
       accessModes:
         - ReadWriteOnce
-      size: 1Gi # UPGRADED from 256Mi
+      size: 1Gi
       storageClassName: netapp-block-standard
 
     podSecurityContext:
@@ -623,19 +628,19 @@ clamav:
   persistence:
     enabled: true
     storageClass: netapp-block-standard
-    size: 512Mi # UPGRADED from 256Mi for virus definition updates
+    size: 512Mi # from 256Mi for virus definition updates
 
   virusScanTempVolume:
     enabled: true
     storageClass: netapp-file-standard
-    size: 1Gi # UPGRADED from 512Mi
+    size: 1Gi
 
 # ============================================================================
 # NGINX PROXY - CBC Cipher Compatibility
 # ============================================================================
 
 nginxProxy:
-  enabled: false # GOLD: Enable for legacy client compatibility
+  enabled: true # GOLD: Enable for legacy client compatibility
 
   image:
     repository: docker.io/nginx
@@ -649,7 +654,7 @@ nginxProxy:
   websocketUpstreamHost: 'hesp-anycable-go'
   websocketUpstreamPort: 8080
 
-  tlsSecretName: 'hesp-tls' # Must be created in e3c3c4-prod namespace
+  tlsSecretName: 'hesp-tls' # Must be created in -prod namespace
 
   resources:
     requests:
@@ -676,7 +681,7 @@ nginxProxy:
     type: ClusterIP
 
   route:
-    host: 'hesp.apps.gold.devops.gov.bc.ca' # PROD route
+    host: 'bcenergysavingsprogram.ca' # PROD route - vanity domain
 
 # ============================================================================
 # SHARED CONFIGURATION OVERRIDES - GOLD
@@ -702,10 +707,10 @@ sharedConfig:
     region: ca-central-1
     endpoint: https://s3.ca-central-1.amazonaws.com
     publicEndpoint: https://s3.ca-central-1.amazonaws.com
-    bucket: hesp-prod-cacentral1-bucket
+    bucket: 'esp-prod-cacentral1-bucket'
 
   app:
-    domain: hesp.apps.gold.devops.gov.bc.ca
+    domain: bcenergysavingsprogram.ca
     clamscanEnabled: 'true' # GOLD: ClamAV enabled for production
     fromEmail: 'no-reply@gov.bc.ca'
     clamavHost: 'hesp-clamav'
@@ -722,13 +727,12 @@ sharedConfig:
     siteminderLogoutUrl: https://logon7.gov.bc.ca/clp-cgi/logoff.cgi
     bceidUrl: https://www.bceid.ca
     bceidBusinessRegistrationUrl: https://www.bceid.ca/register/business/getting_started/getting_started.aspx
-    postLogoutRedirectUrl: https://hesp.apps.gold.devops.gov.bc.ca
+    postLogoutRedirectUrl: https://bcenergysavingsprogram.ca
 
 # ============================================================================
 # S3 KEY ROTATION
 # ============================================================================
 s3KeyRotation:
   enabled: true
-  schedule: '0 */6 * * *' # AWS SSM path where Lambda stores rotated credentials
-  # e.g. /hesp/prod/aws-credentials  — check with: oc exec deploy/hesp-app -- env | grep PARAM
-  parameterStorePath: ''
+  schedule: '0 */2 * * *'
+  parameterStorePath: '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'

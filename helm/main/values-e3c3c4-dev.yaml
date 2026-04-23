@@ -40,6 +40,10 @@ app:
   # DEV: 2 replicas (still HA but resource-light)
   replicaCount: 2
 
+  # Recreate avoids Vite chunk hash mismatches during rolling deploys (white screen).
+  strategy:
+    type: Recreate
+
   image:
     repository: ghcr.io/bcgov/hesp-app
     pullPolicy: IfNotPresent
@@ -139,6 +143,18 @@ sidekiq:
 
   podDisruptionBudget:
     enabled: false # DEV: May cause issues with single replica
+
+  # Restart Sidekiq if it loses its Redis/Sentinel connection.
+  livenessProbe:
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - bundle exec rails runner "Sidekiq.redis { |r| r.ping }"
+    initialDelaySeconds: 60
+    periodSeconds: 60
+    failureThreshold: 3
+    timeoutSeconds: 10
 
   env:
     'SIDEKIQ_CONCURRENCY': '5'

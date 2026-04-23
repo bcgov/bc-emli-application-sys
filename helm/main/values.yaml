@@ -68,7 +68,9 @@ app:
     'VITE_RUBY_HOST': 'vite'
     'WEB_CONCURRENCY': '2'
     'IS_APP_SERVER': true
-
+    'ENABLE_TEMPLATE_FORCE_PUBLISH': 'true'
+    'VITE_ENABLE_TEMPLATE_FORCE_PUBLISH': 'true'
+    
 sidekiq:
   enabled: false
   image:

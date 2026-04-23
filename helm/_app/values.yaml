@@ -1,5 +1,11 @@
 replicaCount: 1
 
+# strategy: controls the pod replacement strategy during deployments.
+# For Vite SPA apps, Recreate prevents chunk hash mismatches (white screen on rolling deploys).
+# Defaults to RollingUpdate if not set.
+# strategy:
+#   type: Recreate
+
 image:
   repository: ghcr.io/bcgov/hesp-app
   # repository: artifacts.developer.gov.bc.ca/bbfc-dev/hesp-dev
