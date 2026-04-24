@@ -144,7 +144,16 @@ export const NotificationStoreModel = types
         case ENotificationActionType.applicationView:
         case ENotificationActionType.applicationIneligible:
         case ENotificationActionType.applicationAssignment:
-        case ENotificationActionType.participantIncompleteDraftNotification:
+        case ENotificationActionType.participantIncompleteDraftNotification: {
+          const data = objectData as IPermitNotificationObjectData;
+          return [
+            {
+              text: t('ui.view'),
+              href: getApplicationLink(data.permitApplicationId, true),
+            },
+          ];
+        }
+
         case ENotificationActionType.contractorInvoiceIneligible: {
           const data = objectData as IPermitNotificationObjectData;
           return [
