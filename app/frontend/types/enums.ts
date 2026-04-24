@@ -531,6 +531,7 @@ export enum ENotificationActionType {
   newSupportingFilesUploaded = 'supporting_files_uploaded',
   contractorInvoiceIneligible = 'invoice_ineligible',
   contractorInvoiceApproved = 'invoice_approved',
+  contractorInvoicePaid = 'invoice_paid',
 }
 
 export enum ECollaboratorableType {
