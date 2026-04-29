@@ -5,7 +5,7 @@ metadata:
   name: {{ include "_.fullname" . }}-purge-logs
 spec:
   schedule: "0 0 * * *"
-  successfulJobsHistoryLimit: 1  # Keep only 1 successful Job
+  successfulJobsHistoryLimit: 1  # Keep only last successful run (daily job)
   failedJobsHistoryLimit: 1  # Keep only 1 failed Job
   concurrencyPolicy: Forbid
   jobTemplate:

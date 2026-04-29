@@ -274,7 +274,7 @@ crunchy-postgres:
     image:
 
     # HA: Longer retention for production
-    retention: '7' # Keep 7 days of backups for GOLD
+    retention: '4' # Keep 4 days of backups for GOLD
     retentionFullType: time # Time-based retention
 
     repos:
@@ -310,8 +310,12 @@ crunchy-postgres:
         memory: 32Mi
 
     # S3 backup for off-site storage (AWS off-site backup)
+    # NOTE: incrementalSchedule/fullSchedule must live here (not in a separate s3 block above)
+    # because Go YAML takes the last duplicate key — merging both here avoids repo2 using the wrong schedule.
     s3:
       enabled: true # ENABLED for GOLD production
+      incrementalSchedule: '0 1-11,13-23 * * *' # Hourly incremental (mirrors repo1)
+      fullSchedule: '0 0,12 * * *' # Full backups at midnight and noon (mirrors repo1)
       createS3Secret: false # Use OS Secret instead of creating one
       s3Secret: pgbackrest-s3-credentials # Reference existing OS Secret
       s3Path: '/pgbackup-prod'
