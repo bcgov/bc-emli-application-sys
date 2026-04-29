@@ -1,0 +1,28 @@
+<p>Hello <%= @first_name %> <%= @last_name %>, </p>
+
+<p>You are getting this email because you are the primary contact for <%= @business_name %>.</p>
+
+<p>The new CleanBC Better Homes Energy Savings Program contractor portal is ready!</p>
+
+<p>We previously sent you an email with instructions to transfer your account. 
+Program registered contractors must transfer their accounts to the new portal.  
+<strong>If you do not transfer the account, you cannot submit invoices or get paid.</strong></p>
+
+<p>Transferring the account should take less than 5 minutes.</p>
+
+<p>Use the link below to log into the new portal and transfer your account. 
+The link does not expire but you should transfer your account as soon as you can. 
+The link works once to transfer the account. 
+If someone else uses the link after the account is transferred, they will get an error message.</p>
+
+<p>Follow the steps in the previous email or click the link below to transfer your account. 
+Make sure you know your Business BCeID manager account log in information.</p>
+
+<p><a href="<%= @root_url %>welcome/contractor/invite?token=<%= @token %>" target="_blank">Log in to the new Contractor Portal</a></p>
+
+<p>The last day you can submit invoices in the old portal is March 10, 2026.</p>
+
+<p>Thank you,<br>Energy Savings Program Support</p>
+
+<p>Have questions or need help?</p>
+<p>Contact us at <a href="mailto:ESPcontractorsupport@clearesult.com">ESPcontractorsupport@clearesult.com</a></p>
