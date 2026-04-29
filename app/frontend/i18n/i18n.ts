@@ -1096,7 +1096,7 @@ const options = {
           whatsNext: {
             heading: "What's next?",
             line1:
-              'Please wait while we assess your registration details. We will email you once your registration is approved. If we need more information we will reach out via email.',
+              'Please wait while we assess your registration details. On review of your registration details, we will email you with next steps. If we need more information, we will reach out to the email you registered with.',
             line2:
               'If you need to add, edit, or remove employees from your account in the future you will need to call us.',
             line3: 'If you have any questions, please call us at 1-833-856-0333 or email us at <1>{{email}}</1>.',
@@ -1462,8 +1462,6 @@ const options = {
             locateRevisions: 'Locate each requested revision by clicking the links below.',
             revisionsWereRequested: 'Updates to this application were requested on {{date}}',
             applicationSubmitted: '{{submissionType}} was submitted on {{date}}',
-            applicationCreated: '{{submissionType}} was created on {{date}}',
-            applicationUpdated: '{{submissionType}} was last updated on {{date}}',
             clickQuestion: 'Click on the question(s) or requirement(s) you want the submitter to revise.',
             clickQuestionUpdate: 'Click on the question(s) or requirement(s) you want to update.',
             inEligibleDetails: 'Ineligible {{submissionType}} form details',
