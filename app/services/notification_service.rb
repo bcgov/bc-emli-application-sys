@@ -534,7 +534,7 @@ class NotificationService
           Rails.logger.info "Contractor welcome notification queued for user #{user.id} (#{user.email})"
         end
       else
-        # Non participants including (admim, admin managers and sys-admins) receive a different message
+        # Non participants including (admin, admin managers and sys-admins) receive a different message
         PermitHubMailer.notify_new_admin_welcome(user)&.deliver_later
         Rails.logger.info "Admin welcome notification queued for user #{user.id} (#{user.email})"
       end
