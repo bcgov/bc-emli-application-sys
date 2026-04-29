@@ -518,7 +518,7 @@ class NotificationService
     begin
       # Send appropriate welcome email based on user role
       if user.participant?
-        PermitHubMailer.notify_new_participant_welcome(user).deliver_later
+        PermitHubMailer.notify_new_participant_welcome(user)&.deliver_later
         Rails.logger.info "Participant welcome notification queued for user #{user.id} (#{user.email})"
       elsif user.contractor?
         # invited_by_id distinguishes employees (invited via Devise) from primary contractors
@@ -527,15 +527,15 @@ class NotificationService
         if user.invited_by_id.present?
           PermitHubMailer.notify_new_contractor_employee_welcome(
             user
-          ).deliver_later
+          )&.deliver_later
           Rails.logger.info "Contractor employee welcome notification queued for user #{user.id} (#{user.email})"
         else
-          PermitHubMailer.notify_new_contractor_welcome(user).deliver_later
+          PermitHubMailer.notify_new_contractor_welcome(user)&.deliver_later
           Rails.logger.info "Contractor welcome notification queued for user #{user.id} (#{user.email})"
         end
       else
         # Non participants including (admim, admin managers and sys-admins) receive a different message
-        PermitHubMailer.notify_new_admin_welcome(user).deliver_later
+        PermitHubMailer.notify_new_admin_welcome(user)&.deliver_later
         Rails.logger.info "Admin welcome notification queued for user #{user.id} (#{user.email})"
       end
     rescue => e
