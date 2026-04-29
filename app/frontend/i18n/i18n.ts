@@ -513,6 +513,8 @@ const options = {
           correctFields: 'Please correct the fields below before saving.',
           done: 'Done',
           view: 'View',
+          reviewSubmission: 'Review the submission',
+          checkSubmission: 'Check the submission to see why',
           totalItems: 'Total items',
           doLater: 'Do this later',
           add: 'Add',

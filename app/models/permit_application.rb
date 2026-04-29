@@ -893,7 +893,10 @@ class PermitApplication < ApplicationRecord
       "action_type" =>
         Constants::NotificationActionTypes::CONTRACTOR_INVOICE_APPROVED,
       "action_text" =>
-        "#{I18n.t("notification.contractor.invoice_approved", number: number)}"
+        "#{I18n.t("notification.contractor.invoice_approved", number: number)}",
+      "object_data" => {
+        "permit_application_id" => id
+      }
     }
   end
 
@@ -903,7 +906,10 @@ class PermitApplication < ApplicationRecord
       "action_type" =>
         Constants::NotificationActionTypes::CONTRACTOR_INVOICE_PAID,
       "action_text" =>
-        "#{I18n.t("notification.contractor.invoice_paid", number: number)}"
+        "#{I18n.t("notification.contractor.invoice_paid", number: number)}",
+      "object_data" => {
+        "permit_application_id" => id
+      }
     }
   end
 
