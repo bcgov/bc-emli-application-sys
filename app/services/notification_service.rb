@@ -518,16 +518,24 @@ class NotificationService
     begin
       # Send appropriate welcome email based on user role
       if user.participant?
-        PermitHubMailer.notify_new_participant_welcome(user).deliver_later
+        PermitHubMailer.notify_new_participant_welcome(user)&.deliver_later
         Rails.logger.info "Participant welcome notification queued for user #{user.id} (#{user.email})"
       elsif user.contractor?
-        PermitHubMailer.notify_new_contractor_employee_welcome(
-          user
-        ).deliver_later
-        Rails.logger.info "Contractor Employee welcome notification queued for user #{user.id} (#{user.email})"
+        # invited_by_id distinguishes employees (invited via Devise) from primary contractors
+        # (self-registered via BCeID). The Contractor record doesn't exist yet at this point
+        # in the flow, so it cannot be used for this check.
+        if user.invited_by_id.present?
+          PermitHubMailer.notify_new_contractor_employee_welcome(
+            user
+          )&.deliver_later
+          Rails.logger.info "Contractor employee welcome notification queued for user #{user.id} (#{user.email})"
+        else
+          PermitHubMailer.notify_new_contractor_welcome(user)&.deliver_later
+          Rails.logger.info "Contractor welcome notification queued for user #{user.id} (#{user.email})"
+        end
       else
-        # Non participants including (admim, admin managers and sys-admins) receive a different message
-        PermitHubMailer.notify_new_admin_welcome(user).deliver_later
+        # Non participants including (admin, admin managers and sys-admins) receive a different message
+        PermitHubMailer.notify_new_admin_welcome(user)&.deliver_later
         Rails.logger.info "Admin welcome notification queued for user #{user.id} (#{user.email})"
       end
     rescue => e

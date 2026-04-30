@@ -369,6 +369,15 @@ class PermitHubMailer < ApplicationMailer
     send_user_mail(email: @user.email, template_key: "notify_new_admin_welcome")
   end
 
+  def notify_new_contractor_welcome(user)
+    @user = user
+
+    send_user_mail(
+      email: @user.email,
+      template_key: "notify_new_contractor_welcome"
+    )
+  end
+
   def notify_new_contractor_employee_welcome(user)
     @user = user
 
