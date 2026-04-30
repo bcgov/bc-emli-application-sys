@@ -32,6 +32,9 @@ env: {}
 
 # livenessProbe: Disabled by default. Enable in environment values to auto-restart
 # Sidekiq when it loses its Redis connection (e.g. after a Sentinel failover).
+# NOTE: timeoutSeconds must be >= 30. The `rails runner` command boots the full
+# Rails environment (S3, Redis Sentinel, cron jobs, etc.) before executing,
+# which takes well over 10s. Setting it lower will cause spurious probe failures.
 livenessProbe: {}
   # exec:
   #   command:
@@ -41,7 +44,7 @@ livenessProbe: {}
   # initialDelaySeconds: 60
   # periodSeconds: 60
   # failureThreshold: 3
-  # timeoutSeconds: 10
+  # timeoutSeconds: 30
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

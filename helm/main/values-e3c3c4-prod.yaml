@@ -170,6 +170,8 @@ sidekiq:
   # Restart Sidekiq if it loses its Redis/Sentinel connection.
   # failureThreshold * periodSeconds = ~3 min of unreachable Redis before restart.
   # Kubernetes CrashLoopBackOff provides exponential back-off, avoiding infinite tight loops.
+  # timeoutSeconds: 30 — rails runner boots the full Rails env (S3, Redis Sentinel,
+  # cron-job loading, etc.) which consistently exceeds 10s. 30s gives headroom.
   livenessProbe:
     exec:
       command:
@@ -179,7 +181,7 @@ sidekiq:
     initialDelaySeconds: 60
     periodSeconds: 60
     failureThreshold: 3
-    timeoutSeconds: 10
+    timeoutSeconds: 30
 
   env:
     'SIDEKIQ_CONCURRENCY': '25'
