@@ -4,4 +4,9 @@ import RubyPlugin from 'vite-plugin-ruby';
 
 export default defineConfig({
   plugins: [RubyPlugin(), ReactPlugin()],
+  css: {
+    lightningcss: {
+      errorRecovery: true,
+    },
+  },
 });

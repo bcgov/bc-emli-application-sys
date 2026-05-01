@@ -25,7 +25,7 @@ ENV LD_PRELOAD="libjemalloc.so.2" \
     RUBY_YJIT_ENABLE="1"
 
 # Install Node.js
-ARG NODE_VERSION=20.15.0
+ARG NODE_VERSION=24.15.0
 RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
     cd /tmp/node-build-master && ./install.sh && \
     /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
@@ -38,10 +38,13 @@ RUN gem install bundler:2.5.4 && \
 
 # Install npm and node modules
 COPY package.json package-lock.json ./
-RUN npm install --legacy-peer-deps --maxsockets=50
+RUN npm install --maxsockets=50 --ignore-scripts
 
 # Copy application code
 COPY . .
+
+# Run postinstall scripts now that app code is present
+RUN npm run gen:theme-typings
 
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
@@ -72,7 +75,9 @@ USER rails:rails
 # Entrypoint - source vault variables from Hashicorp
 ENTRYPOINT ["./devops/docker/app/entrypoint.sh"]
 
-LABEL maintainer="Derek Yau <derek@laterolabs.com>"
+LABEL maintainer="Darrel Siegle <darrel.siegle@dxcas.com>" \
+      description="Docker image for the BC Home Energy Savings Program System" \
+      version="1.0.0"
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
