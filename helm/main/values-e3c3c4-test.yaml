@@ -99,6 +99,9 @@ app:
     'VITE_SUBMIT_INVOICE_ENABLED': 'true'
     'ANYCABLE_URL': 'wss://hesp-anycable.apps.gold.devops.gov.bc.ca/cable'
     'IS_APP_SERVER': true
+    'CLAMAV_TIMEOUT': '30'
+    'VIRUS_SCAN_TEMP_DIR': '/tmp/virus_scan'
+    'UPLOAD_VIRUS_SCAN_TIMEOUT': '45'
     # Note: AWS_REGION, AWS_DEFAULT_REGION, AWS_PARAMETER_BASE_PATH and other
     # shared config are provided via hesp-config ConfigMap
 
@@ -114,6 +117,10 @@ sidekiq:
   enabled: true
 
   replicaCount: 2 # TEST: 2 replicas for redundancy
+
+  # Recreate avoids Vite chunk hash mismatches during rolling deploys (white screen).
+  strategy:
+    type: Recreate
 
   image:
     repository: ghcr.io/bcgov/hesp-app
@@ -138,6 +145,20 @@ sidekiq:
   podDisruptionBudget:
     enabled: true
     minAvailable: 1
+
+  # Restart Sidekiq if it loses its Redis/Sentinel connection.
+  # timeoutSeconds: 30 — rails runner boots the full Rails env (S3, Redis Sentinel,
+  # cron-job loading, etc.) which consistently exceeds 10s. 30s gives headroom.
+  livenessProbe:
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - bundle exec rails runner "Sidekiq.redis { |r| r.ping }"
+    initialDelaySeconds: 60
+    periodSeconds: 60
+    failureThreshold: 3
+    timeoutSeconds: 30
 
   env:
     'SIDEKIQ_CONCURRENCY': '10'
@@ -642,5 +663,5 @@ sharedConfig:
 # ============================================================================
 s3KeyRotation:
   enabled: true
-  schedule: '0 */6 * * *'
+  schedule: '0 */2 * * *'
   parameterStorePath: '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'

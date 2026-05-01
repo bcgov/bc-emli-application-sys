@@ -352,6 +352,45 @@ export const Navigation = observer(() => {
   const { t } = useTranslation();
 
   useEffect(() => {
+    const reloadGuardKey = 'hesp:chunk-reload-attempted';
+    const guardTtlMs = 15000;
+
+    const clearGuardAfterTtl = window.setTimeout(() => {
+      sessionStorage.removeItem(reloadGuardKey);
+    }, guardTtlMs);
+
+    const onUnhandledRejection = (event: PromiseRejectionEvent) => {
+      const reason = event.reason;
+      const message = typeof reason === 'string' ? reason : reason?.message || reason?.toString?.() || '';
+
+      const isChunkLoadFailure =
+        message.includes('Failed to fetch dynamically imported module') ||
+        message.includes('Importing a module script failed') ||
+        message.includes('Loading chunk') ||
+        reason?.name === 'ChunkLoadError';
+
+      if (!isChunkLoadFailure) return;
+
+      const currentPath = window.location.pathname + window.location.search;
+      const lastAttemptPath = sessionStorage.getItem(reloadGuardKey);
+
+      if (lastAttemptPath === currentPath) {
+        return;
+      }
+
+      sessionStorage.setItem(reloadGuardKey, currentPath);
+      window.location.reload();
+    };
+
+    window.addEventListener('unhandledrejection', onUnhandledRejection);
+
+    return () => {
+      window.clearTimeout(clearGuardAfterTtl);
+      window.removeEventListener('unhandledrejection', onUnhandledRejection);
+    };
+  }, []);
+
+  useEffect(() => {
     validateToken();
   }, []);
 

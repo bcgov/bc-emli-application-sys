@@ -116,8 +116,8 @@ metadata:
 spec:
   schedule: {{ .Values.s3KeyRotation.schedule | default "0 */6 * * *" | quote }}
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 2
-  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: {{ .Values.s3KeyRotation.successfulJobsHistoryLimit | default 2 }}
+  failedJobsHistoryLimit: {{ .Values.s3KeyRotation.failedJobsHistoryLimit | default 3 }}
   jobTemplate:
     spec:
       backoffLimit: 3

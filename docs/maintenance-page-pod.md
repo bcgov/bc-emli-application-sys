@@ -25,30 +25,28 @@ The goal is to show a clear outage page instead of DNS/browser error pages durin
 
 - `oc` CLI authenticated to the target cluster.
 - `helm` 3.x installed.
-- Access to target project/namespace (`bfc7dd-dev`, `bfc7dd-test`, `bfc7dd-prod`).
+- Access to target project/namespace (`e3c3c4-prod`).
 
 ## Build and Deploy (First Time Per Namespace)
 
 ### 1) Select project
 
 ```bash
-oc login https://api.silver.devops.gov.bc.ca:6443
-oc project <namespace>
+oc login https://api.gold.devops.gov.bc.ca:6443
+oc project e3c3c4-prod
 ```
 
 ### 2) Create build config once
 
 ```bash
-oc new-build --name=hesp-maintenance --binary --strategy=docker --to=hesp-maintenance:<tag>
+oc new-build --name=hesp-maintenance --binary --strategy=docker --to=hesp-maintenance:prod
 ```
-
-Use `dev`/`test`/`prod` as `<tag>` based on namespace.
 
 ### 3) Build image from local maintenance folder
 
 ```bash
 oc start-build hesp-maintenance \
-  --from-dir=./bc-emli-application-sys/maintenance \
+  --from-dir=./maintenance \
   --follow --wait
 ```
 
@@ -58,23 +56,21 @@ oc start-build hesp-maintenance \
 cd ./bc-emli-application-sys/helm/_maintenance
 
 helm upgrade --install hesp-maintenance . \
-  --namespace <namespace> \
-  --set image.repository=image-registry.openshift-image-registry.svc:5000/<namespace>/hesp-maintenance \
-  --set image.tag=<tag> \
+  --namespace e3c3c4-prod \
+  --set image.repository=image-registry.openshift-image-registry.svc:5000/e3c3c4-prod/hesp-maintenance \
+  --set image.tag=prod \
   --set image.pullPolicy=Always \
   --set replicaCount=1 \
   --set route.enabled=false \
   --set fullnameOverride=maintenance
 ```
 
-> `fullnameOverride=maintenance` ensures the service name is always `maintenance` for route switching.
-
 ### 5) Verify
 
 ```bash
-oc rollout status deploy/maintenance -n <namespace> --timeout=180s
-oc get deploy,pod,svc -n <namespace> -l app.kubernetes.io/name=maintenance
-oc logs deploy/maintenance -n <namespace> --tail=50
+oc rollout status deploy/maintenance -n e3c3c4-prod --timeout=180s
+oc get deploy,pod,svc -n e3c3c4-prod -l app.kubernetes.io/name=maintenance
+oc logs deploy/maintenance -n e3c3c4-prod --tail=50
 ```
 
 ## Update Process (After Editing HTML/CSS)
@@ -85,22 +81,22 @@ When you change `maintenance/index.html` (or nginx config):
 
 ```bash
 oc start-build hesp-maintenance \
-  -n <namespace> \
-  --from-dir=./bc-emli-application-sys/maintenance \
+  -n e3c3c4-prod \
+  --from-dir=./maintenance \
   --follow --wait
 ```
 
-2. Force rollout (important when reusing same tag like `dev` or `prod`):
+2. Force rollout (important when reusing same tag `prod`):
 
 ```bash
-oc rollout restart deploy/maintenance -n <namespace>
-oc rollout status deploy/maintenance -n <namespace> --timeout=180s
+oc rollout restart deploy/maintenance -n e3c3c4-prod
+oc rollout status deploy/maintenance -n e3c3c4-prod --timeout=180s
 ```
 
 3. Validate updated page:
 
 ```bash
-oc port-forward -n <namespace> svc/maintenance 8081:8080
+oc port-forward -n e3c3c4-prod svc/maintenance 8081:8080
 # open http://localhost:8081
 ```
 
@@ -109,14 +105,14 @@ oc port-forward -n <namespace> svc/maintenance 8081:8080
 ### Enable maintenance mode (redirect traffic)
 
 ```bash
-oc patch route hesp-app -n <namespace> --type=merge \
+oc patch route hesp-app -n e3c3c4-prod --type=merge \
   -p '{"spec":{"to":{"name":"maintenance"}}}'
 ```
 
 ### Confirm route target
 
 ```bash
-oc get route hesp-app -n <namespace> -o jsonpath='{.spec.to.name}{"\n"}'
+oc get route hesp-app -n e3c3c4-prod -o jsonpath='{.spec.to.name}{"\n"}'
 ```
 
 Expected output: `maintenance`
@@ -124,7 +120,7 @@ Expected output: `maintenance`
 ### Disable maintenance mode (restore app)
 
 ```bash
-oc patch route hesp-app -n <namespace> --type=merge \
+oc patch route hesp-app -n e3c3c4-prod --type=merge \
   -p '{"spec":{"to":{"name":"hesp-app"}}}'
 ```
 
@@ -133,7 +129,7 @@ oc patch route hesp-app -n <namespace> --type=merge \
 - Maintenance deployment is healthy (`1/1` ready).
 - `svc/maintenance` exists and has endpoints.
 - `route/hesp-app` target is correct (`maintenance` or `hesp-app`).
-- External URL returns expected page content.
+- External URL (`https://hesp.apps.gold.devops.gov.bc.ca`) returns expected page content.
 
 ## Troubleshooting
 
@@ -181,12 +177,12 @@ and confirm temp/pid paths use `/tmp` and writable group permissions.
 - Drops Linux capabilities.
 - Serves static content only.
 
-## Quick Commands (Prod Example)
+## Quick Commands (Gold Prod)
 
 ```bash
-oc project bfc7dd-prod
-oc start-build hesp-maintenance --from-dir=/home/siegleda/workspace/bc-emli-application-sys/maintenance --follow --wait
-oc rollout restart deploy/maintenance -n bfc7dd-prod
-oc rollout status deploy/maintenance -n bfc7dd-prod --timeout=180s
-oc patch route hesp-app -n bfc7dd-prod --type=merge -p '{"spec":{"to":{"name":"maintenance"}}}'
+oc project e3c3c4-prod
+oc start-build hesp-maintenance --from-dir=./maintenance --follow --wait
+oc rollout restart deploy/maintenance -n e3c3c4-prod
+oc rollout status deploy/maintenance -n e3c3c4-prod --timeout=180s
+oc patch route hesp-app -n e3c3c4-prod --type=merge -p '{"spec":{"to":{"name":"maintenance"}}}'
 ```

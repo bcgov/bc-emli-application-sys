@@ -70,7 +70,7 @@ data:
       # HTTPS server with legacy CBC cipher support
       server {
         listen 8443 ssl http2;
-        server_name _;
+        server_name bcenergysavingsprogram.ca;
 
         # SSL Certificate paths (mounted from secret)
         ssl_certificate /etc/nginx/certs/tls.crt;
@@ -84,9 +84,8 @@ data:
         ssl_session_timeout 10m;
 
         # Security headers
-        # NOTE: HSTS intentionally omitted in base config - only enable when a trusted CA cert is in use.
-        # Enabling HSTS with a self-signed cert will hard-block browsers (cannot bypass).
-        # add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        # Trusted Entrust OV CA cert in use - HSTS safe to enable.
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
         add_header X-Frame-Options "SAMEORIGIN" always;
         add_header X-Content-Type-Options "nosniff" always;
         add_header X-XSS-Protection "1; mode=block" always;

@@ -40,6 +40,10 @@ app:
   # DEV: 2 replicas (still HA but resource-light)
   replicaCount: 2
 
+  # Recreate avoids Vite chunk hash mismatches during rolling deploys (white screen).
+  strategy:
+    type: Recreate
+
   image:
     repository: ghcr.io/bcgov/hesp-app
     pullPolicy: IfNotPresent
@@ -123,11 +127,11 @@ sidekiq:
 
   resources:
     limits:
-      cpu: 200m
-      memory: 256Mi
+      cpu: 300m
+      memory: 384Mi
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 150m
+      memory: 192Mi
 
   dependencyWait:
     enabled: true
@@ -139,6 +143,20 @@ sidekiq:
 
   podDisruptionBudget:
     enabled: false # DEV: May cause issues with single replica
+
+  # Restart Sidekiq if it loses its Redis/Sentinel connection.
+  # timeoutSeconds: 30 — rails runner boots the full Rails env (S3, Redis Sentinel,
+  # cron-job loading, etc.) which consistently exceeds 10s. 30s gives headroom.
+  livenessProbe:
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - bundle exec rails runner "Sidekiq.redis { |r| r.ping }"
+    initialDelaySeconds: 60
+    periodSeconds: 60
+    failureThreshold: 3
+    timeoutSeconds: 30
 
   env:
     'SIDEKIQ_CONCURRENCY': '5'
@@ -595,7 +613,7 @@ sharedConfig:
     region: ca-central-1
     endpoint: https://s3.ca-central-1.amazonaws.com
     publicEndpoint: https://s3.ca-central-1.amazonaws.com
-    bucket: esp-dev-cacentral1-bucket
+    bucket: hesp-dev-cacentral1-bucket
 
   app:
     domain: dev-hesp.apps.gold.devops.gov.bc.ca

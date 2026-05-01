@@ -26,6 +26,15 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", :as => :rails_health_check
 
+  # Dedicated health page for GSLB / uptime monitors.
+  # Configure the monitor as:
+  #   Keep-Alive type : HTTP/S
+  #   Keepalive URL   : GET /health HTTP/1.1\r\nHost: <your-hostname>\r\nConnection: Close\r\n\r\n
+  #   Match string    : "ok"
+  # To force a failover during maintenance, temporarily change the response body
+  # in HealthController#show so the match string no longer matches.
+  get "health" => "health#show", :as => :health_check
+
   scope module: :api, path: :api do
     devise_for :users,
                defaults: {
