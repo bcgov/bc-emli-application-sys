@@ -1,5 +1,12 @@
 // The custom components in this directory are from the CHEFS codebase https://github.com/bcgov/common-hosted-form-service/tree/master/components
-import { Form, Formio, Templates } from '@formio/react';
+// CJS interop: @formio/react does not re-export Formio — it lives in @formio/js
+import * as FormioReactModule from '@formio/react';
+import * as FormioJsModule from '@formio/js';
+const _fioReact = (FormioReactModule as any).default ?? FormioReactModule;
+const _fioJs = (FormioJsModule as any).default ?? FormioJsModule;
+const Form = _fioReact.Form as (typeof FormioReactModule)['Form'];
+const Templates = (_fioReact.Templates ?? _fioJs.Templates) as (typeof FormioReactModule)['Templates'];
+const Formio = _fioJs.Formio as (typeof import('@formio/js'))['Formio'];
 import './styles.scss';
 
 import { t } from 'i18next';

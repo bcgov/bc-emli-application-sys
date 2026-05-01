@@ -7,12 +7,13 @@ import { ScrollLink } from '../../shared/energy-savings-applications/scroll-link
 
 interface IErrorBoxProps {
   data: IErrorsBoxData[]; //need to add types
+  show?: boolean;
 }
 
-export const ErrorsBox = ({ data }: IErrorBoxProps) => {
+export const ErrorsBox = ({ data, show = false }: IErrorBoxProps) => {
   const { t } = useTranslation();
   const { isOpen, onToggle } = useDisclosure();
-  if (data.length == 0) {
+  if (!show || data.length == 0) {
     return <React.Fragment key={'errors'}></React.Fragment>;
   }
   return (

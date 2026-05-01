@@ -50,7 +50,7 @@ RUN npm run gen:theme-typings
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY - also compile SSR
-ARG VITE_ENABLE_TEMPLATE_FORCE_PUBLISH
+ARG VITE_ENABLE_TEMPLATE_FORCE_PUBLISH=true
 ARG VITE_BCEID_URL
 ARG VITE_BUSINESS_BCEID_REGISTRATION_URL
 ARG VITE_BASIC_BCEID_REGISTRATION_URL

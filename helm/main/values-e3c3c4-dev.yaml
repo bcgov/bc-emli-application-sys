@@ -103,8 +103,9 @@ app:
 
   env:
     'VITE_SUBMIT_INVOICE_ENABLED': 'true'
-    'ANYCABLE_URL': 'wss://dev-hesp.apps.gold.devops.gov.bc.ca/cable'
+    'ANYCABLE_URL': 'wss://dev-hesp-anycable.apps.gold.devops.gov.bc.ca/cable'
     'IS_APP_SERVER': true
+    'VITE_ENABLE_TEMPLATE_FORCE_PUBLISH': 'true'
     # Note: AWS_REGION, AWS_DEFAULT_REGION, AWS_PARAMETER_BASE_PATH, APP_DOMAIN,
     # KEYCLOAK_AUTH_URL, S3/AWS settings are provided via hesp-config ConfigMap
 
@@ -517,6 +518,7 @@ anycableGo:
 
   route:
     enabled: true # Route handled by nginx proxy
+    host: dev-hesp-anycable.apps.gold.devops.gov.bc.ca
 
   ingress:
     enable: false

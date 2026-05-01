@@ -1,100 +1,113 @@
-import { Box, BoxProps, Button, Text } from "@chakra-ui/react"
-import { CalendarBlank, CaretDown } from "@phosphor-icons/react"
-import * as R from "ramda"
-import React, { forwardRef } from "react"
-import ReactDatePicker, { ReactDatePickerProps } from "react-datepicker"
-import "react-datepicker/dist/react-datepicker.css"
-import { useTranslation } from "react-i18next"
-import { datefnsAppDateFormat } from "../../constants"
+import { Box, BoxProps, Button, Text } from '@chakra-ui/react';
+import { CalendarBlank, CaretDown } from '@phosphor-icons/react';
+import * as R from 'ramda';
+import React, { forwardRef } from 'react';
+import * as ReactDatePickerModule from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { useTranslation } from 'react-i18next';
+import { datefnsAppDateFormat } from '../../constants';
+
+function resolveDatePickerComponent(mod: unknown): React.ComponentType<any> {
+  let candidate: any = mod;
+  for (let depth = 0; depth < 3; depth += 1) {
+    if (typeof candidate === 'function') return candidate;
+    candidate = candidate?.default;
+  }
+  return () => null;
+}
+
+const ReactDatePicker = resolveDatePickerComponent(ReactDatePickerModule);
+
+type ReactDatePickerProps = React.ComponentProps<typeof ReactDatePicker>;
 
 export interface IDatePickerProps extends ReactDatePickerProps {
-  containerProps?: Partial<BoxProps>
+  containerProps?: Partial<BoxProps>;
 }
 
 const CustomInput = forwardRef<
   HTMLButtonElement,
   {
-    value?: string | null
-    readOnly?: boolean
-    onClick?: () => void
+    value?: string | null;
+    readOnly?: boolean;
+    onClick?: () => void;
   }
 >(({ value, onClick, readOnly, ...rest }, ref) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <Button
-      w={"full"}
+      w={'full'}
       lineHeight="27px"
       borderRadius="sm"
       px={3}
-      py={"0.375rem"}
+      py={'0.375rem'}
       _disabled={{
-        bg: "greys.grey04",
-        color: "text.secondary",
+        bg: 'greys.grey04',
+        color: 'text.secondary',
         opacity: 1,
         _hover: {
-          borderColor: "greys.grey01",
-          cursor: "not-allowed",
+          borderColor: 'greys.grey01',
+          cursor: 'not-allowed',
         },
         _focus: {
-          borderColor: "focus",
+          borderColor: 'focus',
         },
       }}
-      border={"1px solid"}
+      border={'1px solid'}
       borderColor="border.input"
-      bg={"white"}
-      _hover={{ borderColor: "border.input" }}
+      bg={'white'}
+      _hover={{ borderColor: 'border.input' }}
       sx={{
-        "&:focus": { borderColor: "focus" },
+        '&:focus': { borderColor: 'focus' },
       }}
-      leftIcon={<CalendarBlank color={"var(--chakra-colors-text-secondary)"} size={20} />}
-      rightIcon={<CaretDown color={"var(--chakra-colors-text-secondary)"} size={20} />}
-      color={value ? "text.primary" : "greys.grey01"}
-      aria-label={"Select date"}
-      role={"date-picker"}
+      leftIcon={<CalendarBlank color={'var(--chakra-colors-text-secondary)'} size={20} />}
+      rightIcon={<CaretDown color={'var(--chakra-colors-text-secondary)'} size={20} />}
+      color={value ? 'text.primary' : 'greys.grey01'}
+      aria-label={'Select date'}
+      role={'date-picker'}
       onClick={onClick}
       ref={ref}
       isDisabled={readOnly}
       {...rest}
     >
-      <Text as={"span"} textAlign={"start"} flex={1}>
-        {value || (!readOnly && t("ui.select"))}
+      <Text as={'span'} textAlign={'start'} flex={1}>
+        {value || (!readOnly && t('ui.select'))}
       </Text>
     </Button>
-  )
-})
+  );
+});
 
 export function DatePicker({ containerProps, ...datePickerProps }: IDatePickerProps) {
-  const sxStyles = containerProps?.sx || {}
+  const sxStyles = containerProps?.sx || {};
   return (
     <Box
-      w={"200px"}
+      w={'200px'}
       {...containerProps}
       sx={R.mergeDeepRight(
         {
-          ".react-datepicker__input-container": {
-            w: "200px",
+          '.react-datepicker__input-container': {
+            w: '200px',
           },
-          ".react-datepicker__close-icon": {
-            "::after": {
-              color: "var(--chakra-colors-text-secondary)",
-              background: "none",
+          '.react-datepicker__close-icon': {
+            '::after': {
+              color: 'var(--chakra-colors-text-secondary)',
+              background: 'none',
               content: `"\\2715"`,
-              fontSize: "var(--chakra-fontSizes-sm)",
+              fontSize: 'var(--chakra-fontSizes-sm)',
             },
-            left: "130px",
+            left: '130px',
           },
         },
-        sxStyles
+        sxStyles,
       )}
     >
       <ReactDatePicker
         customInput={<CustomInput />}
         dateFormat={datefnsAppDateFormat}
-        popperPlacement={"bottom-start"}
+        popperPlacement={'bottom-start'}
         showPopperArrow={false}
         {...datePickerProps}
       />
     </Box>
-  )
+  );
 }

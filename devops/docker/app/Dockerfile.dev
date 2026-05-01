@@ -22,7 +22,7 @@ RUN mkdir -p /tmp/virus_scan && \
     chmod 755 /tmp/virus_scan
 
 # Install Node.js first (smaller layer, changes less frequently)
-ARG NODE_VERSION=20.15.0
+ARG NODE_VERSION=24.15.0
 RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
     cd /tmp/node-build-master && ./install.sh && \
     /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
@@ -35,11 +35,13 @@ RUN gem install bundler:2.5.4 && \
 
 # Install Node dependencies (before copying app code for better caching)
 COPY package.json package-lock.json ./
-RUN npm install --legacy-peer-deps --maxsockets=50
+RUN npm install --maxsockets=50 --ignore-scripts
 
 # Copy application code (this layer changes most frequently)
 COPY . .
 
+# Run postinstall scripts now that app code is present
+RUN npm run gen:theme-typings
 
 RUN bundle exec bootsnap precompile app/ lib/
 

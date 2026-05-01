@@ -33,9 +33,26 @@ if SHRINE_USE_S3
   Rails.logger.info "Storage endpoint: #{ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"]}"
 end
 
+LOCAL_MINIO_S3 =
+  Rails.env.development? &&
+    (
+      ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"]&.include?("minio") ||
+        ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"]&.include?("localhost:9000")
+    )
+
 if SHRINE_USE_S3
   # Simple credentials provider - database only, cron job handles refresh
   def get_aws_credentials
+    if LOCAL_MINIO_S3
+      return(
+        {
+          access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
+          secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
+          session_token: nil
+        }
+      )
+    end
+
     # Check if we can access the database and AwsCredential model during initialization
     begin
       db_credentials = AwsCredential.current_s3_credentials if defined?(
@@ -81,8 +98,7 @@ if SHRINE_USE_S3
   }.compact
 
   # Create bucket if using local MinIO (development)
-  if Rails.env.development? &&
-       ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"]&.include?("minio")
+  if LOCAL_MINIO_S3
     begin
       s3_client = Aws::S3::Client.new(s3_options.except(:bucket))
       bucket_name = s3_options[:bucket]
@@ -213,6 +229,7 @@ if SHRINE_USE_S3
     # Check if current client has invalid credentials
     def credentials_invalid?
       return false unless @client
+      return false if LOCAL_MINIO_S3
       return false unless defined?(AwsCredential) && !Rails.env.test?
 
       begin
@@ -248,6 +265,19 @@ if SHRINE_USE_S3
 
     # Create a new S3 client with current credentials
     def create_s3_client
+      if LOCAL_MINIO_S3
+        return(
+          Aws::S3::Client.new(
+            endpoint: @dynamic_options[:endpoint],
+            region: @dynamic_options[:region],
+            access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
+            secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
+            session_token: nil,
+            force_path_style: @dynamic_options[:force_path_style]
+          )
+        )
+      end
+
       if defined?(AwsCredential) && !Rails.env.test?
         # Handle database connection issues during initialization
         begin

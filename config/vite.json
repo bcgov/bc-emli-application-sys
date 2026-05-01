@@ -2,10 +2,10 @@
   "all": {
     "sourceCodeDir": "app/frontend",
     "watchAdditionalPaths": [],
-    "devServerConnectTimeout": 1
+    "devServerConnectTimeout": 10
   },
   "development": {
-    "autoBuild": true,
+    "autoBuild": false,
     "publicOutputDir": "vite-dev",
     "port": 3036
   },
