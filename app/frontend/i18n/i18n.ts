@@ -515,6 +515,7 @@ const options = {
           view: 'View',
           reviewSubmission: 'Review the submission',
           checkSubmission: 'Check the submission to see why',
+          completeSubmission: 'Please complete this submission',
           totalItems: 'Total items',
           doLater: 'Do this later',
           add: 'Add',

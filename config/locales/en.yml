@@ -180,6 +180,7 @@ en:
       contractor_invoice_ineligible: 'Update on your invoice'
       contractor_invoice_approved: 'Invoice approved'
       contractor_invoice_paid: 'Invoice paid'
+      contractor_invoice_draft_reminder: 'Reminder: Your Better Homes Energy Savings Program invoice'
   authentication_methods:
     bcsc: 'BC Services Card Account'
     bceidbasic: 'Basic BCeID'
@@ -846,6 +847,7 @@ en:
       invoice_ineligible: 'Invoice submission #%{number} has been processed and is not eligible.'
       invoice_approved: 'We approved invoice #%{number}. You will get an email when we issue your payment.'
       invoice_paid: 'Rebate payment for invoice #%{number} will be deposited in 3-5 business days.'
+      invoice_draft_reminder: 'Invoice upload #%{number} is in draft status.'
     user:
       account_update_notification: 'Your account was updated on %{updated_at}. Changes: %{changed_fields}. If you did not make this change, please contact support immediately.'
     permit_collaboration:

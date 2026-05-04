@@ -457,4 +457,19 @@ class PermitHubMailer < ApplicationMailer
 
     send_mail(email: @user.email, template_key: "contractor_invoice_paid")
   end
+
+  def contractor_invoice_draft_reminder(application, user)
+    @application = application
+    @user = user
+    @invoice_number = application.number
+    @invoice_id = application.id
+
+    return unless @user.present?
+    return unless @user.email.present?
+
+    send_mail(
+      email: @user.email,
+      template_key: "contractor_invoice_draft_reminder"
+    )
+  end
 end

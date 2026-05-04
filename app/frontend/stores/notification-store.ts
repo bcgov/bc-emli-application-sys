@@ -155,6 +155,11 @@ export const NotificationStoreModel = types
           ];
         }
 
+        case ENotificationActionType.contractorInvoiceDraftReminder: {
+          const data = objectData as IPermitNotificationObjectData;
+          return [{ text: t('ui.completeSubmission'), href: getApplicationLink(data.permitApplicationId, true) }];
+        }
+
         case ENotificationActionType.contractorInvoiceIneligible: {
           const data = objectData as IPermitNotificationObjectData;
           return [

@@ -178,7 +178,10 @@ class PermitApplication < ApplicationRecord
                if: :saved_change_to_reference_number?
   after_commit :schedule_incomplete_draft_notification,
                on: :create,
-               if: :new_draft?
+               if: :participant_new_draft?
+  after_commit :schedule_invoice_draft_notification,
+               on: :create,
+               if: :invoice_new_draft?
   after_commit :cancel_incomplete_draft_notification,
                if: :status_changed_from_draft?
 
@@ -864,6 +867,22 @@ class PermitApplication < ApplicationRecord
     }
   end
 
+  def publish_invoice_draft_reminder__data
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::CONTRACTOR_INVOICE_DRAFT_REMINDER,
+      "action_text" =>
+        I18n.t(
+          "notification.contractor.invoice_draft_reminder",
+          number: number
+        ),
+      "object_data" => {
+        "permit_application_id" => id
+      }
+    }
+  end
+
   def publish_invoice_updated__data
     {
       "id" => SecureRandom.uuid,
@@ -1152,6 +1171,14 @@ class PermitApplication < ApplicationRecord
     status == "new_draft"
   end
 
+  def participant_new_draft?
+    new_draft? && submission_type_code == "application"
+  end
+
+  def invoice_new_draft?
+    new_draft? && submission_type_code == "invoice"
+  end
+
   def process_contractor_onboarding!
     PermitApplication::ContractorOnboardingProcessor.new(self).process!
   end
@@ -1216,6 +1243,18 @@ class PermitApplication < ApplicationRecord
     return if contractor.nil?
 
     NotificationService.contractor_invoice_approve_paid_event(
+      self,
+      primary_contact,
+      employee_contact
+    )
+  end
+
+  def process_contractor_invoice_draft_reminder!
+    contractor, primary_contact, employee_contact =
+      invoice_submission_recipients
+    return if contractor.nil?
+
+    NotificationService.contractor_invoice_draft_reminder_event(
       self,
       primary_contact,
       employee_contact
@@ -1396,8 +1435,11 @@ class PermitApplication < ApplicationRecord
   end
 
   def schedule_incomplete_draft_notification
-    # Schedule job to run in 24 hours
     ParticipantIncompleteDraftNotificationJob.perform_in(24.hours, id)
+  end
+
+  def schedule_invoice_draft_notification
+    ContractorIncompleteDraftNotificationJob.perform_in(24.hours, id)
   end
 
   def cancel_incomplete_draft_notification
