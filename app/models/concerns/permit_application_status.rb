@@ -26,6 +26,7 @@ module PermitApplicationStatus
   included do
     after_initialize :set_flow
     after_update :check_ineligible_transition
+    after_update :check_screen_in_transition
     after_save :reset_flow_if_status_changed
 
     # Let model calls (like application.submit?) proxy to the flow
@@ -66,6 +67,12 @@ module PermitApplicationStatus
     key = [submission_type&.code, user_group_type&.code, audience_type&.code]
     klass = FLOW_MAP[key] || ApplicationFlow::Default
     klass.new(self)
+  end
+
+  def check_screen_in_transition
+    if saved_change_to_status? && status == "in_review" && screened_in_at.nil?
+      update_column(:screened_in_at, Time.current)
+    end
   end
 
   def check_ineligible_transition
