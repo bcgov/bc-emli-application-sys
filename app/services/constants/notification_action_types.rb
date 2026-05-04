@@ -33,6 +33,6 @@ module Constants
     CONTRACTOR_INVOICE_INELIGIBLE = "invoice_ineligible"
     CONTRACTOR_INVOICE_APPROVED = "invoice_approved"
     CONTRACTOR_INVOICE_PAID = "invoice_paid"
-    CONTRACTOR_INVOICE_DRAFT_REMINDER = "contractor_invoice_draft_reminder"
+    CONTRACTOR_INVOICE_DRAFT_REMINDER = "invoice_draft_reminder"
   end
 end

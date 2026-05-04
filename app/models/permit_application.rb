@@ -1439,7 +1439,7 @@ class PermitApplication < ApplicationRecord
   end
 
   def schedule_invoice_draft_notification
-    ContractorIncompleteDraftNotificationJob.perform_in(24.hours, id)
+    ContractorInvoiceDraftReminderJob.perform_in(24.hours, id)
   end
 
   def cancel_incomplete_draft_notification

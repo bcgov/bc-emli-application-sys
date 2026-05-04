@@ -1,4 +1,4 @@
-class ContractorIncompleteDraftNotificationJob
+class ContractorInvoiceDraftReminderJob
   include Sidekiq::Worker
   sidekiq_options queue: :default
 

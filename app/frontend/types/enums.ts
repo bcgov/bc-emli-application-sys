@@ -532,7 +532,7 @@ export enum ENotificationActionType {
   contractorInvoiceIneligible = 'invoice_ineligible',
   contractorInvoiceApproved = 'invoice_approved',
   contractorInvoicePaid = 'invoice_paid',
-  contractorInvoiceDraftReminder = 'contractor_invoice_draft_reminder',
+  contractorInvoiceDraftReminder = 'invoice_draft_reminder',
 }
 
 export enum ECollaboratorableType {
