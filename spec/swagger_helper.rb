@@ -171,6 +171,13 @@ in this document.
                 description:
                   "Datetime in milliseconds since the epoch (Unix time). This is the timestamp of the last update to the application record."
               },
+              screened_in_at: {
+                type: :number,
+                format: :int64,
+                description:
+                  "Datetime in milliseconds since the epoch (Unix time). This is the timestamp when the application was screened in (moved to in review) by program staff.",
+                nullable: true
+              },
               user_group_type: {
                 type: :string,
                 enum: %w[participant contractor],

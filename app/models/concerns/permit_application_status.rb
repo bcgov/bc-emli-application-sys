@@ -25,6 +25,7 @@ module PermitApplicationStatus
 
   included do
     after_initialize :set_flow
+    before_save :set_screened_in_at
     after_update :check_ineligible_transition
     after_save :reset_flow_if_status_changed
 
@@ -66,6 +67,12 @@ module PermitApplicationStatus
     key = [submission_type&.code, user_group_type&.code, audience_type&.code]
     klass = FLOW_MAP[key] || ApplicationFlow::Default
     klass.new(self)
+  end
+
+  def set_screened_in_at
+    if status_changed? && status == "in_review" && screened_in_at.nil?
+      self.screened_in_at = Time.current
+    end
   end
 
   def check_ineligible_transition

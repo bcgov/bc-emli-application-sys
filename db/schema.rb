@@ -420,6 +420,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_19_222612) do
     t.string "reference_number"
     t.jsonb "compliance_data", default: {}, null: false
     t.datetime "revisions_requested_at", precision: nil
+    t.datetime "screened_in_at"
     t.boolean "first_nations", default: false
     t.uuid "sandbox_id"
     t.uuid "program_id"

@@ -242,7 +242,8 @@ class PermitApplicationBlueprint < Blueprinter::Base
            :full_address,
            :submitted_at,
            :resubmitted_at,
-           :updated_at
+           :updated_at,
+           :screened_in_at
 
     field :submission_data do |pa, _options|
       pa.formatted_submission_data_for_external_use
