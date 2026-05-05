@@ -517,7 +517,10 @@ RSpec.describe "external_api/v1/applications",
         end
       end
 
-      response(400, "Invalid status parameter") do
+      response(
+        400,
+        "Invalid query parameter (e.g. invalid status or date format)"
+      ) do
         let(:status) { "invalid_status" }
         schema "$ref" => "#/components/schemas/ResponseError"
         run_test!

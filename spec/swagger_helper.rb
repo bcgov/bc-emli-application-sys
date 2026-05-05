@@ -68,9 +68,8 @@ During your integration testing phase, you have the flexibility to use custom UR
 tailor the API environment to better suit your development needs. Ensure that your custom URLs are configured correctly to avoid any connectivity or data access issues.
 
 ### Special considerations:
-A returned permit application will have a status of either `newly_submitted` for permit applications submitted for the first time, or `resubmitted` for
-permit applications that have been resubmitted due to revision requests. The `resubmitted_at` field will indicate the timestamp of the latest resubmission.
-While there may be multiple resubmissions, the submission data payload returned will reflect the most recent submission data. 
+A returned permit application can have various statuses depending on the endpoint and filters applied. The `resubmitted_at` field will indicate the timestamp of the latest resubmission.
+While there may be multiple resubmissions, the submission data payload returned will reflect the most recent submission data.
 
 For security purposes, any API response that includes a file URL will have a signed URL. These files will be available for download for a limited time (1 hour).
 We recommend downloading the file immediately upon receiving the URL to avoid any issues. If necessary, you can always call the API again to retrieve a
