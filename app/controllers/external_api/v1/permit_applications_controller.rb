@@ -134,15 +134,15 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
     # Filter by status if provided, otherwise exclude new_draft
     if permitted[:status].present?
       unless PermitApplication.statuses.key?(permitted[:status])
-        render json: {
-                 data: {
-                 },
-                 meta: {
-                   message: "Invalid status: #{permitted[:status]}",
-                   type: "error"
-                 }
-               },
-               status: :bad_request
+        render_error(
+          nil,
+          {
+            status: 400,
+            meta: {
+              message: "Invalid status: #{permitted[:status]}"
+            }
+          }
+        )
         return
       end
       where[:status] = permitted[:status]

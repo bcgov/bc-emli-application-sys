@@ -873,8 +873,8 @@ paths:
                   properties:
                     status:
                       type: string
-                      description: Filter by application status (e.g. in_review).
-                        Defaults to in_review when omitted.
+                      description: Filter by application status. Defaults to in_review
+                        when omitted.
                     permit_classifications:
                       type: string
                       description: Filter by permit classification keywords.
@@ -1012,8 +1012,8 @@ paths:
         in: query
         schema:
           type: string
-        description: Filter applications by status (e.g. in_review, approved, rejected).
-          Omit to return all applications except new_draft.
+        description: Filter applications by status. Omit to return all applications
+          except new_draft.
         required: false
       - name: page
         in: query
@@ -1109,8 +1109,7 @@ paths:
                           nullable: true
                         status:
                           type: string
-                          description: The current status of the application (e.g.
-                            in_review, approved, rejected).
+                          description: The current status of the application.
                       required:
                       - app_id
                   meta:
@@ -1138,6 +1137,12 @@ paths:
                 required:
                 - data
                 - meta
+        '400':
+          description: Invalid status parameter
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ResponseError"
         '429':
           description: 'Rate limit exceeded. Note: The rate limit is 100 requests
             per minute per API key and 300 requests per IP in a 3 minute interval'

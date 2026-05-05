@@ -54,7 +54,7 @@ RSpec.describe "external_api/v1/applications",
                         status: {
                           type: :string,
                           description:
-                            "Filter by application status (e.g. in_review). Defaults to in_review when omitted."
+                            "Filter by application status. Defaults to in_review when omitted."
                         },
                         permit_classifications: {
                           type: :string,
@@ -365,7 +365,7 @@ RSpec.describe "external_api/v1/applications",
                   type: :string
                 },
                 description:
-                  "Filter applications by status (e.g. in_review, approved, rejected). Omit to return all applications except new_draft.",
+                  "Filter applications by status. Omit to return all applications except new_draft.",
                 required: false
 
       parameter name: :page,
@@ -472,8 +472,7 @@ RSpec.describe "external_api/v1/applications",
                        },
                        status: {
                          type: :string,
-                         description:
-                           "The current status of the application (e.g. in_review, approved, rejected)."
+                         description: "The current status of the application."
                        }
                      },
                      required: %w[app_id]
@@ -516,6 +515,11 @@ RSpec.describe "external_api/v1/applications",
             submitted_permit_applications.length
           )
         end
+      end
+
+      response(400, "Invalid status parameter") do
+        schema "$ref" => "#/components/schemas/ResponseError"
+        run_test!
       end
 
       response(
