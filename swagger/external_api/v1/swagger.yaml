@@ -861,6 +861,43 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ResponseError"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                constraints:
+                  type: object
+                  description: Optional filters to narrow the search results.
+                  properties:
+                    status:
+                      type: string
+                      description: Filter by application status (e.g. in_review).
+                        Defaults to in_review when omitted.
+                    permit_classifications:
+                      type: string
+                      description: Filter by permit classification keywords.
+                    submitted_at:
+                      "$ref": "#/components/schemas/DateRangeFilter"
+                    resubmitted_at:
+                      "$ref": "#/components/schemas/DateRangeFilter"
+                    screened_in_at:
+                      "$ref": "#/components/schemas/DateRangeFilter"
+                sort:
+                  type: object
+                  description: Optional sort order for results.
+                  properties:
+                    field:
+                      type: string
+                      description: Field to sort by (e.g. submitted_at, resubmitted_at,
+                        screened_in_at, status, updated_at).
+                    direction:
+                      type: string
+                      enum:
+                      - asc
+                      - desc
+                      description: Sort direction.
   "/applications/{id}":
     get:
       summary: This endpoint retrieves detailed information about a specific application
@@ -935,10 +972,11 @@ paths:
                 "$ref": "#/components/schemas/ResponseError"
   "/applications/summary":
     get:
-      summary: This endpoint retrieves a summary of applications filtered by submission
-        date. Returns lightweight application data with only essential fields (application
-        id, submission date, home type, heating systems, address, contact info). Pagination
-        is optional - omit page parameter to retrieve all results.
+      summary: This endpoint retrieves a summary of participant applications (excludes
+        contractor onboarding, invoices, and support requests). Returns lightweight
+        application data with only essential fields. Filters by submission date, screened-in
+        date, and/or status. Pagination is optional - omit page parameter to retrieve
+        all results.
       tags:
       - Applications
       parameters:
@@ -955,6 +993,27 @@ paths:
           type: string
           format: date
         description: Filter applications submitted on or before this date (YYYY-MM-DD)
+        required: false
+      - name: screened_in_from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Filter applications screened in on or after this date (YYYY-MM-DD)
+        required: false
+      - name: screened_in_to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Filter applications screened in on or before this date (YYYY-MM-DD)
+        required: false
+      - name: status
+        in: query
+        schema:
+          type: string
+        description: Filter applications by status (e.g. in_review, approved, rejected).
+          Omit to return all applications except new_draft.
         required: false
       - name: page
         in: query
@@ -1042,6 +1101,16 @@ paths:
                           description: The email address from the application submission
                             data.
                           nullable: true
+                        screened_in_at:
+                          type: string
+                          format: date-time
+                          description: ISO 8601 timestamp when the application was
+                            screened in (moved to in_review) by program staff.
+                          nullable: true
+                        status:
+                          type: string
+                          description: The current status of the application (e.g.
+                            in_review, approved, rejected).
                       required:
                       - app_id
                   meta:
@@ -1789,6 +1858,26 @@ components:
               items:
                 type: string
               description: Business categories.
+    DateRangeFilter:
+      type: object
+      description: A date range filter using Unix timestamps in milliseconds.
+      properties:
+        gt:
+          type: number
+          format: int64
+          description: Greater than (exclusive lower bound), Unix ms.
+        gte:
+          type: number
+          format: int64
+          description: Greater than or equal (inclusive lower bound), Unix ms.
+        lt:
+          type: number
+          format: int64
+          description: Less than (exclusive upper bound), Unix ms.
+        lte:
+          type: number
+          format: int64
+          description: Less than or equal (inclusive upper bound), Unix ms.
     ResponseError:
       type: object
       properties:

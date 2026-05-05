@@ -624,6 +624,35 @@ in this document.
               }
             }
           },
+          DateRangeFilter: {
+            type: :object,
+            description:
+              "A date range filter using Unix timestamps in milliseconds.",
+            properties: {
+              gt: {
+                type: :number,
+                format: :int64,
+                description: "Greater than (exclusive lower bound), Unix ms."
+              },
+              gte: {
+                type: :number,
+                format: :int64,
+                description:
+                  "Greater than or equal (inclusive lower bound), Unix ms."
+              },
+              lt: {
+                type: :number,
+                format: :int64,
+                description: "Less than (exclusive upper bound), Unix ms."
+              },
+              lte: {
+                type: :number,
+                format: :int64,
+                description:
+                  "Less than or equal (inclusive upper bound), Unix ms."
+              }
+            }
+          },
           ResponseError: {
             type: :object,
             properties: {

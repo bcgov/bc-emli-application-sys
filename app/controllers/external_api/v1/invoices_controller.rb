@@ -88,8 +88,8 @@ class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
     return nil unless from.present? || to.present?
 
     submitted_at = {}
-    submitted_at[:gte] = from if from.present?
-    submitted_at[:lte] = to.end_of_day if to.present?
+    submitted_at[:gte] = from.in_time_zone.beginning_of_day if from.present?
+    submitted_at[:lte] = to.in_time_zone.end_of_day if to.present?
 
     { submitted_at: submitted_at }
   end
