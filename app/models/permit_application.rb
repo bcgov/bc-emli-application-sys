@@ -344,6 +344,7 @@ class PermitApplication < ApplicationRecord
       submitter_name: submitter&.name,
       submitted_at: submitted_at,
       resubmitted_at: resubmitted_at,
+      screened_in_at: screened_in_at,
       viewed_at: viewed_at,
       status: status,
       status_display: status_display_label,

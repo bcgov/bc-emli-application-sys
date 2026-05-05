@@ -37,7 +37,8 @@ module ExternalApi::Concerns::Search::PermitApplications
         :permit_classifications,
         :status,
         submitted_at: %i[gt lt gte lte],
-        resubmitted_at: %i[gt lt gte lte]
+        resubmitted_at: %i[gt lt gte lte],
+        screened_in_at: %i[gt lt gte lte]
       ],
       sort: %i[field direction]
     )

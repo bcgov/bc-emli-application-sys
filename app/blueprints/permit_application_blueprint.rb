@@ -316,6 +316,14 @@ class PermitApplicationBlueprint < Blueprinter::Base
     field :email do |pa|
       pa.extract_email_from_submission_data
     end
+
+    field :screened_in_at do |pa|
+      pa.screened_in_at&.iso8601
+    end
+
+    field :status do |pa|
+      pa.status
+    end
   end
 
   # Invoice summary view - lightweight invoice data for external API

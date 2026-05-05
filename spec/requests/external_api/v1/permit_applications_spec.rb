@@ -40,7 +40,56 @@ RSpec.describe "external_api/v1/applications",
       let(:constraints) { nil }
       consumes "application/json"
       produces "application/json"
-      #parameter name: :constraints, in: :body, required: true
+      parameter name: :body,
+                in: :body,
+                required: false,
+                schema: {
+                  type: :object,
+                  properties: {
+                    constraints: {
+                      type: :object,
+                      description:
+                        "Optional filters to narrow the search results.",
+                      properties: {
+                        status: {
+                          type: :string,
+                          description:
+                            "Filter by application status. Defaults to in_review when omitted."
+                        },
+                        permit_classifications: {
+                          type: :string,
+                          description:
+                            "Filter by permit classification keywords."
+                        },
+                        submitted_at: {
+                          "$ref" => "#/components/schemas/DateRangeFilter"
+                        },
+                        resubmitted_at: {
+                          "$ref" => "#/components/schemas/DateRangeFilter"
+                        },
+                        screened_in_at: {
+                          "$ref" => "#/components/schemas/DateRangeFilter"
+                        }
+                      }
+                    },
+                    sort: {
+                      type: :object,
+                      description: "Optional sort order for results.",
+                      properties: {
+                        field: {
+                          type: :string,
+                          description:
+                            "Field to sort by (e.g. submitted_at, resubmitted_at, screened_in_at, status, updated_at)."
+                        },
+                        direction: {
+                          type: :string,
+                          enum: %w[asc desc],
+                          description: "Sort direction."
+                        }
+                      }
+                    }
+                  }
+                }
 
       # pagination as query params
       parameter name: :page,
@@ -266,7 +315,7 @@ RSpec.describe "external_api/v1/applications",
   end
 
   path "/applications/summary" do
-    get "This endpoint retrieves a summary of applications filtered by submission date. Returns lightweight application data with only essential fields (application id, submission date, home type, heating systems, address, contact info). Pagination is optional - omit page parameter to retrieve all results." do
+    get "This endpoint retrieves a summary of participant applications (excludes contractor onboarding, invoices, and support requests). Returns lightweight application data with only essential fields. Filters by submission date, screened-in date, and/or status. Pagination is optional - omit page parameter to retrieve all results." do
       tags "Applications"
       produces "application/json"
 
@@ -288,6 +337,35 @@ RSpec.describe "external_api/v1/applications",
                 },
                 description:
                   "Filter applications submitted on or before this date (YYYY-MM-DD)",
+                required: false
+
+      parameter name: :screened_in_from,
+                in: :query,
+                schema: {
+                  type: :string,
+                  format: :date
+                },
+                description:
+                  "Filter applications screened in on or after this date (YYYY-MM-DD)",
+                required: false
+
+      parameter name: :screened_in_to,
+                in: :query,
+                schema: {
+                  type: :string,
+                  format: :date
+                },
+                description:
+                  "Filter applications screened in on or before this date (YYYY-MM-DD)",
+                required: false
+
+      parameter name: :status,
+                in: :query,
+                schema: {
+                  type: :string
+                },
+                description:
+                  "Filter applications by status. Omit to return all applications except new_draft.",
                 required: false
 
       parameter name: :page,
@@ -384,6 +462,17 @@ RSpec.describe "external_api/v1/applications",
                          description:
                            "The email address from the application submission data.",
                          nullable: true
+                       },
+                       screened_in_at: {
+                         type: :string,
+                         format: "date-time",
+                         description:
+                           "ISO 8601 timestamp when the application was screened in (moved to in_review) by program staff.",
+                         nullable: true
+                       },
+                       status: {
+                         type: :string,
+                         description: "The current status of the application."
                        }
                      },
                      required: %w[app_id]
@@ -426,6 +515,15 @@ RSpec.describe "external_api/v1/applications",
             submitted_permit_applications.length
           )
         end
+      end
+
+      response(
+        400,
+        "Invalid query parameter (e.g. invalid status or date format)"
+      ) do
+        let(:status) { "invalid_status" }
+        schema "$ref" => "#/components/schemas/ResponseError"
+        run_test!
       end
 
       response(

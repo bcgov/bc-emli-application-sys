@@ -27,11 +27,14 @@ class ExternalApi::V1::ContractorsController < ExternalApi::ApplicationControlle
         :contractor_info
       ).includes(:contractor_info, :employees)
     scope =
-      scope.where("contractor_infos.updated_at >= ?", from) if from.present?
+      scope.where(
+        "contractor_infos.updated_at >= ?",
+        from.in_time_zone.beginning_of_day
+      ) if from.present?
     scope =
       scope.where(
         "contractor_infos.updated_at <= ?",
-        to.end_of_day
+        to.in_time_zone.end_of_day
       ) if to.present?
 
     if permitted[:page]

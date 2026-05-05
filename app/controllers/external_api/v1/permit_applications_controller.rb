@@ -91,34 +91,71 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
     ensure_external_api_key_authorized!
 
     # Transform simple date parameters to constraints format
-    permitted = params.permit(:submitted_from, :submitted_to, :page, :per_page)
+    permitted =
+      params.permit(
+        :submitted_from,
+        :submitted_to,
+        :screened_in_from,
+        :screened_in_to,
+        :status,
+        :page,
+        :per_page
+      )
 
     from = validate_date_param(permitted[:submitted_from], :submitted_from)
     to = validate_date_param(permitted[:submitted_to], :submitted_to)
+    screened_in_from =
+      validate_date_param(permitted[:screened_in_from], :screened_in_from)
+    screened_in_to =
+      validate_date_param(permitted[:screened_in_to], :screened_in_to)
     return if performed?
 
-    constraints = nil
+    constraints = {}
     if from.present? || to.present?
       submitted_at = {}
-      submitted_at[:gte] = from if from.present?
-      submitted_at[:lte] = to.end_of_day if to.present?
-      constraints = { submitted_at: submitted_at }
+      submitted_at[:gte] = from.in_time_zone.beginning_of_day if from.present?
+      submitted_at[:lte] = to.in_time_zone.end_of_day if to.present?
+      constraints[:submitted_at] = submitted_at
+    end
+    if screened_in_from.present? || screened_in_to.present?
+      screened_in_at = {}
+      screened_in_at[
+        :gte
+      ] = screened_in_from.in_time_zone.beginning_of_day if screened_in_from.present?
+      screened_in_at[
+        :lte
+      ] = screened_in_to.in_time_zone.end_of_day if screened_in_to.present?
+      constraints[:screened_in_at] = screened_in_at
     end
 
     # Build where clause with summary-specific filtering
     where = { program_id: current_external_api_key.program_id }
 
-    # Exclude drafts (different from search which filters to in_review)
-    where[:status] = { not: :new_draft }
+    # Filter by status if provided, otherwise exclude new_draft
+    if permitted[:status].present?
+      unless PermitApplication.statuses.key?(permitted[:status])
+        render_error(
+          nil,
+          {
+            status: 400,
+            meta: {
+              message: "Invalid status: #{permitted[:status]}"
+            }
+          }
+        )
+        return
+      end
+      where[:status] = permitted[:status]
+    else
+      where[:status] = { not: :new_draft }
+    end
 
     # Only return participant applications (not contractor onboarding, invoices, etc.)
-    participant_type = UserGroupType.find_by!(code: "participant")
-    application_type = SubmissionType.find_by!(code: "application")
-    where[:user_group_type_id] = participant_type.id
-    where[:submission_type_id] = application_type.id
+    where[:user_group_type_code] = "participant"
+    where[:submission_type_code] = "application"
 
     # Merge date constraints if present
-    where.merge!(constraints.to_h.deep_symbolize_keys) if constraints
+    where.merge!(constraints.deep_symbolize_keys) if constraints.present?
 
     # Execute search
     @permit_application_search =
