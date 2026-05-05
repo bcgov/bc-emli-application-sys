@@ -316,15 +316,23 @@ crunchy-postgres:
 
 redis:
   enabled: true
+  architecture: replication
+
+  commonConfiguration: |-
+    appendonly yes
+    save ""
 
   global:
+    compatibility:
+      openshift:
+        adaptSecurityContext: force
     security:
       allowInsecureImages: true
 
   image:
-    registry: docker.io
-    repository: bitnamilegacy/redis
-    tag: 8.2.1-debian-12-r0
+    registry: registry-1.docker.io
+    repository: bitnami/redis
+    digest: sha256:23289a4f4765da46419590fb80d8803363b07e5783ef45396ff85c641db81a0e
 
   replicaCount: 2 # DEV: 2 replicas (master + 1)
 
@@ -339,9 +347,9 @@ redis:
     enabled: true
 
     image:
-      registry: docker.io
-      repository: bitnamilegacy/redis-sentinel
-      tag: 8.2.1-debian-12-r0
+      registry: registry-1.docker.io
+      repository: bitnami/redis-sentinel
+      digest: sha256:d637c733e704abaa90f3bc032c7e0a6b99a2c94d024287cf17f5f5af97818cdd
 
     masterSet: redisMasterSet
 

@@ -22,12 +22,12 @@ dependencies:
     repository: https://bcgov.github.io/crunchy-postgres/
     condition: crunchy-postgres.enabled
   - name: redis
-    version: '18.16.1'
+    version: '25.4.1'
     repository: 'https://charts.bitnami.com/bitnami'
     condition: redis.enabled
   - name: elasticsearch
     version: '19.19.3'
-    repository: "https://charts.bitnami.com/bitnami"
+    repository: 'https://charts.bitnami.com/bitnami'
     condition: elasticsearch.enabled
   - name: anycable-go
     alias: anycableGo

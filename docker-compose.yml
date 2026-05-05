@@ -60,8 +60,6 @@ services:
     environment:
       <<: *default-env-vars
       VITE_RUBY_HOST: "0.0.0.0"
-      NODE_ENV: development
-      IS_APP_SERVER: ""
     command: "./bin/vite dev"
     ports:
       - "3036:3036"
@@ -128,7 +126,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   redis:
-    image: redis:7
+    image: redis:8.6
     volumes:
       - redis_data:/data
 
@@ -183,7 +181,8 @@ volumes:
   postgres_data:
   redis_data:
   elasticsearch_data:
-  minio_data:
+
+  # minio_data:
 
   virus_scan_tmp:
   clamav_db:

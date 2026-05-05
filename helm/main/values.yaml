@@ -70,7 +70,7 @@ app:
     'IS_APP_SERVER': true
     'ENABLE_TEMPLATE_FORCE_PUBLISH': 'true'
     'VITE_ENABLE_TEMPLATE_FORCE_PUBLISH': 'true'
-    
+
 sidekiq:
   enabled: false
   image:
@@ -215,20 +215,22 @@ crunchy-postgres:
 # See https://github.com/bitnami/charts/blob/main/bitnami/redis/values.yaml
 redis:
   enabled: true
+  architecture: replication
+
+  commonConfiguration: |-
+    appendonly yes
+    save ""
 
   global:
     security:
       allowInsecureImages: true
 
   image:
-    registry: docker.io
-    repository: bitnamilegacy/redis
-    tag: 8.2.1-debian-12-r0
+    registry: registry-1.docker.io
+    repository: bitnami/redis
+    digest: sha256:23289a4f4765da46419590fb80d8803363b07e5783ef45396ff85c641db81a0e
 
   replicaCount: 1
-
-  nameOverride: moti-rabbitmq
-  fullnameOverride: moti-rabbitmq
 
   nameOverride: hesp-redis
   fullnameOverride: hesp-redis
@@ -240,9 +242,9 @@ redis:
     enabled: true
 
     image:
-      registry: docker.io
-      repository: bitnamilegacy/redis-sentinel
-      tag: 8.2.1-debian-12-r0
+      registry: registry-1.docker.io
+      repository: bitnami/redis-sentinel
+      digest: sha256:d637c733e704abaa90f3bc032c7e0a6b99a2c94d024287cf17f5f5af97818cdd
 
     masterSet: redisMasterSet
     podSecurityContext:
@@ -402,20 +404,20 @@ clamav:
 # Provides TLS 1.2 with specific CBC ciphers for older client compatibility
 
 nginxProxy:
-  enabled: false  # Set to true to enable nginx proxy for CBC compatibility
-  configVersion: "2"  # Bump this to force pod restart when nginx.conf template changes
+  enabled: false # Set to true to enable nginx proxy for CBC compatibility
+  configVersion: '2' # Bump this to force pod restart when nginx.conf template changes
 
   image:
     repository: docker.io/nginx
     tag: 'alpine'
     pullPolicy: IfNotPresent
 
-  replicas: 2  # HA by default
+  replicas: 2 # HA by default
 
   # Upstream services
-  upstreamHost: 'hesp-app'  # Main app service
+  upstreamHost: 'hesp-app' # Main app service
   upstreamPort: 3000
-  websocketUpstreamHost: 'hesp-anycable-go'  # WebSocket service
+  websocketUpstreamHost: 'hesp-anycable-go' # WebSocket service
   websocketUpstreamPort: 8080
 
   # TLS certificate (secret must be created beforehand)
@@ -446,7 +448,7 @@ nginxProxy:
     type: ClusterIP
 
   route:
-    host: 'hesp.apps.dev.devops.gov.bc.ca'  # Override in environment-specific values
+    host: 'hesp.apps.dev.devops.gov.bc.ca' # Override in environment-specific values
 
 # ============================================================================
 # SHARED CONFIGURATION (via ConfigMap)
@@ -508,8 +510,8 @@ s3KeyRotation:
   # Disabled by default - enable in namespaces that use pgBackRest S3
   enabled: false
   # Run every 6 hours (well within the 24h overlap window)
-  schedule: "0 */6 * * *"
+  schedule: '0 */6 * * *'
   # AWS SSM Parameter Store path where Lambda stores rotated credentials as JSON:
   # { "current": { "AccessKeyID": "...", "SecretAccessKey": "..." }, "pending_deletion": {...} }
   # Must match AWS_PARAMETER_BASE_PATH used by the app.
-  parameterStorePath: ""
+  parameterStorePath: ''

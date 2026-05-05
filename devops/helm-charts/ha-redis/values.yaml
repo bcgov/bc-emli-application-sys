@@ -12,10 +12,10 @@ redis:
   image:
     registry: docker.io
     repository: bitnami/redis
-    tag: 7.2.4-debian-12-r9
+    tag: 8.6.0-debian-12-r0
   sentinel:
     enabled: true
-    masterSet: "redisMasterSet"
+    masterSet: 'redisMasterSet'
     persistence:
       enabled: false
     containerPorts:
@@ -26,11 +26,11 @@ redis:
       enabled: false
     resources:
       requests:
-        memory: "128Mi"
-        cpu: "20m"
+        memory: '128Mi'
+        cpu: '20m'
       limits:
-        memory: "256Mi"
-        cpu: "50m"
+        memory: '256Mi'
+        cpu: '50m'
   replica:
     replicaCount: 1
     shareProcessNamespace: true
@@ -43,11 +43,11 @@ redis:
       size: 500Mi
     resources:
       requests:
-        memory: "128Mi"
-        cpu: "20m"
+        memory: '128Mi'
+        cpu: '20m'
       limits:
-        memory: "256Mi"
-        cpu: "100m"
+        memory: '256Mi'
+        cpu: '100m'
   # don't need this since we are using sentinel, it will only look at replicas
   # master:
   #   persistence:
