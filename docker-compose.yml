@@ -181,8 +181,7 @@ volumes:
   postgres_data:
   redis_data:
   elasticsearch_data:
-
-  # minio_data:
+  minio_data:
 
   virus_scan_tmp:
   clamav_db:

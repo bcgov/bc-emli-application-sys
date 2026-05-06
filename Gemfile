@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby "3.2.5"
+ruby "4.0.0"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.1.4.1"
@@ -81,15 +81,15 @@ gem "rswag-ui", "~> 2.13"
 
 # brew install geos
 # bundle config build.rgeo --with-geos-dir=/usr/local/opt/geos
-gem "rgeo", "~> 3.0.1"
+gem "rgeo", "~> 3.1"
 # brew install proj
-gem "rgeo-proj4", "~> 4.0.0"
+gem "rgeo-proj4", "~> 5.0"
 gem "aasm", "~> 5.5.0"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[mri windows]
-  gem "pry-byebug", "~> 3.10.1"
+  # pry-byebug removed: byebug has no Ruby 4.0 support; use `debug` gem instead
   gem "rspec-rails", "~> 6.1.0"
   gem "rswag-specs", "~> 2.13"
   gem "factory_bot_rails", "~> 6.4.2"
@@ -129,3 +129,8 @@ gem "faraday-multipart", "~> 1.0"
 
 gem "rack-attack", "~> 6.7"
 gem "data_migrate", "~> 9.4"
+
+# Ruby 4 no longer ships these as default gems.
+gem "ostruct", "~> 0.6.3"
+gem "csv", "~> 3.3"
+gem "benchmark", "~> 0.5"

@@ -62,7 +62,7 @@ app:
     'RAILS_MAX_THREADS': '3'
     'RATE_LIMIT_DEV_REDIS_URL': 'redis://hesp-redis:6379/2'
     'REDIS_URL': 'redis://hesp-redis:6379/0'
-    'RUBY_VERSION': '3.2.5'
+    'RUBY_VERSION': '4.0.0'
     'SESSION_TIMEOUT_MINUTES': '60'
     'SIMPLE_FEED_DEV_REDIS_URL': 'redis://hesp-redis:6379/3'
     'VITE_RUBY_HOST': 'vite'
