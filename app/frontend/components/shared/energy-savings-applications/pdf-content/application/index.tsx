@@ -18,6 +18,7 @@ enum EComponentType {
   file = 'simplefile',
   number = 'number',
   panel = 'panel',
+  radio = 'radio',
   select = 'select',
   checklist = 'selectboxes',
   email = 'simpleemail',
@@ -31,58 +32,6 @@ export const ApplicationFields = function ApplicationFields({
 }: {
   permitApplication: IPermitApplication;
 }) {
-  // Debug: Log component processing and submission data
-  if (import.meta.env.SSR) {
-    console.log('=== PDF GENERATION DEBUG START ===');
-    console.log(
-      `Processing ${permitApplication.formattedFormJson?.components?.length || 0} top-level components for PDF`,
-    );
-
-    // Log submission data structure
-    const submissionData = permitApplication.submissionData;
-    console.log('=== SUBMISSION DATA ANALYSIS ===');
-    console.log('Submission data exists:', !!submissionData);
-    console.log('Submission data structure:', submissionData ? Object.keys(submissionData) : 'N/A');
-
-    if (submissionData?.data) {
-      console.log('Data sections:', Object.keys(submissionData.data));
-      Object.keys(submissionData.data).forEach((sectionKey) => {
-        const section = submissionData.data[sectionKey];
-        if (section && typeof section === 'object') {
-          const fieldCount = Object.keys(section).length;
-          console.log(`  Section "${sectionKey}": ${fieldCount} fields`);
-
-          // Log first few fields in each section as examples
-          const fieldKeys = Object.keys(section).slice(0, 5);
-          fieldKeys.forEach((fieldKey) => {
-            const value = section[fieldKey];
-            const valueType = Array.isArray(value) ? 'array' : typeof value;
-            const valuePreview = Array.isArray(value)
-              ? `[${value.length} items]`
-              : typeof value === 'string'
-                ? `"${value.substring(0, 50)}${value.length > 50 ? '...' : ''}"`
-                : value;
-            console.log(`    "${fieldKey}" (${valueType}): ${valuePreview}`);
-          });
-
-          if (Object.keys(section).length > 5) {
-            console.log(`    ... and ${Object.keys(section).length - 5} more fields`);
-          }
-        }
-      });
-    } else {
-      console.log('No data section found in submission data');
-    }
-
-    console.log('=== COMPONENT STRUCTURE ===');
-    permitApplication.formattedFormJson?.components?.forEach((c, index) => {
-      console.log(
-        `Component ${index + 1}: ${c.type} - "${c.title || c.label || c.key}" (${c.components?.length || 0} children)`,
-      );
-    });
-    console.log('=== END INITIAL DEBUG ===');
-  }
-
   return (
     <Page size="LETTER" style={page}>
       <View style={{ overflow: 'hidden' }}>
@@ -110,64 +59,43 @@ const FormComponent = function ApplicationPDFFormComponent({
   component,
   dataPath,
 }: IFormComponentProps) {
-  // Debug: Log each component being processed
-  if (import.meta.env.SSR) {
-    console.log(`Processing component: ${component.type} - "${component.title || component.label || component.key}"`);
-  }
-
   // Helper function to check if a component has actual field data
   const hasFieldData = (comp) => {
     if (!comp || !comp.input) {
-      if (import.meta.env.SSR) {
-        console.log(`    hasFieldData(${comp?.key || 'unknown'}): not an input field`);
-      }
       return false;
     }
 
     const submissionData = permitApplication.submissionData?.data || {};
     let value = null;
-    let foundInSection = null;
-    let foundWithKey = null;
 
-    if (import.meta.env.SSR) {
-      console.log(`  === FIELD DATA LOOKUP: ${comp.key} (${comp.type}) ===`);
-      console.log(`    Data path: [${dataPath?.join(', ') || 'none'}]`);
-      console.log(`    Available sections: [${Object.keys(submissionData).join(', ')}]`);
-    }
+    const toCamelCase = (str) => str.replace(/_([a-z])/g, (_, l) => l.toUpperCase());
+    const toUnderscoreCase = (str) => str.replace(/([A-Z])/g, '_$1').toLowerCase();
+    const camelKey = comp.key ? toCamelCase(comp.key) : null;
 
-    // Search for the field data using the same logic as extractFieldInfo
+    // Try direct lookup with both snake_case and camelCase keys
     for (const sectionKey of Object.keys(submissionData)) {
       const sectionData = submissionData[sectionKey];
-      if (sectionData && typeof sectionData === 'object' && comp.key in sectionData) {
-        value = sectionData[comp.key];
-        foundInSection = sectionKey;
-        foundWithKey = comp.key;
-        if (import.meta.env.SSR) {
-          console.log(`    ✓ Found direct match in section "${sectionKey}": ${comp.key} = ${JSON.stringify(value)}`);
+      if (sectionData && typeof sectionData === 'object') {
+        const matchKey =
+          comp.key && comp.key in sectionData ? comp.key : camelKey && camelKey in sectionData ? camelKey : null;
+        if (matchKey) {
+          value = sectionData[matchKey];
+          break;
         }
-        break;
       }
     }
 
     // If not found, try with container path prefix
     if (value === null || value === undefined) {
-      if (import.meta.env.SSR) {
-        console.log(`    Direct lookup failed, trying path-based keys...`);
+      const existsAnywhere = Object.values(submissionData).some(
+        (sec) => sec && typeof sec === 'object' && (comp.key in sec || (camelKey && camelKey in sec)),
+      );
+      if (existsAnywhere) {
+        console.warn(`[PDF] Direct lookup missed for "${comp.key}" — key exists in data but direct path failed`);
       }
-
       for (const sectionKey of Object.keys(submissionData)) {
         const sectionData = submissionData[sectionKey];
         if (sectionData && typeof sectionData === 'object') {
-          // Helper function to convert underscore_case to camelCase
-          const toCamelCase = (str) => {
-            return str.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
-          };
-
-          // Helper function to convert camelCase to underscore_case
-          const toUnderscoreCase = (str) => {
-            return str.replace(/([A-Z])/g, '_$1').toLowerCase();
-          };
-
           // Generate potential keys with both naming conventions
           const baseKey = comp.key;
           const camelCaseKey = toCamelCase(baseKey);
@@ -193,40 +121,15 @@ const FormComponent = function ApplicationPDFFormComponent({
             .filter((k) => k !== null && k !== baseKey && k !== camelCaseKey && k !== underscoreKey)
             .concat([baseKey, camelCaseKey, underscoreKey]); // Add base variants at the end
 
-          if (import.meta.env.SSR) {
-            console.log(`    Trying keys in section "${sectionKey}": [${potentialKeys.join(', ')}]`);
-          }
-
           for (const potentialKey of potentialKeys) {
             if (potentialKey in sectionData) {
               value = sectionData[potentialKey];
-              foundInSection = sectionKey;
-              foundWithKey = potentialKey;
-              if (import.meta.env.SSR) {
-                console.log(
-                  `    ✓ Found with key "${potentialKey}" in section "${sectionKey}": ${JSON.stringify(value)}`,
-                );
-              }
               break;
             }
           }
           if (value !== null && value !== undefined) break;
         }
       }
-    }
-
-    if (import.meta.env.SSR && (value === null || value === undefined)) {
-      console.log(`    ✗ No data found for field "${comp.key}"`);
-      // Show what fields ARE available in each section for debugging
-      Object.keys(submissionData).forEach((sectionKey) => {
-        const section = submissionData[sectionKey];
-        if (section && typeof section === 'object') {
-          const availableKeys = Object.keys(section).filter((key) => key.includes(comp.key) || comp.key.includes(key));
-          if (availableKeys.length > 0) {
-            console.log(`    Similar keys in "${sectionKey}": [${availableKeys.join(', ')}]`);
-          }
-        }
-      });
     }
 
     let hasData = false;
@@ -252,11 +155,6 @@ const FormComponent = function ApplicationPDFFormComponent({
       hasData = value !== null && value !== undefined && value !== '';
     }
 
-    if (import.meta.env.SSR) {
-      console.log(`    RESULT: hasData = ${hasData} (value: ${JSON.stringify(value)}, type: ${typeof value})`);
-      console.log(`  === END FIELD DATA LOOKUP ===`);
-    }
-
     return hasData;
   };
 
@@ -265,11 +163,6 @@ const FormComponent = function ApplicationPDFFormComponent({
       // Only return component if it has both a label and actual data
       const hasLabel = component.label && component.label.trim() !== '';
       const hasData = hasFieldData(component);
-      if (import.meta.env.SSR) {
-        console.log(
-          `  Input field: "${component.label}" (${component.key}) - Label: ${hasLabel}, Data: ${hasData} - ${hasLabel && hasData ? 'INCLUDED' : 'EXCLUDED'}`,
-        );
-      }
       return hasLabel && hasData ? component : null;
     } else if (component.components || component.columns) {
       return R.map(extractFields, component.components || [component.columns[0]]);
@@ -290,17 +183,6 @@ const FormComponent = function ApplicationPDFFormComponent({
         const hasLabel = !R.isNil(label) && label.trim() !== '';
         const isVisible = hasLabel && hasData;
 
-        if (import.meta.env.SSR) {
-          console.log(`=== CHECKLIST FIELD: ${component.key} ===`);
-          console.log(`  Label: "${label}"`);
-          console.log(`  Options:`, JSON.stringify(options));
-          console.log(`  Selected values:`, values);
-          console.log(`  Has label: ${hasLabel}`);
-          console.log(`  Has data: ${hasData}`);
-          console.log(`  Is visible: ${isVisible}`);
-          console.log(`=== END CHECKLIST FIELD ===`);
-        }
-
         return { options, values, label, isVisible };
       }
       case EComponentType.datagrid: {
@@ -312,27 +194,29 @@ const FormComponent = function ApplicationPDFFormComponent({
 
         // Use the same logic as formio-helpers.ts for finding data
         const submissionData = permitApplication.submissionData?.data || {};
+        const toCamelCase = (str) => str.replace(/_([a-z])/g, (_, l) => l.toUpperCase());
+        const toUnderscoreCase = (str) => str.replace(/([A-Z])/g, '_$1').toLowerCase();
+        const camelKey = component.key ? toCamelCase(component.key) : null;
 
-        // First, try to find the field directly by component key in any section
+        // Try direct lookup with both snake_case and camelCase keys
         for (const sectionKey of Object.keys(submissionData)) {
           const sectionData = submissionData[sectionKey];
-          if (sectionData && typeof sectionData === 'object' && component.key in sectionData) {
-            value = sectionData[component.key];
-            break;
+          if (sectionData && typeof sectionData === 'object') {
+            const matchKey =
+              component.key && component.key in sectionData
+                ? component.key
+                : camelKey && camelKey in sectionData
+                  ? camelKey
+                  : null;
+            if (matchKey) {
+              value = sectionData[matchKey];
+              break;
+            }
           }
         }
 
         // If not found, try with container path prefix (for complex form structures)
         if (value === null || value === undefined) {
-          // Helper functions for key name conversion
-          const toCamelCase = (str) => {
-            return str.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
-          };
-
-          const toUnderscoreCase = (str) => {
-            return str.replace(/([A-Z])/g, '_$1').toLowerCase();
-          };
-
           for (const sectionKey of Object.keys(submissionData)) {
             const sectionData = submissionData[sectionKey];
             if (sectionData && typeof sectionData === 'object') {
@@ -370,18 +254,6 @@ const FormComponent = function ApplicationPDFFormComponent({
           }
         }
 
-        // Debug logging for SSR
-        if (import.meta.env.SSR) {
-          console.log(`=== EXTRACT FIELD INFO: ${component.key} ===`);
-          console.log(`  Field: "${label}" (${component.type})`);
-          console.log(`  Key: ${component.key}`);
-          console.log(`  Data path: [${dataPath?.join(', ') || 'none'}]`);
-          console.log(`  Raw value:`, JSON.stringify(value));
-          console.log(`  Value type:`, typeof value);
-          console.log(`  Value is array:`, Array.isArray(value));
-          console.log(`  Submission data sections:`, Object.keys(permitApplication.submissionData?.data || {}));
-        }
-
         // Show field only if it has a label and actual data
         // For checkboxes, 0 and false are valid values, for others exclude empty strings
         const hasData =
@@ -392,14 +264,6 @@ const FormComponent = function ApplicationPDFFormComponent({
         const hasLabel = !R.isNil(label) && label.trim() !== '';
         const isVisible = hasLabel && hasData;
 
-        if (import.meta.env.SSR) {
-          console.log(`  VISIBILITY DECISION:`);
-          console.log(`    Has label: ${hasLabel} ("${label}")`);
-          console.log(`    Has data: ${hasData}`);
-          console.log(`    Is visible: ${isVisible}`);
-          console.log(`=== END EXTRACT FIELD INFO ===`);
-        }
-
         return { value, label, isVisible };
     }
   };
@@ -409,12 +273,6 @@ const FormComponent = function ApplicationPDFFormComponent({
       dataPath = [component.key];
       const { components, columns } = component;
       const componentFields = fields(components || columns);
-
-      if (import.meta.env.SSR) {
-        console.log(
-          `  Container "${component.title}" has ${componentFields.length} fields, ${components?.length || 0} total components`,
-        );
-      }
 
       // Only show container if it has components with actual data
       if (!components && !columns) return null;
@@ -563,7 +421,18 @@ const FormComponent = function ApplicationPDFFormComponent({
       const { value, label, isVisible } = extractFieldInfo(component);
       return isVisible ? <CheckboxField value={value} label={label} /> : null;
     }
-    case EComponentType.select:
+    case EComponentType.select: {
+      const { value, label, isVisible } = extractFieldInfo(component);
+      const option = component.data?.values?.find((opt: any) => opt.value === value);
+      const displayValue = option?.label ?? value;
+      return isVisible ? <InputField value={displayValue} label={label} /> : null;
+    }
+    case EComponentType.radio: {
+      const { value, label, isVisible } = extractFieldInfo(component);
+      const option = component.values?.find((opt: any) => opt.value === value);
+      const displayValue = option?.label ?? value;
+      return isVisible ? <InputField value={displayValue} label={label} /> : null;
+    }
     case EComponentType.text:
     case EComponentType.textarea:
     case EComponentType.number:
@@ -571,13 +440,10 @@ const FormComponent = function ApplicationPDFFormComponent({
     case EComponentType.date:
     case EComponentType.email: {
       const { value, label, isVisible } = extractFieldInfo(component);
-      if (import.meta.env.SSR) {
-        console.log(`  Rendering ${component.type} field: "${label}" = "${value}" - Visible: ${isVisible}`);
-      }
       return isVisible ? <InputField value={value} label={label} /> : null;
     }
     default:
-      import.meta.env.DEV && console.log('[DEV]: missing component', component);
+      console.warn(`[PDF] Unhandled component type "${component.type}" — field will be missing from PDF`);
       return null;
   }
 };

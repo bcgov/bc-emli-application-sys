@@ -141,7 +141,7 @@ module FormSupportingDocuments
   def zip_and_upload_supporting_documents
     return unless submitted?
 
-    ZipfileJob.perform_async(id)
+    GeneratePdfJob.perform_async(id)
   end
 
   module ClassMethods
