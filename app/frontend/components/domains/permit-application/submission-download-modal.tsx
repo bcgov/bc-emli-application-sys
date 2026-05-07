@@ -15,58 +15,52 @@ import {
   Text,
   VStack,
   useDisclosure,
-} from "@chakra-ui/react"
-import { Download, FileArrowDown, FileZip, Gear } from "@phosphor-icons/react"
-import { format } from "date-fns"
-import { observer } from "mobx-react-lite"
-import React, { useEffect } from "react"
-import { useTranslation } from "react-i18next"
-import { datefnsAppDateFormat } from "../../../constants"
-import { IPermitApplication } from "../../../models/permit-application"
-import { useMst } from "../../../setup/root"
-import { formatBytes } from "../../../utils/utility-functions"
-import { SharedSpinner } from "../../shared/base/shared-spinner"
-import { LoadingIcon } from "../../shared/loading-icon"
+} from '@chakra-ui/react';
+import { Download, FileArrowDown, Gear } from '@phosphor-icons/react';
+import { format } from 'date-fns';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { datefnsAppDateFormat } from '../../../constants';
+import { IPermitApplication } from '../../../models/permit-application';
+import { useMst } from '../../../setup/root';
+import { formatBytes } from '../../../utils/utility-functions';
+import { SharedSpinner } from '../../shared/base/shared-spinner';
+import { LoadingIcon } from '../../shared/loading-icon';
 
 export interface ISubmissionDownloadModalProps {
-  permitApplication: IPermitApplication
-  renderTrigger?: (onOpen: () => void) => React.ReactNode
-  review?: boolean
+  permitApplication: IPermitApplication;
+  renderTrigger?: (onOpen: () => void) => React.ReactNode;
+  review?: boolean;
 }
 
 export const SubmissionDownloadModal = observer(
   ({ permitApplication, renderTrigger, review }: ISubmissionDownloadModalProps) => {
-    const { t } = useTranslation()
-    const { permitApplicationStore } = useMst()
-    const { allSubmissionVersionCompletedSupportingDocuments, zipfileUrl, zipfileName, stepCode } = permitApplication
-    const checklist = stepCode?.preConstructionChecklist
+    const { t } = useTranslation();
+    const { permitApplicationStore } = useMst();
+    const { allSubmissionVersionCompletedSupportingDocuments } = permitApplication;
 
-    const { isOpen, onOpen, onClose } = useDisclosure()
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     useEffect(() => {
-      if (!isOpen) return
+      if (!isOpen) return;
 
       if (!permitApplication?.isFullyLoaded) {
-        permitApplicationStore.fetchPermitApplication(permitApplication?.id, review)
+        permitApplicationStore.fetchPermitApplication(permitApplication?.id, review);
       }
-    }, [permitApplication?.isFullyLoaded, isOpen])
-
-    useEffect(() => {
-      const fetch = async () => await checklist.load()
-      checklist && !checklist.isLoaded && fetch()
-    }, [checklist?.isLoaded])
+    }, [permitApplication?.isFullyLoaded, isOpen]);
 
     useEffect(() => {
       if (!permitApplication?.isFullyLoaded) {
-        return
+        return;
       }
 
       if (!permitApplication.isSubmitted || !permitApplication.missingPdfs.length) {
-        return
+        return;
       }
 
-      permitApplication.generateMissingPdfs()
-    }, [permitApplication?.isFullyLoaded, permitApplication?.missingPdfs, checklist?.isLoaded])
+      permitApplication.generateMissingPdfs();
+    }, [permitApplication?.isFullyLoaded, permitApplication?.missingPdfs]);
 
     return (
       <>
@@ -74,28 +68,28 @@ export const SubmissionDownloadModal = observer(
           renderTrigger(onOpen)
         ) : (
           <Button variant="primary" onClick={onOpen} leftIcon={<Download />}>
-            {t("permitApplication.show.downloadApplication")}
+            {t('permitApplication.show.downloadApplication')}
           </Button>
         )}
 
         <Modal onClose={onClose} isOpen={isOpen} size="md" scrollBehavior="inside">
           <ModalOverlay />
-          <ModalContent maxW={"container.md"}>
+          <ModalContent maxW={'container.md'}>
             {!permitApplication?.isFullyLoaded ? (
               <SharedSpinner />
             ) : (
               <>
                 <ModalHeader>
                   <VStack w="full" align="start">
-                    <Heading as="h1" fontSize="2xl" textTransform={"capitalize"}>
-                      {t("permitApplication.show.downloadHeading")}
+                    <Heading as="h1" fontSize="2xl" textTransform={'capitalize'}>
+                      {t('permitApplication.show.downloadHeading')}
                       <br />
                       <Text as="span" fontSize="lg" color="text.secondary">
                         {permitApplication.number}
                       </Text>
                     </Heading>
                     <Text fontSize="md" fontWeight="normal">
-                      {t("permitApplication.show.downloadPrompt")}
+                      {t('permitApplication.show.downloadPrompt')}
                     </Text>
                   </VStack>
                   <ModalCloseButton fontSize="11px" />
@@ -120,21 +114,8 @@ export const SubmissionDownloadModal = observer(
                 </ModalBody>
                 <ModalFooter>
                   <Flex gap={2} w="full" wrap="wrap">
-                    <Button
-                      variant="primary"
-                      as={Link}
-                      flex={1}
-                      href={zipfileUrl}
-                      download={zipfileName}
-                      textDecoration="none"
-                      leftIcon={<FileZip />}
-                      isDisabled={!zipfileUrl}
-                      _hover={{ textDecoration: "none" }}
-                    >
-                      {t("permitApplication.show.downloadZip")}
-                    </Button>
                     <Button variant="secondary" onClick={onClose}>
-                      {t("ui.neverMind")}
+                      {t('ui.neverMind')}
                     </Button>
                   </Flex>
                 </ModalFooter>
@@ -143,9 +124,9 @@ export const SubmissionDownloadModal = observer(
           </ModalContent>
         </Modal>
       </>
-    )
-  }
-)
+    );
+  },
+);
 
 const FileDownloadLink = function ApplicationFileDownloadLink({ url, name, size, createdAt }) {
   return (
@@ -170,31 +151,31 @@ const FileDownloadLink = function ApplicationFileDownloadLink({ url, name, size,
         {format(createdAt, datefnsAppDateFormat)}
       </Text>
     </HStack>
-  )
-}
+  );
+};
 
-function MissingPdf({ pdfKey }: { pdfKey: "permit_application_pdf" }) {
-  const { t } = useTranslation()
+function MissingPdf({ pdfKey }: { pdfKey: 'permit_application_pdf' }) {
+  const { t } = useTranslation();
 
   const getMissingPdfLabel = () => {
-    if (pdfKey.startsWith("permit_application_pdf")) {
-      return t("permitApplication.show.missingPdfLabels.permitApplication")
+    if (pdfKey.startsWith('permit_application_pdf')) {
+      return t('permitApplication.show.missingPdfLabels.permitApplication');
     }
 
-    if (pdfKey.startsWith("step_code_checklist_pdf")) {
-      return t("permitApplication.show.missingPdfLabels.stepCode")
+    if (pdfKey.startsWith('step_code_checklist_pdf')) {
+      return t('permitApplication.show.missingPdfLabels.stepCode');
     }
-  }
+  };
   return (
     <Flex w="full" align="center" justify="space-between" pl={1}>
       <HStack spacing={3}>
         <FileArrowDown size={16} />
-        <Text as={"span"} color={"semantic.error"}>
-          {t("permitApplication.show.fetchingMissingPdf", { missingPdf: getMissingPdfLabel() || pdfKey })}
+        <Text as={'span'} color={'semantic.error'}>
+          {t('permitApplication.show.fetchingMissingPdf', { missingPdf: getMissingPdfLabel() || pdfKey })}
         </Text>
       </HStack>
 
       <LoadingIcon icon={<Gear />} />
     </Flex>
-  )
+  );
 }

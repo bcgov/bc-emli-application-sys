@@ -16,7 +16,7 @@ import {
   VStack,
   useDisclosure,
 } from '@chakra-ui/react';
-import { Download, FileArrowDown, FileZip, Gear, Eye } from '@phosphor-icons/react';
+import { Download, FileArrowDown, Gear, Eye } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
@@ -40,8 +40,7 @@ export const SubmissionDownloadModal = observer(
   ({ permitApplication, renderTrigger, review, showIcon = true }: ISubmissionDownloadModalProps) => {
     const { t } = useTranslation();
     const { permitApplicationStore } = useMst();
-    const { allSubmissionVersionCompletedSupportingDocuments, zipfileUrl, zipfileName, stepCode } = permitApplication;
-    const checklist = stepCode?.preConstructionChecklist;
+    const { allSubmissionVersionCompletedSupportingDocuments } = permitApplication;
 
     const [supportingFiles, setSupportingFiles] = useState([]);
 
@@ -86,11 +85,6 @@ export const SubmissionDownloadModal = observer(
                     if (data.data.missingPdfs !== undefined) {
                       permitApplication.missingPdfs = data.data.missingPdfs || [];
                     }
-                    if (data.data.zipfileUrl) {
-                      permitApplication.zipfileUrl = data.data.zipfileUrl;
-                      permitApplication.zipfileName = data.data.zipfileName;
-                      permitApplication.zipfileSize = data.data.zipfileSize;
-                    }
                   }
                 }
               },
@@ -113,11 +107,6 @@ export const SubmissionDownloadModal = observer(
     }, [isOpen, permitApplication?.id]);
 
     useEffect(() => {
-      const fetch = async () => await checklist.load();
-      checklist && !checklist.isLoaded && fetch();
-    }, [checklist?.isLoaded]);
-
-    useEffect(() => {
       if (!permitApplication?.isFullyLoaded) {
         return;
       }
@@ -128,7 +117,7 @@ export const SubmissionDownloadModal = observer(
       }
 
       permitApplication.generateMissingPdfs();
-    }, [permitApplication?.isFullyLoaded, permitApplication?.missingPdfs, checklist?.isLoaded]);
+    }, [permitApplication?.isFullyLoaded, permitApplication?.missingPdfs]);
 
     return (
       <>
@@ -212,32 +201,6 @@ export const SubmissionDownloadModal = observer(
     );
   },
 );
-
-const FileDownloadLink = function ApplicationFileDownloadLink({ url, name, size, createdAt }) {
-  return (
-    <HStack w="full" align="center">
-      <Stack flex={1} spacing={2}>
-        <Button
-          as={Link}
-          href={url}
-          download={name}
-          variant="link"
-          leftIcon={<FileArrowDown size={16} />}
-          whiteSpace="normal"
-        >
-          {name}
-        </Button>
-        <Text color="greys.grey01" fontSize="xs" ml={8}>
-          {formatBytes(size)}
-        </Text>
-      </Stack>
-
-      <Text color="greys.grey01" textAlign="right" fontSize="xs">
-        {format(createdAt, datefnsAppDateFormat)}
-      </Text>
-    </HStack>
-  );
-};
 
 const FileViewLink = function ApplicationFileViewLink({ url, name, size, createdAt }) {
   return (

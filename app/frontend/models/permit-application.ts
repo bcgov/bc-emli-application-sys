@@ -76,9 +76,6 @@ export const PermitApplicationModel = types.snapshotProcessor(
       stepCode: types.maybeNull(types.reference(StepCodeModel)),
       supportingDocuments: types.maybeNull(types.frozen<IDownloadableFile[]>()),
       allSubmissionVersionCompletedSupportingDocuments: types.maybeNull(types.frozen<IDownloadableFile[]>()),
-      zipfileSize: types.maybeNull(types.number),
-      zipfileName: types.maybeNull(types.string),
-      zipfileUrl: types.maybeNull(types.string),
       referenceNumber: types.maybeNull(types.string),
       missingPdfs: types.maybeNull(types.array(types.string)),
       isFullyLoaded: types.optional(types.boolean, false),
@@ -809,9 +806,6 @@ export const PermitApplicationModel = types.snapshotProcessor(
         self.allSubmissionVersionCompletedSupportingDocuments =
           data.allSubmissionVersionCompletedSupportingDocuments ||
           self.allSubmissionVersionCompletedSupportingDocuments;
-        self.zipfileSize = data.zipfileSize;
-        self.zipfileName = data.zipfileName;
-        self.zipfileUrl = data.zipfileUrl;
       },
       generateMissingPdfs: flow(function* () {
         const response = yield self.environment.api.generatePermitApplicationMissingPdfs(self.id);
@@ -833,9 +827,6 @@ export const PermitApplicationModel = types.snapshotProcessor(
         self.allSubmissionVersionCompletedSupportingDocuments =
           data.allSubmissionVersionCompletedSupportingDocuments ||
           self.allSubmissionVersionCompletedSupportingDocuments;
-        self.zipfileSize = data.zipfileSize;
-        self.zipfileName = data.zipfileName;
-        self.zipfileUrl = data.zipfileUrl;
       },
     })),
   {
