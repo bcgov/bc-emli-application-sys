@@ -122,11 +122,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
              ),
            current_user: current_user
          )
-      if !Rails.env.development? || ENV["RUN_COMPLIANCE_ON_SAVE"] == "true"
-        AutomatedCompliance::AutopopulateJob.perform_async(
-          @permit_application.id
-        )
-      end
+      # AutomatedCompliance::AutopopulateJob.perform_async(@permit_application.id)
       render_success @permit_application,
                      ("permit_application.save_draft_success"),
                      {
@@ -438,11 +434,7 @@ class Api::PermitApplicationsController < Api::ApplicationController
     authorize @permit_application
 
     if @permit_application.save
-      if !Rails.env.development? || ENV["RUN_COMPLIANCE_ON_SAVE"] == "true"
-        AutomatedCompliance::AutopopulateJob.perform_async(
-          @permit_application.id
-        )
-      end
+      # AutomatedCompliance::AutopopulateJob.perform_async(@permit_application.id)
 
       render_success @permit_application,
                      "permit_application.create_success",
