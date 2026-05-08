@@ -17,6 +17,7 @@ app:
       memory: 512Mi
 
   env:
+    'DATABASE_POOL': '10'
     'VITE_SUBMIT_INVOICE_ENABLED': 'false'
     'APP_DOMAIN': 'bcenergysavingsprogram.ca'
     'ANYCABLE_URL': 'wss://hesp-anycable.apps.silver.devops.gov.bc.ca/cable'
@@ -60,6 +61,7 @@ sidekiq:
       memory: 256Mi
 
   env:
+    'DATABASE_POOL': '25'
     'APP_DOMAIN': 'bcenergysavingsprogram.ca'
     'FROM_EMAIL': 'no-reply@gov.bc.ca'
     # File Upload Configuration
