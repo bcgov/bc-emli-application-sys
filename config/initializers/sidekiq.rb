@@ -1,23 +1,6 @@
 require "sidekiq-cron"
 require "sidekiq-unique-jobs"
 
-module Sidekiq
-  class JobLifecycleLogger
-    def call(worker, job, queue)
-      job_class = job["wrapped"] || job["class"]
-      start = Time.now
-      Sidekiq.logger.info "[JOB] #{job_class} started jid=#{job["jid"]} queue=#{queue}"
-      yield
-      elapsed = ((Time.now - start) * 1000).round
-      Sidekiq.logger.info "[JOB] #{job_class} completed jid=#{job["jid"]} queue=#{queue} elapsed=#{elapsed}ms"
-    rescue => e
-      elapsed = ((Time.now - start) * 1000).round
-      Sidekiq.logger.error "[JOB] #{job_class} failed jid=#{job["jid"]} queue=#{queue} elapsed=#{elapsed}ms error=#{e.class}: #{e.message}"
-      raise
-    end
-  end
-end
-
 # Shared configuration for all environments
 SHARED_QUEUES = %w[
   virus_scan
@@ -47,7 +30,6 @@ def configure_sidekiq_server(config, redis_cfg = nil, concurrency = nil)
 
   config.server_middleware do |chain|
     chain.add SidekiqUniqueJobs::Middleware::Server
-    chain.add Sidekiq::JobLifecycleLogger
   end
 
   SidekiqUniqueJobs::Server.configure(config)
