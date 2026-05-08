@@ -19,8 +19,6 @@ class GeneratePdfJob
     permit_application = PermitApplication.find(permit_application_id)
     return if permit_application.blank?
 
-    Rails.logger.info "GeneratePdfJob: starting for permit application #{permit_application_id}"
-
     generation_directory_path = Rails.root.join("tmp/files")
     asset_directory_path = Rails.root.join("public")
 
@@ -90,7 +88,6 @@ class GeneratePdfJob
       end
 
     broadcast_update(permit_application) if pdfs_generated
-    Rails.logger.info "GeneratePdfJob: completed for permit application #{permit_application_id}"
   end
 
   def generate_pdfs(submission_version_data, generation_directory_path)
