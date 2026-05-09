@@ -16,8 +16,11 @@ class GeneratePdfJob
   end
 
   def perform(permit_application_id)
-    permit_application = PermitApplication.find(permit_application_id)
-    return if permit_application.blank?
+    begin
+      permit_application = PermitApplication.find(permit_application_id)
+    rescue ActiveRecord::RecordNotFound
+      return
+    end
 
     generation_directory_path = Rails.root.join("tmp/files")
     asset_directory_path = Rails.root.join("public")
@@ -83,9 +86,11 @@ class GeneratePdfJob
       end
 
     pdfs_generated =
-      submission_versions_data.any? do |submission_version_data|
-        generate_pdfs(submission_version_data, generation_directory_path)
-      end
+      submission_versions_data
+        .map do |submission_version_data|
+          generate_pdfs(submission_version_data, generation_directory_path)
+        end
+        .any?
 
     broadcast_update(permit_application) if pdfs_generated
   end
@@ -103,7 +108,11 @@ class GeneratePdfJob
     json_filename =
       "#{generation_directory_path}/pdf_json_data_#{submission_version.id}.json"
 
-    File.open(json_filename, "w") { |file| file.write(pdf_json_data) }
+    File.open(
+      json_filename,
+      File::WRONLY | File::CREAT | File::TRUNC,
+      0o600
+    ) { |file| file.write(pdf_json_data) }
 
     command_args = [
       "npm",
@@ -136,14 +145,14 @@ class GeneratePdfJob
           timed_out = true
           begin
             Process.kill("TERM", -pgid)
-          rescue StandardError
-            Errno::ESRCH
+          rescue Errno::ESRCH
+            nil
           end
           sleep 2
           begin
             Process.kill("KILL", -pgid)
-          rescue StandardError
-            Errno::ESRCH
+          rescue Errno::ESRCH
+            nil
           end
           # Close pipes so reader threads unblock even if descendants escaped the pgroup
           begin
@@ -247,8 +256,10 @@ class GeneratePdfJob
 
     true
   ensure
-    File.delete(json_filename) if File.exist?(json_filename)
+    File.delete(json_filename) if json_filename && File.exist?(json_filename)
   end
+
+  private
 
   def generate_ruby_permit_pdf(output_path, submission_version)
     permit_application = submission_version.permit_application
@@ -355,8 +366,6 @@ class GeneratePdfJob
 
     result
   end
-
-  private
 
   def broadcast_update(permit_application)
     blueprint_data =
