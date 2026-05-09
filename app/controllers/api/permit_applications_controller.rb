@@ -122,7 +122,6 @@ class Api::PermitApplicationsController < Api::ApplicationController
              ),
            current_user: current_user
          )
-      # AutomatedCompliance::AutopopulateJob.perform_async(@permit_application.id)
       render_success @permit_application,
                      ("permit_application.save_draft_success"),
                      {
@@ -434,8 +433,6 @@ class Api::PermitApplicationsController < Api::ApplicationController
     authorize @permit_application
 
     if @permit_application.save
-      # AutomatedCompliance::AutopopulateJob.perform_async(@permit_application.id)
-
       render_success @permit_application,
                      "permit_application.create_success",
                      {

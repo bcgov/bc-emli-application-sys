@@ -133,7 +133,12 @@ class GeneratePdfJob
       chdir: Rails.root,
       pgroup: true
     ) do |_stdin, stdout, stderr, wait_thr|
-      pgid = Process.getpgid(wait_thr.pid)
+      pgid =
+        begin
+          Process.getpgid(wait_thr.pid)
+        rescue Errno::ESRCH
+          nil
+        end
 
       out_reader = Thread.new { stdout.read }
       err_reader = Thread.new { stderr.read }
@@ -143,16 +148,18 @@ class GeneratePdfJob
       loop do
         if Time.now > deadline
           timed_out = true
-          begin
-            Process.kill("TERM", -pgid)
-          rescue Errno::ESRCH
-            nil
-          end
-          sleep 2
-          begin
-            Process.kill("KILL", -pgid)
-          rescue Errno::ESRCH
-            nil
+          if pgid
+            begin
+              Process.kill("TERM", -pgid)
+            rescue Errno::ESRCH
+              nil
+            end
+            sleep 2
+            begin
+              Process.kill("KILL", -pgid)
+            rescue Errno::ESRCH
+              nil
+            end
           end
           # Close pipes so reader threads unblock even if descendants escaped the pgroup
           begin
@@ -172,7 +179,7 @@ class GeneratePdfJob
 
       stdout_str = out_reader.join(3)&.value || ""
       stderr_str = err_reader.join(3)&.value || ""
-      status = wait_thr.value
+      status = wait_thr.join(5)&.value
     end
 
     execution_time = Time.current - start_time

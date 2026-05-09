@@ -43,7 +43,7 @@ RSpec.describe ApplicationFlow::InvoiceExternalContractor, type: :model do
       allow(permit_application).to receive(
         :using_current_template_version
       ).and_return(true)
-      allow(permit_application).to receive(:zip_and_upload_supporting_documents)
+      allow(permit_application).to receive(:generate_and_upload_pdfs)
       allow(permit_application).to receive(:form_json).and_return(
         { "components" => [] }
       )
@@ -61,9 +61,7 @@ RSpec.describe ApplicationFlow::InvoiceExternalContractor, type: :model do
               }.by(1)
 
         expect(permit_application.signed_off_at).to be_present
-        expect(permit_application).to have_received(
-          :zip_and_upload_supporting_documents
-        )
+        expect(permit_application).to have_received(:generate_and_upload_pdfs)
       end
 
       it "blocks submission when signature is missing" do
