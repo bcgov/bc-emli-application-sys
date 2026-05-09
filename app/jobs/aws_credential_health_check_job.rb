@@ -120,12 +120,12 @@ class AwsCredentialHealthCheckJob < ApplicationJob
       hours =
         (
           if status[:time_until_expiry]
-            (status[:time_until_expiry] / 1.hour).round(2)
+            "#{(status[:time_until_expiry] / 1.hour).round(2)}h"
           else
             "unknown"
           end
         )
-      Rails.logger.warn "AWS credential health check: NEEDS_REFRESH — expiry in #{hours}h"
+      Rails.logger.warn "AWS credential health check: NEEDS_REFRESH — expiry in #{hours}"
     else
       Rails.logger.error "AWS credential health check: CRITICAL — " \
                            "has_credentials=#{status[:has_credentials]} " \

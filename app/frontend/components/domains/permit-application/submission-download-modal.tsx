@@ -154,7 +154,7 @@ const FileDownloadLink = function ApplicationFileDownloadLink({ url, name, size,
   );
 };
 
-function MissingPdf({ pdfKey }: { pdfKey: 'permit_application_pdf' }) {
+function MissingPdf({ pdfKey }: { pdfKey: string }) {
   const { t } = useTranslation();
 
   const getMissingPdfLabel = () => {

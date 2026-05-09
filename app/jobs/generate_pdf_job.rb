@@ -97,6 +97,7 @@ class GeneratePdfJob
     should_permit_application_pdf_be_generated =
       submission_version_data[:should_permit_application_pdf_be_generated]
 
+    json_filename = nil
     return false unless should_permit_application_pdf_be_generated
 
     json_filename =
@@ -111,7 +112,7 @@ class GeneratePdfJob
       json_filename
     ]
 
-    puts "=== Executing Node.js PDF Generation ==="
+    Rails.logger.info "=== Executing Node.js PDF Generation ==="
     start_time = Time.current
     stdout_str = ""
     stderr_str = ""
@@ -166,7 +167,7 @@ class GeneratePdfJob
     end
 
     execution_time = Time.current - start_time
-    puts "=== Node.js PDF Generation complete: exit=#{status&.exitstatus} time=#{execution_time.round(2)}s ==="
+    Rails.logger.info "=== Node.js PDF Generation complete: exit=#{status&.exitstatus} time=#{execution_time.round(2)}s ==="
 
     if timed_out
       Rails.logger.error "GeneratePdfJob: Node.js timed out after #{execution_time.round(2)}s"

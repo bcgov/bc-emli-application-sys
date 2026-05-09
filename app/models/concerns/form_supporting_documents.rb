@@ -138,7 +138,7 @@ module FormSupportingDocuments
     )
   end
 
-  def zip_and_upload_supporting_documents
+  def generate_and_upload_pdfs
     return unless submitted?
 
     GeneratePdfJob.perform_async(id)

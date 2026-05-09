@@ -229,7 +229,7 @@ const FileViewLink = function ApplicationFileViewLink({ url, name, size, created
   );
 };
 
-function MissingPdf({ pdfKey }: { pdfKey: 'permit_application_pdf' }) {
+function MissingPdf({ pdfKey }: { pdfKey: string }) {
   const { t } = useTranslation();
 
   const getMissingPdfLabel = () => {

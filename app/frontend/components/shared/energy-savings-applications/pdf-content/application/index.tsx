@@ -88,7 +88,7 @@ const FormComponent = function ApplicationPDFFormComponent({
     // If not found, try with container path prefix
     if (value === null || value === undefined) {
       const existsAnywhere = Object.values(submissionData).some(
-        (sec) => sec && typeof sec === 'object' && (comp.key in sec || (camelKey && camelKey in sec)),
+        (sec) => sec && typeof sec === 'object' && ((comp.key && comp.key in sec) || (camelKey && camelKey in sec)),
       );
       if (existsAnywhere) {
         console.warn(`[PDF] Direct lookup missed for "${comp.key}" — key exists in data but direct path failed`);

@@ -75,7 +75,7 @@ module ApplicationFlow
           )
       )
 
-      application.zip_and_upload_supporting_documents
+      application.generate_and_upload_pdfs
       application.send_submit_notifications
     end
   end
