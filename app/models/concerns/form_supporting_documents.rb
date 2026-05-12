@@ -121,27 +121,10 @@ module FormSupportingDocuments
     supporting_documents.file_ids_with_regex(regex_pattern).without_compliance
   end
 
-  def zipfile_size
-    zipfile_data&.dig("metadata", "size")
-  end
-
-  def zipfile_name
-    zipfile_data&.dig("metadata", "filename")
-  end
-
-  def zipfile_url
-    zipfile&.url(
-      public: false,
-      expires_in: 3600,
-      response_content_disposition:
-        "attachment; filename=\"#{zipfile.original_filename}\""
-    )
-  end
-
-  def zip_and_upload_supporting_documents
+  def generate_and_upload_pdfs
     return unless submitted?
 
-    ZipfileJob.perform_async(id)
+    GeneratePdfJob.perform_async(id)
   end
 
   module ClassMethods

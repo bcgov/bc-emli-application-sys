@@ -18,6 +18,7 @@ app:
 
 
   env:
+    'DATABASE_POOL': '10'
     'APP_DOMAIN': 'dev-hesp.apps.silver.devops.gov.bc.ca'
     'SECURE_JWT_COOKIE': 'true'
     'VITE_ENABLE_TEMPLATE_FORCE_PUBLISH': 'true'
@@ -63,6 +64,7 @@ sidekiq:
       memory: 256Mi
 
   env:
+    'DATABASE_POOL': '25'
     'APP_DOMAIN': 'dev-hesp.apps.silver.devops.gov.bc.ca'
     'FROM_EMAIL': 'no-reply@gov.bc.ca'
     # File Upload Configuration

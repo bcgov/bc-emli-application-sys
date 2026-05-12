@@ -5,8 +5,6 @@ class AwsCredentialHealthCheckJob < ApplicationJob
   discard_on StandardError
 
   def perform
-    Rails.logger.info "Starting AWS credential health check"
-
     service = AwsCredentialRefreshService.new
     current_creds = AwsCredential.current_s3_credentials
 
@@ -112,27 +110,28 @@ class AwsCredentialHealthCheckJob < ApplicationJob
   private
 
   def log_health_status(status)
-    Rails.logger.info "AWS Credential Health Check Results:"
-    Rails.logger.info "  Has credentials: #{status[:has_credentials]}"
-    Rails.logger.info "  Credentials valid: #{status[:credentials_valid]}"
-
-    if status[:time_until_expiry]
-      hours_until_expiry = (status[:time_until_expiry] / 1.hour).round(2)
-      Rails.logger.info "  Time until expiry: #{hours_until_expiry} hours"
+    if status[:using_pending_key]
+      Rails.logger.warn "AWS credential health check: using_pending_key=true, needs_refresh=#{status[:needs_refresh]}"
     end
 
-    Rails.logger.info "  Needs refresh: #{status[:needs_refresh]}"
-    Rails.logger.info "  Using pending key: #{status[:using_pending_key]}"
-    Rails.logger.info "  Parameter Store accessible: #{status[:parameter_store_accessible]}"
-    Rails.logger.info "  Environment fallback available: #{status[:environment_fallback_available]}"
-
-    # Color-coded status summary
     if status[:credentials_valid] && !status[:needs_refresh]
-      Rails.logger.info "✅ AWS credentials health: GOOD"
+      Rails.logger.info "AWS credential health check: OK"
     elsif status[:credentials_valid] && status[:needs_refresh]
-      Rails.logger.warn "⚠️  AWS credentials health: NEEDS_REFRESH"
+      hours =
+        (
+          if status[:time_until_expiry]
+            "#{(status[:time_until_expiry] / 1.hour).round(2)}h"
+          else
+            "unknown"
+          end
+        )
+      Rails.logger.warn "AWS credential health check: NEEDS_REFRESH — expiry in #{hours}"
     else
-      Rails.logger.error "❌ AWS credentials health: CRITICAL"
+      Rails.logger.error "AWS credential health check: CRITICAL — " \
+                           "has_credentials=#{status[:has_credentials]} " \
+                           "credentials_valid=#{status[:credentials_valid]} " \
+                           "parameter_store_accessible=#{status[:parameter_store_accessible]} " \
+                           "environment_fallback_available=#{status[:environment_fallback_available]}"
     end
   end
 

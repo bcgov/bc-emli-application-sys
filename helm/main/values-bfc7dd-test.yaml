@@ -17,6 +17,7 @@ app:
       memory: 512Mi
 
   env:
+    'DATABASE_POOL': '10'
     'APP_DOMAIN': 'test-hesp.apps.silver.devops.gov.bc.ca'
     'ANYCABLE_URL': 'wss://test-hesp-anycable.apps.silver.devops.gov.bc.ca/cable'
     'KEYCLOAK_AUTH_URL': 'https://test.loginproxy.gov.bc.ca/'
@@ -61,6 +62,7 @@ sidekiq:
       memory: 256Mi
 
   env:
+    'DATABASE_POOL': '25'
     'APP_DOMAIN': 'test-hesp.apps.silver.devops.gov.bc.ca'
     'FROM_EMAIL': 'no-reply@gov.bc.ca'
     # File Upload Configuration

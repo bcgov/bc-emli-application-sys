@@ -303,9 +303,6 @@ export const PermitApplicationStoreModel = types
         supportingDocuments: overrides.supportingDocuments || null,
         allSubmissionVersionCompletedSupportingDocuments:
           overrides.allSubmissionVersionCompletedSupportingDocuments || null,
-        zipfileSize: overrides.zipfileSize || null,
-        zipfileName: overrides.zipfileName || null,
-        zipfileUrl: overrides.zipfileUrl || null,
         referenceNumber: overrides.referenceNumber || null,
         missingPdfs: overrides.missingPdfs || null,
         isFullyLoaded: overrides.isFullyLoaded ?? false,
@@ -370,7 +367,10 @@ export const PermitApplicationStoreModel = types
 
       return app;
     },
-    requestSupportingFiles: flow(function* (permitApplicationId: string, params: { note: string; audience_type_code?: string }) {
+    requestSupportingFiles: flow(function* (
+      permitApplicationId: string,
+      params: { note: string; audience_type_code?: string },
+    ) {
       const permitApplication = self.getPermitApplicationById(permitApplicationId);
       if (!permitApplication) return false;
 
@@ -426,11 +426,14 @@ export const PermitApplicationStoreModel = types
         },
       } as TSearchParams<EPermitApplicationSortFields, IEnergySavingsApplicationSearchFilters>;
 
-
       const currentProgramId = self.rootStore?.programStore?.currentProgram?.id;
 
       // Don't search if we don't have the required filters set
-      if (!searchParams.filters.userGroupTypeId || !searchParams.filters.submissionTypeId || (Array.isArray(searchParams.filters.submissionTypeId) && searchParams.filters.submissionTypeId.length === 0)) {
+      if (
+        !searchParams.filters.userGroupTypeId ||
+        !searchParams.filters.submissionTypeId ||
+        (Array.isArray(searchParams.filters.submissionTypeId) && searchParams.filters.submissionTypeId.length === 0)
+      ) {
         return false;
       }
 

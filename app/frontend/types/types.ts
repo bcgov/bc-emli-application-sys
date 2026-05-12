@@ -347,9 +347,6 @@ export interface IEnergySavingsApplicationSupportingDocumentsUpdate {
   supportingDocuments: IDownloadableFile[];
   allSubmissionVersionCompletedSupportingDocuments?: IDownloadableFile[];
   missingPdfs: string[];
-  zipfileSize: null | number;
-  zipfileName: null | string;
-  zipfileUrl: null | string;
 }
 
 export interface IPermitApplicationSupportingDocumentsUpdate {
@@ -357,9 +354,6 @@ export interface IPermitApplicationSupportingDocumentsUpdate {
   supportingDocuments: IDownloadableFile[];
   allSubmissionVersionCompletedSupportingDocuments?: IDownloadableFile[];
   missingPdfs: string[];
-  zipfileSize: null | number;
-  zipfileName: null | string;
-  zipfileUrl: null | string;
 }
 
 export interface IUserPushPayload {

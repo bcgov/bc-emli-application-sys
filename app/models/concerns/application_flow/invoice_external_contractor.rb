@@ -102,7 +102,7 @@ module ApplicationFlow
         submission_data: application.submission_data
       )
 
-      application.zip_and_upload_supporting_documents
+      application.generate_and_upload_pdfs
 
       application.process_contractor_invoice_submission!
     end
@@ -115,7 +115,7 @@ module ApplicationFlow
         submission_data: application.submission_data
       )
 
-      application.zip_and_upload_supporting_documents
+      application.generate_and_upload_pdfs
     end
   end
 end

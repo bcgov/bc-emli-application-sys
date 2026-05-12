@@ -41,9 +41,6 @@ class PermitApplicationBlueprint < Blueprinter::Base
            :full_address,
            :pid,
            :pin,
-           :zipfile_size,
-           :zipfile_name,
-           :zipfile_url,
            :reference_number,
            :submitted_at,
            :submitted_for,
@@ -389,7 +386,7 @@ class PermitApplicationBlueprint < Blueprinter::Base
   view :supporting_docs_update do
     identifier :id
 
-    fields :missing_pdfs, :zipfile_size, :zipfile_name, :zipfile_url
+    fields :missing_pdfs
 
     association :supporting_documents, blueprint: SupportingDocumentBlueprint
     association :all_submission_version_completed_supporting_documents,

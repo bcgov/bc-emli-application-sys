@@ -48,7 +48,7 @@ module ApplicationFlow
           submission_data: application.submission_data
         )
 
-        application.zip_and_upload_supporting_documents
+        application.generate_and_upload_pdfs
         application.process_contractor_submission!
 
         application.update(signed_off_at: Time.current)
