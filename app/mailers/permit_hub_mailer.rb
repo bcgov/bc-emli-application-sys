@@ -104,32 +104,6 @@ class PermitHubMailer < ApplicationMailer
     )
   end
 
-  def send_batched_integration_mapping_notifications(
-    notifiable,
-    notification_ids
-  )
-    # This should be called by the SendBatchedIntegrationMappingNotificationsJob
-
-    @notifications = IntegrationMappingNotification.where(id: notification_ids)
-
-    return unless @notifications.any?
-
-    if notifiable.is_a?(User)
-      @user = notifiable
-      send_user_mail(
-        email: notifiable.email,
-        template_key: "notify_batched_integration_mapping"
-      )
-    elsif notifiable.is_a?(ExternalApiKey)
-      @external_api_key = notifiable
-      @jurisdiction_name = @external_api_key&.jurisdiction.qualified_name
-      send_mail(
-        email: notifiable.notification_email,
-        template_key: "notify_batched_integration_mapping"
-      )
-    end
-  end
-
   def notify_reviewer_application_received(
     permit_type_submission_contact,
     permit_application
