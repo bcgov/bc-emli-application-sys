@@ -1,11 +1,9 @@
-class AwsCredentialRefreshJob < ApplicationJob
-  queue_as :default
-
-  # Retry configuration for critical credential refresh
-  retry_on StandardError, wait: :exponentially_longer, attempts: 3
+class AwsCredentialRefreshJob
+  include Sidekiq::Job
+  sidekiq_options queue: :default, retry: 3, log_level: :warn
 
   def perform
-    Rails.logger.info "Starting scheduled AWS credential refresh job"
+    Rails.logger.debug "Starting scheduled AWS credential refresh job"
 
     service = AwsCredentialRefreshService.new
 
@@ -14,7 +12,7 @@ class AwsCredentialRefreshJob < ApplicationJob
 
     begin
       if service.refresh_credentials!
-        Rails.logger.info "✅ Scheduled AWS credential refresh completed successfully"
+        Rails.logger.debug "✅ Scheduled AWS credential refresh completed successfully"
 
         # Refresh S3 storage clients to use new credentials
         refresh_shrine_clients
@@ -62,7 +60,7 @@ class AwsCredentialRefreshJob < ApplicationJob
       attempts += 1
 
       if service.test_credentials
-        Rails.logger.info "✅ New credentials tested and working (attempt #{attempts})"
+        Rails.logger.debug "✅ New credentials tested and working (attempt #{attempts})"
         return true
       end
 
