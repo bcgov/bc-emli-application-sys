@@ -21,6 +21,5 @@ aws_credential_health_check:
   cron: "*/5 * * * * America/Vancouver" # Runs every 5 minutes for aggressive monitoring
   class: "AwsCredentialHealthCheckJob"
   queue: default
-  active_job: true
 
 

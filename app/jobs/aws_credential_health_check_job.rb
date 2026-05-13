@@ -1,8 +1,6 @@
-class AwsCredentialHealthCheckJob < ApplicationJob
-  queue_as :default
-
-  # Don't retry health checks - they should run on schedule
-  discard_on StandardError
+class AwsCredentialHealthCheckJob
+  include Sidekiq::Job
+  sidekiq_options queue: :default, retry: false, log_level: :warn
 
   def perform
     service = AwsCredentialRefreshService.new

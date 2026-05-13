@@ -442,6 +442,11 @@ const FormComponent = function ApplicationPDFFormComponent({
       const { value, label, isVisible } = extractFieldInfo(component);
       return isVisible ? <InputField value={value} label={label} /> : null;
     }
+    case 'button':
+    case 'choicesjs':
+    case 'content':
+    case 'htmlelement':
+      return null;
     default:
       console.warn(`[PDF] Unhandled component type "${component.type}" — field will be missing from PDF`);
       return null;

@@ -112,7 +112,7 @@ class AwsCredentialRefreshService
           return nil
         end
 
-        Rails.logger.info "Successfully fetched current credentials from Parameter Store"
+        Rails.logger.debug "Successfully fetched current credentials from Parameter Store"
 
         return(
           {
@@ -160,7 +160,6 @@ class AwsCredentialRefreshService
           get_parameter_store_credentials(
             force_environment: !use_database_creds
           )
-        Rails.logger.debug "Using credentials for Parameter Store pending_deletion check"
 
         ssm_client = Aws::SSM::Client.new(ssm_client_options)
 
@@ -198,7 +197,7 @@ class AwsCredentialRefreshService
       rescue Aws::SSM::Errors::UnauthorizedOperation,
              Aws::SSM::Errors::AccessDeniedException => e
         if use_database_creds
-          Rails.logger.debug "Database credentials failed for pending check: #{e.message}, trying environment fallback"
+          Rails.logger.warn "Database credentials failed for pending check: #{e.message}, trying environment fallback"
           next # Try environment credentials
         else
           Rails.logger.error "Environment credentials also failed for pending check: #{e.message}"
@@ -206,7 +205,7 @@ class AwsCredentialRefreshService
         end
       rescue => e
         if use_database_creds
-          Rails.logger.debug "Parameter Store pending check failed with database credentials: #{e.message}, trying environment fallback"
+          Rails.logger.warn "Parameter Store pending check failed with database credentials: #{e.message}, trying environment fallback"
           next # Try environment credentials
         else
           Rails.logger.error "Parameter Store pending check failed with environment credentials: #{e.message}"
@@ -271,7 +270,7 @@ class AwsCredentialRefreshService
 
       # Test by listing bucket (minimal operation)
       s3_client.head_bucket(bucket: ENV["BCGOV_OBJECT_STORAGE_BUCKET"])
-      Rails.logger.info "AWS credentials test successful"
+      Rails.logger.debug "AWS credentials test successful"
       true
     rescue => e
       Rails.logger.error "AWS credentials test failed: #{e.message}"
@@ -294,7 +293,6 @@ class AwsCredentialRefreshService
       end
 
       if db_creds && !credentials_expire_soon?(db_creds)
-        Rails.logger.debug "Using database credentials for Parameter Store access"
         return(
           {
             region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1",
@@ -307,7 +305,6 @@ class AwsCredentialRefreshService
     end
 
     # Use environment credentials
-    Rails.logger.debug "Using environment credentials for Parameter Store access"
     {
       region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1",
       access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
