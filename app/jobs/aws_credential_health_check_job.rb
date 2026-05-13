@@ -82,13 +82,13 @@ class AwsCredentialHealthCheckJob
           Rails.logger.error "❌ Emergency credential refresh failed"
 
           # Queue the job as fallback
-          AwsCredentialRefreshJob.perform_later
+          AwsCredentialRefreshJob.perform_async
         end
       rescue => e
         Rails.logger.error "Emergency refresh failed with exception: #{e.message}"
 
         # Queue the job as fallback
-        AwsCredentialRefreshJob.perform_later
+        AwsCredentialRefreshJob.perform_async
       end
     end
 
