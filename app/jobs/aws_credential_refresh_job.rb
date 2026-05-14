@@ -3,8 +3,6 @@ class AwsCredentialRefreshJob
   sidekiq_options queue: :default, retry: 3, log_level: :warn
 
   def perform
-    Rails.logger.debug "Starting scheduled AWS credential refresh job"
-
     service = AwsCredentialRefreshService.new
 
     # First check if we have any valid credentials at all
@@ -12,8 +10,6 @@ class AwsCredentialRefreshJob
 
     begin
       if service.refresh_credentials!
-        Rails.logger.debug "✅ Scheduled AWS credential refresh completed successfully"
-
         # Refresh S3 storage clients to use new credentials
         refresh_shrine_clients
 
@@ -59,10 +55,7 @@ class AwsCredentialRefreshJob
     while attempts < max_attempts
       attempts += 1
 
-      if service.test_credentials
-        Rails.logger.debug "✅ New credentials tested and working (attempt #{attempts})"
-        return true
-      end
+      return true if service.test_credentials
 
       Rails.logger.warn "⚠️ Credential test failed (attempt #{attempts}/#{max_attempts})"
 

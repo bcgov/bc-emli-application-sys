@@ -2,13 +2,8 @@ class AwsCredentialRefreshService
   include ActiveModel::Model
 
   def refresh_credentials!
-    Rails.logger.debug "Starting AWS credential refresh process"
-
     # Check if current credentials are still valid and not expiring soon
-    if credentials_still_valid?
-      Rails.logger.debug "Current credentials are still valid, skipping refresh"
-      return true
-    end
+    return true if credentials_still_valid?
 
     # First, deactivate any expired credentials
     AwsCredential.deactivate_expired!
@@ -242,7 +237,7 @@ class AwsCredentialRefreshService
 
     # Test if credentials actually work
     if test_credentials(current_creds)
-      Rails.logger.debug "Credentials valid until #{current_creds[:expires_at]} (#{time_until_expiry(current_creds[:expires_at])} remaining)"
+      Rails.logger.info "AWS credential refresh: valid until #{current_creds[:expires_at].strftime("%Y-%m-%d")} (#{time_until_expiry(current_creds[:expires_at])} remaining)"
       true
     else
       Rails.logger.warn "Credentials failed validation test, need refresh"
