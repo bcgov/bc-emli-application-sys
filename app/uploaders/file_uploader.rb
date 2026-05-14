@@ -176,7 +176,7 @@ class FileUploader < Shrine
           updated_at: Time.current
         )
 
-        Rails.logger.info "Virus scan clean: #{scan_result[:original_filename]} (#{attacher.record.class.name}##{attacher.record.id})"
+        Rails.logger.info "Virus scan #{scan_result[:status]}: #{scan_result[:original_filename]} (#{attacher.record.class.name}##{attacher.record.id})"
       rescue => e
         Rails.logger.error "Failed to store virus scan results: #{e.message}"
         Rails.logger.error e.backtrace.join("\n")
