@@ -127,7 +127,6 @@ if SHRINE_USE_S3
     # Reset client to force credential refresh (called by cron job)
     def refresh_client!
       @client = nil
-      Rails.logger.debug "S3 client refreshed - will use latest database credentials"
     end
 
     # Override methods to handle credential failures gracefully
