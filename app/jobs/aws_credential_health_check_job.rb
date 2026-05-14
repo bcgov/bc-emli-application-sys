@@ -13,8 +13,7 @@ class AwsCredentialHealthCheckJob
       time_until_expiry: nil,
       needs_refresh: false,
       parameter_store_accessible: false,
-      environment_fallback_available: false,
-      using_pending_key: false
+      environment_fallback_available: false
     }
 
     if current_creds
@@ -28,20 +27,9 @@ class AwsCredentialHealthCheckJob
       health_status[:needs_refresh] = current_creds[:expires_at] <
         (Time.current + 8.hours)
 
-      # Check if using pending deletion key
-      begin
-        health_status[:using_pending_key] = service.send(
-          :using_pending_deletion_key?,
-          current_creds
-        )
-        if health_status[:using_pending_key]
-          Rails.cache.delete("aws_credentials/s3")
-          Rails.logger.warn "Cache invalidated due to pending deletion key"
-          health_status[:needs_refresh] = true
-        end
-      rescue => e
-        Rails.logger.debug "Could not check pending key status: #{e.message}"
-      end
+      # Let refresh_credentials! handle pending_deletion detection internally
+      # (calling using_pending_deletion_key? here would double the WARN logs)
+      health_status[:needs_refresh] ||= !health_status[:credentials_valid]
     else
       health_status[:needs_refresh] = true
     end
@@ -73,6 +61,9 @@ class AwsCredentialHealthCheckJob
           Rails.logger.info "✅ Emergency credential refresh completed successfully"
 
           # Update health status after refresh
+          health_status[
+            :has_credentials
+          ] = !AwsCredential.current_s3_credentials.nil?
           health_status[:credentials_valid] = service.test_credentials
           health_status[:needs_refresh] = false
 
@@ -108,10 +99,6 @@ class AwsCredentialHealthCheckJob
   private
 
   def log_health_status(status)
-    if status[:using_pending_key]
-      Rails.logger.warn "AWS credential health check: using_pending_key=true, needs_refresh=#{status[:needs_refresh]}"
-    end
-
     if status[:credentials_valid] && !status[:needs_refresh]
       Rails.logger.info "AWS credential health check: OK"
     elsif status[:credentials_valid] && status[:needs_refresh]
