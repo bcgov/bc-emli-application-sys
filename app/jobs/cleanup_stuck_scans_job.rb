@@ -1,9 +1,8 @@
-class CleanupStuckScansJob < ApplicationJob
-  queue_as :default
+class CleanupStuckScansJob
+  include Sidekiq::Job
+  sidekiq_options queue: :default, retry: false, log_level: :warn
 
   def perform
-    Rails.logger.info "Starting cleanup of stuck virus scans"
-
     cleanup_count = 0
     error_count = 0
 

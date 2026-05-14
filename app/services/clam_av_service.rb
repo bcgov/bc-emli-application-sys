@@ -107,7 +107,7 @@ class ClamAvService
     end
 
     result = result.strip
-    Rails.logger.info "ClamAV scan result: #{result}"
+    Rails.logger.debug "ClamAV scan result: #{result}"
 
     case result
     when /stream: OK/

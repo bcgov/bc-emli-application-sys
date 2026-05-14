@@ -9,7 +9,6 @@ cleanup_stuck_scans:
   cron: "0 */6 * * * America/Vancouver" # Runs every 6 hours
   class: "CleanupStuckScansJob"
   queue: default
-  active_job: true
 
 aws_credential_refresh:
   cron: "0 */2 * * * America/Vancouver" # Runs every 2 hours (more frequent refresh)

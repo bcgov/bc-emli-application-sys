@@ -112,8 +112,6 @@ class AwsCredentialRefreshService
           return nil
         end
 
-        Rails.logger.debug "Successfully fetched current credentials from Parameter Store"
-
         return(
           {
             access_key_id: current_creds["AccessKeyID"],
@@ -270,7 +268,6 @@ class AwsCredentialRefreshService
 
       # Test by listing bucket (minimal operation)
       s3_client.head_bucket(bucket: ENV["BCGOV_OBJECT_STORAGE_BUCKET"])
-      Rails.logger.debug "AWS credentials test successful"
       true
     rescue => e
       Rails.logger.error "AWS credentials test failed: #{e.message}"
