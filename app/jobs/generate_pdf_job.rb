@@ -8,7 +8,7 @@ class GeneratePdfJob
                   queue: :file_processing,
                   on_conflict: {
                     client: :log,
-                    server: :reject
+                    server: :log
                   }
 
   def self.lock_args(args)

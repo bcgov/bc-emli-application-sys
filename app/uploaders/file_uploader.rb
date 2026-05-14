@@ -30,8 +30,6 @@ class FileUploader < Shrine
     next unless file # Skip if no file attached
     next unless ClamAvService.enabled? # Skip if virus scanning disabled
 
-    Rails.logger.info "Performing immediate virus scan for: #{file.original_filename}"
-
     # Check if ClamAV service is reachable before proceeding
     unless ClamAvService.ping
       Rails.logger.error "ClamAV service is not reachable, skipping virus scan for development"
@@ -109,7 +107,7 @@ class FileUploader < Shrine
                             )
         end
       else
-        Rails.logger.info "File passed immediate virus scan: #{file.original_filename} (#{scan_result[:message]})"
+        # clean result logged in promote_block with filename + record ID
       end
     rescue Timeout::Error => e
       Rails.logger.error "Virus scan timeout during upload: #{e.message}"
@@ -160,8 +158,6 @@ class FileUploader < Shrine
          Thread.current[:virus_scan_result]
       scan_result = Thread.current[:virus_scan_result]
 
-      Rails.logger.info "Storing immediate virus scan results for #{attacher.record.class.name}##{attacher.record.id}"
-
       begin
         # Use update_columns to avoid callbacks and potential infinite loops
         attacher.record.update_columns(
@@ -180,7 +176,7 @@ class FileUploader < Shrine
           updated_at: Time.current
         )
 
-        Rails.logger.info "Successfully stored virus scan results: #{scan_result[:status]} for #{attacher.record.class.name}##{attacher.record.id}"
+        Rails.logger.info "Virus scan #{scan_result[:status]}: #{scan_result[:original_filename]} (#{attacher.record.class.name}##{attacher.record.id})"
       rescue => e
         Rails.logger.error "Failed to store virus scan results: #{e.message}"
         Rails.logger.error e.backtrace.join("\n")
