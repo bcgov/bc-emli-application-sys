@@ -8,6 +8,37 @@ import { generateUUID } from '../../../../../utils/utility-functions';
 import { Footer } from '../shared/footer';
 import { page } from '../shared/styles/page';
 
+const toCamelCase = (str: string) => str.replace(/_([a-z])/g, (_, l) => l.toUpperCase());
+
+// Find a field value by matching the compound key suffix against submission data.
+// Uses the last two key segments (e.g. "|RBuuid|email") to distinguish same-named
+// fields across different form sections (e.g. two email fields in contractor forms).
+const findFieldValue = (key: string | undefined, submissionData: Record<string, any>): any => {
+  if (!key) return null;
+  const parts = key.split('|');
+  const suffix = parts[parts.length - 1];
+  if (!suffix) return null;
+  const camelSuffix = toCamelCase(suffix);
+  // For compound keys, include the second-to-last segment to scope the match
+  const specificSuffix = parts.length > 1 ? `${parts[parts.length - 2]}|${suffix}` : suffix;
+  const specificCamelSuffix = parts.length > 1 ? `${parts[parts.length - 2]}|${camelSuffix}` : camelSuffix;
+
+  for (const sectionData of Object.values(submissionData)) {
+    if (!sectionData || typeof sectionData !== 'object') continue;
+    // Exact match for simple keys stored without a compound path (e.g. `signed`)
+    if (Object.prototype.hasOwnProperty.call(sectionData, suffix)) return sectionData[suffix];
+    if (camelSuffix !== suffix && Object.prototype.hasOwnProperty.call(sectionData, camelSuffix))
+      return sectionData[camelSuffix];
+    // Specific suffix match using last 2 segments — avoids false matches when multiple
+    // sections contain fields with the same name (e.g. two email fields)
+    const matchKey = Object.keys(sectionData).find(
+      (k) => k.endsWith(`|${specificCamelSuffix}`) || k.endsWith(`|${specificSuffix}`),
+    );
+    if (matchKey !== undefined) return sectionData[matchKey];
+  }
+  return null;
+};
+
 enum EComponentType {
   checkbox = 'checkbox',
   container = 'container',
@@ -59,103 +90,18 @@ const FormComponent = function ApplicationPDFFormComponent({
   component,
   dataPath,
 }: IFormComponentProps) {
-  // Helper function to check if a component has actual field data
   const hasFieldData = (comp) => {
-    if (!comp || !comp.input) {
-      return false;
-    }
-
+    if (!comp || !comp.input) return false;
     const submissionData = permitApplication.submissionData?.data || {};
-    let value = null;
+    const value = findFieldValue(comp.key, submissionData);
 
-    const toCamelCase = (str) => str.replace(/_([a-z])/g, (_, l) => l.toUpperCase());
-    const toUnderscoreCase = (str) => str.replace(/([A-Z])/g, '_$1').toLowerCase();
-    const camelKey = comp.key ? toCamelCase(comp.key) : null;
-
-    // Try direct lookup with both snake_case and camelCase keys
-    for (const sectionKey of Object.keys(submissionData)) {
-      const sectionData = submissionData[sectionKey];
-      if (sectionData && typeof sectionData === 'object') {
-        const matchKey =
-          comp.key && comp.key in sectionData ? comp.key : camelKey && camelKey in sectionData ? camelKey : null;
-        if (matchKey) {
-          value = sectionData[matchKey];
-          break;
-        }
-      }
+    if (comp.type === 'selectboxes') {
+      return value && typeof value === 'object' && Object.keys(value).some((key) => !!value[key]);
     }
-
-    // If not found, try with container path prefix
-    if (value === null || value === undefined) {
-      const existsAnywhere = Object.values(submissionData).some(
-        (sec) => sec && typeof sec === 'object' && ((comp.key && comp.key in sec) || (camelKey && camelKey in sec)),
-      );
-      if (existsAnywhere) {
-        console.warn(`[PDF] Direct lookup missed for "${comp.key}" — key exists in data but direct path failed`);
-      }
-      for (const sectionKey of Object.keys(submissionData)) {
-        const sectionData = submissionData[sectionKey];
-        if (sectionData && typeof sectionData === 'object') {
-          // Generate potential keys with both naming conventions
-          const baseKey = comp.key;
-          const camelCaseKey = toCamelCase(baseKey);
-          const underscoreKey = toUnderscoreCase(baseKey);
-
-          const potentialKeys = [
-            baseKey,
-            camelCaseKey,
-            underscoreKey,
-            dataPath && dataPath.length > 0 ? `${dataPath[0]}|${baseKey}` : null,
-            dataPath && dataPath.length > 0 ? `${dataPath[0]}|${camelCaseKey}` : null,
-            dataPath && dataPath.length > 0 ? `${dataPath[0]}|${underscoreKey}` : null,
-            dataPath && dataPath.length > 0 && !dataPath[0].startsWith('formSubmissionDataRST')
-              ? `formSubmissionDataRST${dataPath[0]}|${baseKey}`
-              : null,
-            dataPath && dataPath.length > 0 && !dataPath[0].startsWith('formSubmissionDataRST')
-              ? `formSubmissionDataRST${dataPath[0]}|${camelCaseKey}`
-              : null,
-            dataPath && dataPath.length > 0 && !dataPath[0].startsWith('formSubmissionDataRST')
-              ? `formSubmissionDataRST${dataPath[0]}|${underscoreKey}`
-              : null,
-          ]
-            .filter((k) => k !== null && k !== baseKey && k !== camelCaseKey && k !== underscoreKey)
-            .concat([baseKey, camelCaseKey, underscoreKey]); // Add base variants at the end
-
-          for (const potentialKey of potentialKeys) {
-            if (potentialKey in sectionData) {
-              value = sectionData[potentialKey];
-              break;
-            }
-          }
-          if (value !== null && value !== undefined) break;
-        }
-      }
+    if (comp.type === 'simplefile') {
+      return Array.isArray(value) && value.length > 0;
     }
-
-    let hasData = false;
-
-    // For checkboxes, 0 and false are valid data (but not empty string)
-    if (comp.type === 'checkbox') {
-      hasData = value !== null && value !== undefined && value !== '';
-    }
-    // For checklists, check if any options are selected
-    else if (comp.type === 'selectboxes') {
-      if (!value || typeof value !== 'object') {
-        hasData = false;
-      } else {
-        hasData = Object.keys(value).some((key) => !!value[key]);
-      }
-    }
-    // For file fields, check if files exist and are not empty arrays
-    else if (comp.type === 'simplefile') {
-      hasData = Array.isArray(value) && value.length > 0;
-    }
-    // For other fields, check if there's meaningful data
-    else {
-      hasData = value !== null && value !== undefined && value !== '';
-    }
-
-    return hasData;
+    return value !== null && value !== undefined && value !== '';
   };
 
   const extractFields = (component) => {
@@ -176,91 +122,22 @@ const FormComponent = function ApplicationPDFFormComponent({
   const extractFieldInfo = (component) => {
     switch (component.type) {
       case EComponentType.checklist: {
-        const options = R.path([dataPath, component.key], permitApplication.submissionData?.data || {});
+        const options = findFieldValue(component.key, permitApplication.submissionData?.data || {});
         const label = component.label;
-        const values: any = Object.keys(options ?? {}).filter((key) => !!options[key]);
-        const hasData = values && values.length > 0;
+        const hasData = options && typeof options === 'object' && Object.keys(options).some((key) => !!options[key]);
         const hasLabel = !R.isNil(label) && label.trim() !== '';
         const isVisible = hasLabel && hasData;
 
-        return { options, values, label, isVisible };
+        return { options, label, isVisible };
       }
       case EComponentType.datagrid: {
         return { value: null, label: null };
       }
       default:
         const label = component.label;
-        let value = null;
-
-        // Use the same logic as formio-helpers.ts for finding data
         const submissionData = permitApplication.submissionData?.data || {};
-        const toCamelCase = (str) => str.replace(/_([a-z])/g, (_, l) => l.toUpperCase());
-        const toUnderscoreCase = (str) => str.replace(/([A-Z])/g, '_$1').toLowerCase();
-        const camelKey = component.key ? toCamelCase(component.key) : null;
-
-        // Try direct lookup with both snake_case and camelCase keys
-        for (const sectionKey of Object.keys(submissionData)) {
-          const sectionData = submissionData[sectionKey];
-          if (sectionData && typeof sectionData === 'object') {
-            const matchKey =
-              component.key && component.key in sectionData
-                ? component.key
-                : camelKey && camelKey in sectionData
-                  ? camelKey
-                  : null;
-            if (matchKey) {
-              value = sectionData[matchKey];
-              break;
-            }
-          }
-        }
-
-        // If not found, try with container path prefix (for complex form structures)
-        if (value === null || value === undefined) {
-          for (const sectionKey of Object.keys(submissionData)) {
-            const sectionData = submissionData[sectionKey];
-            if (sectionData && typeof sectionData === 'object') {
-              // Generate potential keys with both naming conventions
-              const baseKey = component.key;
-              const camelCaseKey = toCamelCase(baseKey);
-              const underscoreKey = toUnderscoreCase(baseKey);
-
-              const potentialKeys = [
-                baseKey,
-                camelCaseKey,
-                underscoreKey,
-                dataPath && dataPath.length > 0 ? `${dataPath[0]}|${baseKey}` : null,
-                dataPath && dataPath.length > 0 ? `${dataPath[0]}|${camelCaseKey}` : null,
-                dataPath && dataPath.length > 0 ? `${dataPath[0]}|${underscoreKey}` : null,
-                dataPath && dataPath.length > 0 && !dataPath[0].startsWith('formSubmissionDataRST')
-                  ? `formSubmissionDataRST${dataPath[0]}|${baseKey}`
-                  : null,
-                dataPath && dataPath.length > 0 && !dataPath[0].startsWith('formSubmissionDataRST')
-                  ? `formSubmissionDataRST${dataPath[0]}|${camelCaseKey}`
-                  : null,
-                dataPath && dataPath.length > 0 && !dataPath[0].startsWith('formSubmissionDataRST')
-                  ? `formSubmissionDataRST${dataPath[0]}|${underscoreKey}`
-                  : null,
-              ].filter((k) => k !== null);
-
-              for (const potentialKey of potentialKeys) {
-                if (potentialKey in sectionData) {
-                  value = sectionData[potentialKey];
-                  break;
-                }
-              }
-              if (value !== null && value !== undefined) break;
-            }
-          }
-        }
-
-        // Show field only if it has a label and actual data
-        // For checkboxes, 0 and false are valid values, for others exclude empty strings
-        const hasData =
-          component.type === 'checkbox'
-            ? value !== null && value !== undefined && value !== ''
-            : value !== null && value !== undefined && value !== '';
-
+        const value = findFieldValue(component.key, submissionData);
+        const hasData = value !== null && value !== undefined && value !== '';
         const hasLabel = !R.isNil(label) && label.trim() !== '';
         const isVisible = hasLabel && hasData;
 
@@ -415,7 +292,7 @@ const FormComponent = function ApplicationPDFFormComponent({
     }
     case EComponentType.checklist: {
       const { options, label, isVisible } = extractFieldInfo(component);
-      return isVisible ? <ChecklistField options={options} label={label} /> : null;
+      return isVisible ? <ChecklistField options={options} label={label} valueDefinitions={component.values} /> : null;
     }
     case EComponentType.checkbox: {
       const { value, label, isVisible } = extractFieldInfo(component);
@@ -494,8 +371,14 @@ const PanelHeader = function ApplicationPDFPanelHeader({ component }) {
   );
 };
 
-const ChecklistField = function ApplicationPDFPanelChecklistField({ options, label }) {
-  const hasOptions = options && typeof options === 'object' && Object.keys(options).length > 0;
+const ChecklistField = function ApplicationPDFPanelChecklistField({ options, label, valueDefinitions }) {
+  const selectedKeys =
+    options && typeof options === 'object' ? Object.keys(options).filter((key) => !!options[key]) : [];
+
+  const getLabel = (key: string) => {
+    const match = valueDefinitions?.find((v: any) => v.value === key);
+    return match?.label ?? key;
+  };
 
   return (
     <View style={{ gap: 4, paddingTop: 4 }} wrap={false}>
@@ -510,10 +393,8 @@ const ChecklistField = function ApplicationPDFPanelChecklistField({ options, lab
         {label}
       </Text>
       <View style={{ gap: 8 }}>
-        {hasOptions ? (
-          Object.keys(options).map((key) => {
-            return <Checkbox key={key} isChecked={!!options[key]} label={key} />;
-          })
+        {selectedKeys.length > 0 ? (
+          selectedKeys.map((key) => <Checkbox key={key} isChecked={true} label={getLabel(key)} />)
         ) : (
           <Text style={{ fontSize: 10, color: theme.colors.text.secondary, fontStyle: 'italic' }}>
             No options selected
@@ -587,8 +468,6 @@ function Input({ value }) {
   return (
     <View
       style={{
-        flexDirection: 'row',
-        alignItems: 'center',
         minHeight: 28,
         borderColor: theme.colors.border.light,
         borderRadius: 4,
