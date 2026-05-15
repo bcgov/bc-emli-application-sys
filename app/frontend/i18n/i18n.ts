@@ -2955,7 +2955,7 @@ const options = {
           support: {
             getSupport: 'Get support',
             contactAt: 'Contact us at',
-            contactTeamCTA: 'betterhomesesp@clearresult.com',
+            contactTeamCTA: 'betterhomesESP@clearesult.com',
             contactUs: 'or 1-833-856-0333 from 9 am - 5 pm, Monday - Friday (excluding statutory holidays).',
             hereToHelp: "We're here to help",
             speakWithEnergyCoach: 'Speak with an Energy Coach',
@@ -2966,7 +2966,7 @@ const options = {
             offers:
               "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It's part the Province of B.C.'s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
             betterHomes: 'Better Homes',
-            emailAriaLabel: 'Email us at betterhomesesp@clearresult.com',
+            emailAriaLabel: 'Email us at betterhomesESP@clearesult.com',
             applicationHelpTitle: 'Get help with your Energy Savings Program application',
             applicationHelpDescription:
               'Do you have questions about your application, the program or home upgrade opportunities? We can help you understand home energy upgrades and rebates. Calls usually take about 20 minutes.',

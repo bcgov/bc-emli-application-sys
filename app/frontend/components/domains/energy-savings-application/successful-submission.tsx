@@ -231,7 +231,7 @@ const WhatsNextBlock = ({ headingKey, lineKeys, email, bulletLineKeys = false }:
 // Need Help Block component
 const NeedHelpBlock = () => {
   const { t } = useTranslation();
-  const email = 'betterhomesbc@gov.bc.ca';
+  const email = t('site.support.contactTeamCTA');
 
   return (
     <Box mb={6} p={8} borderRadius="md" backgroundColor="greys.grey10" width="100%">
