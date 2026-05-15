@@ -53,7 +53,11 @@ class AwsCredentialHealthCheckJob
 
     # Take immediate corrective action if needed
     if health_status[:needs_refresh] || !health_status[:credentials_valid]
-      Rails.logger.warn "Health check detected credential issues, performing immediate refresh"
+      if health_status[:credentials_valid]
+        Rails.logger.info "Health check: credentials expiring soon, rotating proactively"
+      else
+        Rails.logger.warn "Health check: credentials invalid or missing, performing emergency refresh"
+      end
 
       begin
         # Perform immediate synchronous refresh instead of queuing job
