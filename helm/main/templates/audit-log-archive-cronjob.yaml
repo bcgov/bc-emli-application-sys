@@ -1,0 +1,75 @@
+{{- if .Values.auditLogArchive.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "main.fullname" . }}-audit-log-archive
+  labels:
+    {{- include "main.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.auditLogArchive.schedule | default "0 23 * * 0" | quote }}
+  {{- if .Values.auditLogArchive.timeZone }}
+  timeZone: {{ .Values.auditLogArchive.timeZone | quote }}
+  {{- end }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: {{ .Values.auditLogArchive.successfulJobsHistoryLimit | default 2 }}
+  failedJobsHistoryLimit: {{ .Values.auditLogArchive.failedJobsHistoryLimit | default 3 }}
+  jobTemplate:
+    spec:
+      backoffLimit: {{ .Values.auditLogArchive.backoffLimit | default 2 }}
+      template:
+        spec:
+          serviceAccountName: {{ .Values.global.serviceAccountName | default "default" }}
+          restartPolicy: OnFailure
+          {{- $imagePullSecrets := concat (.Values.app.imagePullSecrets | default list) (.Values.global.imagePullSecrets | default list) -}}
+          {{- with $imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: audit-log-archive
+              image: "{{ .Values.auditLogArchive.image.repository | default .Values.app.image.repository | default "ghcr.io/bcgov/hesp-app" }}:{{ .Values.auditLogArchive.image.tag | default .Values.app.image.tag | default "main" }}"
+              imagePullPolicy: {{ .Values.auditLogArchive.image.pullPolicy | default .Values.app.image.pullPolicy | default "IfNotPresent" }}
+              command: ["/bin/sh", "-c"]
+              args:
+                - bundle exec rake audit_logs:archive_and_prune
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.auditLogArchive.crunchydbSecret | default "hesp-crunchydb-pguser-postgres" }}
+                      key: uri
+                - name: DATABASE_OPENSHIFT_SERVICE_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.auditLogArchive.crunchydbSecret | default "hesp-crunchydb-pguser-postgres" }}
+                      key: host
+              {{- $env := merge (.Values.global.env | default dict) (.Values.app.env | default dict) (.Values.auditLogArchive.env | default dict) -}}
+                {{- range $k, $v := $env }}
+                - name: {{ $k | quote }}
+                  value: {{ $v | quote }}
+                {{- end }}
+              {{- $envSecrets := list }}
+              {{- if .Values.global.envSecretName }}
+                {{- $envSecrets = append $envSecrets .Values.global.envSecretName }}
+              {{- end }}
+              {{- if .Values.app.envSecretName }}
+                {{- $envSecrets = append $envSecrets .Values.app.envSecretName }}
+              {{- end }}
+              {{- if .Values.auditLogArchive.envSecretName }}
+                {{- $envSecrets = append $envSecrets .Values.auditLogArchive.envSecretName }}
+              {{- end }}
+              {{- if or $envSecrets .Values.global.sharedConfig.enabled }}
+              envFrom:
+                {{- if .Values.global.sharedConfig.enabled }}
+                - configMapRef:
+                    name: hesp-config
+                    optional: true
+                {{- end }}
+                {{- range $envSecrets }}
+                - secretRef:
+                    name: {{ . }}
+                {{- end }}
+              {{- end }}
+              resources:
+                {{- toYaml .Values.auditLogArchive.resources | nindent 16 }}
+{{- end }}

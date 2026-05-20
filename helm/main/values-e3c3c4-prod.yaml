@@ -281,15 +281,15 @@ crunchy-postgres:
 
     repos:
       schedules:
-        # NEW BACKUP STRATEGY:
-        # - Full backups every 12 hours (0:00 and 12:00 UTC)
-        # - Skip incremental on full backup hours, run hourly incremental at all other hours
-        full: '0 0,12 * * *' # Full backups at midnight and noon
-        incremental: '0 1-11,13-23 * * *' # Hourly incremental all other hours
+        # Repo1 (PVC) pressure reduction strategy:
+        # - Full backups daily at local BC midnight (UTC-7 = 07:00 UTC)
+        # - Incremental backups at local 06:00, 12:00, and 18:00
+        full: '0 7 * * *' # Daily full backup (targets local BC midnight)
+        incremental: '0 1,13,19 * * *' # Local 18:00, 06:00, and 12:00 (skip local midnight full)
 
       volume:
         accessModes: 'ReadWriteOnce'
-        storage: 10Gi # Matches Silver prod (actual usage ~3.5Gi)
+        storage: 20Gi # Matches Silver prod (actual usage ~3.5Gi)
         storageClassName: netapp-file-backup
 
     repoHost:
@@ -316,8 +316,8 @@ crunchy-postgres:
     # because Go YAML takes the last duplicate key — merging both here avoids repo2 using the wrong schedule.
     s3:
       enabled: true # ENABLED for GOLD production
-      incrementalSchedule: '0 1-11,13-23 * * *' # Hourly incremental (mirrors repo1)
-      fullSchedule: '0 0,12 * * *' # Full backups at midnight and noon (mirrors repo1)
+      incrementalSchedule: '0 0-6,8-18,20-23 * * *' # Hourly incremental for repo2 (skip full hours)
+      fullSchedule: '0 7,19 * * *' # Full backups at local BC midnight/noon (UTC-7)
       createS3Secret: false # Use OS Secret instead of creating one
       s3Secret: pgbackrest-s3-credentials # Reference existing OS Secret
       s3Path: '/pgbackup-prod'
@@ -750,3 +750,17 @@ s3KeyRotation:
   enabled: true
   schedule: '0 */2 * * *'
   parameterStorePath: '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
+
+# ============================================================================
+# AUDIT LOG ARCHIVE + PRUNE
+# ============================================================================
+auditLogArchive:
+  enabled: true
+  # Weekly Sunday 11:00 PM local time.
+  schedule: '0 23 * * 0'
+  timeZone: 'America/Vancouver'
+  env:
+    AUDIT_LOG_RETENTION_DAYS: '90'
+    AUDIT_LOG_ARCHIVE_PREFIX: 'audit-log-archives/prod'
+    # Dedicated archive bucket only for audit logs, separate from app uploads/db backups.
+    AUDIT_LOG_ARCHIVE_S3_BUCKET: 'REPLACE_WITH_AUDIT_ARCHIVE_BUCKET'

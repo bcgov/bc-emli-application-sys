@@ -24,4 +24,4 @@ dependencies:
   repository: file://../_clamav
   version: 0.1.0
 digest: sha256:1d910c60c9c9993314fded61e8e7426c1f98860fa2f03642883b50676a409172
-generated: "2026-05-04T15:51:44.276988271-07:00"
+generated: "2026-05-20T16:30:52.268517659-07:00"
