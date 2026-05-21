@@ -130,10 +130,10 @@ sidekiq:
   resources:
     limits:
       cpu: 300m
-      memory: 384Mi
+      memory: 1Gi
     requests:
       cpu: 150m
-      memory: 192Mi
+      memory: 512Mi
 
   dependencyWait:
     enabled: true
