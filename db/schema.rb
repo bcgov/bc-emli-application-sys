@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_02_19_222612) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_04_204952) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -420,7 +420,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_19_222612) do
     t.string "reference_number"
     t.jsonb "compliance_data", default: {}, null: false
     t.datetime "revisions_requested_at", precision: nil
-    t.datetime "screened_in_at"
     t.boolean "first_nations", default: false
     t.uuid "sandbox_id"
     t.uuid "program_id"
@@ -432,6 +431,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_19_222612) do
     t.string "submitter_type", null: false
     t.uuid "submitter_id", null: false
     t.uuid "submission_variant_id"
+    t.datetime "screened_in_at"
     t.index ["activity_id"], name: "index_permit_applications_on_activity_id"
     t.index ["audience_type_id"],
             name: "index_permit_applications_on_audience_type_id"

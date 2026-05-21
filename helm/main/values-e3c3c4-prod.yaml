@@ -20,6 +20,7 @@ global:
 
   env:
     'SECRET_KEY_BASE': '1'
+    'DATABASE_POOL': '10'
 
   envSecretName: hesp
   serviceAccountName: e3c3c4-vault
@@ -185,6 +186,7 @@ sidekiq:
 
   env:
     'SIDEKIQ_CONCURRENCY': '25'
+    'DATABASE_POOL': '25'
     # other shared config are provided via hesp-config ConfigMap
 
 # ============================================================================
@@ -760,7 +762,7 @@ auditLogArchive:
   schedule: '0 23 * * 0'
   timeZone: 'America/Vancouver'
   env:
-    AUDIT_LOG_RETENTION_DAYS: '90'
+    AUDIT_LOG_RETENTION_DAYS: '30'
     AUDIT_LOG_ARCHIVE_PREFIX: 'audit-log-archives/prod'
     # Dedicated archive bucket only for audit logs, separate from app uploads/db backups.
     AUDIT_LOG_ARCHIVE_S3_BUCKET: 'REPLACE_WITH_AUDIT_ARCHIVE_BUCKET'

@@ -43,7 +43,7 @@ gem "omniauth-rails_csrf_protection", "1.0.1"
 gem "blueprinter", "~> 1.0.2"
 
 gem "awesome_print", "~> 1.9"
-gem "sidekiq", "~> 7.2.4"
+gem "sidekiq", "~> 8.0"
 gem "shrine", "~> 3.5.0"
 gem "redis", "~> 5.3"
 gem "image_processing", "~> 1.12.2"
@@ -63,7 +63,7 @@ gem "faraday", "~> 2.9.0"
 gem "factory_bot", "~> 6.4"
 # The timcop gem mocks Time, it is only used in specs and for seeding a published template version to get around time based validations
 gem "timecop", "~> 0.9.8"
-gem "sidekiq-cron", "~> 1.12"
+gem "sidekiq-cron", "~> 2.0"
 gem "sidekiq-unique-jobs", "~> 8.0"
 gem "rubyzip", "~> 2.3.2"
 gem "anycable-rails", "~> 1.4"
@@ -100,7 +100,7 @@ group :development, :test do
 end
 
 group :test do
-  gem "rspec-sidekiq", "~> 4.1"
+  gem "rspec-sidekiq", "~> 5.0"
 end
 
 group :development do
