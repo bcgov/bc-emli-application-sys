@@ -24,7 +24,7 @@ export GITHUB_USER=<your-github-username>
 export GITHUB_TOKEN=<your-ghcr-pat>          # Classic PAT with write:packages scope
 
 # The image tag to use. For dev use the short git SHA; for test/prod use a semver tag.
-export IMAGE_TAG=$(git rev-parse HEAD)        # dev  -- full SHA
+export IMAGE_TAG=$(git rev-parse --short=8 HEAD)        # dev  -- full SHA $(git rev-parse HEAD)
 # export IMAGE_TAG=1.2.3                      # test/prod -- semver (no "v" prefix)
 
 # Target OpenShift namespace (matches the values file suffix)
