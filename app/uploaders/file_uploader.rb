@@ -2,7 +2,6 @@ class FileUploader < Shrine
   plugin :validation_helpers
   plugin :determine_mime_type
   # plugin :store_dimensions # Disabled - requires fastimage
-  plugin :delete_raw # delete raw files after processing
 
   Attacher.validate do
     validate_max_size Constants::Sizes::FILE_UPLOAD_MAX_SIZE * 1024 * 1024 # 100 MB to start

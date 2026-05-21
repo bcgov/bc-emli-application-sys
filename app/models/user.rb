@@ -31,7 +31,8 @@ class User < ApplicationRecord
          omniauth_providers: %i[keycloak],
          jwt_revocation_strategy: self
 
-  enum role: {
+  enum :role,
+       {
          participant: 0,
          admin_manager: 1,
          admin: 2,
@@ -41,7 +42,7 @@ class User < ApplicationRecord
          contractor: 6,
          unassigned: 7
        },
-       _default: :participant
+       default: :participant
 
   #role ranking in order, these can be adjust or have
   # other roles added without breaking the roles in the database

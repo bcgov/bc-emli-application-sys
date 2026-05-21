@@ -251,13 +251,11 @@ crunchy-postgres:
     name: ha # Name reflects HA configuration
     replicas: 3 # UPGRADED from 1 (default) to 3
 
-    livenessProbe:
-      exec:
-        command: ['pg_isready', '-U', 'postgres']
-      initialDelaySeconds: 10
-      timeoutSeconds: 5
-      periodSeconds: 10
-      failureThreshold: 6
+    # NOTE: The Crunchy PostgreSQL operator injects HTTPS probes by default, but Patroni
+    # REST API is not configured for TLS. This causes "connection reset" failures.
+    # WORKAROUND: Use the kustomization.yaml patch to change probes to HTTP:
+    #   kustomize build helm/main | oc apply -f -
+    # Or integrate into your deployment pipeline to apply the patch after helm template.
 
     # Storage configuration for HA
     dataVolumeClaimSpec:

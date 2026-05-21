@@ -8,7 +8,8 @@ class Requirement < ApplicationRecord
 
   acts_as_list scope: :requirement_block, top_of_list: 0
 
-  enum input_type: {
+  enum :input_type,
+       {
          text: 0,
          number: 1,
          checkbox: 2,
@@ -30,7 +31,7 @@ class Requirement < ApplicationRecord
          service_information: 20,
          utility_account_number: 21
        },
-       _prefix: true
+       prefix: true
 
   # This needs to run before validation because we have validations related to the requirement_code
   before_validation :set_requirement_code

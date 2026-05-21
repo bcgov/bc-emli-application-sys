@@ -193,7 +193,7 @@ anycable-rpc:
   resources:
     limits:
       cpu: 200m
-      memory: 256Mi
+      memory: 384Mi
     requests:
       cpu: 100m
       memory: 128Mi
@@ -550,7 +550,7 @@ anycableGo:
       memory: 128Mi
     limits:
       cpu: 100m
-      memory: 256Mi
+      memory: 384Mi
 
 # ============================================================================
 # ANTIVIRUS - DEV

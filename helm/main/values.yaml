@@ -52,12 +52,14 @@ app:
       memory: 512Mi
 
   env:
+    'BUNDLE_APP_CONFIG': '/tmp/.bundle'
     'VITE_SUBMIT_INVOICE_ENABLED': 'true'
     'BUNDLE_PATH': '/usr/local/bundle'
     'CACHE_DEV_REDIS_URL': 'redis://hesp-redis:6379/4'
     'ELASTICSEARCH_URL': 'http://hesp-elasticsearch:9200'
     'FROM_EMAIL': 'no-reply@gov.bc.ca'
     'GEM_HOME': '/usr/local/bundle'
+    'HOME': '/tmp'
     'RAILS_ENV': 'production'
     'RAILS_MAX_THREADS': '3'
     'RATE_LIMIT_DEV_REDIS_URL': 'redis://hesp-redis:6379/2'
@@ -85,7 +87,9 @@ sidekiq:
       memory: 256Mi
 
   env:
+    'BUNDLE_APP_CONFIG': '/tmp/.bundle'
     'ELASTICSEARCH_URL': 'http://hesp-elasticsearch:9200'
+    'HOME': '/tmp'
 
 anycable-rpc:
   enabled: false
@@ -101,7 +105,9 @@ anycable-rpc:
       memory: 256Mi
 
   env:
+    'BUNDLE_APP_CONFIG': '/tmp/.bundle'
     'ELASTICSEARCH_URL': 'http://hesp-elasticsearch:9200'
+    'HOME': '/tmp'
 
 # See https://github.com/bcgov/crunchy-postgres/blob/main/charts/crunchy-postgres/values.yaml
 crunchy-postgres:

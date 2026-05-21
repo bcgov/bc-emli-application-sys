@@ -13,7 +13,8 @@ class PermitClassification < ApplicationRecord
 
   scope :enabled, -> { where(enabled: true) }
 
-  enum code: %i[
+  enum :code,
+       %i[
          low_residential
          medium_residential
          high_residential
