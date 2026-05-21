@@ -45,18 +45,30 @@ jobs:
   zap-baseline:
     name: ZAP Baseline Scan
     runs-on: ubuntu-latest
-    if: ${{ secrets.ZAP_TARGET_URL != '' }}
+    env:
+      ZAP_TARGET_URL: ${{ secrets.ZAP_TARGET_URL }}
 
     steps:
+      - name: Check ZAP target configuration
+        id: zap_target_check
+        run: |
+          if [ -n "$ZAP_TARGET_URL" ]; then
+            echo "run_scan=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_scan=false" >> "$GITHUB_OUTPUT"
+            echo "ZAP_TARGET_URL is not set. Skipping ZAP baseline scan."
+          fi
+
       - name: Run ZAP baseline scan
+        if: steps.zap_target_check.outputs.run_scan == 'true'
         uses: zaproxy/action-baseline@v0.14.0
         with:
-          target: ${{ secrets.ZAP_TARGET_URL }}
+          target: ${{ env.ZAP_TARGET_URL }}
           cmd_options: '-a'
           fail_action: false
 
       - name: Upload ZAP report artifacts
-        if: always()
+        if: always() && steps.zap_target_check.outputs.run_scan == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: zap-baseline-report
