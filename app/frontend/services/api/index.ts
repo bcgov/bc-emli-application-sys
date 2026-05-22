@@ -272,8 +272,6 @@ export class Api {
     );
   }
 
-  ay;
-
   async fetchPermitApplications(params?: TSearchParams<EPermitApplicationSortFields, IPermitApplicationSearchFilters>) {
     return this.client.post<IJurisdictionPermitApplicationResponse>(`/permit_applications/search`, params);
   }
