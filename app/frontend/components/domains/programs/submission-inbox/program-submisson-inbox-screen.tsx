@@ -9,12 +9,7 @@ import { usePermitClassificationsLoad } from '../../../../hooks/resources/use-pe
 import { useSearch } from '../../../../hooks/use-search';
 import { IEnergySavingsApplication } from '../../../../models/energy-savings-application';
 import { useMst } from '../../../../setup/root';
-import {
-  ECollaborationType,
-  EFlashMessageStatus,
-  EPermitApplicationStatus,
-  EPermitClassificationCode,
-} from '../../../../types/enums';
+import { ECollaborationType, EFlashMessageStatus, EPermitClassificationCode } from '../../../../types/enums';
 import { ErrorScreen } from '../../../shared/base/error-screen';
 import { Paginator } from '../../../shared/base/inputs/paginator';
 import { PerPageSelect } from '../../../shared/base/inputs/per-page-select';
@@ -46,8 +41,7 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
   const { programStore, permitApplicationStore, permitClassificationStore, userStore, uiStore } = useMst();
   const { setValue } = methods;
 
-  const { setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, setStatusFilter, search } =
-    permitApplicationStore;
+  const { setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter } = permitApplicationStore;
 
   const [programOptions, setProgramOptions] = useState([]);
   const [submissionOptions, setSubmissionOptions] = useState([]);
@@ -64,28 +58,11 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
       return;
     }
 
-    // Set classification filters
+    // Set classification filters. Status filter and search are owned by
+    // EnergySavingsApplicationFilter, which re-mounts via filterKey when these change.
     setUserGroupFilter(selectedValue?.userGroupType);
     setAudienceTypeFilter(selectedValue?.AudienceType);
     setSubmissionTypeFilter(selectedValue?.SubmissionType);
-
-    // Set the status filter from the dropdown option
-    if (selectedValue?.status) {
-      setStatusFilter(selectedValue.status);
-    } else {
-      // Set default status filters
-      setStatusFilter([
-        EPermitApplicationStatus.draft,
-        EPermitApplicationStatus.submitted,
-        EPermitApplicationStatus.inReview,
-        EPermitApplicationStatus.approved,
-        EPermitApplicationStatus.ineligible,
-        EPermitApplicationStatus.revisionsRequested,
-      ]);
-    }
-
-    // Trigger search with the new filters
-    search();
   };
 
   const handleProgramChange = useCallback(
@@ -124,44 +101,19 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
       });
       setSubmissionOptions(translatedOptions);
 
-      // Set default to participant submissions and trigger initial search
+      // Set default classification filters. Status filter and initial search are
+      // owned by EnergySavingsApplicationFilter, which mounts via filterKey.
       if (translatedOptions.length > 0) {
         const defaultOption = fromPage?.info ?? translatedOptions[0].value;
         methods.setValue('selectedType', defaultOption);
         setUserGroupFilter(defaultOption?.userGroupType);
         setAudienceTypeFilter(defaultOption?.AudienceType);
         setSubmissionTypeFilter(defaultOption?.SubmissionType);
-
-        // Set status filters
-        if (defaultOption?.status) {
-          setStatusFilter(defaultOption.status as EPermitApplicationStatus[]);
-        } else {
-          setStatusFilter([
-            EPermitApplicationStatus.draft,
-            EPermitApplicationStatus.submitted,
-            EPermitApplicationStatus.inReview,
-            EPermitApplicationStatus.approved,
-            EPermitApplicationStatus.ineligible,
-            EPermitApplicationStatus.revisionsRequested,
-          ]);
-        }
-
-        // Trigger initial search with default filters
-        search();
       }
     } catch (error) {
       console.error('Failed to fetch submission options', error);
     }
-  }, [
-    permitClassificationStore,
-    t,
-    setUserGroupFilter,
-    setAudienceTypeFilter,
-    setSubmissionTypeFilter,
-    setStatusFilter,
-    search,
-    methods,
-  ]);
+  }, [permitClassificationStore, t, setUserGroupFilter, setAudienceTypeFilter, setSubmissionTypeFilter, methods]);
 
   const loadProgramOptions = useCallback(async () => {
     try {
@@ -203,7 +155,8 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
 
   useEffect(() => {
     loadProgramOptions();
-  }, [loadProgramOptions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Set count per page to 10 for submission inbox
   useEffect(() => {
