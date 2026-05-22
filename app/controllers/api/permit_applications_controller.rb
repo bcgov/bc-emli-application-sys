@@ -322,7 +322,10 @@ class Api::PermitApplicationsController < Api::ApplicationController
 
     update_success = @permit_application.update(params_to_use)
     @permit_application.send(:set_flow) if update_success
-    submit_success = @permit_application.submit! if update_success
+    submit_success =
+      if update_success
+        @permit_application.with_lock { @permit_application.submit! }
+      end
 
     if update_success && submit_success
       handle_submission_notifications(@permit_application)
