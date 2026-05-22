@@ -65,6 +65,9 @@ export const PermitApplicationStoreModel = types
   .extend(withEnvironment())
   .extend(withRootStore())
   .extend(withMerge())
+  .volatile(() => ({
+    searchAbortController: null as AbortController | null,
+  }))
   .views((self) => ({
     get draftStatuses() {
       return [EPermitApplicationStatus.draft];
@@ -437,9 +440,17 @@ export const PermitApplicationStoreModel = types
         return false;
       }
 
+      // Abort any in-flight search so the latest one wins, regardless of response order.
+      self.searchAbortController?.abort();
+      const controller = new AbortController();
+      self.searchAbortController = controller;
+
       const response = currentProgramId
-        ? yield self.environment.api.fetchProgramPermitApplications(currentProgramId, searchParams)
-        : yield self.environment.api.fetchPermitApplications(searchParams);
+        ? yield self.environment.api.fetchProgramPermitApplications(currentProgramId, searchParams, controller.signal)
+        : yield self.environment.api.fetchPermitApplications(searchParams, controller.signal);
+
+      // A newer search aborted this one — don't apply its (now-stale) results to the store.
+      if (controller.signal.aborted) return false;
 
       if (response.ok) {
         //const permitApplications = response.data.data;

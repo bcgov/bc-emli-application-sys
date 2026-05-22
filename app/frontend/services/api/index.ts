@@ -272,8 +272,11 @@ export class Api {
     );
   }
 
-  async fetchPermitApplications(params?: TSearchParams<EPermitApplicationSortFields, IPermitApplicationSearchFilters>) {
-    return this.client.post<IJurisdictionPermitApplicationResponse>(`/permit_applications/search`, params);
+  async fetchPermitApplications(
+    params?: TSearchParams<EPermitApplicationSortFields, IPermitApplicationSearchFilters>,
+    signal?: AbortSignal,
+  ) {
+    return this.client.post<IJurisdictionPermitApplicationResponse>(`/permit_applications/search`, params, { signal });
   }
 
   async fetchCollaboratorsByCollaboratorable(collaboratorableId: string, params?: TSearchParams<never, never>) {
@@ -286,10 +289,12 @@ export class Api {
   async fetchProgramPermitApplications(
     programId,
     params?: TSearchParams<EPermitApplicationSortFields, IPermitApplicationSearchFilters>,
+    signal?: AbortSignal,
   ) {
     return this.client.post<IJurisdictionPermitApplicationResponse>(
       `/programs/${programId}/permit_applications/search`,
       params,
+      { signal },
     );
   }
 
