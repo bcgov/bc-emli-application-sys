@@ -153,6 +153,15 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
     }
   }, [userStore, uiStore, programStore, methods, fetchSubmissionOptions, handleProgramChange, t]);
 
+  // Restore the search query from URL so bookmarks/refreshes preserve the admin's
+  // last query. Runs before the filter component mounts and triggers its initial
+  // search, so the search uses the URL-derived query.
+  useEffect(() => {
+    const queryParam = new URLSearchParams(location.search).get('query');
+    if (queryParam) permitApplicationStore.setQuery(decodeURIComponent(queryParam));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     loadProgramOptions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
