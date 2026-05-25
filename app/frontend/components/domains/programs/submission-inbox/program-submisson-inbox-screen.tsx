@@ -153,12 +153,11 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
     }
   }, [userStore, uiStore, programStore, methods, fetchSubmissionOptions, handleProgramChange, t]);
 
-  // Restore the search query from URL so bookmarks/refreshes preserve the admin's
-  // last query. Runs before the filter component mounts and triggers its initial
-  // search, so the search uses the URL-derived query.
+  // Set URL query in store before the filter component's mount effect fires
+  // its initial search, so the search uses it.
   useEffect(() => {
     const queryParam = new URLSearchParams(location.search).get('query');
-    if (queryParam) permitApplicationStore.setQuery(decodeURIComponent(queryParam));
+    if (queryParam) permitApplicationStore.setQuery(queryParam);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
