@@ -92,6 +92,7 @@
     "uuid": "^14.0.0"
   },
   "overrides": {
+    "form-data": "^4.0.4",
     "uuid": "^14.0.0",
     "vite": {
       "rollup": "npm:@rollup/wasm-node"

@@ -355,7 +355,7 @@ GEM
       timeout
     net-smtp (0.5.1)
       net-protocol
-    nio4r (2.7.5)
+    nio4r (2.7.3)
     nokogiri (1.19.3-aarch64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.19.3-arm64-darwin)
@@ -722,7 +722,7 @@ DEPENDENCIES
   kaminari (~> 1.2.2)
   letter_opener (~> 1.8)
   letter_opener_web (~> 1.4)
-  nokogiri (>= 1.16.5)
+  nokogiri (>= 1.18.9)
   omniauth-keycloak (= 1.5.1)
   ostruct (~> 0.6.3)
   pg (~> 1.1)
