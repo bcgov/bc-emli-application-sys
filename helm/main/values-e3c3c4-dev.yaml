@@ -51,11 +51,11 @@ app:
 
   resources:
     limits:
-      cpu: 300m
-      memory: 512Mi
+      cpu: 500m
+      memory: 1Gi
     requests:
-      cpu: 150m
-      memory: 256Mi
+      cpu: 300m
+      memory: 768Mi
 
   dependencyWait:
     enabled: true

@@ -1,4 +1,6 @@
 # Configure logs so that we get request-id (log tags configured in application.rb)
+return if Rails.env.production?
+
 Rails.application.config.logger =
   ActiveSupport::TaggedLogging.new(
     ActiveSupport::Logger

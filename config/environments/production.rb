@@ -119,6 +119,10 @@ Rails.application.configure do
   stdout_logger = Logger.new(STDOUT)
 
   config.logger = MultiLogger.new(stdout_logger, file_logger)
+  Rails.logger = config.logger
+  ActionController::Base.logger = config.logger if defined?(
+    ActionController::Base
+  )
   # Ensure ActiveRecord uses the same logger
   ActiveRecord::Base.logger = config.logger
 

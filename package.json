@@ -74,6 +74,7 @@
     "mobx-react-lite": "^4.0.5",
     "mobx-state-tree": "^5.4.0",
     "query-string": "^8.1.0",
+    "quill": "2.0.2",
     "quill-delta": "^5.1.0",
     "ramda": "^0.29.1",
     "rc-pagination": "^4.0.4",
@@ -94,6 +95,9 @@
   "overrides": {
     "form-data": "^4.0.4",
     "uuid": "^14.0.0",
+    "quill": "2.0.2",
+    "@opentelemetry/sdk-node": "0.218.0",
+    "@opentelemetry/exporter-prometheus": "0.218.0",
     "vite": {
       "rollup": "npm:@rollup/wasm-node"
     }
