@@ -6,7 +6,6 @@ import React, { useEffect, useCallback, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useJurisdiction } from '../../../../hooks/resources/use-jurisdiction';
 import { usePermitClassificationsLoad } from '../../../../hooks/resources/use-permit-classifications-load';
-import { useSearch } from '../../../../hooks/use-search';
 import { IEnergySavingsApplication } from '../../../../models/energy-savings-application';
 import { useMst } from '../../../../setup/root';
 import { ECollaborationType, EFlashMessageStatus, EPermitClassificationCode } from '../../../../types/enums';
