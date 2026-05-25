@@ -29,11 +29,12 @@ class PermitApplication < ApplicationRecord
     :program,
     :assigned_users,
     :submission_type,
+    :submission_variant,
     :template_version,
     :support_requests,
     :user_group_type,
     :audience_type,
-    { template_version: :requirement_template },
+    { template_version: { requirement_template: :audience_type } },
     :supporting_documents,
     {
       support_requests: [

@@ -34,13 +34,13 @@ export const useSearch = (searchModel: ISearch, dependencyArray: any[] = []) => 
     const sortDirection = queryParams.get('sortDirection') as ESortDirection;
     const sortField = queryParams.get('sortField');
 
-    if (query) searchModel.setQuery(decodeURIComponent(query));
+    if (query) searchModel.setQuery(query);
     if (currentPage) {
-      searchModel.setCurrentPage(parseInt(decodeURIComponent(currentPage)));
+      searchModel.setCurrentPage(parseInt(currentPage));
     } else {
       searchModel.setCurrentPage(1);
     }
-    if (countPerPage) searchModel.setCountPerPage(parseInt(decodeURIComponent(countPerPage)));
+    if (countPerPage) searchModel.setCountPerPage(parseInt(countPerPage));
     if (showArchived) searchModel.setShowArchived(parseBoolean(showArchived));
     if (visibility) searchModel.setVisibility(visibility);
     if (sortDirection && sortField) {
