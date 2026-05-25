@@ -60,6 +60,9 @@ Rails.application.configure do
   # want to log everything, set the level to "debug".
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
 
+  # Silence frequent liveness/readiness probes so they do not drown out useful logs.
+  config.silence_healthcheck_path = %r{\A/(health|up)\z}
+
   # Use a different cache store in production.
   if ENV["IS_DOCKER_BUILD"].blank?
     config.cache_store =
