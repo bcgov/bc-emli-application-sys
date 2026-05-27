@@ -114,6 +114,7 @@ app:
     'VIRUS_SCAN_TEMP_DIR': '/tmp/virus_scan'
     'UPLOAD_VIRUS_SCAN_TIMEOUT': '45'
     'IS_APP_SERVER': true
+    'RAILS_CONSOLE_ENV_LABEL': 'prod'
 
   route:
     enabled: true # disable to have route handled by nginx proxy
