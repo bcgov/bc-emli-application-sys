@@ -677,3 +677,17 @@ s3KeyRotation:
   schedule: '0 */2 * * *'
   syncPgbackrestSecret: false
   parameterStorePath: '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
+
+# ============================================================================
+# AUDIT LOG ARCHIVE + PRUNE
+# ============================================================================
+auditLogArchive:
+  enabled: true
+  # Weekly Sunday 11:00 PM local time.
+  schedule: '0 23 * * 0'
+  timeZone: 'America/Vancouver'
+  env:
+    AUDIT_LOG_RETENTION_DAYS: '30'
+    AUDIT_LOG_ARCHIVE_PREFIX: 'audit-log-archives/test'
+    # Dedicated archive bucket only for audit logs, separate from app uploads/db backups.
+    AUDIT_LOG_ARCHIVE_S3_BUCKET: 'hesp-dev-cacentral1-audit-storage'

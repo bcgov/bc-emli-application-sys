@@ -764,4 +764,4 @@ auditLogArchive:
     AUDIT_LOG_RETENTION_DAYS: '30'
     AUDIT_LOG_ARCHIVE_PREFIX: 'audit-log-archives/prod'
     # Dedicated archive bucket only for audit logs, separate from app uploads/db backups.
-    AUDIT_LOG_ARCHIVE_S3_BUCKET: 'REPLACE_WITH_AUDIT_ARCHIVE_BUCKET'
+    AUDIT_LOG_ARCHIVE_S3_BUCKET: 'esp-prod-cacentral1-audit-storage'
