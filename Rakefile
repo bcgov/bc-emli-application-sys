@@ -3,4 +3,10 @@
 
 require_relative "config/application"
 
+begin
+	require "data_migrate"
+rescue LoadError
+	# Ignore when the gem group is excluded in a minimal environment.
+end
+
 Rails.application.load_tasks

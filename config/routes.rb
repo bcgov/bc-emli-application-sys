@@ -31,9 +31,10 @@ Rails.application.routes.draw do
   #   Keep-Alive type : HTTP/S
   #   Keepalive URL   : GET /health HTTP/1.1\r\nHost: <your-hostname>\r\nConnection: Close\r\n\r\n
   #   Match string    : "ok"
-  # To force a failover during maintenance, temporarily change the response body
-  # in HealthController#show so the match string no longer matches.
-  get "health" => "health#show", :as => :health_check
+  # This route intentionally bypasses ActionController to avoid noisy request logs.
+  get "health",
+      to: ->(_env) { [200, { "Content-Type" => "text/plain" }, ["ok"]] },
+      as: :health_check
 
   scope module: :api, path: :api do
     devise_for :users,

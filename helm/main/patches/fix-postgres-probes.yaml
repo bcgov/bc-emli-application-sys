@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# This patch fixes the Crunchy PostgreSQL operator's default HTTPS liveness/readiness probes
+# which fail because Patroni REST API is not configured for TLS.
+# Changes the probes from https:// to http:// to match actual Patroni REST API configuration.
+
+patchesJson6902:
+  - target:
+      kind: StatefulSet
+      name: hesp-crunchydb-ha
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/livenessProbe/httpGet/scheme
+        value: HTTP
+      - op: replace
+        path: /spec/template/spec/containers/0/readinessProbe/httpGet/scheme
+        value: HTTP

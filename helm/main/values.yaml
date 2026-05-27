@@ -52,17 +52,19 @@ app:
       memory: 512Mi
 
   env:
+    'BUNDLE_APP_CONFIG': '/tmp/.bundle'
     'VITE_SUBMIT_INVOICE_ENABLED': 'true'
     'BUNDLE_PATH': '/usr/local/bundle'
     'CACHE_DEV_REDIS_URL': 'redis://hesp-redis:6379/4'
     'ELASTICSEARCH_URL': 'http://hesp-elasticsearch:9200'
     'FROM_EMAIL': 'no-reply@gov.bc.ca'
     'GEM_HOME': '/usr/local/bundle'
+    'HOME': '/tmp'
     'RAILS_ENV': 'production'
     'RAILS_MAX_THREADS': '3'
     'RATE_LIMIT_DEV_REDIS_URL': 'redis://hesp-redis:6379/2'
     'REDIS_URL': 'redis://hesp-redis:6379/0'
-    'RUBY_VERSION': '3.2.5'
+    'RUBY_VERSION': '4.0.0'
     'SESSION_TIMEOUT_MINUTES': '60'
     'SIMPLE_FEED_DEV_REDIS_URL': 'redis://hesp-redis:6379/3'
     'VITE_RUBY_HOST': 'vite'
@@ -70,7 +72,7 @@ app:
     'IS_APP_SERVER': true
     'ENABLE_TEMPLATE_FORCE_PUBLISH': 'true'
     'VITE_ENABLE_TEMPLATE_FORCE_PUBLISH': 'true'
-    
+
 sidekiq:
   enabled: false
   image:
@@ -85,7 +87,9 @@ sidekiq:
       memory: 256Mi
 
   env:
+    'BUNDLE_APP_CONFIG': '/tmp/.bundle'
     'ELASTICSEARCH_URL': 'http://hesp-elasticsearch:9200'
+    'HOME': '/tmp'
 
 anycable-rpc:
   enabled: false
@@ -101,7 +105,9 @@ anycable-rpc:
       memory: 256Mi
 
   env:
+    'BUNDLE_APP_CONFIG': '/tmp/.bundle'
     'ELASTICSEARCH_URL': 'http://hesp-elasticsearch:9200'
+    'HOME': '/tmp'
 
 # See https://github.com/bcgov/crunchy-postgres/blob/main/charts/crunchy-postgres/values.yaml
 crunchy-postgres:
@@ -215,20 +221,22 @@ crunchy-postgres:
 # See https://github.com/bitnami/charts/blob/main/bitnami/redis/values.yaml
 redis:
   enabled: true
+  architecture: replication
+
+  commonConfiguration: |-
+    appendonly yes
+    save ""
 
   global:
     security:
       allowInsecureImages: true
 
   image:
-    registry: docker.io
-    repository: bitnamilegacy/redis
-    tag: 8.2.1-debian-12-r0
+    registry: registry-1.docker.io
+    repository: bitnami/redis
+    digest: sha256:23289a4f4765da46419590fb80d8803363b07e5783ef45396ff85c641db81a0e
 
   replicaCount: 1
-
-  nameOverride: moti-rabbitmq
-  fullnameOverride: moti-rabbitmq
 
   nameOverride: hesp-redis
   fullnameOverride: hesp-redis
@@ -240,9 +248,9 @@ redis:
     enabled: true
 
     image:
-      registry: docker.io
-      repository: bitnamilegacy/redis-sentinel
-      tag: 8.2.1-debian-12-r0
+      registry: registry-1.docker.io
+      repository: bitnami/redis-sentinel
+      digest: sha256:d637c733e704abaa90f3bc032c7e0a6b99a2c94d024287cf17f5f5af97818cdd
 
     masterSet: redisMasterSet
     podSecurityContext:
@@ -402,20 +410,20 @@ clamav:
 # Provides TLS 1.2 with specific CBC ciphers for older client compatibility
 
 nginxProxy:
-  enabled: false  # Set to true to enable nginx proxy for CBC compatibility
-  configVersion: "2"  # Bump this to force pod restart when nginx.conf template changes
+  enabled: false # Set to true to enable nginx proxy for CBC compatibility
+  configVersion: '2' # Bump this to force pod restart when nginx.conf template changes
 
   image:
     repository: docker.io/nginx
     tag: 'alpine'
     pullPolicy: IfNotPresent
 
-  replicas: 2  # HA by default
+  replicas: 2 # HA by default
 
   # Upstream services
-  upstreamHost: 'hesp-app'  # Main app service
+  upstreamHost: 'hesp-app' # Main app service
   upstreamPort: 3000
-  websocketUpstreamHost: 'hesp-anycable-go'  # WebSocket service
+  websocketUpstreamHost: 'hesp-anycable-go' # WebSocket service
   websocketUpstreamPort: 8080
 
   # TLS certificate (secret must be created beforehand)
@@ -446,7 +454,7 @@ nginxProxy:
     type: ClusterIP
 
   route:
-    host: 'hesp.apps.dev.devops.gov.bc.ca'  # Override in environment-specific values
+    host: 'hesp.apps.dev.devops.gov.bc.ca' # Override in environment-specific values
 
 # ============================================================================
 # SHARED CONFIGURATION (via ConfigMap)
@@ -508,8 +516,54 @@ s3KeyRotation:
   # Disabled by default - enable in namespaces that use pgBackRest S3
   enabled: false
   # Run every 6 hours (well within the 24h overlap window)
-  schedule: "0 */6 * * *"
+  schedule: '0 */6 * * *'
+  # If true, also sync credentials into a pgbackrest secret for repo2 S3 backups.
+  # Set false in namespaces where pgBackRest S3 is not used (e.g. dev/test).
+  syncPgbackrestSecret: true
+  # Target secret name when syncPgbackrestSecret=true.
+  pgbackrestSecretName: 'pgbackrest-s3-credentials'
   # AWS SSM Parameter Store path where Lambda stores rotated credentials as JSON:
   # { "current": { "AccessKeyID": "...", "SecretAccessKey": "..." }, "pending_deletion": {...} }
   # Must match AWS_PARAMETER_BASE_PATH used by the app.
-  parameterStorePath: ""
+  parameterStorePath: ''
+
+# ============================================================================
+# AUDIT LOG ARCHIVE + PRUNE
+# Weekly CronJob that exports old audit_logs rows as gzipped text to S3,
+# then prunes the archived rows from Postgres.
+# ============================================================================
+auditLogArchive:
+  enabled: false
+  # Runs every Sunday at 11:00 PM local time.
+  schedule: '0 23 * * 0'
+  # Kubernetes CronJob time zone. Override per environment as needed.
+  timeZone: 'America/Vancouver'
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  backoffLimit: 2
+
+  # Defaults to the standard Crunchy user secret generated by the chart.
+  crunchydbSecret: hesp-crunchydb-pguser-postgres
+
+  image:
+    # Optional overrides. If blank, the app image repository/tag are reused.
+    repository: ''
+    tag: ''
+    pullPolicy: IfNotPresent
+
+  envSecretName: ''
+  env:
+    AUDIT_LOG_RETENTION_DAYS: '90'
+    AUDIT_LOG_ARCHIVE_PREFIX: 'audit-log-archives'
+    # Required: dedicated S3 bucket for audit-log archive .gz files.
+    # Keep separate from file upload bucket and pgBackRest backup bucket.
+    AUDIT_LOG_ARCHIVE_S3_BUCKET: ''
+    AUDIT_LOG_ARCHIVE_BATCH_SIZE: '1000'
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 300m
+      memory: 512Mi

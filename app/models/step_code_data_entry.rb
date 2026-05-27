@@ -3,7 +3,7 @@ class StepCodeDataEntry < ApplicationRecord
 
   belongs_to :step_code
 
-  enum stage: %i[proposed as_built]
+  enum :stage, %i[proposed as_built]
 
   before_create :set_stage
 

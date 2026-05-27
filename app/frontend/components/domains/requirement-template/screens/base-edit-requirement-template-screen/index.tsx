@@ -18,6 +18,7 @@ import {
 import { CalloutBanner } from '../../../../shared/base/callout-banner';
 import { ErrorScreen } from '../../../../shared/base/error-screen';
 import { LoadingScreen } from '../../../../shared/base/loading-screen';
+import { getRuntimeBooleanMetaValue } from '../../../../../utils/utility-functions';
 import { FloatingHelpDrawer } from '../../../../shared/floating-help-drawer';
 import { BuilderBottomFloatingButtons } from '../../builder-bottom-floating-buttons';
 import { SectionsSidebar } from '../../sections-sidebar';
@@ -146,27 +147,26 @@ export const BaseEditRequirementTemplateScreen = observer(function BaseEditRequi
     })();
   };
 
-  const onForcePublishNow =
-    import.meta.env.VITE_ENABLE_TEMPLATE_FORCE_PUBLISH === 'true'
-      ? async () => {
-          await handleSubmit(async (templateFormData) => {
-            const formattedSubmitData = formatSubmitData(templateFormData);
+  const onForcePublishNow = getRuntimeBooleanMetaValue('template-force-publish', false)
+    ? async () => {
+        await handleSubmit(async (templateFormData) => {
+          const formattedSubmitData = formatSubmitData(templateFormData);
 
-            const updatedRequirementTemplate = await requirementTemplateStore.forcePublishRequirementTemplate(
-              requirementTemplate.id,
-              formattedSubmitData,
-            );
+          const updatedRequirementTemplate = await requirementTemplateStore.forcePublishRequirementTemplate(
+            requirementTemplate.id,
+            formattedSubmitData,
+          );
 
-            if (updatedRequirementTemplate) {
-              const publishedTemplateVersion = updatedRequirementTemplate.publishedTemplateVersion;
+          if (updatedRequirementTemplate) {
+            const publishedTemplateVersion = updatedRequirementTemplate.publishedTemplateVersion;
 
-              // publishedTemplateVersion
-              //   ? navigate(`/template-versions/${publishedTemplateVersion.id}`)
-              navigate('/requirement-templates');
-            }
-          })();
-        }
-      : undefined;
+            // publishedTemplateVersion
+            //   ? navigate(`/template-versions/${publishedTemplateVersion.id}`)
+            navigate('/requirement-templates');
+          }
+        })();
+      }
+    : undefined;
 
   const hasNoSections = watchedSectionsAttributes.length === 0;
 

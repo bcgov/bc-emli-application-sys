@@ -276,7 +276,7 @@ export const RequirementForm = observer(
     }
 
     const onFormSubmit = async (submission: any) => {
-      setHasErrors(null);
+      setHasErrors(false);
       setImminentSubmission(submission);
       onOpen();
     };
@@ -527,7 +527,7 @@ export const RequirementForm = observer(
               <SharedSpinner h={24} w={24} />
             </Center>
           )}
-          <ErrorsBox data={errorBoxData} />
+          <ErrorsBox data={errorBoxData} show={hasErrors} />
           {shouldShowDiff &&
             userShouldSeeDiff &&
             (permitApplication.diff ? (

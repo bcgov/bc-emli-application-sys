@@ -23,6 +23,7 @@ global:
 
   env:
     'SECRET_KEY_BASE': '1'
+    'DATABASE_POOL': '10'
 
   envSecretName: hesp
   serviceAccountName: e3c3c4-vault
@@ -46,11 +47,11 @@ app:
 
   resources:
     limits:
-      cpu: 400m
-      memory: 768Mi
+      cpu: 500m
+      memory: 1.5Gi
     requests:
-      cpu: 200m
-      memory: 384Mi
+      cpu: 300m
+      memory: 1Gi
 
   dependencyWait:
     enabled: true
@@ -102,6 +103,7 @@ app:
     'CLAMAV_TIMEOUT': '30'
     'VIRUS_SCAN_TEMP_DIR': '/tmp/virus_scan'
     'UPLOAD_VIRUS_SCAN_TIMEOUT': '45'
+    'RAILS_CONSOLE_ENV_LABEL': 'test'
     # Note: AWS_REGION, AWS_DEFAULT_REGION, AWS_PARAMETER_BASE_PATH and other
     # shared config are provided via hesp-config ConfigMap
 
@@ -129,10 +131,10 @@ sidekiq:
   resources:
     limits:
       cpu: 300m
-      memory: 384Mi
+      memory: 1Gi
     requests:
       cpu: 150m
-      memory: 192Mi
+      memory: 512Mi
 
   dependencyWait:
     enabled: true
@@ -162,6 +164,7 @@ sidekiq:
 
   env:
     'SIDEKIQ_CONCURRENCY': '10'
+    'DATABASE_POOL': '15'
     # Note: FROM_EMAIL, AWS_REGION, AWS_DEFAULT_REGION, AWS_PARAMETER_BASE_PATH
     # and other shared config are provided via hesp-config ConfigMap
 
@@ -317,15 +320,23 @@ crunchy-postgres:
 
 redis:
   enabled: true
+  architecture: replication
+
+  commonConfiguration: |-
+    appendonly yes
+    save ""
 
   global:
+    compatibility:
+      openshift:
+        adaptSecurityContext: force
     security:
       allowInsecureImages: true
 
   image:
-    registry: docker.io
-    repository: bitnamilegacy/redis
-    tag: 8.2.1-debian-12-r0
+    registry: registry-1.docker.io
+    repository: bitnami/redis
+    digest: sha256:23289a4f4765da46419590fb80d8803363b07e5783ef45396ff85c641db81a0e
 
   replicaCount: 2 # TEST: 2 replicas (master + 1)
 
@@ -340,9 +351,9 @@ redis:
     enabled: true
 
     image:
-      registry: docker.io
-      repository: bitnamilegacy/redis-sentinel
-      tag: 8.2.1-debian-12-r0
+      registry: registry-1.docker.io
+      repository: bitnami/redis-sentinel
+      digest: sha256:d637c733e704abaa90f3bc032c7e0a6b99a2c94d024287cf17f5f5af97818cdd
 
     masterSet: redisMasterSet
 
@@ -664,4 +675,19 @@ sharedConfig:
 s3KeyRotation:
   enabled: true
   schedule: '0 */2 * * *'
+  syncPgbackrestSecret: false
   parameterStorePath: '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
+
+# ============================================================================
+# AUDIT LOG ARCHIVE + PRUNE
+# ============================================================================
+auditLogArchive:
+  enabled: true
+  # Weekly Sunday 11:00 PM local time.
+  schedule: '0 23 * * 0'
+  timeZone: 'America/Vancouver'
+  env:
+    AUDIT_LOG_RETENTION_DAYS: '30'
+    AUDIT_LOG_ARCHIVE_PREFIX: 'audit-log-archives/test'
+    # Dedicated archive bucket only for audit logs, separate from app uploads/db backups.
+    AUDIT_LOG_ARCHIVE_S3_BUCKET: 'hesp-dev-cacentral1-audit-storage'

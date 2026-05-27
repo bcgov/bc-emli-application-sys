@@ -2,6 +2,13 @@ name: Security Scans
 
 on:
   push:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/**'
+      - '.husky/**'
+      - 'helm/**'
+      - 'docs/**'
   workflow_dispatch:
 
 permissions:

@@ -1,17 +1,17 @@
-import { persistFileUpload, uploadFile } from "../../../../../../utils/uploads"
+import { persistFileUpload, uploadFile } from '../../../../../../utils/uploads';
 
 class StorageError extends Error {
   constructor(message, detail) {
-    super(message) // Call the parent class constructor with the message
-    this.detail = detail
+    super(message); // Call the parent class constructor with the message
+    this.detail = detail;
   }
 }
 
 /* tslint:disable */
 const s3custom = function Provider(formio) {
   return {
-    title: "s3custom",
-    name: "s3custom",
+    title: 's3custom',
+    name: 's3custom',
 
     uploadFile: async (
       file,
@@ -23,28 +23,28 @@ const s3custom = function Provider(formio) {
       fileKey,
       groupPermissions,
       groupId,
-      abortCallback
+      abortCallback,
     ) => {
       try {
-        const presignedUploadResponse = await uploadFile(file, fileName, progressCallback)
+        const presignedUploadResponse = await uploadFile(file, fileName, progressCallback);
 
         const presignedPayload = {
-          storage: "cache",
+          storage: 'cache',
           filename: fileName || file.name,
           size: file.size,
           type: file.type,
           groupPermissions,
           groupId,
-          id: presignedUploadResponse?.key?.startsWith("cache/")
+          id: presignedUploadResponse?.key?.startsWith('cache/')
             ? presignedUploadResponse.key.slice(6)
             : presignedUploadResponse?.key,
           metadata: {
             filename: file.name,
             size: file.size,
             mime_type: file.type,
-            content_disposition: presignedUploadResponse?.headers?.["Content-Disposition"], //if multiplart this is moved inline
+            content_disposition: presignedUploadResponse?.headers?.['Content-Disposition'], //if multiplart this is moved inline
           },
-        }
+        };
         const presignedPermitApplicationPayload = {
           permit_application: {
             supporting_documents_attributes: [
@@ -54,19 +54,20 @@ const s3custom = function Provider(formio) {
               },
             ],
           },
-        }
+        };
 
         const persistedResponse = await persistFileUpload(
           options?.config?.formCustomOptions?.persistFileUploadAction,
           options?.config?.formCustomOptions?.persistFileUploadUrl,
           presignedPermitApplicationPayload,
-          presignedPayload
-        )
+          presignedPayload,
+        );
 
-        return persistedResponse
+        return persistedResponse;
       } catch (error) {
-        import.meta.env.DEV && console.log("[DEV] file upload error", error)
-        throw new StorageError(error, "Failed to upload the file directly.  Please contact support.")
+        import.meta.env.DEV && console.log('[DEV] file upload error', error);
+        const detail = error?.message || 'Failed to upload the file directly. Please contact support.';
+        throw new StorageError(detail, detail);
       }
     },
     deleteFile: async (fileInfo, options) => {
@@ -76,25 +77,25 @@ const s3custom = function Provider(formio) {
       //assume we will not have public-read acl, use shrine to generate the request
       try {
         //if there is no model info, it is an unpersisted cache item
-        if (fileInfo.id.startsWith("cache/")) {
+        if (fileInfo.id.startsWith('cache/')) {
           const params = new URLSearchParams({
             id: fileInfo.id,
-          })
+          });
           const response = await fetch(`/api/storage/s3/delete?${params.toString()}`, {
-            method: "DELETE",
+            method: 'DELETE',
             headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
             },
-          })
+          });
         } else {
           //form.io assumes that the delete will just succeed, it always removes the link from the form
         }
       } catch (error) {
         throw new StorageError(
           error,
-          "An error occured during deletion, but please save the application and try again."
-        )
+          'An error occured during deletion, but please save the application and try again.',
+        );
       }
     },
     downloadFile: async (fileInfo, options) => {
@@ -106,28 +107,28 @@ const s3custom = function Provider(formio) {
           id: fileInfo.id,
           ...(fileInfo.model && { model: fileInfo.model }),
           ...(fileInfo.modelId && { model_id: fileInfo.modelId }),
-        })
+        });
 
         const response = await fetch(`/api/storage/s3/download?${params.toString()}`, {
-          method: "GET",
+          method: 'GET',
           headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
           },
-        })
+        });
 
         if (!response.ok) {
-          throw new StorageError(`HTTP error! status: ${response.status}`, "Failed to get a valid download url.")
+          throw new StorageError(`HTTP error! status: ${response.status}`, 'Failed to get a valid download url.');
         }
 
-        const responseJson = await response.json()
-        window.open(responseJson.url, "_blank")
-        return responseJson // Resolving the promise implicitly by returning the value
+        const responseJson = await response.json();
+        window.open(responseJson.url, '_blank');
+        return responseJson; // Resolving the promise implicitly by returning the value
       } catch (error) {
-        throw new StorageError(error, `Failed to download the file.`) // Rejecting the promise implicitly by throwing an error
+        throw new StorageError(error, `Failed to download the file.`); // Rejecting the promise implicitly by throwing an error
       }
     },
-  }
-}
-s3custom.title = "s3custom"
-export default s3custom
+  };
+};
+s3custom.title = 's3custom';
+export default s3custom;

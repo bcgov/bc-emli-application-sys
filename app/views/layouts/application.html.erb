@@ -6,6 +6,7 @@
   <meta name="deployment-tag" content="<%= ENV.fetch('DEPLOYMENT_TAG', 'localdev') %>">
   <meta name="deployment-timestamp" content="<%= ENV.fetch('DEPLOYMENT_TIMESTAMP', Time.now.utc.iso8601) %>">
   <meta name="submit-invoice-enabled" content="<%= ENV.fetch('VITE_SUBMIT_INVOICE_ENABLED', 'true') %>">
+  <meta name="template-force-publish" content="<%= ENV.fetch('VITE_ENABLE_TEMPLATE_FORCE_PUBLISH', 'false') %>">
   
   <!-- Open Graph metadata -->
   <meta property="og:title" content="Energy Savings Program">

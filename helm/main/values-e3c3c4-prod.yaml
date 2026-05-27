@@ -20,6 +20,7 @@ global:
 
   env:
     'SECRET_KEY_BASE': '1'
+    'DATABASE_POOL': '10'
 
   envSecretName: hesp
   serviceAccountName: e3c3c4-vault
@@ -49,10 +50,10 @@ app:
   resources:
     limits:
       cpu: 500m
-      memory: 1Gi
+      memory: 1.5Gi
     requests:
       cpu: 300m
-      memory: 512Mi
+      memory: 1Gi
 
   dependencyWait:
     enabled: true
@@ -113,6 +114,7 @@ app:
     'VIRUS_SCAN_TEMP_DIR': '/tmp/virus_scan'
     'UPLOAD_VIRUS_SCAN_TIMEOUT': '45'
     'IS_APP_SERVER': true
+    'RAILS_CONSOLE_ENV_LABEL': 'prod'
 
   route:
     enabled: true # disable to have route handled by nginx proxy
@@ -135,10 +137,10 @@ sidekiq:
   resources:
     limits:
       cpu: 400m
-      memory: 768Mi
+      memory: 1Gi
     requests:
       cpu: 200m
-      memory: 256Mi
+      memory: 512Mi
 
   dependencyWait:
     enabled: true
@@ -185,6 +187,7 @@ sidekiq:
 
   env:
     'SIDEKIQ_CONCURRENCY': '25'
+    'DATABASE_POOL': '25'
     # other shared config are provided via hesp-config ConfigMap
 
 # ============================================================================
@@ -249,13 +252,11 @@ crunchy-postgres:
     name: ha # Name reflects HA configuration
     replicas: 3 # UPGRADED from 1 (default) to 3
 
-    livenessProbe:
-      exec:
-        command: ['pg_isready', '-U', 'postgres']
-      initialDelaySeconds: 10
-      timeoutSeconds: 5
-      periodSeconds: 10
-      failureThreshold: 6
+    # NOTE: The Crunchy PostgreSQL operator injects HTTPS probes by default, but Patroni
+    # REST API is not configured for TLS. This causes "connection reset" failures.
+    # WORKAROUND: Use the kustomization.yaml patch to change probes to HTTP:
+    #   kustomize build helm/main | oc apply -f -
+    # Or integrate into your deployment pipeline to apply the patch after helm template.
 
     # Storage configuration for HA
     dataVolumeClaimSpec:
@@ -281,15 +282,15 @@ crunchy-postgres:
 
     repos:
       schedules:
-        # NEW BACKUP STRATEGY:
-        # - Full backups every 12 hours (0:00 and 12:00 UTC)
-        # - Skip incremental on full backup hours, run hourly incremental at all other hours
-        full: '0 0,12 * * *' # Full backups at midnight and noon
-        incremental: '0 1-11,13-23 * * *' # Hourly incremental all other hours
+        # Repo1 (PVC) pressure reduction strategy:
+        # - Full backups daily at local BC midnight (UTC-7 = 07:00 UTC)
+        # - Incremental backups at local 06:00, 12:00, and 18:00
+        full: '0 7 * * *' # Daily full backup (targets local BC midnight)
+        incremental: '0 1,13,19 * * *' # Local 18:00, 06:00, and 12:00 (skip local midnight full)
 
       volume:
         accessModes: 'ReadWriteOnce'
-        storage: 10Gi # Matches Silver prod (actual usage ~3.5Gi)
+        storage: 20Gi # Matches Silver prod (actual usage ~3.5Gi)
         storageClassName: netapp-file-backup
 
     repoHost:
@@ -316,8 +317,8 @@ crunchy-postgres:
     # because Go YAML takes the last duplicate key — merging both here avoids repo2 using the wrong schedule.
     s3:
       enabled: true # ENABLED for GOLD production
-      incrementalSchedule: '0 1-11,13-23 * * *' # Hourly incremental (mirrors repo1)
-      fullSchedule: '0 0,12 * * *' # Full backups at midnight and noon (mirrors repo1)
+      incrementalSchedule: '0 0-6,8-18,20-23 * * *' # Hourly incremental for repo2 (skip full hours)
+      fullSchedule: '0 7,19 * * *' # Full backups at local BC midnight/noon (UTC-7)
       createS3Secret: false # Use OS Secret instead of creating one
       s3Secret: pgbackrest-s3-credentials # Reference existing OS Secret
       s3Path: '/pgbackup-prod'
@@ -372,15 +373,23 @@ crunchy-postgres:
 
 redis:
   enabled: true
+  architecture: replication
+
+  commonConfiguration: |-
+    appendonly yes
+    save ""
 
   global:
+    compatibility:
+      openshift:
+        adaptSecurityContext: force
     security:
       allowInsecureImages: true
 
   image:
-    registry: docker.io
-    repository: bitnamilegacy/redis
-    tag: 8.2.1-debian-12-r0
+    registry: registry-1.docker.io
+    repository: bitnami/redis
+    digest: sha256:23289a4f4765da46419590fb80d8803363b07e5783ef45396ff85c641db81a0e
 
   # HA: Master + 2 replicas (requires 3 nodes minimum)
   # Can tolerate 1 node failure, Sentinel handles failover
@@ -398,9 +407,9 @@ redis:
     enabled: true
 
     image:
-      registry: docker.io
-      repository: bitnamilegacy/redis-sentinel
-      tag: 8.2.1-debian-12-r0
+      registry: registry-1.docker.io
+      repository: bitnami/redis-sentinel
+      digest: sha256:d637c733e704abaa90f3bc032c7e0a6b99a2c94d024287cf17f5f5af97818cdd
 
     masterSet: redisMasterSet
 
@@ -742,3 +751,17 @@ s3KeyRotation:
   enabled: true
   schedule: '0 */2 * * *'
   parameterStorePath: '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
+
+# ============================================================================
+# AUDIT LOG ARCHIVE + PRUNE
+# ============================================================================
+auditLogArchive:
+  enabled: true
+  # Weekly Sunday 11:00 PM local time.
+  schedule: '0 23 * * 0'
+  timeZone: 'America/Vancouver'
+  env:
+    AUDIT_LOG_RETENTION_DAYS: '30'
+    AUDIT_LOG_ARCHIVE_PREFIX: 'audit-log-archives/prod'
+    # Dedicated archive bucket only for audit logs, separate from app uploads/db backups.
+    AUDIT_LOG_ARCHIVE_S3_BUCKET: 'esp-prod-cacentral1-audit-storage'

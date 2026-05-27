@@ -8,7 +8,8 @@ metadata:
   labels:
     {{- include "main.labels" . | nindent 4 }}
 ---
-# Role: allow the CronJob to read/patch the hesp secret and patch pgbackrest-s3-credentials
+# Role: allow the CronJob to read/patch the hesp secret and, optionally,
+# patch a pgbackrest credentials secret when pgBackRest S3 is in use.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -18,7 +19,11 @@ metadata:
 rules:
   - apiGroups: [""]
     resources: ["secrets"]
-    resourceNames: [{{ .Values.global.envSecretName | quote }}, "pgbackrest-s3-credentials"]
+    resourceNames:
+      - {{ .Values.global.envSecretName | quote }}
+      {{- if .Values.s3KeyRotation.syncPgbackrestSecret }}
+      - {{ .Values.s3KeyRotation.pgbackrestSecretName | default "pgbackrest-s3-credentials" | quote }}
+      {{- end }}
     verbs: ["get", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -104,8 +109,8 @@ data:
         sys.exit(1)
 ---
 # CronJob: every 6 hours, fetch current credentials from AWS SSM Parameter Store
-# (where the BC Gov Lambda rotation function stores them), then sync into both
-# the hesp secret and pgbackrest-s3-credentials.
+# (where the BC Gov Lambda rotation function stores them), then sync into the
+# hesp secret and (optionally) the pgbackrest credentials secret.
 # Falls back to hesp secret directly if parameterStorePath is not set or SSM fails.
 apiVersion: batch/v1
 kind: CronJob
@@ -178,12 +183,16 @@ spec:
 
                   echo "Updating secrets with key ID: ${KEY_ID:0:8}..."
 
+                  {{- if .Values.s3KeyRotation.syncPgbackrestSecret }}
                   S3_CONF=$(printf '[global]\nrepo2-s3-key=%s\nrepo2-s3-key-secret=%s\n' "$KEY_ID" "$KEY_SECRET" | base64 -w 0)
 
-                  oc patch secret pgbackrest-s3-credentials \
+                  oc patch secret {{ .Values.s3KeyRotation.pgbackrestSecretName | default "pgbackrest-s3-credentials" | quote }} \
                     --type='json' \
                     -p="[{\"op\":\"replace\",\"path\":\"/data/s3.conf\",\"value\":\"${S3_CONF}\"}]"
-                  echo "pgbackrest-s3-credentials patched successfully."
+                  echo "pgbackrest credentials secret patched successfully."
+                  {{- else }}
+                  echo "Skipping pgbackrest credentials sync (syncPgbackrestSecret=false)."
+                  {{- end }}
 
                   KEY_ID_B64=$(echo -n "$KEY_ID" | base64 -w 0)
                   KEY_SECRET_B64=$(echo -n "$KEY_SECRET" | base64 -w 0)

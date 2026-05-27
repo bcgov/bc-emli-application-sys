@@ -33,15 +33,17 @@ Rails.application.configure do
       # Base policy: only allow resources from same origin and HTTPS
       policy.default_src :self, :https
 
-      # Uncomment and customize these if needed:
-      # policy.font_src    :self, :https, :data       # Allow fonts from self, HTTPS, and embedded data URIs
-      # policy.img_src     :self, :https, :data       # Allow images from self, HTTPS, and embedded data URIs
-      # policy.object_src  :none                      # Disallow Flash/Java plugins entirely
+      # Allow fonts and images from trusted origins plus data/blob URIs used by icon/fonts libraries.
+      policy.font_src :self, :https, :data
+      policy.img_src :self, :https, :data, :blob
+      policy.object_src :none
 
       # Only allow scripts from self and HTTPS and webpacked eval (will be overridden in dev)
       policy.script_src :self, :https, :unsafe_eval
-      # Only allow styles from self and HTTPS
+      # Only allow styles from self and HTTPS (nonce is injected automatically for style/script tags).
       policy.style_src :self, :https
+      # Allow inline style attributes used by third-party UI libs (e.g. icon/svg and form renderers).
+      policy.style_src_attr :unsafe_inline
       # Only allow fetch/WebSocket/XHR to self and HTTPS (overridden in dev)
       policy.connect_src :self, :https, cable_ws if cable_ws.present?
     end

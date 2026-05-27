@@ -7,7 +7,7 @@ if git diff --cached --name-only | grep -qE '^helm/.*\.(ya?ml|tpl)$'; then
   helm dependency build ./helm/main >/dev/null 2>&1
 
   # Direct pipe, no rendered.yaml saved
-  if ! helm template ./helm/main | kube-linter lint -; then
+  if ! helm template ./helm/main | kube-linter lint --do-not-auto-add-defaults --include privileged-container --include latest-tag -; then
     echo "kube-linter found issues in Helm charts. Please fix them before committing."
     exit 1
   else

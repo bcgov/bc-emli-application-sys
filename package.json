@@ -13,11 +13,14 @@
     "@types/node": "^20.12.2",
     "@types/quill": "^2.0.14",
     "@types/ramda": "^0.29.9",
-    "@typescript-eslint/eslint-plugin": "^6.13.2",
-    "@typescript-eslint/parser": "^6.13.2",
-    "@vitejs/plugin-react": "^4.2.1",
-    "eslint-plugin-jsx-a11y": "^6.8.0",
-    "eslint-plugin-react": "^7.22.0",
+    "@eslint/js": "^9.0.0",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^9.0.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^15.0.0",
+    "typescript-eslint": "^8.59.1",
     "husky": "^8.0.3",
     "lint-staged": "^11.0.0",
     "prettier": "^3.1.0",
@@ -27,12 +30,12 @@
     "reactotron-apisauce": "^3.0.0",
     "reactotron-mst": "^3.1.4",
     "reactotron-react-js": "^3.3.8",
-    "release-it": "^18.1.2",
+    "release-it": "^20.0.1",
     "sass": "^1.70.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.3",
-    "vite": "^5.4.9",
-    "vite-plugin-ruby": "^5.0.0"
+    "vite": "^8.0.10",
+    "vite-plugin-ruby": "^5.2.1"
   },
   "dependencies": {
     "@anycable/web": "^0.8.0",
@@ -44,8 +47,8 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@formio/js": "^5.0.0-rc.37",
-    "@formio/react": "^5.3.0",
+    "@formio/js": "^5.3.4",
+    "@formio/react": "^6.2.0",
     "@phosphor-icons/react": "^2.0.15",
     "@react-pdf/renderer": "^3.4.0",
     "@snowplow/browser-plugin-form-tracking": "^4.6.7",
@@ -60,7 +63,7 @@
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.1",
     "follow-redirects": ">=1.15.6",
-    "formiojs": "^4.17.4",
+    "formiojs": "^4.21.7",
     "framer-motion": "^10.16.5",
     "fuse.js": "^7.0.0",
     "humps": "^2.0.1",
@@ -71,6 +74,7 @@
     "mobx-react-lite": "^4.0.5",
     "mobx-state-tree": "^5.4.0",
     "query-string": "^8.1.0",
+    "quill": "2.0.2",
     "quill-delta": "^5.1.0",
     "ramda": "^0.29.1",
     "rc-pagination": "^4.0.4",
@@ -86,9 +90,14 @@
     "react-router-dom": "^6.20.0",
     "react-select": "^5.10.1",
     "restructure": "^3.0.0",
-    "uuid": "^9.0.1"
+    "uuid": "^14.0.0"
   },
   "overrides": {
+    "form-data": "^4.0.4",
+    "uuid": "^14.0.0",
+    "quill": "2.0.2",
+    "@opentelemetry/sdk-node": "0.218.0",
+    "@opentelemetry/exporter-prometheus": "0.218.0",
     "vite": {
       "rollup": "npm:@rollup/wasm-node"
     }
@@ -96,7 +105,7 @@
   "scripts": {
     "dev": "bin/vite dev",
     "build": "bundle exec vite build",
-    "lint": "eslint app/frontend/**/*.ts[x]",
+    "lint": "eslint 'app/frontend/**/*.ts[x]'",
     "prepare": "husky install",
     "gen:theme-typings": "chakra-cli tokens app/frontend/styles/theme/index.ts",
     "postinstall": "npm run gen:theme-typings",

@@ -4,13 +4,8 @@ module VirusScannable
 
   included do
     # Virus scan status enum
-    enum virus_scan_status: {
-           pending: 0,
-           scanning: 1,
-           clean: 2,
-           infected: 3,
-           scan_error: 4
-         }
+    enum :virus_scan_status,
+         { pending: 0, scanning: 1, clean: 2, infected: 3, scan_error: 4 }
 
     scope :virus_scan_pending, -> { where(virus_scan_status: :pending) }
     scope :virus_scan_clean, -> { where(virus_scan_status: :clean) }

@@ -28,6 +28,11 @@ fi
 # Rails Entrypoint
 # If running the rails server then create or migrate existing database
 if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
+  if [ -f /app/tmp/pids/server.pid ]; then
+    echo "[entrypoint] Removing stale server PID file at /app/tmp/pids/server.pid"
+    rm -f /app/tmp/pids/server.pid
+  fi
+
   until nc -z -v -w30 ${DATABASE_OPENSHIFT_SERVICE_HOST} 5432; do
     echo "Waiting for PostgreSQL database (${DATABASE_OPENSHIFT_SERVICE_HOST}) to start..."
     sleep 1

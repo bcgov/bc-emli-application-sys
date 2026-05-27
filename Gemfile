@@ -1,13 +1,13 @@
 source "https://rubygems.org"
 
-ruby "3.2.5"
+ruby "4.0.0"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 7.1.4.1"
+gem "rails", "~> 8.1.0"
 
 # Use postgresql as the database for Active Record
 gem "pg", "~> 1.1"
-gem "activerecord-nulldb-adapter", "1.0.1" # for Dockerfile asset build
+gem "activerecord-nulldb-adapter", "1.2.1" # for Dockerfile asset build
 
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 6.4.2"
@@ -15,7 +15,7 @@ gem "puma", ">= 6.4.2"
 # Use Redis adapter to run Action Cable in production
 # gem "redis", ">= 4.0.1"
 
-gem "vite_rails", "3.0.17"
+gem "vite_rails", "~> 3.11.0"
 gem "dotenv-rails", "2.8.1", require: "dotenv/rails-now"
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
@@ -38,20 +38,19 @@ gem "devise-jwt-cookie", "0.5.1"
 gem "json-jwt", ">= 1.16.6"
 gem "dry-container", "0.8.0"
 gem "omniauth-keycloak", "1.5.1"
-gem "omniauth-rails_csrf_protection", "1.0.1"
 
 gem "blueprinter", "~> 1.0.2"
 
 gem "awesome_print", "~> 1.9"
-gem "sidekiq", "~> 7.2.4"
+gem "sidekiq", "~> 8.0"
 gem "shrine", "~> 3.5.0"
-gem "redis", "~> 5.0.8"
+gem "redis", "~> 5.3"
 gem "image_processing", "~> 1.12.2"
 gem "acts_as_list", "~> 1.1.0"
 gem "searchkick", "~> 5.5.2"
 gem "elasticsearch", "~> 8.11.0"
 gem "kaminari", "~> 1.2.2"
-gem "acts-as-taggable-on", "~> 10.0.0"
+gem "acts-as-taggable-on", "~> 13.0"
 # Assuming BC Common Object Management Service (COMS) is compatible with S3 formats:
 gem "aws-sdk-s3", "~> 1.141.0"
 gem "aws-sdk-ssm", "~> 1.0"
@@ -63,14 +62,14 @@ gem "faraday", "~> 2.9.0"
 gem "factory_bot", "~> 6.4"
 # The timcop gem mocks Time, it is only used in specs and for seeding a published template version to get around time based validations
 gem "timecop", "~> 0.9.8"
-gem "sidekiq-cron", "~> 1.12"
+gem "sidekiq-cron", "~> 2.0"
 gem "sidekiq-unique-jobs", "~> 8.0"
 gem "rubyzip", "~> 2.3.2"
 gem "anycable-rails", "~> 1.4"
 gem "addressable", "~> 2.8"
 gem "friendly_id", "~> 5.5.1"
-gem "exception_notification", "~> 4.5.0"
-gem "nokogiri", ">= 1.16.5"
+gem "exception_notification", "~> 4.6.0"
+gem "nokogiri", ">= 1.18.9"
 gem "rdoc", ">= 6.6.3.1"
 gem "rack", ">= 3.0.9.1"
 gem "uppy-s3_multipart", "~> 1.2"
@@ -81,26 +80,26 @@ gem "rswag-ui", "~> 2.13"
 
 # brew install geos
 # bundle config build.rgeo --with-geos-dir=/usr/local/opt/geos
-gem "rgeo", "~> 3.0.1"
+gem "rgeo", "~> 3.1"
 # brew install proj
-gem "rgeo-proj4", "~> 4.0.0"
+gem "rgeo-proj4", "~> 5.0"
 gem "aasm", "~> 5.5.0"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[mri windows]
-  gem "pry-byebug", "~> 3.10.1"
+  # pry-byebug removed: byebug has no Ruby 4.0 support; use `debug` gem instead
   gem "rspec-rails", "~> 6.1.0"
   gem "rswag-specs", "~> 2.13"
   gem "factory_bot_rails", "~> 6.4.2"
   gem "faker", "~> 3.2.2"
   gem "shoulda-matchers", "~> 5.3.0"
   gem "vcr", "~> 6.2"
-  gem "bullet", "~> 7.1.6"
+  gem "bullet", "~> 8.1.1"
 end
 
 group :test do
-  gem "rspec-sidekiq", "~> 4.1"
+  gem "rspec-sidekiq", "~> 5.0"
 end
 
 group :development do
@@ -128,4 +127,9 @@ end
 gem "faraday-multipart", "~> 1.0"
 
 gem "rack-attack", "~> 6.7"
-gem "data_migrate", "~> 9.4"
+gem "data_migrate", "~> 11.3", require: false
+
+# Ruby 4 no longer ships these as default gems.
+gem "ostruct", "~> 0.6.3"
+gem "csv", "~> 3.3"
+gem "benchmark", "~> 0.5"

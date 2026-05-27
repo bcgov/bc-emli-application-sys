@@ -1,9 +1,8 @@
 /* tslint:disable */
-import { Components, Utils } from 'formiojs';
+import { Components } from 'formiojs';
 import { Constants } from '../Common/Constants.js';
 import editForm from './Component.form.js';
 const ParentComponent = Components.components.file;
-var uniqueName = Utils.uniqueName;
 const ID = 'simplefile';
 const DISPLAY = 'File Upload';
 export default class Component extends ParentComponent {
@@ -76,134 +75,10 @@ export default class Component extends ParentComponent {
       }
     }
   }
-  upload(files) {
-    // Only allow one upload if not multiple.
-    if (!this.component.multiple) {
-      files = Array.prototype.slice.call(files, 0, 1);
-    }
-    if (this.component.storage && files && files.length) {
-      // files is not really an array and does not have a forEach method, so fake it.
-      Array.prototype.forEach.call(files, (file) => {
-        const fileName = uniqueName(file.name, this.component.fileNameTemplate, this.evalContext());
-        const fileUpload = {
-          originalName: file.name,
-          name: fileName,
-          size: file.size,
-          status: 'info',
-          message: this.t('Starting upload'),
-        };
-        // Check file pattern
-        if (this.component.filePattern && !this.validatePattern(file, this.component.filePattern)) {
-          fileUpload.status = 'error';
-          fileUpload.message = this.t('File is the wrong type; it must be {{ pattern }}', {
-            pattern: this.component.filePattern,
-          });
-        }
-        // Check allowed file formats
-        if (file.name) {
-          const fileName = file.name.toLowerCase();
-          const allowedExtensions = ['.jpg', '.jpeg', '.png', '.img', '.pdf', '.xlsx', '.xls', '.txt'];
-          const fileExtension = fileName.substring(fileName.lastIndexOf('.'));
-
-          if (!allowedExtensions.includes(fileExtension)) {
-            fileUpload.status = 'error';
-            fileUpload.message = this.t(
-              'File format not supported. Please upload one of these file types: .jpg, .jpeg, .png, .img, .pdf, .xlsx, .xls, .txt',
-            );
-          }
-        }
-        // Check file minimum size
-        if (this.component.fileMinSize && !this.validateMinSize(file, this.component.fileMinSize)) {
-          fileUpload.status = 'error';
-          fileUpload.message = this.t('File is too small; it must be at least {{ size }}', {
-            size: this.component.fileMinSize,
-          });
-        }
-        // Check file maximum size
-        if (this.component.fileMaxSize && !this.validateMaxSize(file, this.component.fileMaxSize)) {
-          fileUpload.status = 'error';
-          fileUpload.message = this.t('File is too big; it must be at most {{ size }}', {
-            size: this.component.fileMaxSize,
-          });
-        }
-        // Get a unique name for this file to keep file collisions from occurring.
-        const dir = this.interpolate(this.component.dir || '');
-        const { fileService } = this;
-        if (!fileService) {
-          fileUpload.status = 'error';
-          fileUpload.message = this.t('File Service not provided.');
-        }
-        this.statuses.push(fileUpload);
-        this.redraw();
-        if (fileUpload.status !== 'error') {
-          if (this.component.privateDownload) {
-            file.private = true;
-          }
-          const { storage, options = {} } = this.component;
-          const url = this.interpolate(this.component.url);
-          let groupKey = null;
-          let groupPermissions = null;
-          //Iterate through form custom-formio-components to find group resource if one exists
-          this.root.everyComponent((element) => {
-            if (element.component?.submissionAccess || element.component?.defaultPermission) {
-              groupPermissions = !element.component.submissionAccess
-                ? [
-                    {
-                      type: element.component.defaultPermission,
-                      roles: [],
-                    },
-                  ]
-                : element.component.submissionAccess;
-              groupPermissions.forEach((permission) => {
-                groupKey = ['admin', 'write', 'create'].includes(permission.type) ? element.component.key : null;
-              });
-            }
-          });
-          const fileKey = this.component.fileKey || 'file';
-          const groupResourceId = groupKey ? this.currentForm.submission.data[groupKey]._id : null;
-          fileService
-            .uploadFile(
-              storage,
-              file,
-              fileName,
-              dir,
-              (evt) => {
-                fileUpload.status = 'progress';
-                // @ts-ignore
-                fileUpload.progress = parseInt((100.0 * evt.loaded) / evt.total);
-                delete fileUpload.message;
-                this.redraw();
-              },
-              url,
-              options,
-              fileKey,
-              groupPermissions,
-              groupResourceId,
-            )
-            .then((fileInfo) => {
-              const index = this.statuses.indexOf(fileUpload);
-              if (index !== -1) {
-                this.statuses.splice(index, 1);
-              }
-              fileInfo.originalName = file.name;
-              if (!this.hasValue()) {
-                this.dataValue = [];
-              }
-              this.dataValue.push(fileInfo);
-              this.redraw();
-              this.triggerChange();
-            })
-            .catch((response) => {
-              fileUpload.status = 'error';
-              // grab the detail out our api-problem response.
-              fileUpload.message = response.detail;
-              // @ts-ignore
-              delete fileUpload.progress;
-              this.redraw();
-            });
-        }
-      });
-    }
+  upload(...args) {
+    // Formio v5 handles file lifecycle via filesToSync + syncFiles().
+    // Delegate to parent upload() so selected files actually trigger network requests.
+    return super.upload(...args);
   }
   getFile(fileInfo) {
     const { options = {} } = this.component;

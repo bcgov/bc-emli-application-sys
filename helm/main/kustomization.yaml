@@ -1,0 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# CRUNCHY POSTGRES PROBE FIX
+# The Crunchy PostgreSQL operator injects HTTPS probes by default, but Patroni's
+# REST API listens on plain HTTP (port 8008). This causes probe failures with:
+#   "connection reset by peer" or "read: connection reset by peer"
+#
+# This kustomization patches the StatefulSet to use HTTP instead of HTTPS.
+#
+# DEPLOYMENT OPTIONS:
+#
+# Option 1: With kustomize (recommended)
+#   kustomize build helm/main | oc apply -f -
+#
+# Option 2: Helm + Kustomize pipeline
+#   helm template ./helm/main -f helm/main/values.yaml \
+#     -f helm/main/values-e3c3c4-prod.yaml | \
+#     kustomize build - | oc apply -f -
+#
+# Option 3: Direct kubectl patch (if kustomize unavailable)
+#   oc patch statefulset hesp-crunchydb-ha -n e3c3c4-prod \
+#     -p='[{"op":"replace","path":"/spec/template/spec/containers/0/livenessProbe/httpGet/scheme","value":"HTTP"},{"op":"replace","path":"/spec/template/spec/containers/0/readinessProbe/httpGet/scheme","value":"HTTP"}]' \
+#     --type=json
+
+patchesJson6902:
+  - target:
+      kind: StatefulSet
+      name: hesp-crunchydb-ha
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/livenessProbe/httpGet/scheme
+        value: HTTP
+      - op: replace
+        path: /spec/template/spec/containers/0/readinessProbe/httpGet/scheme
+        value: HTTP

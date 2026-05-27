@@ -24,6 +24,9 @@ export const overrideFileTemplate = (ctx) => {
   var __t,
     __p = '',
     __j = Array.prototype.join;
+  const files = Array.isArray(ctx?.files) ? ctx.files : [];
+  const statuses = Array.isArray(ctx?.statuses) ? ctx.statuses : [];
+  const fileTypes = Array.isArray(ctx?.component?.fileTypes) ? ctx.component.fileTypes : [];
   function print() {
     __p += __j.call(arguments, '');
   }
@@ -74,7 +77,7 @@ export const overrideFileTemplate = (ctx) => {
         '</strong></div>\n        ';
     }
     __p += '\n      </div>\n    </li>\n    ';
-    ctx.files.forEach(function (file) {
+    files.forEach(function (file) {
       __p += '\n      <li class="list-group-item">\n        <div class="row">\n          ';
       if (!ctx.disabled) {
         __p +=
@@ -108,7 +111,7 @@ export const overrideFileTemplate = (ctx) => {
       if (ctx.self.hasTypes && !ctx.disabled) {
         __p +=
           '\n            <div class="col-md-2">\n              <select class="file-type" ref="fileType">\n                ';
-        ctx.component.fileTypes.map(function (type) {
+        fileTypes.map(function (type) {
           __p += '\n                  <option class="test" value="' + ((__t = type.value) == null ? '' : __t) + '" ';
           if (type.label === file.fileType) {
             __p += 'selected="selected"';
@@ -125,7 +128,7 @@ export const overrideFileTemplate = (ctx) => {
     __p += '\n  </ul>\n';
   } else {
     __p += '\n  <div>\n    ';
-    ctx.files.forEach(function (file) {
+    files.forEach(function (file) {
       __p +=
         '\n      <div>\n        <span>\n          <img ref="fileImage" src="" alt="' +
         ((__t = file.originalName || file.name) == null ? '' : __t) +
@@ -143,7 +146,7 @@ export const overrideFileTemplate = (ctx) => {
     __p += '\n  </div>\n';
   }
   __p += '\n';
-  if (!ctx.disabled && (ctx.component.multiple || !ctx.files.length)) {
+  if (!ctx.disabled && (ctx.component.multiple || !files.length)) {
     __p += '\n  ';
     if (ctx.self.useWebViewCamera) {
       __p +=
@@ -200,10 +203,10 @@ export const overrideFileTemplate = (ctx) => {
     __p += '\n';
   }
   __p += '\n';
-  ctx.statuses.forEach(function (status) {
+  statuses.forEach(function (status) {
     __p +=
       '\n  <div class="file ' +
-      ((__t = ctx.statuses.status === 'error' ? ' has-error' : '') == null ? '' : __t) +
+      ((__t = status.status === 'error' ? ' has-error' : '') == null ? '' : __t) +
       '">\n    <div class="row">\n      <div class="fileName col-form-label col-sm-10">' +
       ((__t = status.originalName) == null ? '' : __t) +
       '\n        <i class="' +

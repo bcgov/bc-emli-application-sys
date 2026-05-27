@@ -1,5 +1,6 @@
 class PermitApplication < ApplicationRecord
-  enum status: {
+  enum :status,
+       {
          new_draft: 0,
          newly_submitted: 1,
          revisions_requested: 3,
@@ -12,7 +13,7 @@ class PermitApplication < ApplicationRecord
          approved_pending: 10,
          approved_paid: 11
        },
-       _default: 0
+       default: 0
 
   include PermitApplicationStatus
 

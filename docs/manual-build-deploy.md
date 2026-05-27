@@ -44,7 +44,7 @@ export VITE_ENABLE_TEMPLATE_FORCE_PUBLISH=true
 ## Step 1 — Authenticate to GHCR
 
 ```bash
-echo "${GITHUB_TOKEN}" | docker login ghcr.io -u "${GITHUB_USER}" --password-stdin
+echo "${GITHUB_TOKEN}" | podman login ghcr.io -u "${GITHUB_USER}" --password-stdin
 ```
 
 ---
@@ -56,7 +56,7 @@ Run from the **repository root** (same directory as `Gemfile`, `package.json`, e
 ```bash
 cd /path/to/bc-emli-application-sys
 
-docker build \
+podman build \
   -f devops/docker/app/Dockerfile \
   --build-arg DEPLOYMENT_TIMESTAMP="${DEPLOYMENT_TIMESTAMP}" \
   --build-arg VITE_ENABLE_TEMPLATE_FORCE_PUBLISH="${VITE_ENABLE_TEMPLATE_FORCE_PUBLISH}" \
@@ -84,10 +84,10 @@ docker build \
 
 ```bash
 # Full SHA tag (used by helm upgrade)
-docker tag hesp-app-local ghcr.io/bcgov/hesp-app:${IMAGE_TAG}
+podman tag hesp-app-local ghcr.io/bcgov/hesp-app:${IMAGE_TAG}
 
 # Branch tag (optional convenience)
-docker tag hesp-app-local ghcr.io/bcgov/hesp-app:main
+podman tag hesp-app-local ghcr.io/bcgov/hesp-app:main
 ```
 
 ### For test/prod (semver tag, mirrors `deploy-test.yml` / `deploy-prod.yml`)
@@ -96,9 +96,9 @@ docker tag hesp-app-local ghcr.io/bcgov/hesp-app:main
 # Semver tag (strip the leading "v" — the Makefile expects bare numbers)
 export IMAGE_TAG=1.2.3
 
-docker tag hesp-app-local ghcr.io/bcgov/hesp-app:${IMAGE_TAG}
-docker tag hesp-app-local ghcr.io/bcgov/hesp-app:1.2          # major.minor
-docker tag hesp-app-local ghcr.io/bcgov/hesp-app:1            # major
+podman tag hesp-app-local ghcr.io/bcgov/hesp-app:${IMAGE_TAG}
+podman tag hesp-app-local ghcr.io/bcgov/hesp-app:1.2          # major.minor
+podman tag hesp-app-local ghcr.io/bcgov/hesp-app:1            # major
 ```
 
 ---
@@ -106,12 +106,12 @@ docker tag hesp-app-local ghcr.io/bcgov/hesp-app:1            # major
 ## Step 4 — Push the Image to GHCR
 
 ```bash
-docker push ghcr.io/bcgov/hesp-app:${IMAGE_TAG}
+podman push ghcr.io/bcgov/hesp-app:${IMAGE_TAG}
 
 # Push the additional convenience tags if you created them
-docker push ghcr.io/bcgov/hesp-app:main          # dev only
-# docker push ghcr.io/bcgov/hesp-app:1.2         # test/prod
-# docker push ghcr.io/bcgov/hesp-app:1           # test/prod
+podman push ghcr.io/bcgov/hesp-app:main          # dev only
+# podman push ghcr.io/bcgov/hesp-app:1.2         # test/prod
+# podman push ghcr.io/bcgov/hesp-app:1           # test/prod
 ```
 
 ---
@@ -191,22 +191,22 @@ export IMAGE_TAG=$(git rev-parse HEAD)
 export DEPLOYMENT_TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 
 # 1. login
-echo "${GITHUB_TOKEN}" | docker login ghcr.io -u "${GITHUB_USER}" --password-stdin
+echo "${GITHUB_TOKEN}" | podman login ghcr.io -u "${GITHUB_USER}" --password-stdin
 
 # 2. build
-docker build \
+podman build \
   -f devops/docker/app/Dockerfile \
   --build-arg DEPLOYMENT_TIMESTAMP="${DEPLOYMENT_TIMESTAMP}" \
   --build-arg VITE_ENABLE_TEMPLATE_FORCE_PUBLISH=true \
   -t hesp-app-local .
 
 # 3. tag
-docker tag hesp-app-local ghcr.io/bcgov/hesp-app:${IMAGE_TAG}
-docker tag hesp-app-local ghcr.io/bcgov/hesp-app:main
+podman tag hesp-app-local ghcr.io/bcgov/hesp-app:${IMAGE_TAG}
+podman tag hesp-app-local ghcr.io/bcgov/hesp-app:main
 
 # 4. push
-docker push ghcr.io/bcgov/hesp-app:${IMAGE_TAG}
-docker push ghcr.io/bcgov/hesp-app:main
+podman push ghcr.io/bcgov/hesp-app:${IMAGE_TAG}
+podman push ghcr.io/bcgov/hesp-app:main
 
 # 5. helm deps
 cd helm/main && helm dependency update

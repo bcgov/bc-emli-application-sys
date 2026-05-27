@@ -83,15 +83,13 @@ export const uploadFileOneChunk = async (signedUrl: string, headers: any, file: 
     const response = await fetch(signedUrl, {
       method: 'PUT',
       credentials: 'same-origin',
-      headers: Object.assign({}, headers, {
-        'Content-Length': file.size,
-        'Transfer-Encoding': 'chunked',
-      }),
+      headers: Object.assign({}, headers),
       body: file,
     });
 
     if (!response.ok) {
-      throw new Error(`Upload file failed.`);
+      const errorBody = await response.text().catch(() => '');
+      throw new Error(`Upload file failed (${response.status}). ${errorBody}`.trim());
     }
     return;
   } catch (error) {
@@ -204,11 +202,7 @@ export const uploadFileInChunks = async (
       const response = await fetch(signedUrl, {
         method: 'PUT',
         credentials: 'same-origin',
-        headers: Object.assign({}, headers, {
-          // "Content-Range": contentRange,
-          'Content-Length': chunk.size,
-          'Transfer-Encoding': 'chunked',
-        }),
+        headers: Object.assign({}, headers),
         body: chunk,
       });
 

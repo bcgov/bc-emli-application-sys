@@ -4,8 +4,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
 interface ICustomMessageBoxProps
-  extends Omit<FlexProps, 'id' | 'title'>,
-    Omit<ToastProps, 'position' | 'title' | 'id'> {
+  extends Omit<FlexProps, 'id' | 'title'>, Omit<ToastProps, 'position' | 'title' | 'id'> {
   title?: React.ReactNode; // Allow title to be any ReactNode
   description?: string | React.ReactNode; // Allow description to be any ReactNode
   children?: React.ReactNode;
@@ -26,6 +25,8 @@ export const CustomMessageBox = ({
   status,
   children,
   headingProps,
+  isClosable: _isClosable,
+  render: _render,
   ...rest
 }: ICustomMessageBoxProps) => {
   return (
