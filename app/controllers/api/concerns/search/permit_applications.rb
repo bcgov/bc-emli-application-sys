@@ -1,16 +1,6 @@
 module Api::Concerns::Search::PermitApplications
   extend ActiveSupport::Concern
 
-  # Simple status priority for business sorting
-  STATUS_PRIORITY = {
-    "newly_submitted" => 1,
-    "revisions_requested" => 2,
-    "resubmitted" => 3,
-    "in_review" => 4,
-    "ineligible" => 5,
-    "approved" => 6
-  }.freeze
-
   def perform_permit_application_search
     params = search_params
 
@@ -29,7 +19,7 @@ module Api::Concerns::Search::PermitApplications
         order: permit_application_order,
         page: params[:page],
         per_page: params[:per_page] || Kaminari.config.default_per_page,
-        includes: PermitApplication::SEARCH_INCLUDES
+        includes: permit_application_search_includes
       )
   end
 
@@ -111,24 +101,12 @@ module Api::Concerns::Search::PermitApplications
     elsif current_user.participant?
       { created_at: { order: :desc, unmapped_type: "long" } }
     else
-      # Default sort - Business priority order (simple script)
-      {
-        _script: {
-          type: "number",
-          script: {
-            source:
-              "
-              if (doc.containsKey('status') && doc['status'].size() > 0) {
-                def statusPriority = [#{status_priority_map}];
-                return statusPriority.getOrDefault(doc['status'].value, 999);
-              }
-              return 999;
-            "
-          },
-          order: "asc"
-        }
-      }
+      { status_priority: { order: :asc, unmapped_type: "long" } }
     end
+  end
+
+  def permit_application_search_includes
+    PermitApplication::SEARCH_INCLUDES
   end
 
   def permit_application_where_clause
@@ -203,10 +181,5 @@ module Api::Concerns::Search::PermitApplications
       .compact
       .except(:is_supported_applications_page)
       .merge!(where)
-  end
-
-  def status_priority_map
-    @status_priority_map ||=
-      STATUS_PRIORITY.map { |k, v| "'#{k}': #{v}" }.join(", ")
   end
 end

@@ -50,6 +50,19 @@ class PermitApplication < ApplicationRecord
     }
   ]
 
+  PROGRAM_SEARCH_INCLUDES = [
+    :submission_versions,
+    :submitter,
+    :program,
+    :assigned_users,
+    :submission_type,
+    :submission_variant,
+    :template_version,
+    :user_group_type,
+    :audience_type,
+    { template_version: { requirement_template: :audience_type } }
+  ]
+
   API_SEARCH_INCLUDES = %i[
     program
     submitter
@@ -76,6 +89,15 @@ class PermitApplication < ApplicationRecord
       ]
     }
   ]
+
+  STATUS_PRIORITY = {
+    "newly_submitted" => 1,
+    "revisions_requested" => 2,
+    "resubmitted" => 3,
+    "in_review" => 4,
+    "ineligible" => 5,
+    "approved" => 6
+  }.freeze
 
   searchkick word_middle: %i[
                number
@@ -348,6 +370,7 @@ class PermitApplication < ApplicationRecord
       screened_in_at: screened_in_at,
       viewed_at: viewed_at,
       status: status,
+      status_priority: STATUS_PRIORITY.fetch(status, 999),
       status_display: status_display_label,
       #jurisdiction_id: jurisdiction&.id,
       user_group_type_id: user_group_type&.id,
