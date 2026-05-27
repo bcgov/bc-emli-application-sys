@@ -185,7 +185,7 @@ class Api::ProgramsController < Api::ApplicationController
                      },
                      blueprint: PermitApplicationBlueprint,
                      blueprint_opts: {
-                       view: :jurisdiction_review_inbox
+                       view: :program_review_inbox
                      }
                    }
   end
@@ -205,6 +205,10 @@ class Api::ProgramsController < Api::ApplicationController
   end
 
   private
+
+  def permit_application_search_includes
+    PermitApplication::PROGRAM_SEARCH_INCLUDES
+  end
 
   def program_params
     params.require(:program).permit(

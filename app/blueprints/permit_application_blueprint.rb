@@ -119,6 +119,16 @@ class PermitApplicationBlueprint < Blueprinter::Base
     end
   end
 
+  view :program_review_inbox do
+    include_view :base
+    exclude :sandbox
+    exclude :support_requests
+
+    field :submitter do |pa, options|
+      SubmitterBlueprint.render(pa.submitter, view: :minimal)
+    end
+  end
+
   view :extended do
     include_view :base
     fields :formatted_compliance_data, :front_end_form_update
