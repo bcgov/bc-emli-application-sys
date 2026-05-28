@@ -205,6 +205,7 @@ export const EnergySavingsApplicationIndexScreen = observer(
                       <ModelSearchInput
                         searchModel={permitApplicationStore}
                         inputGroupProps={{ w: { md: '100%', base: 'full' } }}
+                        debounceTimeInMilliseconds={300}
                       />
                     </Box>
                   </FormControl>
