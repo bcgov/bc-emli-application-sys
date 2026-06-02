@@ -49,4 +49,50 @@ RSpec.describe SubmissionVersion, type: :model do
       end
     end
   end
+
+  describe "#missing_pdfs" do
+    let(:app) { create(:permit_application) }
+    let(:version) { create(:submission_version, permit_application: app) }
+
+    it "reports the application PDF as missing when no supporting_documents exist" do
+      expect(version.missing_pdfs).to include(
+        "#{SupportingDocument::APPLICATION_PDF_DATA_KEY}_#{version.id}"
+      )
+    end
+
+    it "does not fire queries when supporting_documents are preloaded" do
+      SubmissionVersion
+        .includes(:supporting_documents)
+        .where(id: version.id)
+        .each do |loaded|
+          queries = count_queries { loaded.missing_pdfs }
+          expect(queries).to eq(0),
+          "N+1 detected: #{queries} queries fired on preloaded association"
+        end
+    end
+
+    it "returns the same result whether or not supporting_documents are preloaded" do
+      expected = version.missing_pdfs
+      SubmissionVersion
+        .includes(:supporting_documents)
+        .where(id: version.id)
+        .each { |loaded| expect(loaded.missing_pdfs).to eq(expected) }
+    end
+  end
+
+  describe "#missing_permit_application_pdf?" do
+    let(:app) { create(:permit_application) }
+    let(:version) { create(:submission_version, permit_application: app) }
+
+    it "does not fire queries when supporting_documents are preloaded" do
+      SubmissionVersion
+        .includes(:supporting_documents)
+        .where(id: version.id)
+        .each do |loaded|
+          queries = count_queries { loaded.missing_permit_application_pdf? }
+          expect(queries).to eq(0),
+          "N+1 detected: #{queries} queries fired on preloaded association"
+        end
+    end
+  end
 end

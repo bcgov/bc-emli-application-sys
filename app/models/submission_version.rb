@@ -40,19 +40,13 @@ class SubmissionVersion < ApplicationRecord
     missing_data_keys = []
 
     existing_application_pdf =
-      supporting_documents.find_by(
-        data_key: SupportingDocument::APPLICATION_PDF_DATA_KEY
-      )
-
+      find_supporting_doc(SupportingDocument::APPLICATION_PDF_DATA_KEY)
     if existing_application_pdf.blank? || existing_application_pdf.file.blank?
       missing_data_keys << "#{SupportingDocument::APPLICATION_PDF_DATA_KEY}_#{id}"
     end
 
     existing_checklist_pdf =
-      supporting_documents.find_by(
-        data_key: SupportingDocument::CHECKLIST_PDF_DATA_KEY
-      )
-
+      find_supporting_doc(SupportingDocument::CHECKLIST_PDF_DATA_KEY)
     if has_step_code_checklist? &&
          (existing_checklist_pdf.blank? || existing_checklist_pdf.file.blank?)
       missing_data_keys << "#{SupportingDocument::CHECKLIST_PDF_DATA_KEY}_#{id}"
@@ -63,21 +57,14 @@ class SubmissionVersion < ApplicationRecord
 
   def missing_permit_application_pdf?
     existing_document =
-      supporting_documents.find_by(
-        data_key: SupportingDocument::APPLICATION_PDF_DATA_KEY
-      )
-
+      find_supporting_doc(SupportingDocument::APPLICATION_PDF_DATA_KEY)
     existing_document.blank? || existing_document.file.blank?
   end
 
   def missing_step_code_checklist_pdf?
     return false unless has_step_code_checklist?
-
     existing_document =
-      supporting_documents.find_by(
-        data_key: SupportingDocument::CHECKLIST_PDF_DATA_KEY
-      )
-
+      find_supporting_doc(SupportingDocument::CHECKLIST_PDF_DATA_KEY)
     existing_document.blank? || existing_document.file.blank?
   end
 
@@ -132,6 +119,16 @@ class SubmissionVersion < ApplicationRecord
     # Check if the `viewed_at` was `nil` before the change and is now not `nil`.
     if (viewed_at_change&.first.nil? && viewed_at_change&.last.present?)
       NotificationService.publish_application_view_event(permit_application)
+    end
+  end
+
+  private
+
+  def find_supporting_doc(data_key)
+    if supporting_documents.loaded?
+      supporting_documents.find { |d| d.data_key == data_key }
+    else
+      supporting_documents.find_by(data_key: data_key)
     end
   end
 end

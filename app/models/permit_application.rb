@@ -52,16 +52,10 @@ class PermitApplication < ApplicationRecord
   ]
 
   PROGRAM_SEARCH_INCLUDES = [
-    :submission_versions,
+    { submission_versions: :supporting_documents },
     :submitter,
-    :program,
     :assigned_users,
-    :submission_type,
-    :submission_variant,
-    :template_version,
-    :user_group_type,
-    :audience_type,
-    { template_version: { requirement_template: :audience_type } }
+    :submission_type
   ]
 
   API_SEARCH_INCLUDES = %i[
@@ -297,13 +291,20 @@ class PermitApplication < ApplicationRecord
     end
   end
 
-  # Helper method to get the latest SubmissionVersion
   def latest_submission_version
-    submission_versions.order(created_at: :desc).first
+    if submission_versions.loaded?
+      submission_versions.max_by(&:created_at)
+    else
+      submission_versions.order(created_at: :desc).first
+    end
   end
 
   def earliest_submission_version
-    submission_versions.order(created_at: :desc).last
+    if submission_versions.loaded?
+      submission_versions.min_by(&:created_at)
+    else
+      submission_versions.order(created_at: :asc).first
+    end
   end
 
   # Method to get all revision requests from the latest SubmissionVersion
@@ -455,7 +456,7 @@ class PermitApplication < ApplicationRecord
   end
 
   def indexed_using_current_template_version
-    self.class.searchkick_index.retrieve(self)["using_current_template_version"]
+    using_current_template_version
   end
 
   # def formatted_permit_classifications
@@ -471,14 +472,14 @@ class PermitApplication < ApplicationRecord
   end
 
   def current_published_template_version
-    # this will eventually be different, if there is a new version it should notify the user
-    RequirementTemplate.published_requirement_template_version(
-      program_id,
-      user_group_type_id,
-      audience_type_id,
-      submission_type_id,
-      submission_variant_id
-    )
+    @current_published_template_version ||=
+      RequirementTemplate.published_requirement_template_version(
+        program_id,
+        user_group_type_id,
+        audience_type_id,
+        submission_type_id,
+        submission_variant_id
+      )
   end
 
   def form_customizations
