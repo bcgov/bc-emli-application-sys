@@ -54,14 +54,8 @@ class PermitApplication < ApplicationRecord
   PROGRAM_SEARCH_INCLUDES = [
     { submission_versions: :supporting_documents },
     :submitter,
-    :program,
     :assigned_users,
-    :submission_type,
-    :submission_variant,
-    :template_version,
-    :user_group_type,
-    :audience_type,
-    { template_version: { requirement_template: :audience_type } }
+    :submission_type
   ]
 
   API_SEARCH_INCLUDES = %i[

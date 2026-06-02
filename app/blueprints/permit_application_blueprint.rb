@@ -123,6 +123,17 @@ class PermitApplicationBlueprint < Blueprinter::Base
     include_view :base
     exclude :sandbox
     exclude :support_requests
+    exclude :full_address
+    exclude :pid
+    exclude :pin
+    exclude :reference_number
+    exclude :resubmitted_at
+    exclude :revisions_requested_at
+    exclude :submission_variant
+    exclude :user_group_type
+    exclude :program
+    exclude :audience_type
+    exclude :indexed_using_current_template_version
 
     field :submitter do |pa, options|
       SubmitterBlueprint.render(pa.submitter, view: :minimal)
