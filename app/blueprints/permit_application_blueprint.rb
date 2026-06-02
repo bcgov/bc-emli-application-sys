@@ -71,7 +71,6 @@ class PermitApplicationBlueprint < Blueprinter::Base
                 name: :assignedUsers
 
     field :indexed_using_current_template_version do |pa, options|
-      # Indexed data is used to prevent N extra queries on every search
       pa.indexed_using_current_template_version
     end
 

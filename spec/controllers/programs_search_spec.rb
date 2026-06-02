@@ -73,14 +73,13 @@ RSpec.describe Api::ProgramsController, type: :controller do
                    base_params.deep_merge(filters: { status: ["resubmitted"] })
           end
 
-        extra_apps =
-          create_list(
-            :permit_application,
-            3,
-            :resubmitted,
-            submitter: submitter,
-            program: program
-          )
+        create_list(
+          :permit_application,
+          3,
+          :resubmitted,
+          submitter: submitter,
+          program: program
+        )
         PermitApplication.reindex
 
         queries_6 =
