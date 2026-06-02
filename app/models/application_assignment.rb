@@ -6,11 +6,11 @@ class ApplicationAssignment < ApplicationRecord
 
   validates :user_id, uniqueness: { scope: :permit_application_id }
 
-  after_commit :reindex_permit_application
+  after_commit :reindex_permit_application, on: %i[create destroy]
 
   private
 
   def reindex_permit_application
-    permit_application.reindex
+    permit_application&.reindex
   end
 end
