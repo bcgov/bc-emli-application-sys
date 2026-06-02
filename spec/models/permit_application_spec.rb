@@ -64,6 +64,64 @@ RSpec.describe PermitApplication, type: :model do
     end
   end
 
+  describe "#latest_submission_version and #earliest_submission_version" do
+    let(:app) { create(:permit_application) }
+    let!(:older_version) do
+      create(
+        :submission_version,
+        permit_application: app,
+        created_at: 2.days.ago
+      )
+    end
+    let!(:newer_version) do
+      create(
+        :submission_version,
+        permit_application: app,
+        created_at: 1.day.ago
+      )
+    end
+
+    describe "#latest_submission_version" do
+      it "returns the most recent version" do
+        expect(app.latest_submission_version).to eq(newer_version)
+      end
+
+      it "does not fire a query when submission_versions are already loaded" do
+        app.submission_versions.load
+        queries = count_queries { app.latest_submission_version }
+        expect(queries).to eq(0)
+      end
+    end
+
+    describe "#earliest_submission_version" do
+      it "returns the oldest version" do
+        expect(app.earliest_submission_version).to eq(older_version)
+      end
+
+      it "does not fire a query when submission_versions are already loaded" do
+        app.submission_versions.load
+        queries = count_queries { app.earliest_submission_version }
+        expect(queries).to eq(0)
+      end
+    end
+  end
+
+  describe "#missing_pdfs" do
+    let(:app) { create(:permit_application) }
+    let!(:version) { create(:submission_version, permit_application: app) }
+
+    it "does not fire queries when supporting_documents are preloaded through submission_versions" do
+      PermitApplication
+        .includes(submission_versions: :supporting_documents)
+        .where(id: app.id)
+        .each do |loaded_app|
+          queries = count_queries { loaded_app.missing_pdfs }
+          expect(queries).to eq(0),
+          "N+1 detected: #{queries} queries on preloaded supporting_documents"
+        end
+    end
+  end
+
   # describe "validations" do
   #   context "with an invalid submitter" do
   #     let(:submitter) { create(:user, role: :reviewer) }

@@ -68,11 +68,11 @@ class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
         },
         match: :word_start,
         where: where,
-        page: permitted[:page],
+        page: permitted[:page] || (permitted[:per_page] ? 1 : nil),
         per_page:
           (
-            if permitted[:page]
-              (permitted[:per_page] || Kaminari.config.default_per_page)
+            if permitted[:page] || permitted[:per_page]
+              permitted[:per_page] || Kaminari.config.default_per_page
             else
               nil
             end
