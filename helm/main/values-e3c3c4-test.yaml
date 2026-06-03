@@ -224,7 +224,7 @@ crunchy-postgres:
       failureThreshold: 6
 
     dataVolumeClaimSpec:
-      storage: 2Gi # TEST: Reduced to fit namespace quota
+      storage: 3Gi # TEST: Reduced to fit namespace quota
       storageClassName: netapp-block-standard
 
     requests:

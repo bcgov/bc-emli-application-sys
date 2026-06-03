@@ -35,8 +35,8 @@ fullnameOverride: hesp
 app:
   enabled: true
 
-  # HA: 2 replicas (tolerates 1 pod failure)
-  replicaCount: 2
+  # HA: 3 replicas (tolerates 1 pod failure)
+  replicaCount: 3
 
   # Recreate avoids Vite chunk hash mismatches during rolling deploys (white screen).
   # Trade-off: ~30s downtime on deploy. Acceptable for planned deployments.
@@ -50,10 +50,10 @@ app:
   resources:
     limits:
       cpu: 500m
-      memory: 1.5Gi
+      memory: 2Gi
     requests:
       cpu: 300m
-      memory: 1Gi
+      memory: 1.5Gi
 
   dependencyWait:
     enabled: true

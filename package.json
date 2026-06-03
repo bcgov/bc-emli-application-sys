@@ -105,7 +105,10 @@
   "scripts": {
     "dev": "bin/vite dev",
     "build": "bundle exec vite build",
-    "lint": "eslint 'app/frontend/**/*.ts[x]'",
+    "lint": "eslint --cache 'app/frontend/**/*.{js,jsx,ts,tsx}'",
+    "lint:fix": "npm run lint -- --fix",
+    "format": "prettier --write 'app/frontend/**/*.{js,jsx,ts,tsx,css,scss,md,json}'",
+    "format:check": "prettier --check 'app/frontend/**/*.{js,jsx,ts,tsx,css,scss,md,json}'",
     "prepare": "husky install",
     "gen:theme-typings": "chakra-cli tokens app/frontend/styles/theme/index.ts",
     "postinstall": "npm run gen:theme-typings",

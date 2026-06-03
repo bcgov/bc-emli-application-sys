@@ -327,7 +327,7 @@ bundle exec erd
 ## Formatting & Linting
 
 - **Backend:** RuboCop ([.rubocop.yml](.rubocop.yml)) for linting; Ruby LSP for formatting. Install the RubyLSP VS Code extension and select it as the formatter.
-- **Frontend:** Prettier ([.prettierrc.mjs](.prettierrc.mjs)) and ESLint ([.eslintrc](.eslintrc)).
+- **Frontend:** Prettier ([.prettierrc.mjs](.prettierrc.mjs)) and ESLint ([eslint.config.mjs](eslint.config.mjs)).
 - Pre-commit hooks are enforced via Husky ([.husky](.husky/)).
 
 ---

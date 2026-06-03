@@ -12,6 +12,7 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
+    files: ['**/*.{js,jsx,ts,tsx}'],
     plugins: {
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
@@ -29,6 +30,7 @@ export default tseslint.config(
     },
     rules: {
       ...reactPlugin.configs.recommended.rules,
+      ...reactHooksPlugin.configs.recommended.rules,
       ...jsxA11yPlugin.configs.recommended.rules,
       semi: ['warn', 'always'],
       'no-unused-vars': 'off',
@@ -41,6 +43,7 @@ export default tseslint.config(
       'no-extra-semi': 'warn',
       'valid-typeof': 'off',
       'react-hooks/exhaustive-deps': 'warn',
+      'react/prop-types': 'off',
       'react/jsx-uses-vars': 'error',
     },
   },
