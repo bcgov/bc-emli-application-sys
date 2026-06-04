@@ -361,6 +361,18 @@ class PermitHubMailer < ApplicationMailer
     )
   end
 
+  def notify_contractor_employee_invite_revoked(user)
+    @user = user
+
+    # send_mail (not send_user_mail) because a pending invitee is unconfirmed
+    return unless @user.present? && @user.email.present?
+
+    send_mail(
+      email: @user.email,
+      template_key: "notify_contractor_employee_invite_revoked"
+    )
+  end
+
   def contractor_invite(import)
     email = import.payload["username"]
     Rails.logger.info("Sending contractor invite to #{email}")
