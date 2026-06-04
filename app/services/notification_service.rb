@@ -545,6 +545,21 @@ class NotificationService
     end
   end
 
+  def self.publish_contractor_employee_invite_revoked_event(user)
+    return unless user&.email.present?
+
+    # Email-only notification: the invitee has no account/in-app inbox
+    begin
+      PermitHubMailer.notify_contractor_employee_invite_revoked(
+        user
+      )&.deliver_later
+      Rails.logger.info "Contractor employee invite revoked notification queued for user #{user.id} (#{user.email})"
+    rescue => e
+      Rails.logger.error "Failed to queue invite revoked notification for user #{user.id}: #{e.message}"
+      raise e unless Rails.env.production?
+    end
+  end
+
   def self.publish_supporting_files_requested_event(
     permit_application,
     missing_files:,

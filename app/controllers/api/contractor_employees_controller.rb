@@ -97,19 +97,28 @@ class Api::ContractorEmployeesController < Api::ApplicationController
         employee_user.invitation_token = nil
         employee_user.save!
 
+        # Notify the employee that their invitation has been revoked.
+        # Fired here (before the destroys) while the user row is intact.
+        NotificationService.publish_contractor_employee_invite_revoked_event(
+          employee_user
+        )
+
         # Remove the contractor employee association entirely
         @employee.destroy!
 
         # Check if this user should be completely deleted
         # Only delete if they have no other associations and never accepted an invite
-        should_delete_user = employee_user.invitation_accepted_at.nil? &&
-                            ContractorEmployee.where(employee: employee_user).count == 0 &&
-                            employee_user.program_memberships.count == 0 &&
-                            employee_user.permit_applications.count == 0
+        should_delete_user =
+          employee_user.invitation_accepted_at.nil? &&
+            ContractorEmployee.where(employee: employee_user).count == 0 &&
+            employee_user.program_memberships.count == 0 &&
+            employee_user.permit_applications.count == 0
 
         if should_delete_user
           employee_user.destroy!
-          Rails.logger.info("Deleted orphaned user #{employee_user.id} after revoking invite")
+          Rails.logger.info(
+            "Deleted orphaned user #{employee_user.id} after revoking invite"
+          )
         end
 
         render_success nil, "contractor.employees.revoke_success"
