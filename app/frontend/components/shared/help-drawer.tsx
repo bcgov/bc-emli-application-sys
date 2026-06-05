@@ -18,6 +18,7 @@ import {
 import { Envelope, Phone } from '@phosphor-icons/react';
 import React, { Ref, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useMst } from '../../setup/root';
 
 interface IProps {
   defaultButtonProps?: Partial<ButtonProps>;
@@ -26,10 +27,13 @@ interface IProps {
 
 export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) {
   const { t } = useTranslation();
+  const { userStore } = useMst();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef<HTMLButtonElement>(null);
 
-  const groundOrientedEmailHref = `mailto:${t('site.helpDrawer.groundOrientedEmail')}`;
+  const isContractor = userStore.currentUser?.isContractor;
+  const emailKey = isContractor ? 'site.helpDrawer.contractorEmail' : 'site.helpDrawer.emailAddress';
+  const emailHref = `mailto:${t(emailKey)}`;
 
   const baseTextSx = { fontSize: '16px', lineHeight: '27px', color: 'greys.homeScreenGrey' };
   const iconBoxSx = {
@@ -119,11 +123,11 @@ export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) 
                     {t('site.helpDrawer.emailTitle')}
                   </Text>
                   <Link
-                    href={groundOrientedEmailHref}
+                    href={emailHref}
                     sx={linkSx}
-                    aria-label={t('site.helpDrawer.groundOrientedEmailAriaLabel')}
+                    aria-label={isContractor ? t('site.helpDrawer.contractorEmailAriaLabel') : t(emailKey)}
                   >
-                    {t('site.helpDrawer.groundOrientedEmail')}
+                    {t(emailKey)}
                   </Link>
                 </Box>
               </Flex>

@@ -2329,7 +2329,7 @@ const options = {
           invalidInvitationToken: {
             message:
               'If you have any questions, please ask your primary contact to call us at 1-833-856-0333 or email us at:',
-            mailTo: 'ESPContractorSupport@clearesult.com',
+            mailTo: 'ESPcontractorSupport@CLEAResult.com',
             expired: {
               title: 'Expired Invitation',
               adminBody: 'Contact your manager to re-issue the invite.',
@@ -2344,7 +2344,7 @@ const options = {
             contact: {
               heading: "Your company's primary contact can reach out if you need help:",
               phone: '1-833-856-0333',
-              email: 'ESPContractorSupport@clearesult.com',
+              email: 'ESPcontractorSupport@CLEAResult.com',
             },
           },
           createAccount: 'Proceed with your account creation',
@@ -2947,15 +2947,15 @@ const options = {
             phoneHours: '9 am - 5 pm, Monday - Friday',
             phoneHoursNote: '(excluding statutory holidays).',
             emailTitle: 'Email',
-            emailAddress: 'betterhomesep@clearesult.com',
-            groundOrientedEmail: 'ESPcontractorsupport@clearesult.com',
-            groundOrientedEmailAriaLabel: 'Email us at ESPcontractorsupport@clearesult.com.',
+            emailAddress: 'BetterHomesESP@CLEAResult.com',
+            contractorEmail: 'ESPcontractorSupport@CLEAResult.com',
+            contractorEmailAriaLabel: 'Email us at ESPcontractorSupport@CLEAResult.com.',
             multiUnitEmail: 'ESPcondoapartment@CLEAResult.com',
           },
           support: {
             getSupport: 'Get support',
             contactAt: 'Contact us at',
-            contactTeamCTA: 'betterhomesESP@clearesult.com',
+            contactTeamCTA: 'BetterHomesESP@CLEAResult.com',
             contactUs: 'or 1-833-856-0333 from 9 am - 5 pm, Monday - Friday (excluding statutory holidays).',
             hereToHelp: "We're here to help",
             speakWithEnergyCoach: 'Speak with an Energy Coach',
@@ -2966,7 +2966,7 @@ const options = {
             offers:
               "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It's part the Province of B.C.'s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
             betterHomes: 'Better Homes',
-            emailAriaLabel: 'Email us at betterhomesESP@clearesult.com',
+            emailAriaLabel: 'Email us at BetterHomesESP@CLEAResult.com',
             applicationHelpTitle: 'Get help with your Energy Savings Program application',
             applicationHelpDescription:
               'Do you have questions about your application, the program or home upgrade opportunities? We can help you understand home energy upgrades and rebates. Calls usually take about 20 minutes.',
@@ -3004,7 +3004,7 @@ const options = {
             learnMoreDescriptionShort:
               "The Better Homes Energy Savings Program offers income-based rebates on home energy upgrades. It's part of the Province of B.C.'s CleanBC program. Learn more about program eligibility and the home energy rebates that are offered on",
             betterHomesLinkTextShort: 'Better Homes',
-            contractorSupportEmail: 'ESPcontractorsupport@clearesult.com',
+            contractorSupportEmail: 'ESPcontractorSupport@CLEAResult.com',
           },
           territorialAcknowledgement:
             'The B.C. Public Service acknowledges the territories of First Nations around B.C. and is grateful to carry out our work on these lands. We acknowledge these rights, interests, priorities, and concerns of all Indigenous Peoples - First Nations, Métis, and Inuit - respecting and acknowledging their distinct cultures, histories, rights, laws, and governments.',
