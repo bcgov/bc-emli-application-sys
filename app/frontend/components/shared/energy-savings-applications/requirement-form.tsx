@@ -1,4 +1,4 @@
-import { Box, Center, Flex, Link, useDisclosure } from '@chakra-ui/react';
+import { Box, Center, Flex, useDisclosure } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 
 import { format } from 'date-fns';
@@ -589,16 +589,6 @@ export const RequirementForm = observer(
             />
           )}
 
-          {showSiteWarning && (
-            <Box bg="greys.grey03" p={3} borderRadius="sm">
-              <Trans
-                i18nKey="site.foippaWarning"
-                components={{
-                  link: <Link href={`mailto:${t('site.contactEmail')}`}>{t('site.contactEmail')}</Link>,
-                }}
-              />
-            </Box>
-          )}
           <Form
             key={permitApplication.formFormatKey}
             form={processedFormJson}
@@ -620,6 +610,11 @@ export const RequirementForm = observer(
             }}
             onInitialized={onInitialized}
           />
+          {showSiteWarning && (
+            <Box bg="greys.grey03" p={3} borderRadius="sm">
+              <Trans i18nKey="site.foippaWarning" values={{ email: t('site.contactEmail') }} />
+            </Box>
+          )}
         </Flex>
 
         {!(permitApplication?.isInReview && currentUser?.isParticipant) && (
