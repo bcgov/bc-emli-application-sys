@@ -125,7 +125,9 @@ export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) 
                   <Link
                     href={emailHref}
                     sx={linkSx}
-                    aria-label={isContractor ? t('site.helpDrawer.contractorEmailAriaLabel') : t(emailKey)}
+                    aria-label={
+                      isContractor ? t('site.helpDrawer.contractorEmailAriaLabel') : t('site.support.emailAriaLabel')
+                    }
                   >
                     {t(emailKey)}
                   </Link>
