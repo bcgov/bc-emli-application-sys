@@ -334,9 +334,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
       <Flex id="permitHeader" direction="column" position="sticky" top={0} zIndex={12} ref={permitHeaderRef}>
         <Flex w="full" px={6} py={3} bg="theme.blue" justify="space-between" color="greys.white">
           <HStack gap={4} flex={1}>
-            {!isEditContractor && (
-              <EnergySavingsApplicationStatusTag energySavingsApplication={currentPermitApplication} />
-            )}
+            <EnergySavingsApplicationStatusTag energySavingsApplication={currentPermitApplication} />
             <Flex direction="column" w="full">
               <Heading fontSize="xl" as="h3">
                 {currentPermitApplication.fullAddress}
