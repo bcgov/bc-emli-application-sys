@@ -649,14 +649,20 @@ class PermitApplication < ApplicationRecord
     # end
   end
 
+  # Reads the precomputed blob cached on the latest submission version
+  # (populated at submit time; see SubmissionVersion#external_formatted_data).
+  # Every :external_api endpoint serves it through this one method.
+  # No-version apps (drafts, or seeded/legacy rows without a submission_version)
+  # fall back to live formatting — preserves prior behaviour; never returns empty
+  # submission_data for an app that has data.
   def formatted_submission_data_for_external_use
-    ExternalPermitApplicationService.new(
-      self
-    ).formatted_submission_data_for_external_use
-  end
-
-  def formatted_raw_h2k_files_for_external_use
-    ExternalPermitApplicationService.new(self).get_raw_h2k_files
+    if latest_submission_version
+      latest_submission_version.external_formatted_data
+    else
+      ExternalPermitApplicationService.new(
+        self
+      ).formatted_submission_data_for_external_use
+    end
   end
 
   def send_submitted_webhook

@@ -89,7 +89,7 @@ class ExternalPermitApplicationService
           if submitted_field_key.to_s.ends_with?("multi_contact")
             get_formatted_multi_contact_submission_value(submitted_value)
           elsif requirement["input_type"] == "file"
-            get_file_urls_from_submission_value(submitted_value)
+            get_file_metadata_from_submission_value(submitted_value)
           else
             submitted_value
           end
@@ -113,30 +113,6 @@ class ExternalPermitApplicationService
     self.permit_application.template_version.requirement_blocks_json[
       requirement_block_id
     ]
-  end
-
-  def get_raw_h2k_files
-    unless permit_application.step_code.present? &&
-             !permit_application.step_code.data_entries.empty?
-      return nil
-    end
-
-    permit_application
-      .step_code
-      .data_entries
-      .map do |data_entry|
-        url = data_entry.h2k_file_url
-        next unless url.present?
-
-        {
-          id: data_entry.id,
-          name: data_entry.h2k_file_name,
-          type: data_entry.h2k_file_type,
-          size: data_entry.h2k_file_size,
-          url: data_entry.h2k_file_url
-        }
-      end
-      .compact
   end
 
   private
@@ -176,12 +152,9 @@ class ExternalPermitApplicationService
 
         # create a new key and value pair, to collect the fragmented single_contact field values into a single array,
         # with one contact object.
-
-        contact_submissions_to_merge[formatted_requirement_key] = [
-          {}
-        ] unless contact_submissions_to_merge[
-          formatted_requirement_key
-        ].present?
+        unless contact_submissions_to_merge[formatted_requirement_key].present?
+          contact_submissions_to_merge[formatted_requirement_key] = [{}]
+        end
 
         contact_submissions_to_merge[formatted_requirement_key].first[
           contact_property_key
@@ -221,25 +194,24 @@ class ExternalPermitApplicationService
     end
   end
 
-  def get_file_urls_from_submission_value(submitted_value)
+  # File metadata for external use, built entirely from the reference already in
+  # submission_data (model_id/filename/type/size). No SupportingDocument load and
+  # no presigned URL: S3 presigned URLs expire in 1h so they can't be cached, and
+  # are fragile even on the live endpoint — dropped from the external API. This
+  # also removes the previous per-file find_by N+1.
+  def get_file_metadata_from_submission_value(submitted_value)
     return nil unless submitted_value.present? && submitted_value.is_a?(Array)
 
     submitted_value
       .map do |file_data|
-        file_model_name = file_data["model"]
         file_model_id = file_data["model_id"]
-        next unless file_model_name.present? && file_model_id.present?
-
-        file_model = file_model_name.constantize.find_by(id: file_model_id)
-
-        next unless file_model.present?
+        next unless file_model_id.present?
 
         {
           id: file_model_id,
           name: file_data&.dig("metadata", "filename"),
           type: file_data["type"],
-          size: file_data["size"],
-          url: file_model.file_url
+          size: file_data["size"]
         }
       end
       .compact

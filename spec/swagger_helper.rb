@@ -71,9 +71,7 @@ tailor the API environment to better suit your development needs. Ensure that yo
 A returned permit application can have various statuses depending on the endpoint and filters applied. The `resubmitted_at` field will indicate the timestamp of the latest resubmission.
 While there may be multiple resubmissions, the submission data payload returned will reflect the most recent submission data.
 
-For security purposes, any API response that includes a file URL will have a signed URL. These files will be available for download for a limited time (1 hour).
-We recommend downloading the file immediately upon receiving the URL to avoid any issues. If necessary, you can always call the API again to retrieve a
-new file URL.
+File fields return file metadata (id, name, type, size) identifying each uploaded document. Download URLs are not included in the response.
 
 ### Visual aids and examples:
 For a better understanding of how our APIs work, including webhook setups and request handling, please refer to the code examples included later
@@ -428,7 +426,7 @@ in this document.
           },
           FileSubmissionValue: {
             description:
-              "The file submission value. It is an array of file objects. Note: the urls are signed and will expire after 1 hour.",
+              "The file submission value. It is an array of file objects (metadata only; no download URL).",
             type: :array,
             items: {
               "$ref" => "#/components/schemas/File"
@@ -453,11 +451,6 @@ in this document.
                 type: :string,
                 description:
                   "The type of the file. e.g. image/png, application/pdf, etc."
-              },
-              url: {
-                type: :string,
-                format: "url",
-                description: "The signed URL to download the file."
               }
             }
           },
