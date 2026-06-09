@@ -94,7 +94,10 @@ module ApplicationFlow
     end
 
     def handle_submission
-      application.update(signed_off_at: Time.current)
+      application.update(
+        signed_off_at: Time.current,
+        submitted_at: application.submitted_at || Time.current
+      )
 
       # Create submission version to capture application state at submission time
       application.submission_versions.create!(

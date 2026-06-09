@@ -8,18 +8,11 @@ module ExternalApi::Concerns::Search::PermitApplications
       order: permit_application_order,
       match: :word_start,
       where: permit_application_where_clause,
-      page: permit_application_search_params[:page],
-      per_page:
-        (
-          if permit_application_search_params[:page]
-            (
-              permit_application_search_params[:per_page] ||
-                Kaminari.config.default_per_page
-            )
-          else
-            nil
-          end
-        ),
+      page: (permit_application_search_params[:page]&.to_i || 1),
+      per_page: [
+        (permit_application_search_params[:per_page]&.to_i || 25),
+        250
+      ].min,
       includes: PermitApplication::API_SEARCH_INCLUDES
     }
 

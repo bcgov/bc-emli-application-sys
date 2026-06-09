@@ -33,15 +33,12 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
 
   def summary
     perform_permit_application_summary
-    return if performed? # Stop if date validation failed
+    return if performed?
 
-    authorized_results =
-      apply_search_authorization(@permit_application_search.results)
-
-    render_success authorized_results,
+    render_success @permit_application_summary,
                    nil,
                    {
-                     meta: page_meta(@permit_application_search),
+                     meta: page_meta(@permit_application_summary),
                      blueprint: PermitApplicationBlueprint,
                      blueprint_opts: {
                        view: :submission_summary
@@ -90,7 +87,6 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
   def perform_permit_application_summary
     ensure_external_api_key_authorized!
 
-    # Transform simple date parameters to constraints format
     permitted =
       params.permit(
         :submitted_from,
@@ -110,78 +106,62 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
       validate_date_param(permitted[:screened_in_to], :screened_in_to)
     return if performed?
 
-    constraints = {}
-    if from.present? || to.present?
-      submitted_at = {}
-      submitted_at[:gte] = from.in_time_zone.beginning_of_day if from.present?
-      submitted_at[:lte] = to.in_time_zone.end_of_day if to.present?
-      constraints[:submitted_at] = submitted_at
-    end
-    if screened_in_from.present? || screened_in_to.present?
-      screened_in_at = {}
-      screened_in_at[
-        :gte
-      ] = screened_in_from.in_time_zone.beginning_of_day if screened_in_from.present?
-      screened_in_at[
-        :lte
-      ] = screened_in_to.in_time_zone.end_of_day if screened_in_to.present?
-      constraints[:screened_in_at] = screened_in_at
-    end
-
-    # Build where clause with summary-specific filtering
-    where = { program_id: current_external_api_key.program_id }
-
-    # Filter by status if provided, otherwise exclude new_draft
-    if permitted[:status].present?
-      unless PermitApplication.statuses.key?(permitted[:status])
-        render_error(
-          nil,
-          {
-            status: 400,
-            meta: {
-              message: "Invalid status: #{permitted[:status]}"
-            }
+    if permitted[:status].present? &&
+         !PermitApplication.statuses.key?(permitted[:status])
+      render_error(
+        nil,
+        {
+          status: 400,
+          meta: {
+            message: "Invalid status: #{permitted[:status]}"
           }
-        )
-        return
-      end
-      where[:status] = permitted[:status]
-    else
-      where[:status] = { not: :new_draft }
-    end
-
-    # Only return participant applications (not contractor onboarding, invoices, etc.)
-    where[:user_group_type_code] = "participant"
-    where[:submission_type_code] = "application"
-
-    # Merge date constraints if present
-    where.merge!(constraints.deep_symbolize_keys) if constraints.present?
-
-    # Execute search
-    @permit_application_search =
-      PermitApplication.search(
-        "*",
-        order: {
-          submitted_at: {
-            order: :desc,
-            unmapped_type: "long"
-          }
-        },
-        match: :word_start,
-        where: where,
-        page:
-          permitted[:page].presence ||
-            (permitted[:per_page].present? ? 1 : nil),
-        per_page:
-          (
-            if permitted[:page].present? || permitted[:per_page].present?
-              permitted[:per_page].presence || Kaminari.config.default_per_page
-            else
-              nil
-            end
-          ),
-        includes: PermitApplication::API_SEARCH_INCLUDES
+        }
       )
+      return
+    end
+
+    scope =
+      PermitApplication
+        .includes(:submission_type, :user_group_type, :audience_type)
+        .where(
+          program_id: current_external_api_key.program_id,
+          user_group_type_id: UserGroupType.find_by!(code: "participant").id,
+          submission_type_id: SubmissionType.find_by!(code: "application").id
+        )
+        .order(submitted_at: :desc)
+
+    scope =
+      if permitted[:status].present?
+        scope.where(status: permitted[:status])
+      else
+        scope.where.not(status: :new_draft)
+      end
+
+    scope =
+      scope.where(
+        "submitted_at >= ?",
+        from.in_time_zone.beginning_of_day
+      ) if from.present?
+    scope =
+      scope.where(
+        "submitted_at <= ?",
+        to.in_time_zone.end_of_day
+      ) if to.present?
+    scope =
+      scope.where(
+        "screened_in_at >= ?",
+        screened_in_from.in_time_zone.beginning_of_day
+      ) if screened_in_from.present?
+    scope =
+      scope.where(
+        "screened_in_at <= ?",
+        screened_in_to.in_time_zone.end_of_day
+      ) if screened_in_to.present?
+
+    page = (permitted[:page]&.to_i || 1)
+    per_page = [(permitted[:per_page]&.to_i || 25), 250].min
+
+    @permit_application_summary = scope.page(page).per(per_page)
   end
 
   def set_permit_application

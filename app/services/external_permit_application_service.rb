@@ -48,7 +48,12 @@ class ExternalPermitApplicationService
 
         next unless submitted_field_key_split.length > 1
 
-        requirement_block_id = submitted_field_key_split.last.split("|").first
+        # The portion after the last "|RB" matches the end of the requirement's
+        # form_json key. Compute it once per field and reuse it for both the
+        # requirement_block_id and the requirement lookup below (the lookup used
+        # to re-split this key on every requirement iteration).
+        requirement_block_ending_key = submitted_field_key_split.last
+        requirement_block_id = requirement_block_ending_key.split("|").first
 
         requirement_block = get_requirement_block_json(requirement_block_id)
 
@@ -73,10 +78,8 @@ class ExternalPermitApplicationService
             # So, the submission key will not be the same as the requirement form_json key.
             # However, the end (|RB{requirement_block_id}|{ending_key}) of the submission key
             # will be the same as the end of requirement form_json key
-            # So, we get the requirement using the ending_key.
-            common_ending_key = submitted_field_key.split("|RB").last
-
-            req.dig("form_json", "key").ends_with?(common_ending_key)
+            # So, we get the requirement using the ending_key (computed once above).
+            req.dig("form_json", "key").ends_with?(requirement_block_ending_key)
           end
 
         next unless requirement.present?
@@ -101,13 +104,6 @@ class ExternalPermitApplicationService
           value: formatted_value
         }
       end
-    end
-
-    remaining_energy_step_code_submission =
-      form_remaining_energy_step_code_submission_data
-
-    if remaining_energy_step_code_submission.present?
-      formatted_submission_data.merge!(remaining_energy_step_code_submission)
     end
 
     formatted_submission_data
@@ -247,51 +243,5 @@ class ExternalPermitApplicationService
         }
       end
       .compact
-  end
-
-  def form_remaining_energy_step_code_submission_data
-    return nil unless permit_application.present?
-
-    latest_submission_version = permit_application.latest_submission_version
-
-    return nil unless latest_submission_version.present?
-
-    checklist_document =
-      latest_submission_version.supporting_documents.find_by(
-        data_key: PermitApplication::CHECKLIST_PDF_DATA_KEY
-      )
-
-    return nil unless checklist_document.present?
-
-    url = checklist_document.file_url
-
-    return nil unless url.present?
-
-    # These is originally not part of the requirement model, but to keep a unified structure, we will format it as such.
-    file_values = [
-      {
-        id: checklist_document.id,
-        name: checklist_document.file_name,
-        type: checklist_document.file_type,
-        size: checklist_document.file_size,
-        url: checklist_document.file_url
-      }
-    ]
-
-    {
-      id: "energy_step_code_tool",
-      requirement_block_code: "energy_step_code_tool",
-      name: "Energy step code",
-      description: "",
-      requirement: [
-        {
-          id: "energy_step_code_documents",
-          name: "Energy step code documents",
-          requirement_code: "energy_step_code_documents",
-          type: :file,
-          value: file_values
-        }
-      ]
-    }
   end
 end

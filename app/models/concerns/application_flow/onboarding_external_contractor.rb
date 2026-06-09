@@ -51,7 +51,10 @@ module ApplicationFlow
         application.generate_and_upload_pdfs
         application.process_contractor_submission!
 
-        application.update(signed_off_at: Time.current)
+        application.update(
+          signed_off_at: Time.current,
+          submitted_at: application.submitted_at || Time.current
+        )
       end
     end
   end

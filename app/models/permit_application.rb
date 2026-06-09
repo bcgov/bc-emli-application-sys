@@ -60,24 +60,63 @@ class PermitApplication < ApplicationRecord
     :audience_type
   ]
 
+  # submission_versions needed for resubmitted_at (count + latest created_at). Drop :program —
+  # Pundit policy compares program_id directly. Add :audience_type for set_flow (after_initialize).
+  # No supporting_documents eager-load: the only external-API consumer was the dead step-code
+  # formatter (EMLI has no step codes), now removed.
   API_SEARCH_INCLUDES = %i[
-    program
     submitter
     template_version
     submission_versions
     submission_type
     user_group_type
+    audience_type
   ]
 
   # Separate includes for invoice endpoints — invoice submissions use a User as the submitter
   # (via EspApplicationController). Eager load contractor-specific associations here.
   # Do NOT merge into API_SEARCH_INCLUDES — participant app queries have a different submitter context.
+  # submission_versions for resubmitted_at; add :audience_type; drop :program (policy uses program_id).
+  # No supporting_documents — only the removed step-code formatter used them.
   INVOICE_API_SEARCH_INCLUDES = [
-    :program,
     :template_version,
     :submission_versions,
     :submission_type,
     :user_group_type,
+    :audience_type,
+    {
+      submitter: [
+        :contractor_info,
+        :contact,
+        { contractor_employees: { contractor: :contractor_info } }
+      ]
+    }
+  ]
+
+  # Change 4: lightweight includes for /applications/summary — drops template_version
+  # (large JSONB) and :submitter (unused by submission_summary blueprint).
+  # Keeps :submission_versions because submitted_at and extract_* methods need it.
+  # Keeps :audience_type for set_flow (after_initialize) and :submission_type/:user_group_type.
+  # No :program — Pundit policy now uses program_id comparison.
+  # submitted_at is now a column; submission_data for the 8 fields is read from
+  # permit_application.submission_data directly (SubmissionDataExtractorService).
+  # No submission_versions needed — zero JSONB loaded from that table for summary.
+  SUMMARY_API_SEARCH_INCLUDES = %i[
+    submission_type
+    user_group_type
+    audience_type
+  ]
+
+  # Change 4 + N+1 fix: lightweight includes for /invoices/summary.
+  # Drops :template_version and :submission_versions (submitted_at is a column;
+  # extraction reads from permit_application.submission_data directly).
+  # Adds :submission_variant (fixes N+1 — was missing from INVOICE_API_SEARCH_INCLUDES entirely).
+  # Preserves full contractor subtree — invoice_summary blueprint reads 7 contractor fields.
+  INVOICE_SUMMARY_API_SEARCH_INCLUDES = [
+    :submission_type,
+    :user_group_type,
+    :audience_type,
+    :submission_variant,
     {
       submitter: [
         :contractor_info,
@@ -655,11 +694,6 @@ class PermitApplication < ApplicationRecord
 
   def viewed_at
     latest_submission_version&.viewed_at
-  end
-
-  def submitted_at
-    return nil if submission_versions.length < 1
-    return earliest_submission_version.created_at
   end
 
   def resubmitted_at
