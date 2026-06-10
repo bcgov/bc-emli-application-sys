@@ -158,8 +158,8 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
         screened_in_to.in_time_zone.end_of_day
       ) if screened_in_to.present?
 
-    page = (permitted[:page]&.to_i || 1)
-    per_page = [(permitted[:per_page]&.to_i || 25), 250].min
+    page = normalized_page(permitted[:page])
+    per_page = normalized_per_page(permitted[:per_page])
 
     @permit_application_summary = scope.page(page).per(per_page)
   end

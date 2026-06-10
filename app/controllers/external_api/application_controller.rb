@@ -28,6 +28,19 @@ class ExternalApi::ApplicationController < ActionController::API
     }
   end
 
+  # Pagination params arrive as strings; `to_i` turns invalid input ("abc") into 0,
+  # and 0 is truthy in Ruby so `|| default` won't catch it. Clamp explicitly so
+  # garbage never reaches Searchkick/Kaminari (a 0 page yields a negative ES offset).
+  def normalized_page(value)
+    [(value&.to_i || 1), 1].max
+  end
+
+  def normalized_per_page(value, max: 250)
+    per_page = value&.to_i
+    per_page = 25 unless per_page&.positive?
+    [per_page, max].min
+  end
+
   def validate_date_param(value, param_name)
     return nil unless value.present?
     Date.iso8601(value)

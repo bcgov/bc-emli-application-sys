@@ -95,7 +95,6 @@ class PermitApplication < ApplicationRecord
 
   # Change 4: lightweight includes for /applications/summary — drops template_version
   # (large JSONB) and :submitter (unused by submission_summary blueprint).
-  # Keeps :submission_versions because submitted_at and extract_* methods need it.
   # Keeps :audience_type for set_flow (after_initialize) and :submission_type/:user_group_type.
   # No :program — Pundit policy now uses program_id comparison.
   # submitted_at is now a column; submission_data for the 8 fields is read from

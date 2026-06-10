@@ -74,8 +74,8 @@ class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
         },
         match: :word_start,
         where: where,
-        page: (permitted[:page]&.to_i || 1),
-        per_page: [(permitted[:per_page]&.to_i || 25), 250].min,
+        page: normalized_page(permitted[:page]),
+        per_page: normalized_per_page(permitted[:per_page]),
         includes: includes
       )
   end
