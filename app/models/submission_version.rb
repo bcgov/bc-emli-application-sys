@@ -141,12 +141,19 @@ class SubmissionVersion < ApplicationRecord
 
   # Populate the external-API formatted blob once, at version creation (the single
   # chokepoint for all submit/resubmit flows). update_column = no validations/callbacks.
+  # Best-effort: runs inside the submit transaction, so a formatter failure must NOT
+  # roll back the user's submission — rescue and let the read-path compute-on-miss
+  # fallback handle it (cache stays nil = recompute on next external-API read).
   def cache_external_formatted_data
     update_column(
       :external_formatted_data,
       ExternalPermitApplicationService.new(
         permit_application
       ).formatted_submission_data_for_external_use
+    )
+  rescue => e
+    Rails.logger.error(
+      "Failed to cache external_formatted_data for submission_version #{id}: #{e.message}"
     )
   end
 
