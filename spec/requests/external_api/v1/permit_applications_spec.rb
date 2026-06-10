@@ -315,7 +315,7 @@ RSpec.describe "external_api/v1/applications",
   end
 
   path "/applications/summary" do
-    get "This endpoint retrieves a summary of participant applications (excludes contractor onboarding, invoices, and support requests). Returns lightweight application data with only essential fields. Filters by submission date, screened-in date, and/or status. Pagination is optional - omit page parameter to retrieve all results." do
+    get "This endpoint retrieves a summary of participant applications (excludes contractor onboarding, invoices, and support requests). Returns lightweight application data with only essential fields. Filters by submission date, screened-in date, and/or status. Results are paginated; use page and per_page to page through all results." do
       tags "Applications"
       produces "application/json"
 
@@ -376,7 +376,7 @@ RSpec.describe "external_api/v1/applications",
                   minimum: 1
                 },
                 description:
-                  "Page number (optional). Omit to retrieve all results without pagination.",
+                  "Page number (default 1). Responses are paginated; page through all results using page and per_page.",
                 required: false
 
       parameter name: :per_page,
@@ -388,7 +388,7 @@ RSpec.describe "external_api/v1/applications",
                   maximum: 100
                 },
                 description:
-                  "Number of results per page (optional). Only used when page parameter is provided.",
+                  "Number of results per page (default 25). Applied on every request.",
                 required: false
 
       response(200, "Successful") do
@@ -397,7 +397,7 @@ RSpec.describe "external_api/v1/applications",
                  data: {
                    type: :array,
                    description:
-                     "Application summaries. Returns all results when page parameter is omitted, or paginated results when page parameter is provided.",
+                     "Application summaries (paginated — page through all results using page and per_page).",
                    items: {
                      type: :object,
                      description:

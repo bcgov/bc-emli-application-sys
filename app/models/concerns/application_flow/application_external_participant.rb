@@ -56,7 +56,10 @@ module ApplicationFlow
 
     # --- Flow-specific handlers ---
     def handle_submission
-      application.update(signed_off_at: Time.current)
+      application.update(
+        signed_off_at: Time.current,
+        submitted_at: application.submitted_at || Time.current
+      )
 
       checklist = application.step_code&.pre_construction_checklist
       application.submission_versions.create!(

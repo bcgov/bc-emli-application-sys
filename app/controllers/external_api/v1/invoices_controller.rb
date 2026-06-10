@@ -3,7 +3,9 @@ class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
   before_action :set_invoice, only: :show
 
   def index
-    perform_invoice_search
+    perform_invoice_search(
+      includes: PermitApplication::INVOICE_API_SEARCH_INCLUDES
+    )
     return if performed? # Stop if date validation failed
 
     authorized_results = apply_search_authorization(@invoice_search.results)
@@ -20,7 +22,9 @@ class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
   end
 
   def summary
-    perform_invoice_search
+    perform_invoice_search(
+      includes: PermitApplication::INVOICE_SUMMARY_API_SEARCH_INCLUDES
+    )
     return if performed? # Stop if date validation failed
 
     authorized_results = apply_search_authorization(@invoice_search.results)
@@ -51,7 +55,9 @@ class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
 
   private
 
-  def perform_invoice_search
+  def perform_invoice_search(
+    includes: PermitApplication::INVOICE_API_SEARCH_INCLUDES
+  )
     permitted = params.permit(:submitted_from, :submitted_to, :page, :per_page)
     constraints = build_date_constraints(permitted)
     return if performed? # Stop if date validation failed
@@ -68,18 +74,9 @@ class ExternalApi::V1::InvoicesController < ExternalApi::ApplicationController
         },
         match: :word_start,
         where: where,
-        page:
-          permitted[:page].presence ||
-            (permitted[:per_page].present? ? 1 : nil),
-        per_page:
-          (
-            if permitted[:page].present? || permitted[:per_page].present?
-              permitted[:per_page].presence || Kaminari.config.default_per_page
-            else
-              nil
-            end
-          ),
-        includes: PermitApplication::INVOICE_API_SEARCH_INCLUDES
+        page: normalized_page(permitted[:page]),
+        per_page: normalized_per_page(permitted[:per_page]),
+        includes: includes
       )
   end
 

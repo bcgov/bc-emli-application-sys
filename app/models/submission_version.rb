@@ -6,6 +6,7 @@ class SubmissionVersion < ApplicationRecord
   accepts_nested_attributes_for :revision_requests, allow_destroy: true
 
   after_commit :notify_user_application_viewed
+  after_create :cache_external_formatted_data
 
   delegate :sandbox, to: :permit_application
 
@@ -85,6 +86,20 @@ class SubmissionVersion < ApplicationRecord
     )
   end
 
+  # External-API formatted submission, cached on this (immutable) version.
+  # Populated once at create (see #cache_external_formatted_data). Compute-on-miss
+  # here covers versions created before the column existed / not yet backfilled,
+  # and does NOT persist (avoids a write during a read — safe with read replicas).
+  # nil column => never cached (recompute); {} is a valid cached value (cache hit).
+  def external_formatted_data
+    cached = self[:external_formatted_data]
+    return cached unless cached.nil?
+
+    ExternalPermitApplicationService.new(
+      permit_application
+    ).formatted_submission_data_for_external_use
+  end
+
   def version_number
     permit_application
       .submission_versions
@@ -123,6 +138,24 @@ class SubmissionVersion < ApplicationRecord
   end
 
   private
+
+  # Populate the external-API formatted blob once, at version creation (the single
+  # chokepoint for all submit/resubmit flows). update_column = no validations/callbacks.
+  # Best-effort: runs inside the submit transaction, so a formatter failure must NOT
+  # roll back the user's submission — rescue and let the read-path compute-on-miss
+  # fallback handle it (cache stays nil = recompute on next external-API read).
+  def cache_external_formatted_data
+    update_column(
+      :external_formatted_data,
+      ExternalPermitApplicationService.new(
+        permit_application
+      ).formatted_submission_data_for_external_use
+    )
+  rescue => e
+    Rails.logger.error(
+      "Failed to cache external_formatted_data for submission_version #{id}: #{e.message}"
+    )
+  end
 
   def find_supporting_doc(data_key)
     if supporting_documents.loaded?

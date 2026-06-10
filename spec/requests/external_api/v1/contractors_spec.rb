@@ -8,7 +8,7 @@ RSpec.describe "external_api/v1/contractors",
   let!(:Authorization) { "Bearer #{token}" }
 
   path "/contractors" do
-    get "Retrieves all onboarded contractors for the API key's program. Supports optional pagination and date filtering on approval or last update date." do
+    get "Retrieves onboarded contractors for the API key's program. Results are paginated; page through all results using page and per_page. Supports date filtering on approval or last update date." do
       tags "Contractors"
       produces "application/json"
 
@@ -40,7 +40,7 @@ RSpec.describe "external_api/v1/contractors",
                   minimum: 1
                 },
                 description:
-                  "Page number (optional). Omit to retrieve all results without pagination.",
+                  "Page number (default 1). Responses are paginated; page through all results using page and per_page.",
                 required: false
 
       parameter name: :per_page,
@@ -52,7 +52,7 @@ RSpec.describe "external_api/v1/contractors",
                   maximum: 100
                 },
                 description:
-                  "Number of results per page (optional). Only used when page parameter is provided.",
+                  "Number of results per page (default 25). Applied on every request.",
                 required: false
 
       response(200, "Successful") do

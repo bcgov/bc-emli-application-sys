@@ -41,9 +41,7 @@ info:
     A returned permit application can have various statuses depending on the endpoint and filters applied. The `resubmitted_at` field will indicate the timestamp of the latest resubmission.
     While there may be multiple resubmissions, the submission data payload returned will reflect the most recent submission data.
 
-    For security purposes, any API response that includes a file URL will have a signed URL. These files will be available for download for a limited time (1 hour).
-    We recommend downloading the file immediately upon receiving the URL to avoid any issues. If necessary, you can always call the API again to retrieve a
-    new file URL.
+    File fields return file metadata (id, name, type, size) identifying each uploaded document. Download URLs are not included in the response.
 
     ### Visual aids and examples:
     For a better understanding of how our APIs work, including webhook setups and request handling, please refer to the code examples included later
@@ -77,8 +75,9 @@ webhooks:
 paths:
   "/contractors":
     get:
-      summary: Retrieves all onboarded contractors for the API key's program. Supports
-        optional pagination and date filtering on approval or last update date.
+      summary: Retrieves onboarded contractors for the API key's program. Results
+        are paginated; page through all results using page and per_page. Supports
+        date filtering on approval or last update date.
       tags:
       - Contractors
       parameters:
@@ -102,8 +101,8 @@ paths:
           type: integer
           default: 1
           minimum: 1
-        description: Page number (optional). Omit to retrieve all results without
-          pagination.
+        description: Page number (default 1). Responses are paginated; page through
+          all results using page and per_page.
         required: false
       - name: per_page
         in: query
@@ -112,8 +111,7 @@ paths:
           default: 25
           minimum: 1
           maximum: 100
-        description: Number of results per page (optional). Only used when page parameter
-          is provided.
+        description: Number of results per page (default 25). Applied on every request.
         required: false
       responses:
         '200':
@@ -483,8 +481,8 @@ paths:
           type: integer
           default: 1
           minimum: 1
-        description: Page number (optional). Omit to retrieve all results without
-          pagination.
+        description: Page number (default 1). Responses are paginated; page through
+          all results using page and per_page.
         required: false
       - name: per_page
         in: query
@@ -493,8 +491,7 @@ paths:
           default: 25
           minimum: 1
           maximum: 100
-        description: Number of results per page (optional). Only used when page parameter
-          is provided.
+        description: Number of results per page (default 25). Applied on every request.
         required: false
       responses:
         '200':
@@ -579,7 +576,7 @@ paths:
       summary: This endpoint retrieves a summary of contractor invoices filtered by
         submission date. Returns lightweight invoice data with only essential fields
         (invoice number, contractor name, submission date, status, amounts, homeowner
-        info). Pagination is optional - omit page parameter to retrieve all results.
+        info). Results are paginated; use page and per_page to page through all results.
       tags:
       - Invoices
       parameters:
@@ -603,8 +600,8 @@ paths:
           type: integer
           default: 1
           minimum: 1
-        description: Page number (optional). Omit to retrieve all results without
-          pagination.
+        description: Page number (default 1). Responses are paginated; page through
+          all results using page and per_page.
         required: false
       - name: per_page
         in: query
@@ -613,8 +610,7 @@ paths:
           default: 25
           minimum: 1
           maximum: 100
-        description: Number of results per page (optional). Only used when page parameter
-          is provided.
+        description: Number of results per page (default 25). Applied on every request.
         required: false
       responses:
         '200':
@@ -981,8 +977,8 @@ paths:
       summary: This endpoint retrieves a summary of participant applications (excludes
         contractor onboarding, invoices, and support requests). Returns lightweight
         application data with only essential fields. Filters by submission date, screened-in
-        date, and/or status. Pagination is optional - omit page parameter to retrieve
-        all results.
+        date, and/or status. Results are paginated; use page and per_page to page
+        through all results.
       tags:
       - Applications
       parameters:
@@ -1027,8 +1023,8 @@ paths:
           type: integer
           default: 1
           minimum: 1
-        description: Page number (optional). Omit to retrieve all results without
-          pagination.
+        description: Page number (default 1). Responses are paginated; page through
+          all results using page and per_page.
         required: false
       - name: per_page
         in: query
@@ -1037,8 +1033,7 @@ paths:
           default: 25
           minimum: 1
           maximum: 100
-        description: Number of results per page (optional). Only used when page parameter
-          is provided.
+        description: Number of results per page (default 25). Applied on every request.
         required: false
       responses:
         '200':
@@ -1050,9 +1045,8 @@ paths:
                 properties:
                   data:
                     type: array
-                    description: Application summaries. Returns all results when page
-                      parameter is omitted, or paginated results when page parameter
-                      is provided.
+                    description: Application summaries (paginated — page through all
+                      results using page and per_page).
                     items:
                       type: object
                       description: Lightweight summary of application with essential
@@ -1713,8 +1707,8 @@ components:
             type: string
             description: The organization of the contact.
     FileSubmissionValue:
-      description: 'The file submission value. It is an array of file objects. Note:
-        the urls are signed and will expire after 1 hour.'
+      description: The file submission value. It is an array of file objects (metadata
+        only; no download URL).
       type: array
       items:
         "$ref": "#/components/schemas/File"
@@ -1733,10 +1727,6 @@ components:
         type:
           type: string
           description: The type of the file. e.g. image/png, application/pdf, etc.
-        url:
-          type: string
-          format: url
-          description: The signed URL to download the file.
     AccountHolder:
       type: object
       description: The account holder (invoice submitter) of the application. The

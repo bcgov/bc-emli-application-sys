@@ -37,22 +37,10 @@ class ExternalApi::V1::ContractorsController < ExternalApi::ApplicationControlle
         to.in_time_zone.end_of_day
       ) if to.present?
 
-    if permitted[:page]
-      results =
-        scope.page(permitted[:page]).per(
-          permitted[:per_page] || Kaminari.config.default_per_page
-        )
-      meta = page_meta(results)
-    else
-      results = scope
-      total = scope.count
-      meta = {
-        total_pages: 1,
-        total_count: total,
-        current_page: 1,
-        per_page: total
-      }
-    end
+    page = normalized_page(permitted[:page])
+    per_page = normalized_per_page(permitted[:per_page])
+    results = scope.page(page).per(per_page)
+    meta = page_meta(results)
 
     render_success results,
                    nil,

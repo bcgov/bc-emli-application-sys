@@ -1,7 +1,6 @@
 class ExternalApi::PermitApplicationPolicy < ExternalApi::ApplicationPolicy
   def index?
-    # we're only checking
-    external_api_key.program == record.program
+    external_api_key.program_id == record.program_id
   end
 
   def show?
@@ -13,7 +12,7 @@ class ExternalApi::PermitApplicationPolicy < ExternalApi::ApplicationPolicy
   end
 
   def show_integration_mapping?
-    external_api_key.program == record.program
+    external_api_key.program_id == record.program_id
   end
 
   class Scope < Scope

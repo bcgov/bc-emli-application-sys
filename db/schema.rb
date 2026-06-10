@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_04_204952) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_10_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -416,8 +416,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_204952) do
     t.uuid "program_id"
     t.string "reference_number"
     t.datetime "revisions_requested_at", precision: nil
-    t.datetime "screened_in_at"
-    t.boolean "first_nations", default: false
     t.uuid "sandbox_id"
     t.datetime "screened_in_at"
     t.datetime "signed_off_at"
@@ -426,9 +424,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_204952) do
     t.jsonb "submission_data"
     t.uuid "submission_type_id"
     t.uuid "submission_variant_id"
+    t.datetime "submitted_at"
     t.string "submitted_for"
     t.uuid "submitter_id", null: false
-    t.uuid "submission_variant_id"
     t.index ["activity_id"], name: "index_permit_applications_on_activity_id"
     t.index ["audience_type_id"],
             name: "index_permit_applications_on_audience_type_id"
@@ -441,10 +439,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_204952) do
             unique: true
     t.index ["program_id"], name: "index_permit_applications_on_program_id"
     t.index ["sandbox_id"], name: "index_permit_applications_on_sandbox_id"
+    t.index ["screened_in_at"],
+            name: "index_permit_applications_on_screened_in_at"
     t.index ["submission_type_id"],
             name: "index_permit_applications_on_submission_type_id"
     t.index ["submission_variant_id"],
             name: "index_permit_applications_on_submission_variant_id"
+    t.index ["submitted_at"], name: "index_permit_applications_on_submitted_at"
     t.index ["template_version_id"],
             name: "index_permit_applications_on_template_version_id"
     t.index ["user_group_type_id"],
@@ -972,6 +973,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_204952) do
                default: -> { "gen_random_uuid()" },
                force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.jsonb "external_formatted_data"
     t.jsonb "form_json"
     t.uuid "permit_application_id", null: false
     t.jsonb "step_code_checklist_json", default: {}
