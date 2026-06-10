@@ -388,7 +388,7 @@ RSpec.describe "external_api/v1/applications",
                   maximum: 100
                 },
                 description:
-                  "Number of results per page (optional). Only used when page parameter is provided.",
+                  "Number of results per page (default 25). Applied on every request.",
                 required: false
 
       response(200, "Successful") do
@@ -397,7 +397,7 @@ RSpec.describe "external_api/v1/applications",
                  data: {
                    type: :array,
                    description:
-                     "Application summaries. Returns all results when page parameter is omitted, or paginated results when page parameter is provided.",
+                     "Application summaries (paginated — page through all results using page and per_page).",
                    items: {
                      type: :object,
                      description:

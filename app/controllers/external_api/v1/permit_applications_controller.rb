@@ -122,7 +122,7 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
 
     scope =
       PermitApplication
-        .includes(:submission_type, :user_group_type, :audience_type)
+        .includes(PermitApplication::SUMMARY_API_SEARCH_INCLUDES)
         .where(
           program_id: current_external_api_key.program_id,
           user_group_type_id: UserGroupType.find_by!(code: "participant").id,

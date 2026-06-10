@@ -52,7 +52,7 @@ RSpec.describe "external_api/v1/contractors",
                   maximum: 100
                 },
                 description:
-                  "Number of results per page (optional). Only used when page parameter is provided.",
+                  "Number of results per page (default 25). Applied on every request.",
                 required: false
 
       response(200, "Successful") do

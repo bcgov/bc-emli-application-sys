@@ -111,8 +111,7 @@ paths:
           default: 25
           minimum: 1
           maximum: 100
-        description: Number of results per page (optional). Only used when page parameter
-          is provided.
+        description: Number of results per page (default 25). Applied on every request.
         required: false
       responses:
         '200':
@@ -492,8 +491,7 @@ paths:
           default: 25
           minimum: 1
           maximum: 100
-        description: Number of results per page (optional). Only used when page parameter
-          is provided.
+        description: Number of results per page (default 25). Applied on every request.
         required: false
       responses:
         '200':
@@ -612,8 +610,7 @@ paths:
           default: 25
           minimum: 1
           maximum: 100
-        description: Number of results per page (optional). Only used when page parameter
-          is provided.
+        description: Number of results per page (default 25). Applied on every request.
         required: false
       responses:
         '200':
@@ -1036,8 +1033,7 @@ paths:
           default: 25
           minimum: 1
           maximum: 100
-        description: Number of results per page (optional). Only used when page parameter
-          is provided.
+        description: Number of results per page (default 25). Applied on every request.
         required: false
       responses:
         '200':
@@ -1049,9 +1045,8 @@ paths:
                 properties:
                   data:
                     type: array
-                    description: Application summaries. Returns all results when page
-                      parameter is omitted, or paginated results when page parameter
-                      is provided.
+                    description: Application summaries (paginated — page through all
+                      results using page and per_page).
                     items:
                       type: object
                       description: Lightweight summary of application with essential
