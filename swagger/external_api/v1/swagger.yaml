@@ -75,8 +75,9 @@ webhooks:
 paths:
   "/contractors":
     get:
-      summary: Retrieves all onboarded contractors for the API key's program. Supports
-        optional pagination and date filtering on approval or last update date.
+      summary: Retrieves onboarded contractors for the API key's program. Results
+        are paginated; page through all results using page and per_page. Supports
+        date filtering on approval or last update date.
       tags:
       - Contractors
       parameters:
@@ -100,8 +101,8 @@ paths:
           type: integer
           default: 1
           minimum: 1
-        description: Page number (optional). Omit to retrieve all results without
-          pagination.
+        description: Page number (default 1). Responses are paginated; page through
+          all results using page and per_page.
         required: false
       - name: per_page
         in: query
@@ -481,8 +482,8 @@ paths:
           type: integer
           default: 1
           minimum: 1
-        description: Page number (optional). Omit to retrieve all results without
-          pagination.
+        description: Page number (default 1). Responses are paginated; page through
+          all results using page and per_page.
         required: false
       - name: per_page
         in: query
@@ -577,7 +578,7 @@ paths:
       summary: This endpoint retrieves a summary of contractor invoices filtered by
         submission date. Returns lightweight invoice data with only essential fields
         (invoice number, contractor name, submission date, status, amounts, homeowner
-        info). Pagination is optional - omit page parameter to retrieve all results.
+        info). Results are paginated; use page and per_page to page through all results.
       tags:
       - Invoices
       parameters:
@@ -601,8 +602,8 @@ paths:
           type: integer
           default: 1
           minimum: 1
-        description: Page number (optional). Omit to retrieve all results without
-          pagination.
+        description: Page number (default 1). Responses are paginated; page through
+          all results using page and per_page.
         required: false
       - name: per_page
         in: query
@@ -979,8 +980,8 @@ paths:
       summary: This endpoint retrieves a summary of participant applications (excludes
         contractor onboarding, invoices, and support requests). Returns lightweight
         application data with only essential fields. Filters by submission date, screened-in
-        date, and/or status. Pagination is optional - omit page parameter to retrieve
-        all results.
+        date, and/or status. Results are paginated; use page and per_page to page
+        through all results.
       tags:
       - Applications
       parameters:
@@ -1025,8 +1026,8 @@ paths:
           type: integer
           default: 1
           minimum: 1
-        description: Page number (optional). Omit to retrieve all results without
-          pagination.
+        description: Page number (default 1). Responses are paginated; page through
+          all results using page and per_page.
         required: false
       - name: per_page
         in: query

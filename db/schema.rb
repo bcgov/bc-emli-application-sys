@@ -416,8 +416,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_170000) do
     t.uuid "program_id"
     t.string "reference_number"
     t.datetime "revisions_requested_at", precision: nil
-    t.datetime "screened_in_at"
-    t.boolean "first_nations", default: false
     t.uuid "sandbox_id"
     t.datetime "screened_in_at"
     t.datetime "signed_off_at"
@@ -429,7 +427,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_170000) do
     t.datetime "submitted_at"
     t.string "submitted_for"
     t.uuid "submitter_id", null: false
-    t.uuid "submission_variant_id"
     t.index ["activity_id"], name: "index_permit_applications_on_activity_id"
     t.index ["audience_type_id"],
             name: "index_permit_applications_on_audience_type_id"
