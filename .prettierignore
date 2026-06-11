@@ -1,0 +1,2 @@
+# Helm templates - YAML formatter conflicts with template syntax
+helm/

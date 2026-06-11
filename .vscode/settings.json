@@ -19,15 +19,9 @@
       "rails": true
     }
   },
-  "yaml.validate": true,
-  "yaml.schemas": {
-    "kubernetes": "helm/**"
-  },
-  "yaml.customTags": [
-    "!*",
-    "tag:yaml.org,2002:js/undefined",
-    "tag:yaml.org,2002:map",
-    "tag:yaml.org,2002:seq"
-  ],
+  "yaml.validate": false,
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false
+  }
 }
-

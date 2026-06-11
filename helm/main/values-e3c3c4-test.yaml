@@ -675,7 +675,7 @@ sharedConfig:
 s3KeyRotation:
   enabled: true
   schedule: '0 */2 * * *'
-  syncPgbackrestSecret: false
+  syncPgbackrestSecret: true
   parameterStorePath: '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
 
 # ============================================================================
