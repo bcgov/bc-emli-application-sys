@@ -135,11 +135,11 @@ class PermitApplication < ApplicationRecord
   }.freeze
 
   searchkick word_middle: %i[
-               number
                permit_classifications
                submitter_name
                review_delegatee_name
-             ]
+             ],
+             text_middle: %i[number]
 
   # belongs_to :submitter, class_name: "User"
   belongs_to :submitter, polymorphic: true

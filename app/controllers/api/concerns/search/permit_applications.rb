@@ -7,11 +7,11 @@ module Api::Concerns::Search::PermitApplications
     @permit_application_search =
       PermitApplication.search(
         params[:query].presence || "*",
-        fields: %i[
-          number
-          permit_classifications
-          submitter_name
-          review_delegatee_name
+        fields: [
+          { number: :text_middle },
+          :permit_classifications,
+          :submitter_name,
+          :review_delegatee_name
         ],
         match: :word_middle,
         misspellings: false,
