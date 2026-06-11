@@ -52,14 +52,85 @@ RSpec.describe "external_api/v1/applications",
                         "Optional filters to narrow the search results.",
                       properties: {
                         status: {
-                          type: :string,
+                          type: :array,
+                          items: {
+                            type: :string,
+                            enum: PermitApplication.statuses.keys
+                          },
                           description:
-                            "Filter by application status. Defaults to in_review when omitted."
+                            "Filter by application status. Omit to return applications of ALL statuses. Accepts a single status code or an array of codes (e.g. \"in_review\" or [\"in_review\", \"resubmitted\"]).",
+                          example: PermitApplication.statuses.keys
                         },
                         permit_classifications: {
                           type: :string,
                           description:
-                            "Filter by permit classification keywords."
+                            "Filter by permit classification keywords (composite free-text match across the classification dimensions). Unchanged for backward compatibility."
+                        },
+                        user_group_type: {
+                          type: :array,
+                          items: {
+                            type: :string,
+                            enum: %w[participant contractor]
+                          },
+                          description:
+                            "Filter by user group; excludes other groups. Provide as an array of codes. Codes: participant, contractor. e.g. {\"user_group_type\":[\"participant\"]} returns all participant applications (internal + external) and excludes contractors.",
+                          example: %w[participant contractor]
+                        },
+                        submission_type: {
+                          type: :array,
+                          items: {
+                            type: :string,
+                            enum: %w[
+                              application
+                              onboarding
+                              support_request
+                              invoice
+                            ]
+                          },
+                          description:
+                            "Filter by application type. Provide as an array of codes. Codes: application, onboarding, support_request, invoice.",
+                          example: %w[
+                            application
+                            onboarding
+                            support_request
+                            invoice
+                          ]
+                        },
+                        audience_type: {
+                          type: :array,
+                          items: {
+                            type: :string,
+                            enum: %w[internal external]
+                          },
+                          description:
+                            "Filter by visibility context. Provide as an array of codes. Codes: internal, external.",
+                          example: %w[internal external]
+                        },
+                        submission_variant: {
+                          type: :array,
+                          items: {
+                            type: :string,
+                            enum: %w[
+                              invoice_heat_pump_space
+                              invoice_heat_pump_water
+                              invoice_insulation
+                              invoice_windows_doors
+                              invoice_ventilation
+                              invoice_electrical_upgrade
+                              invoice_health_safety
+                            ]
+                          },
+                          description:
+                            "Filter by invoice subtype (only applicable to invoices). Provide as an array of codes. Codes: invoice_heat_pump_space, invoice_heat_pump_water, invoice_insulation, invoice_windows_doors, invoice_ventilation, invoice_electrical_upgrade, invoice_health_safety.",
+                          example: %w[
+                            invoice_heat_pump_space
+                            invoice_heat_pump_water
+                            invoice_insulation
+                            invoice_windows_doors
+                            invoice_ventilation
+                            invoice_electrical_upgrade
+                            invoice_health_safety
+                          ]
                         },
                         submitted_at: {
                           "$ref" => "#/components/schemas/DateRangeFilter"
@@ -68,6 +139,9 @@ RSpec.describe "external_api/v1/applications",
                           "$ref" => "#/components/schemas/DateRangeFilter"
                         },
                         screened_in_at: {
+                          "$ref" => "#/components/schemas/DateRangeFilter"
+                        },
+                        updated_at: {
                           "$ref" => "#/components/schemas/DateRangeFilter"
                         }
                       }
@@ -326,7 +400,7 @@ RSpec.describe "external_api/v1/applications",
                   format: :date
                 },
                 description:
-                  "Filter applications submitted on or after this date (YYYY-MM-DD)",
+                  "Filter applications submitted on or after this date. YYYY-MM-DD, interpreted as a program-local Pacific (PST/PDT) calendar day; inclusive from the start of that day.",
                 required: false
 
       parameter name: :submitted_to,
@@ -336,7 +410,7 @@ RSpec.describe "external_api/v1/applications",
                   format: :date
                 },
                 description:
-                  "Filter applications submitted on or before this date (YYYY-MM-DD)",
+                  "Filter applications submitted on or before this date. YYYY-MM-DD, interpreted as a program-local Pacific (PST/PDT) calendar day; inclusive through the end of that day.",
                 required: false
 
       parameter name: :screened_in_from,
@@ -346,7 +420,7 @@ RSpec.describe "external_api/v1/applications",
                   format: :date
                 },
                 description:
-                  "Filter applications screened in on or after this date (YYYY-MM-DD)",
+                  "Filter applications screened in on or after this date. YYYY-MM-DD, interpreted as a program-local Pacific (PST/PDT) calendar day; inclusive from the start of that day.",
                 required: false
 
       parameter name: :screened_in_to,
@@ -356,16 +430,43 @@ RSpec.describe "external_api/v1/applications",
                   format: :date
                 },
                 description:
-                  "Filter applications screened in on or before this date (YYYY-MM-DD)",
+                  "Filter applications screened in on or before this date. YYYY-MM-DD, interpreted as a program-local Pacific (PST/PDT) calendar day; inclusive through the end of that day.",
+                required: false
+
+      parameter name: :updated_from,
+                in: :query,
+                schema: {
+                  type: :string,
+                  format: :date
+                },
+                description:
+                  "Filter applications last updated on or after this date. YYYY-MM-DD, interpreted as a program-local Pacific (PST/PDT) calendar day; inclusive from the start of that day.",
+                required: false
+
+      parameter name: :updated_to,
+                in: :query,
+                schema: {
+                  type: :string,
+                  format: :date
+                },
+                description:
+                  "Filter applications last updated on or before this date. YYYY-MM-DD, interpreted as a program-local Pacific (PST/PDT) calendar day; inclusive through the end of that day.",
                 required: false
 
       parameter name: :status,
                 in: :query,
                 schema: {
-                  type: :string
+                  type: :array,
+                  items: {
+                    type: :string,
+                    enum: PermitApplication.statuses.keys
+                  }
                 },
+                style: :form,
+                explode: false,
                 description:
-                  "Filter applications by status. Omit to return all applications except new_draft.",
+                  "Filter applications by status. Omit to return all applications except new_draft. Accepts a single code (?status=in_review) or a comma-separated list (?status=in_review,resubmitted).",
+                example: PermitApplication.statuses.keys,
                 required: false
 
       parameter name: :page,

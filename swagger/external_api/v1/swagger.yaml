@@ -874,17 +874,115 @@ paths:
                   description: Optional filters to narrow the search results.
                   properties:
                     status:
-                      type: string
-                      description: Filter by application status. Defaults to in_review
-                        when omitted.
+                      type: array
+                      items:
+                        type: string
+                        enum:
+                        - new_draft
+                        - newly_submitted
+                        - revisions_requested
+                        - resubmitted
+                        - in_review
+                        - update_needed
+                        - approved
+                        - ineligible
+                        - training_pending
+                        - approved_pending
+                        - approved_paid
+                      description: Filter by application status. Omit to return applications
+                        of ALL statuses. Accepts a single status code or an array
+                        of codes (e.g. "in_review" or ["in_review", "resubmitted"]).
+                      example:
+                      - new_draft
+                      - newly_submitted
+                      - revisions_requested
+                      - resubmitted
+                      - in_review
+                      - update_needed
+                      - approved
+                      - ineligible
+                      - training_pending
+                      - approved_pending
+                      - approved_paid
                     permit_classifications:
                       type: string
-                      description: Filter by permit classification keywords.
+                      description: Filter by permit classification keywords (composite
+                        free-text match across the classification dimensions). Unchanged
+                        for backward compatibility.
+                    user_group_type:
+                      type: array
+                      items:
+                        type: string
+                        enum:
+                        - participant
+                        - contractor
+                      description: 'Filter by user group; excludes other groups. Provide
+                        as an array of codes. Codes: participant, contractor. e.g.
+                        {"user_group_type":["participant"]} returns all participant
+                        applications (internal + external) and excludes contractors.'
+                      example:
+                      - participant
+                      - contractor
+                    submission_type:
+                      type: array
+                      items:
+                        type: string
+                        enum:
+                        - application
+                        - onboarding
+                        - support_request
+                        - invoice
+                      description: 'Filter by application type. Provide as an array
+                        of codes. Codes: application, onboarding, support_request,
+                        invoice.'
+                      example:
+                      - application
+                      - onboarding
+                      - support_request
+                      - invoice
+                    audience_type:
+                      type: array
+                      items:
+                        type: string
+                        enum:
+                        - internal
+                        - external
+                      description: 'Filter by visibility context. Provide as an array
+                        of codes. Codes: internal, external.'
+                      example:
+                      - internal
+                      - external
+                    submission_variant:
+                      type: array
+                      items:
+                        type: string
+                        enum:
+                        - invoice_heat_pump_space
+                        - invoice_heat_pump_water
+                        - invoice_insulation
+                        - invoice_windows_doors
+                        - invoice_ventilation
+                        - invoice_electrical_upgrade
+                        - invoice_health_safety
+                      description: 'Filter by invoice subtype (only applicable to
+                        invoices). Provide as an array of codes. Codes: invoice_heat_pump_space,
+                        invoice_heat_pump_water, invoice_insulation, invoice_windows_doors,
+                        invoice_ventilation, invoice_electrical_upgrade, invoice_health_safety.'
+                      example:
+                      - invoice_heat_pump_space
+                      - invoice_heat_pump_water
+                      - invoice_insulation
+                      - invoice_windows_doors
+                      - invoice_ventilation
+                      - invoice_electrical_upgrade
+                      - invoice_health_safety
                     submitted_at:
                       "$ref": "#/components/schemas/DateRangeFilter"
                     resubmitted_at:
                       "$ref": "#/components/schemas/DateRangeFilter"
                     screened_in_at:
+                      "$ref": "#/components/schemas/DateRangeFilter"
+                    updated_at:
                       "$ref": "#/components/schemas/DateRangeFilter"
                 sort:
                   type: object
@@ -987,35 +1085,90 @@ paths:
         schema:
           type: string
           format: date
-        description: Filter applications submitted on or after this date (YYYY-MM-DD)
+        description: Filter applications submitted on or after this date. YYYY-MM-DD,
+          interpreted as a program-local Pacific (PST/PDT) calendar day; inclusive
+          from the start of that day.
         required: false
       - name: submitted_to
         in: query
         schema:
           type: string
           format: date
-        description: Filter applications submitted on or before this date (YYYY-MM-DD)
+        description: Filter applications submitted on or before this date. YYYY-MM-DD,
+          interpreted as a program-local Pacific (PST/PDT) calendar day; inclusive
+          through the end of that day.
         required: false
       - name: screened_in_from
         in: query
         schema:
           type: string
           format: date
-        description: Filter applications screened in on or after this date (YYYY-MM-DD)
+        description: Filter applications screened in on or after this date. YYYY-MM-DD,
+          interpreted as a program-local Pacific (PST/PDT) calendar day; inclusive
+          from the start of that day.
         required: false
       - name: screened_in_to
         in: query
         schema:
           type: string
           format: date
-        description: Filter applications screened in on or before this date (YYYY-MM-DD)
+        description: Filter applications screened in on or before this date. YYYY-MM-DD,
+          interpreted as a program-local Pacific (PST/PDT) calendar day; inclusive
+          through the end of that day.
+        required: false
+      - name: updated_from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Filter applications last updated on or after this date. YYYY-MM-DD,
+          interpreted as a program-local Pacific (PST/PDT) calendar day; inclusive
+          from the start of that day.
+        required: false
+      - name: updated_to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Filter applications last updated on or before this date. YYYY-MM-DD,
+          interpreted as a program-local Pacific (PST/PDT) calendar day; inclusive
+          through the end of that day.
         required: false
       - name: status
         in: query
         schema:
-          type: string
+          type: array
+          items:
+            type: string
+            enum:
+            - new_draft
+            - newly_submitted
+            - revisions_requested
+            - resubmitted
+            - in_review
+            - update_needed
+            - approved
+            - ineligible
+            - training_pending
+            - approved_pending
+            - approved_paid
+        style: form
+        explode: false
         description: Filter applications by status. Omit to return all applications
-          except new_draft.
+          except new_draft. Accepts a single code (?status=in_review) or a comma-separated
+          list (?status=in_review,resubmitted).
+        example:
+        - new_draft
+        - newly_submitted
+        - revisions_requested
+        - resubmitted
+        - in_review
+        - update_needed
+        - approved
+        - ineligible
+        - training_pending
+        - approved_pending
+        - approved_paid
         required: false
       - name: page
         in: query
@@ -1861,7 +2014,12 @@ components:
               description: Business categories.
     DateRangeFilter:
       type: object
-      description: A date range filter using Unix timestamps in milliseconds.
+      description: A date range filter using absolute Unix timestamps in milliseconds
+        (a UTC-based instant, NOT a calendar date and NOT timezone-adjusted). Pass
+        an integer epoch-ms value. To filter on a program-local (Pacific) calendar
+        day, send the epoch-ms of local midnight for that day — e.g. the start of
+        2026-02-17 Pacific, not the bare date. (This differs from the /applications/summary
+        date filters, which take Pacific-local YYYY-MM-DD calendar dates.)
       properties:
         gt:
           type: number

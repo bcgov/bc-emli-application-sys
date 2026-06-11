@@ -52,6 +52,57 @@ class ExternalApi::ApplicationController < ActionController::API
     nil
   end
 
+  # Validate a single Unix-epoch-milliseconds value (the documented /search date
+  # format). Returns the integer ms on success, nil for blank, or renders a 400 +
+  # returns nil for a non-integer value (otherwise a bad value reaches
+  # Elasticsearch and raises an unhandled 500).
+  def validate_unix_ms_param(value, param_name)
+    return nil if value.blank?
+    unless value.to_s.match?(/\A-?\d+\z/)
+      render json: {
+               error:
+                 "Invalid timestamp for #{param_name}. Use Unix epoch milliseconds (integer)."
+             },
+             status: :bad_request
+      return nil
+    end
+    value.to_i
+  end
+
+  # Validate every operator value in a date-range constraint ({gte:, lte:, ...}).
+  # Returns a hash of validated ms values, or renders a 400 + returns nil.
+  def validate_unix_ms_range(range, field)
+    range.each_with_object({}) do |(op, value), out|
+      ms = validate_unix_ms_param(value, "#{field}.#{op}")
+      return nil if performed?
+      out[op] = ms unless ms.nil?
+    end
+  end
+
+  # Translate classification codes -> ids for `klass` (an STI PermitClassification
+  # subclass: UserGroupType / SubmissionType / AudienceType / SubmissionVariant).
+  # Returns [] for blank input, an array of ids on success, or renders a 400 +
+  # returns nil if any code is unknown OR doesn't belong to that dimension.
+  # (`code` is one shared enum on PermitClassification, so an unknown value would
+  # raise ArgumentError on a where(code:) — we filter to known enum keys first, and
+  # a count mismatch catches both unknown and wrong-dimension codes.)
+  def classification_ids_for(klass, codes, param_name)
+    codes = Array.wrap(codes).compact_blank.map(&:to_s)
+    return [] if codes.empty?
+
+    known = codes & PermitClassification.codes.keys
+    records = known.size == codes.size ? klass.where(code: known) : klass.none
+    if records.size != codes.size
+      bad = codes - records.map(&:code)
+      render json: {
+               error: "Invalid #{param_name}: #{bad.join(", ")}"
+             },
+             status: :bad_request
+      return nil
+    end
+    records.map(&:id)
+  end
+
   def apply_search_authorization(results, policy_action = action_name)
     results.select do |result|
       policy([:external_api, result]).send("#{policy_action}?".to_sym)

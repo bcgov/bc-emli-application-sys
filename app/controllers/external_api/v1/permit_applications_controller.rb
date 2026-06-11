@@ -93,6 +93,8 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
         :submitted_to,
         :screened_in_from,
         :screened_in_to,
+        :updated_from,
+        :updated_to,
         :status,
         :page,
         :per_page
@@ -104,16 +106,22 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
       validate_date_param(permitted[:screened_in_from], :screened_in_from)
     screened_in_to =
       validate_date_param(permitted[:screened_in_to], :screened_in_to)
+    updated_from = validate_date_param(permitted[:updated_from], :updated_from)
+    updated_to = validate_date_param(permitted[:updated_to], :updated_to)
     return if performed?
 
-    if permitted[:status].present? &&
-         !PermitApplication.statuses.key?(permitted[:status])
+    # Accept a single status code or a comma-separated list
+    # (?status=in_review or ?status=in_review,resubmitted), matching the
+    # codebase's comma-separated multi-value query convention (see visibility).
+    statuses = permitted[:status].to_s.split(",").map(&:strip).reject(&:blank?)
+    invalid_statuses = statuses - PermitApplication.statuses.keys
+    if invalid_statuses.any?
       render_error(
         nil,
         {
           status: 400,
           meta: {
-            message: "Invalid status: #{permitted[:status]}"
+            message: "Invalid status: #{invalid_statuses.join(", ")}"
           }
         }
       )
@@ -131,8 +139,8 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
         .order(submitted_at: :desc)
 
     scope =
-      if permitted[:status].present?
-        scope.where(status: permitted[:status])
+      if statuses.any?
+        scope.where(status: statuses)
       else
         scope.where.not(status: :new_draft)
       end
@@ -157,6 +165,16 @@ class ExternalApi::V1::PermitApplicationsController < ExternalApi::ApplicationCo
         "screened_in_at <= ?",
         screened_in_to.in_time_zone.end_of_day
       ) if screened_in_to.present?
+    scope =
+      scope.where(
+        "updated_at >= ?",
+        updated_from.in_time_zone.beginning_of_day
+      ) if updated_from.present?
+    scope =
+      scope.where(
+        "updated_at <= ?",
+        updated_to.in_time_zone.end_of_day
+      ) if updated_to.present?
 
     page = normalized_page(permitted[:page])
     per_page = normalized_per_page(permitted[:per_page])
