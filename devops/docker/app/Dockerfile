@@ -20,9 +20,13 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists/*
 
 # Use jemalloc to improve memory management
+# YJIT exec-mem-size: cap native code cache per process (default 128MB is too large for 1.5Gi pods).
+# 32MB is sufficient for a Rails app's hot paths; trade-off is slightly less JIT coverage.
+# narenas:2 limits jemalloc arena count (default = ncpus, which wastes memory on multi-core nodes).
 ENV LD_PRELOAD="libjemalloc.so.2" \
     MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
-    RUBY_YJIT_ENABLE="1"
+    RUBY_YJIT_ENABLE="1" \
+    RUBYOPT="--yjit-exec-mem-size=32 --yjit-code-gc"
 
 # Install Node.js
 ARG NODE_VERSION=24.15.0
@@ -30,6 +34,8 @@ RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz
     cd /tmp/node-build-master && ./install.sh && \
     /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
     rm -rf /tmp/node-build-master
+
+RUN npm install -g npm@11.16.0
 
 # Install Ruby gems
 COPY Gemfile Gemfile.lock ./
