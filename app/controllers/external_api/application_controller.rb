@@ -87,7 +87,7 @@ class ExternalApi::ApplicationController < ActionController::API
   # raise ArgumentError on a where(code:) — we filter to known enum keys first, and
   # a count mismatch catches both unknown and wrong-dimension codes.)
   def classification_ids_for(klass, codes, param_name)
-    codes = Array.wrap(codes).compact_blank.map(&:to_s)
+    codes = Array.wrap(codes).compact_blank.map(&:to_s).uniq
     return [] if codes.empty?
 
     known = codes & PermitClassification.codes.keys

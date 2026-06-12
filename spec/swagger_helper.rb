@@ -622,23 +622,23 @@ in this document.
               "A date range filter using absolute Unix timestamps in milliseconds (a UTC-based instant, NOT a calendar date and NOT timezone-adjusted). Pass an integer epoch-ms value. To filter on a program-local (Pacific) calendar day, send the epoch-ms of local midnight for that day — e.g. the start of 2026-02-17 Pacific, not the bare date. (This differs from the /applications/summary date filters, which take Pacific-local YYYY-MM-DD calendar dates.)",
             properties: {
               gt: {
-                type: :number,
+                type: :integer,
                 format: :int64,
                 description: "Greater than (exclusive lower bound), Unix ms."
               },
               gte: {
-                type: :number,
+                type: :integer,
                 format: :int64,
                 description:
                   "Greater than or equal (inclusive lower bound), Unix ms."
               },
               lt: {
-                type: :number,
+                type: :integer,
                 format: :int64,
                 description: "Less than (exclusive upper bound), Unix ms."
               },
               lte: {
-                type: :number,
+                type: :integer,
                 format: :int64,
                 description:
                   "Less than or equal (inclusive upper bound), Unix ms."

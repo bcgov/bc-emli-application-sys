@@ -2022,19 +2022,19 @@ components:
         date filters, which take Pacific-local YYYY-MM-DD calendar dates.)
       properties:
         gt:
-          type: number
+          type: integer
           format: int64
           description: Greater than (exclusive lower bound), Unix ms.
         gte:
-          type: number
+          type: integer
           format: int64
           description: Greater than or equal (inclusive lower bound), Unix ms.
         lt:
-          type: number
+          type: integer
           format: int64
           description: Less than (exclusive upper bound), Unix ms.
         lte:
-          type: number
+          type: integer
           format: int64
           description: Less than or equal (inclusive upper bound), Unix ms.
     ResponseError:
