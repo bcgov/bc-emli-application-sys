@@ -71,8 +71,31 @@ export const EULAScreen = observer(function EULAScreen({ withClose }: { withClos
         <Suspense fallback={<LoadingScreen />}>
           {eula && (
             <>
-              <Box maxW="4xl" overflow="hidden" sx={{ '.quill': { height: '100%', overflow: 'auto' } }}>
-                <Editor value={eula.content} readOnly={true} modules={{ toolbar: false }} />
+              <Box
+                maxW="4xl"
+                w="full"
+                overflow="hidden"
+                sx={{
+                  '.quill': { height: '100%', overflow: 'auto' },
+                  '.quill .ql-container': {
+                    border: '1px solid',
+                    borderColor: 'border.light',
+                    borderRadius: '6px',
+                    fontFamily: 'BC Sans',
+                    fontSize: '16px',
+                    lineHeight: '27px',
+                    color: '#2D2D2D',
+                  },
+                  '.quill .ql-editor': {
+                    fontFamily: 'BC Sans',
+                    fontSize: '16px',
+                    lineHeight: '27px',
+                    color: '#2D2D2D',
+                    padding: '1rem',
+                  },
+                }}
+              >
+                <Editor htmlValue={eula.content} readonly modules={{ toolbar: false }} />
               </Box>
               {(userStore.currentUser && !userStore.currentUser.eulaAccepted) || !userStore.currentUser ? (
                 <form onSubmit={handleSubmit(onSubmit)} style={{ flex: 0, flexBasis: 'auto' }}>

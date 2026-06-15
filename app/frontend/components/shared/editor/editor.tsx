@@ -1,102 +1,120 @@
-import debounce from "lodash/debounce"
-import { observer } from "mobx-react-lite"
-import React, { useEffect, useMemo, useRef } from "react"
-import ReactQuill, { Quill, ReactQuillProps } from "react-quill"
+import debounce from 'lodash/debounce';
+import { observer } from 'mobx-react-lite';
+import Quill from 'quill';
+import React, { useEffect, useMemo, useRef } from 'react';
 // importing Quill CSS directly from NPM package doesn't work with Vite
 // instead, we import from this CSS file which imports the CSS from the CDN URL
 // this URL is specific to the current quill versions and should be updated accordingly
-import { isQuillEmpty } from "../../../utils/utility-functions"
-import { CustomImageBlot } from "./custom-extensions/image-blot"
-import { CustomLinkBlot } from "./custom-extensions/link-blot"
-import ImageUploader from "./custom-extensions/quill-image-uploader/imageUploader.js"
-import "./quill.css"
+import { isQuillEmpty } from '../../../utils/utility-functions';
+import { CustomImageBlot } from './custom-extensions/image-blot';
+import { CustomLinkBlot } from './custom-extensions/link-blot';
+import ImageUploader from './custom-extensions/quill-image-uploader/imageUploader.js';
+import './quill.css';
 
-Quill.register(CustomImageBlot)
-Quill.register(CustomLinkBlot)
-Quill.register("modules/imageUploader", ImageUploader)
+Quill.register(CustomImageBlot);
+Quill.register(CustomLinkBlot);
+Quill.register('modules/imageUploader', ImageUploader);
 
 // from https://stackoverflow.com/questions/11300906/check-if-a-string-starts-with-http-using-javascript
-export const getValidUrl = (url = "") => {
-  let newUrl = window.decodeURIComponent(url)
-  newUrl = newUrl?.trim()?.replace(/\s/g, "")
+export const getValidUrl = (url = '') => {
+  let newUrl = window.decodeURIComponent(url);
+  newUrl = newUrl?.trim()?.replace(/\s/g, '');
 
   if (/^(:\/\/)/.test(newUrl)) {
-    return `https${newUrl}`
+    return `https${newUrl}`;
   }
   if (!/^(f|ht)tps?:\/\//i.test(newUrl)) {
-    return `https://${newUrl}`
+    return `https://${newUrl}`;
   }
 
-  return newUrl
-}
+  return newUrl;
+};
 
 type TToolbarItemName =
-  | "bold"
-  | "italic"
-  | "underline"
-  | "strike"
-  | "header"
-  | "blockquote"
-  | "code-block"
-  | "link"
-  | "image"
-  | "list"
+  | 'bold'
+  | 'italic'
+  | 'underline'
+  | 'strike'
+  | 'header'
+  | 'blockquote'
+  | 'code-block'
+  | 'link'
+  | 'image'
+  | 'list';
 
-export interface IEditorProps extends Partial<ReactQuillProps> {
-  richText?: boolean
-  readonly?: boolean
-  placeholder?: string
-  onChange?: (htmlValue: string) => void
-  htmlValue?: string
-  autoFocus?: boolean
+export interface IEditorProps {
+  richText?: boolean;
+  readonly?: boolean;
+  readOnly?: boolean;
+  placeholder?: string;
+  onChange?: (htmlValue: string) => void;
+  htmlValue?: string;
+  value?: string;
+  modules?: Record<string, unknown>;
+  className?: string;
+  id?: string;
+  style?: React.CSSProperties;
+  autoFocus?: boolean;
   shouldContainRichTextToolbarItem?: (
-    item: TToolbarItemName | string | { [key: TToolbarItemName | string]: any }
-  ) => boolean
+    item: TToolbarItemName | string | { [key: TToolbarItemName | string]: any },
+  ) => boolean;
 }
 
 export const Editor = observer(
   ({
     richText = true,
     readonly,
+    readOnly,
     placeholder,
     onChange,
-    htmlValue = "",
+    htmlValue = '',
+    value,
+    modules: modulesOverride,
+    className,
+    id,
+    style,
     autoFocus = false,
     shouldContainRichTextToolbarItem = () => true,
-    ...rest
   }: IEditorProps) => {
-    const editorRef = useRef<ReactQuill>()
+    const editorRef = useRef<Quill | null>(null);
+    const editorContainerRef = useRef<HTMLDivElement | null>(null);
 
-    // the types from react quill are not being imported properly so using any. Supposedly fixed in v2.00 beta
-    const handleChange = (content: string, delta: any, source: any, editor: any) => {
-      onChange?.(isQuillEmpty(content) ? "" : content)
-    }
+    const initialHtml = value ?? htmlValue ?? '';
+    const isReadOnly = readOnly ?? readonly ?? false;
+
+    const handleChange = useMemo(
+      () =>
+        debounce((content: string) => {
+          onChange?.(isQuillEmpty(content) ? '' : content);
+        }, 500),
+      [onChange],
+    );
 
     // This modules cannot be reactive
     // using use memo so that values don't change after initial render
-    const modules = useMemo(
+    const defaultModules = useMemo(
       () => ({
         toolbar: richText
           ? {
               container: [
-                ["bold", "italic", "underline", { list: "bullet" }, { list: "ordered" }, "link"], // TODO: image neeeds to be added when object storage is implemented
+                ['bold', 'italic', 'underline', { list: 'bullet' }, { list: 'ordered' }, 'link'], // TODO: image neeeds to be added when object storage is implemented
               ]
                 .map((toolbarRow) => toolbarRow.filter((item) => shouldContainRichTextToolbarItem(item)))
                 .filter((toolbarRow) => toolbarRow.length > 0),
               handlers: {
                 link: function (value) {
-                  let href = prompt("Enter the URL of the link:")
+                  const href = prompt('Enter the URL of the link:');
                   if (value && href) {
-                    const validUrl = getValidUrl(href)
-                    const editor = this?.quill
-                    const selectionRange = editor?.getSelection()
+                    const validUrl = getValidUrl(href);
+                    const editor = this?.quill;
+                    const selectionRange = editor?.getSelection();
                     if (selectionRange?.length === 0) {
-                      editor?.insertText(editor?.getSelection()?.index, href, "link", { href: validUrl })
+                      editor?.insertText(editor?.getSelection()?.index, href, 'link', { href: validUrl });
                     } else {
-                      this.quill.format("link", { href: validUrl })
+                      this.quill.format('link', { href: validUrl });
                     }
                   } else {
-                    this.quill.format("link", false)
+                    this.quill.format('link', false);
                   }
                 },
               },
@@ -154,30 +172,95 @@ export const Editor = observer(
         //     }
         //   : {}),
       }),
-      []
-    )
+      [richText, shouldContainRichTextToolbarItem],
+    );
 
-    const debouncedHandleChangeEditor = debounce(handleChange, 500)
+    const modules = useMemo(() => {
+      if (!modulesOverride) {
+        return defaultModules;
+      }
+
+      return {
+        ...defaultModules,
+        ...modulesOverride,
+      };
+    }, [defaultModules, modulesOverride]);
 
     useEffect(() => {
-      if (autoFocus) {
-        const editor = editorRef?.current?.getEditor()
-        editor?.focus?.()
+      const container = editorContainerRef.current;
+      if (!container || editorRef.current) {
+        return;
       }
-    }, [autoFocus])
 
-    return (
-      <ReactQuill
-        ref={editorRef}
-        theme={!readonly && richText ? "snow" : "bubble"}
-        defaultValue={htmlValue}
-        readOnly={readonly}
-        value={htmlValue}
-        onChange={debouncedHandleChangeEditor}
-        modules={modules}
-        placeholder={placeholder}
-        {...rest}
-      />
-    )
-  }
-)
+      const editorNode = container.ownerDocument.createElement('div');
+      container.appendChild(editorNode);
+
+      const quill = new Quill(editorNode, {
+        theme: !isReadOnly && richText ? 'snow' : 'bubble',
+        modules,
+        readOnly: isReadOnly,
+        placeholder,
+      });
+
+      editorRef.current = quill;
+
+      if (initialHtml) {
+        quill.clipboard.dangerouslyPasteHTML(initialHtml);
+      }
+
+      const onTextChange = (_delta: unknown, _oldDelta: unknown, source: string) => {
+        if (source !== 'user') {
+          return;
+        }
+
+        handleChange(quill.root.innerHTML);
+      };
+
+      quill.on('text-change', onTextChange);
+
+      if (autoFocus) {
+        quill.focus();
+      }
+
+      return () => {
+        handleChange.cancel();
+        quill.off('text-change', onTextChange);
+        editorRef.current = null;
+        container.innerHTML = '';
+      };
+    }, [autoFocus, handleChange, initialHtml, isReadOnly, modules, placeholder, richText]);
+
+    useEffect(() => {
+      return () => {
+        handleChange.cancel();
+      };
+    }, [handleChange]);
+
+    useEffect(() => {
+      const quill = editorRef.current;
+      if (!quill) {
+        return;
+      }
+
+      quill.enable(!isReadOnly);
+    }, [isReadOnly]);
+
+    useEffect(() => {
+      const quill = editorRef.current;
+      if (!quill) {
+        return;
+      }
+
+      const nextHtml = value ?? htmlValue ?? '';
+      const currentHtml = quill.root.innerHTML;
+
+      if (nextHtml !== currentHtml) {
+        quill.clipboard.dangerouslyPasteHTML(nextHtml);
+      }
+    }, [htmlValue, value]);
+
+    const containerClassName = ['quill', className].filter(Boolean).join(' ');
+
+    return <div id={id} className={containerClassName} style={style} ref={editorContainerRef} />;
+  },
+);
