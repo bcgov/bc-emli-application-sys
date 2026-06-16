@@ -78,7 +78,8 @@ export const Editor = observer(
   }: IEditorProps) => {
     const editorRef = useRef<Quill | null>(null);
     const editorContainerRef = useRef<HTMLDivElement | null>(null);
-
+    const wasReadOnlyRef = useRef<boolean>(false);
+    const isFirstRenderRef = useRef<boolean>(true);
     const initialHtml = value ?? htmlValue ?? '';
     const isReadOnly = readOnly ?? readonly ?? false;
 
@@ -191,7 +192,10 @@ export const Editor = observer(
       if (!container || editorRef.current) {
         return;
       }
-
+      if (!isFirstRenderRef.current) {
+        return;
+      }
+      isFirstRenderRef.current = false;
       const editorNode = container.ownerDocument.createElement('div');
       container.appendChild(editorNode);
 
@@ -222,13 +226,16 @@ export const Editor = observer(
         quill.focus();
       }
 
+      // Track initial read-only state
+      wasReadOnlyRef.current = isReadOnly;
+
       return () => {
         handleChange.cancel();
         quill.off('text-change', onTextChange);
         editorRef.current = null;
         container.innerHTML = '';
       };
-    }, [autoFocus, handleChange, initialHtml, isReadOnly, modules, placeholder, richText]);
+    }, []);
 
     useEffect(() => {
       return () => {
@@ -247,17 +254,65 @@ export const Editor = observer(
 
     useEffect(() => {
       const quill = editorRef.current;
+      if (!quill || isReadOnly) {
+        return;
+      }
+
+      // Only sync when transitioning from read-only to edit mode
+      // This allows EditorWithPreview to sync content when switching modes
+      const justSwitchedToEdit = wasReadOnlyRef.current === true;
+
+      if (!justSwitchedToEdit) {
+        return;
+      }
+
+      const nextHtml = htmlValue ?? '';
+      const currentHtml = quill.root.innerHTML;
+
+      if (nextHtml && nextHtml !== currentHtml) {
+        quill.clipboard.dangerouslyPasteHTML(nextHtml);
+      }
+    }, [isReadOnly]);
+
+    // Track mode transitions
+    useEffect(() => {
+      wasReadOnlyRef.current = isReadOnly;
+    }, [isReadOnly]);
+
+    // Separate effect for read-only mode syncing
+    useEffect(() => {
+      const quill = editorRef.current;
+      if (!quill || !isReadOnly) {
+        return;
+      }
+
+      const nextHtml = htmlValue ?? '';
+      const currentHtml = quill.root.innerHTML;
+
+      if (nextHtml && nextHtml !== currentHtml) {
+        quill.clipboard.dangerouslyPasteHTML(nextHtml);
+      }
+    }, [htmlValue, isReadOnly]);
+    // Sync external HTML changes (non-destructive)
+    useEffect(() => {
+      const quill = editorRef.current;
       if (!quill) {
         return;
       }
 
-      const nextHtml = value ?? htmlValue ?? '';
+      const nextHtml = htmlValue ?? '';
       const currentHtml = quill.root.innerHTML;
 
-      if (nextHtml !== currentHtml) {
+      // Only sync in read-only mode or when content is empty
+      // In edit mode with content, user owns the state
+      if (!isReadOnly && currentHtml !== '' && isQuillEmpty(currentHtml) === false) {
+        return;
+      }
+
+      if (nextHtml && nextHtml !== currentHtml) {
         quill.clipboard.dangerouslyPasteHTML(nextHtml);
       }
-    }, [htmlValue, value]);
+    }, [htmlValue, isReadOnly]);
 
     const containerClassName = ['quill', className].filter(Boolean).join(' ');
 

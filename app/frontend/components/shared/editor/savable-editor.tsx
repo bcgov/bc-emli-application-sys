@@ -1,28 +1,32 @@
-import { Box, Button } from "@chakra-ui/react"
-import React, { useState } from "react"
-import ReactQuill from "react-quill"
-import "react-quill/dist/quill.snow.css" // Include the quill.snow.css stylesheet
+import { Box, Button } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; // Include the quill.snow.css stylesheet
 
+/**
+ * @deprecated This component is currently unused and relies on ReactQuill.
+ * Do not use for new development; prefer the native Quill-based Editor component.
+ */
 // Define your component's props and state as needed
 interface IProps {
-  initialValue: string
-  onSave: () => void
+  initialValue: string;
+  onSave: () => void;
   // You can include other props as necessary
 }
 
 const SavableEditor: React.FC<IProps> = ({ initialValue, onSave }) => {
-  const [value, setValue] = useState<string>(initialValue)
-  const [isDirty, setIsDirty] = useState<boolean>(false)
+  const [value, setValue] = useState<string>(initialValue);
+  const [isDirty, setIsDirty] = useState<boolean>(false);
 
   const handleOnChange = (content: string) => {
-    setValue(content)
-    setIsDirty(true) // Mark the editor's content as modified
-  }
+    setValue(content);
+    setIsDirty(true); // Mark the editor's content as modified
+  };
 
   const handleSave = () => {
-    onSave()
-    setIsDirty(false)
-  }
+    onSave();
+    setIsDirty(false);
+  };
 
   return (
     <Box>
@@ -33,5 +37,5 @@ const SavableEditor: React.FC<IProps> = ({ initialValue, onSave }) => {
         </Button>
       )}
     </Box>
-  )
-}
+  );
+};
