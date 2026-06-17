@@ -374,13 +374,32 @@ class PermitHubMailer < ApplicationMailer
   end
 
   def contractor_invite(import)
-    email = import.payload["username"]
+    email = import.email
     Rails.logger.info("Sending contractor invite to #{email}")
     return unless email.present?
 
     @token = import.invite_code
+    @first_name = import.first_name
+    @last_name = import.last_name
+    @business_name = import.business_name
 
     send_user_mail(email: email, template_key: "imported_contractor_invite")
+  end
+
+  def contractor_invite_reminder(import)
+    email = import.email
+    Rails.logger.info("Sending contractor invite reminder to #{email}")
+    return unless email.present?
+
+    @token = import.invite_code
+    @first_name = import.first_name
+    @last_name = import.last_name
+    @business_name = import.business_name
+
+    send_user_mail(
+      email: email,
+      template_key: "imported_contractor_invite_reminder"
+    )
   end
 
   def contractor_invoice_submission(application, user)

@@ -1,9 +1,64 @@
-<p>Hello</p>
+<p>Hello <%= @first_name %> <%= @last_name %>,</p>
 
-<p>You have been registered as a contractor with the Better Homes Energy Savings Program.</p>
+<p>You are getting this email because you are the primary contact for <%= @business_name %>.</p>
 
-<p><a href="<%= @root_url %>welcome/contractor/invite?token=<%= @token %>" target="_blank">Log in to the Contractor Portal with your Business BCeID</a> to get started.</p>
+<p>The new CleanBC Better Homes Energy Savings Program contractor portal is ready!</p>
 
-<%= render 'contractor_contact_line' %>
+<p>Program registered contractors must transfer their accounts to the new portal.  
+<strong>If you do not transfer the account, you cannot submit invoices or get paid.</strong></p>
+
+<p>Transferring the account should take less than 5 minutes.</p>
+
+<p>To make it easier, there is a unique link below that transfers the primary contact and business details. 
+Past submissions are not transferred.</p>
+
+<p>The link will not expire but you should create your account as soon as you can. 
+You can only use the link once to transfer the account. 
+If someone else uses the link after the account is transferred, they will get an error message.</p>
+
+<p><strong>You cannot submit invoices in the old contractor portal after March 10, 2026.</strong></p>
+
+<p>Follow the steps below to transfer your account.</p>
+
+<p style="font-size: 18px; font-weight: bold; border-bottom: 2px solid #333; padding-bottom: 4px; margin-top: 24px; margin-bottom: 8px;">Before you start</p>
+
+<p>You need a <a href="#">Business BCeID</a> account for your company. You cannot log into the new portal with your old login credentials.<br>
+Make sure you know your Business BCeID manager account log in information.</p>
+
+<p style="font-size: 15px; font-weight: bold; margin-top: 16px; margin-bottom: 4px;">Employee portal access</p>
+
+<p>Any employee that submits invoices must use their own Business BCeID user account to log in.</p>
+<ul>
+  <li>You create user accounts for employees from the Business BCeID manager account</li>
+  <li>For step-by-step instructions, use the <a href="#">Business BCeID Account Management Guide</a></li>
+</ul>
+<p>Do not share BCeID accounts between employees.<br>
+For BCeID help <a href="#">contact the Service BC help desk</a></p>
+
+<p style="font-size: 18px; font-weight: bold; border-bottom: 2px solid #333; padding-bottom: 4px; margin-top: 24px; margin-bottom: 8px;">How to transfer your contractor account</p>
+
+<p style="font-size: 15px; font-weight: bold; margin-top: 16px; margin-bottom: 4px;">Step 1 &ndash; Open new portal with the link below and log in</p>
+<ul>
+  <li><a href="#">Open the new contractor portal using this link</a></li>
+  <li>Log in with your Business BCeID account</li>
+</ul>
+
+<p style="font-size: 15px; font-weight: bold; margin-top: 16px; margin-bottom: 4px;">Step 2 &ndash; Accept terms and conditions</p>
+<ul>
+  <li>Review and accept the terms and conditions for using the new portal</li>
+</ul>
+
+<p style="font-size: 15px; font-weight: bold; margin-top: 16px; margin-bottom: 4px;">Step 3 &ndash; Create account and explore the portal</p>
+<ul>
+  <li>Click create account</li>
+  <li>Access the portal and review program resources</li>
+</ul>
+
+<p><strong>The last day you can submit invoices in the old portal is March 10, 2026.</strong></p>
+
+<p><a href="<%= @root_url %>welcome/contractor/invite?token=<%= @token %>" target="_blank">Log in to the new Contractor Portal</a></p>
 
 <p>Thank you,<br>Energy Savings Program Support</p>
+
+<p>Have questions or need help?</p>
+<p>Contact us at <a href="mailto:ESPcontractorsupport@clearesult.com">ESPcontractorsupport@clearesult.com</a></p>
