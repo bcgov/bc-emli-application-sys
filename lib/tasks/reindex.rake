@@ -4,11 +4,14 @@ namespace :search do
   task reindex: :environment do
     puts "Starting reindex..."
 
+    puts "Reindexing PermitApplication (batch_size: 100)..."
+    PermitApplication.searchkick_options[:batch_size] = 100
+    PermitApplication.reindex
+
     [
       Collaborator,
       RequirementTemplate,
       Program,
-      PermitApplication,
       User,
       LiveRequirementTemplate,
       Contractor
