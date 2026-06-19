@@ -597,7 +597,7 @@ export const RequirementForm = observer(
               >
                 <Flex align="center" gap={2}>
                   <Box color="semantic.info">
-                    <Info size={20} aria-label="info icon" />
+                    <Info size={20} aria-hidden={true} />
                   </Box>
                   <Text fontWeight="semibold" fontSize="sm" mb={0}>
                     {t('energySavingsApplication.show.applicationStatusTitle')}

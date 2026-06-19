@@ -48,7 +48,7 @@ export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) 
     alignItems: 'center',
   };
   const linkSx = { ...baseTextSx, textDecoration: 'underline', mb: 2, display: 'block' };
-  const listBoxSx = { as: 'ul', listStyleType: 'disc', pl: 4, color: 'greys.homeScreenGrey' };
+  const listBoxSx = { listStyleType: 'disc', pl: 4, color: 'greys.homeScreenGrey' };
 
   return (
     <>
@@ -146,7 +146,7 @@ export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) 
                       >
                         {t('site.helpDrawer.groundOrientedEmail')}
                       </Link>
-                      <Box sx={{ ...listBoxSx, mb: 6 }}>
+                      <Box as="ul" sx={{ ...listBoxSx, mb: 6 }}>
                         <Text as="li" sx={baseTextSx}>
                           {t('site.helpDrawer.singleFamilyHome')}
                         </Text>
@@ -174,7 +174,7 @@ export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) 
                       >
                         {t('site.helpDrawer.multiUnitEmail')}
                       </Link>
-                      <Box sx={listBoxSx}>
+                      <Box as="ul" sx={listBoxSx}>
                         <Text as="li" sx={baseTextSx}>
                           {t('site.helpDrawer.apartmentCondo')}
                         </Text>
