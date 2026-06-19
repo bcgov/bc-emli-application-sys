@@ -8,9 +8,9 @@ import {
   ECollaboratorType,
   EPermitApplicationStatus,
   EPermitBlockStatus,
+  EPermitClassificationCode,
   ERequirementChangeAction,
   ERequirementType,
-  EPermitClassificationCode,
 } from '../types/enums';
 import {
   ICompareRequirementsBoxData,
@@ -50,15 +50,13 @@ import {
   IUserGroupType,
 } from './permit-classification';
 import { IPermitCollaboration, PermitCollaborationModel } from './permit-collaboration';
+import { IProgram } from './program';
 import { IRequirement } from './requirement';
-import { ISupportRequest, SupportRequestModel } from './support_request';
 import { SandboxModel } from './sandbox';
 import { StepCodeModel } from './step-code';
-import { ProgramModel } from './program';
+import { ISupportRequest } from './support_request';
 import { TemplateVersionModel } from './template-version';
-import { IUser, UserModel } from './user';
-import { ContractorModel } from './contractor';
-import { IProgram } from './program';
+import { IUser } from './user';
 
 export const EnergySavingsApplicationModel = types.snapshotProcessor(
   types
@@ -89,6 +87,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       formattedComplianceData: types.maybeNull(types.frozen()),
       formCustomizations: types.maybeNull(types.frozen<ITemplateCustomization>()),
       submittedAt: types.maybeNull(types.Date),
+      screenedInAt: types.maybeNull(types.Date),
       resubmittedAt: types.maybeNull(types.Date),
       revisionsRequestedAt: types.maybeNull(types.Date),
       selectedTabIndex: types.optional(types.number, 0),

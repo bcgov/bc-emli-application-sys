@@ -32,8 +32,10 @@ export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) 
   const btnRef = useRef<HTMLButtonElement>(null);
 
   const isContractor = userStore.currentUser?.isContractor;
-  const emailKey = isContractor ? 'site.helpDrawer.contractorEmail' : 'site.helpDrawer.emailAddress';
-  const emailHref = `mailto:${t(emailKey)}`;
+
+  const groundOrientedEmailHref = `mailto:${t('site.helpDrawer.groundOrientedEmail')}`;
+  const multiUnitEmailHref = `mailto:${t('site.helpDrawer.multiUnitEmail')}`;
+  const contractorEmailHref = `mailto:${t('site.helpDrawer.contractorEmail')}`;
 
   const baseTextSx = { fontSize: '16px', lineHeight: '27px', color: 'greys.homeScreenGrey' };
   const iconBoxSx = {
@@ -46,6 +48,7 @@ export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) 
     alignItems: 'center',
   };
   const linkSx = { ...baseTextSx, textDecoration: 'underline', mb: 2, display: 'block' };
+  const listBoxSx = { listStyleType: 'disc', pl: 4, color: 'greys.homeScreenGrey' };
 
   return (
     <>
@@ -113,7 +116,7 @@ export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) 
                 </Box>
               </Flex>
 
-              {/* Email Section - Ground-oriented home types */}
+              {/* Email Section */}
               <Flex direction="row" alignItems="flex-start" gap={2}>
                 <Box as="span" sx={iconBoxSx}>
                   <Envelope size={16} color="white" />
@@ -122,15 +125,68 @@ export function HelpDrawer({ defaultButtonProps, renderTriggerButton }: IProps) 
                   <Text fontWeight="bold" sx={baseTextSx} mb={0}>
                     {t('site.helpDrawer.emailTitle')}
                   </Text>
-                  <Link
-                    href={emailHref}
-                    sx={linkSx}
-                    aria-label={
-                      isContractor ? t('site.helpDrawer.contractorEmailAriaLabel') : t('site.support.emailAriaLabel')
-                    }
-                  >
-                    {t(emailKey)}
-                  </Link>
+
+                  {isContractor ? (
+                    <Link
+                      href={contractorEmailHref}
+                      sx={linkSx}
+                      aria-label={t('site.helpDrawer.contractorEmailAriaLabel')}
+                    >
+                      {t('site.helpDrawer.contractorEmail')}
+                    </Link>
+                  ) : (
+                    <>
+                      <Text sx={baseTextSx} mb={0}>
+                        {t('site.helpDrawer.groundOrientedTitle')}
+                      </Text>
+                      <Link
+                        href={groundOrientedEmailHref}
+                        sx={linkSx}
+                        aria-label={t('site.helpDrawer.groundOrientedEmailAriaLabel')}
+                      >
+                        {t('site.helpDrawer.groundOrientedEmail')}
+                      </Link>
+                      <Box as="ul" sx={{ ...listBoxSx, mb: 6 }}>
+                        <Text as="li" sx={baseTextSx}>
+                          {t('site.helpDrawer.singleFamilyHome')}
+                        </Text>
+                        <Text as="li" sx={baseTextSx}>
+                          {t('site.helpDrawer.secondarySuite')}
+                        </Text>
+                        <Text as="li" sx={baseTextSx}>
+                          {t('site.helpDrawer.duplexTriplex')}
+                        </Text>
+                        <Text as="li" sx={baseTextSx}>
+                          {t('site.helpDrawer.rowTownhome')}
+                        </Text>
+                        <Text as="li" sx={baseTextSx}>
+                          {t('site.helpDrawer.manufacturedHome')}
+                        </Text>
+                      </Box>
+
+                      <Text sx={baseTextSx} mt={4} mb={0}>
+                        {t('site.helpDrawer.multiUnitTitle')}
+                      </Text>
+                      <Link
+                        href={multiUnitEmailHref}
+                        sx={linkSx}
+                        aria-label={t('site.helpDrawer.multiUnitEmailAriaLabel')}
+                      >
+                        {t('site.helpDrawer.multiUnitEmail')}
+                      </Link>
+                      <Box as="ul" sx={listBoxSx}>
+                        <Text as="li" sx={baseTextSx}>
+                          {t('site.helpDrawer.apartmentCondo')}
+                        </Text>
+                        <Text as="li" sx={baseTextSx}>
+                          {t('site.helpDrawer.stackedTownhouse')}
+                        </Text>
+                        <Text as="li" sx={baseTextSx}>
+                          {t('site.helpDrawer.multiplexes')}
+                        </Text>
+                      </Box>
+                    </>
+                  )}
                 </Box>
               </Flex>
             </Flex>

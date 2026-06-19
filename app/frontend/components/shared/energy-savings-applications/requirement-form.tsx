@@ -1,4 +1,5 @@
-import { Box, Center, Flex, useDisclosure } from '@chakra-ui/react';
+import { Box, Center, Collapse, Flex, Link, Text, useDisclosure } from '@chakra-ui/react';
+import { CaretDown, CaretUp, Info } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 
 import { format } from 'date-fns';
@@ -8,6 +9,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMountStatus } from '../../../hooks/use-mount-status';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
+import { useMst } from '../../../setup/root';
 import { IErrorsBoxData } from '../../../types/types';
 import { getCompletedBlocksFromForm, getRequirementByKey } from '../../../utils/formio-component-traversal';
 import { singleRequirementFormJson, singleRequirementSubmissionData } from '../../../utils/formio-helpers';
@@ -20,7 +22,6 @@ import { Form, defaultOptions } from '../chefs';
 import { ContactModal } from '../contact/contact-modal';
 import { PreviousSubmissionModal } from '../revisions/previous-submission-modal';
 import { PermitApplicationSubmitModal } from './permit-application-submit-modal';
-import { useMst } from '../../../setup/root';
 
 interface IRequirementFormProps {
   permitApplication?: IEnergySavingsApplication;
@@ -100,6 +101,7 @@ export const RequirementForm = observer(
     };
 
     const { isOpen: isContactsOpen, onOpen: onContactsOpen, onClose: onContactsClose } = useDisclosure();
+    const { isOpen: isStatusOpen, onToggle: onStatusToggle } = useDisclosure({ defaultIsOpen: false });
     const {
       isOpen: isPreviousSubmissionOpen,
       onOpen: onPreviousSubmissionOpen,
@@ -131,6 +133,14 @@ export const RequirementForm = observer(
               : t('ui.na'),
           }),
         });
+        if (permitApplication?.screenedInAt) {
+          statuses.push({
+            label: t('energySavingsApplication.show.applicationScreenedIn', {
+              submissionType: permitApplication?.submissionType.name,
+              date: format(permitApplication.screenedInAt, 'MMM d, yyyy h:mm a'),
+            }),
+          });
+        }
         statuses.push({
           label: t('energySavingsApplication.show.applicationUpdated', {
             submissionType: permitApplication?.submissionType.name,
@@ -571,17 +581,50 @@ export const RequirementForm = observer(
               />
             ))} */}
           {infoStatusItems.length > 0 && (
-            <CustomMessageBox
-              status="info"
-              description={
-                <ul style={{ marginBottom: 0 }}>
-                  {infoStatusItems.map((s, idx) => (
-                    <li key={idx}>{s.label}</li>
-                  ))}
-                </ul>
-              }
-            />
+            <Box border="1px solid" borderColor="semantic.info" borderRadius="lg" overflow="hidden">
+              <Flex
+                as="button"
+                w="full"
+                bg="semantic.infoLight"
+                px={4}
+                py={3}
+                align="center"
+                justify="space-between"
+                cursor="pointer"
+                onClick={onStatusToggle}
+                aria-expanded={isStatusOpen}
+                aria-controls="application-status-details"
+              >
+                <Flex align="center" gap={2}>
+                  <Box color="semantic.info">
+                    <Info size={20} aria-hidden={true} />
+                  </Box>
+                  <Text fontWeight="semibold" fontSize="sm" mb={0}>
+                    {t('energySavingsApplication.show.applicationStatusTitle')}
+                  </Text>
+                </Flex>
+                <Box color="semantic.info">{isStatusOpen ? <CaretUp size={18} /> : <CaretDown size={18} />}</Box>
+              </Flex>
+              <Collapse in={isStatusOpen} animateOpacity>
+                <Box id="application-status-details" bg="semantic.infoLight" px={4} pb={4}>
+                  <ul style={{ marginBottom: 0 }}>
+                    {infoStatusItems.map((s, idx) => (
+                      <li key={idx}>{s.label}</li>
+                    ))}
+                  </ul>
+                </Box>
+              </Collapse>
+            </Box>
           )}
+          <Text fontSize="sm" mb={0}>
+            {t('site.formSupportContact')}{' '}
+            <Link
+              href={`mailto:${t(currentUser?.isContractor ? 'site.helpDrawer.contractorEmail' : 'site.helpDrawer.emailAddress')}`}
+              isExternal
+            >
+              {t(currentUser?.isContractor ? 'site.helpDrawer.contractorEmail' : 'site.helpDrawer.emailAddress')}
+            </Link>
+          </Text>
           {showVersionDiffContactWarning && (
             <CustomMessageBox
               description={t('energySavingsApplication.show.versionDiffContactWarning')}
