@@ -17,9 +17,11 @@ define arguments
 endef
 
 define set-app-version
-	@if [ -n "${IMAGE_TAG}" ]; then \
-		yq e ".appVersion = \"${IMAGE_TAG}\"" -i Chart.yaml; \
-	fi
+    @if [ -n "${IMAGE_TAG}" ]; then \
+        TAG="${IMAGE_TAG}"; \
+        if [ $${#TAG} -eq 40 ]; then TAG=$${TAG:0:8}; fi; \
+        yq e ".appVersion = \"$$TAG\"" -i Chart.yaml; \
+    fi
 endef
 
 define curr-image-tag
