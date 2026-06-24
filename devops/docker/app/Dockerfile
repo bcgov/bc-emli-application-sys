@@ -19,6 +19,10 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential curl git libpq-dev libvips node-gyp pkg-config python3 python-is-python3 libjemalloc2 postgresql-client libproj-dev libgeos-dev proj-bin netcat-openbsd fish && \
     rm -rf /var/lib/apt/lists/*
 
+# Replace /bin/sh with fish for interactive shell access via oc rsh
+RUN ln -sf /usr/bin/fish /bin/sh
+SHELL ["/bin/bash", "-c"]
+
 # Use jemalloc to improve memory management
 # YJIT exec-mem-size: cap native code cache per process (default 128MB is too large for 1.5Gi pods).
 # 32MB is sufficient for a Rails app's hot paths; trade-off is slightly less JIT coverage.
@@ -87,8 +91,7 @@ USER rails:rails
 # Entrypoint
 ENTRYPOINT ["./devops/docker/app/entrypoint.sh"]
 
-# Replace /bin/sh with fish for interactive shell access via oc rsh
-RUN ln -sf /usr/bin/fish /bin/sh
+
 
 LABEL maintainer="Darrel Siegle <darrel.siegle@dxcas.com>" \
       description="Docker image for the BC Home Energy Savings Program System" \
