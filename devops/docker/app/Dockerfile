@@ -21,7 +21,7 @@ RUN apt-get update -qq && \
 
 # Replace /bin/sh with fish for interactive shell access via oc rsh
 RUN ln -sf /usr/bin/fish /bin/sh
-SHELL ["/bin/bash", "-c"]
+SHELL ["/bin/sh", "-c"]
 
 # Use jemalloc to improve memory management
 # YJIT exec-mem-size: cap native code cache per process (default 128MB is too large for 1.5Gi pods).
