@@ -1,0 +1,14 @@
+{{- if .Values.logVolume.enabled }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "_.fullname" . }}-log
+  labels:
+    {{- include "_.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.logVolume.storage }}
+{{- end }}

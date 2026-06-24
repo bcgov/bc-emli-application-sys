@@ -1,5 +1,5 @@
 import { Box, Center, Collapse, Flex, Link, Text, useDisclosure } from '@chakra-ui/react';
-import { CaretDown, CaretUp, Info } from '@phosphor-icons/react';
+import { CaretDown, CaretUp } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 
 import { format } from 'date-fns';
@@ -589,21 +589,23 @@ export const RequirementForm = observer(
                 px={4}
                 py={3}
                 align="center"
-                justify="space-between"
+                gap={2}
                 cursor="pointer"
                 onClick={onStatusToggle}
                 aria-expanded={isStatusOpen}
                 aria-controls="application-status-details"
               >
-                <Flex align="center" gap={2}>
-                  <Box color="semantic.info">
-                    <Info size={20} aria-hidden={true} />
-                  </Box>
-                  <Text fontWeight="semibold" fontSize="sm" mb={0}>
-                    {t('energySavingsApplication.show.applicationStatusTitle')}
+                <Box color="semantic.info">
+                  {isStatusOpen ? <CaretUp size={18} aria-hidden={true} /> : <CaretDown size={18} aria-hidden={true} />}
+                </Box>
+                {permitApplication?.updatedAt && (
+                  <Text mb={0}>
+                    {t('energySavingsApplication.show.applicationUpdated', {
+                      submissionType: permitApplication.submissionType.name,
+                      date: format(permitApplication.updatedAt, 'MMM d, yyyy h:mm a'),
+                    })}
                   </Text>
-                </Flex>
-                <Box color="semantic.info">{isStatusOpen ? <CaretUp size={18} /> : <CaretDown size={18} />}</Box>
+                )}
               </Flex>
               <Collapse in={isStatusOpen} animateOpacity>
                 <Box id="application-status-details" bg="semantic.infoLight" px={4} pb={4}>
