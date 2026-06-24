@@ -52,6 +52,10 @@ if Rails.env.production? && ENV["IS_DOCKER_BUILD"].blank? # skip this during pre
 
   Sidekiq.configure_server do |config|
     configure_sidekiq_server(config, redis_cfg, ENV["SIDEKIQ_CONCURRENCY"].to_i)
+    # Route Sidekiq's own logs (job lifecycle, heartbeat) through the Rails
+    # MultiLogger so they go to both STDOUT (Loki) and /app/log/application.log
+    # (PVC), matching the app pod's logging behaviour.
+    config.logger = Rails.logger
   end
 
   Sidekiq.configure_client do |config|
@@ -59,9 +63,11 @@ if Rails.env.production? && ENV["IS_DOCKER_BUILD"].blank? # skip this during pre
   end
 
   # Load cron schedule in production only
+  # load_from_hash! (bang) replaces ALL cron jobs atomically — removes stale Redis entries
+  # not in the YAML. load_from_hash (no bang) only adds/updates, leaving removed jobs alive.
   schedule_file = "config/sidekiq_cron_schedule.yml"
   if File.exist?(schedule_file)
-    Sidekiq::Cron::Job.load_from_hash YAML.load_file(schedule_file)
+    Sidekiq::Cron::Job.load_from_hash! YAML.load_file(schedule_file)
   end
 elsif Rails.env.development?
   # Development configuration uses default Redis connection
@@ -72,6 +78,6 @@ elsif Rails.env.development?
   # Load cron schedule in development for testing
   schedule_file = "config/sidekiq_cron_schedule.yml"
   if File.exist?(schedule_file)
-    Sidekiq::Cron::Job.load_from_hash YAML.load_file(schedule_file)
+    Sidekiq::Cron::Job.load_from_hash! YAML.load_file(schedule_file)
   end
 end

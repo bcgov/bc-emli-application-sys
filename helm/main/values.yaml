@@ -81,6 +81,9 @@ sidekiq:
   nameOverride: hesp-sidekiq
   fullnameOverride: hesp-sidekiq
 
+  logVolume:
+    enabled: true
+
   resources:
     requests:
       cpu: 300m
