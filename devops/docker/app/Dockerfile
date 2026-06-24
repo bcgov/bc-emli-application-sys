@@ -19,9 +19,6 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential curl git libpq-dev libvips node-gyp pkg-config python3 python-is-python3 libjemalloc2 postgresql-client libproj-dev libgeos-dev proj-bin netcat-openbsd fish && \
     rm -rf /var/lib/apt/lists/*
 
-RUN ln -sf /usr/bin/fish /bin/sh
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
 # Use jemalloc to improve memory management
 # YJIT exec-mem-size: cap native code cache per process (default 128MB is too large for 1.5Gi pods).
 # 32MB is sufficient for a Rails app's hot paths; trade-off is slightly less JIT coverage.
@@ -84,6 +81,9 @@ RUN SECRET_KEY_BASE_DUMMY=1 IS_DOCKER_BUILD=true VITE_RUBY_SSR_BUILD_ENABLED=tru
 RUN useradd rails --create-home --shell /usr/bin/fish && \
     chown -R rails:rails /app && \
     chmod -R 777 log tmp db storage 
+
+# Replace /bin/sh after build steps so oc rsh gets fish without affecting RUN scripts.
+RUN ln -sf /usr/bin/fish /bin/sh
 
 USER rails:rails
 
