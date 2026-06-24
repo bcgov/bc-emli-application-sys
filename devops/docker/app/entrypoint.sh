@@ -10,41 +10,27 @@ ulimit -n 65536
 
 set -euo pipefail 
 
-# shellcheck disable=SC1091
-
-VAULT_SECRETS_DIR=/vault/secrets
-
-if [ -d ${VAULT_SECRETS_DIR} ]; then
-  set -a # enable mark variables which are modified or created for export
-  for i in ${VAULT_SECRETS_DIR}/*.env; do
-    echo "[entrypoint] Adding environment variables from ${i}"
-    source ${i}
-  done
-  set +a # disable mark variables which are modified or created for export
-else
-  echo "[entrypoint] Vault secrets directory (${VAULT_SECRETS_DIR}) does not exist"
-fi
-
 # Rails Entrypoint
 # If running the rails server then create or migrate existing database
-if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
+# if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
+if [ -n "$IS_APP_SERVER" ]; then
   if [ -f /app/tmp/pids/server.pid ]; then
     echo "[entrypoint] Removing stale server PID file at /app/tmp/pids/server.pid"
     rm -f /app/tmp/pids/server.pid
   fi
-
+  
   until nc -z -v -w30 ${DATABASE_OPENSHIFT_SERVICE_HOST} 5432; do
     echo "Waiting for PostgreSQL database (${DATABASE_OPENSHIFT_SERVICE_HOST}) to start..."
     sleep 1
   done
 
-  echo "*** Preparing Database..."
+  echo "*** Migrating Database..."
   
-  IS_APP_SERVER=true ./bin/rails db:migrate
+  ./bin/rails db:migrate
 
-  echo "*** reindexing models for search..."
+  echo "*** Reindexing models for search..."
   
-  IS_APP_SERVER=true ./bin/rails search:reindex
+  bundle exec rails search:reindex
 fi
 
 exec "$@"

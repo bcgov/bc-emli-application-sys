@@ -14,7 +14,7 @@ ENV RAILS_ENV="development" \
 
 # Install packages needed for both building and running the application
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential curl git libpq-dev libvips node-gyp pkg-config python3 python-is-python3 postgresql-client libproj-dev libgeos-dev proj-bin netcat-openbsd xvfb libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libnss3 libxss1 libx11-xcb1 libxtst6 wget gnupg2 chromium && \
+    apt-get install --no-install-recommends -y build-essential curl git libpq-dev libvips node-gyp pkg-config python3 python-is-python3 postgresql-client libproj-dev libgeos-dev proj-bin netcat-openbsd xvfb libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libnss3 libxss1 libx11-xcb1 libxtst6 wget gnupg2 chromium fish && \
     rm -rf /var/lib/apt/lists/*
 
 # Create virus scan temp directory for ClamAV service communication
@@ -51,7 +51,12 @@ RUN bundle config set --local path "$BUNDLE_PATH" && \
 
 RUN bundle exec bootsnap precompile app/ lib/
 
+RUN useradd rails --create-home --shell /usr/bin/fish && \
+    chown -R rails:rails /app && \
+    chmod -R 777 log tmp db storage 
+
+USER rails:rails
+
 EXPOSE 3000
 ENTRYPOINT ["./devops/docker/app/entrypoint-dev.sh"]
 # CMD ["./bin/rails", "server"]
-

@@ -16,7 +16,7 @@ ENV RAILS_ENV="production" \
 
 # Install packages needed for both building and running the application
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential curl git libpq-dev libvips node-gyp pkg-config python3 python-is-python3 libjemalloc2 postgresql-client libproj-dev libgeos-dev proj-bin netcat-openbsd && \
+    apt-get install --no-install-recommends -y build-essential curl git libpq-dev libvips node-gyp pkg-config python3 python-is-python3 libjemalloc2 postgresql-client libproj-dev libgeos-dev proj-bin netcat-openbsd fish && \
     rm -rf /var/lib/apt/lists/*
 
 # Use jemalloc to improve memory management
@@ -78,13 +78,13 @@ COPY config/database.yml.docker_precompile_dummy /app/config/database.yml
 RUN SECRET_KEY_BASE_DUMMY=1 IS_DOCKER_BUILD=true VITE_RUBY_SSR_BUILD_ENABLED=true VITE_ENABLE_TEMPLATE_FORCE_PUBLISH=${VITE_ENABLE_TEMPLATE_FORCE_PUBLISH} VITE_BCEID_URL=${VITE_BCEID_URL} VITE_BUSINESS_BCEID_REGISTRATION_URL=${VITE_BUSINESS_BCEID_REGISTRATION_URL} VITE_BASIC_BCEID_REGISTRATION_URL=${VITE_BASIC_BCEID_REGISTRATION_URL} VITE_POST_LOGOUT_REDIRECT_URL=${VITE_POST_LOGOUT_REDIRECT_URL} VITE_KEYCLOAK_LOGOUT_URL=${VITE_KEYCLOAK_LOGOUT_URL} VITE_SITEMINDER_LOGOUT_URL=${VITE_SITEMINDER_LOGOUT_URL} VITE_SUBMIT_INVOICE_ENABLED=${VITE_SUBMIT_INVOICE_ENABLED} ./bin/rails assets:precompile
 
 # Run and own only the runtime files as a non-root user for security
-RUN useradd rails --create-home --shell /bin/bash && \
+RUN useradd rails --create-home --shell /usr/bin/fish && \
     chown -R rails:rails /app && \
-    chmod -R 777 log tmp db storage
+    chmod -R 777 log tmp db storage 
 
 USER rails:rails
 
-# Entrypoint - source vault variables from Hashicorp
+# Entrypoint
 ENTRYPOINT ["./devops/docker/app/entrypoint.sh"]
 
 LABEL maintainer="Darrel Siegle <darrel.siegle@dxcas.com>" \
