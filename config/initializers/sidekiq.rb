@@ -52,10 +52,22 @@ if Rails.env.production? && ENV["IS_DOCKER_BUILD"].blank? # skip this during pre
 
   Sidekiq.configure_server do |config|
     configure_sidekiq_server(config, redis_cfg, ENV["SIDEKIQ_CONCURRENCY"].to_i)
-    # Route Sidekiq's own logs (job lifecycle, heartbeat) through the Rails
-    # MultiLogger so they go to both STDOUT (Loki) and /app/log/application.log
-    # (PVC), matching the app pod's logging behaviour.
-    config.logger = Rails.logger
+
+    # Persist Sidekiq's own logs to a dedicated file on the log PVC for 30 days
+    # (the purge cronjob deletes /app/log files older than 30 days), for post-mortem
+    # debugging — e.g. tracing which job froze the workers. Sidekiq logs still go to
+    # STDOUT (oc logs/Loki) in their native format, and are additionally tee'd to a
+    # daily-rotated sidekiq.log, reusing Sidekiq's own formatter and level so the file
+    # matches the pod logs exactly (full job context: jid/class/elapsed). Kept separate
+    # from application.log to avoid mixing formats.
+    sidekiq_level = config.logger.level
+    sidekiq_formatter = config.logger.formatter
+    stdout_logger = Logger.new($stdout)
+    stdout_logger.formatter = sidekiq_formatter
+    file_logger = Logger.new(Rails.root.join("log", "sidekiq.log"), "daily")
+    file_logger.formatter = sidekiq_formatter
+    config.logger = MultiLogger.new(stdout_logger, file_logger)
+    config.logger.level = sidekiq_level
   end
 
   Sidekiq.configure_client do |config|
