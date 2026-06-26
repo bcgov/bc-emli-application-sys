@@ -6,11 +6,12 @@ WORKDIR /app
 
 # Set development environment
 ENV RAILS_ENV="development" \
+    NODE_ENV="development" \
     BUNDLE_PATH="/usr/local/bundle" \
     BUNDLE_WITHOUT="production" \
     PATH="/usr/local/node/bin:$PATH" \
     npm_config_cache="/app/.npm" \
-    IS_APP_SERVER=true
+    IS_APP_SERVER=""
 
 # Install packages needed for both building and running the application
 RUN apt-get update -qq && \
