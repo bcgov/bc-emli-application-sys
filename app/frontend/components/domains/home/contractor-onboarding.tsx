@@ -1,10 +1,10 @@
-import React, { useEffect, useCallback, useState, useRef } from 'react';
-import { useMst } from '../../../setup/root';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { SharedSpinner } from '../../shared/base/shared-spinner';
 import { Flex } from '@chakra-ui/react';
-import { useSessionStorage } from '../../../hooks/use-session-state';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { contractorOnboardingImportTokenKey } from '../../../constants';
+import { useSessionStorage } from '../../../hooks/use-session-state';
+import { useMst } from '../../../setup/root';
+import { SharedSpinner } from '../../shared/base/shared-spinner';
 
 interface IContractorOnboardingScreenProps {}
 
@@ -12,6 +12,7 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
   const { permitApplicationStore, userStore, uiStore, contractorStore, sessionStore } = useMst();
   const { currentUser } = userStore;
   const navigate = useNavigate();
+  const location = useLocation();
   const [importToken, setImportToken] = useSessionStorage(contractorOnboardingImportTokenKey, null);
   const [importHandled, setImportHandled] = useState(false);
   const cancelledRef = useRef(false);
@@ -90,7 +91,7 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
         if (onboarding) {
           navigate(`/applications/${onboarding.permitApplicationId}/edit`);
         } else {
-          navigate('/welcome');
+          navigate('/welcome/contractor');
         }
         return;
       }
@@ -99,10 +100,15 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
       onboarding = await contractorStore.fetchOnboarding(contractor.id);
       if (cancelledRef.current) return;
       if (!onboarding) {
-        // if we got here it means we have a contractor but their onboarding is gone "withdrawn?"
-        // should we even allow withdrawn?
-        console.error('No onboarding found; why didnt we create one or was it withdrawn?');
-
+        // Contractor exists but has no onboarding (e.g. a previous draft was withdrawn/deleted).
+        // Let them restart: create a fresh onboarding for the existing contractor.
+        onboarding = await contractorStore.createOnboarding(currentUser.id);
+        if (cancelledRef.current) return;
+        if (onboarding) {
+          navigate(`/applications/${onboarding.permitApplicationId}/edit`);
+        } else {
+          navigate('/welcome/contractor');
+        }
         return;
       }
 

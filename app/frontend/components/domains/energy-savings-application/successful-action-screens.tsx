@@ -1,12 +1,12 @@
-import { Container, Flex, Heading, Icon, Text, VStack, Box, Button } from '@chakra-ui/react';
+import { Box, Button, Container, Flex, Heading, Icon, Text, VStack } from '@chakra-ui/react';
 import { CheckCircleIcon, WarningCircleIcon } from '@phosphor-icons/react';
-import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { observer } from 'mobx-react-lite';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import { useMst } from '../../../setup/root';
 import React, { useEffect } from 'react';
-import { EUserRoles, EPermitClassificationCode } from '../../../types/enums';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useMst } from '../../../setup/root';
+import { EPermitClassificationCode, EUserRoles } from '../../../types/enums';
+import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 
 /***
  * Base Reusable Success Screen
@@ -111,12 +111,14 @@ export const SuccessfulActionScreen = ({
 export const SuccessfulWithdrawalScreen = observer(() => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { submissionType } = location.state || {};
+  const { submissionType, isOnboarding } = location.state || {};
   const { userStore } = useMst();
   const currentUser = userStore.currentUser;
 
   const getReturnPath = () => {
     if (currentUser.isParticipant) return '/applications';
+    // A not-yet-onboarded contractor has no /contractor-dashboard; their home is the welcome page.
+    if (currentUser.isContractor && isOnboarding) return '/welcome/contractor';
     if (currentUser.isContractor) return '/contractor-dashboard';
     return '/submission-inbox';
   };
@@ -130,9 +132,11 @@ export const SuccessfulWithdrawalScreen = observer(() => {
       primaryButtonLabel={
         currentUser.isParticipant
           ? t('energySavingsApplication.returnToDashboard')
-          : currentUser.isContractor
-            ? t('contractor.invoiceSuccess.returnToDashboard')
-            : t('energySavingsApplication.new.viewAllSubmissions')
+          : currentUser.isContractor && isOnboarding
+            ? t('contractorOnboarding.returnToDashboard')
+            : currentUser.isContractor
+              ? t('contractor.invoiceSuccess.returnToDashboard')
+              : t('energySavingsApplication.new.viewAllSubmissions')
       }
       primaryButtonTo={getReturnPath()}
     />

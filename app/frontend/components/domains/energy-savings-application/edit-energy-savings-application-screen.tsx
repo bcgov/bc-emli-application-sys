@@ -1,6 +1,5 @@
 import { Box, Button, Divider, Flex, Heading, HStack, Spacer, Stack, Text, useDisclosure } from '@chakra-ui/react';
-import { Phone } from '@phosphor-icons/react';
-import { CaretDown, CaretRight, CaretUp, FloppyDiskBack, Info, NotePencil, Warning } from '@phosphor-icons/react';
+import { CaretDown, CaretRight, CaretUp, FloppyDiskBack, NotePencil, Phone, Warning } from '@phosphor-icons/react';
 import { t } from 'i18next';
 import { observer } from 'mobx-react-lite';
 import * as R from 'ramda';
@@ -23,9 +22,9 @@ import { PermitApplicationSubmitModal } from '../../shared/energy-savings-applic
 import { RequirementForm } from '../../shared/energy-savings-applications/requirement-form';
 import { FloatingHelpDrawer } from '../../shared/floating-help-drawer';
 import SandboxHeader from '../../shared/sandbox/sandbox-header';
-import { ChecklistSideBar } from './checklist-sidebar';
 import { BlockCollaboratorAssignmentManagement } from './assignment-management/block-collaborator-assignment-management';
 import { useCollaborationAssignmentNodes } from './assignment-management/hooks/use-collaboration-assignment-nodes';
+import { ChecklistSideBar } from './checklist-sidebar';
 import { ContactSummaryModal } from './contact-summary-modal';
 import { RevisionSideBar } from './revision-sidebar';
 import { SubmissionDownloadModal } from './submission-download-modal';
@@ -141,8 +140,6 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
     try {
       const response = await currentPermitApplication.destroy();
       if (response.ok) {
-        onWithdrawlClose();
-        navigate('/');
         return true;
       }
       return false;
@@ -228,6 +225,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
       navigate(`/applications/${currentPermitApplication?.id}/withdrawl-success`, {
         state: {
           submissionType: currentPermitApplication.submissionType.name,
+          isOnboarding: currentPermitApplication.isContractorOnboarding,
         },
       });
     }
@@ -502,9 +500,14 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
         headerText={t('energySavingsApplication.withdraw.confirmTitle', {
           submissionType: currentPermitApplication.submissionType.name.toLowerCase(),
         })}
-        bodyText={t('energySavingsApplication.withdraw.confirmMessage', {
-          submissionType: currentPermitApplication.submissionType.name.toLowerCase(),
-        })}
+        bodyText={t(
+          currentPermitApplication.isContractorOnboarding
+            ? 'energySavingsApplication.withdraw.confirmMessageOnboarding'
+            : 'energySavingsApplication.withdraw.confirmMessage',
+          {
+            submissionType: currentPermitApplication.submissionType.name.toLowerCase(),
+          },
+        )}
         confirmText={t('ui.confirm')}
         cancelText={t('ui.cancel')}
         closeOnOverlayClick={false}

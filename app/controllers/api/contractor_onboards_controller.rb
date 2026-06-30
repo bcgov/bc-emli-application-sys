@@ -15,13 +15,23 @@ class Api::ContractorOnboardsController < Api::ApplicationController
   def create
     program = Program.find_by!(slug: "energy-savings-program")
 
+    # Reuse the user's existing contractor if there is one (e.g. when restarting after a
+    # withdrawn onboarding); only create a new contractor for a first-time onboarding.
     contractor =
-      Contractor.create!(
-        contact: current_user,
-        business_name: "TBD",
-        onboarded: false
-      )
+      Contractor.find_or_create_by(contact: current_user) do |c|
+        c.business_name = "TBD"
+        c.onboarded = false
+      end
     contractor.reindex
+
+    # If this contractor already has an in-progress onboarding, return it instead of
+    # creating a duplicate (guards against double-fire / multi-tab races).
+    existing = contractor.latest_onboard
+    if existing&.onboard_application&.draft?
+      return(
+        render json: ContractorOnboardBlueprint.render(existing), status: :ok
+      )
+    end
 
     # Create the Permit Aplication (Contractor Onboarding type)
     onboarding_form =
