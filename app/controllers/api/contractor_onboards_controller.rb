@@ -26,7 +26,7 @@ class Api::ContractorOnboardsController < Api::ApplicationController
 
     # If this contractor already has an in-progress onboarding, return it instead of
     # creating a duplicate (guards against double-fire / multi-tab races).
-    existing = contractor.contractor_onboards.order(created_at: :desc).first
+    existing = contractor.latest_onboard
     if existing&.onboard_application&.draft?
       return(
         render json: ContractorOnboardBlueprint.render(existing), status: :ok
