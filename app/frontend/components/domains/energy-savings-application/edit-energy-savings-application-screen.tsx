@@ -140,7 +140,6 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
     try {
       const response = await currentPermitApplication.destroy();
       if (response.ok) {
-        onWithdrawlClose();
         return true;
       }
       return false;

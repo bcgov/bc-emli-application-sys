@@ -1,6 +1,6 @@
 import { Flex } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { contractorOnboardingImportTokenKey } from '../../../constants';
 import { useSessionStorage } from '../../../hooks/use-session-state';
 import { useMst } from '../../../setup/root';
@@ -12,6 +12,7 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
   const { permitApplicationStore, userStore, uiStore, contractorStore, sessionStore } = useMst();
   const { currentUser } = userStore;
   const navigate = useNavigate();
+  const location = useLocation();
   const [importToken, setImportToken] = useSessionStorage(contractorOnboardingImportTokenKey, null);
   const [importHandled, setImportHandled] = useState(false);
   const cancelledRef = useRef(false);
@@ -101,7 +102,7 @@ export const ContractorOnboardingScreen = ({ ...rest }: IContractorOnboardingScr
       if (!onboarding) {
         // Contractor exists but has no onboarding (e.g. a previous draft was withdrawn/deleted).
         // Let them restart: create a fresh onboarding for the existing contractor.
-        onboarding = await contractorStore.createOnboarding(contractor.id);
+        onboarding = await contractorStore.createOnboarding(currentUser.id);
         if (cancelledRef.current) return;
         if (onboarding) {
           navigate(`/applications/${onboarding.permitApplicationId}/edit`);
