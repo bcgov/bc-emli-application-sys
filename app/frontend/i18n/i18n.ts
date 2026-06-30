@@ -1364,6 +1364,8 @@ const options = {
           withdraw: {
             confirmTitle: 'Are you sure you want to withdraw this {{submissionType}} form?',
             confirmMessage: 'By withdrawing this {{submissionType}} form your draft will not be saved.',
+            confirmMessageOnboarding:
+              'If you withdraw, your draft will not be saved. You can restart the onboarding process if you decide to register in future.',
             confirm: 'Withdraw application',
             success: {
               title: 'Your {{submissionType}} form has been withdrawn.',
