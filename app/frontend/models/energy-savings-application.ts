@@ -97,6 +97,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       supportingDocuments: types.maybeNull(types.frozen<IDownloadableFile[]>()),
       allSubmissionVersionCompletedSupportingDocuments: types.maybeNull(types.frozen<IDownloadableFile[]>()),
       referenceNumber: types.maybeNull(types.string),
+      statusUpdateReason: types.maybeNull(types.string),
       missingPdfs: types.maybeNull(types.array(types.string)),
       isFullyLoaded: types.optional(types.boolean, false),
       isDirty: types.optional(types.boolean, false),
