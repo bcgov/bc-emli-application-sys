@@ -47,7 +47,8 @@ class PermitApplicationBlueprint < Blueprinter::Base
            :resubmitted_at,
            :screened_in_at,
            :revisions_requested_at,
-           :missing_pdfs
+           :missing_pdfs,
+           :status_update_reason
     association :submission_type,
                 blueprint: PermitClassificationBlueprint,
                 view: :base

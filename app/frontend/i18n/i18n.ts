@@ -1476,6 +1476,7 @@ const options = {
             inEligibleDetails: 'Ineligible {{submissionType}} form details',
             applicationId: 'Reference # is #',
             inEligibleReason: 'Reason this {{submissionType}} form is ineligible:',
+            ineligibleReasonShort: 'Ineligible reason:',
             revision: {
               newRevision: 'New revision',
               pastRequests: 'Past requests',

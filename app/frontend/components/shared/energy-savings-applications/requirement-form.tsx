@@ -118,7 +118,7 @@ export const RequirementForm = observer(
       const latestSR = permitApplication.latestSubmittedSupportRequestWithDocuments;
       const statuses = [];
 
-      if (permitApplication.isSubmitted || permitApplication.isInReview) {
+      if (!permitApplication.isDraft) {
         statuses.push({
           label: t('energySavingsApplication.show.applicationCreated', {
             submissionType: permitApplication?.submissionType.name,
@@ -553,33 +553,6 @@ export const RequirementForm = observer(
             ) : (
               <SharedSpinner position="fixed" right={24} top="50vh" zIndex={12} />
             ))}
-          {permitApplication?.isRevisionsRequested && permitApplication?.revisionsRequestedAt && (
-            <CustomMessageBox
-              description={t('energySavingsApplication.show.revisionsWereRequested', {
-                date: format(permitApplication.revisionsRequestedAt, 'MMM d, yyyy h:mm a'),
-              })}
-              status="warning"
-            />
-          )}
-          {formattedSupportRequestDate && isAdminUser && (
-            <CustomMessageBox
-              description={t('energySavingsApplication.show.supportingFilesRequest.requestedText', {
-                date: formattedSupportRequestDate,
-              })}
-              status="warning"
-            />
-          )}
-          {/* {permitApplication?.isSubmitted ||
-            (permitApplication?.isInReview && (
-              <CustomMessageBox
-                description={t('energySavingsApplication.show.applicationSubmitted', {
-                  date: permitApplication?.submittedAt
-                    ? format(new Date(permitApplication.submittedAt), 'MMM d, yyyy h:mm a')
-                    : '',
-                })}
-                status="info"
-              />
-            ))} */}
           {infoStatusItems.length > 0 && (
             <Box border="1px solid" borderColor="semantic.info" borderRadius="lg" overflow="hidden">
               <Flex
@@ -618,6 +591,45 @@ export const RequirementForm = observer(
               </Collapse>
             </Box>
           )}
+          {permitApplication?.isIneligible && (
+            <CustomMessageBox
+              description={
+                permitApplication?.statusUpdateReason
+                  ? `${t('energySavingsApplication.show.ineligibleReasonShort')} ${permitApplication.statusUpdateReason}`
+                  : t('energySavingsApplication.show.inEligibleDetails', {
+                      submissionType: permitApplication?.submissionType?.name?.toLowerCase(),
+                    })
+              }
+              status="error"
+            />
+          )}
+          {permitApplication?.isRevisionsRequested && permitApplication?.revisionsRequestedAt && (
+            <CustomMessageBox
+              description={t('energySavingsApplication.show.revisionsWereRequested', {
+                date: format(permitApplication.revisionsRequestedAt, 'MMM d, yyyy h:mm a'),
+              })}
+              status="warning"
+            />
+          )}
+          {formattedSupportRequestDate && isAdminUser && (
+            <CustomMessageBox
+              description={t('energySavingsApplication.show.supportingFilesRequest.requestedText', {
+                date: formattedSupportRequestDate,
+              })}
+              status="warning"
+            />
+          )}
+          {/* {permitApplication?.isSubmitted ||
+            (permitApplication?.isInReview && (
+              <CustomMessageBox
+                description={t('energySavingsApplication.show.applicationSubmitted', {
+                  date: permitApplication?.submittedAt
+                    ? format(new Date(permitApplication.submittedAt), 'MMM d, yyyy h:mm a')
+                    : '',
+                })}
+                status="info"
+              />
+            ))} */}
           <Text fontSize="sm" mb={0}>
             {t('site.formSupportContact')}{' '}
             <Link
