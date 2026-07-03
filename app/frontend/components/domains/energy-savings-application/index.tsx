@@ -1,8 +1,8 @@
-import { Box, Button, Container, Flex, FormControl, FormLabel, Text, VStack } from '@chakra-ui/react';
-import { CaretDown, Funnel } from '@phosphor-icons/react';
+import { Box, Button, Container, Flex, FormControl, FormLabel } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import { useFlashQueryParam } from '../../../hooks/use-flash-query-param';
 import { useQuery } from '../../../hooks/use-query';
 import { useResetQueryParams } from '../../../hooks/use-reset-query-params';
@@ -10,24 +10,20 @@ import { useSearch } from '../../../hooks/use-search';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { useMst } from '../../../setup/root';
 import {
-  EPermitApplicationStatus,
   EPermitApplicationStatusGroup,
   EPermitApplicationSubmitterSortFields,
   EPermitClassificationCode,
-  EUserRoles,
 } from '../../../types/enums';
+import { getRuntimeBooleanMetaValue } from '../../../utils/utility-functions';
 import { BlueTitleBar } from '../../shared/base/blue-title-bar';
 import { Paginator } from '../../shared/base/inputs/paginator';
 import { PerPageSelect } from '../../shared/base/inputs/per-page-select';
 import { ModelSearchInput } from '../../shared/base/model-search-input';
 import { SharedSpinner } from '../../shared/base/shared-spinner';
 import { EnergySavingsApplicationCard } from '../../shared/energy-savings-applications/energy-savings-application-card';
+import { EnergySavingsApplicationFilter } from '../../shared/energy-savings-applications/energy-savings-application-filter';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 import { SortSelect } from '../../shared/select/selectors/sort-select';
-import { PermitApplicationStatusTabs } from '../../shared/energy-savings-applications/permit-application-status-tabs';
-import { EnergySavingsApplicationFilter } from '../../shared/energy-savings-applications/energy-savings-application-filter';
-import { useLocation } from 'react-router-dom';
-import { getRuntimeBooleanMetaValue } from '../../../utils/utility-functions';
 
 interface IEnergySavingsApplicationIndexScreenProps {
   skipDefaultFilters?: boolean;
@@ -190,6 +186,8 @@ export const EnergySavingsApplicationIndexScreen = observer(
                       EPermitApplicationStatusGroup.revisionsRequested,
                       EPermitApplicationStatusGroup.inReview,
                       EPermitApplicationStatusGroup.approved,
+                      EPermitApplicationStatusGroup.approvedPending,
+                      EPermitApplicationStatusGroup.approvedPaid,
                       EPermitApplicationStatusGroup.ineligible,
                       EPermitApplicationStatusGroup.resubmitted,
                     ]}
