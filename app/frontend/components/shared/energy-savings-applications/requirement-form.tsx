@@ -595,7 +595,7 @@ export const RequirementForm = observer(
             <CustomMessageBox
               description={
                 permitApplication?.statusUpdateReason
-                  ? `${t('energySavingsApplication.show.ineligibleReasonShort')} ${permitApplication.statusUpdateReason}`
+                  ? `${t('energySavingsApplication.show.inEligibleReasonShort')} ${permitApplication.statusUpdateReason}`
                   : t('energySavingsApplication.show.inEligibleDetails', {
                       submissionType: permitApplication?.submissionType?.name?.toLowerCase(),
                     })
