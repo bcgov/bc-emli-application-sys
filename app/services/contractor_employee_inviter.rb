@@ -27,26 +27,40 @@ class ContractorEmployeeInviter
     role = user_params[:role]&.to_sym || :contractor
 
     user = User.find_by(email: email)
+    return invite_new_user(email, name, role) unless user.present?
 
-    if user.present?
-      contractor_employee = employee_exists?(user)
-      return handle_email_taken(user) if contractor_employee
+    existing_membership =
+      contractor.contractor_employees.find_by(employee: user)
 
-      # Only reinvite if user is not discarded
-      if !user.discarded?
-        reinvite_user(user, role)
-      else
-        # User exists but is deactivated and not yet a contractor employee - don't allow invite
-        results[:email_taken_deactivated] << user
-      end
+    if existing_membership.present?
+      handle_existing_contractor_employee(user)
+    elsif employee_exists_elsewhere?(user)
+      handle_email_taken(user)
+    elsif !user.discarded?
+      reinvite_user(user, role)
     else
-      invite_new_user(email, name, role)
+      # User exists but is deactivated and not yet a contractor employee - don't allow invite
+      results[:email_taken_deactivated] << user
     end
   end
 
-  def employee_exists?(user)
+  def employee_exists_elsewhere?(user)
     ContractorEmployee.exists?(employee: user) ||
       Contractor.exists?(contact_id: user.id)
+  end
+
+  # User is already a ContractorEmployee of this contractor - resend the
+  # invite if pending, rather than reporting it as "taken" (matches the
+  # single-employee reinvite action's behavior).
+  def handle_existing_contractor_employee(user)
+    if user.discarded?
+      results[:email_taken_deactivated] << user
+    elsif user.invitation_sent_at.present? && user.invitation_accepted_at.nil?
+      user.invite!(invited_by, invitation_options)
+      results[:reinvited] << user
+    else
+      results[:email_taken_active] << user
+    end
   end
 
   def handle_email_taken(user)
