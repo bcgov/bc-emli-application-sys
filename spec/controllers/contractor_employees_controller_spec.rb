@@ -213,8 +213,8 @@ RSpec.describe Api::ContractorEmployeesController, type: :controller do
   describe "POST #invite" do
     context "when user is authorized (admin)" do
       it "resends the invite and reports it under reinvited when the email is already pending for this contractor" do
+        pending_employee.update!(invitation_sent_at: 1.hour.ago)
         original_sent_at = pending_employee.invitation_sent_at
-        sleep 0.1 # Ensure timestamp difference
 
         post :invite,
              params: {
@@ -283,8 +283,8 @@ RSpec.describe Api::ContractorEmployeesController, type: :controller do
   describe "POST #reinvite" do
     context "when user is authorized (admin)" do
       it "re-invites a pending employee" do
+        pending_employee.update!(invitation_sent_at: 1.hour.ago)
         original_sent_at = pending_employee.invitation_sent_at
-        sleep 0.1 # Ensure timestamp difference
 
         post :reinvite,
              params: {
@@ -413,7 +413,7 @@ RSpec.describe Api::ContractorEmployeesController, type: :controller do
       employee = pending_employee
 
       3.times do
-        sleep 0.1
+        employee.update!(invitation_sent_at: 1.hour.ago)
         original_sent_at = employee.invitation_sent_at
 
         post :reinvite,

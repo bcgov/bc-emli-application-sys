@@ -77,6 +77,33 @@ RSpec.describe ContractorEmployeeInviter do
         original_sent_at
     end
 
+    it "ensures a ProgramMembership exists when reinviting a pending employee whose membership is missing" do
+      pending_employee =
+        User.create!(
+          first_name: "Pending",
+          last_name: "Employee",
+          email: "pending@example.com",
+          password: "P@ssword1",
+          invitation_sent_at: 1.day.ago,
+          invitation_accepted_at: nil,
+          invitation_token: "test_token_123",
+          confirmed_at: Time.current
+        )
+      ContractorEmployee.create!(
+        contractor: contractor,
+        employee: pending_employee
+      )
+      expect(
+        ProgramMembership.exists?(user: pending_employee, program: program)
+      ).to be false
+
+      invite("pending@example.com")
+
+      expect(
+        ProgramMembership.exists?(user: pending_employee, program: program)
+      ).to be true
+    end
+
     it "reports email_taken_active when the email is already an active employee of this contractor" do
       active_employee =
         User.create!(
