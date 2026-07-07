@@ -58,6 +58,7 @@ class ContractorEmployeeInviter
     elsif user.invitation_sent_at.present? && user.invitation_accepted_at.nil?
       user.invite!(invited_by, invitation_options)
       results[:reinvited] << user
+      create_associations(user)
     else
       results[:email_taken_active] << user
     end
