@@ -547,7 +547,7 @@ export interface IMinimalFrozenUser {
 export interface IInternalComment {
   id: string;
   body: string;
-  createdAt: number;
+  createdAt: string;
   user?: IMinimalFrozenUser;
 }
 

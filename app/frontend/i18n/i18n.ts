@@ -1523,8 +1523,6 @@ const options = {
               post: 'Post comment',
               emptyState: 'No comments yet.',
               unknownAuthor: 'Unknown',
-              count: '{{count}} comment',
-              count_other: '{{count}} comments',
               delete: 'Delete comment',
               deleteConfirm: 'Delete this comment?',
             },
