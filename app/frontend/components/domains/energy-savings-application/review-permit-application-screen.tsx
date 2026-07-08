@@ -10,37 +10,37 @@ import {
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { IContractor } from '../../../models/contractor';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
+import { IContractor } from '../../../models/contractor';
 import { useMst } from '../../../setup/root';
-import { ECollaborationType, EPermitApplicationStatus, EFlashMessageStatus } from '../../../types/enums';
+import { ECollaborationType, EPermitApplicationStatus } from '../../../types/enums';
 import { CopyableValue } from '../../shared/base/copyable-value';
 import { ErrorScreen } from '../../shared/base/error-screen';
 import { LoadingScreen } from '../../shared/base/loading-screen';
 import { RequirementForm } from '../../shared/energy-savings-applications/requirement-form';
 import SandboxHeader from '../../shared/sandbox/sandbox-header';
-import { ChecklistSideBar } from './checklist-sidebar';
 import { BlockCollaboratorAssignmentManagement } from './assignment-management/block-collaborator-assignment-management';
 import { useCollaborationAssignmentNodes } from './assignment-management/hooks/use-collaboration-assignment-nodes';
+import { ChecklistSideBar } from './checklist-sidebar';
 import { ContactSummaryModal } from './contact-summary-modal';
+import { InternalCommentsModal } from './internal-comments-modal';
 import { RevisionSideBar } from './revision-sidebar';
 import { SubmissionDownloadModal } from './submission-download-modal';
 //import ApplicationReviewModal from '../../shared/modals/application-review-modal';
-import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation-modal';
-import UpdatePathwayModal from '../../shared/modals/application-update-pathway';
-import AddSupportingFilesPathwayModal from '../../shared/modals/add-supporting-files-pathway-modal';
-import { EnergySavingsApplicationStatusTag } from '../../shared/energy-savings-applications/energy-savings-application-status-tag';
-import {
-  EPermitClassificationCode,
-  EUserRoles,
-  EOnboardingRevisionFields,
-  EContractorRevisionFields,
-  EUpdateRoles,
-  ERevisionSideBarItems,
-} from '../../../types/enums';
 import { useLocation } from 'react-router-dom';
+import {
+  EContractorRevisionFields,
+  EPermitClassificationCode,
+  ERevisionSideBarItems,
+  EUpdateRoles,
+  EUserRoles,
+} from '../../../types/enums';
+import { EnergySavingsApplicationStatusTag } from '../../shared/energy-savings-applications/energy-savings-application-status-tag';
+import AddSupportingFilesPathwayModal from '../../shared/modals/add-supporting-files-pathway-modal';
+import UpdatePathwayModal from '../../shared/modals/application-update-pathway';
+import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation-modal';
 interface IReferenceNumberForm {
   referenceNumber?: string;
 }
@@ -352,6 +352,16 @@ export const ReviewPermitApplicationScreen = observer(() => {
             </Flex>
           </HStack>
           <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
+            {isAdminUser && (
+              <InternalCommentsModal
+                permitApplication={currentPermitApplication}
+                renderTrigger={(onOpen) => (
+                  <Button variant="primary" onClick={onOpen}>
+                    {t('energySavingsApplication.show.internalComments.addComment')}
+                  </Button>
+                )}
+              />
+            )}
             {!isEditContractor && !isInvoiceSubmission && (
               <Button variant="primary" onClick={onAddSupportingFilesPathwayOpen}>
                 {t('energySavingsApplication.show.supportingFilesRequest.addSupportingFiles')}

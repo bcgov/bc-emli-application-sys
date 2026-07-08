@@ -4,12 +4,10 @@ import { IPermitBlockStatus } from '../models/permit-block-status';
 import { IActivity, IPermitType } from '../models/permit-classification';
 import { IRequirement } from '../models/requirement';
 import {
-  EActiveUserSortFields,
   EAutoComplianceModule,
   EAutoComplianceType,
   ECollaborationType,
   ECollaboratorType,
-  EDeactivatedUserSortFields,
   EDescriptionPartType,
   EDoorsPerformanceType,
   EEnabledElectiveFieldReason,
@@ -19,7 +17,6 @@ import {
   EJurisdictionTypes,
   ENotificationActionType,
   ENumberUnit,
-  EPendingUserSortFields,
   EPermitApplicationSocketEventTypes,
   EPermitApplicationStatus,
   ERequirementType,
@@ -545,6 +542,13 @@ export interface IMinimalFrozenUser {
   organization?: string;
   certified: boolean;
   discardedAt?: Date;
+}
+
+export interface IInternalComment {
+  id: string;
+  body: string;
+  createdAt: string;
+  user?: IMinimalFrozenUser;
 }
 
 export interface ISubmissionVersion {

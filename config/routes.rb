@@ -235,6 +235,7 @@ Rails.application.routes.draw do
       get "download_application_metrics_csv",
           on: :collection,
           to: "permit_applications#download_application_metrics_csv"
+      resources :internal_comments, only: %i[index create destroy]
     end
 
     resources :support_requests, only: %i[index show create update destroy] do

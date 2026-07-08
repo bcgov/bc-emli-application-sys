@@ -121,6 +121,10 @@ en:
           attributes:
             user:
               incorrect_role: 'User must be review staff'
+        internal_comment:
+          attributes:
+            user:
+              incorrect_role: 'User must be review staff'
         permit_collaboration:
           attributes:
             base:
@@ -569,6 +573,10 @@ en:
       external_api_disabled_success:
         title: ''
         message: 'Program external api successfully disabled!'
+    internal_comment:
+      create_error:
+        title: Error
+        message: '%{error_message}'
     permit_application:
       create_error:
         title: Error

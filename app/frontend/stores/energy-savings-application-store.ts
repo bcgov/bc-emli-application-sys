@@ -1,8 +1,8 @@
 import { t } from 'i18next';
-import { flow, Instance, types } from 'mobx-state-tree';
+import { cast, flow, Instance, types } from 'mobx-state-tree';
 import * as R from 'ramda';
-import { TCreatePermitApplicationFormData } from '../components/domains/energy-savings-application/new-energy-savings-application-screen';
 import { TCreateEnergyApplicationFormData } from '../components/domains/energy-savings-application/new-application';
+import { TCreatePermitApplicationFormData } from '../components/domains/energy-savings-application/new-energy-savings-application-screen';
 import { createSearchModel } from '../lib/create-search-model';
 import { withEnvironment } from '../lib/with-environment';
 import { withMerge } from '../lib/with-merge';
@@ -12,7 +12,6 @@ import { IJurisdiction } from '../models/jurisdiction';
 import { IPermitBlockStatus } from '../models/permit-block-status';
 import { IRequirementTemplate } from '../models/requirement-template';
 import { IUser } from '../models/user';
-import { cast } from 'mobx-state-tree';
 
 import {
   ECustomEvents,
@@ -20,13 +19,11 @@ import {
   EPermitApplicationSortFields,
   EPermitApplicationStatus,
   EPermitApplicationStatusGroup,
-  EPermitClassificationCode,
 } from '../types/enums';
 import {
   IEnergySavingsApplicationComplianceUpdate,
   IEnergySavingsApplicationSearchFilters,
-  IEnergySavingsApplicationSupportingDocumentsUpdate,
-  IMinimalFrozenUser,
+  IInternalComment,
   IPermitApplicationSupportingDocumentsUpdate,
   IUserPushPayload,
   TSearchParams,
@@ -40,6 +37,9 @@ export const PermitApplicationStoreModel = types
   .compose(
     types.model('PermitApplicationStore', {
       permitApplicationMap: types.map(EnergySavingsApplicationModel),
+      // Internal comment threads keyed by permit application id. Kept in the store (not on the
+      // application model) so that reloading/merging the application never clobbers the thread.
+      internalCommentsMap: types.map(types.frozen<IInternalComment[]>()),
       tablePermitApplications: types.array(types.reference(EnergySavingsApplicationModel)),
       currentPermitApplication: types.maybeNull(types.reference(EnergySavingsApplicationModel)),
       statusFilter: types.optional(types.array(types.enumeration(filterableStatus)), [
@@ -84,6 +84,10 @@ export const PermitApplicationStoreModel = types
     // View to get a PermitApplication by id
     getPermitApplicationById(id: string) {
       return self.permitApplicationMap.get(id);
+    },
+    // Internal comment thread for a permit application (empty array if not yet fetched)
+    getInternalComments(id: string): IInternalComment[] {
+      return self.internalCommentsMap.get(id) ?? [];
     },
     // View to get all permitapplications as an array
     get permitApplications() {
@@ -382,6 +386,41 @@ export const PermitApplicationStoreModel = types
         self.normalizeSubmitter(response);
         self.mergeUpdate(response, 'permitApplicationMap');
         return response;
+      }
+      return false;
+    }),
+    fetchInternalComments: flow(function* (permitApplicationId: string) {
+      const permitApplication = self.getPermitApplicationById(permitApplicationId);
+      if (!permitApplication) return false;
+
+      const { ok, data: response } = yield self.environment.api.fetchInternalComments(permitApplicationId);
+      if (ok && response?.data) {
+        self.internalCommentsMap.set(permitApplicationId, response.data);
+        // keep the badge count in sync where the application is loaded
+        self.getPermitApplicationById(permitApplicationId)?.setInternalCommentsCount(response.data.length);
+        return response.data;
+      }
+      return false;
+    }),
+    createInternalComment: flow(function* (permitApplicationId: string, params: { body: string }) {
+      const { ok, data: response } = yield self.environment.api.createInternalComment(permitApplicationId, params);
+      if (ok && response?.data) {
+        const existing = self.internalCommentsMap.get(permitApplicationId) ?? [];
+        const updated = [...existing, response.data];
+        self.internalCommentsMap.set(permitApplicationId, updated);
+        self.getPermitApplicationById(permitApplicationId)?.setInternalCommentsCount(updated.length);
+        return response.data;
+      }
+      return false;
+    }),
+    deleteInternalComment: flow(function* (permitApplicationId: string, commentId: string) {
+      const { ok } = yield self.environment.api.deleteInternalComment(permitApplicationId, commentId);
+      if (ok) {
+        const existing = self.internalCommentsMap.get(permitApplicationId) ?? [];
+        const updated = existing.filter((c) => c.id !== commentId);
+        self.internalCommentsMap.set(permitApplicationId, updated);
+        self.getPermitApplicationById(permitApplicationId)?.setInternalCommentsCount(updated.length);
+        return true;
       }
       return false;
     }),

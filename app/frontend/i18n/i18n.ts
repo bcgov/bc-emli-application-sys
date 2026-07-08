@@ -1515,6 +1515,17 @@ const options = {
               filesAdded: 'Supporting files added on {{date}}',
               filesUploaded: 'Supporting file(s) successfully uploaded',
             },
+            internalComments: {
+              title: 'Comments',
+              addComment: 'Add comment',
+              prompt: 'Only Admins and Admin managers can see these comments.',
+              placeholder: 'Add a comment...',
+              post: 'Post comment',
+              emptyState: 'No comments yet.',
+              unknownAuthor: 'Unknown',
+              delete: 'Delete comment',
+              deleteConfirm: 'Delete this comment?',
+            },
           },
         },
         sandbox: {
