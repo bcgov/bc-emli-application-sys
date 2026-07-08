@@ -23,8 +23,7 @@ class Api::InternalCommentsController < Api::ApplicationController
 
     comment =
       @permit_application.internal_comments.new(
-        body: params[:body],
-        user: current_user
+        internal_comment_params.merge(user: current_user)
       )
 
     if comment.save
@@ -56,6 +55,11 @@ class Api::InternalCommentsController < Api::ApplicationController
   end
 
   private
+
+  # Frontend posts a flat { body }, so permit it at the top level (no resource nesting).
+  def internal_comment_params
+    params.permit(:body)
+  end
 
   def set_permit_application
     @permit_application = PermitApplication.find(params[:permit_application_id])

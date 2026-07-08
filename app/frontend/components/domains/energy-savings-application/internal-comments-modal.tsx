@@ -36,7 +36,6 @@ export const InternalCommentsModal = observer(({ permitApplication, renderTrigge
   const { t } = useTranslation();
   const { permitApplicationStore, userStore } = useMst();
   const currentUser = userStore.currentUser;
-  const triggerRef = React.useRef<HTMLButtonElement>(null);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [body, setBody] = useState('');
@@ -81,12 +80,12 @@ export const InternalCommentsModal = observer(({ permitApplication, renderTrigge
       {renderTrigger ? (
         renderTrigger(onOpen)
       ) : (
-        <Button ref={triggerRef} variant="secondary" onClick={onOpen}>
+        <Button variant="secondary" onClick={onOpen}>
           {t('energySavingsApplication.show.internalComments.title')}
         </Button>
       )}
 
-      <Modal finalFocusRef={triggerRef} onClose={onClose} isOpen={isOpen} scrollBehavior="inside">
+      <Modal onClose={onClose} isOpen={isOpen} scrollBehavior="inside">
         <ModalOverlay />
         <ModalContent maxW="container.md" as="form" onSubmit={handleSubmit}>
           <ModalHeader>

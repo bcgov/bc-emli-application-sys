@@ -127,8 +127,10 @@ RSpec.describe PermitApplicationPolicy do
     end
 
     context "for a system_admin" do
+      # system_admin is NOT review staff; the model rejects them as authors, so the policy
+      # forbids them too (aligned to avoid a policy-pass / validation-422 mismatch).
       let(:user) { FactoryBot.create(:user, :super_admin) }
-      include_examples "permits internal comments"
+      include_examples "forbids internal comments"
     end
 
     context "for a participant" do

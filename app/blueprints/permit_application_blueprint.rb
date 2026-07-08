@@ -51,10 +51,12 @@ class PermitApplicationBlueprint < Blueprinter::Base
            :status_update_reason
     # Internal-comment count for the review-staff inbox/detail badge. Omitted entirely for
     # non-review-staff (the `if:` guard) so it never leaks to participants/contractors and the
-    # frontend model's default (0) applies.
+    # frontend model's default (0) applies. Falls back to Current.user (set by store_currents on
+    # every API request) so callers don't have to remember to pass current_user; external-API
+    # requests set Current.external_api_key (not user), so the field stays correctly omitted there.
     field :internal_comments_count,
           if: ->(_field_name, _pa, options) do
-            options[:current_user]&.review_staff?
+            (options[:current_user] || Current.user)&.review_staff?
           end
     association :submission_type,
                 blueprint: PermitClassificationBlueprint,

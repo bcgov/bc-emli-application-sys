@@ -185,8 +185,7 @@ class Api::ProgramsController < Api::ApplicationController
                      },
                      blueprint: PermitApplicationBlueprint,
                      blueprint_opts: {
-                       view: :program_review_inbox,
-                       current_user: current_user
+                       view: :program_review_inbox
                      }
                    }
   end
