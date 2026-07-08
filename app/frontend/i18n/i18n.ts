@@ -1517,7 +1517,7 @@ const options = {
             },
             internalComments: {
               title: 'Comments',
-              addComment: 'Add comment',
+              addComment: 'Manage comments',
               prompt: 'Only Admins and Admin managers can see these comments.',
               placeholder: 'Add a comment...',
               post: 'Post comment',
