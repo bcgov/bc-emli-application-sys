@@ -15,6 +15,7 @@ import { getCompletedBlocksFromForm, getRequirementByKey } from '../../../utils/
 import { singleRequirementFormJson, singleRequirementSubmissionData } from '../../../utils/formio-helpers';
 import { CompareRequirementsBox } from '../../domains/energy-savings-application/compare-requirements-box';
 import { ErrorsBox } from '../../domains/energy-savings-application/errors-box';
+import { InternalCommentsPanel } from '../../domains/energy-savings-application/internal-comments-panel';
 import { BuilderBottomFloatingButtons } from '../../domains/requirement-template/builder-bottom-floating-buttons';
 import { CustomMessageBox } from '../base/custom-message-box';
 import { SharedSpinner } from '../base/shared-spinner';
@@ -619,6 +620,7 @@ export const RequirementForm = observer(
               status="warning"
             />
           )}
+          {isAdminUser && <InternalCommentsPanel permitApplication={permitApplication} />}
           {/* {permitApplication?.isSubmitted ||
             (permitApplication?.isInReview && (
               <CustomMessageBox
@@ -630,15 +632,17 @@ export const RequirementForm = observer(
                 status="info"
               />
             ))} */}
-          <Text fontSize="sm" mb={0}>
-            {t('site.formSupportContact')}{' '}
-            <Link
-              href={`mailto:${t(currentUser?.isContractor ? 'site.helpDrawer.contractorEmail' : 'site.helpDrawer.emailAddress')}`}
-              isExternal
-            >
-              {t(currentUser?.isContractor ? 'site.helpDrawer.contractorEmail' : 'site.helpDrawer.emailAddress')}
-            </Link>
-          </Text>
+          {!isAdminUser && (
+            <Text fontSize="sm" mb={0}>
+              {t('site.formSupportContact')}{' '}
+              <Link
+                href={`mailto:${t(currentUser?.isContractor ? 'site.helpDrawer.contractorEmail' : 'site.helpDrawer.emailAddress')}`}
+                isExternal
+              >
+                {t(currentUser?.isContractor ? 'site.helpDrawer.contractorEmail' : 'site.helpDrawer.emailAddress')}
+              </Link>
+            </Text>
+          )}
           {showVersionDiffContactWarning && (
             <CustomMessageBox
               description={t('energySavingsApplication.show.versionDiffContactWarning')}

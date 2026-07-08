@@ -88,6 +88,16 @@ class PermitApplicationPolicy < ApplicationPolicy
     user.admin_manager? || user.admin?
   end
 
+  # Internal review comments — visible to and authored by review staff only.
+  # Role-only (no program/status scoping), matching the sibling review actions above.
+  def view_internal_comments?
+    user.review_staff? || user.system_admin?
+  end
+
+  def create_internal_comment?
+    user.review_staff? || user.system_admin?
+  end
+
   # Default hook for support requests – subclasses/services must override!
   def support_requests?
     false

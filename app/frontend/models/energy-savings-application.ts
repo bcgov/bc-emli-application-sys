@@ -113,6 +113,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       isViewingPastRequests: types.optional(types.boolean, false),
       supportRequests: types.maybeNull(types.array(types.frozen<ISupportRequest>())), // Array of ISupportRequest
       incomingSupportRequests: types.maybeNull(types.frozen<ISupportRequest>()), // ISupportRequest link to Parent Application
+      internalCommentsCount: types.optional(types.number, 0), // review-staff-only badge count (base blueprint)
     })
     .extend(withEnvironment())
     .extend(withRootStore())
@@ -716,6 +717,9 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       },
       setAssignedUsers(users: IMinimalFrozenUser[]) {
         self.assignedUsers.splice(0, self.assignedUsers.length, ...users);
+      },
+      setInternalCommentsCount(count: number) {
+        self.internalCommentsCount = count;
       },
       updatePermitCollaboration(permitCollaborationData: IPermitCollaboration) {
         if (permitCollaborationData.collaborator) {

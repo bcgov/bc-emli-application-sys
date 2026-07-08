@@ -1,22 +1,24 @@
 import { ApiResponse, ApisauceInstance, create, Monitor } from 'apisauce';
+import { TCreateEnergyApplicationFormData } from '../../components/domains/energy-savings-application/new-application';
 import { TCreatePermitApplicationFormData } from '../../components/domains/energy-savings-application/new-energy-savings-application-screen';
 import { IRevisionRequestForm } from '../../components/domains/energy-savings-application/revision-sidebar';
 import { IJurisdictionTemplateVersionCustomizationForm } from '../../components/domains/requirement-template/screens/jurisdiction-edit-digital-permit-screen';
 import { TContactFormData } from '../../components/shared/contact/create-edit-contact-modal';
 import { IEarlyAccessPreview } from '../../models/early-access-preview';
+import { IEnergySavingsApplication } from '../../models/energy-savings-application';
 import { IExternalApiKey } from '../../models/external-api-key';
 import { IIntegrationMapping } from '../../models/integration-mapping';
 import { IJurisdiction } from '../../models/jurisdiction';
 import { IJurisdictionTemplateVersionCustomization } from '../../models/jurisdiction-template-version-customization';
-import { IEnergySavingsApplication } from '../../models/energy-savings-application';
 import {
   IActivity,
-  IPermitType,
   IAudienceType,
+  IPermitType,
   ISubmissionType,
   IUserGroupType,
 } from '../../models/permit-classification';
 import { IPermitCollaboration } from '../../models/permit-collaboration';
+import { IProgram } from '../../models/program';
 import { IRequirementTemplate } from '../../models/requirement-template';
 import { IStepCode } from '../../models/step-code';
 import { IStepCodeChecklist } from '../../models/step-code-checklist';
@@ -64,20 +66,19 @@ import {
 import {
   IContact,
   ICopyRequirementTemplateFormData,
+  IInternalComment,
   IJurisdictionFilters,
   IJurisdictionSearchFilters,
   IPermitApplicationSearchFilters,
+  ISyncClassificationsParams,
   ITemplateVersionDiff,
   TAutoComplianceModuleConfigurations,
   TCreateRequirementTemplateFormData,
-  TSearchParams,
-  ISyncClassificationsParams,
   TInviteUserParams,
+  TSearchParams,
 } from '../../types/types';
 import { camelizeResponse, decamelizeRequest } from '../../utils';
 import { getCsrfToken } from '../../utils/utility-functions';
-import { IProgram } from '../../models/program';
-import { TCreateEnergyApplicationFormData } from '../../components/domains/energy-savings-application/new-application';
 
 export class Api {
   client: ApisauceInstance;
@@ -317,6 +318,23 @@ export class Api {
       parent_application_id: parentId,
       ...params,
     });
+  }
+
+  async fetchInternalComments(permitApplicationId: string) {
+    return this.client.get<ApiResponse<IInternalComment[]>>(
+      `/permit_applications/${permitApplicationId}/internal_comments`,
+    );
+  }
+
+  async createInternalComment(permitApplicationId: string, params: { body: string }) {
+    return this.client.post<ApiResponse<IInternalComment>>(
+      `/permit_applications/${permitApplicationId}/internal_comments`,
+      params,
+    );
+  }
+
+  async deleteInternalComment(permitApplicationId: string, commentId: string) {
+    return this.client.delete(`/permit_applications/${permitApplicationId}/internal_comments/${commentId}`);
   }
 
   async createRequirementBlock(params: IRequirementBlockParams) {

@@ -51,9 +51,17 @@ class Api::PermitApplicationsController < Api::ApplicationController
   def mark_as_viewed
     authorize @permit_application
     @permit_application.update_viewed_at
+    # current_user is required so the review-staff-gated `internal_comments_count` field renders
+    # in the blueprint; without it the field is omitted and merging this response into the
+    # frontend model would blank the comments badge count. (Same reason it's passed in `show`.)
     render_success @permit_application,
                    nil,
-                   { blueprint_opts: { view: :program_review_extended } }
+                   {
+                     blueprint_opts: {
+                       view: :program_review_extended,
+                       current_user: current_user
+                     }
+                   }
   end
 
   def change_status

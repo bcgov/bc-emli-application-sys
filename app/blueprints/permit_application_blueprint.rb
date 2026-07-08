@@ -49,6 +49,13 @@ class PermitApplicationBlueprint < Blueprinter::Base
            :revisions_requested_at,
            :missing_pdfs,
            :status_update_reason
+    # Internal-comment count for the review-staff inbox/detail badge. Omitted entirely for
+    # non-review-staff (the `if:` guard) so it never leaks to participants/contractors and the
+    # frontend model's default (0) applies.
+    field :internal_comments_count,
+          if: ->(_field_name, _pa, options) do
+            options[:current_user]&.review_staff?
+          end
     association :submission_type,
                 blueprint: PermitClassificationBlueprint,
                 view: :base

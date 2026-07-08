@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_10_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_07_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -321,6 +321,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_170000) do
             name: "index_integration_mappings_on_template_version_id"
   end
 
+  create_table "internal_comments",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.uuid "permit_application_id", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
+    t.index ["permit_application_id"],
+            name: "index_internal_comments_on_permit_application_id"
+    t.index ["user_id"], name: "index_internal_comments_on_user_id"
+  end
+
   create_table "jurisdiction_memberships",
                id: :uuid,
                default: -> { "gen_random_uuid()" },
@@ -407,6 +421,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_170000) do
     t.boolean "first_nations", default: false
     t.jsonb "form_customizations_snapshot"
     t.string "full_address"
+    t.integer "internal_comments_count", default: 0, null: false
     t.uuid "jurisdiction_id"
     t.string "nickname"
     t.string "number"
@@ -1235,6 +1250,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_170000) do
   add_foreign_key "integration_mapping_notifications", "template_versions"
   add_foreign_key "integration_mappings", "jurisdictions"
   add_foreign_key "integration_mappings", "template_versions"
+  add_foreign_key "internal_comments", "permit_applications"
+  add_foreign_key "internal_comments", "users"
   add_foreign_key "jurisdiction_memberships", "jurisdictions"
   add_foreign_key "jurisdiction_memberships", "users"
   add_foreign_key "jurisdiction_template_version_customizations",

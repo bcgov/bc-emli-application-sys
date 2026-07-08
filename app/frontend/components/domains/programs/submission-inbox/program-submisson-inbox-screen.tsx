@@ -1,32 +1,31 @@
-import { Box, Button, Container, Flex, Heading, HStack, IconButton, Stack, Text, VStack } from '@chakra-ui/react';
-import { ArrowSquareOut, Download } from '@phosphor-icons/react';
+import { Badge, Box, Container, Flex, Heading, HStack, IconButton, Stack, Text, VStack } from '@chakra-ui/react';
+import { ChatCircle, Download } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useJurisdiction } from '../../../../hooks/resources/use-jurisdiction';
 import { usePermitClassificationsLoad } from '../../../../hooks/resources/use-permit-classifications-load';
+import { useProgram } from '../../../../hooks/resources/use-program';
+import { useSessionStorage } from '../../../../hooks/use-session-state';
 import { IEnergySavingsApplication } from '../../../../models/energy-savings-application';
 import { useMst } from '../../../../setup/root';
-import { ECollaborationType, EFlashMessageStatus, EPermitClassificationCode } from '../../../../types/enums';
+import { ECollaborationType, EFlashMessageStatus } from '../../../../types/enums';
+import { IMinimalFrozenUser } from '../../../../types/types';
 import { ErrorScreen } from '../../../shared/base/error-screen';
+import { AsyncDropdown } from '../../../shared/base/inputs/async-dropdown';
 import { Paginator } from '../../../shared/base/inputs/paginator';
 import { PerPageSelect } from '../../../shared/base/inputs/per-page-select';
 import { LoadingScreen } from '../../../shared/base/loading-screen';
 import { SharedSpinner } from '../../../shared/base/shared-spinner';
+import { EnergySavingsApplicationStatusTag } from '../../../shared/energy-savings-applications/energy-savings-application-status-tag';
 import { SearchGrid } from '../../../shared/grid/search-grid';
 import { SearchGridItem } from '../../../shared/grid/search-grid-item';
-import { RouterLink } from '../../../shared/navigation/router-link';
 import { RouterLinkButton } from '../../../shared/navigation/router-link-button';
-import { EnergySavingsApplicationStatusTag } from '../../../shared/energy-savings-applications/energy-savings-application-status-tag';
 import { DesignatedCollaboratorAssignmentPopover } from '../../energy-savings-application/assignment-management/designated-user-assignment-popover';
+import { InternalCommentsModal } from '../../energy-savings-application/internal-comments-modal';
 import { SubmissionDownloadModal } from '../../energy-savings-application/submission-download-modal';
 import { GridHeaders } from './grid-header';
-import { AsyncDropdown } from '../../../shared/base/inputs/async-dropdown';
-import { FormProvider, useForm, Controller } from 'react-hook-form';
-import { useProgram } from '../../../../hooks/resources/use-program';
-import { IMinimalFrozenUser, IOption } from '../../../../types/types';
-import { useSessionStorage } from '../../../../hooks/use-session-state';
 
 export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionInbox() {
   const { isLoaded: isPermitClassificationsLoaded } = usePermitClassificationsLoad();
@@ -321,6 +320,40 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
       <SearchGridItem gap={2}>
         <Stack>
           <HStack>
+            <InternalCommentsModal
+              permitApplication={permitApplication}
+              renderTrigger={(onOpen) => (
+                <Box position="relative" display="inline-flex">
+                  <IconButton
+                    variant="secondary"
+                    icon={<ChatCircle />}
+                    aria-label={
+                      permitApplication.internalCommentsCount > 0
+                        ? `${t('energySavingsApplication.show.internalComments.title')} (${permitApplication.internalCommentsCount})`
+                        : t('energySavingsApplication.show.internalComments.title')
+                    }
+                    onClick={onOpen}
+                  />
+                  {permitApplication.internalCommentsCount > 0 && (
+                    <Badge
+                      aria-hidden={true}
+                      position="absolute"
+                      top="-6px"
+                      right="-6px"
+                      colorScheme="theme.blue"
+                      bg="theme.blue"
+                      color="greys.white"
+                      borderRadius="full"
+                      fontSize="0.7em"
+                      minW="18px"
+                      textAlign="center"
+                    >
+                      {permitApplication.internalCommentsCount}
+                    </Badge>
+                  )}
+                </Box>
+              )}
+            />
             <SubmissionDownloadModal
               permitApplication={permitApplication}
               renderTrigger={(onOpen) => (
