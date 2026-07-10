@@ -29,6 +29,6 @@ export default defineConfig({
   optimizeDeps: {
     // Force esbuild to pre-bundle CJS packages into ESM so rolldown
     // doesn't mangle their default exports (React error #130)
-    include: ['react-quill', 'formiojs', '@formio/react', '@formio/js'],
+    include: ['formiojs', '@formio/react', '@formio/js'],
   },
 });
