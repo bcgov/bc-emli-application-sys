@@ -1,7 +1,9 @@
-/* CSS is imported from the installed `quill` package itself (not react-quill's
-   bundle) so it always matches the Quill version actually running - react-quill
-   still declares "quill": "^1.3.7", so its own published CSS is stale relative
-   to the "quill": "2.0.2" this app resolves via package.json override */
+/* CSS is imported from the installed `quill` package itself so it always
+   matches the Quill version actually running (pinned to "2.0.2" via the
+   package.json override below). Previously this imported react-quill's
+   published CSS bundle via CDN, which was stale (built against quill@^1.3.7)
+   and caused bullet lists to render as numbered lists. react-quill has since
+   been removed from this app entirely. */
 @import 'quill/dist/quill.snow.css';
 @import 'quill/dist/quill.bubble.css';
 
