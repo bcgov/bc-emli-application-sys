@@ -133,8 +133,7 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
                     showOptional={false}
                     inputProps={{ w: 'lg', maxLength: 1000 }}
                     validate={{
-                      satisfiesLength: (str: string) =>
-                        !str || (str.length >= 1 && str.length <= 1000) || t('ui.invalidInput'),
+                      satisfiesLength: (str: string | null) => !str || str.length <= 1000 || t('ui.invalidInput'),
                     }}
                     sx={{
                       '& label': {
