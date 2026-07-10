@@ -8,16 +8,8 @@ import {
   FormLabel,
   HStack,
   Heading,
-  Switch,
-  VStack,
   Select,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  ModalCloseButton,
+  Switch,
   useDisclosure,
 } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
@@ -28,8 +20,8 @@ import { useNavigate } from 'react-router-dom';
 import { useMst } from '../../../../setup/root';
 import { TSiteWideMessageConfiguration } from '../../../../types/types';
 import { TextFormControl } from '../../../shared/form/input-form-control';
-import { SectionBox } from '../../home/section-box';
 import { GlobalConfirmationModal } from '../../../shared/modals/global-confirmation-modal';
+import { SectionBox } from '../../home/section-box';
 
 export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
   const { siteConfigurationStore } = useMst();
@@ -139,7 +131,10 @@ export const SitewideMessageScreen = observer(function SitewideMessageScreen() {
                     fieldName="sitewideMessage"
                     hint={t('siteConfiguration.sitewideMessage.hint')}
                     showOptional={false}
-                    inputProps={{ w: 'lg', maxLength: 255 }} // Added maxLength to limit input to 255 characters
+                    inputProps={{ w: 'lg', maxLength: 1000 }}
+                    validate={{
+                      satisfiesLength: (str: string | null) => !str || str.length <= 1000 || t('ui.invalidInput'),
+                    }}
                     sx={{
                       '& label': {
                         mb: 1,
