@@ -15,21 +15,18 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
-  Spacer,
   Text,
   Textarea,
   useDisclosure,
 } from '@chakra-ui/react';
-import { Trash } from '@phosphor-icons/react';
 import React, { useState } from 'react';
 import { UseFieldArrayReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useMst } from '../../../setup/root';
 import { IFormIORequirement, IRevisionRequest } from '../../../types/types';
-import { singleRequirementFormJson } from '../../../utils/formio-helpers';
 import { formatFieldValue } from '../../../utils/field-value-formatter';
+import { singleRequirementFormJson } from '../../../utils/formio-helpers';
 import { IRevisionRequestForm } from '../../domains/energy-savings-application/revision-sidebar';
-import { SingleRequirementForm } from '../energy-savings-applications/single-requirement-form';
 
 export interface IRevisionModalProps extends Partial<ReturnType<typeof useDisclosure>> {
   requirementJson: IFormIORequirement;
@@ -46,6 +43,7 @@ export interface IRevisionModalProps extends Partial<ReturnType<typeof useDisclo
 }
 
 const CONTRACTOR_REASON_CODE = 'contractor_onboarding_form';
+const MAX_COMMENT_LENGTH = 1000;
 
 export const RevisionModal: React.FC<IRevisionModalProps> = ({
   requirementJson,
@@ -206,7 +204,7 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder={t('permitApplication.show.revision.comment')}
-                maxLength={350}
+                maxLength={MAX_COMMENT_LENGTH}
                 isDisabled={isRevisionsRequested}
                 sx={{
                   _disabled: {
@@ -215,7 +213,14 @@ export const RevisionModal: React.FC<IRevisionModalProps> = ({
                   },
                 }}
               />
-              {!disableInput && <FormHelperText>{t('permitApplication.show.revision.maxCharacters')}</FormHelperText>}
+              {!disableInput && (
+                <FormHelperText>
+                  {t('permitApplication.show.revision.maxCharacters', {
+                    count: comment.length,
+                    max: MAX_COMMENT_LENGTH,
+                  })}
+                </FormHelperText>
+              )}
             </FormControl>
 
             <Divider />

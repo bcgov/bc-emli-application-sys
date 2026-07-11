@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_07_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_10_213000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -756,7 +756,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_120000) do
                id: :uuid,
                default: -> { "gen_random_uuid()" },
                force: :cascade do |t|
-    t.string "comment", limit: 350
+    t.string "comment", limit: 1000
     t.datetime "created_at", null: false
     t.string "performed_by"
     t.string "reason_code", limit: 64
