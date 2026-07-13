@@ -35,6 +35,7 @@ import {
 } from '../../types/api-request';
 import {
   IAcceptInvitationResponse,
+  IAhriLookupResponse,
   IApiResponse,
   ICollaboratorSearchResponse,
   IEmployeeActionResponse,
@@ -660,7 +661,7 @@ export class Api {
   }
 
   async fetchRequirementTemplate(id: string) {
-    return this.client.get<IApiResponse<IRequirementTemplate, {}>>(`/requirement_templates/${id}`);
+    return this.client.get<IApiResponse<IRequirementTemplate, unknown>>(`/requirement_templates/${id}`);
   }
 
   async createRequirementTemplate(params: TCreateRequirementTemplateFormData) {
@@ -957,5 +958,9 @@ export class Api {
 
   async checkEligibilityCode(code: string) {
     return this.client.get<{ valid: boolean; expiryDate?: string }>(`/eligibility_codes/${encodeURIComponent(code)}`);
+  }
+
+  async lookupAhriReference(referenceId: string) {
+    return this.client.post<IAhriLookupResponse>('/ahri_lookups', { referenceId });
   }
 }

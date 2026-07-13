@@ -115,7 +115,9 @@ const requirementsComponentMap = {
     ...editableGroupProps
   }: TRequirementEditProps<TFieldValues>) {
     if (!unitSelectProps) {
-      import.meta.env.DEV && console.error('unitSelectProps is required for number requi  rement edit');
+      if (import.meta.env.DEV) {
+        console.error('unitSelectProps is required for number requirement edit');
+      }
       return null;
     }
 
@@ -155,7 +157,9 @@ const requirementsComponentMap = {
     const { t } = useTranslation();
 
     if (!multiOptionProps) {
-      import.meta.env.DEV && console.error('multiOptionProps is required for radio requirement edit');
+      if (import.meta.env.DEV) {
+        console.error('multiOptionProps is required for radio requirement edit');
+      }
       return null;
     }
 
@@ -240,7 +244,9 @@ const requirementsComponentMap = {
     const { t } = useTranslation();
 
     if (!multiOptionProps) {
-      import.meta.env.DEV && console.error('multiOptionProps is required for multiOptionSelect requirement edit');
+      if (import.meta.env.DEV) {
+        console.error('multiOptionProps is required for multiOptionSelect requirement edit');
+      }
       return null;
     }
 
@@ -296,7 +302,9 @@ const requirementsComponentMap = {
     const { t } = useTranslation();
 
     if (!multiOptionProps) {
-      import.meta.env.DEV && console.error('multiOptionProps is required for select requirement edit');
+      if (import.meta.env.DEV) {
+        console.error('multiOptionProps is required for select requirement edit');
+      }
       return null;
     }
     const { useFieldArrayProps, onOptionValueChange, getOptionValue } = multiOptionProps;
@@ -378,7 +386,9 @@ const requirementsComponentMap = {
     ];
 
     if (!canAddMultipleContactProps) {
-      import.meta.env.DEV && console.error('canAddMultipleContactProps is required for contact requirement edit');
+      if (import.meta.env.DEV) {
+        console.error('canAddMultipleContactProps is required for contact requirement edit');
+      }
       return null;
     }
 
@@ -399,7 +409,9 @@ const requirementsComponentMap = {
     ...rest
   }: TRequirementEditProps<TFieldValues>) {
     if (!canAddMultipleContactProps) {
-      import.meta.env.DEV && console.error('multipleContactProps is required for contact requirement edit');
+      if (import.meta.env.DEV) {
+        console.error('multipleContactProps is required for contact requirement edit');
+      }
       return null;
     }
 
@@ -471,6 +483,10 @@ const requirementsComponentMap = {
     return <EditableGroup editableInput={<Input bg={'white'} isReadOnly />} {...props} />;
   },
 
+  [ERequirementType.ahriNumber]: function <TFieldValues>(props: TRequirementEditProps<TFieldValues>) {
+    return <EditableGroup editableInput={<Input bg={'white'} isReadOnly />} {...props} />;
+  },
+
   [ERequirementType.serviceInformation]: function <TFieldValues>({
     editableLabelProps,
     isOptionalCheckboxProps,
@@ -501,8 +517,9 @@ const requirementsComponentMap = {
     ];
 
     if (!isOptionalCheckboxProps) {
-      import.meta.env.DEV &&
+      if (import.meta.env.DEV) {
         console.error('isOptionalCheckboxProps is required for service information requirement edit');
+      }
       return null;
     }
 
@@ -529,7 +546,7 @@ export const RequirementFieldEdit = observer(function RequirementFieldEdit<TFiel
   // removing unnecessary props based on requirement type, to prevent
   // passing them to dom
   const propsToRemove = (() => {
-    let toRemove = [];
+    const toRemove = [];
 
     if (requirementType !== ERequirementType.number) {
       toRemove.push('unitSelectProps');

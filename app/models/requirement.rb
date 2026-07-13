@@ -29,7 +29,8 @@ class Requirement < ApplicationRecord
          professional_contact: 18,
          pid_info: 19,
          service_information: 20,
-         utility_account_number: 21
+         utility_account_number: 21,
+         ahri_number: 22
        },
        prefix: true
 

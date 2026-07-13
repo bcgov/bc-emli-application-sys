@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Button, Flex, HStack, Tag, Text, useDisclosure, VStack } from '@chakra-ui/react';
 import { Info } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
@@ -83,7 +84,9 @@ export const FieldsSetup = observer(function FieldsSetup({
           ? t('requirementsLibrary.modals.defaultContactLabel')
           : requirementType === ERequirementType.serviceInformation
             ? t('requirementsLibrary.requirementTypeLabels.serviceInformation')
-            : undefined,
+            : requirementType === ERequirementType.ahriNumber
+              ? t('requirementsLibrary.requirementTypeLabels.ahriNumber')
+              : undefined,
         ...(isMultiOptionRequirement(requirementType)
           ? {
               inputOptions: {
@@ -344,7 +347,6 @@ export const FieldsSetup = observer(function FieldsSetup({
                                     control: control,
 
                                     name: `requirementsAttributes.${index}.inputOptions.numberUnit`,
-                                    // @ts-ignore
                                     defaultValue: ENumberUnit.noUnit,
                                   },
                                 }
@@ -399,7 +401,7 @@ export const FieldsSetup = observer(function FieldsSetup({
                           helperText={watchedHint}
                           unit={
                             requirementType === ERequirementType.number
-                              ? watch(`requirementsAttributes.${index}.inputOptions.numberUnit`) ?? null
+                              ? (watch(`requirementsAttributes.${index}.inputOptions.numberUnit`) ?? null)
                               : undefined
                           }
                           options={watch(`requirementsAttributes.${index}.inputOptions.valueOptions`)?.map(

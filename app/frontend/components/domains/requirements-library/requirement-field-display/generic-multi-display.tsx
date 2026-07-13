@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, BoxProps, Button, Heading, HeadingProps } from '@chakra-ui/react';
 import { Plus } from '@phosphor-icons/react';
 import React from 'react';
@@ -72,7 +73,7 @@ export function GenericMultiDisplay<TFieldValues>({
         <Box w={'full'} display={'grid'} gridTemplateColumns={'repeat(2, 1fr)'} gap={'1rem 1.5rem'}>
           {fieldItems.map(({ type, key, label, required, containerProps }) => (
             <Box
-              key={type}
+              key={`${key}-${type}`}
               sx={{
                 '.chakra-form-control': {
                   display: 'flex',
