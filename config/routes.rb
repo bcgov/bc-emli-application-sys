@@ -181,6 +181,8 @@ Rails.application.routes.draw do
 
     resources :eligibility_codes, only: %i[show]
 
+    resources :ahri_lookups, only: %i[create]
+
     resources :geocoder, only: %i[] do
       get "site_options", on: :collection
       get "pids", on: :collection

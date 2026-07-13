@@ -602,7 +602,6 @@ types" do
           key:
             "#{requirement.requirement_block.key}|multi_option_select_requirement",
           label: "Multi option select Requirement",
-          optionsLabelPosition: "right",
           requirementInputType: "multi_option_select",
           tableView: false,
           type: "selectboxes",
@@ -634,6 +633,77 @@ types" do
         }
 
         expect(form_json).to eq(expected_form_json)
+      end
+
+      it "returns correct form json for AHRI number requirement" do
+        ahri_hint =
+          '<a href="https://www.ahridirectory.org" target="_blank">AHRI Directory</a>'
+        requirement =
+          create(
+            :requirement,
+            requirement_code: "ahri_number",
+            label: "AHRI Number",
+            input_type: "ahri_number",
+            required: true,
+            hint: ahri_hint
+          )
+
+        form_json = requirement.to_form_json
+        parent_key = "#{requirement.requirement_block.key}|ahri_number"
+
+        expect(form_json).to include(
+          id: requirement.id,
+          key: "#{parent_key}|ahriLookup",
+          type: "fieldset",
+          custom_class: "ahri-number-field-set",
+          label: "AHRI Number",
+          hideLabel: true,
+          input: false,
+          tableView: false,
+          validate: {
+            required: true
+          }
+        )
+        expect(form_json).not_to have_key(:description)
+
+        ahri_columns = form_json[:components].first
+        expect(ahri_columns).to include(type: "columns")
+        expect(ahri_columns[:columns].first[:components].first).to include(
+          key: "#{parent_key}|ahriNumber",
+          label: I18n.t("formio.requirement.ahri_number.reference_id"),
+          type: "simpletextfield",
+          description: ahri_hint,
+          validate: {
+            required: true
+          }
+        )
+        expect(ahri_columns[:columns].second[:components].first).to include(
+          type: "button",
+          action: "custom",
+          label: "Lookup"
+        )
+
+        result_columns = form_json[:components].second
+        expect(result_columns[:columns].first[:components].first).to include(
+          key: "#{parent_key}|make",
+          label: I18n.t("formio.requirement.ahri_number.make"),
+          type: "simpletextfield",
+          disabled: true,
+          persistent: true,
+          validate: {
+            required: true
+          }
+        )
+        expect(result_columns[:columns].second[:components].first).to include(
+          key: "#{parent_key}|model",
+          label: I18n.t("formio.requirement.ahri_number.model"),
+          type: "simpletextfield",
+          disabled: true,
+          persistent: true,
+          validate: {
+            required: true
+          }
+        )
       end
 
       context "electives" do
@@ -707,6 +777,7 @@ types" do
             },
             customConditional: ";show = false"
           }
+          expect(form_json).to eq(expected_form_json)
         end
 
         it "merges the show condition for an elective with customConditional" do
@@ -734,6 +805,7 @@ types" do
             },
             customConditional: "show = true;show = false"
           }
+          expect(form_json).to eq(expected_form_json)
         end
       end
 

@@ -15,6 +15,8 @@ class Wrappers::Base
 
   def handle_response(response)
     if response.success?
+      return nil if response.body.to_s.strip.blank?
+
       return(
         response.body.is_a?(Hash) ? response.body : JSON.parse(response.body)
       )

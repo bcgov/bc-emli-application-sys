@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 export enum EFlashMessageStatus {
   error = 'error',
   success = 'success',
@@ -284,6 +283,7 @@ export enum ERequirementType {
   professionalContact = 'professional_contact',
   serviceInformation = 'service_information',
   utilityAccountNumber = 'utility_account_number',
+  ahriNumber = 'ahri_number',
 }
 
 export enum ENumberUnit {

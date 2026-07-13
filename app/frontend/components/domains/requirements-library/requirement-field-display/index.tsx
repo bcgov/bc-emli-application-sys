@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Box,
   BoxProps,
@@ -338,6 +339,57 @@ const requirementsComponentMap = {
 
   [ERequirementType.utilityAccountNumber](props: TRequirementFieldDisplayProps) {
     return <GenericFieldDisplay inputDisplay={<Input bg={'white'} />} {...props} />;
+  },
+
+  [ERequirementType.ahriNumber](props: TRequirementFieldDisplayProps) {
+    const ahriFieldItemTypes: Array<{
+      type: ERequirementType;
+      key: string;
+      label: string;
+      containerProps?: BoxProps;
+      required?: boolean;
+    }> = [
+      {
+        type: ERequirementType.text,
+        key: 'ahri_number',
+        label: 'AHRI number',
+        required: props?.required,
+      },
+      {
+        type: ERequirementType.text,
+        key: 'make',
+        label: 'Make',
+      },
+      {
+        type: ERequirementType.text,
+        key: 'model',
+        label: 'Model',
+      },
+    ];
+
+    return (
+      <Box>
+        <GenericMultiDisplay
+          fieldItems={ahriFieldItemTypes}
+          {...props}
+          showAddButton={false}
+          label={props.label || 'AHRI Number'}
+        />
+        <Button
+          variant="primary"
+          size="sm"
+          my={6}
+          isDisabled
+          _disabled={{
+            bg: 'primary',
+            color: 'white',
+            cursor: 'not-allowed',
+          }}
+        >
+          Lookup
+        </Button>
+      </Box>
+    );
   },
 
   [ERequirementType.serviceInformation](props: TRequirementFieldDisplayProps) {

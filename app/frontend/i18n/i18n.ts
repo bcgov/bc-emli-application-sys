@@ -1743,6 +1743,7 @@ const options = {
             pidInfo: 'Pid Info',
             serviceInformation: 'Employee Information',
             utilityAccountNumber: 'Utility Account Number',
+            ahriNumber: 'AHRI Number',
           },
           contactFieldItemLabels: {
             firstName: 'First name',
@@ -3507,6 +3508,7 @@ const options = {
   lng: 'en', // default language
   fallbackLng: 'en',
   interpolation: { escapeValue: false },
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   parseMissingKeyHandler: (key, defaultValue) => {
     return fallbackTranslations.en.fallback;
   },

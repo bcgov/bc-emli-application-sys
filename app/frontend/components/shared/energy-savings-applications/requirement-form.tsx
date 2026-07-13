@@ -1,15 +1,17 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Center, Collapse, Flex, Link, Text, useDisclosure } from '@chakra-ui/react';
 import { CaretDown, CaretUp } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 
 import { format } from 'date-fns';
 import * as R from 'ramda';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMountStatus } from '../../../hooks/use-mount-status';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
-import { useMst } from '../../../setup/root';
+import { useMst, useServerAPI } from '../../../setup/root';
 import { IErrorsBoxData } from '../../../types/types';
 import { getCompletedBlocksFromForm, getRequirementByKey } from '../../../utils/formio-component-traversal';
 import { singleRequirementFormJson, singleRequirementSubmissionData } from '../../../utils/formio-helpers';
@@ -56,14 +58,12 @@ export const RequirementForm = observer(
     showSiteWarning = true,
   }: IRequirementFormProps) => {
     const {
-      jurisdiction,
       submissionData,
       setSelectedTabIndex,
       indexOfBlockId,
       formJson,
       blockClasses,
       formattedFormJson,
-      isDraft,
       isScreenedIn,
       isIneligible,
       previousSubmissionVersion,
@@ -75,6 +75,7 @@ export const RequirementForm = observer(
     const userShouldSeeDiff = permitApplication?.currentUserShouldSeeApplicationDiff;
     const isSubmitted = permitApplication?.isSubmitted;
     const { userStore } = useMst();
+    const api = useServerAPI();
     const { currentUser } = userStore;
 
     const pastVersion = isViewingPastRequests ? selectedPastSubmissionVersion : previousSubmissionVersion;
@@ -110,7 +111,6 @@ export const RequirementForm = observer(
     } = useDisclosure();
 
     const infoBoxData = permitApplication.diffToInfoBoxData;
-    const [applicationNumber, setApplicationNumber] = useState(null);
     const [infoStatusItems, setInfoStatusItems] = useState([]);
 
     useEffect(() => {
@@ -227,31 +227,72 @@ export const RequirementForm = observer(
       };
     }, [formJson, isMounted, window.innerHeight, wrapperClickCount]);
 
-    const handleOpenStepCode = async (_event) => {
+    const handleOpenStepCode = useCallback(async () => {
       await triggerSave?.();
       navigate('step-code', { state: { enableStepCodeRoute: true } });
-    };
+    }, [navigate, triggerSave]);
 
-    const handleOpenContactAutofill = async (event) => {
-      setAutofillContactKey(event.detail.key);
-      onContactsOpen();
-    };
+    const handleOpenContactAutofill = useCallback(
+      async (event) => {
+        setAutofillContactKey(event.detail.key);
+        onContactsOpen();
+      },
+      [onContactsOpen],
+    );
 
-    const handleOpenPreviousSubmission = async (event) => {
-      setPreviousSubmissionKey(event.detail.key);
-      onPreviousSubmissionOpen();
-    };
+    const handleOpenPreviousSubmission = useCallback(
+      async (event) => {
+        setPreviousSubmissionKey(event.detail.key);
+        onPreviousSubmissionOpen();
+      },
+      [onPreviousSubmissionOpen],
+    );
+
+    const handleLookupAhriNumber = useCallback(
+      async (event) => {
+        const { ahriNumberKey, makeKey, modelKey } = event.detail || {};
+        const makeComponent = formRef.current?.getComponent(makeKey);
+        const modelComponent = formRef.current?.getComponent(modelKey);
+
+        [makeComponent, modelComponent].forEach((component) => {
+          if (!component) return;
+
+          component.component.validate = {
+            ...(component.component.validate || {}),
+            required: true,
+          };
+          component.setValue('');
+        });
+
+        const ahriNumber = formRef.current?.getComponent(ahriNumberKey)?.getValue()?.toString()?.trim();
+        permitApplication.setIsDirty(true);
+
+        if (!ahriNumber) return;
+
+        const response = await api.lookupAhriReference(ahriNumber);
+        if (!response.ok) return;
+
+        const make = response.data?.make || response.data?.outdoorUnitBrandName || '';
+        const model = response.data?.model || response.data?.modelNumber || '';
+
+        makeComponent?.setValue(make);
+        modelComponent?.setValue(model);
+      },
+      [api, formRef, permitApplication],
+    );
 
     useEffect(() => {
       document.addEventListener('openStepCode', handleOpenStepCode);
       document.addEventListener('openAutofillContact', handleOpenContactAutofill);
       document.addEventListener('openPreviousSubmission', handleOpenPreviousSubmission);
+      document.addEventListener('lookupAhriNumber', handleLookupAhriNumber);
       return () => {
         document.removeEventListener('openStepCode', handleOpenStepCode);
         document.removeEventListener('openAutofillContact', handleOpenContactAutofill);
         document.removeEventListener('openPreviousSubmission', handleOpenPreviousSubmission);
+        document.removeEventListener('lookupAhriNumber', handleLookupAhriNumber);
       };
-    }, []);
+    }, [handleLookupAhriNumber, handleOpenContactAutofill, handleOpenPreviousSubmission, handleOpenStepCode]);
 
     const setIsCollapsedAll = (isCollapsedAll: boolean) => {
       if (isCollapsedAll) {
@@ -384,8 +425,6 @@ export const RequirementForm = observer(
     };
     // formio-component-${requirementJson.key}
     const isAdminUser = currentUser?.role === 'admin' || currentUser?.role === 'admin_manager';
-    // Trust the parent component's isEditing logic - it already handles pathway context
-    const shouldAllowAdminEditing = isAdminUser && isEditing;
 
     // Process form JSON to handle field editability based on pathway
     const processedFormJson = useMemo(() => {

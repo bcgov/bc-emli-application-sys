@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 import { ICollaborator } from '../models/collaborator';
-import { IJurisdiction } from '../models/jurisdiction';
 import { IPermitApplication } from '../models/energy-savings-application';
+import { IJurisdiction } from '../models/jurisdiction';
+import { IProgram } from '../models/program';
 import { IRequirementBlock } from '../models/requirement-block';
 import { IRequirementTemplate } from '../models/requirement-template';
 import { IUser } from '../models/user';
 import { INotification, IOption, ITemplateVersionDiff } from './types';
-import { IProgram } from '../models/program';
 
 export interface IApiResponse<TData, TMeta> {
   data: TData;
@@ -18,28 +19,27 @@ export interface IPageMeta {
   currentPage: number;
 }
 
-export interface IUserResponse extends IApiResponse<IUser, {}> {}
+export type IUserResponse = IApiResponse<IUser, {}>;
 
-export interface IRequirementBlockResponse extends IApiResponse<IRequirementBlock[], IPageMeta> {}
+export type IRequirementBlockResponse = IApiResponse<IRequirementBlock[], IPageMeta>;
 
-export interface IRequirementTemplateResponse extends IApiResponse<IRequirementTemplate[], IPageMeta> {}
+export type IRequirementTemplateResponse = IApiResponse<IRequirementTemplate[], IPageMeta>;
 
-export interface IJurisdictionResponse extends IApiResponse<IJurisdiction[], IPageMeta> {}
+export type IJurisdictionResponse = IApiResponse<IJurisdiction[], IPageMeta>;
 
-export interface IProgramResponse extends IApiResponse<IProgram[], IPageMeta> {}
+export type IProgramResponse = IApiResponse<IProgram[], IPageMeta>;
 
-export interface IUsersResponse extends IApiResponse<IUser[], IPageMeta> {}
+export type IUsersResponse = IApiResponse<IUser[], IPageMeta>;
 
-export interface IJurisdictionPermitApplicationResponse extends IApiResponse<IPermitApplication[], IPageMeta> {}
+export type IJurisdictionPermitApplicationResponse = IApiResponse<IPermitApplication[], IPageMeta>;
 
-export interface ICollaboratorSearchResponse extends IApiResponse<ICollaborator[], IPageMeta> {}
+export type ICollaboratorSearchResponse = IApiResponse<ICollaborator[], IPageMeta>;
 
-export interface IAcceptInvitationResponse extends IApiResponse<{}, { redirectUrl: string }> {}
+export type IAcceptInvitationResponse = IApiResponse<{}, { redirectUrl: string }>;
 
-export interface IInvitationResponse
-  extends IApiResponse<{ invited: IUser[]; reinvited: IUser[]; emailTaken: IUser[] }, {}> {}
+export type IInvitationResponse = IApiResponse<{ invited: IUser[]; reinvited: IUser[]; emailTaken: IUser[] }, {}>;
 
-export interface IOptionResponse<T = string> extends IApiResponse<IOption<T>[], IPageMeta> {}
+export type IOptionResponse<T = string> = IApiResponse<IOption<T>[], IPageMeta>;
 
 export interface INotificationResponse {
   data: INotification[];
@@ -50,5 +50,14 @@ export interface ITemplateVersionDiffResponse {
   data: ITemplateVersionDiff;
 }
 
-export interface IEmployeeActionResponse
-  extends IApiResponse<null, { message: { type: string; title: string; message: string } }> {}
+export interface IAhriLookupResponse {
+  referenceId: string;
+  programId: number;
+  make?: string;
+  model?: string;
+  outdoorUnitBrandName?: string;
+  modelNumber?: string;
+  error?: string;
+}
+
+export type IEmployeeActionResponse = IApiResponse<null, { message: { type: string; title: string; message: string } }>;

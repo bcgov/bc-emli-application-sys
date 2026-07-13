@@ -261,6 +261,15 @@
     margin-top: 1rem;
   }
 
+  .ahri-number-field-set .formio-component-ahri_lookup_columns > [class*='col-']:has(.ahri-lookup-button) {
+    align-content: space-evenly;
+    margin-bottom: 1rem;
+  }
+
+  .ahri-number-field-set > fieldset > legend {
+    display: none !important;
+  }
+
   // tooltips
   .tooltip-inner {
     background-color: #606060;

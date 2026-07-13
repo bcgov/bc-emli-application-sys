@@ -99,6 +99,8 @@ class RequirementFormJsonService
         get_contact_form_json(requirement_block_key)
       elsif requirement.input_type_pid_info?
         get_pid_info_components(requirement_block_key, requirement.required)
+      elsif requirement.input_type_ahri_number?
+        get_ahri_number_components(requirement_block_key, requirement.required)
       elsif requirement.input_type_service_information? ||
             requirement.input_type == "service_information" ||
             requirement.input_type.to_s == "service_information" ||
@@ -124,7 +126,9 @@ class RequirementFormJsonService
         }.merge!(formio_type_options)
       end
 
-    json.merge!({ description: requirement.hint }) if requirement.hint
+    if requirement.hint && !requirement.input_type_ahri_number?
+      json.merge!({ description: requirement.hint })
+    end
 
     json.merge!({ validate: { required: true } }) if requirement.required
 
@@ -541,6 +545,91 @@ class RequirementFormJsonService
       false,
       "Add employee"
     )
+  end
+
+  def get_ahri_number_components(
+    requirement_block_key = requirement&.requirement_block&.key,
+    required = false
+  )
+    return {} unless requirement.input_type_ahri_number?
+
+    parent_key = requirement.key(requirement_block_key)
+    ahri_number_key = "#{parent_key}|ahriNumber"
+    make_key = "#{parent_key}|make"
+    model_key = "#{parent_key}|model"
+
+    {
+      id: requirement.id,
+      legend: requirement.label,
+      key: "#{parent_key}|ahriLookup",
+      type: "fieldset",
+      custom_class: "ahri-number-field-set",
+      label: requirement.label,
+      hideLabel: true,
+      input: false,
+      tableView: false,
+      components: [
+        get_columns_form_json(
+          "ahri_lookup_columns",
+          [
+            get_nested_info_component(
+              :ahri_number,
+              parent_key,
+              I18n.t("formio.requirement.ahri_number.reference_id"),
+              required
+            ).tap do |component|
+              component[:description] = requirement.hint if requirement.hint
+            end,
+            get_ahri_lookup_button_form_json(
+              ahri_number_key,
+              make_key,
+              model_key
+            )
+          ]
+        ),
+        get_columns_form_json(
+          "ahri_result_columns",
+          [
+            get_readonly_nested_info_component(
+              :make,
+              parent_key,
+              I18n.t("formio.requirement.ahri_number.make"),
+              true
+            ),
+            get_readonly_nested_info_component(
+              :model,
+              parent_key,
+              I18n.t("formio.requirement.ahri_number.model"),
+              true
+            )
+          ]
+        )
+      ]
+    }
+  end
+
+  def get_readonly_nested_info_component(
+    field_key,
+    parent_key,
+    label,
+    required = false
+  )
+    get_nested_info_component(field_key, parent_key, label, required).merge(
+      disabled: true,
+      persistent: true
+    )
+  end
+
+  def get_ahri_lookup_button_form_json(ahri_number_key, make_key, model_key)
+    {
+      type: "button",
+      action: "custom",
+      title: I18n.t("formio.requirement.ahri_number.lookup"),
+      label: I18n.t("formio.requirement.ahri_number.lookup"),
+      custom_class: "ahri-lookup-button",
+      custom:
+        "document.dispatchEvent(new CustomEvent('lookupAhriNumber', { detail: { ahriNumberKey: '#{ahri_number_key}', makeKey: '#{make_key}', modelKey: '#{model_key}' } }));"
+    }
   end
 
   def get_service_information_data_grid_form_json(
