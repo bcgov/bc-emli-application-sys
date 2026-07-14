@@ -4,7 +4,11 @@ class IncreaseRevisionRequestCommentLimit < ActiveRecord::Migration[7.1]
   end
 
   def down
-    if RevisionRequest.where("length(comment) > 350").exists?
+    oversized =
+      select_value(
+        "SELECT 1 FROM revision_requests WHERE length(comment) > 350 LIMIT 1"
+      )
+    if oversized
       raise ActiveRecord::IrreversibleMigration,
             "Cannot revert to limit: 350 while comments longer than 350 characters exist"
     end

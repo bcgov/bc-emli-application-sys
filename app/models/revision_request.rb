@@ -8,6 +8,7 @@ class RevisionRequest < ApplicationRecord
              primary_key: :reason_code,
              optional: true
 
+  validates :comment, length: { maximum: 1000 }
   validate :user_must_be_review_staff
 
   private
