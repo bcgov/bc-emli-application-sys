@@ -10,7 +10,7 @@ RSpec.describe RevisionRequest, type: :model do
 
   describe "comment validation" do
     let(:revision_request) do
-      build(:revision_request, user: build(:user, role: :admin))
+      create(:revision_request, user: create(:user, role: :admin))
     end
 
     it "is valid at exactly 1000 characters" do
@@ -22,6 +22,10 @@ RSpec.describe RevisionRequest, type: :model do
       revision_request.comment = "a" * 1001
       expect(revision_request).not_to be_valid
       expect(revision_request.errors[:comment]).to be_present
+      expect(revision_request.save).to eq(false)
+      expect { revision_request.save! }.to raise_error(
+        ActiveRecord::RecordInvalid
+      )
     end
   end
 end
