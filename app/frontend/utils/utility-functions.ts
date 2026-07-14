@@ -66,7 +66,6 @@ export function setQueryParam(key: string, value: string | string[]) {
   if (!value) {
     searchParams.delete(key);
   } else {
-    // @ts-ignore
     searchParams.set(key, value);
   }
   const stringParams = searchParams.toString();
@@ -88,7 +87,7 @@ export function isContactRequirement(requirementType: ERequirementType): boolean
 }
 
 export function isQuillEmpty(value: string) {
-  if (!value || (value.replace(/<(.|\n)*?>/g, '').trim().length === 0 && !value.includes('<img'))) {
+  if (!value || (value.replace(/<[^>]*>/g, '').trim().length === 0 && !/<img\b/i.test(value))) {
     return true;
   }
   return false;
@@ -205,7 +204,7 @@ export const arrayEqualsAsSet = (a: string[], b: string[]): boolean => {
   if (a.length !== b.length) return false;
   const setA = new Set(a);
   const setB = new Set(b);
-  for (let item of setA) {
+  for (const item of setA) {
     if (!setB.has(item)) return false;
   }
   return true;
