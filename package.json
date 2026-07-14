@@ -120,5 +120,11 @@
     "*.rb": "stree write",
     "helm/**/*.{yaml,yml,tpl}": "bash scripts/helm-lint.sh"
   },
-  "version": "1.45.0"
+  "version": "1.45.0",
+  "allowScripts": {
+    "@parcel/watcher@2.5.6": true,
+    "core-js@3.49.0": true,
+    "esbuild@0.25.12": true,
+    "protobufjs@7.6.5": true
+  }
 }
