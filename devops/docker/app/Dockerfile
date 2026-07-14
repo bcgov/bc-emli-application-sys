@@ -35,7 +35,7 @@ RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz
     /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
     rm -rf /tmp/node-build-master
 
-RUN npm install -g npm@11.16.0
+RUN npm install -g npm@12.0.1
 
 # Install Ruby gems
 COPY Gemfile Gemfile.lock ./

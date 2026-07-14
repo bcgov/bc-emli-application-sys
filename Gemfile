@@ -31,7 +31,7 @@ gem "tzinfo-data", platforms: %i[windows jruby]
 gem "bootsnap", require: false
 
 # Authentication
-gem "devise", "4.9.3"
+gem "devise", "> 4.9.3"
 gem "devise_invitable", "~> 2.0.9"
 gem "devise-jwt", "0.8.1"
 gem "devise-jwt-cookie", "0.5.1"
@@ -52,13 +52,13 @@ gem "elasticsearch", "~> 8.11.0"
 gem "kaminari", "~> 1.2.2"
 gem "acts-as-taggable-on", "~> 13.0"
 # Assuming BC Common Object Management Service (COMS) is compatible with S3 formats:
-gem "aws-sdk-s3", "~> 1.141.0"
-gem "aws-sdk-ssm", "~> 1.0"
+gem "aws-sdk-s3", "> 1.141.0"
+gem "aws-sdk-ssm", "> 1.0"
 gem "pundit", "~> 2.3.1"
 gem "phonelib", "~> 0.8.5"
 gem "roo", "~> 2.10"
 gem "discard", "~> 1.2"
-gem "faraday", "~> 2.9.0"
+gem "faraday", ">= 2.14.3", "< 3.0"
 gem "factory_bot", "~> 6.4"
 # The timcop gem mocks Time, it is only used in specs and for seeding a published template version to get around time based validations
 gem "timecop", "~> 0.9.8"
