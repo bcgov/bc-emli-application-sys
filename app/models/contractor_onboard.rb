@@ -1,4 +1,6 @@
 class ContractorOnboard < ApplicationRecord
+  include Auditable
+
   belongs_to :contractor
   belongs_to :onboard_application,
              class_name: "PermitApplication",

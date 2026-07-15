@@ -110,6 +110,27 @@ RSpec.describe Api::ContractorEmployeesController, type: :controller do
         expect(active_employee.reload.discarded_at).to be_present
       end
 
+      it "logs an audit entry for the suspend (Auditable via User)" do
+        since = Time.current
+        post :deactivate,
+             params: {
+               contractor_id: contractor.id,
+               id: active_employee.id
+             }
+
+        log =
+          AuditLog
+            .where(table_name: "users", action: "edit")
+            .where("created_at >= ?", since)
+            .detect do |l|
+              l.data_after&.key?("discarded_at") &&
+                l.data_after["discarded_at"].present?
+            end
+        expect(log).to be_present
+        expect(log.user_id).to eq(admin_user.id)
+        expect(log.record_id).to eq(active_employee.id)
+      end
+
       it "is idempotent - can deactivate already deactivated employee" do
         post :deactivate,
              params: {
@@ -181,6 +202,27 @@ RSpec.describe Api::ContractorEmployeesController, type: :controller do
         expect(response).to have_http_status(:success)
         expect(json_response["meta"]["message"]["type"]).to eq("success")
         expect(deactivated_employee.reload.discarded_at).to be_nil
+      end
+
+      it "logs an audit entry for the unsuspend (Auditable via User)" do
+        since = Time.current
+        post :reactivate,
+             params: {
+               contractor_id: contractor.id,
+               id: deactivated_employee.id
+             }
+
+        log =
+          AuditLog
+            .where(table_name: "users", action: "edit")
+            .where("created_at >= ?", since)
+            .detect do |l|
+              l.data_after&.key?("discarded_at") &&
+                l.data_after["discarded_at"].nil?
+            end
+        expect(log).to be_present
+        expect(log.user_id).to eq(admin_user.id)
+        expect(log.record_id).to eq(deactivated_employee.id)
       end
 
       it "is idempotent - can reactivate already active employee" do

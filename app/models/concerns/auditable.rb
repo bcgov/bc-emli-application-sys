@@ -45,6 +45,7 @@ module Auditable
   def create_audit_log(action, data_before, data_after)
     AuditLog.create!(
       table_name: self.class.table_name,
+      record_id: id,
       action: action,
       data_before: data_before,
       data_after: data_after,
@@ -55,6 +56,7 @@ module Auditable
     Rails.logger.warn "Audit log creation failed (#{e.class}): #{e.message}"
     AuditLog.create!(
       table_name: self.class.table_name,
+      record_id: id,
       action: action,
       data_before: data_before,
       data_after: data_after,
