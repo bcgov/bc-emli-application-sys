@@ -697,7 +697,7 @@ DEPENDENCIES
   addressable (~> 2.8)
   anycable-rails (~> 1.4)
   awesome_print (~> 1.9)
-  aws-sdk-s3 (> 1.141.0)
+  aws-sdk-s3 (> 1.208.0)
   aws-sdk-ssm (~> 1.0)
   benchmark (~> 0.5)
   blueprinter (~> 1.0.2)
