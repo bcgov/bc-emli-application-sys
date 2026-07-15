@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby "4.0.0"
+ruby "4.0.5"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.1.0"
@@ -31,12 +31,11 @@ gem "tzinfo-data", platforms: %i[windows jruby]
 gem "bootsnap", require: false
 
 # Authentication
-gem "devise", "> 4.9.3"
+gem "devise", "~> 5.0.4"
 gem "devise_invitable", "~> 2.0.9"
-gem "devise-jwt", "0.8.1"
-gem "devise-jwt-cookie", "0.5.1"
+gem "devise-jwt", "~> 0.13.0"
 gem "json-jwt", ">= 1.16.6"
-gem "dry-container", "0.8.0"
+gem "dry-container", "~> 0.11.0"
 gem "omniauth-keycloak", "1.5.1"
 
 gem "blueprinter", "~> 1.0.2"
@@ -52,8 +51,8 @@ gem "elasticsearch", "~> 8.11.0"
 gem "kaminari", "~> 1.2.2"
 gem "acts-as-taggable-on", "~> 13.0"
 # Assuming BC Common Object Management Service (COMS) is compatible with S3 formats:
-gem "aws-sdk-s3", "> 1.141.0"
-gem "aws-sdk-ssm", "> 1.0"
+gem "aws-sdk-s3", "~> 1.141.0"
+gem "aws-sdk-ssm", "~> 1.0"
 gem "pundit", "~> 2.3.1"
 gem "phonelib", "~> 0.8.5"
 gem "roo", "~> 2.10"

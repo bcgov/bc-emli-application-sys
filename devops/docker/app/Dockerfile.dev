@@ -1,5 +1,5 @@
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
-ARG RUBY_VERSION=4.0.0-bookworm
+ARG RUBY_VERSION=4.0.5-bookworm
 FROM ruby:$RUBY_VERSION
 
 WORKDIR /app
@@ -38,7 +38,11 @@ RUN BUNDLER_VERSION="$(ruby -e 'lock = File.read("Gemfile.lock"); puts lock[/^BU
 
 # Install Node dependencies (before copying app code for better caching)
 COPY package.json package-lock.json ./
-RUN npm install --maxsockets=50 --ignore-scripts
+RUN npm config set maxsockets 15 && \
+    npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    (npm install --ignore-scripts || (echo "npm install failed, retrying once after cache verify" && npm cache verify && npm install --ignore-scripts))
 
 # Copy application code (this layer changes most frequently)
 COPY . .
