@@ -1,5 +1,5 @@
 import { t } from 'i18next';
-import { cast, flow, Instance, types } from 'mobx-state-tree';
+import { cast, flow, Instance, isAlive, types } from 'mobx-state-tree';
 import * as R from 'ramda';
 import { withEnvironment } from '../lib/with-environment';
 import { withRootStore } from '../lib/with-root-store';
@@ -279,6 +279,10 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
           .filter((outNull) => outNull);
       },
       get formattedFormJson() {
+        // Guards against still-mounted observers (e.g. RequirementForm) recomputing
+        // this after the node has been removed from permitApplicationMap (see destroy()).
+        if (!isAlive(self)) return undefined;
+
         const clonedFormJson = R.clone(self.formJson);
 
         // Disable certain fields if this is an ephemeral preview
@@ -1111,9 +1115,6 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
           const response = yield self.environment.api.deletePermitApplication(self.id);
 
           if (response.ok) {
-            // Use store action to handle deletion
-            self.rootStore.permitApplicationStore.removePermitApplication(self.id);
-
             // Reset any dirty state
             self.setIsDirty(false);
 
@@ -1122,6 +1123,9 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
 
             // Clear any diffs
             self.resetDiff();
+
+            // Use store action to handle deletion (destroys this node - must run last)
+            self.rootStore.permitApplicationStore.removePermitApplication(self.id);
 
             return response;
           }

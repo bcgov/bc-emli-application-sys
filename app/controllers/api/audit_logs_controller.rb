@@ -76,7 +76,7 @@ class Api::AuditLogsController < Api::ApplicationController
     # Handle CSV export
     if params[:format] == "csv" || request.format.csv?
       csv_limit = ENV.fetch("AUDIT_LOG_CSV_EXPORT_LIMIT", 50_000).to_i
-      audit_logs = audit_logs_query.limit(csv_limit)
+      audit_logs = AuditLogHelper.preload_for(audit_logs_query.limit(csv_limit))
       csv_data = generate_csv(audit_logs)
 
       send_data csv_data,
@@ -92,7 +92,10 @@ class Api::AuditLogsController < Api::ApplicationController
     offset = (page - 1) * per_page
 
     total_count = audit_logs_query.count
-    audit_logs = audit_logs_query.limit(per_page).offset(offset)
+    audit_logs =
+      AuditLogHelper.preload_for(
+        audit_logs_query.limit(per_page).offset(offset)
+      )
 
     total_pages = (total_count / per_page.to_f).ceil
 
@@ -110,6 +113,8 @@ class Api::AuditLogsController < Api::ApplicationController
                        view: :extended
                      }
                    }
+  ensure
+    AuditLogHelper.clear_preload
   end
 
   private

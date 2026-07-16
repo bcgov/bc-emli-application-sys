@@ -1,4 +1,6 @@
 class Contractor < ApplicationRecord
+  include Auditable
+
   searchkick(
     callbacks: false,
     searchable: %i[

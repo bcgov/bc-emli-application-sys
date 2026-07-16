@@ -48,6 +48,7 @@ class Api::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       begin
         AuditLog.create!(
           user: @user,
+          record_id: @user.id,
           action: "login",
           table_name: "users",
           data_after: {
@@ -77,9 +78,9 @@ class Api::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   end
 
   def failure
-    error = env["omniauth.error"]
-    error_type = env["omniauth.error.type"]
-    error_strategy = env["omniauth.error.strategy"]&.name
+    error = request.env["omniauth.error"]
+    error_type = request.env["omniauth.error.type"]
+    error_strategy = request.env["omniauth.error.strategy"]&.name
     Rails.logger.error "OmniAuth failure: type=#{error_type}, strategy=#{error_strategy}, error=#{error&.class}: #{error&.message}"
     if error&.backtrace
       Rails.logger.error error&.backtrace&.first(5)&.join("\n")

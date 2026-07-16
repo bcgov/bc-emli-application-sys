@@ -219,13 +219,18 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
   };
 
   const handleConfirmWithdrawal = async () => {
+    // Captured before destroy() detaches currentPermitApplication from the MST tree
+    const withdrawnApplicationId = currentPermitApplication?.id;
+    const withdrawnSubmissionType = currentPermitApplication.submissionType.name;
+    const withdrawnIsOnboarding = currentPermitApplication.isContractorOnboarding;
+
     const success = await handleWithdrawl();
     if (success) {
       onWithdrawlClose();
-      navigate(`/applications/${currentPermitApplication?.id}/withdrawl-success`, {
+      navigate(`/applications/${withdrawnApplicationId}/withdrawl-success`, {
         state: {
-          submissionType: currentPermitApplication.submissionType.name,
-          isOnboarding: currentPermitApplication.isContractorOnboarding,
+          submissionType: withdrawnSubmissionType,
+          isOnboarding: withdrawnIsOnboarding,
         },
       });
     }

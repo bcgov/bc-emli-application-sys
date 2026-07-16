@@ -20,9 +20,21 @@ module Auditable
 
   private
 
+  # user_id is excluded by default because on most models it's redundant
+  # with the audit row's own actor (AuditLog#user_id). Some models use
+  # user_id for genuine domain data instead (e.g. ApplicationAssignment's
+  # user_id is WHICH REVIEWER got assigned, not who performed the audited
+  # action) - those models can override this to keep it. The dynamic
+  # actor_duplicate? check in AuditLogHelper already suppresses it at
+  # display time on the rare occasion it genuinely does equal the actor, so
+  # this doesn't reintroduce WHO-duplication for the common case either.
+  def audit_excluded_columns
+    EXCLUDED_COLUMNS
+  end
+
   def store_previous_values
     @previous_values =
-      changes.except(*EXCLUDED_COLUMNS).transform_values(&:first)
+      changes.except(*audit_excluded_columns).transform_values(&:first)
   end
 
   def audit_create
@@ -43,27 +55,30 @@ module Auditable
   end
 
   def create_audit_log(action, data_before, data_after)
-    AuditLog.create!(
+    attrs = {
       table_name: self.class.table_name,
       action: action,
       data_before: data_before,
       data_after: data_after,
       user_id: current_audit_user&.id
-    )
+    }
+    # Only stamp record_id if the column actually exists - otherwise, mid
+    # rolling-deploy (app code deployed before the migration runs), this
+    # would raise UnknownAttributeError on the FIRST attempt, get caught
+    # below, then raise the SAME error again on the retry (since it also
+    # included record_id), crashing the request instead of degrading
+    # gracefully like the rescue intends.
+    attrs[:record_id] = id if AuditLog.column_names.include?("record_id")
+
+    AuditLog.create!(attrs)
   rescue ActiveRecord::InvalidForeignKey,
          ActiveModel::UnknownAttributeError => e
     Rails.logger.warn "Audit log creation failed (#{e.class}): #{e.message}"
-    AuditLog.create!(
-      table_name: self.class.table_name,
-      action: action,
-      data_before: data_before,
-      data_after: data_after,
-      user_id: nil
-    )
+    AuditLog.create!(attrs.merge(user_id: nil))
   end
 
   def filtered_attributes
-    attributes.except(*EXCLUDED_COLUMNS)
+    attributes.except(*audit_excluded_columns)
   end
 
   def current_audit_user

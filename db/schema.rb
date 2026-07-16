@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_10_213000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_15_194414) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -61,12 +61,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_10_213000) do
     t.datetime "created_at", null: false
     t.jsonb "data_after"
     t.jsonb "data_before"
+    t.uuid "record_id"
     t.string "table_name"
     t.datetime "updated_at", null: false
     t.uuid "user_id"
     t.index ["action"], name: "idx_audit_logs_action"
     t.index ["created_at"], name: "idx_audit_logs_created_at"
     t.index %w[table_name created_at], name: "idx_audit_logs_table_created"
+    t.index %w[table_name record_id],
+            name: "index_audit_logs_on_table_name_and_record_id"
     t.index %w[user_id created_at],
             name: "idx_audit_logs_user_created",
             where: "(user_id IS NOT NULL)"
