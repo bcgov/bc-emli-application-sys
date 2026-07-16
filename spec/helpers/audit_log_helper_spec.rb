@@ -63,6 +63,27 @@ RSpec.describe AuditLogHelper do
       expect(changes.first).to eq("User: #{employee.name} (#{employee.email})")
     end
 
+    it "does not prepend a subject line for a login action (WHO already IS the subject)" do
+      log =
+        AuditLog.create!(
+          table_name: "users",
+          record_id: actor.id,
+          action: "login",
+          user_id: actor.id,
+          data_after: {
+            "user_id" => actor.id,
+            "email" => actor.email,
+            "ip_address" => "127.0.0.1",
+            "user_agent" => "test",
+            "sign_in_count" => 5
+          }
+        )
+
+      changes = described_class.format_changes(log)
+
+      expect(changes.join).not_to include("User: #{actor.name}")
+    end
+
     it "falls back gracefully when the referenced user no longer exists" do
       log =
         AuditLog.create!(
@@ -162,6 +183,181 @@ RSpec.describe AuditLogHelper do
 
       expect(described_class.format_changes(log).first).to eq(
         "Application: (deleted)"
+      )
+    end
+
+    it "prepends the identified contractor for an edit on contractors directly" do
+      log =
+        AuditLog.create!(
+          table_name: "contractors",
+          record_id: contractor.id,
+          action: "edit",
+          data_before: {
+            "business_name" => "old"
+          },
+          data_after: {
+            "business_name" => "new"
+          },
+          user_id: actor.id
+        )
+
+      changes = described_class.format_changes(log)
+
+      expect(changes.first).to eq(
+        "Contractor: #{contractor.business_name} (##{contractor.number})"
+      )
+    end
+
+    it "falls back gracefully when the referenced contractor no longer exists" do
+      log =
+        AuditLog.create!(
+          table_name: "contractors",
+          record_id: SecureRandom.uuid,
+          action: "edit",
+          data_before: {
+            "business_name" => "old"
+          },
+          data_after: {
+            "business_name" => "new"
+          },
+          user_id: actor.id
+        )
+
+      expect(described_class.format_changes(log).first).to eq(
+        "Contractor: (deleted)"
+      )
+    end
+
+    it "resolves an internal_comment subject through to its parent application" do
+      comment =
+        InternalComment.create!(
+          permit_application: permit_application,
+          user: actor,
+          body: "a test comment"
+        )
+
+      log =
+        AuditLog
+          .where(table_name: "internal_comments", action: "create")
+          .order(:created_at)
+          .last
+
+      changes = described_class.format_changes(log)
+
+      expect(changes.first).to eq(
+        "Comment on Application: #{permit_application.nickname} (##{permit_application.number})"
+      )
+      expect(comment).to be_present
+    end
+
+    it "falls back gracefully when the referenced internal_comment no longer exists" do
+      log =
+        AuditLog.create!(
+          table_name: "internal_comments",
+          record_id: SecureRandom.uuid,
+          action: "edit",
+          data_before: {
+            "body" => "old"
+          },
+          data_after: {
+            "body" => "new"
+          },
+          user_id: actor.id
+        )
+
+      expect(described_class.format_changes(log).first).to eq(
+        "Comment: (deleted)"
+      )
+    end
+
+    it "resolves a revision_request subject through submission_version to its application" do
+      submission_version =
+        create(:submission_version, permit_application: permit_application)
+      revision_request =
+        RevisionRequest.create!(
+          submission_version: submission_version,
+          user: actor,
+          comment: "please clarify X",
+          reason_code: "zoning_non_compliance"
+        )
+
+      log =
+        AuditLog
+          .where(table_name: "revision_requests", action: "create")
+          .order(:created_at)
+          .last
+
+      changes = described_class.format_changes(log)
+
+      expect(changes.first).to eq(
+        "Revision Request on Application: #{permit_application.nickname} (##{permit_application.number})"
+      )
+      expect(revision_request).to be_present
+    end
+
+    it "falls back gracefully when the referenced revision_request no longer exists" do
+      log =
+        AuditLog.create!(
+          table_name: "revision_requests",
+          record_id: SecureRandom.uuid,
+          action: "edit",
+          data_before: {
+            "comment" => "old"
+          },
+          data_after: {
+            "comment" => "new"
+          },
+          user_id: actor.id
+        )
+
+      expect(described_class.format_changes(log).first).to eq(
+        "Revision Request: (deleted)"
+      )
+    end
+
+    it "resolves a template_version subject through to its requirement_template" do
+      requirement_template =
+        create(
+          :early_access_requirement_template,
+          nickname: "Test Template Nickname"
+        )
+      template_version =
+        TemplateVersion.create!(
+          requirement_template: requirement_template,
+          version_date: Date.new(2026, 1, 15),
+          status: 0
+        )
+
+      log =
+        AuditLog
+          .where(table_name: "template_versions", action: "create")
+          .order(:created_at)
+          .last
+
+      changes = described_class.format_changes(log)
+
+      expect(changes.first).to eq(
+        "Template Version: #{requirement_template.nickname} (v2026-01-15)"
+      )
+    end
+
+    it "falls back gracefully when the referenced template_version no longer exists" do
+      log =
+        AuditLog.create!(
+          table_name: "template_versions",
+          record_id: SecureRandom.uuid,
+          action: "edit",
+          data_before: {
+            "status" => 0
+          },
+          data_after: {
+            "status" => 1
+          },
+          user_id: actor.id
+        )
+
+      expect(described_class.format_changes(log).first).to eq(
+        "Template Version: (deleted)"
       )
     end
 
@@ -607,6 +803,33 @@ RSpec.describe AuditLogHelper do
 
       changes = described_class.format_changes(log)
       expect(changes.last).to include("2024-13-45T10:00:00 some free text")
+    end
+
+    it "shows the full raw text instead of silently discarding it for a date-shaped string with trailing content" do
+      # Time.parse would "succeed" here, silently parsing just the date/time
+      # prefix and discarding everything after it - showing a plausible but
+      # WRONG value instead of the actual free-text answer. Time.iso8601
+      # correctly rejects the whole string (strict format, no trailing
+      # content allowed), so it falls through to the raw-text branch instead.
+      value = "2024-01-01T10:00:00 some real free text that is not a date"
+
+      log =
+        AuditLog.create!(
+          table_name: "permit_applications",
+          record_id: SecureRandom.uuid,
+          action: "edit",
+          data_before: {
+            "nickname" => "old"
+          },
+          data_after: {
+            "nickname" => value
+          },
+          user_id: actor.id
+        )
+
+      changes = described_class.format_changes(log)
+
+      expect(changes.last).to include(value)
     end
   end
 end

@@ -12,6 +12,10 @@ module AuditLogHelper
     user_ids = []
     contractor_onboard_ids = []
     permit_application_ids = []
+    contractor_ids = []
+    internal_comment_ids = []
+    revision_request_ids = []
+    template_version_ids = []
 
     audit_logs.each do |log|
       case log.table_name
@@ -21,6 +25,14 @@ module AuditLogHelper
         contractor_onboard_ids << log.record_id if log.record_id.present?
       when "permit_applications"
         permit_application_ids << log.record_id if log.record_id.present?
+      when "contractors"
+        contractor_ids << log.record_id if log.record_id.present?
+      when "internal_comments"
+        internal_comment_ids << log.record_id if log.record_id.present?
+      when "revision_requests"
+        revision_request_ids << log.record_id if log.record_id.present?
+      when "template_versions"
+        template_version_ids << log.record_id if log.record_id.present?
       end
 
       [log.data_before, log.data_after].each do |data|
@@ -45,6 +57,21 @@ module AuditLogHelper
     Thread.current[
       :audit_log_permit_application_cache
     ] = PermitApplication.where(id: permit_application_ids.uniq).index_by(&:id)
+    Thread.current[:audit_log_contractor_cache] = Contractor.where(
+      id: contractor_ids.uniq
+    ).index_by(&:id)
+    Thread.current[:audit_log_internal_comment_cache] = InternalComment
+      .includes(:permit_application)
+      .where(id: internal_comment_ids.uniq)
+      .index_by(&:id)
+    Thread.current[:audit_log_revision_request_cache] = RevisionRequest
+      .includes(submission_version: :permit_application)
+      .where(id: revision_request_ids.uniq)
+      .index_by(&:id)
+    Thread.current[:audit_log_template_version_cache] = TemplateVersion
+      .includes(:requirement_template)
+      .where(id: template_version_ids.uniq)
+      .index_by(&:id)
 
     audit_logs
   end
@@ -53,6 +80,10 @@ module AuditLogHelper
     Thread.current[:audit_log_user_cache] = nil
     Thread.current[:audit_log_contractor_onboard_cache] = nil
     Thread.current[:audit_log_permit_application_cache] = nil
+    Thread.current[:audit_log_contractor_cache] = nil
+    Thread.current[:audit_log_internal_comment_cache] = nil
+    Thread.current[:audit_log_revision_request_cache] = nil
+    Thread.current[:audit_log_template_version_cache] = nil
   end
 
   def self.format_changes(audit_log)
@@ -85,6 +116,10 @@ module AuditLogHelper
   # snapshot.
   def self.subject_line(audit_log)
     return nil unless audit_log.record_id.present?
+    # A login's actor IS its subject - you can't log in as someone else - so
+    # WHO already fully identifies it. Resolving record_id here would just
+    # repeat the same name/email WHO already shows.
+    return nil if audit_log.action == "login"
 
     case audit_log.table_name
     when "users"
@@ -109,6 +144,57 @@ module AuditLogHelper
         "audit_log.application_subject",
         nickname: application.nickname,
         number: application.number
+      )
+    when "contractors"
+      contractor = cached_contractor(audit_log.record_id)
+      return t("audit_log.deleted_contractor_subject") unless contractor
+
+      t(
+        "audit_log.contractor_subject",
+        business_name: contractor.business_name,
+        number: contractor.number
+      )
+    when "internal_comments"
+      # A comment isn't identifying on its own - resolve through to the
+      # application it's attached to instead, same identifying info as the
+      # permit_applications case but phrased as "a comment ON X" rather than
+      # "X itself changed", so the two don't read as the same kind of event.
+      application =
+        cached_internal_comment(audit_log.record_id)&.permit_application
+      return t("audit_log.deleted_internal_comment_subject") unless application
+
+      t(
+        "audit_log.internal_comment_subject",
+        nickname: application.nickname,
+        number: application.number
+      )
+    when "revision_requests"
+      # No direct permit_application FK - a RevisionRequest belongs to a
+      # SubmissionVersion, which belongs to the application. Same two-hop
+      # shape as internal_comments, distinct phrasing so it doesn't read as
+      # the application itself being edited.
+      application =
+        cached_revision_request(
+          audit_log.record_id
+        )&.submission_version&.permit_application
+      return t("audit_log.deleted_revision_request_subject") unless application
+
+      t(
+        "audit_log.revision_request_subject",
+        nickname: application.nickname,
+        number: application.number
+      )
+    when "template_versions"
+      template_version = cached_template_version(audit_log.record_id)
+      requirement_template = template_version&.requirement_template
+      unless requirement_template
+        return t("audit_log.deleted_template_version_subject")
+      end
+
+      t(
+        "audit_log.template_version_subject",
+        nickname: requirement_template.nickname,
+        version_date: template_version.version_date
       )
     end
   end
@@ -141,6 +227,42 @@ module AuditLogHelper
     return PermitApplication.find_by(id: id) unless cache
 
     cache.fetch(id) { PermitApplication.find_by(id: id) }
+  end
+
+  def self.cached_contractor(id)
+    return nil if id.blank?
+
+    cache = Thread.current[:audit_log_contractor_cache]
+    return Contractor.find_by(id: id) unless cache
+
+    cache.fetch(id) { Contractor.find_by(id: id) }
+  end
+
+  def self.cached_internal_comment(id)
+    return nil if id.blank?
+
+    cache = Thread.current[:audit_log_internal_comment_cache]
+    return InternalComment.find_by(id: id) unless cache
+
+    cache.fetch(id) { InternalComment.find_by(id: id) }
+  end
+
+  def self.cached_revision_request(id)
+    return nil if id.blank?
+
+    cache = Thread.current[:audit_log_revision_request_cache]
+    return RevisionRequest.find_by(id: id) unless cache
+
+    cache.fetch(id) { RevisionRequest.find_by(id: id) }
+  end
+
+  def self.cached_template_version(id)
+    return nil if id.blank?
+
+    cache = Thread.current[:audit_log_template_version_cache]
+    return TemplateVersion.find_by(id: id) unless cache
+
+    cache.fetch(id) { TemplateVersion.find_by(id: id) }
   end
 
   def self.format_create_changes(audit_log)
@@ -354,13 +476,16 @@ module AuditLogHelper
     # otherwise every timestamp falls through as a raw ISO string and this
     # never fires (that was the pre-existing bug: dates always rendered raw).
     # A date-SHAPED string isn't necessarily a valid date (e.g. free-text
-    # form input matching the pattern by coincidence) - Time.parse raises
-    # ArgumentError on those, which would otherwise crash the whole audit
-    # log page render, not just this one line.
+    # form input matching the pattern by coincidence). Time.iso8601 (not
+    # Time.parse) deliberately: Time.parse is permissive about trailing
+    # garbage (e.g. "2024-01-01T10:00:00 some free text" parses "successfully"
+    # and silently discards the trailing text - Time.iso8601 correctly
+    # rejects the whole string instead, falling through to raw text below).
+    # It also raises ArgumentError on out-of-range dates same as parse did.
     if value.is_a?(String) &&
          value.match?(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)
       begin
-        return Time.parse(value).strftime("%Y-%m-%d %H:%M")
+        return Time.iso8601(value).in_time_zone.strftime("%Y-%m-%d %H:%M")
       rescue ArgumentError
         # fall through to the generic string branch below
       end
@@ -382,12 +507,17 @@ module AuditLogHelper
   end
 
   def self.skip_field?(field)
-    # Skip system fields and internal fields that aren't useful for auditing
+    # Skip system fields and internal fields that aren't useful for auditing.
+    # NOTE: user_id deliberately NOT in this list - Auditable::EXCLUDED_COLUMNS
+    # already strips it at write time for every model except the ones that
+    # explicitly opt out (e.g. ApplicationAssignment, where user_id is real
+    # domain data). For those, actor_duplicate? already suppresses it
+    # dynamically on the rare occasion it genuinely IS the actor - a second,
+    # static "always hide user_id" rule here would defeat that opt-out.
     skipped_fields = %w[
       id
       created_at
       updated_at
-      user_id
       encrypted_password
       reset_password_token
       reset_password_sent_at
@@ -459,6 +589,18 @@ module AuditLogHelper
       "Application: #{options[:nickname]} (##{options[:number]})"
     when "audit_log.deleted_application_subject"
       "Application: (deleted)"
+    when "audit_log.internal_comment_subject"
+      "Comment on Application: #{options[:nickname]} (##{options[:number]})"
+    when "audit_log.deleted_internal_comment_subject"
+      "Comment: (deleted)"
+    when "audit_log.revision_request_subject"
+      "Revision Request on Application: #{options[:nickname]} (##{options[:number]})"
+    when "audit_log.deleted_revision_request_subject"
+      "Revision Request: (deleted)"
+    when "audit_log.template_version_subject"
+      "Template Version: #{options[:nickname]} (v#{options[:version_date]})"
+    when "audit_log.deleted_template_version_subject"
+      "Template Version: (deleted)"
     else
       key
     end

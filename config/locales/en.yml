@@ -921,6 +921,12 @@ en:
     deleted_contractor_subject: 'Contractor: (deleted)'
     application_subject: 'Application: %{nickname} (#%{number})'
     deleted_application_subject: 'Application: (deleted)'
+    internal_comment_subject: 'Comment on Application: %{nickname} (#%{number})'
+    deleted_internal_comment_subject: 'Comment: (deleted)'
+    revision_request_subject: 'Revision Request on Application: %{nickname} (#%{number})'
+    deleted_revision_request_subject: 'Revision Request: (deleted)'
+    template_version_subject: 'Template Version: %{nickname} (v%{version_date})'
+    deleted_template_version_subject: 'Template Version: (deleted)'
   contact:
     fields:
       phone: 'Phone'
