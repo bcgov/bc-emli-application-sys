@@ -1,12 +1,13 @@
 module AuditLogHelper
-  # Batch-preloads every User/ContractorOnboard that a page of AuditLog rows
-  # could reference (subject-line targets AND *_by/user_id values inside the
-  # diffs), so format_changes doesn't do a find_by per row per field. Call
+  # Batch-preloads every User/ContractorOnboard/PermitApplication/Contractor/
+  # InternalComment/RevisionRequest/TemplateVersion that a page of AuditLog
+  # rows could reference (subject-line targets AND *_by/user_id values inside
+  # the diffs), so format_changes doesn't do a find_by per row per field. Call
   # once before rendering/exporting a collection; always pair with
   # clear_preload (ensure) so nothing leaks into a later request on the same
   # Puma thread. Callers that skip this (e.g. specs calling format_changes
-  # directly) still work correctly - cached_user/cached_contractor_onboard
-  # fall back to a live single query when no preload is active.
+  # directly) still work correctly - each cached_* lookup falls back to a
+  # live single query when no preload is active.
   def self.preload_for(audit_logs)
     audit_logs = audit_logs.to_a
     user_ids = []
@@ -111,9 +112,10 @@ module AuditLogHelper
   # doesn't say (e.g. an "edit" that only touches non-identifying columns
   # like discarded_at, or a contractor_onboards row where contractor_id
   # never changes so never appears in the diff). Resolves for :users,
-  # :contractor_onboards, and :permit_applications today; other tables' diffs
-  # already tend to carry identifying context (name, body, etc.) via create/delete's full-attribute
-  # snapshot.
+  # :contractor_onboards, :permit_applications, :contractors,
+  # :internal_comments, :revision_requests, and :template_versions today;
+  # other tables' diffs already tend to carry identifying context (name,
+  # body, etc.) via create/delete's full-attribute snapshot.
   def self.subject_line(audit_log)
     return nil unless audit_log.record_id.present?
     # A login's actor IS its subject - you can't log in as someone else - so
