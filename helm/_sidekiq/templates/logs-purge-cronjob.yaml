@@ -24,7 +24,7 @@ spec:
                 - >
                   echo "Starting log purge: $(date)";
                   find /app/log -name 'application.log*' -type f -mtime +14 -exec rm -v {} + ;
-                  find /app/log -name 'sidekiq.log*' -type f -mtime +30 -exec rm -v {} + ;
+                  find /app/log -name 'sidekiq.log*' -type f -mtime +90 -exec rm -v {} + ;
                   echo "Log purge completed: $(date)";
               volumeMounts:
                 - name: log-volume
