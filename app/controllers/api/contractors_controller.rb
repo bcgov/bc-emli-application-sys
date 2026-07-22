@@ -10,6 +10,7 @@ class Api::ContractorsController < Api::ApplicationController
                   suspend
                   unsuspend
                   deactivate
+                  status_history
                 ]
   skip_before_action :authenticate_user!, only: %i[shim]
   skip_after_action :verify_authorized, only: %i[shim by_user]
@@ -129,34 +130,42 @@ class Api::ContractorsController < Api::ApplicationController
       )
     end
 
-    # Suspend the contractor (sets suspended_at on contractor_onboard)
-    if onboard.update(
-         suspended_at: Time.current,
-         suspended_reason: params[:reason],
-         suspended_by: current_user
-       )
-      # Send email notification to primary contact
-      # TODO: Re-enable if client wants emails sent
-      # PermitHubMailer.contractor_suspended(@contractor).deliver_later
-
-      # Reindex for Elasticsearch
-      @contractor.reindex
-
-      # Return success
-      render_success @contractor,
-                     "contractor.suspended",
-                     {
-                       blueprint: ContractorBlueprint,
-                       blueprint_opts: {
-                         view: :base
-                       }
-                     }
-    else
-      render json: {
-               error: onboard.errors.full_messages
-             },
-             status: :unprocessable_entity
+    # Suspend the contractor (sets suspended_at on contractor_onboard) and
+    # record a permanent history event in the same transaction.
+    begin
+      ActiveRecord::Base.transaction do
+        onboard.update!(
+          suspended_at: Time.current,
+          suspended_reason: params[:reason],
+          suspended_by: current_user
+        )
+        record_status_event!(onboard, "suspend", params[:reason])
+      end
+    rescue ActiveRecord::RecordInvalid => e
+      return(
+        render json: {
+                 error: e.record.errors.full_messages
+               },
+               status: :unprocessable_entity
+      )
     end
+
+    # Send email notification to primary contact
+    # TODO: Re-enable if client wants emails sent
+    # PermitHubMailer.contractor_suspended(@contractor).deliver_later
+
+    # Reindex for Elasticsearch
+    @contractor.reindex
+
+    # Return success
+    render_success @contractor,
+                   "contractor.suspended",
+                   {
+                     blueprint: ContractorBlueprint,
+                     blueprint_opts: {
+                       view: :base
+                     }
+                   }
   end
 
   def unsuspend
@@ -176,33 +185,42 @@ class Api::ContractorsController < Api::ApplicationController
       )
     end
 
-    # Unsuspend the contractor (clears suspended_at, suspended_reason, and suspended_by on contractor_onboard)
-    if onboard.update(
-         suspended_at: nil,
-         suspended_reason: nil,
-         suspended_by: nil
-       )
-      # Send email notification to primary contact
-      # TODO: Re-enable if client wants emails sent
-      # PermitHubMailer.contractor_unsuspended(@contractor).deliver_later
-
-      # Reindex for Elasticsearch
-      @contractor.reindex
-
-      render_success @contractor,
-                     "contractor.unsuspended",
-                     {
-                       blueprint: ContractorBlueprint,
-                       blueprint_opts: {
-                         view: :base
-                       }
-                     }
-    else
-      render json: {
-               error: onboard.errors.full_messages
-             },
-             status: :unprocessable_entity
+    # Unsuspend the contractor (clears suspended_at, suspended_reason, and
+    # suspended_by on contractor_onboard) and record a permanent history event
+    # in the same transaction. No reason is collected on unsuspend.
+    begin
+      ActiveRecord::Base.transaction do
+        onboard.update!(
+          suspended_at: nil,
+          suspended_reason: nil,
+          suspended_by: nil
+        )
+        record_status_event!(onboard, "unsuspend", nil)
+      end
+    rescue ActiveRecord::RecordInvalid => e
+      return(
+        render json: {
+                 error: e.record.errors.full_messages
+               },
+               status: :unprocessable_entity
+      )
     end
+
+    # Send email notification to primary contact
+    # TODO: Re-enable if client wants emails sent
+    # PermitHubMailer.contractor_unsuspended(@contractor).deliver_later
+
+    # Reindex for Elasticsearch
+    @contractor.reindex
+
+    render_success @contractor,
+                   "contractor.unsuspended",
+                   {
+                     blueprint: ContractorBlueprint,
+                     blueprint_opts: {
+                       view: :base
+                     }
+                   }
   end
 
   def deactivate
@@ -222,33 +240,62 @@ class Api::ContractorsController < Api::ApplicationController
       )
     end
 
-    # Deactivate the contractor (sets deactivated_at, deactivated_reason, and deactivated_by on contractor_onboard)
-    if onboard.update(
-         deactivated_at: Time.current,
-         deactivated_reason: params[:reason],
-         deactivated_by: current_user
-       )
-      # Send email notification to primary contact
-      # TODO: Re-enable if client wants emails sent
-      # PermitHubMailer.contractor_removed(@contractor).deliver_later
-
-      # Reindex for Elasticsearch
-      @contractor.reindex
-
-      render_success @contractor,
-                     "contractor.removed",
-                     {
-                       blueprint: ContractorBlueprint,
-                       blueprint_opts: {
-                         view: :base
-                       }
-                     }
-    else
-      render json: {
-               error: onboard.errors.full_messages
-             },
-             status: :unprocessable_entity
+    # Deactivate the contractor (sets deactivated_at, deactivated_reason, and
+    # deactivated_by on contractor_onboard) and record a permanent history
+    # event in the same transaction. The event_type is "remove" to match the
+    # frontend's wording for this action.
+    begin
+      ActiveRecord::Base.transaction do
+        onboard.update!(
+          deactivated_at: Time.current,
+          deactivated_reason: params[:reason],
+          deactivated_by: current_user
+        )
+        record_status_event!(onboard, "remove", params[:reason])
+      end
+    rescue ActiveRecord::RecordInvalid => e
+      return(
+        render json: {
+                 error: e.record.errors.full_messages
+               },
+               status: :unprocessable_entity
+      )
     end
+
+    # Send email notification to primary contact
+    # TODO: Re-enable if client wants emails sent
+    # PermitHubMailer.contractor_removed(@contractor).deliver_later
+
+    # Reindex for Elasticsearch
+    @contractor.reindex
+
+    render_success @contractor,
+                   "contractor.removed",
+                   {
+                     blueprint: ContractorBlueprint,
+                     blueprint_opts: {
+                       view: :base
+                     }
+                   }
+  end
+
+  def status_history
+    authorize @contractor, :status_history?
+
+    events =
+      @contractor
+        .contractor_status_events
+        .includes(:performed_by)
+        .order(created_at: :desc)
+
+    render_success events,
+                   nil,
+                   {
+                     blueprint: ContractorStatusEventBlueprint,
+                     blueprint_opts: {
+                       view: :base
+                     }
+                   }
   end
 
   def by_user
@@ -275,6 +322,15 @@ class Api::ContractorsController < Api::ApplicationController
 
   def set_contractor
     @contractor = Contractor.find(params[:id])
+  end
+
+  def record_status_event!(onboard, event_type, reason)
+    @contractor.contractor_status_events.create!(
+      contractor_onboard: onboard,
+      event_type: event_type,
+      reason: reason,
+      performed_by: current_user
+    )
   end
 
   def contractor_params

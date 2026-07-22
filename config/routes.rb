@@ -279,6 +279,9 @@ Rails.application.routes.draw do
       # Deactivate (remove) contractor
       post "deactivate", on: :member, to: "contractors#deactivate"
 
+      # Suspend/unsuspend/remove history
+      get "status_history", on: :member, to: "contractors#status_history"
+
       resources :employees, controller: "contractor_employees", only: [] do
         collection { post :invite }
         member do

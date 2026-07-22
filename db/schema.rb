@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_15_194414) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_20_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -218,6 +218,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_194414) do
             name: "index_contractor_onboards_on_contractor_id"
     t.index ["onboard_application_id"],
             name: "index_contractor_onboards_on_onboard_application_id"
+  end
+
+  create_table "contractor_status_events",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.uuid "contractor_id", null: false
+    t.uuid "contractor_onboard_id", null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.uuid "performed_by_id"
+    t.text "reason"
+    t.datetime "updated_at", null: false
+    t.index %w[contractor_id created_at],
+            name:
+              "index_contractor_status_events_on_contractor_id_and_created_at"
+    t.index ["contractor_onboard_id"],
+            name: "index_contractor_status_events_on_contractor_onboard_id"
+    t.index ["performed_by_id"],
+            name: "index_contractor_status_events_on_performed_by_id"
   end
 
   create_table "contractors",
@@ -1245,6 +1265,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_194414) do
                   column: "onboard_application_id"
   add_foreign_key "contractor_onboards", "users", column: "deactivated_by"
   add_foreign_key "contractor_onboards", "users", column: "suspended_by"
+  add_foreign_key "contractor_status_events", "contractor_onboards"
+  add_foreign_key "contractor_status_events", "contractors"
+  add_foreign_key "contractor_status_events", "users", column: "performed_by_id"
   add_foreign_key "contractors", "users", column: "contact_id"
   add_foreign_key "early_access_previews", "users", column: "previewer_id"
   add_foreign_key "external_api_keys", "jurisdictions"

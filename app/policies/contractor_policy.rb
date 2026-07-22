@@ -44,6 +44,13 @@ class ContractorPolicy < ApplicationPolicy
     user.admin? || user.admin_manager?
   end
 
+  def status_history?
+    # Anyone who can suspend can view the suspend/unsuspend/remove history.
+    # (Deliberately broader than AuditLogPolicy, which is admin_manager/
+    # system_admin only - a plain admin can suspend, so must see the history.)
+    user.admin? || user.admin_manager?
+  end
+
   def deactivate?
     # Admin managers and admins can deactivate contractors
     user.admin_manager? || user.admin?

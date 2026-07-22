@@ -1,22 +1,23 @@
-import { Badge, Box, Flex, Menu, MenuButton, MenuItem, MenuList, Link } from '@chakra-ui/react';
+import { Box, Flex, Link, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 import {
-  Eye,
-  PencilSimple,
-  Envelope,
-  Users,
-  Prohibit,
-  HourglassMedium,
-  Trash,
   ArrowsLeftRight,
+  ClockCounterClockwise,
+  Envelope,
+  Eye,
+  HourglassMedium,
+  PencilSimple,
+  Trash,
+  Users,
 } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { IContractor } from '../../../models/contractor';
-import { SearchGridItem } from '../../shared/grid/search-grid-item';
 import { useMst } from '../../../setup/root';
+import { SearchGridItem } from '../../shared/grid/search-grid-item';
 import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation-modal';
+import { StatusHistoryModal } from './status-history-modal';
 
 interface ContractorRowProps {
   contractor: IContractor;
@@ -30,6 +31,7 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
   const [isSuspendModalOpen, setIsSuspendModalOpen] = useState(false);
   const [isUnsuspendModalOpen, setIsUnsuspendModalOpen] = useState(false);
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
 
   const handleEdit = () => {
     contractorStore.fetchOnboarding(contractor.id).then((onboarding) => {
@@ -88,6 +90,10 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
 
   const handleRemove = () => {
     setIsRemoveModalOpen(true);
+  };
+
+  const handleViewHistory = () => {
+    setIsHistoryModalOpen(true);
   };
 
   const handleRemoveConfirm = () => {
@@ -291,6 +297,21 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
                     {t('contractor.actions.suspendContractor')}
                   </MenuItem>
                   <MenuItem
+                    icon={<ClockCounterClockwise />}
+                    onClick={handleViewHistory}
+                    role="menuitem"
+                    aria-label={`View status history for ${contractor.businessName}`}
+                    _focus={{ bg: 'blue.50', outline: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleViewHistory();
+                      }
+                    }}
+                  >
+                    {t('contractor.actions.viewStatusHistory')}
+                  </MenuItem>
+                  <MenuItem
                     icon={<Trash />}
                     onClick={handleRemove}
                     color="red.500"
@@ -343,6 +364,21 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
                     {t('contractor.actions.viewContractor')}
                   </MenuItem>
                   <MenuItem
+                    icon={<ClockCounterClockwise />}
+                    onClick={handleViewHistory}
+                    role="menuitem"
+                    aria-label={`View status history for ${contractor.businessName}`}
+                    _focus={{ bg: 'blue.50', outline: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleViewHistory();
+                      }
+                    }}
+                  >
+                    {t('contractor.actions.viewStatusHistory')}
+                  </MenuItem>
+                  <MenuItem
                     icon={<Trash />}
                     onClick={handleRemove}
                     color="red.500"
@@ -361,23 +397,40 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
                 </>
               )}
 
-              {/* Removed contractors: View contractor only */}
+              {/* Removed contractors: View contractor, View history */}
               {contractor.isDeactivated && (
-                <MenuItem
-                  icon={<Eye />}
-                  onClick={handleView}
-                  role="menuitem"
-                  aria-label={`View contractor ${contractor.businessName}`}
-                  _focus={{ bg: 'blue.50', outline: 'none' }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleView();
-                    }
-                  }}
-                >
-                  {t('contractor.actions.viewContractor')}
-                </MenuItem>
+                <>
+                  <MenuItem
+                    icon={<Eye />}
+                    onClick={handleView}
+                    role="menuitem"
+                    aria-label={`View contractor ${contractor.businessName}`}
+                    _focus={{ bg: 'blue.50', outline: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleView();
+                      }
+                    }}
+                  >
+                    {t('contractor.actions.viewContractor')}
+                  </MenuItem>
+                  <MenuItem
+                    icon={<ClockCounterClockwise />}
+                    onClick={handleViewHistory}
+                    role="menuitem"
+                    aria-label={`View status history for ${contractor.businessName}`}
+                    _focus={{ bg: 'blue.50', outline: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleViewHistory();
+                      }
+                    }}
+                  >
+                    {t('contractor.actions.viewStatusHistory')}
+                  </MenuItem>
+                </>
               )}
             </MenuList>
           </Menu>
@@ -438,6 +491,12 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
         onSubmit={handleRemoveConfirm}
         confirmText={t('ui.confirm', 'Confirm')}
         cancelText={t('ui.cancel', 'Cancel')}
+      />
+
+      <StatusHistoryModal
+        contractor={contractor}
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
       />
     </Box>
   );

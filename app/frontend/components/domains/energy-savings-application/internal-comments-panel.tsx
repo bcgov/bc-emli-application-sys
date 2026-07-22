@@ -54,9 +54,19 @@ export const InternalCommentsPanel = observer(({ permitApplication }: IInternalC
 
       <Collapse in={isOpen} animateOpacity>
         <Box id={`internal-comments-${permitApplication.id}`} bg="greys.grey03" px={4} pb={4}>
-          <VStack align="stretch" spacing={3} divider={<Divider />}>
+          <VStack
+            as="ul"
+            role="list"
+            aria-label={t('energySavingsApplication.show.internalComments.title')}
+            align="stretch"
+            spacing={3}
+            divider={<Divider />}
+            listStyleType="none"
+            m={0}
+            p={0}
+          >
             {comments.map((comment) => (
-              <Box key={comment.id}>
+              <Box as="li" role="listitem" key={comment.id}>
                 <Text fontSize="sm" color="text.secondary">
                   {`${comment.user?.firstName ?? ''} ${comment.user?.lastName ?? ''}`.trim() ||
                     t('energySavingsApplication.show.internalComments.unknownAuthor')}

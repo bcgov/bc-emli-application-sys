@@ -3293,6 +3293,24 @@ const options = {
             suspendContractor: 'Suspend contractor',
             unsuspendContractor: 'Unsuspend contractor',
             removeContractor: 'Remove contractor',
+            viewStatusHistory: 'View status history',
+          },
+          statusHistory: {
+            title: 'Status history',
+            subtitle: 'Suspend, unsuspend, and removal history for {{name}}.',
+            loading: 'Loading history...',
+            empty: 'No status history yet.',
+            reasonLabel: 'Reason',
+            unknownActor: 'Unknown',
+            close: 'Close',
+            listLabel: 'Status change history',
+            entryAria: '{{event}} by {{actor}} on {{date}}',
+            entryAriaWithReason: '{{event}} by {{actor}} on {{date}}. Reason: {{reason}}',
+            eventType: {
+              suspend: 'Suspended',
+              unsuspend: 'Unsuspended',
+              remove: 'Removed',
+            },
           },
           suspend: {
             modal: {

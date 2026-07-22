@@ -4,8 +4,8 @@ import { createSearchModel } from '../lib/create-search-model';
 import { withEnvironment } from '../lib/with-environment';
 import { withMerge } from '../lib/with-merge';
 import { withRootStore } from '../lib/with-root-store';
-import { IContractor, ContractorModel } from '../models/contractor';
-import { ContractorOnboardModel } from '../models/contractor-onboard';
+import { ContractorModel, IContractor } from '../models/contractor';
+import { IContractorStatusEvent } from '../types/types';
 
 export enum EContractorSortFields {
   id = 'number',
@@ -267,6 +267,13 @@ export const ContractorStoreModel = types
       }
 
       return response;
+    }),
+    fetchStatusHistory: flow(function* (contractorId: string) {
+      const response = yield self.environment.api.getContractorStatusHistory(contractorId);
+      if (response.ok) {
+        return (response.data.data as IContractorStatusEvent[]) ?? [];
+      }
+      return [] as IContractorStatusEvent[];
     }),
     validateImportToken: flow(function* (token: string) {
       const response = yield self.environment.api.validateContractorImportToken(token);
