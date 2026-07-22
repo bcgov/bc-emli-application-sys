@@ -551,6 +551,16 @@ export interface IInternalComment {
   user?: IMinimalFrozenUser;
 }
 
+export type TContractorStatusEventType = 'suspend' | 'unsuspend' | 'remove';
+
+export interface IContractorStatusEvent {
+  id: string;
+  eventType: TContractorStatusEventType;
+  reason?: string | null;
+  createdAt: number;
+  performedBy?: IMinimalFrozenUser;
+}
+
 export interface ISubmissionVersion {
   id: string;
   formJson: IFormJson;

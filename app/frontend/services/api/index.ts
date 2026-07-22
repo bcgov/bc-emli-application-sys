@@ -452,6 +452,10 @@ export class Api {
     });
   }
 
+  async getContractorStatusHistory(contractorId: string) {
+    return this.client.get<ApiResponse<any>>(`/contractors/${contractorId}/status_history`);
+  }
+
   async createContractorOnboarding(contractorId: string) {
     return this.client.post<ApiResponse<any>>(`/contractor_onboards`, {
       contractor_id: contractorId,
