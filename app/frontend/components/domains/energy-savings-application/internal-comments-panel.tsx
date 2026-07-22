@@ -60,7 +60,7 @@ export const InternalCommentsPanel = observer(({ permitApplication }: IInternalC
             aria-label={t('energySavingsApplication.show.internalComments.title')}
             align="stretch"
             spacing={3}
-            divider={<Divider />}
+            divider={<Divider as="li" aria-hidden="true" />}
             listStyleType="none"
             m={0}
             p={0}

@@ -557,7 +557,7 @@ export interface IContractorStatusEvent {
   id: string;
   eventType: TContractorStatusEventType;
   reason?: string | null;
-  createdAt: string;
+  createdAt: number;
   performedBy?: IMinimalFrozenUser;
 }
 

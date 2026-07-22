@@ -95,7 +95,7 @@ export const StatusHistoryModal = observer(({ contractor, isOpen, onClose }: ISt
               aria-label={t('contractor.statusHistory.listLabel')}
               align="stretch"
               spacing={3}
-              divider={<Divider />}
+              divider={<Divider as="li" aria-hidden="true" />}
               listStyleType="none"
               m={0}
               p={0}
