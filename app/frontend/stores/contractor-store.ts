@@ -270,10 +270,12 @@ export const ContractorStoreModel = types
     }),
     fetchStatusHistory: flow(function* (contractorId: string) {
       const response = yield self.environment.api.getContractorStatusHistory(contractorId);
-      if (response.ok) {
-        return (response.data.data as IContractorStatusEvent[]) ?? [];
+      // Throw (rather than return []) so the modal can tell "no events" apart
+      // from a failed/forbidden request and show an error instead of empty.
+      if (!response.ok) {
+        throw new Error('Failed to load contractor status history');
       }
-      return [] as IContractorStatusEvent[];
+      return (response.data.data as IContractorStatusEvent[]) ?? [];
     }),
     validateImportToken: flow(function* (token: string) {
       const response = yield self.environment.api.validateContractorImportToken(token);

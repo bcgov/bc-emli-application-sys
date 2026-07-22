@@ -47,15 +47,20 @@ export const StatusHistoryModal = observer(({ contractor, isOpen, onClose }: ISt
   const { contractorStore } = useMst();
   const [events, setEvents] = useState<IContractorStatusEvent[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
     let active = true;
     setIsLoading(true);
+    setHasError(false);
     contractorStore
       .fetchStatusHistory(contractor.id)
       .then((result: IContractorStatusEvent[]) => {
         if (active) setEvents(result ?? []);
+      })
+      .catch(() => {
+        if (active) setHasError(true);
       })
       .finally(() => {
         if (active) setIsLoading(false);
@@ -86,6 +91,8 @@ export const StatusHistoryModal = observer(({ contractor, isOpen, onClose }: ISt
             <Flex justify="center" py={8}>
               <Spinner aria-label={t('contractor.statusHistory.loading')} />
             </Flex>
+          ) : hasError ? (
+            <Text color="semantic.error">{t('contractor.statusHistory.error')}</Text>
           ) : events.length === 0 ? (
             <Text color="text.secondary">{t('contractor.statusHistory.empty')}</Text>
           ) : (

@@ -3300,6 +3300,7 @@ const options = {
             subtitle: 'Suspend, unsuspend, and removal history for {{name}}.',
             loading: 'Loading history...',
             empty: 'No status history yet.',
+            error: 'Could not load status history. Please try again.',
             reasonLabel: 'Reason',
             unknownActor: 'Unknown',
             close: 'Close',
