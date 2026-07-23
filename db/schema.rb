@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_20_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_22_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -849,6 +849,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_20_120000) do
     t.string "sitewide_message_color"
     t.uuid "small_scale_requirement_template_id"
     t.datetime "updated_at", null: false
+    t.text "application_submission_notice"
     t.index ["small_scale_requirement_template_id"],
             name: "idx_on_small_scale_requirement_template_id_235b636c86"
   end
