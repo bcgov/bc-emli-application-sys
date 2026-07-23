@@ -1,33 +1,35 @@
-import { Box, Center } from '@chakra-ui/react';
+import { Box, Center, Container } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
 import React, { Suspense, lazy, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useMst } from '../../../setup/root';
 import { EFlashMessageStatus } from '../../../types/enums';
+import { trackPageViewEvent } from '../../../utils/snowplow';
 import { FlashMessage } from '../../shared/base/flash-message';
 import { LoadingScreen } from '../../shared/base/loading-screen';
+import { AdminPortalLogin } from '../admin/login';
+import { ContractorDashboardScreen } from '../contractor-dashboard/contractor-dashboard-screen';
+import { ContractorLandingScreen } from '../contractor-landing';
+import { ContractorOnboardingImport } from '../contractor-landing/import';
+import { ContractorManagementScreen } from '../contractor-management';
+import { ContractorProgramResourcesScreen } from '../contractor-management/contractor-program-resources-screen';
+import { ContractorEmployeeIndexScreen } from '../contractor-management/employees';
+import { RemoveReasonPage } from '../contractor-management/remove-reason-page';
+import { SuspendReasonPage } from '../contractor-management/suspend-reason-page';
+import { RejectApplicationScreen } from '../energy-savings-application/application-rejection-reason';
+import {
+  ContractorRemoveConfirmedScreen,
+  ContractorSuspendConfirmedScreen,
+  ContractorUnsuspendConfirmedScreen,
+} from '../energy-savings-application/successful-action-screens';
 import { SupportScreen } from '../misc/support-screen';
 import { EULAScreen } from '../onboarding/eula';
-import { NavBar } from './nav-bar';
-import { ProtectedRoute } from './protected-route';
-import { AdminPortalLogin } from '../admin/login';
 import { ProgramsIndexScreen } from '../programs';
 import { ProgramInviteUserScreen } from '../programs/invite-users';
-import { RejectApplicationScreen } from '../energy-savings-application/application-rejection-reason';
 import { BlankTemplateScreen } from '../requirement-template/screens/blank-template';
-import { ContractorLandingScreen } from '../contractor-landing';
-import { ContractorManagementScreen } from '../contractor-management';
-import { ContractorEmployeeIndexScreen } from '../contractor-management/employees';
-import { ContractorProgramResourcesScreen } from '../contractor-management/contractor-program-resources-screen';
-import { ContractorDashboardScreen } from '../contractor-dashboard/contractor-dashboard-screen';
-import { ContractorOnboardingImport } from '../contractor-landing/import';
-import { SuspendReasonPage } from '../contractor-management/suspend-reason-page';
-import { RemoveReasonPage } from '../contractor-management/remove-reason-page';
-import { ContractorSuspendConfirmedScreen } from '../energy-savings-application/successful-action-screens';
-import { ContractorUnsuspendConfirmedScreen } from '../energy-savings-application/successful-action-screens';
-import { ContractorRemoveConfirmedScreen } from '../energy-savings-application/successful-action-screens';
-import { trackPageViewEvent } from '../../../utils/snowplow';
+import { NavBar } from './nav-bar';
+import { ProtectedRoute } from './protected-route';
 
 const ExternalApiKeysIndexScreen = lazy(() =>
   import('../external-api-key').then((module) => ({ default: module.ExternalApiKeysIndexScreen })),
@@ -404,8 +406,10 @@ export const Navigation = observer(() => {
         </Box>
       </Box>
       {displaySitewideMessage && (
-        <Center h={16} bg={siteConfigurationStore.sitewideMessageColor || 'theme.yellowLight'}>
-          {sitewideMessage}
+        <Center minH={16} px={4} py={2} bg={siteConfigurationStore.sitewideMessageColor || 'theme.yellowLight'}>
+          <Container maxW="container.lg" mx="auto" p={0} textAlign="center">
+            {sitewideMessage}
+          </Container>
         </Center>
       )}
       <NavBar />
