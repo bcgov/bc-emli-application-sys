@@ -1,7 +1,8 @@
 class AddApplicationSubmissionNoticeToSiteConfigurations < ActiveRecord::Migration[
-  7.1
+  8.1
 ]
-  # Blank is the column default; the notice text is seed data, not schema.
+  # No column default (NULL), so the paragraph is hidden unless text is set;
+  # the notice text is seed data, not schema.
   # We backfill the existing SiteConfiguration row here (rather than in a
   # separate db/data migration) so the paragraph appears on deploy even if the
   # pipeline does not run data migrations.
