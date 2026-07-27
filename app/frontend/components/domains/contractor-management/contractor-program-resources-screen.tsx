@@ -4,11 +4,10 @@ import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMst } from '../../../setup/root';
-import CustomAlert from '../../shared/base/custom-alert';
-import { BlueTitleBar } from '../../shared/base/blue-title-bar';
-import { SubNavBar } from '../navigation/sub-nav-bar';
 import { EDescriptionPartType } from '../../../types/enums';
 import { DescriptionPart } from '../../../types/types';
+import { BlueTitleBar } from '../../shared/base/blue-title-bar';
+import CustomAlert from '../../shared/base/custom-alert';
 interface ProgramResource {
   id: string;
   title: string;
@@ -284,7 +283,13 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
   hideBlueSection = false,
 }: ContractorProgramResourcesScreenProps) {
   const { t } = useTranslation();
-  const { environment } = useMst();
+  const { environment, userStore } = useMst();
+  const { currentUser } = userStore;
+  // BCHEP-737: suspended contractors (and their employees) may not use eligibility-code validation.
+  const isContractorSuspended = currentUser?.contractorSuspended ?? false;
+  const sidebarCategories = isContractorSuspended
+    ? SIDEBAR_CATEGORIES.filter((category) => category.key !== 'checkEligibilityCode')
+    : SIDEBAR_CATEGORIES;
   const [selectedCategory, setSelectedCategory] = useState<ResourceCategory>('addEmployees');
   const [eligibilityCode, setEligibilityCode] = useState('');
   const [checkResult, setCheckResult] = useState<{
@@ -398,7 +403,7 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
             bg="greys.white"
           >
             <VStack align="stretch" spacing={0} role="tablist" overflow="visible">
-              {SIDEBAR_CATEGORIES.map((category) => (
+              {sidebarCategories.map((category) => (
                 <Box
                   key={category.key}
                   as="button"
@@ -447,7 +452,8 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
           </Box>
 
           {/* Right Content Area */}
-          {selectedCategory === 'checkEligibilityCode' ? (
+          {/* BCHEP-737: hide eligibility-code panel for suspended contractors (belt-and-suspenders; tab is also filtered out). */}
+          {selectedCategory === 'checkEligibilityCode' && !isContractorSuspended ? (
             <VStack
               flex={1}
               align="flex-start"
