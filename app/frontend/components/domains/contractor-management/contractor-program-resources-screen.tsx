@@ -1,7 +1,7 @@
 import { Box, Button, Container, Flex, Heading, Input, Link, Text, VStack } from '@chakra-ui/react';
 import { CheckCircle } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMst } from '../../../setup/root';
 import { EDescriptionPartType } from '../../../types/enums';
@@ -300,6 +300,14 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
   const [checking, setChecking] = useState(false);
   const [checkError, setCheckError] = useState(false);
 
+  // BCHEP-737: if the contractor becomes suspended while 'checkEligibilityCode' is selected,
+  // reset to a safe category so the resource panel never indexes the (now-hidden) eligibility key.
+  useEffect(() => {
+    if (isContractorSuspended && selectedCategory === 'checkEligibilityCode') {
+      setSelectedCategory('addEmployees');
+    }
+  }, [isContractorSuspended, selectedCategory]);
+
   const handleCheckEligibility = async () => {
     const code = eligibilityCode.trim();
     if (!ELIGIBILITY_CODE_REGEX.test(code)) {
@@ -452,8 +460,7 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
           </Box>
 
           {/* Right Content Area */}
-          {/* BCHEP-737: hide eligibility-code panel for suspended contractors (belt-and-suspenders; tab is also filtered out). */}
-          {selectedCategory === 'checkEligibilityCode' && !isContractorSuspended ? (
+          {selectedCategory === 'checkEligibilityCode' ? (
             <VStack
               flex={1}
               align="flex-start"
