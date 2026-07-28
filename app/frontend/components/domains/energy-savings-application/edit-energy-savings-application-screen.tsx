@@ -10,6 +10,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { requirementTypeToFormioType } from '../../../constants';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
 import { useInterval } from '../../../hooks/use-interval';
+import { IContractor } from '../../../models/contractor';
 import { useMst } from '../../../setup/root';
 import { ICustomEventMap } from '../../../types/dom';
 import { ECollaborationType, ECustomEvents, EPermitApplicationStatus, ERequirementType } from '../../../types/enums';
@@ -22,10 +23,12 @@ import { PermitApplicationSubmitModal } from '../../shared/energy-savings-applic
 import { RequirementForm } from '../../shared/energy-savings-applications/requirement-form';
 import { FloatingHelpDrawer } from '../../shared/floating-help-drawer';
 import SandboxHeader from '../../shared/sandbox/sandbox-header';
+import { StatusHistoryModal } from '../contractor-management/status-history-modal';
 import { BlockCollaboratorAssignmentManagement } from './assignment-management/block-collaborator-assignment-management';
 import { useCollaborationAssignmentNodes } from './assignment-management/hooks/use-collaboration-assignment-nodes';
 import { ChecklistSideBar } from './checklist-sidebar';
 import { ContactSummaryModal } from './contact-summary-modal';
+import { ContractorSuspendedBanner } from './contractor-suspended-banner';
 import { RevisionSideBar } from './revision-sidebar';
 import { SubmissionDownloadModal } from './submission-download-modal';
 //import { WithdrawApplicationModal } from './withdraw-application-modal';
@@ -58,6 +61,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
 
   const [completedBlocks, setCompletedBlocks] = useState({});
   const { isOpen: isContactsOpen, onOpen: onContactsOpen, onClose: onContactsClose } = useDisclosure();
+  const { isOpen: isStatusHistoryOpen, onOpen: onStatusHistoryOpen, onClose: onStatusHistoryClose } = useDisclosure();
 
   const [processEventOnLoad, setProcessEventOnLoad] = useState<CustomEvent | null>(null);
   const { requirementBlockAssignmentNodes, updateRequirementBlockAssignmentNode } = useCollaborationAssignmentNodes({
@@ -316,6 +320,11 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
 
             {isSubmitted || isIneligible || isInReview || isAdminViewingContractorOnboarding ? (
               <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
+                {currentPermitApplication?.submitterSuspendedAt && (
+                  <Button variant="primary" onClick={onStatusHistoryOpen}>
+                    {t('contractor.suspended.onboardingBanner.viewReasons')}
+                  </Button>
+                )}
                 <SubmissionDownloadModal permitApplication={currentPermitApplication} />
                 <Button
                   rightIcon={<CaretRight />}
@@ -452,6 +461,11 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
             <RequirementForm
               formRef={formRef}
               permitApplication={currentPermitApplication}
+              renderTopButtons={
+                currentPermitApplication?.submitterSuspendedAt
+                  ? () => <ContractorSuspendedBanner suspendedAt={currentPermitApplication!.submitterSuspendedAt!} />
+                  : undefined
+              }
               onCompletedBlocksChange={setCompletedBlocks}
               triggerSave={handleSave}
               showHelpButton
@@ -483,6 +497,14 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
           onOpen={onContactsOpen}
           onClose={onContactsClose}
           permitApplication={currentPermitApplication}
+        />
+      )}
+      {currentPermitApplication?.submitter && (
+        <StatusHistoryModal
+          contractor={currentPermitApplication.submitter as IContractor}
+          isOpen={isStatusHistoryOpen}
+          onClose={onStatusHistoryClose}
+          title={t('contractor.statusHistory.suspensionReasonsTitle')}
         />
       )}
       {requirementBlockAssignmentNodes.map((requirementBlockAssignmentNode) => {

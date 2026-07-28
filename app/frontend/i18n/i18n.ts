@@ -3297,11 +3297,13 @@ const options = {
           },
           statusHistory: {
             title: 'Status history',
+            suspensionReasonsTitle: 'Suspension reasons',
             subtitle: 'Suspend, unsuspend, and removal history for {{name}}.',
             loading: 'Loading history...',
             empty: 'No status history yet.',
             error: 'Could not load status history. Please try again.',
             reasonLabel: 'Reason',
+            byLabel: 'by',
             unknownActor: 'Unknown',
             close: 'Close',
             listLabel: 'Status change history',
@@ -3371,6 +3373,10 @@ const options = {
               title: 'Account suspended',
               message:
                 'You can only view past submissions and access program resources. You can not submit a new invoice until we unsuspend your account.',
+            },
+            onboardingBanner: {
+              title: 'Contractor suspended on {{date}}',
+              viewReasons: 'View suspension reasons',
             },
           },
           employees: {

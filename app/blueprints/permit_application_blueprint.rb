@@ -163,6 +163,14 @@ class PermitApplicationBlueprint < Blueprinter::Base
       SubmitterBlueprint.render(pa.submitter, view: :minimal)
     end
 
+    # BCHEP-531: suspension timestamp of a contractor submitter (nil when not a
+    # suspended contractor). Drives the onboarding "contractor suspended" banner for
+    # admin/review staff — both the gate (presence) and the displayed date/time.
+    # nil (no query) for User submitters; one latest_onboard lookup for contractors.
+    field :submitter_suspended_at do |pa, options|
+      pa.submitter.suspended_at if pa.submitter.is_a?(Contractor)
+    end
+
     field :is_fully_loaded do |pa, options|
       true
     end

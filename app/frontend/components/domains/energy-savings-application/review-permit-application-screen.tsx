@@ -21,10 +21,12 @@ import { ErrorScreen } from '../../shared/base/error-screen';
 import { LoadingScreen } from '../../shared/base/loading-screen';
 import { RequirementForm } from '../../shared/energy-savings-applications/requirement-form';
 import SandboxHeader from '../../shared/sandbox/sandbox-header';
+import { StatusHistoryModal } from '../contractor-management/status-history-modal';
 import { BlockCollaboratorAssignmentManagement } from './assignment-management/block-collaborator-assignment-management';
 import { useCollaborationAssignmentNodes } from './assignment-management/hooks/use-collaboration-assignment-nodes';
 import { ChecklistSideBar } from './checklist-sidebar';
 import { ContactSummaryModal } from './contact-summary-modal';
+import { ContractorSuspendedBanner } from './contractor-suspended-banner';
 import { InternalCommentsModal } from './internal-comments-modal';
 import { RevisionSideBar } from './revision-sidebar';
 import { SubmissionDownloadModal } from './submission-download-modal';
@@ -95,6 +97,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
     onClose: onContractorApprovalClose,
   } = useDisclosure();
   const { isOpen: isContactsOpen, onOpen: onContactsOpen, onClose: onContactsClose } = useDisclosure();
+  const { isOpen: isStatusHistoryOpen, onOpen: onStatusHistoryOpen, onClose: onStatusHistoryClose } = useDisclosure();
   const { isOpen: isUpdatePathwayOpen, onOpen: onUpdatePathwayOpen, onClose: onUpdatePathwayClose } = useDisclosure();
   const {
     isOpen: isAddSupportingFilesPathwayOpen,
@@ -367,6 +370,11 @@ export const ReviewPermitApplicationScreen = observer(() => {
                 {t('energySavingsApplication.show.supportingFilesRequest.addSupportingFiles')}
               </Button>
             )}
+            {currentPermitApplication?.submitterSuspendedAt && (
+              <Button variant="primary" onClick={onStatusHistoryOpen}>
+                {t('contractor.suspended.onboardingBanner.viewReasons')}
+              </Button>
+            )}
             <SubmissionDownloadModal
               permitApplication={currentPermitApplication}
               review
@@ -470,140 +478,146 @@ export const ReviewPermitApplicationScreen = observer(() => {
               showSiteWarning={false}
               renderTopButtons={() => {
                 return (
-                  (!revisionMode || isEditContractor) && (
-                    <HStack spacing={6}>
-                      {!isEditContractor &&
-                        !(
-                          isInvoiceSubmission &&
-                          [
+                  <>
+                    {(!revisionMode || isEditContractor) && (
+                      <HStack spacing={6}>
+                        {!isEditContractor &&
+                          !(
+                            isInvoiceSubmission &&
+                            [
+                              EPermitApplicationStatus.approved,
+                              EPermitApplicationStatus.approvedPending,
+                              EPermitApplicationStatus.approvedPaid,
+                            ].includes(currentPermitApplication?.status)
+                          ) && (
+                            <Button
+                              variant="calloutInverse"
+                              leftIcon={<NotePencilIcon />}
+                              px={14}
+                              onClick={onUpdatePathwayOpen}
+                              borderColor="theme.yellow"
+                              isDisabled={
+                                currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
+                                (currentPermitApplication?.status === EPermitApplicationStatus.inReview &&
+                                  !isInvoiceSubmission)
+                              }
+                            >
+                              {t('energySavingsApplication.show.update')}
+                            </Button>
+                          )}
+                        {currentPermitApplication.submissionType?.code !== EPermitClassificationCode.onboarding &&
+                          ![
+                            EPermitApplicationStatus.inReview,
                             EPermitApplicationStatus.approved,
                             EPermitApplicationStatus.approvedPending,
                             EPermitApplicationStatus.approvedPaid,
-                          ].includes(currentPermitApplication?.status)
-                        ) && (
-                          <Button
-                            variant="calloutInverse"
-                            leftIcon={<NotePencilIcon />}
-                            px={14}
-                            onClick={onUpdatePathwayOpen}
-                            borderColor="theme.yellow"
-                            isDisabled={
-                              currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
-                              (currentPermitApplication?.status === EPermitApplicationStatus.inReview &&
-                                !isInvoiceSubmission)
-                            }
-                          >
-                            {t('energySavingsApplication.show.update')}
-                          </Button>
-                        )}
-                      {currentPermitApplication.submissionType?.code !== EPermitClassificationCode.onboarding &&
-                        ![
-                          EPermitApplicationStatus.inReview,
-                          EPermitApplicationStatus.approved,
-                          EPermitApplicationStatus.approvedPending,
-                          EPermitApplicationStatus.approvedPaid,
-                        ].includes(currentPermitApplication?.status) && (
-                          <Button
-                            variant="calloutInverse"
-                            leftIcon={<CheckCircleIcon />}
-                            px={14}
-                            onClick={onScreenIn}
-                            borderColor="green"
-                            isDisabled={currentPermitApplication?.status === EPermitApplicationStatus.ineligible}
-                          >
-                            {t('energySavingsApplication.show.screenIn')}
-                          </Button>
-                        )}
-                      {currentPermitApplication.submissionType?.code === EPermitClassificationCode.onboarding ? (
-                        currentPermitApplication?.status !== EPermitApplicationStatus.trainingPending ? (
-                          <Button
-                            variant="calloutInverse"
-                            px={14}
-                            onClick={onTrainingPending}
-                            borderColor="theme.darkGreen"
-                            bg="theme.lightGreen"
-                            _hover={{ bg: 'theme.lightGreen' }}
-                            _active={{ bg: 'theme.lightGreen' }}
-                            isDisabled={
-                              hasUnsavedEdits ||
-                              currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
-                              currentPermitApplication?.status === EPermitApplicationStatus.approved
-                            }
-                          >
-                            {t('energySavingsApplication.show.readyForTraining')}
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="calloutInverse"
-                            px={14}
-                            onClick={onContractorApproval}
-                            borderColor="theme.darkGreen"
-                            bg="theme.lightGreen"
-                            _hover={{ bg: 'theme.lightGreen' }}
-                            _active={{ bg: 'theme.lightGreen' }}
-                            isDisabled={
-                              hasUnsavedEdits ||
-                              currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
-                              currentPermitApplication?.status === EPermitApplicationStatus.approved
-                            }
-                          >
-                            {t('ui.approve')}
-                          </Button>
-                        )
-                      ) : isInvoiceSubmission ? (
-                        currentPermitApplication?.status === EPermitApplicationStatus.approvedPending ? (
-                          <Button
-                            variant="calloutInverse"
-                            px={14}
-                            onClick={onMarkPaidOpen}
-                            borderColor="green"
-                            isDisabled={
-                              currentPermitApplication?.status !== EPermitApplicationStatus.approvedPending ||
-                              currentPermitApplication?.status === EPermitApplicationStatus.ineligible
-                            }
-                          >
-                            {t('energySavingsApplication.show.approvePaid')}
-                          </Button>
-                        ) : currentPermitApplication?.status === EPermitApplicationStatus.inReview ? (
-                          <Button
-                            variant="calloutInverse"
-                            px={14}
-                            onClick={onApprovePendingOpen}
-                            borderColor="green"
-                            isDisabled={
-                              currentPermitApplication?.status !== EPermitApplicationStatus.inReview ||
-                              currentPermitApplication?.status === EPermitApplicationStatus.ineligible
-                            }
-                          >
-                            {t('energySavingsApplication.show.approvePending')}
-                          </Button>
-                        ) : null
-                      ) : null}
-                      {!hasUnsavedEdits &&
-                        !(
-                          currentPermitApplication?.status === EPermitApplicationStatus.inReview && !isInvoiceSubmission
-                        ) &&
-                        currentPermitApplication?.status !== EPermitApplicationStatus.ineligible &&
-                        currentPermitApplication?.status !== EPermitApplicationStatus.approved &&
-                        currentPermitApplication?.status !== EPermitApplicationStatus.approvedPending &&
-                        currentPermitApplication?.status !== EPermitApplicationStatus.approvedPaid && (
-                          <Button
-                            variant="calloutInverse"
-                            leftIcon={!isEditContractor && <ProhibitIcon />}
-                            px={14}
-                            onClick={onIneligibleOpen}
-                            borderColor="semantic.errorDark"
-                            bg="theme.softRose"
-                            _hover={{ bg: 'theme.softRose' }}
-                            _active={{ bg: 'theme.softRose' }}
-                          >
-                            {!isEditContractor
-                              ? t('energySavingsApplication.show.inEligible')
-                              : t('energySavingsApplication.show.markIneligible')}
-                          </Button>
-                        )}
-                    </HStack>
-                  )
+                          ].includes(currentPermitApplication?.status) && (
+                            <Button
+                              variant="calloutInverse"
+                              leftIcon={<CheckCircleIcon />}
+                              px={14}
+                              onClick={onScreenIn}
+                              borderColor="green"
+                              isDisabled={currentPermitApplication?.status === EPermitApplicationStatus.ineligible}
+                            >
+                              {t('energySavingsApplication.show.screenIn')}
+                            </Button>
+                          )}
+                        {currentPermitApplication.submissionType?.code === EPermitClassificationCode.onboarding ? (
+                          currentPermitApplication?.status !== EPermitApplicationStatus.trainingPending ? (
+                            <Button
+                              variant="calloutInverse"
+                              px={14}
+                              onClick={onTrainingPending}
+                              borderColor="theme.darkGreen"
+                              bg="theme.lightGreen"
+                              _hover={{ bg: 'theme.lightGreen' }}
+                              _active={{ bg: 'theme.lightGreen' }}
+                              isDisabled={
+                                hasUnsavedEdits ||
+                                currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
+                                currentPermitApplication?.status === EPermitApplicationStatus.approved
+                              }
+                            >
+                              {t('energySavingsApplication.show.readyForTraining')}
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="calloutInverse"
+                              px={14}
+                              onClick={onContractorApproval}
+                              borderColor="theme.darkGreen"
+                              bg="theme.lightGreen"
+                              _hover={{ bg: 'theme.lightGreen' }}
+                              _active={{ bg: 'theme.lightGreen' }}
+                              isDisabled={
+                                hasUnsavedEdits ||
+                                currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
+                                currentPermitApplication?.status === EPermitApplicationStatus.approved
+                              }
+                            >
+                              {t('ui.approve')}
+                            </Button>
+                          )
+                        ) : isInvoiceSubmission ? (
+                          currentPermitApplication?.status === EPermitApplicationStatus.approvedPending ? (
+                            <Button
+                              variant="calloutInverse"
+                              px={14}
+                              onClick={onMarkPaidOpen}
+                              borderColor="green"
+                              isDisabled={
+                                currentPermitApplication?.status !== EPermitApplicationStatus.approvedPending ||
+                                currentPermitApplication?.status === EPermitApplicationStatus.ineligible
+                              }
+                            >
+                              {t('energySavingsApplication.show.approvePaid')}
+                            </Button>
+                          ) : currentPermitApplication?.status === EPermitApplicationStatus.inReview ? (
+                            <Button
+                              variant="calloutInverse"
+                              px={14}
+                              onClick={onApprovePendingOpen}
+                              borderColor="green"
+                              isDisabled={
+                                currentPermitApplication?.status !== EPermitApplicationStatus.inReview ||
+                                currentPermitApplication?.status === EPermitApplicationStatus.ineligible
+                              }
+                            >
+                              {t('energySavingsApplication.show.approvePending')}
+                            </Button>
+                          ) : null
+                        ) : null}
+                        {!hasUnsavedEdits &&
+                          !(
+                            currentPermitApplication?.status === EPermitApplicationStatus.inReview &&
+                            !isInvoiceSubmission
+                          ) &&
+                          currentPermitApplication?.status !== EPermitApplicationStatus.ineligible &&
+                          currentPermitApplication?.status !== EPermitApplicationStatus.approved &&
+                          currentPermitApplication?.status !== EPermitApplicationStatus.approvedPending &&
+                          currentPermitApplication?.status !== EPermitApplicationStatus.approvedPaid && (
+                            <Button
+                              variant="calloutInverse"
+                              leftIcon={!isEditContractor && <ProhibitIcon />}
+                              px={14}
+                              onClick={onIneligibleOpen}
+                              borderColor="semantic.errorDark"
+                              bg="theme.softRose"
+                              _hover={{ bg: 'theme.softRose' }}
+                              _active={{ bg: 'theme.softRose' }}
+                            >
+                              {!isEditContractor
+                                ? t('energySavingsApplication.show.inEligible')
+                                : t('energySavingsApplication.show.markIneligible')}
+                            </Button>
+                          )}
+                      </HStack>
+                    )}
+                    {currentPermitApplication?.submitterSuspendedAt && (
+                      <ContractorSuspendedBanner suspendedAt={currentPermitApplication.submitterSuspendedAt!} />
+                    )}
+                  </>
                 );
               }}
               isEditing={
@@ -721,6 +735,14 @@ export const ReviewPermitApplicationScreen = observer(() => {
           onOpen={onContactsOpen}
           onClose={onContactsClose}
           permitApplication={currentPermitApplication}
+        />
+      )}
+      {currentPermitApplication?.submitter && (
+        <StatusHistoryModal
+          contractor={currentPermitApplication.submitter as IContractor}
+          isOpen={isStatusHistoryOpen}
+          onClose={onStatusHistoryClose}
+          title={t('contractor.statusHistory.suspensionReasonsTitle')}
         />
       )}
       {requirementBlockAssignmentNodes.map((requirementBlockAssignmentNode) => {
