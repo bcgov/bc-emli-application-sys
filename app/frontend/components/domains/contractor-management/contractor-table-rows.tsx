@@ -6,7 +6,6 @@ import {
   Eye,
   HourglassMedium,
   PencilSimple,
-  Trash,
   Users,
 } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
@@ -311,22 +310,29 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
                   >
                     {t('contractor.actions.viewStatusHistory')}
                   </MenuItem>
-                  <MenuItem
-                    icon={<Trash />}
-                    onClick={handleRemove}
-                    color="red.500"
-                    role="menuitem"
-                    aria-label={`Remove contractor ${contractor.businessName}`}
-                    _focus={{ bg: 'red.50', outline: 'none' }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleRemove();
-                      }
-                    }}
-                  >
-                    {t('contractor.actions.removeContractor')}
-                  </MenuItem>
+                  {/*
+                    BCHEP-737: "Remove contractor" hidden per July 23, 2026 business decision.
+                    Contractor participation is now managed via Suspend / Unsuspend only.
+                    Backend deactivate flow (controller, route, reason page, store) is retained
+                    and re-enablable — do not delete. See ticket BCHEP-737.
+
+                    <MenuItem
+                      icon={<Trash />}
+                      onClick={handleRemove}
+                      color="red.500"
+                      role="menuitem"
+                      aria-label={`Remove contractor ${contractor.businessName}`}
+                      _focus={{ bg: 'red.50', outline: 'none' }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleRemove();
+                        }
+                      }}
+                    >
+                      {t('contractor.actions.removeContractor')}
+                    </MenuItem>
+                  */}
                 </>
               )}
 
@@ -378,22 +384,29 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
                   >
                     {t('contractor.actions.viewStatusHistory')}
                   </MenuItem>
-                  <MenuItem
-                    icon={<Trash />}
-                    onClick={handleRemove}
-                    color="red.500"
-                    role="menuitem"
-                    aria-label={`Remove contractor ${contractor.businessName}`}
-                    _focus={{ bg: 'red.50', outline: 'none' }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleRemove();
-                      }
-                    }}
-                  >
-                    {t('contractor.actions.removeContractor')}
-                  </MenuItem>
+                  {/*
+                    BCHEP-737: "Remove contractor" hidden per July 23, 2026 business decision.
+                    Contractor participation is now managed via Suspend / Unsuspend only.
+                    Backend deactivate flow (controller, route, reason page, store) is retained
+                    and re-enablable — do not delete. See ticket BCHEP-737.
+
+                    <MenuItem
+                      icon={<Trash />}
+                      onClick={handleRemove}
+                      color="red.500"
+                      role="menuitem"
+                      aria-label={`Remove contractor ${contractor.businessName}`}
+                      _focus={{ bg: 'red.50', outline: 'none' }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleRemove();
+                        }
+                      }}
+                    >
+                      {t('contractor.actions.removeContractor')}
+                    </MenuItem>
+                  */}
                 </>
               )}
 

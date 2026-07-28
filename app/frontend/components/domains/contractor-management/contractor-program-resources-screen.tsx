@@ -1,14 +1,13 @@
 import { Box, Button, Container, Flex, Heading, Input, Link, Text, VStack } from '@chakra-ui/react';
 import { CheckCircle } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMst } from '../../../setup/root';
-import CustomAlert from '../../shared/base/custom-alert';
-import { BlueTitleBar } from '../../shared/base/blue-title-bar';
-import { SubNavBar } from '../navigation/sub-nav-bar';
 import { EDescriptionPartType } from '../../../types/enums';
 import { DescriptionPart } from '../../../types/types';
+import { BlueTitleBar } from '../../shared/base/blue-title-bar';
+import CustomAlert from '../../shared/base/custom-alert';
 interface ProgramResource {
   id: string;
   title: string;
@@ -284,7 +283,13 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
   hideBlueSection = false,
 }: ContractorProgramResourcesScreenProps) {
   const { t } = useTranslation();
-  const { environment } = useMst();
+  const { environment, userStore } = useMst();
+  const { currentUser } = userStore;
+  // BCHEP-737: suspended contractors (and their employees) may not use eligibility-code validation.
+  const isContractorSuspended = currentUser?.contractorSuspended ?? false;
+  const sidebarCategories = isContractorSuspended
+    ? SIDEBAR_CATEGORIES.filter((category) => category.key !== 'checkEligibilityCode')
+    : SIDEBAR_CATEGORIES;
   const [selectedCategory, setSelectedCategory] = useState<ResourceCategory>('addEmployees');
   const [eligibilityCode, setEligibilityCode] = useState('');
   const [checkResult, setCheckResult] = useState<{
@@ -294,6 +299,14 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
   } | null>(null);
   const [checking, setChecking] = useState(false);
   const [checkError, setCheckError] = useState(false);
+
+  // BCHEP-737: if the contractor becomes suspended while 'checkEligibilityCode' is selected,
+  // reset to a safe category so the resource panel never indexes the (now-hidden) eligibility key.
+  useEffect(() => {
+    if (isContractorSuspended && selectedCategory === 'checkEligibilityCode') {
+      setSelectedCategory('addEmployees');
+    }
+  }, [isContractorSuspended, selectedCategory]);
 
   const handleCheckEligibility = async () => {
     const code = eligibilityCode.trim();
@@ -398,7 +411,7 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
             bg="greys.white"
           >
             <VStack align="stretch" spacing={0} role="tablist" overflow="visible">
-              {SIDEBAR_CATEGORIES.map((category) => (
+              {sidebarCategories.map((category) => (
                 <Box
                   key={category.key}
                   as="button"
