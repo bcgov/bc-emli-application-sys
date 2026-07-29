@@ -148,6 +148,24 @@ class PermitApplicationBlueprint < Blueprinter::Base
     field :submitter do |pa, options|
       SubmitterBlueprint.render(pa.submitter, view: :minimal)
     end
+
+    # BCHEP-531 follow-up: suspension timestamp of the submitting contractor (nil when
+    # not suspended). Drives the suspended-contractor indicator in the submission inbox so
+    # review staff can spot those submissions without opening each row. Same authoritative
+    # resolver as the :extended detail banner (contractor_for_invoice: the submitter itself
+    # for onboarding, else the submitting user's own/employer contractor).
+    #
+    # Guard: only contractor submissions (onboarding + invoices) can have a suspended
+    # contractor, so skip the resolver for participant rows. user_group_type is eager-loaded
+    # (PROGRAM_SEARCH_INCLUDES), making this check free — and it keeps the participant inbox
+    # (all of prod today, since contractors aren't live yet) at zero added query cost.
+    field :submitter_suspended_at do |pa, options|
+      if pa.user_group_type&.code == "contractor"
+        pa.contractor_for_invoice&.suspended_at
+      else
+        nil
+      end
+    end
   end
 
   view :extended do

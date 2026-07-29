@@ -1,5 +1,17 @@
-import { Badge, Box, Container, Flex, Heading, HStack, IconButton, Stack, Text, VStack } from '@chakra-ui/react';
-import { ChatCircle, Download } from '@phosphor-icons/react';
+import {
+  Badge,
+  Box,
+  Container,
+  Flex,
+  Heading,
+  HStack,
+  IconButton,
+  Stack,
+  Text,
+  Tooltip,
+  VStack,
+} from '@chakra-ui/react';
+import { ChatCircle, Download, Warning } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -224,7 +236,16 @@ export const ProgramSubmissionInboxScreen = observer(function ProgramSubmissionI
           </Box>
         </Flex>
 
-        <SearchGrid templateColumns="1.5fr repeat(6, 1fr)" mt={4}>
+        {/* Status, Reference #, Submission type and Assigned are content-sized (auto): status
+            tags and submission types are short bounded values, reference numbers are a fixed-width
+            format, and the Assigned column is used on a tiny fraction of submissions in practice —
+            so a fixed 1fr each just wastes width. The remaining 1fr columns (Submitter, Submitted,
+            Actions) hold the genuinely variable-width content and absorb the freed space.
+            Submitter gets the largest flexible share (2fr) so contractor/person names stay on one
+            line even on pages where a long status label (e.g. "Approved - Pending") widens the auto
+            Status column.
+            Order: Status, Reference #, Submission type, Submitter, Submitted, Assigned, Actions. */}
+        <SearchGrid templateColumns="auto auto auto 2fr 1fr auto 1fr" mt={4}>
           <GridHeaders />
 
           {isSearching ? (
@@ -266,6 +287,9 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
   const { t } = useTranslation();
   const [newUser, setNewUser] = useState<IMinimalFrozenUser | null>(null);
 
+  const assignedUser = newUser ?? permitApplication?.assignedUsers?.[0];
+  const assigneeName = `${assignedUser?.firstName || ''} ${assignedUser?.lastName || ''}`.trim();
+
   return (
     <Box
       key={permitApplication.id}
@@ -279,8 +303,19 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
       <SearchGridItem>{permitApplication.number}</SearchGridItem>
       <SearchGridItem wordBreak="break-word">{permitApplication?.submissionType?.name}</SearchGridItem>
       <SearchGridItem>
-        <Flex>
-          <Text fontWeight={700} flex={1}>
+        <Flex align="center" gap={1.5}>
+          {/* BCHEP-531 follow-up: flag submissions from a suspended contractor at a glance
+              (onboarding and invoices), via submitter_suspended_at on the :program_review_inbox
+              blueprint. Prefixes the name; the Submitter column is wide enough (2fr) that this
+              doesn't wrap. Tooltip + aria-label carry the "Suspended" label. */}
+          {permitApplication.submitterSuspendedAt && (
+            <Tooltip label={t('contractor.suspended.badge')} hasArrow>
+              <Box as="span" display="inline-flex" color="theme.orange" flexShrink={0}>
+                <Warning weight="fill" size={16} aria-label={t('contractor.suspended.badge')} />
+              </Box>
+            </Tooltip>
+          )}
+          <Text fontWeight={700}>
             {permitApplication.submittedFor ? permitApplication.submittedFor : permitApplication.submitter?.name}
           </Text>
         </Flex>
@@ -292,13 +327,14 @@ const ApplicationItem = ({ permitApplication }: { permitApplication: IEnergySavi
         </Flex>
       </SearchGridItem>
       <SearchGridItem>
-        <Flex>
-          <Text fontWeight={700} flex={1}>
-            {newUser
-              ? `${newUser?.firstName || ''} ${newUser?.lastName || ''}`.trim()
-              : `${permitApplication?.assignedUsers?.[0]?.firstName || ''} ${permitApplication?.assignedUsers?.[0]?.lastName || ''}`.trim()}
-          </Text>
-          <Box flex={1}>
+        {/* Name + avatar sit as a left-aligned group (SearchGridItem is justify=flex-start). The name
+            renders only when there's an assignee, so an empty name never adds a gap that pushes the
+            "+" right; when there's no assignee the trigger is nudged left (ml) to cancel the ghost
+            IconButton's internal icon inset, so the "+" glyph lines up flush under the "Assigned"
+            header. The avatar is fixed size (flexShrink={0}) so longer names use the full width. */}
+        <Flex align="center" gap={2}>
+          {assigneeName && <Text fontWeight={700}>{assigneeName}</Text>}
+          <Box flexShrink={0} ml={assigneeName ? 0 : -3}>
             <DesignatedCollaboratorAssignmentPopover
               permitApplication={permitApplication}
               collaborationType={ECollaborationType.review}
