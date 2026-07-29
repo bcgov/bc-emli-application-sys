@@ -100,6 +100,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       statusUpdateReason: types.maybeNull(types.string),
       missingPdfs: types.maybeNull(types.array(types.string)),
       isFullyLoaded: types.optional(types.boolean, false),
+      submitterSuspendedAt: types.maybeNull(types.Date),
       isDirty: types.optional(types.boolean, false),
       isLoading: types.optional(types.boolean, false),
       indexedUsingCurrentTemplateVersion: types.maybeNull(types.boolean),
