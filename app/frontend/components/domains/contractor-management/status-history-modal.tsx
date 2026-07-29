@@ -18,12 +18,11 @@ import { format } from 'date-fns';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IContractor } from '../../../models/contractor';
 import { useMst } from '../../../setup/root';
 import { IContractorStatusEvent } from '../../../types/types';
 
 interface IStatusHistoryModalProps {
-  contractor: IContractor;
+  contractorId: string;
   isOpen: boolean;
   onClose: () => void;
   // Optional heading override (e.g. "Suspension reasons" on the onboarding page).
@@ -34,7 +33,7 @@ interface IStatusHistoryModalProps {
 // Read-only modal listing the permanent suspend/unsuspend/remove history for a
 // contractor (backed by contractor_status_events). Fetches fresh each time it
 // opens; the events are not held in the store.
-export const StatusHistoryModal = observer(({ contractor, isOpen, onClose, title }: IStatusHistoryModalProps) => {
+export const StatusHistoryModal = observer(({ contractorId, isOpen, onClose, title }: IStatusHistoryModalProps) => {
   const { t } = useTranslation();
   const { contractorStore } = useMst();
   const [events, setEvents] = useState<IContractorStatusEvent[]>([]);
@@ -47,7 +46,7 @@ export const StatusHistoryModal = observer(({ contractor, isOpen, onClose, title
     setIsLoading(true);
     setHasError(false);
     contractorStore
-      .fetchStatusHistory(contractor.id)
+      .fetchStatusHistory(contractorId)
       .then((result: IContractorStatusEvent[]) => {
         if (active) setEvents(result ?? []);
       })
@@ -60,7 +59,7 @@ export const StatusHistoryModal = observer(({ contractor, isOpen, onClose, title
     return () => {
       active = false;
     };
-  }, [isOpen, contractor.id]);
+  }, [isOpen, contractorId]);
 
   const actorName = (event: IContractorStatusEvent) => {
     const user = event.performedBy;

@@ -10,7 +10,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { requirementTypeToFormioType } from '../../../constants';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
 import { useInterval } from '../../../hooks/use-interval';
-import { IContractor } from '../../../models/contractor';
 import { useMst } from '../../../setup/root';
 import { ICustomEventMap } from '../../../types/dom';
 import { ECollaborationType, ECustomEvents, EPermitApplicationStatus, ERequirementType } from '../../../types/enums';
@@ -320,7 +319,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
 
             {isSubmitted || isIneligible || isInReview || isAdminViewingContractorOnboarding ? (
               <Stack direction={{ base: 'column', lg: 'row' }} align={{ base: 'flex-end', lg: 'center' }}>
-                {currentPermitApplication?.submitterSuspendedAt && (
+                {isAdminViewingContractorOnboarding && currentPermitApplication?.submitterSuspendedAt && (
                   <Button variant="primary" onClick={onStatusHistoryOpen}>
                     {t('contractor.suspended.onboardingBanner.viewReasons')}
                   </Button>
@@ -462,7 +461,7 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
               formRef={formRef}
               permitApplication={currentPermitApplication}
               renderTopButtons={
-                currentPermitApplication?.submitterSuspendedAt
+                currentUser?.isReviewStaff && currentPermitApplication?.submitterSuspendedAt
                   ? () => <ContractorSuspendedBanner suspendedAt={currentPermitApplication!.submitterSuspendedAt!} />
                   : undefined
               }
@@ -499,9 +498,9 @@ export const EditPermitApplicationScreen = observer(({}: IEditPermitApplicationS
           permitApplication={currentPermitApplication}
         />
       )}
-      {currentPermitApplication?.submitter && (
+      {isAdminViewingContractorOnboarding && currentPermitApplication?.submitterSuspendedAt && (
         <StatusHistoryModal
-          contractor={currentPermitApplication.submitter as IContractor}
+          contractorId={currentPermitApplication?.submitter?.id ?? ''}
           isOpen={isStatusHistoryOpen}
           onClose={onStatusHistoryClose}
           title={t('contractor.statusHistory.suspensionReasonsTitle')}

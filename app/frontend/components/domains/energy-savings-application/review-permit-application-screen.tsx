@@ -370,7 +370,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                 {t('energySavingsApplication.show.supportingFilesRequest.addSupportingFiles')}
               </Button>
             )}
-            {currentPermitApplication?.submitterSuspendedAt && (
+            {isEditContractor && currentPermitApplication?.submitterSuspendedAt && (
               <Button variant="primary" onClick={onStatusHistoryOpen}>
                 {t('contractor.suspended.onboardingBanner.viewReasons')}
               </Button>
@@ -614,7 +614,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                           )}
                       </HStack>
                     )}
-                    {currentPermitApplication?.submitterSuspendedAt && (
+                    {isAdminUser && currentPermitApplication?.submitterSuspendedAt && (
                       <ContractorSuspendedBanner suspendedAt={currentPermitApplication.submitterSuspendedAt!} />
                     )}
                   </>
@@ -737,9 +737,9 @@ export const ReviewPermitApplicationScreen = observer(() => {
           permitApplication={currentPermitApplication}
         />
       )}
-      {currentPermitApplication?.submitter && (
+      {isEditContractor && currentPermitApplication?.submitterSuspendedAt && (
         <StatusHistoryModal
-          contractor={currentPermitApplication.submitter as IContractor}
+          contractorId={currentPermitApplication?.submitter?.id ?? ''}
           isOpen={isStatusHistoryOpen}
           onClose={onStatusHistoryClose}
           title={t('contractor.statusHistory.suspensionReasonsTitle')}

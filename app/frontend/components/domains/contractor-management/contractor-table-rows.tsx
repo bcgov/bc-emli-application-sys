@@ -507,7 +507,7 @@ export const ContractorRow = observer(({ contractor, status = 'active' }: Contra
       />
 
       <StatusHistoryModal
-        contractor={contractor}
+        contractorId={contractor.id}
         isOpen={isHistoryModalOpen}
         onClose={() => setIsHistoryModalOpen(false)}
       />
