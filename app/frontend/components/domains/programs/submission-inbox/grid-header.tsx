@@ -10,9 +10,9 @@ import {
   EPermitClassificationCode,
 } from '../../../../types/enums';
 import { ModelSearchInput } from '../../../shared/base/model-search-input';
+import { EnergySavingsApplicationFilter } from '../../../shared/energy-savings-applications/energy-savings-application-filter';
 import { GridHeader } from '../../../shared/grid/grid-header';
 import { SortIcon } from '../../../shared/sort-icon';
-import { EnergySavingsApplicationFilter } from '../../../shared/energy-savings-applications/energy-savings-application-filter';
 
 export const GridHeaders = observer(function GridHeaders() {
   const { permitApplicationStore, userStore, permitClassificationStore, programStore } = useMst();
@@ -20,19 +20,21 @@ export const GridHeaders = observer(function GridHeaders() {
   const getSortColumnHeader = permitApplicationStore?.getSortColumnHeader;
   const currentUserId = userStore.currentUser?.id;
 
-
   // Don't render the filter if program is not set yet (prevents premature search on mount)
   if (!programStore.currentProgram) {
     return null;
   }
 
   // Filters now contain codes directly, not IDs
-  const submissionTypeCodes = permitApplicationStore.submissionTypeIdFilter ? [...permitApplicationStore.submissionTypeIdFilter] : [];
+  const submissionTypeCodes = permitApplicationStore.submissionTypeIdFilter
+    ? [...permitApplicationStore.submissionTypeIdFilter]
+    : [];
   const userGroupTypeCode = permitApplicationStore.userGroupTypeIdFilter;
 
   const isContractor = userGroupTypeCode === EPermitClassificationCode.contractor;
   const isOnboarding = submissionTypeCodes?.includes(EPermitClassificationCode.onboarding);
-  const isOnlyOnboarding = submissionTypeCodes?.length === 1 && submissionTypeCodes?.includes(EPermitClassificationCode.onboarding);
+  const isOnlyOnboarding =
+    submissionTypeCodes?.length === 1 && submissionTypeCodes?.includes(EPermitClassificationCode.onboarding);
 
   let statusGroups: EPermitApplicationStatusGroup[];
 
@@ -76,10 +78,7 @@ export const GridHeaders = observer(function GridHeaders() {
           <Flex justifyContent="flex-end" w="100%">
             <Flex gap={2} maxW="1000px" w="fit-content">
               <Box flex="1">
-                <EnergySavingsApplicationFilter
-                  key={filterKey}
-                  statusGroups={statusGroups}
-                />
+                <EnergySavingsApplicationFilter key={filterKey} statusGroups={statusGroups} />
               </Box>
               <Box flex="1">
                 <ModelSearchInput searchModel={permitApplicationStore} inputGroupProps={{ w: 'full' }} />
@@ -129,6 +128,10 @@ export const GridHeaders = observer(function GridHeaders() {
                   w={'full'}
                   as={'button'}
                   justifyContent={'space-between'}
+                  // Minimum gap between the label and the sort arrows. space-between alone
+                  // collapses to zero on content-sized (auto) columns, leaving the arrows
+                  // touching the header text; the gap floor keeps them separated there.
+                  gap={2}
                   cursor="pointer"
                   onClick={() => permitApplicationStore.toggleSort(castField)}
                   borderRight={'1px solid'}
@@ -137,7 +140,10 @@ export const GridHeaders = observer(function GridHeaders() {
                 >
                   <Text textAlign="left">{getSortColumnHeader(castField)}</Text>
                   {EPermitApplicationReviewerSortFields[key] !== EPermitApplicationReviewerSortFields.actions && (
-                    <SortIcon<EPermitApplicationSortFields> field={castField} currentSort={permitApplicationStore.sort} />
+                    <SortIcon<EPermitApplicationSortFields>
+                      field={castField}
+                      currentSort={permitApplicationStore.sort}
+                    />
                   )}
                 </Flex>
               </GridHeader>

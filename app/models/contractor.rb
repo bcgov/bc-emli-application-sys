@@ -38,9 +38,15 @@ class Contractor < ApplicationRecord
 
   validates :business_name, presence: true
 
-  # Delegate status fields to latest contractor_onboard record
+  # Delegate status fields to latest contractor_onboard record.
+  # Use the loaded association when present (avoids re-querying on repeated calls and
+  # lets any eager-load pay off) — falls back to an ordered query otherwise.
   def latest_onboard
-    contractor_onboards.order(created_at: :desc).first
+    if contractor_onboards.loaded?
+      contractor_onboards.max_by(&:created_at)
+    else
+      contractor_onboards.order(created_at: :desc).first
+    end
   end
 
   def suspended_at

@@ -921,7 +921,7 @@ const options = {
             permit_classification: 'Types',
             submitter: 'Submitter',
             submitted_at: 'Submitted',
-            submission_type: 'Submission type',
+            submission_type: 'Type',
             viewed_at: 'Viewed at',
             updated_at: 'Last Updated',
             status: 'Status',
@@ -3367,6 +3367,7 @@ const options = {
             },
           },
           suspended: {
+            badge: 'Suspended',
             buttonDisabled: 'Submit invoice - disabled due to suspension',
             message: 'Your contractor account is suspended. You cannot submit invoices at this time.',
             banner: {
