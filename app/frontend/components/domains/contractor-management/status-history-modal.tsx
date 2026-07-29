@@ -42,6 +42,13 @@ export const StatusHistoryModal = observer(({ contractorId, isOpen, onClose, tit
 
   useEffect(() => {
     if (!isOpen) return;
+    // Guard: without a contractor id there is nothing to fetch — clear any stale
+    // events and skip the request rather than calling /contractors//status_history.
+    if (!contractorId) {
+      setEvents([]);
+      setIsLoading(false);
+      return;
+    }
     let active = true;
     setIsLoading(true);
     setHasError(false);
