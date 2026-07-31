@@ -1,19 +1,20 @@
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  ModalCloseButton,
-  Button,
-  Text,
-  Spinner,
   Box,
+  Button,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Spinner,
+  Text,
 } from '@chakra-ui/react';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMst } from '../../../setup/root';
+import { EulaContent } from '../eula-content';
 
 interface IEulaViewModalProps {
   isOpen: boolean;
@@ -33,7 +34,7 @@ export const EulaViewModal: React.FC<IEulaViewModalProps> = ({ isOpen, onClose }
     try {
       await userStore.fetchEULA();
     } catch (err) {
-      setError(t('ui.error'));
+      setError(t('site.error'));
     } finally {
       setIsLoading(false);
     }
@@ -97,33 +98,7 @@ export const EulaViewModal: React.FC<IEulaViewModalProps> = ({ isOpen, onClose }
             </Text>
           )}
 
-          {userStore.eula && !isLoading && !error && (
-            <Box
-              dangerouslySetInnerHTML={{ __html: userStore.eula.content }}
-              sx={{
-                fontFamily: 'BC Sans',
-                fontSize: '16px',
-                lineHeight: '27px',
-                color: '#2D2D2D',
-                '& p': { marginBottom: '1rem' },
-                '& ul': { marginBottom: '1rem', paddingLeft: '1.5rem' },
-                '& li': { marginBottom: '0.5rem' },
-                '& b, & strong': { fontWeight: '700' },
-                '& a': {
-                  color: '#005C97',
-                  textDecoration: 'underline',
-                  '&:hover': { color: '#003f68' },
-                },
-                '& h1, & h2, & h3': {
-                  fontFamily: 'BC Sans',
-                  fontWeight: '700',
-                  color: '#005C97',
-                  marginBottom: '1rem',
-                  marginTop: '1.5rem',
-                },
-              }}
-            />
-          )}
+          {userStore.eula && !isLoading && !error && <EulaContent content={userStore.eula.content} />}
 
           {!isLoading && !error && !userStore.eula && (
             <Text textAlign="center" p={4} fontFamily="BC Sans" fontSize="16px" color="#2D2D2D">

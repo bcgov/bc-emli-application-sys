@@ -1,13 +1,11 @@
 import { Box, Button, Flex, Heading, VStack } from '@chakra-ui/react';
 import { t } from 'i18next';
 import { observer } from 'mobx-react-lite';
-import React, { Suspense, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useMst, useServerAPI } from '../../../../setup/root';
-import { LoadingScreen } from '../../../shared/base/loading-screen';
-
-const Editor = React.lazy(() => import('../../../shared/editor/editor').then((module) => ({ default: module.Editor })));
+import { EulaContent } from '../../../shared/eula-content';
 
 export const EULAScreen = observer(function EULAScreen({ withClose }: { withClose?: boolean }) {
   const { userStore } = useMst();
@@ -64,49 +62,35 @@ export const EULAScreen = observer(function EULAScreen({ withClose }: { withClos
 
   return (
     <>
-      <VStack direction="column" spacing={8} py={20} w="full" h={`calc(100vh - ${navHeight}px)`}>
+      <VStack
+        as="main"
+        id="main-content"
+        tabIndex={-1}
+        direction="column"
+        spacing={8}
+        py={20}
+        w="full"
+        h={`calc(100vh - ${navHeight}px)`}
+      >
         <Heading as="h1" m={0} flex={0} flexBasis="auto" color="theme.blueAlt">
           {t('eula.title')}
         </Heading>
-        <Suspense fallback={<LoadingScreen />}>
-          {eula && (
-            <>
-              <Box
-                maxW="4xl"
-                w="full"
-                overflow="hidden"
-                sx={{
-                  '.quill': { height: '100%', overflow: 'auto' },
-                  '.quill .ql-container': {
-                    border: '1px solid',
-                    borderColor: 'border.light',
-                    borderRadius: '6px',
-                    fontFamily: 'BC Sans',
-                    fontSize: '16px',
-                    lineHeight: '27px',
-                    color: '#2D2D2D',
-                  },
-                  '.quill .ql-editor': {
-                    fontFamily: 'BC Sans',
-                    fontSize: '16px',
-                    lineHeight: '27px',
-                    color: '#2D2D2D',
-                    padding: '1rem',
-                  },
-                }}
-              >
-                <Editor htmlValue={eula.content} readonly modules={{ toolbar: false }} />
+        {eula && (
+          <>
+            <Box maxW="4xl" w="full" overflow="hidden">
+              <Box h="100%" overflow="auto" border="1px solid" borderColor="border.light" borderRadius="6px">
+                <EulaContent content={eula.content} p="1rem" />
               </Box>
-              {(userStore.currentUser && !userStore.currentUser.eulaAccepted) || !userStore.currentUser ? (
-                <form onSubmit={handleSubmit(onSubmit)} style={{ flex: 0, flexBasis: 'auto' }}>
-                  <Button variant="primary" type="submit" isLoading={isLoading} isDisabled={!isValid || isLoading}>
-                    {t('eula.accept')}
-                  </Button>
-                </form>
-              ) : null}
-            </>
-          )}
-        </Suspense>
+            </Box>
+            {(userStore.currentUser && !userStore.currentUser.eulaAccepted) || !userStore.currentUser ? (
+              <form onSubmit={handleSubmit(onSubmit)} style={{ flex: 0, flexBasis: 'auto' }}>
+                <Button variant="primary" type="submit" isLoading={isLoading} isDisabled={!isValid || isLoading}>
+                  {t('eula.accept')}
+                </Button>
+              </form>
+            ) : null}
+          </>
+        )}
       </VStack>
       {withClose && (
         <Flex

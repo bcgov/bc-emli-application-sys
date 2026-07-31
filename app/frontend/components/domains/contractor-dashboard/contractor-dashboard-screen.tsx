@@ -1,12 +1,12 @@
-import { Box, Container, Flex, Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs, VStack } from '@chakra-ui/react';
+import { Box, Container, Flex, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 import { observer } from 'mobx-react-lite';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMst } from '../../../setup/root';
 import { EPermitClassificationCode } from '../../../types/enums';
+import { BlueTitleBar } from '../../shared/base/blue-title-bar';
 import { ContractorProgramResourcesScreen } from '../contractor-management/contractor-program-resources-screen';
 import { EnergySavingsApplicationIndexScreen } from '../energy-savings-application';
-import { BlueTitleBar } from '../../shared/base/blue-title-bar';
 
 export const ContractorDashboardScreen = observer(function ContractorDashboard() {
   const { t } = useTranslation();
@@ -28,7 +28,7 @@ export const ContractorDashboardScreen = observer(function ContractorDashboard()
   };
 
   return (
-    <Flex as="main" direction="column" w="full" bg="greys.white" pb="24" minH="100vh">
+    <Flex as="main" id="main-content" tabIndex={-1} direction="column" w="full" bg="greys.white" pb="24" minH="100vh">
       <BlueTitleBar title={t('landing.contractor.dashboard.title', 'Contractor portal')} />
 
       <Container maxW="container.lg" pb={4} flex="1">

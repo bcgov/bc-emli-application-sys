@@ -46,8 +46,13 @@ class ApplicationPolicy
       @scope = scope
     end
 
+    # Fail closed, matching Pundit's own generated default. A policy that is used with
+    # policy_scope must define its own Scope#resolve; inheriting a permissive `scope.all`
+    # here means any future index action on a model whose policy has no Scope silently
+    # returns the entire table, and verify_policy_scoped still passes because it only
+    # checks that policy_scope was called - not that it narrowed anything.
     def resolve
-      scope.all
+      raise NoMethodError, "You must define #resolve in #{self.class}"
     end
   end
 end

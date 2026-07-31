@@ -176,7 +176,15 @@ export const EligibilityCheck = observer(() => {
       </Flex>
 
       {/* Content Section */}
-      <Container maxW="container.lg" pt={{ md: 12 }} px={{ lg: 8 }} pb={{ md: 12 }} id="main-content" tabIndex={-1}>
+      <Container
+        as="main"
+        maxW="container.lg"
+        pt={{ md: 12 }}
+        px={{ lg: 8 }}
+        pb={{ md: 12 }}
+        id="main-content"
+        tabIndex={-1}
+      >
         <VStack spacing={{ base: 4, md: 12 }} align="flex-start">
           <Flex direction={{ base: 'column', md: 'row' }} gap={{ base: 6, md: 12 }}>
             <Box position="relative">
