@@ -612,7 +612,7 @@ const options = {
         },
         eula: {
           title: 'Terms and Conditions',
-          accept: 'Accept terms and conditions',
+          accept: 'Accept',
         },
         userEulas: {
           title: 'End user license agreement',
@@ -3162,6 +3162,7 @@ const options = {
             welcome: 'Welcome',
             contractor: 'Contractor',
             getSupport: 'Get support',
+            terms: 'Terms and Conditions',
             sitewideBanner: 'Site-wide banner',
             apiSettings: 'API settings',
             create: 'Create',

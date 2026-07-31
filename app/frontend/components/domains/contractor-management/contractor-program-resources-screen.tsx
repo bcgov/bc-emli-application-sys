@@ -371,7 +371,13 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
 
   return (
     <Flex
-      as="main"
+      // This renders both as its own route (/contractor-program-resources) and embedded
+      // inside the contractor dashboard, which has its own <main> and skip-link target.
+      // hideBlueSection is set only by the dashboard, so it doubles as "am I embedded":
+      // when embedded, stay a plain section so we don't nest <main> elements or steal the
+      // page's #main-content target.
+      as={hideBlueSection ? 'section' : 'main'}
+      {...(hideBlueSection ? {} : { id: 'main-content', tabIndex: -1 })}
       direction="column"
       w="full"
       bg={hideBlueSection ? 'white' : 'greys.grey04'}
@@ -406,8 +412,6 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
             overflow="visible"
             role="navigation"
             aria-label="Resource categories"
-            id="main-content"
-            tabIndex={-1}
             bg="greys.white"
           >
             <VStack align="stretch" spacing={0} role="tablist" overflow="visible">

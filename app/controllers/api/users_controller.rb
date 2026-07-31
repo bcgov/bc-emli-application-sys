@@ -200,6 +200,15 @@ class Api::UsersController < Api::ApplicationController
     # Try to find contractor first, then user
     contractor = Contractor.find_by(id: account_id)
     if contractor
+      # This branch is unauthenticated - it exists only for the pre-login flow where
+      # contractors#shim has just created a placeholder contractor. Treat that contractor id
+      # like the single-use capability token in ContractorImport: only ever accept for a fresh,
+      # un-onboarded placeholder that has not accepted yet. Without this, any known contractor
+      # id - including a real, onboarded one - could have consent recorded against it.
+      if contractor.onboarded? || contractor.license_agreements.exists?
+        return(render_error "misc.user_not_authorized_error", { status: 403 })
+      end
+
       # Non-registered contractor accepting EULA
       contractor.license_agreements.create!(
         accepted_at: Time.current,
