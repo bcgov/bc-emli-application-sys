@@ -52,7 +52,7 @@ class ApplicationPolicy
     # returns the entire table, and verify_policy_scoped still passes because it only
     # checks that policy_scope was called - not that it narrowed anything.
     def resolve
-      raise NoMethodError, "You must define #resolve in #{self.class}"
+      raise NotImplementedError, "You must define #resolve in #{self.class}"
     end
   end
 end
