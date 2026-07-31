@@ -206,7 +206,7 @@ class Api::UsersController < Api::ApplicationController
       # un-onboarded placeholder that has not accepted yet. Without this, any known contractor
       # id - including a real, onboarded one - could have consent recorded against it.
       if contractor.onboarded? || contractor.license_agreements.exists?
-        return render_error "misc.user_not_authorized_error"
+        return(render_error "misc.user_not_authorized_error", { status: 403 })
       end
 
       # Non-registered contractor accepting EULA
