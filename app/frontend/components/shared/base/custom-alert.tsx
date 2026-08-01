@@ -10,10 +10,10 @@ import {
   Text,
   UnorderedList,
 } from '@chakra-ui/react';
-import { ArrowSquareOutIcon, WarningCircleIcon, Info } from '@phosphor-icons/react';
+import { ArrowSquareOutIcon, Info, WarningCircleIcon } from '@phosphor-icons/react';
 import React, { FC, ReactElement } from 'react';
-import { DescriptionPart } from '../../../types/types';
 import { EDescriptionPartType } from '../../../types/enums';
+import { DescriptionPart } from '../../../types/types';
 
 type BaseAlertProps = {
   title?: string;
@@ -129,7 +129,10 @@ export const InformationAlert: FC<CustomInformationAlertProps> = ({
       width="100%"
       align="stretch"
     >
-      <Alert status="error" variant="subtle" bg="transparent" alignItems="start" p={0}>
+      {/* addRole={false}: this panel is static page content, not a response to a user action.
+          Chakra's Alert sets role="alert" by default, making it an assertive live region that
+          screen readers interrupt to announce on load. */}
+      <Alert status="info" addRole={false} variant="subtle" bg="transparent" alignItems="start" p={0}>
         <Icon
           variant="ghost"
           icon={icon}
