@@ -3448,7 +3448,6 @@ const options = {
               contractorRebateJourney: 'Contractor rebate journey',
               heatPumpExceptionForm: 'Heat pump exception form',
               heatPumpRequirements: 'Heat pump requirements guide',
-              rebateEligibility: 'Rebate eligibility requirements',
               insulationCutSheet: 'Insulation cut sheet',
               windowsDoorsCutSheet: 'Windows and doors cut sheet',
               contractorTermsConditionsCondoApartment: 'Contractor terms and conditions - condos and apartments',
