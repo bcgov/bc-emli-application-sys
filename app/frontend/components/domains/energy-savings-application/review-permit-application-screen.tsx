@@ -37,7 +37,6 @@ import {
   EPermitClassificationCode,
   ERevisionSideBarItems,
   EUpdateRoles,
-  EUserRoles,
 } from '../../../types/enums';
 import { EnergySavingsApplicationStatusTag } from '../../shared/energy-savings-applications/energy-savings-application-status-tag';
 import AddSupportingFilesPathwayModal from '../../shared/modals/add-supporting-files-pathway-modal';
@@ -55,7 +54,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const location = useLocation();
   const { backToPage } = location.state || {};
   const formRef = useRef(null);
-  const isAdminUser = [EUserRoles.admin, EUserRoles.adminManager].indexOf(currentUser.role) >= 0;
+  const isAdminUser = currentUser.isReviewStaff;
   const isEditContractor =
     currentPermitApplication?.submissionType?.code === EPermitClassificationCode.onboarding && isAdminUser;
 
@@ -230,10 +229,10 @@ export const ReviewPermitApplicationScreen = observer(() => {
 
   const { formattedFormJson, number, revisionMode, setRevisionMode } = currentPermitApplication;
 
-  if (
-    currentPermitApplication.submissionType?.code === EPermitClassificationCode.onboarding &&
-    [EUserRoles.admin, EUserRoles.adminManager].indexOf(currentUser.role) >= 0
-  ) {
+  // Assigning state during render logs a React warning, but this cannot move to an effect
+  // until __mergeUpdate stops discarding revisionMode on every merge - it only works here
+  // because it re-applies on each render.
+  if (isEditContractor) {
     if (!performedBy) {
       setPerformedBy(EUpdateRoles.staff);
     }
@@ -620,10 +619,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                   </>
                 );
               }}
-              isEditing={
-                currentPermitApplication?.status === 'draft' ||
-                ([EUserRoles.admin, EUserRoles.adminManager].indexOf(currentUser.role) >= 0 && revisionMode)
-              }
+              isEditing={currentPermitApplication?.status === 'draft' || (isAdminUser && revisionMode)}
               updateCollaborationAssignmentNodes={updateRequirementBlockAssignmentNode}
             />
           </Flex>
