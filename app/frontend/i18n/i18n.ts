@@ -2414,11 +2414,12 @@ const options = {
             descriptionParts: [
               {
                 type: 'text',
-                content: 'The above information is from your Business BCeID Account. You can ',
+                content:
+                  'This information is from your Business BCeID Account. We will use this email address for communication. ',
               },
               {
                 type: 'link',
-                content: { text: 'manage it on the BCeID website', href: 'https://www.bceid.ca/' },
+                content: { text: 'Manage your Business BCeID Account', href: 'https://www.bceid.ca/' },
               },
               {
                 type: 'bold',
