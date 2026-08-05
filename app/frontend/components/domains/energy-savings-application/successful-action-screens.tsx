@@ -7,7 +7,6 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
 import { useMst } from '../../../setup/root';
 import { EPermitClassificationCode, EUserRoles } from '../../../types/enums';
-import { LoadingScreen } from '../../shared/base/loading-screen';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 
 /***
@@ -159,15 +158,10 @@ export const SuccessfulIneligibleScreen = observer(() => {
   // tab, a bookmark - leaves it empty, so fall back to the application record; the
   // id is always available from the route.
   const { submissionType: stateSubmissionType, referenceNumber: stateReferenceNumber } = location.state || {};
-  const hasNavigationState = stateSubmissionType !== undefined;
   const { currentPermitApplication } = usePermitApplication();
 
   const submissionType = stateSubmissionType ?? currentPermitApplication?.submissionType?.code;
   const referenceNumber = stateReferenceNumber ?? currentPermitApplication?.number;
-
-  // Without navigation state the subtitle below depends on the fetched record, so
-  // wait for it rather than flashing the wrong guidance to staff.
-  if (!hasNavigationState && !currentPermitApplication) return <LoadingScreen />;
 
   const isUserAdmin = [EUserRoles.admin, EUserRoles.adminManager].indexOf(currentUser.role) >= 0;
   return (

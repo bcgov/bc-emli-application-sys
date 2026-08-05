@@ -2393,6 +2393,7 @@ const options = {
                   href: 'https://www.bceid.ca/aboutbceid/faqs.aspx',
                 },
               },
+              { type: 'text', content: '.' },
             ],
           },
           changeBcsc: {
@@ -2408,6 +2409,7 @@ const options = {
                   href: 'https://www2.gov.bc.ca/gov/content/governments/government-id/bc-services-card/your-card/change-personal-information',
                 },
               },
+              { type: 'text', content: '.' },
             ],
           },
           changePrimaryContact: {
