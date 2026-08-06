@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
 import { Box, Button, Flex, Icon, Text, Textarea, VStack } from '@chakra-ui/react';
 import { WarningCircleIcon } from '@phosphor-icons/react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
-import { EPermitApplicationStatus } from '../../../types/enums';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
+import { EPermitApplicationStatus } from '../../../types/enums';
 
 export const RejectApplicationScreen = observer(() => {
   const { t } = useTranslation();
@@ -34,7 +34,7 @@ export const RejectApplicationScreen = observer(() => {
   };
 
   return (
-    <VStack spacing={6} p={8} bg="white">
+    <VStack as="main" spacing={6} p={8} bg="white">
       <VStack spacing={4} align="center" textAlign="center">
         <Icon as={WarningCircleIcon} boxSize={10} color="orange.400" />
         <Text fontSize="2xl" fontWeight="bold" color="theme.blueAlt">

@@ -4,9 +4,11 @@ import {
   Container,
   Flex,
   HStack,
+  Heading,
   Hide,
   IconButton,
   Image,
+  Link,
   Menu,
   MenuButton,
   MenuDivider,
@@ -18,15 +20,13 @@ import {
   Show,
   Spacer,
   Text,
-  Heading,
-  Link,
 } from '@chakra-ui/react';
 import { List, Warning as WarningIcon } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import * as R from 'ramda';
 import React, { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { PopoverProvider, useNotificationPopover } from '../../../hooks/use-notification-popover';
 import { useMst } from '../../../setup/root';
 import { INotification, IPermitNotificationObjectData } from '../../../types/types';
@@ -183,8 +183,10 @@ export const NavBar = observer(function NavBar() {
         }}
         onClick={(e) => {
           e.preventDefault();
-          const mainContent = document.getElementById('main-content');
+          const mainContent = document.getElementById('main-content') ?? document.querySelector('main');
           if (mainContent) {
+            // <main> isn't focusable by default, so focus() would silently do nothing
+            mainContent.setAttribute('tabindex', '-1');
             mainContent.focus();
             mainContent.scrollIntoView({ behavior: 'auto', block: 'start' });
           }
