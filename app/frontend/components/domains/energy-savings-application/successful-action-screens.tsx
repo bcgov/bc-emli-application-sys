@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
 import { useMst } from '../../../setup/root';
-import { EPermitClassificationCode, EUserRoles } from '../../../types/enums';
+import { EPermitClassificationCode } from '../../../types/enums';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 
 /***
@@ -163,12 +163,11 @@ export const SuccessfulIneligibleScreen = observer(() => {
   const submissionType = stateSubmissionType ?? currentPermitApplication?.submissionType?.code;
   const referenceNumber = stateReferenceNumber ?? currentPermitApplication?.number;
 
-  const isUserAdmin = [EUserRoles.admin, EUserRoles.adminManager].indexOf(currentUser.role) >= 0;
   return (
     <SuccessfulActionScreen
       icon="warning"
       title={t(
-        `${isUserAdmin ? 'energySavingsApplication.review.admin.markedIneligible' : 'energySavingsApplication.review.markedIneligible'}`,
+        `${currentUser.isReviewStaff ? 'energySavingsApplication.review.admin.markedIneligible' : 'energySavingsApplication.review.markedIneligible'}`,
         {
           submissionType: submissionType?.toLowerCase(),
         },
