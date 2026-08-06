@@ -2384,26 +2384,32 @@ const options = {
             descriptionParts: [
               {
                 type: 'text',
-                content:
-                  'The information above is from your Basic BCeID account. To change your Basic BCeID account information, click ',
+                content: 'The information above is from your Basic BCeID account. You can ',
               },
-              { type: 'link', content: { text: 'here', href: 'https://www.bceid.ca/aboutbceid/faqs.aspx' } },
+              {
+                type: 'link',
+                content: {
+                  text: 'change your Basic BCeID account information',
+                  href: 'https://www.bceid.ca/aboutbceid/faqs.aspx',
+                },
+              },
+              { type: 'text', content: '.' },
             ],
           },
           changeBcsc: {
             descriptionParts: [
               {
                 type: 'text',
-                content:
-                  'The information above is from your BC Services account. To change your BC Services Card information, click ',
+                content: 'The information above is from your BC Services account. You can ',
               },
               {
                 type: 'link',
                 content: {
-                  text: 'here',
+                  text: 'change your BC Services Card information',
                   href: 'https://www2.gov.bc.ca/gov/content/governments/government-id/bc-services-card/your-card/change-personal-information',
                 },
               },
+              { type: 'text', content: '.' },
             ],
           },
           changePrimaryContact: {
@@ -2411,9 +2417,12 @@ const options = {
               {
                 type: 'text',
                 content:
-                  'The above information is from your Business BCeID Account. To manage this information, click ',
+                  'This information is from your Business BCeID Account. We will use this email address for communication. ',
               },
-              { type: 'link', content: { text: 'here', href: 'https://www.bceid.ca/' } },
+              {
+                type: 'link',
+                content: { text: 'Manage your Business BCeID Account', href: 'https://www.bceid.ca/' },
+              },
               {
                 type: 'bold',
                 content: '. All notifications will be sent to the above email, the primary contact. ',
@@ -3448,7 +3457,6 @@ const options = {
               contractorRebateJourney: 'Contractor rebate journey',
               heatPumpExceptionForm: 'Heat pump exception form',
               heatPumpRequirements: 'Heat pump requirements guide',
-              rebateEligibility: 'Rebate eligibility requirements',
               insulationCutSheet: 'Insulation cut sheet',
               windowsDoorsCutSheet: 'Windows and doors cut sheet',
               contractorTermsConditionsCondoApartment: 'Contractor terms and conditions - condos and apartments',

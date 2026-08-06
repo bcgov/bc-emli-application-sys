@@ -1,11 +1,10 @@
 import { Tag, TagProps } from '@chakra-ui/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
-import { EPermitApplicationStatus } from '../../../types/enums';
-import { useMst } from '../../../setup/root';
-import { EUserRoles } from '../../../types/enums';
 import { useLocation } from 'react-router-dom';
+import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
+import { useMst } from '../../../setup/root';
+import { EPermitApplicationStatus, EUserRoles } from '../../../types/enums';
 
 interface IEnergySavingsApplicationStatusTagProps extends TagProps {
   energySavingsApplication: IEnergySavingsApplication | null;
@@ -32,12 +31,12 @@ export const EnergySavingsApplicationStatusTag = ({
   const bgMap = {
     [EPermitApplicationStatus.submitted]: 'theme.orangeLight02',
     [EPermitApplicationStatus.resubmitted]: 'theme.orangeLight02',
-    [EPermitApplicationStatus.draft]: 'theme.blueLight',
+    [EPermitApplicationStatus.draft]: 'theme.orangeLight02',
     [EPermitApplicationStatus.revisionsRequested]: 'theme.softRose',
     // [EPermitApplicationStatus.ephemeral]: 'theme.blueLight',
-    [EPermitApplicationStatus.inReview]: 'theme.lightGreen',
+    [EPermitApplicationStatus.inReview]: 'theme.orangeLight02',
     [EPermitApplicationStatus.approved]: 'theme.lightGreen',
-    [EPermitApplicationStatus.approvedPending]: 'theme.lightGreen',
+    [EPermitApplicationStatus.approvedPending]: 'theme.orangeLight02',
     [EPermitApplicationStatus.approvedPaid]: 'theme.lightGreen',
     [EPermitApplicationStatus.trainingPending]: 'theme.orangeLight02',
     [EPermitApplicationStatus.ineligible]: 'greys.grey50',
@@ -60,12 +59,12 @@ export const EnergySavingsApplicationStatusTag = ({
   const borderColorMap = {
     [EPermitApplicationStatus.submitted]: 'theme.orange',
     [EPermitApplicationStatus.resubmitted]: 'theme.orange',
-    [EPermitApplicationStatus.draft]: 'greys.lightGrey',
+    [EPermitApplicationStatus.draft]: 'theme.orange',
     [EPermitApplicationStatus.revisionsRequested]: 'semantic.errorDark',
     // [EPermitApplicationStatus.ephemeral]: 'theme.blueLight',
-    [EPermitApplicationStatus.inReview]: 'theme.darkGreen',
+    [EPermitApplicationStatus.inReview]: 'theme.orange',
     [EPermitApplicationStatus.approved]: 'theme.darkGreen',
-    [EPermitApplicationStatus.approvedPending]: 'theme.darkGreen',
+    [EPermitApplicationStatus.approvedPending]: 'theme.orange',
     [EPermitApplicationStatus.approvedPaid]: 'theme.darkGreen',
     [EPermitApplicationStatus.trainingPending]: 'theme.orange',
     [EPermitApplicationStatus.ineligible]: 'border.randomBorderColorforthePublishModal',

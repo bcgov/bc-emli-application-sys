@@ -1,7 +1,3 @@
-import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -15,10 +11,14 @@ import {
   Text,
   VisuallyHidden,
 } from '@chakra-ui/react';
-import { useMst } from '../../../setup/root';
+import { observer } from 'mobx-react-lite';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { usePermitClassificationsLoad } from '../../../hooks/resources/use-permit-classifications-load';
-import { BlueTitleBar } from '../../shared/base/blue-title-bar';
+import { useMst } from '../../../setup/root';
 import { EPermitClassificationCode } from '../../../types/enums';
+import { BlueTitleBar } from '../../shared/base/blue-title-bar';
 
 export const NewInvoiceScreen = observer(() => {
   const { t } = useTranslation();
@@ -89,10 +89,13 @@ export const NewInvoiceScreen = observer(() => {
           <RadioGroup
             value={selectedVariantId}
             onChange={handleSelectionChange}
+            aria-labelledby="invoice-type-legend"
             aria-describedby={showError ? 'invoice-type-error' : undefined}
           >
             <Stack as="fieldset" spacing={4} border="none" p={0} m={0}>
-              <VisuallyHidden as="legend">{t('invoices.selection.pageTitle', 'Select an invoice type')}</VisuallyHidden>
+              <VisuallyHidden as="legend" id="invoice-type-legend">
+                {t('invoices.selection.pageTitle', 'Select an invoice type')}
+              </VisuallyHidden>
 
               {invoiceVariants.length === 0 ? (
                 <Text color="greys.homeScreenGrey" py={4}>

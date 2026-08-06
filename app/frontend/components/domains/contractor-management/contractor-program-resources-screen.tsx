@@ -65,13 +65,6 @@ const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
       url: 'https://esp.clearesult.ca/contractor/sites/default/files/2024-10/Heat%20Pump%20Requirements%20Guide.pdf',
     },
     {
-      id: 'rebate-eligibility',
-      title: 'contractor.programResources.resources.rebateEligibility',
-      size: '604 KB',
-      type: 'PDF',
-      url: 'https://www.betterhomesbc.ca/app/uploads/sites/956/2025/07/RebateEligibilityRequirements_ESP_15July2025.pdf',
-    },
-    {
       id: 'insulation-cut-sheet',
       title: 'contractor.programResources.resources.insulationCutSheet',
       size: '181 KB',

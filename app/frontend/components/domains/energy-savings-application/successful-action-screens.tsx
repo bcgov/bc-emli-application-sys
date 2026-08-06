@@ -4,8 +4,9 @@ import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
 import { useMst } from '../../../setup/root';
-import { EPermitClassificationCode, EUserRoles } from '../../../types/enums';
+import { EPermitClassificationCode } from '../../../types/enums';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
 
 /***
@@ -149,16 +150,24 @@ export const SuccessfulWithdrawalScreen = observer(() => {
 export const SuccessfulIneligibleScreen = observer(() => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { submissionType, referenceNumber } = location.state || {};
   const { userStore } = useMst();
   const currentUser = userStore.currentUser;
 
-  const isUserAdmin = [EUserRoles.admin, EUserRoles.adminManager].indexOf(currentUser.role) >= 0;
+  // location.state is only populated on the redirect hop from the rejection-reason
+  // screen. Reaching this URL through a fresh history entry - a pasted link, a new
+  // tab, a bookmark - leaves it empty, so fall back to the application record; the
+  // id is always available from the route.
+  const { submissionType: stateSubmissionType, referenceNumber: stateReferenceNumber } = location.state || {};
+  const { currentPermitApplication } = usePermitApplication();
+
+  const submissionType = stateSubmissionType ?? currentPermitApplication?.submissionType?.code;
+  const referenceNumber = stateReferenceNumber ?? currentPermitApplication?.number;
+
   return (
     <SuccessfulActionScreen
       icon="warning"
       title={t(
-        `${isUserAdmin ? 'energySavingsApplication.review.admin.markedIneligible' : 'energySavingsApplication.review.markedIneligible'}`,
+        `${currentUser.isReviewStaff ? 'energySavingsApplication.review.admin.markedIneligible' : 'energySavingsApplication.review.markedIneligible'}`,
         {
           submissionType: submissionType?.toLowerCase(),
         },
