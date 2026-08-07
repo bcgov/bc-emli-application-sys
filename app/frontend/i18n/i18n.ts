@@ -1095,16 +1095,15 @@ const options = {
           readyContractor: 'Ready to submit your registration details?',
           confirmationContractor:
             'By submitting your registration details you confirm that the information you provided was completed to the best of your knowledge and ability.',
-          submissionSuccess: 'You have submitted your details to the Energy Savings Program.',
+          submissionSuccess: 'Your {{ submissionType }} form has been submitted',
           whatsNext: {
             heading: "What's next?",
             line1:
-              'Please wait while we assess your registration details. We will email you once your registration is approved. If we need more information we will reach out via email.',
+              'Please wait while we assess your registration details. If we need more information, we will reach out to the email you registered with. We will email you with next steps once we have reviewed your submission.',
             line2:
-              'If you need to add, edit, or remove employees from your account in the future you will need to call us.',
-            line3: 'If you have any questions, please call us at 1-833-856-0333 or email us at <1>{{email}}</1>.',
+              'If you need to add, edit, or remove employees from your account in the future you will need to email us. If you have any questions, please call 833-856-0333 or email <1>{{email}}</1>.',
           },
-          returnToDashboard: 'Back to Contractor homepage',
+          returnToDashboard: 'Back to contractor homepage',
           trainingPending: {
             confirmReadyTitle: 'Ready to mark this contractor as training pending?',
             confirmReadyMessage: 'I confirm this {{submissionType}} form has all the required information.',
