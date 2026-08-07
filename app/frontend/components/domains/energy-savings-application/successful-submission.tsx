@@ -2,15 +2,15 @@ import { Box, Button, Container, Divider, Flex, Heading, Icon, Tag, Text, VStack
 import { CheckCircleIcon } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { useTranslation, Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import { usePermitApplication } from '../../../hooks/resources/use-permit-application';
+import { useMst } from '../../../setup/root';
+import { EPermitApplicationStatus, EUpdateRoles } from '../../../types/enums';
+import { GreenLineSmall } from '../../shared/base/decorative/green-line-small';
 import { ErrorScreen } from '../../shared/base/error-screen';
 import { LoadingScreen } from '../../shared/base/loading-screen';
 import { RouterLinkButton } from '../../shared/navigation/router-link-button';
-import { useMst } from '../../../setup/root';
-import { useLocation } from 'react-router-dom';
-import { GreenLineSmall } from '../../shared/base/decorative/green-line-small';
-import { EPermitApplicationStatus, EUpdateRoles } from '../../../types/enums';
 
 // Successful Submission Screen
 export const SuccessfulSubmissionScreen = observer(() => {
@@ -58,9 +58,13 @@ export const SuccessfulSubmissionScreen = observer(() => {
           ? t('energySavingsApplication.new.staffSubmissionSuccess', {
               submissionType: submissionTypeLabel,
             })
-          : t('energySavingsApplication.new.submissionSuccess', {
-              submissionType: submissionTypeLabel,
-            });
+          : currentPermitApplication.isContractorOnboarding
+            ? t('contractorOnboarding.submissionSuccess', {
+                submissionType: submissionTypeLabel,
+              })
+            : t('energySavingsApplication.new.submissionSuccess', {
+                submissionType: submissionTypeLabel,
+              });
 
   const determinedMessage =
     performedBy === EUpdateRoles.staff ? message.charAt(0).toUpperCase() + message.slice(1) : message;
@@ -75,11 +79,7 @@ export const SuccessfulSubmissionScreen = observer(() => {
   // Override for contractor onboarding
   if (currentPermitApplication.isContractorOnboarding) {
     whatsNextHeadingKey = 'contractorOnboarding.whatsNext.heading';
-    whatsNextLineKeys = [
-      'contractorOnboarding.whatsNext.line1',
-      'contractorOnboarding.whatsNext.line2',
-      'contractorOnboarding.whatsNext.line3',
-    ];
+    whatsNextLineKeys = ['contractorOnboarding.whatsNext.line1', 'contractorOnboarding.whatsNext.line2'];
     whatsNextEmail = t('site.support.contractorSupportEmail');
   } else if (isContractorInvoice) {
     // Override for contractor invoice
