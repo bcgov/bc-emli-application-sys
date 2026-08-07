@@ -1,44 +1,44 @@
-import { Box, Container, Heading, ListItem, Text, UnorderedList, VStack } from "@chakra-ui/react"
-import { observer } from "mobx-react-lite"
-import React from "react"
-import { useTranslation } from "react-i18next"
-import { IHomeScreenProps } from "../../domains/home"
-import { RouterLink } from "../navigation/router-link"
+import { Box, Container, Heading, ListItem, Text, UnorderedList, VStack } from '@chakra-ui/react';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { IHomeScreenProps } from '../../domains/home';
+import { RouterLink } from '../navigation/router-link';
 
 interface INotFoundScreenProps extends IHomeScreenProps {}
 
 export const NotFoundScreen = observer(({ ...rest }: INotFoundScreenProps) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
-    <Container maxW="container.lg">
+    <Container as="main" maxW="container.lg">
       <VStack gap="16" my="20" mb="40">
         <Box>
           <Heading as="h1" color="theme.blueAlt">
-            {t("site.pageNotFound")}
+            {t('site.pageNotFound')}
           </Heading>
-          <Text>{t("site.pageNotFoundInstructions")}</Text>
+          <Text>{t('site.pageNotFoundInstructions')}</Text>
           <br />
-          <Text>{t("site.pageNotFoundWeSuggest")}</Text>
+          <Text>{t('site.pageNotFoundWeSuggest')}</Text>
           <br />
           <UnorderedList paddingLeft={0}>
             <ListItem>
-              <Text>{t("site.pageNotFoundChecking")}</Text>
+              <Text>{t('site.pageNotFoundChecking')}</Text>
             </ListItem>
             <ListItem>
               <Text>
-                {t("site.pageNotFoundGoing")} <RouterLink to="/welcome">{t("site.pageNotFoundGoHome")}</RouterLink>
+                {t('site.pageNotFoundGoing')} <RouterLink to="/welcome">{t('site.pageNotFoundGoHome')}</RouterLink>
               </Text>
             </ListItem>
             <ListItem>
               <Text>
-                {t("site.pageNotFoundReaching")}{" "}
-                <RouterLink to="/get-support">{t("site.pageNotFoundGetSupport")}</RouterLink>
+                {t('site.pageNotFoundReaching')}{' '}
+                <RouterLink to="/get-support">{t('site.pageNotFoundGetSupport')}</RouterLink>
               </Text>
             </ListItem>
           </UnorderedList>
         </Box>
       </VStack>
     </Container>
-  )
-})
+  );
+});

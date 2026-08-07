@@ -50,7 +50,7 @@ export const SuccessfulActionScreen = ({
   const displayLabel = referenceLabel ?? t('energySavingsApplication.referenceNumber');
 
   return (
-    <Container maxW="container.lg">
+    <Container as="main" maxW="container.lg">
       <Flex direction="column" align="center" my={24} gap={8} role="region" aria-live="polite">
         {resolveIcon()}
 

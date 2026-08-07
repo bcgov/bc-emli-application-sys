@@ -2277,7 +2277,7 @@ const options = {
         errors: {
           fetchContractor: 'Something went wrong fetching the contractor',
           fetchJurisdiction: 'Something went wrong fetching the jurisdiction',
-          fetchPermitApplication: 'Something went wrong fetching the permit application',
+          fetchSubmission: 'Something went wrong fetching the submission',
           fetchPermitTypeOptions: 'Something went wrong fetching the permit type options',
           fetchAutoComplianceModuleConfigurations: 'Something went wrong fetching the auto compliance module options',
           fetchActivityOptions: 'Something went wrong fetching the activity options',
