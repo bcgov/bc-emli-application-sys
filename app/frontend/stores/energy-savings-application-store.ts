@@ -406,7 +406,7 @@ export const PermitApplicationStoreModel = types
       const { ok, data: response } = yield self.environment.api.createInternalComment(permitApplicationId, params);
       if (ok && response?.data) {
         const existing = self.internalCommentsMap.get(permitApplicationId) ?? [];
-        const updated = [...existing, response.data];
+        const updated = [response.data, ...existing];
         self.internalCommentsMap.set(permitApplicationId, updated);
         self.getPermitApplicationById(permitApplicationId)?.setInternalCommentsCount(updated.length);
         return response.data;

@@ -32,6 +32,23 @@ RSpec.describe Api::InternalCommentsController, type: :controller do
       get :index, params: { permit_application_id: permit_application.id }
       expect(response).to have_http_status(:forbidden)
     end
+
+    it "returns newest comments first" do
+      older = comment
+      newer =
+        InternalComment.create!(
+          permit_application: permit_application,
+          user: admin,
+          body: "a newer note",
+          created_at: older.created_at + 1.hour
+        )
+
+      sign_in admin
+      get :index, params: { permit_application_id: permit_application.id }
+      expect(json_response["data"].map { |c| c["id"] }).to eq(
+        [newer.id, older.id]
+      )
+    end
   end
 
   describe "POST #create" do

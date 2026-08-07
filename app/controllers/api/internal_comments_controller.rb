@@ -6,7 +6,10 @@ class Api::InternalCommentsController < Api::ApplicationController
     authorize @permit_application, :view_internal_comments?
 
     comments =
-      @permit_application.internal_comments.includes(:user).order(:created_at)
+      @permit_application
+        .internal_comments
+        .includes(:user)
+        .order(created_at: :desc)
 
     render_success comments,
                    nil,
