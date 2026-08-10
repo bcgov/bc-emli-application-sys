@@ -107,14 +107,8 @@ const options = {
             //   register: "Register for Business BCeID",
             // },
             contractor: {
-              title: 'Contractor log in',
-              description:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent aliquet pretium ipsum quis interdum. Mauris in dapibus ligula. ',
-              ctaText: 'Log in with Business BCeID',
               loginPrompt: 'You must log in with a Business BCeID account.',
               loginButton: 'Log in with Business BCeID Account',
-              learnMore: 'Learn more about BCeID',
-              setupAccount: 'and how to set up an account',
               needSetup: 'Do you need to set up your Business BCeID account? Get started',
               here: 'here',
             },
