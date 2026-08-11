@@ -256,7 +256,7 @@ const formatExpiryDate = (dateStr: string) => {
   const day = date.getUTCDate().toString().padStart(2, '0');
   const month = date.toLocaleString('en-CA', { month: 'short', timeZone: 'UTC' });
   const year = date.getUTCFullYear();
-  return `${day}. ${month}, ${year}`;
+  return `${day} ${month}, ${year}`;
 };
 
 const SIDEBAR_CATEGORIES: { key: ResourceCategory; label: string }[] = [
@@ -478,73 +478,80 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
               aria-labelledby="tab-checkEligibilityCode"
               tabIndex={-1}
             >
-              <Flex gap={2} align="center" w="full">
-                <Input
-                  aria-label={t('contractor.programResources.checkEligibilityCode')}
-                  placeholder={t('contractor.programResources.checkEligibilityCode_inputPlaceholder')}
-                  value={eligibilityCode}
-                  onChange={(e) => {
-                    setEligibilityCode(e.target.value);
-                    setCheckResult(null);
-                    setCheckError(false);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && eligibilityCode.trim()) handleCheckEligibility();
-                  }}
-                  maxW="400px"
-                  borderColor="border.input"
-                />
-                <Button
-                  onClick={handleCheckEligibility}
-                  isDisabled={!eligibilityCode.trim() || checking}
-                  isLoading={checking}
-                  variant="primary"
-                >
-                  {t('contractor.programResources.checkEligibilityCode_search')}
-                </Button>
-              </Flex>
-              {checkResult?.valid &&
-                (() => {
-                  const today = new Date();
-                  const todayUTC = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
-                  const isExpired = !!checkResult.expiryDate && new Date(checkResult.expiryDate) < todayUTC;
+              {/* Search field and its result alert share one info-surface panel, per design. */}
+              <Flex direction="column" justify="center" w="full" minH="200px" bg="semantic.infoLight" px={6} py={6}>
+                <Flex gap={6} align="center" w="full">
+                  <Input
+                    aria-label={t('contractor.programResources.checkEligibilityCode')}
+                    placeholder={t('contractor.programResources.checkEligibilityCode_inputPlaceholder')}
+                    value={eligibilityCode}
+                    onChange={(e) => {
+                      setEligibilityCode(e.target.value);
+                      setCheckResult(null);
+                      setCheckError(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && eligibilityCode.trim()) handleCheckEligibility();
+                    }}
+                    maxW="400px"
+                    borderColor="border.input"
+                  />
+                  <Button
+                    onClick={handleCheckEligibility}
+                    isDisabled={!eligibilityCode.trim() || checking}
+                    isLoading={checking}
+                    variant="primary"
+                  >
+                    {t('contractor.programResources.checkEligibilityCode_search')}
+                  </Button>
+                </Flex>
+                {checkResult?.valid &&
+                  (() => {
+                    const today = new Date();
+                    const todayUTC = new Date(
+                      Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()),
+                    );
+                    const isExpired = !!checkResult.expiryDate && new Date(checkResult.expiryDate) < todayUTC;
 
-                  if (isExpired) {
+                    if (isExpired) {
+                      return (
+                        <CustomAlert
+                          description={t('contractor.programResources.checkEligibilityCode_validExpired', {
+                            date: formatExpiryDate(checkResult.expiryDate),
+                          })}
+                        />
+                      );
+                    }
+
                     return (
                       <CustomAlert
-                        description={t('contractor.programResources.checkEligibilityCode_validExpired', {
-                          date: formatExpiryDate(checkResult.expiryDate),
-                        })}
+                        description={
+                          !checkResult.expiryDate
+                            ? t('contractor.programResources.checkEligibilityCode_validNoExpiry')
+                            : t('contractor.programResources.checkEligibilityCode_validWithExpiry', {
+                                date: formatExpiryDate(checkResult.expiryDate),
+                              })
+                        }
+                        icon={<CheckCircle size={27} />}
+                        borderColor="success"
+                        backgroundColor="semantic.successLight"
+                        iconColor="green"
                       />
                     );
-                  }
-
-                  return (
-                    <CustomAlert
-                      description={
-                        !checkResult.expiryDate
-                          ? t('contractor.programResources.checkEligibilityCode_validNoExpiry')
-                          : t('contractor.programResources.checkEligibilityCode_validWithExpiry', {
-                              date: formatExpiryDate(checkResult.expiryDate),
-                            })
-                      }
-                      icon={<CheckCircle size={27} />}
-                      borderColor="success"
-                      backgroundColor="semantic.successLight"
-                      iconColor="green"
-                    />
-                  );
-                })()}
-              {checkResult && !checkResult.valid && (
-                <CustomAlert
-                  description={t(
-                    checkResult.invalidFormat
-                      ? 'contractor.programResources.checkEligibilityCode_invalidFormat'
-                      : 'contractor.programResources.checkEligibilityCode_invalid',
-                  )}
-                />
-              )}
-              {checkError && <CustomAlert description={t('contractor.programResources.checkEligibilityCode_error')} />}
+                  })()}
+                {checkResult && !checkResult.valid && (
+                  <CustomAlert
+                    description={t(
+                      checkResult.invalidFormat
+                        ? 'contractor.programResources.checkEligibilityCode_invalidFormat'
+                        : 'contractor.programResources.checkEligibilityCode_invalid',
+                    )}
+                  />
+                )}
+                {checkError && (
+                  <CustomAlert description={t('contractor.programResources.checkEligibilityCode_error')} />
+                )}
+              </Flex>
             </VStack>
           ) : (
             <VStack
