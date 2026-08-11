@@ -3427,7 +3427,7 @@ const options = {
           programResources: {
             title: 'Contractor program resources',
             pageHeading: 'Program resources: Program guidance',
-            addEmployees: 'Add Employees',
+            addEmployees: 'Add employees',
             checkEligibilityCode: 'Check eligibility code',
             checkEligibilityCode_description:
               "You can only receive payment for eligible work. Check your customer's eligibility code before providing a quote or starting any work. Each eligibility code can only be used for work completed at the approved address.",
@@ -3456,12 +3456,12 @@ const options = {
               contractorTermsConditionsgroundOriented: 'Contractor terms and conditions - ground oriented homes',
               participantTermsConditionsCondoApartment: 'Participant terms and conditions - condos and apartments',
               participantTermsConditionsgroundOriented: 'Participant terms and conditions - ground oriented homes',
-              rebateEligibilityGroundOriented: 'Rebate eligibility requirement - ground oriented homes',
-              rebateEligibilityCondoApartment: 'Rebate eligibility requirements - condo and apartment',
+              rebateEligibilityGroundOriented: 'Rebate eligibility requirements - ground oriented homes',
+              rebateEligibilityCondoApartment: 'Rebate eligibility requirements - condos and apartments',
               heatPump: 'Heat pump',
               heatPumpWaterHeater: 'Heat pump water heater',
               heatPumpCondoApartment: 'Heat pump - condo and apartment',
-              heatPumpWaterCondoApartment: 'Heat pump water - condo and apartment',
+              heatPumpWaterCondoApartment: 'Heat pump water heater - condo and apartment',
               windowsAndDoors: 'Windows and doors',
               insulation: 'Insulation',
               electricServiceUpgrade: 'Electric service upgrade',
@@ -3517,6 +3517,8 @@ const options = {
             fileInfoHPWH: '. [423 KB, PDF]',
             qualifiedProductListSubheading:
               'Installations must use items on the relevant qualified product list and/or be certified by the specified body to be eligible for ESP rebates.',
+            addEmployeesSubheading:
+              'You may want to grant your employees access to the contractor portal, so they can submit invoices and access program resources. To make this happen, employees need Business BCeID accounts, and you must complete the add employee form.',
             programResourcesPrefix: 'Program resources:',
           },
         },

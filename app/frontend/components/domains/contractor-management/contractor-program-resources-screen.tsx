@@ -154,6 +154,13 @@ const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
       url: 'https://www.betterhomesbc.ca/esp-sample-invoice-heat-pump-PDF',
     },
     {
+      id: 'heat-pump-water-heater',
+      title: 'contractor.programResources.resources.heatPumpWaterHeater',
+      size: '1027 KB',
+      type: 'PDF',
+      url: 'https://www.betterhomesbc.ca/esp-sample-invoice-heat-pump-water-heater-PDF',
+    },
+    {
       id: 'heat-pump-condo-apartment',
       title: 'contractor.programResources.resources.heatPumpCondoApartment',
       size: '270 KB',
@@ -166,13 +173,6 @@ const PROGRAM_RESOURCES: Record<ResourceListCategory, ProgramResource[]> = {
       size: '258 KB',
       type: 'PDF',
       url: 'https://www.betterhomesbc.ca/esp-sample-invoice-heat-pump-water-heater-condo-apartment',
-    },
-    {
-      id: 'heat-pump-water-heater',
-      title: 'contractor.programResources.resources.heatPumpWaterHeater',
-      size: '1027 KB',
-      type: 'PDF',
-      url: 'https://www.betterhomesbc.ca/esp-sample-invoice-heat-pump-water-heater-PDF',
     },
     {
       id: 'windows-and-doors',
@@ -268,6 +268,13 @@ const SIDEBAR_CATEGORIES: { key: ResourceCategory; label: string }[] = [
   { key: 'resourcesForCustomers', label: 'contractor.programResources.resourcesForCustomers' },
 ];
 
+// Categories that show an intro paragraph between the page heading and the panel.
+const CATEGORY_SUBHEADINGS: Partial<Record<ResourceCategory, string>> = {
+  checkEligibilityCode: 'contractor.programResources.checkEligibilityCode_description',
+  addEmployees: 'contractor.programResources.addEmployeesSubheading',
+  qualifiedProductList: 'contractor.programResources.qualifiedProductListSubheading',
+};
+
 interface ContractorProgramResourcesScreenProps {
   hideBlueSection?: boolean;
 }
@@ -284,6 +291,9 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
     ? SIDEBAR_CATEGORIES.filter((category) => category.key !== 'checkEligibilityCode')
     : SIDEBAR_CATEGORIES;
   const [selectedCategory, setSelectedCategory] = useState<ResourceCategory>('addEmployees');
+  // Categories whose resources each render as their own bordered card rather than as
+  // rows inside one shared container.
+  const usesCardLayout = selectedCategory === 'qualifiedProductList' || selectedCategory === 'addEmployees';
   const [eligibilityCode, setEligibilityCode] = useState('');
   const [checkResult, setCheckResult] = useState<{
     valid: boolean;
@@ -390,12 +400,13 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
           {selectedCategory !== 'checkEligibilityCode' && `${t('contractor.programResources.programResourcesPrefix')} `}
           {t(SIDEBAR_CATEGORIES.find((cat) => cat.key === selectedCategory)?.label || '')}
         </Heading>
-        {selectedCategory === 'qualifiedProductList' && (
+        {CATEGORY_SUBHEADINGS[selectedCategory] ? (
           <Text fontSize="md" color="greys.grey60" mb={12} lineHeight="tall">
-            {t('contractor.programResources.qualifiedProductListSubheading')} 
+            {t(CATEGORY_SUBHEADINGS[selectedCategory] as string)}
           </Text>
+        ) : (
+          <Box mb={12} />
         )}
-        {selectedCategory !== 'qualifiedProductList' && <Box mb={12} />}
         <Flex direction={{ base: 'column', lg: 'row' }} gap={8} align="flex-start">
           {/* Left Sidebar - Category Navigation */}
           <Box
@@ -467,7 +478,6 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
               aria-labelledby="tab-checkEligibilityCode"
               tabIndex={-1}
             >
-              <Text sx={baseTextSx}>{t('contractor.programResources.checkEligibilityCode_description')}</Text>
               <Flex gap={2} align="center" w="full">
                 <Input
                   aria-label={t('contractor.programResources.checkEligibilityCode')}
@@ -544,11 +554,11 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
               id="resource-panel"
               role="tabpanel"
               aria-labelledby={`tab-${selectedCategory}`}
-              border={selectedCategory === 'qualifiedProductList' ? 'none' : '1px solid'}
-              borderColor={selectedCategory === 'qualifiedProductList' ? 'transparent' : '#D8D8D8'}
-              borderRadius={selectedCategory === 'qualifiedProductList' ? '0' : '8px'}
-              bg={selectedCategory === 'qualifiedProductList' ? 'transparent' : 'greys.white'}
-              p={selectedCategory === 'qualifiedProductList' ? 0 : 6}
+              border={usesCardLayout ? 'none' : '1px solid'}
+              borderColor={usesCardLayout ? 'transparent' : '#D8D8D8'}
+              borderRadius={usesCardLayout ? '0' : '8px'}
+              bg={usesCardLayout ? 'transparent' : 'greys.white'}
+              p={usesCardLayout ? 0 : 6}
               tabIndex={-1}
             >
               {PROGRAM_RESOURCES[selectedCategory as ResourceListCategory].length > 0 ? (
@@ -556,13 +566,13 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
                   <Box
                     key={resource.id}
                     w="full"
-                    mb={resource.description ? 4 : 0}
-                    p={selectedCategory === 'qualifiedProductList' ? 8 : 0}
+                    mb={resource.description && !usesCardLayout ? 4 : 0}
+                    p={usesCardLayout ? (selectedCategory === 'qualifiedProductList' ? 8 : 6) : 0}
                     pb={selectedCategory === 'qualifiedProductList' ? 16 : undefined}
-                    border={selectedCategory === 'qualifiedProductList' ? '1px solid' : 'none'}
-                    borderColor={selectedCategory === 'qualifiedProductList' ? '#D8D8D8' : 'transparent'}
-                    borderRadius={selectedCategory === 'qualifiedProductList' ? '4px' : '0'}
-                    bg={selectedCategory === 'qualifiedProductList' ? 'greys.white' : 'transparent'}
+                    border={usesCardLayout ? '1px solid' : 'none'}
+                    borderColor={usesCardLayout ? '#D8D8D8' : 'transparent'}
+                    borderRadius={usesCardLayout ? '4px' : '0'}
+                    bg={usesCardLayout ? 'greys.white' : 'transparent'}
                   >
                     {resource.url === '#' ? (
                       <Text
@@ -575,7 +585,14 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
                       >
                         {t(resource.title)}
                         {resource.size && resource.type && (
-                          <Text as="span" color="greys.grey60" fontWeight="bold" ml={1} aria-hidden="true">
+                          <Text
+                            as="span"
+                            color="greys.grey60"
+                            fontWeight="bold"
+                            ml={1}
+                            whiteSpace="nowrap"
+                            aria-hidden="true"
+                          >
                             [{resource.size}, {resource.type}]
                           </Text>
                         )}
@@ -606,7 +623,14 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
                       >
                         {t(resource.title)}
                         {resource.size && resource.type && (
-                          <Text as="span" color="greys.grey60" fontWeight="bold" ml={1} aria-hidden="true">
+                          <Text
+                            as="span"
+                            color="greys.grey60"
+                            fontWeight="bold"
+                            ml={1}
+                            whiteSpace="nowrap"
+                            aria-hidden="true"
+                          >
                             [{resource.size}, {resource.type}]
                           </Text>
                         )}
@@ -642,6 +666,11 @@ export const ContractorProgramResourcesScreen = observer(function ContractorProg
                             >
                               {t('contractor.programResources.linkText.qualifyingProductList')}
                             </Link>
+                            {
+                              t('contractor.programResources.descriptions.miniSplitHeatPumps').split(
+                                t('contractor.programResources.linkText.qualifyingProductList'),
+                              )[1]
+                            }
                           </>
                         ) : resource.id === 'air-to-water-heat-pumps' ? (
                           <>
