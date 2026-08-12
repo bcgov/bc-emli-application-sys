@@ -1,5 +1,8 @@
 class CustomDeviseMailer < Devise::Mailer
-  default from: ENV["FROM_EMAIL"]
+  # This is now the only source of the From header (see devise_mail below), and an
+  # empty-but-present FROM_EMAIL is truthy, so it would sail through Devise's check
+  # and produce the same blank From that CHES rejects with 422.
+  default from: ENV["FROM_EMAIL"].presence || "no-reply@gov.bc.ca"
   layout "mailer"
 
   # If you wanted to override devise confirmation instructions do it here
@@ -33,9 +36,11 @@ class CustomDeviseMailer < Devise::Mailer
     mail_headers = headers_for(action, opts)
     @root_url = FrontendUrlHelper.root_url
 
+    # Do NOT pass `from:` here. Devise's headers_for deliberately omits :from when the
+    # mailer defines `default from:` (see Devise::Mailers::Helpers), so mail_headers[:from]
+    # is nil and passing it explicitly overrides the default with a blank From.
     mail(
       to: mail_headers[:to],
-      from: mail_headers[:from],
       subject:
         "#{I18n.t("application_mailer.subject_start")} - #{mail_headers[:subject]}",
       template_path: "devise/mailer",
