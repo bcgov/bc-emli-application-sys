@@ -1,5 +1,7 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: ENV["FROM_EMAIL"]
+  # An empty-but-present FROM_EMAIL yields a blank From header, which CHES rejects
+  # with 422. Fall back so notification mail can't be dropped that way.
+  default from: ENV["FROM_EMAIL"].presence || "no-reply@gov.bc.ca"
   layout "mailer"
 
   protected
