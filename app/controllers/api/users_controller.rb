@@ -147,6 +147,10 @@ class Api::UsersController < Api::ApplicationController
                      }
                    }
     end
+  rescue ChesEmailDelivery::DeliveryError => e
+    # Devise sends the confirmation email from an after_commit hook, so the profile
+    # change is already saved when delivery fails. Say so rather than 500ing.
+    render_error("user.confirmation_email_failed", {}, e)
   end
 
   def license_agreements

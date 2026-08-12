@@ -8,6 +8,7 @@ class Api::ApplicationController < ActionController::API
   before_action :require_confirmation
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  rescue_from ChesEmailDelivery::DeliveryError, with: :email_delivery_failed
 
   after_action :verify_authorized, except: %i[index], unless: :skip_pundit?
   after_action :verify_policy_scoped, only: %i[index], unless: :skip_pundit?
@@ -34,6 +35,14 @@ class Api::ApplicationController < ActionController::API
 
   def skip_pundit?
     devise_controller?
+  end
+
+  # Devise delivers its mail inline (send_devise_notification uses deliver_now), so a
+  # CHES rejection surfaces in whichever action triggered the send - invite!, a
+  # confirmation, a reconfirmation. Actions that can say something more specific
+  # rescue it themselves; this is the catch-all so the rest don't 500.
+  def email_delivery_failed(exception)
+    render_error("misc.email_delivery_failed", {}, exception) and return
   end
 
   def user_not_authorized(exception)
