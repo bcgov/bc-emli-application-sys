@@ -367,6 +367,9 @@ en:
       reconfirmation_sent:
         title: Confirmation email sent
         message: Please click the link in your email inbox.
+      confirmation_email_failed:
+        title: Email could not be sent
+        message: Your changes were saved, but we could not send the confirmation email. Please try again, or contact support if the problem continues.
       reinvited:
         title: Invitation email sent
         message: ''
@@ -704,6 +707,9 @@ en:
       user_not_authorized_error:
         title: 'Unauthorized'
         message: 'The user is not authorized to do this action'
+      email_delivery_failed:
+        title: 'Email could not be sent'
+        message: 'The email could not be sent. Please try again, or contact support if the problem continues.'
       external_api_key_forbidden_error:
         title: 'Forbidden'
         message: 'The external api key is not authorized to do this action'

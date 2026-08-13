@@ -1,4 +1,10 @@
 class ChesEmailDelivery
+  # Raised when CHES accepts the request but rejects the message (4xx/5xx).
+  # Surfacing this matters: a silently-swallowed 422 hid every Devise email
+  # failing for three weeks after the Devise 5 upgrade.
+  class DeliveryError < StandardError
+  end
+
   attr_accessor :config, :client, :bearer_token, :delivery_method
 
   def initialize(config)
@@ -39,7 +45,8 @@ class ChesEmailDelivery
       return body.dig("messages", 0, "msgId")
     else
       Rails.logger.error "[CHES] Failed to send email: #{response.status} #{response.body}"
-      #raise "CHES email delivery failed: #{response.status} #{response.body}"
+      raise DeliveryError,
+            "CHES email delivery failed: #{response.status} #{response.body}"
     end
   end
 
