@@ -1,10 +1,11 @@
-import { Box, Divider, Flex, Heading, HStack, Link, Text, VStack, Button } from '@chakra-ui/react';
+import { Box, Button, Divider, Flex, Heading, HStack, Link, Text, VStack } from '@chakra-ui/react';
 import { ArrowSquareOut } from '@phosphor-icons/react';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useMst } from '../../../setup/root';
+import { getRuntimeStringMetaValue } from '../../../utils/utility-functions';
 import { CenterContainer } from '../../shared/containers/center-container';
 import { storeEntryPoint } from '../../shared/store-entry-point';
-import { useMst } from '../../../setup/root';
 
 export interface ILoginScreenProps {
   isAdmin?: boolean;
@@ -143,7 +144,7 @@ export const LoginForm = ({ handleSubmit, isContractor }) => {
           <Text fontSize="md">
             {t('auth.bceidInfo.contractor.needSetup')}{' '}
             <Link
-              href={import.meta.env.VITE_BUSINESS_BCEID_REGISTRATION_URL}
+              href={getRuntimeStringMetaValue('business-bceid-registration-url', '')}
               color="text.primary"
               isExternal
               textDecoration="underline"

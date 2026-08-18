@@ -106,6 +106,15 @@ export function getRuntimeBooleanMetaValue(name: string, defaultValue: boolean):
   return content.trim().toLowerCase() === 'true';
 }
 
+export function getRuntimeStringMetaValue(name: string, defaultValue: string): string {
+  if (typeof document === 'undefined') return defaultValue;
+
+  const content = document.querySelector(`meta[name="${name}"]`)?.getAttribute('content');
+  if (!content?.trim()) return defaultValue;
+
+  return content.trim();
+}
+
 export function handleScrollToTop() {
   document.documentElement.scrollTo({
     top: 0,

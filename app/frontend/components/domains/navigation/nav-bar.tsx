@@ -120,6 +120,8 @@ function isContractorWorkflowPath(path: string): boolean {
 function shouldHideSubNavbarForPath(path: string): boolean {
   const matchers: Array<(path: string) => boolean> = [
     (path) => path === '/',
+    // The eligibility screen renders its own SubNavBar, so the global one would double it up.
+    (path) => path === '/check-eligible',
     isTemplateEditPath,
     isEarlyAccessTemplateEditPath,
     isEarlyAccessTemplateViewPath,

@@ -1,15 +1,4 @@
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Box,
-  Icon,
-  Link,
-  ListItem,
-  Stack,
-  Text,
-  UnorderedList,
-} from '@chakra-ui/react';
+import { Alert, AlertDescription, AlertTitle, Box, Link, ListItem, Stack, Text, UnorderedList } from '@chakra-ui/react';
 import { ArrowSquareOutIcon, Info, WarningCircleIcon } from '@phosphor-icons/react';
 import React, { FC, ReactElement } from 'react';
 import { EDescriptionPartType } from '../../../types/enums';
@@ -21,7 +10,6 @@ type BaseAlertProps = {
   borderColor?: string;
   backgroundColor?: string;
   iconColor?: string;
-  ariaLabel?: string;
 };
 
 // Extend by adding more properties
@@ -51,7 +39,6 @@ const CustomAlert: FC<CustomAlertProps> = ({
   borderColor = 'semantic.error', // Default border color
   backgroundColor = 'semantic.errorLight', // Default background color
   iconColor = 'semantic.error', // Default icon color
-  ariaLabel = 'Error Icon',
 }) => {
   return (
     <Stack
@@ -64,17 +51,23 @@ const CustomAlert: FC<CustomAlertProps> = ({
       width="100%"
       align="stretch"
     >
-      <Alert status="error" variant="subtle" bg="transparent" alignItems="start" p={0}>
-        <Icon
-          variant="ghost"
-          icon={icon}
+      {/* overflow visible: Alert defaults to hidden, which clips the focus ring of
+          links sitting flush with its bottom edge. */}
+      <Alert status="error" variant="subtle" bg="transparent" alignItems="start" p={0} overflow="visible">
+        {/* Render the passed element directly: Chakra's <Icon> has no `icon` prop, so passing one
+            silently discarded the caller's icon and fell back to Chakra's default glyph.
+            aria-hidden because the alert text already conveys the state. */}
+        <Box
+          aria-hidden="true"
           zIndex={1}
           color={iconColor}
-          aria-label={ariaLabel}
           fontSize={20}
+          flexShrink={0}
           marginTop={'.7rem'}
           marginRight={'.5rem'}
-        />
+        >
+          {icon}
+        </Box>
         <Stack mt={2}>
           {title && (
             <AlertTitle fontSize="md" fontWeight="bold">
@@ -116,7 +109,6 @@ export const InformationAlert: FC<CustomInformationAlertProps> = ({
   borderColor = 'theme.darkBlue',
   backgroundColor = 'greys.offWhite',
   iconColor = 'theme.darkBlue',
-  ariaLabel = 'Information Icon',
 }) => {
   return (
     <Stack
@@ -132,17 +124,28 @@ export const InformationAlert: FC<CustomInformationAlertProps> = ({
       {/* addRole={false}: this panel is static page content, not a response to a user action.
           Chakra's Alert sets role="alert" by default, making it an assertive live region that
           screen readers interrupt to announce on load. */}
-      <Alert status="info" addRole={false} variant="subtle" bg="transparent" alignItems="start" p={0}>
-        <Icon
-          variant="ghost"
-          icon={icon}
+      <Alert
+        status="info"
+        addRole={false}
+        variant="subtle"
+        bg="transparent"
+        alignItems="start"
+        p={0}
+        overflow="visible"
+      >
+        {/* Decorative: the alert text already conveys the state, so announcing the icon
+            adds nothing for screen readers. */}
+        <Box
+          aria-hidden="true"
           zIndex={1}
           color={iconColor}
-          aria-label={ariaLabel}
           fontSize={20}
+          flexShrink={0}
           marginTop={'.7rem'}
           marginRight={'.5rem'}
-        />
+        >
+          {icon}
+        </Box>
         <Stack mt={2}>
           {title && (
             <AlertTitle fontSize="md" fontWeight="bold">
