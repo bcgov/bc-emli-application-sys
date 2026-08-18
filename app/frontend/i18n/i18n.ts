@@ -605,7 +605,7 @@ const options = {
           clearAll: 'Clear All',
         },
         eula: {
-          title: 'Terms and Conditions',
+          title: 'Terms and conditions',
           accept: 'Accept',
         },
         userEulas: {
@@ -3164,7 +3164,7 @@ const options = {
             welcome: 'Welcome',
             contractor: 'Contractor',
             getSupport: 'Get support',
-            terms: 'Terms and Conditions',
+            terms: 'Terms and conditions',
             sitewideBanner: 'Site-wide banner',
             apiSettings: 'API settings',
             create: 'Create',
