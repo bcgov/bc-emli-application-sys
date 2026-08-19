@@ -73,11 +73,23 @@ class Api::SupportRequestsController < Api::ApplicationController
         status: :unprocessable_entity
       )
     end
-  rescue ActiveRecord::RecordNotFound => e
+  rescue SupportRequestTemplateMissingError => e
+    render_error(
+      "application_controller.support_request_template_missing",
+      { status: :not_found },
+      e
+    )
+  rescue SupportRequestTemplateError => e
     render_error(
       "application_controller.no_published_template_version",
-      status: :bad_request,
-      detail: e.message
+      { status: :not_found },
+      e
+    )
+  rescue ActiveRecord::RecordNotFound => e
+    render_error(
+      "application_controller.support_request_record_not_found",
+      { status: :not_found },
+      e
     )
   end
 

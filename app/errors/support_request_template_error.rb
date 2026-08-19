@@ -1,0 +1,2 @@
+class SupportRequestTemplateError < StandardError
+end
