@@ -22,6 +22,9 @@ class PermitApplicationBlueprint < Blueprinter::Base
 
   view :minimal_with_documents do
     include_view :minimal
+    # signed_off_at is when the support request form was submitted; this flow does not
+    # set submitted_at (see ApplicationFlow::SupportRequestExternalParticipant).
+    field :signed_off_at
     association :supporting_documents, blueprint: SupportingDocumentBlueprint
   end
 

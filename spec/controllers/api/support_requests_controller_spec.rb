@@ -131,6 +131,27 @@ RSpec.describe Api::SupportRequestsController, type: :controller do
       expect(support_request.linked_application).to be_new_draft
     end
 
+    it "serializes the linked application fields the supporting-files card reads" do
+      # The card shows a Submitted date from signed_off_at, a reference number, and
+      # picks its wording from the audience type. All three come from the blueprint's
+      # minimal_with_documents view, and dropping any of them fails silently in the UI.
+      post :request_supporting_files,
+           params: {
+             parent_application_id: parent_app.id,
+             note: "invoice.pdf"
+           }
+
+      expect(response).to have_http_status(:created)
+
+      linked = json_response["support_requests"].first["linked_application"]
+      expect(linked).to include(
+        "signed_off_at",
+        "number",
+        "audience_type",
+        "status"
+      )
+    end
+
     it "reports a missing record, not a missing template, for an unknown parent application" do
       post :request_supporting_files,
            params: {
