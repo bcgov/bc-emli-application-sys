@@ -1158,7 +1158,11 @@ const options = {
             reviewActionText:
               'An agent has reviewed your {{submissionType}} and needs more information. Please review and update your {{submissionType}}.',
             supportingFileSubmissionText: 'An admin has submitted supporting files on your behalf.',
-            uploadFilesText: 'Please upload... {{additionalText}}',
+            supportingFileParticipantSubmissionText: 'You have submitted the requested supporting files.',
+            uploadFilesText: 'Please upload {{additionalText}}',
+            uploadFilesTextNoList: 'Please upload the requested supporting files.',
+            requestedOn: 'Requested: {{date}}',
+            submittedOn: 'Submitted: {{date}}',
           },
           referenceNumber: 'Reference #',
           pdf: {
