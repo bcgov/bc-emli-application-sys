@@ -1163,6 +1163,7 @@ const options = {
             uploadFilesTextNoList: 'Please upload the requested supporting files.',
             requestedOn: 'Requested: {{date}}',
             submittedOn: 'Submitted: {{date}}',
+            submittedNoDate: 'Submitted',
           },
           referenceNumber: 'Reference #',
           pdf: {
