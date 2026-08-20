@@ -39,7 +39,7 @@ export default function SupportRequestList({ supportRequests }: SupportRequestLi
 
   // format epoch timestamp -> readable date
   const formatDate = (epoch?: number) => {
-    if (!epoch) return '—';
+    if (!epoch) return '';
     try {
       return format(new Date(epoch), 'MMM d, yyyy'); // e.g. "Oct 7, 2025"
     } catch {
@@ -72,6 +72,15 @@ export default function SupportRequestList({ supportRequests }: SupportRequestLi
         // Every card carries the same nickname, so the reference number is the only
         // thing distinguishing them while collapsed.
         const referenceNumber = sr.linkedApplication?.number;
+
+        // A submitted form has no date if its status was set directly instead of through
+        // the AASM submit event - show the bare label rather than a placeholder.
+        const submittedAt = sr.linkedApplication?.signedOffAt;
+        const dateLine = isDraft
+          ? t('energySavingsApplication.card.requestedOn', { date: formatDate(sr.createdAt) })
+          : submittedAt
+            ? t('energySavingsApplication.card.submittedOn', { date: formatDate(submittedAt) })
+            : t('energySavingsApplication.card.submittedNoDate');
 
         // Drafts prompt for the upload; the pathway modal creates requests with no note,
         // so there is often no file list to name. Once submitted, the wording depends on
@@ -125,11 +134,7 @@ export default function SupportRequestList({ supportRequests }: SupportRequestLi
                 <Flex flexDirection={{ base: 'column', md: 'row' }} gap={6} w="full" align="flex-start">
                   <Flex direction="column" flex={{ base: 1, md: 4 }} maxW={{ base: '100%', md: '80%' }}>
                     <Text fontSize="sm" color="gray.600">
-                      {isDraft
-                        ? t('energySavingsApplication.card.requestedOn', { date: formatDate(sr.createdAt) })
-                        : t('energySavingsApplication.card.submittedOn', {
-                            date: formatDate(sr.linkedApplication?.signedOffAt),
-                          })}
+                      {dateLine}
                     </Text>
 
                     <Text fontSize="sm" mt={2}>
