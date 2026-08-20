@@ -605,7 +605,7 @@ const options = {
           clearAll: 'Clear All',
         },
         eula: {
-          title: 'Terms and Conditions',
+          title: 'Terms and conditions',
           accept: 'Accept',
         },
         userEulas: {
@@ -1158,7 +1158,12 @@ const options = {
             reviewActionText:
               'An agent has reviewed your {{submissionType}} and needs more information. Please review and update your {{submissionType}}.',
             supportingFileSubmissionText: 'An admin has submitted supporting files on your behalf.',
-            uploadFilesText: 'Please upload... {{additionalText}}',
+            supportingFileParticipantSubmissionText: 'You have submitted the requested supporting files.',
+            uploadFilesText: 'Please upload {{additionalText}}',
+            uploadFilesTextNoList: 'Please upload the requested supporting files.',
+            requestedOn: 'Requested: {{date}}',
+            submittedOn: 'Submitted: {{date}}',
+            submittedNoDate: 'Submitted',
           },
           referenceNumber: 'Reference #',
           pdf: {
@@ -3164,7 +3169,7 @@ const options = {
             welcome: 'Welcome',
             contractor: 'Contractor',
             getSupport: 'Get support',
-            terms: 'Terms and Conditions',
+            terms: 'Terms and conditions',
             sitewideBanner: 'Site-wide banner',
             apiSettings: 'API settings',
             create: 'Create',
