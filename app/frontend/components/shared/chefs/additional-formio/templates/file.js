@@ -219,6 +219,11 @@ export const overrideFileTemplate = (ctx) => {
     __p += '\n';
   }
   __p += '\n';
+  // INVARIANT: every entry in filesToUpload must render exactly one [ref="fileToSyncRemove"].
+  // Formio binds these controls by their position in the refs array and splices
+  // filesToUpload at that same index (File.js:394), so a row that renders no control shifts
+  // every later row's target and dismisses the wrong entry. Rows that must not offer the
+  // control render a hidden placeholder rather than omitting it.
   filesToUpload.forEach(function (status) {
     // A client-side rejection (wrong type, too big, duplicate name) never left the browser -
     // nothing was scanned, uploaded or attached. So it renders as a plain message, with no
@@ -231,7 +236,7 @@ export const overrideFileTemplate = (ctx) => {
         ((__t = status.originalName || status.name) == null ? '' : __t) +
         ' ' +
         ((__t = ctx.t(why)) == null ? '' : __t) +
-        '</div>\n';
+        '<button type="button" ref="fileToSyncRemove" hidden></button></div>\n';
       return;
     }
 
@@ -241,12 +246,33 @@ export const overrideFileTemplate = (ctx) => {
       '\n  <div class="file ' +
       ((__t = status.status === 'error' ? ' has-error' : '') == null ? '' : __t) +
       '">\n    <div class="row">\n      <div class="fileName col-sm-10">' +
-      ((__t = status.originalName) == null ? '' : __t) +
-      '\n        <button type="button" class="' +
-      ((__t = ctx.iconClass('remove')) == null ? '' : __t) +
-      '" ref="fileToSyncRemove"><span class="sr-only">' +
-      ((__t = ctx.t('Dismiss message about ' + (status.originalName || status.name) + '.')) == null ? '' : __t) +
-      '</span></button>\n      </div>\n      <div class="fileSize col-sm-2 text-right">' +
+      ((__t = status.originalName) == null ? '' : __t);
+    // Only a failed upload can be dismissed. Dismissing one that is still in flight splices
+    // filesToSync.filesToUpload, and syncFiles() then fails its length check (File.js:1035)
+    // and returns before dataValue.push(...) - discarding the WHOLE batch from the form while
+    // every file is already in storage.
+    //
+    // Note the test is for the terminal state, not for 'progress'. A file spends nearly all of
+    // its in-flight life at status 'info' (waitFileProcessing) covering the virus scan and the
+    // S3 PUT; 'progress' appears only at the very end, because our provider reports progress
+    // exactly once at 100% after the PUT returns (uploads.ts:33). Keying on 'progress' would
+    // leave the control live for almost the whole window.
+    //
+    // Formio's stock template offers an abort button here instead, but our provider never
+    // calls abortCallback (s3custom.js:26) and uploadFileOneChunk uses fetch with no
+    // AbortSignal, so it would do nothing.
+    if (status.status !== 'error') {
+      __p += '\n        <button type="button" ref="fileToSyncRemove" hidden></button>';
+    } else {
+      __p +=
+        '\n        <button type="button" class="' +
+        ((__t = ctx.iconClass('remove')) == null ? '' : __t) +
+        '" ref="fileToSyncRemove"><span class="sr-only">' +
+        ((__t = ctx.t('Dismiss message about ' + (status.originalName || status.name) + '.')) == null ? '' : __t) +
+        '</span></button>';
+    }
+    __p +=
+      '\n      </div>\n      <div class="fileSize col-sm-2 text-right">' +
       ((__t = ctx.fileSize(status.size)) == null ? '' : __t) +
       '</div>\n    </div>\n    <div class="row">\n      <div class="col-sm-12">\n        ';
     if (status.status === 'progress') {
