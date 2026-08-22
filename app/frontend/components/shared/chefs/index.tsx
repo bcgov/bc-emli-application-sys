@@ -1,18 +1,18 @@
 // The custom components in this directory are from the CHEFS codebase https://github.com/bcgov/common-hosted-form-service/tree/master/components
 // CJS interop: @formio/react does not re-export Formio — it lives in @formio/js
-import * as FormioReactModule from '@formio/react';
 import * as FormioJsModule from '@formio/js';
+import * as FormioReactModule from '@formio/react';
+import './styles.scss';
 const _fioReact = (FormioReactModule as any).default ?? FormioReactModule;
 const _fioJs = (FormioJsModule as any).default ?? FormioJsModule;
 const Form = _fioReact.Form as (typeof FormioReactModule)['Form'];
 const Templates = (_fioReact.Templates ?? _fioJs.Templates) as (typeof FormioReactModule)['Templates'];
 const Formio = _fioJs.Formio as (typeof import('@formio/js'))['Formio'];
-import './styles.scss';
 
 import { t } from 'i18next';
 import ChefsFormioComponents from './additional-formio';
-import { overridePanelTemplate } from './additional-formio/templates/panel';
 import { overrideFileTemplate } from './additional-formio/templates/file';
+import { overridePanelTemplate } from './additional-formio/templates/panel';
 import { overrideSelectTemplate } from './additional-formio/templates/select';
 
 import { FILE_UPLOAD_MAX_SIZE } from './additional-formio/constant';
@@ -24,6 +24,11 @@ const defaultButtonsTemplate = Templates.current.button.form;
 //panels - are for section blocks, to put things inside panels, we need to target the components section under the body
 
 Templates.current = {
+  // Formio v5's bootstrap5 template sets defaultIconset to 'bi' (Bootstrap Icons),
+  // which this project has never shipped — every icon rendered as an empty <i>.
+  // FontAwesome 4.7 is loaded in styles.scss, so pin the iconset back to 'fa'.
+  // Regression from the v4 -> v5 upgrade (f890065).
+  defaultIconset: 'fa',
   panel: {
     form: (ctx) => {
       let template = overridePanelTemplate(ctx);
@@ -100,4 +105,4 @@ const defaultOptions = {
   },
 };
 
-export { Form, Formio, defaultOptions };
+export { defaultOptions, Form, Formio };
