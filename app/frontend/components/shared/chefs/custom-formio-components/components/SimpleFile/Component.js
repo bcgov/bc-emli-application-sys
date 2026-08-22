@@ -1,5 +1,6 @@
 /* tslint:disable */
 import { Components } from 'formiojs';
+import { FILE_UPLOAD_FILE_PATTERN } from '../../../additional-formio/constant';
 import { Constants } from '../Common/Constants.js';
 import editForm from './Component.form.js';
 const ParentComponent = Components.components.file;
@@ -21,7 +22,7 @@ export default class Component extends ParentComponent {
         webcamSize: 320,
         privateDownload: false,
         imageSize: '200',
-        filePattern: '*',
+        filePattern: FILE_UPLOAD_FILE_PATTERN,
         fileMinSize: '0KB',
         fileMaxSize: '100MB',
         uploadOnly: false,
@@ -30,6 +31,14 @@ export default class Component extends ParentComponent {
       ...extend,
     );
   }
+  // Form.io v5's File hardcodes `get defaultSchema() { return FileComponent.schema(); }` -
+  // the PARENT class, not `this.constructor`. Component#mergeSchema builds each instance from
+  // defaultSchema, so without this override our static schema() is never consulted and every
+  // instance silently falls back to the parent's defaults (notably filePattern: '*').
+  get defaultSchema() {
+    return this.constructor.schema();
+  }
+
   static editForm = editForm;
   static get builderInfo() {
     return {
@@ -64,6 +73,43 @@ export default class Component extends ParentComponent {
         }
       }
     } catch (e) {}
+  }
+  interpolateErrors(errors) {
+    const interpolated = super.interpolateErrors(errors);
+    // An empty required file field produces TWO errors saying the same thing: `required`, and
+    // `array_nonempty` from core's validateMultiple - which only fires because every file
+    // component is forced to multiple: true (formio-component-traversal.ts). The second renders
+    // as "<label> must be a non-empty array", which is developer-facing. Drop it when the plain
+    // required message is already being shown.
+    return interpolated.some((e) => e.ruleName === 'required')
+      ? interpolated.filter((e) => e.ruleName !== 'array_nonempty')
+      : interpolated;
+  }
+
+  handleFilesToUpload(files) {
+    // Client-side rejections render without a dismiss control (nothing was uploaded, so there
+    // is nothing to remove). Clear stale ones whenever the user tries again, otherwise they
+    // accumulate with no way to get rid of them.
+    this.filesToSync.filesToUpload = this.filesToSync.filesToUpload.filter((f) => !f.isValidationError);
+    return super.handleFilesToUpload(files);
+  }
+
+  prepareFileToDelete(fileInfo) {
+    // Form.io v5 locates the row to remove with `file.name === fileInfo.name`. Our file
+    // objects carry no `name` - the name lives in `filename` / `originalName` - so every
+    // comparison was `undefined === undefined`, findIndex always returned 0, and clicking
+    // any file's remove control deleted the FIRST file instead. Match on `id`, which is
+    // unique and present on every entry. (v4 used the clicked index and was correct.)
+    //
+    // A missing id yields -1, which Component.splice() ignores via hasOwnProperty, so the
+    // failure mode is "nothing removed" rather than "wrong file removed".
+    this.filesToSync.filesToDelete.push({
+      ...fileInfo,
+      status: 'info',
+      message: this.t(this.autoSync ? 'readyForRemovingFromStorage' : 'preparingFileToRemove'),
+    });
+    this.splice(this.dataValue.findIndex((file) => file.id === fileInfo.id));
+    this.redraw();
   }
   deleteFile(fileInfo) {
     const { options = {} } = this.component;

@@ -572,6 +572,47 @@
       }
     }
 
+    // The remove / dismiss controls are real <button>s so they are keyboard-operable and have
+    // an accessible name. Strip the browser chrome so they still read as bare icons.
+    [ref='removeLink'],
+    [ref='fileToSyncRemove'] {
+      background: none;
+      border: 0;
+      line-height: 1;
+      color: inherit;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: var(--chakra-radii-full);
+
+      // Hover is the affordance that says the icon is interactive. Red only on hover, not at
+      // rest - a column of red x's next to several attached files reads as an error state
+      // rather than a set of controls.
+      &:hover {
+        color: $bcgov-font-error;
+        background-color: var(--chakra-colors-semantic-errorLight);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--chakra-colors-focus);
+        outline-offset: 2px;
+      }
+    }
+
+    // a file rejected in the browser - never uploaded, so no remove control and no size
+    .file-rejected {
+      font-size: var(--chakra-fontSizes-sm);
+      padding: var(--chakra-space-2);
+      margin-bottom: 0.5rem;
+      border-radius: var(--chakra-radii-sm);
+    }
+
+    // allowed formats, shown under the drop zone
+    .file-pattern-hint {
+      font-size: var(--chakra-fontSizes-sm);
+      color: var(--chakra-colors-text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
     .file {
       border-radius: var(--chakra-radii-sm);
       border: 1px solid var(--chakra-colors-border-light);
@@ -579,7 +620,7 @@
       font-size: var(--chakra-fontSizes-sm);
 
       .fileName {
-        [ref='fileStatusRemove'] {
+        [ref='fileToSyncRemove'] {
           color: $bcgov-font-error;
           margin: 0 var(--chakra-space-1);
           padding: 6px;
