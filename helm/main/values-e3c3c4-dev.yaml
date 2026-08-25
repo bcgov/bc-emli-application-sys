@@ -123,7 +123,7 @@ app:
     # KEYCLOAK_AUTH_URL, S3/AWS settings are provided via hesp-config ConfigMap
 
   route:
-    enabled: true # Route will be handled by nginx proxy
+    enabled: false # Disabled so external traffic is served via nginx proxy route
     host: 'dev-hesp.apps.gold.devops.gov.bc.ca' # DEV on GOLD cluster domain
 
 # ============================================================================
@@ -582,7 +582,7 @@ clamav:
 # ============================================================================
 
 nginxProxy:
-  enabled: false # DEV: Enable for testing CBC cipher compatibility
+  enabled: true # DEV: Enabled to validate proxy path and maintenance toggling
 
   image:
     repository: docker.io/nginx

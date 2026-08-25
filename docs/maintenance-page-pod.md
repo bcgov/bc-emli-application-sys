@@ -20,6 +20,7 @@ The goal is to show a clear outage page instead of DNS/browser error pages durin
   - Deployment: `maintenance`
   - Service: `maintenance`
   - Main app route (existing): `hesp-app`
+  - Vanity route (nginx mode): `hesp-nginx` (and optional `hesp-nginx-www`)
 
 ## Prerequisites
 
@@ -100,24 +101,57 @@ oc port-forward -n e3c3c4-prod svc/maintenance 8081:8080
 # open http://localhost:8081
 ```
 
-## Switching Routes (Maintenance Mode)
+## Switching Traffic (Maintenance Mode)
 
-### Enable maintenance mode (redirect traffic)
+### Recommended: use toggle script
+
+The script now auto-detects mode:
+
+- **nginx proxy mode** (vanity domains): switches nginx upstream between `hesp-app:3000` and `maintenance:8080`
+- **direct app route mode**: patches route target between `hesp-app` and `maintenance`
+
+```bash
+NAMESPACE=e3c3c4-prod ./scripts/toggle-maintenance.sh enable
+NAMESPACE=e3c3c4-prod ./scripts/toggle-maintenance.sh status
+NAMESPACE=e3c3c4-prod ./scripts/toggle-maintenance.sh disable
+```
+
+### Manual fallback (nginx proxy mode)
+
+Use this for vanity domains (`bcenergysavingsprogram.ca`, `www.bcenergysavingsprogram.ca`) when traffic flows through `hesp-nginx-proxy`.
+
+Enable maintenance:
+
+```bash
+oc get configmap hesp-nginx-config -n e3c3c4-prod -o yaml | \
+  sed 's/server hesp-app:3000;/server maintenance:8080;/g' | \
+  oc apply -f -
+
+oc rollout restart deployment/hesp-nginx-proxy -n e3c3c4-prod
+oc rollout status deployment/hesp-nginx-proxy -n e3c3c4-prod --timeout=180s
+```
+
+Disable maintenance:
+
+```bash
+oc get configmap hesp-nginx-config -n e3c3c4-prod -o yaml | \
+  sed 's/server maintenance:8080;/server hesp-app:3000;/g' | \
+  oc apply -f -
+
+oc rollout restart deployment/hesp-nginx-proxy -n e3c3c4-prod
+oc rollout status deployment/hesp-nginx-proxy -n e3c3c4-prod --timeout=180s
+```
+
+### Manual fallback (direct app route mode)
+
+Enable maintenance:
 
 ```bash
 oc patch route hesp-app -n e3c3c4-prod --type=merge \
   -p '{"spec":{"to":{"name":"maintenance"}}}'
 ```
 
-### Confirm route target
-
-```bash
-oc get route hesp-app -n e3c3c4-prod -o jsonpath='{.spec.to.name}{"\n"}'
-```
-
-Expected output: `maintenance`
-
-### Disable maintenance mode (restore app)
+Disable maintenance:
 
 ```bash
 oc patch route hesp-app -n e3c3c4-prod --type=merge \
@@ -128,8 +162,11 @@ oc patch route hesp-app -n e3c3c4-prod --type=merge \
 
 - Maintenance deployment is healthy (`1/1` ready).
 - `svc/maintenance` exists and has endpoints.
-- `route/hesp-app` target is correct (`maintenance` or `hesp-app`).
-- External URL (`https://hesp.apps.gold.devops.gov.bc.ca`) returns expected page content.
+- In nginx mode: upstream in `hesp-nginx-config` points to expected backend.
+- In route mode: `route/hesp-app` target is correct (`maintenance` or `hesp-app`).
+- External URLs return expected page content.
+  - Internal route: `https://hesp.apps.gold.devops.gov.bc.ca`
+  - Vanity route(s): `https://bcenergysavingsprogram.ca` and `https://www.bcenergysavingsprogram.ca`
 
 ## Troubleshooting
 
@@ -161,6 +198,26 @@ oc get endpoints maintenance -n <namespace>
 
 3. Test with curl/incognito to avoid browser cache.
 
+### Vanity domain does not switch to maintenance page
+
+1. Verify nginx upstream target:
+
+```bash
+oc get configmap hesp-nginx-config -n <namespace> -o yaml | grep -A2 'upstream hesp_app'
+```
+
+2. Verify nginx pods restarted after ConfigMap update:
+
+```bash
+oc rollout status deployment/hesp-nginx-proxy -n <namespace> --timeout=180s
+```
+
+3. Verify routes for vanity hosts point to nginx proxy service:
+
+```bash
+oc get route -n <namespace> | grep nginx
+```
+
 ### Nginx permission errors on startup
 
 The image is configured for OpenShift restricted SCC (random UID). If this regresses, inspect:
@@ -184,5 +241,6 @@ oc project e3c3c4-prod
 oc start-build hesp-maintenance --from-dir=./maintenance --follow --wait
 oc rollout restart deploy/maintenance -n e3c3c4-prod
 oc rollout status deploy/maintenance -n e3c3c4-prod --timeout=180s
-oc patch route hesp-app -n e3c3c4-prod --type=merge -p '{"spec":{"to":{"name":"maintenance"}}}'
+NAMESPACE=e3c3c4-prod ./scripts/toggle-maintenance.sh enable
+NAMESPACE=e3c3c4-prod ./scripts/toggle-maintenance.sh status
 ```

@@ -20,6 +20,49 @@ This runbook covers updating the TLS certificate for the NGINX proxy that handle
   - Run: `oc get pods -l app.kubernetes.io/component=nginx-proxy` to see your namespace
   - Check your helm values for the actual TLS secret name (not the template default)
 
+## Step 0: Generate CSR for CA team
+
+Run these commands before certificate issuance/renewal and send the `.csr` file contents to the CA team.
+
+```bash
+cat > csr.conf <<'EOF'
+[ req ]
+default_bits       = 2048
+prompt             = no
+default_md         = sha256
+distinguished_name = dn
+req_extensions     = req_ext
+
+[ dn ]
+C  = CA
+ST = British Columbia
+L  = Victoria
+O  = Government of the Province of British Columbia
+CN = bcenergysavingsprogram.ca
+
+[ req_ext ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = bcenergysavingsprogram.ca
+DNS.2 = www.bcenergysavingsprogram.ca
+EOF
+
+openssl genrsa -out bcenergysavingsprogram-ca.key 2048
+chmod 600 bcenergysavingsprogram-ca.key
+
+openssl req -new \
+  -key bcenergysavingsprogram-ca.key \
+  -out bcenergysavingsprogram-ca.csr \
+  -config csr.conf
+```
+
+Verify SAN values in the CSR before submission:
+
+```bash
+openssl req -in bcenergysavingsprogram-ca.csr -noout -text | grep -A2 "Subject Alternative Name"
+```
+
 ## Step 1: Prepare the certificate files
 
 **Navigate to your cert directory:**

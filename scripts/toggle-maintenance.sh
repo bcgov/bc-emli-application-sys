@@ -2,11 +2,16 @@
 # Maintenance Mode Toggle Script for BC Home Energy Platform
 # Usage: ./toggle-maintenance.sh [enable|disable|status]
 
-set -e
+set -euo pipefail
 
-NAMESPACE="${NAMESPACE:-bfc7dd-prod}"
+NAMESPACE="${NAMESPACE:-}"
 MAIN_APP_SERVICE="${MAIN_APP_SERVICE:-hesp-app}"
-MAINTENANCE_SERVICE="maintenance"
+MAIN_APP_PORT="${MAIN_APP_PORT:-3000}"
+MAINTENANCE_SERVICE="${MAINTENANCE_SERVICE:-maintenance}"
+MAINTENANCE_PORT="${MAINTENANCE_PORT:-8080}"
+NGINX_ROUTE_NAME="${NGINX_ROUTE_NAME:-hesp-nginx}"
+NGINX_DEPLOYMENT_NAME="${NGINX_DEPLOYMENT_NAME:-hesp-nginx-proxy}"
+NGINX_CONFIGMAP_NAME="${NGINX_CONFIGMAP_NAME:-}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -30,6 +35,19 @@ print_info() {
     echo "ℹ $1"
 }
 
+resolve_namespace() {
+    if [ -n "$NAMESPACE" ]; then
+        return
+    fi
+
+    NAMESPACE=$(oc project -q 2>/dev/null || true)
+    if [ -z "$NAMESPACE" ]; then
+        print_error "NAMESPACE is not set and current project could not be detected."
+        print_info "Set it explicitly, e.g. NAMESPACE=e3c3c4-prod $0 status"
+        exit 1
+    fi
+}
+
 check_prerequisites() {
     # Check if oc/kubectl is available
     if ! command -v oc &> /dev/null; then
@@ -43,6 +61,8 @@ check_prerequisites() {
         exit 1
     fi
 
+    resolve_namespace
+
     # Check namespace
     if ! oc get namespace "$NAMESPACE" &> /dev/null; then
         print_error "Namespace '$NAMESPACE' not found or not accessible."
@@ -50,6 +70,62 @@ check_prerequisites() {
     fi
 
     print_success "Prerequisites check passed"
+}
+
+is_nginx_proxy_mode() {
+    oc get route "$NGINX_ROUTE_NAME" -n "$NAMESPACE" &> /dev/null
+}
+
+get_nginx_configmap() {
+    if [ -n "$NGINX_CONFIGMAP_NAME" ]; then
+        echo "$NGINX_CONFIGMAP_NAME"
+        return
+    fi
+
+    local cm
+    cm=$(oc get configmap hesp-nginx-config -n "$NAMESPACE" -o name 2>/dev/null | cut -d'/' -f2 || true)
+    if [ -z "$cm" ]; then
+        cm=$(oc get configmap -n "$NAMESPACE" -o name | grep 'nginx-config' | head -n1 | cut -d'/' -f2 || true)
+    fi
+
+    if [ -z "$cm" ]; then
+        print_error "Could not find nginx proxy ConfigMap in namespace '$NAMESPACE'."
+        exit 1
+    fi
+
+    echo "$cm"
+}
+
+get_nginx_upstream_target() {
+    local cm=$1
+    oc get configmap "$cm" -n "$NAMESPACE" -o jsonpath='{.data.nginx\.conf}' | \
+        awk '
+            /upstream hesp_app[[:space:]]*\{/ { in_upstream=1; next }
+            in_upstream && /^[[:space:]]*server[[:space:]]+/ {
+                gsub(/^[[:space:]]*server[[:space:]]+/, "", $0)
+                gsub(/;[[:space:]]*$/, "", $0)
+                print $0
+                exit
+            }
+            in_upstream && /\}/ { in_upstream=0 }
+        '
+}
+
+switch_nginx_upstream() {
+    local cm=$1
+    local from_target=$2
+    local to_target=$3
+
+    # Patch only the hesp_app upstream server line.
+    oc get configmap "$cm" -n "$NAMESPACE" -o yaml | \
+        sed "s/server ${from_target};/server ${to_target};/g" | \
+        oc apply -f - >/dev/null
+}
+
+restart_nginx_proxy() {
+    print_info "Restarting nginx proxy deployment..."
+    oc rollout restart deployment/"$NGINX_DEPLOYMENT_NAME" -n "$NAMESPACE" >/dev/null
+    oc rollout status deployment/"$NGINX_DEPLOYMENT_NAME" -n "$NAMESPACE" --timeout=180s >/dev/null
 }
 
 get_main_route() {
@@ -88,6 +164,51 @@ enable_maintenance() {
     
     check_prerequisites
     check_maintenance_pod
+
+    if is_nginx_proxy_mode; then
+        local cm
+        local current_upstream
+        local app_target
+        local maintenance_target
+
+        cm=$(get_nginx_configmap)
+        app_target="${MAIN_APP_SERVICE}:${MAIN_APP_PORT}"
+        maintenance_target="${MAINTENANCE_SERVICE}:${MAINTENANCE_PORT}"
+        current_upstream=$(get_nginx_upstream_target "$cm")
+
+        print_info "Mode: nginx proxy (vanity domain path)"
+        print_info "ConfigMap: $cm"
+        print_info "Current upstream: ${current_upstream:-UNKNOWN}"
+
+        if [ "$current_upstream" = "$maintenance_target" ]; then
+            print_warning "Maintenance mode is already enabled"
+            exit 0
+        fi
+
+        print_warning "This will redirect vanity-domain traffic to the maintenance page"
+        read -p "Continue? (yes/no): " -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy][Ee][Ss]$ ]]; then
+            print_info "Cancelled"
+            exit 0
+        fi
+
+        print_info "Switching nginx upstream from '$app_target' to '$maintenance_target'..."
+        switch_nginx_upstream "$cm" "$app_target" "$maintenance_target"
+        restart_nginx_proxy
+
+        current_upstream=$(get_nginx_upstream_target "$cm")
+        if [ "$current_upstream" = "$maintenance_target" ]; then
+            echo ""
+            print_success "Maintenance mode ENABLED"
+            print_info "Users will now see the maintenance page"
+            print_info "To restore service, run: $0 disable"
+        else
+            print_error "Failed to enable maintenance mode via nginx upstream switch"
+            exit 1
+        fi
+        return
+    fi
     
     local main_route
     main_route=$(get_main_route)
@@ -136,6 +257,50 @@ disable_maintenance() {
     echo ""
     
     check_prerequisites
+
+    if is_nginx_proxy_mode; then
+        local cm
+        local current_upstream
+        local app_target
+        local maintenance_target
+
+        cm=$(get_nginx_configmap)
+        app_target="${MAIN_APP_SERVICE}:${MAIN_APP_PORT}"
+        maintenance_target="${MAINTENANCE_SERVICE}:${MAINTENANCE_PORT}"
+        current_upstream=$(get_nginx_upstream_target "$cm")
+
+        print_info "Mode: nginx proxy (vanity domain path)"
+        print_info "ConfigMap: $cm"
+        print_info "Current upstream: ${current_upstream:-UNKNOWN}"
+
+        if [ "$current_upstream" = "$app_target" ]; then
+            print_warning "Maintenance mode is already disabled"
+            exit 0
+        fi
+
+        print_warning "This will restore normal application service"
+        read -p "Continue? (yes/no): " -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy][Ee][Ss]$ ]]; then
+            print_info "Cancelled"
+            exit 0
+        fi
+
+        print_info "Switching nginx upstream from '$maintenance_target' to '$app_target'..."
+        switch_nginx_upstream "$cm" "$maintenance_target" "$app_target"
+        restart_nginx_proxy
+
+        current_upstream=$(get_nginx_upstream_target "$cm")
+        if [ "$current_upstream" = "$app_target" ]; then
+            echo ""
+            print_success "Maintenance mode DISABLED"
+            print_info "Normal service restored"
+        else
+            print_error "Failed to disable maintenance mode via nginx upstream switch"
+            exit 1
+        fi
+        return
+    fi
     
     local main_route
     main_route=$(get_main_route)
@@ -159,12 +324,20 @@ disable_maintenance() {
         exit 0
     fi
     
-    # Check if main app is ready
-    local app_ready
-    app_ready=$(oc get pods -n "$NAMESPACE" -l app.kubernetes.io/name="$MAIN_APP_SERVICE" \
-        -o jsonpath='{.items[?(@.status.conditions[?(@.type=="Ready")].status=="True")].metadata.name}' 2>/dev/null)
-    
-    if [ -z "$app_ready" ]; then
+    # Check if at least one main app pod is fully ready (READY x/x and Running).
+    local app_ready_count
+    app_ready_count=$(oc get pods -n "$NAMESPACE" -l app.kubernetes.io/name="$MAIN_APP_SERVICE" --no-headers 2>/dev/null | \
+        awk '
+            {
+                split($2, rr, "/");
+                if ($3 == "Running" && rr[1] == rr[2]) {
+                    c++;
+                }
+            }
+            END { print c+0 }
+        ')
+
+    if [ "${app_ready_count:-0}" -eq 0 ]; then
         print_warning "Main application pods may not be ready"
         read -p "Continue anyway? (yes/no): " -r
         echo
@@ -201,28 +374,60 @@ show_status() {
     echo "========================================="
     echo ""
     
-    local main_route
-    main_route=$(get_main_route)
-    
-    local current_service
-    current_service=$(get_current_service "$main_route")
-    
     echo "Namespace:       $NAMESPACE"
-    echo "Route:           $main_route"
-    echo "Current Service: $current_service"
-    echo ""
     
-    if [ "$current_service" = "$MAINTENANCE_SERVICE" ]; then
-        print_error "Status: MAINTENANCE MODE ENABLED"
+    if is_nginx_proxy_mode; then
+        local cm
+        local current_upstream
+        local app_target
+        local maintenance_target
+
+        cm=$(get_nginx_configmap)
+        app_target="${MAIN_APP_SERVICE}:${MAIN_APP_PORT}"
+        maintenance_target="${MAINTENANCE_SERVICE}:${MAINTENANCE_PORT}"
+        current_upstream=$(get_nginx_upstream_target "$cm")
+
+        echo "Mode:            nginx proxy"
+        echo "ConfigMap:       $cm"
+        echo "Upstream target: ${current_upstream:-UNKNOWN}"
         echo ""
-        print_info "Users are seeing the maintenance page"
-        print_info "To restore service: $0 disable"
-    elif [ "$current_service" = "$MAIN_APP_SERVICE" ]; then
-        print_success "Status: NORMAL OPERATION"
-        echo ""
-        print_info "Application is serving traffic normally"
+
+        if [ "$current_upstream" = "$maintenance_target" ]; then
+            print_error "Status: MAINTENANCE MODE ENABLED"
+            echo ""
+            print_info "Users are seeing the maintenance page"
+            print_info "To restore service: $0 disable"
+        elif [ "$current_upstream" = "$app_target" ]; then
+            print_success "Status: NORMAL OPERATION"
+            echo ""
+            print_info "Application is serving traffic normally"
+        else
+            print_warning "Status: UNKNOWN (upstream=$current_upstream)"
+        fi
     else
-        print_warning "Status: UNKNOWN ($current_service)"
+        local main_route
+        local current_service
+
+        main_route=$(get_main_route)
+        current_service=$(get_current_service "$main_route")
+
+        echo "Mode:            direct app route"
+        echo "Route:           $main_route"
+        echo "Current Service: $current_service"
+        echo ""
+
+        if [ "$current_service" = "$MAINTENANCE_SERVICE" ]; then
+            print_error "Status: MAINTENANCE MODE ENABLED"
+            echo ""
+            print_info "Users are seeing the maintenance page"
+            print_info "To restore service: $0 disable"
+        elif [ "$current_service" = "$MAIN_APP_SERVICE" ]; then
+            print_success "Status: NORMAL OPERATION"
+            echo ""
+            print_info "Application is serving traffic normally"
+        else
+            print_warning "Status: UNKNOWN ($current_service)"
+        fi
     fi
     
     echo ""
@@ -246,14 +451,20 @@ Commands:
     status    Show current status
 
 Environment Variables:
-    NAMESPACE           OpenShift namespace (default: bfc7dd-prod)
+    NAMESPACE           OpenShift namespace (default: current oc project)
     MAIN_APP_SERVICE    Main application service name (default: hesp-app)
+    MAIN_APP_PORT       Main app service port (default: 3000)
+    MAINTENANCE_SERVICE Maintenance service name (default: maintenance)
+    MAINTENANCE_PORT    Maintenance service port (default: 8080)
+    NGINX_ROUTE_NAME    Nginx route name (default: hesp-nginx)
+    NGINX_DEPLOYMENT_NAME Nginx deployment name (default: hesp-nginx-proxy)
+    NGINX_CONFIGMAP_NAME Nginx configmap name (default: auto-detect)
 
 Examples:
     $0 enable                          # Enable maintenance mode
     $0 disable                         # Disable maintenance mode
     $0 status                          # Check current status
-    NAMESPACE=bfc7dd-test $0 status    # Check status in test environment
+    NAMESPACE=e3c3c4-test $0 status    # Check status in test environment
 
 For more information, see docs/maintenance-page-pod.md
 EOF
