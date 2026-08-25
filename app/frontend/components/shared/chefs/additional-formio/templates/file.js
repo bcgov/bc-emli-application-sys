@@ -180,8 +180,12 @@ export const overrideFileTemplate = (ctx) => {
       // The allowed-types list is rendered visibly under the drop zone (.file-pattern-hint), so
       // it is announced from there. Repeating it here made screen readers say it twice. Only
       // mention it when there is no visible hint, i.e. when the pattern is unrestricted.
-      const filePatternText =
-        !ctx.component.filePattern || ctx.component.filePattern === '*' ? 'Any file types are allowed' : '';
+      const hasPatternHint = !!(ctx.component.filePattern && ctx.component.filePattern !== '*');
+      // The visible hint is a sibling of the browse link, so it is not part of that link's
+      // accessible name. Point at it with aria-describedby so assistive tech announces the
+      // allowed types on focus, without duplicating the text into the name itself.
+      const hintId = 'file-pattern-hint-' + ctx.instance.id;
+      const filePatternText = hasPatternHint ? '' : 'Any file types are allowed';
       const srOnlyText = ctx.t(
         'Browse to attach file for ' +
           ctx.component.label +
@@ -193,7 +197,9 @@ export const overrideFileTemplate = (ctx) => {
       __p +=
         '\n        ' +
         ((__t = ctx.t('or')) == null ? '' : __t) +
-        '\n        <a href="#" ref="fileBrowse" class="browse">\n          ' +
+        '\n        <a href="#" ref="fileBrowse" class="browse"' +
+        (hasPatternHint ? ' aria-describedby="' + hintId + '"' : '') +
+        '>\n          ' +
         ((__t = ctx.t('browse')) == null ? '' : __t) +
         '\n          <span class="sr-only">\n            ' +
         ((__t = srOnlyText) == null ? '' : __t) +
@@ -202,9 +208,11 @@ export const overrideFileTemplate = (ctx) => {
       // Allowed formats, visible. Previously this only existed inside the sr-only span above
       // (and in a `ctx.options.vpat`-gated div that is never enabled), so sighted users were
       // never told what the field accepts - the single biggest cause of failed uploads.
-      if (ctx.component.filePattern && ctx.component.filePattern !== '*') {
+      if (hasPatternHint) {
         __p +=
-          '\n      <div class="file-pattern-hint">' +
+          '\n      <div class="file-pattern-hint" id="' +
+          hintId +
+          '">' +
           ((__t = ctx.t('Allowed file types: ') + ctx.component.filePattern.split(',').join(', ')) == null ? '' : __t) +
           '</div>';
       }
@@ -247,21 +255,29 @@ export const overrideFileTemplate = (ctx) => {
       ((__t = status.status === 'error' ? ' has-error' : '') == null ? '' : __t) +
       '">\n    <div class="row">\n      <div class="fileName col-sm-10">' +
       ((__t = status.originalName) == null ? '' : __t);
-    // Only a failed upload can be dismissed. Dismissing one that is still in flight splices
-    // filesToSync.filesToUpload, and syncFiles() then fails its length check (File.js:1035)
-    // and returns before dataValue.push(...) - discarding the WHOLE batch from the form while
-    // every file is already in storage.
+    // A row is dismissible only once it has failed AND the whole sync has settled.
     //
-    // Note the test is for the terminal state, not for 'progress'. A file spends nearly all of
-    // its in-flight life at status 'info' (waitFileProcessing) covering the virus scan and the
-    // S3 PUT; 'progress' appears only at the very end, because our provider reports progress
-    // exactly once at 100% after the PUT returns (uploads.ts:33). Keying on 'progress' would
-    // leave the control live for almost the whole window.
+    // Dismissing before then does not stick: when syncFiles() finishes it rebuilds
+    // filesToSync.filesToUpload from the batch result (File.js:1041), so a row spliced out
+    // mid-sync simply reappears. Measured - splicing an entry at t=2000ms of a 5s upload had
+    // no lasting effect either way. A control that silently undoes itself is worse than no
+    // control, so nothing is offered until the queue is stable.
+    //
+    // Both halves of the test matter:
+    //   status === 'error' - a file spends nearly all its in-flight life at 'info'
+    //     (waitFileProcessing), covering the virus scan and the S3 PUT. 'progress' appears only
+    //     at the very end, because our provider reports progress once at 100% after the PUT
+    //     returns (uploads.ts:33). Keying on 'progress' leaves the control live almost the
+    //     whole time.
+    //   !ctx.isSyncing - upload() is a Promise.all (File.js:960), so one file can fail and
+    //     redraw its row while its siblings are still uploading. Measured at 5.25s for a 60kB
+    //     sibling on a throttled connection. syncFiles' finally block clears isSyncing and
+    //     redraws, which is what exposes the buttons.
     //
     // Formio's stock template offers an abort button here instead, but our provider never
     // calls abortCallback (s3custom.js:26) and uploadFileOneChunk uses fetch with no
     // AbortSignal, so it would do nothing.
-    if (status.status !== 'error') {
+    if (status.status !== 'error' || ctx.isSyncing) {
       __p += '\n        <button type="button" ref="fileToSyncRemove" hidden></button>';
     } else {
       __p +=
@@ -290,7 +306,7 @@ export const overrideFileTemplate = (ctx) => {
         '</span>\n            </div>\n          </div>\n        ';
     } else if (status.status === 'error') {
       __p +=
-        '\n          <div class="alert alert-danger">' +
+        '\n          <div class="alert alert-danger" role="alert">' +
         ((__t = ctx.t(status.message)) == null ? '' : __t) +
         '</div>\n        ';
     } else {
