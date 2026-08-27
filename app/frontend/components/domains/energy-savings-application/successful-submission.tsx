@@ -71,8 +71,8 @@ export const SuccessfulSubmissionScreen = observer(() => {
 
   // determine "What's Next" content dynamically
 
-  let whatsNextHeadingKey: string = 'whatsNext.heading';
-  let whatsNextLineKeys: string[] = ['whatsNext.line1'];
+  let whatsNextHeadingKey: string = 'permitApplication.new.whatsNextTitle';
+  let whatsNextLineKeys: string[] = ['permitApplication.new.whatsNext'];
   let whatsNextEmail: string | null = null;
   let shouldBulletWhatsNextLines = false;
 
@@ -120,15 +120,13 @@ export const SuccessfulSubmissionScreen = observer(() => {
               email={whatsNextEmail}
               bulletLineKeys={shouldBulletWhatsNextLines}
             />
-            <Box px={8} width="100%" backgroundColor="greys.grey10">
-              <Divider borderColor="greys.lightGrey" />
-            </Box>
-            {isContractorInvoice ? (
-              <NeedHelpContractorInvoiceBlock />
-            ) : currentUser.isContractor ? (
-              <NeedHelpContractorBlock />
-            ) : (
-              <NeedHelpBlock />
+            {!currentPermitApplication.isContractorOnboarding && (
+              <>
+                <Box px={8} width="100%" backgroundColor="greys.grey10">
+                  <Divider borderColor="greys.lightGrey" />
+                </Box>
+                {isContractorInvoice ? <NeedHelpContractorInvoiceBlock /> : <NeedHelpBlock />}
+              </>
             )}
           </>
         )}
@@ -154,20 +152,11 @@ interface WhatsNextBlockProps {
 const WhatsNextBlock = ({ headingKey, lineKeys, email, bulletLineKeys = false }: WhatsNextBlockProps) => {
   const { t } = useTranslation();
 
-  // Use default heading if translation is missing or returns "Not found"
-  const translatedHeading = t(headingKey as any, { defaultValue: "What's next?" }) as string;
-  const heading =
-    translatedHeading === headingKey || translatedHeading.includes('Not found') ? "What's next?" : translatedHeading;
-
-  // Use default content if translation is missing
-  const defaultContent =
-    'We will review your application. If we need more information or change the status of your application, we will send you an email. Please check your inbox regularly for updates to your application.';
-
   return (
     <Box mt={6} p={8} borderRadius="md" backgroundColor="greys.grey10" width="100%">
       <GreenLineSmall />
       <Text fontSize="2xl" fontWeight="bold" mb={4}>
-        {heading}
+        {t(headingKey as any)}
       </Text>
 
       <VStack
@@ -177,52 +166,31 @@ const WhatsNextBlock = ({ headingKey, lineKeys, email, bulletLineKeys = false }:
         pl={bulletLineKeys ? 6 : 0}
         listStyleType={bulletLineKeys ? 'disc' : 'none'}
       >
-        {lineKeys.length > 0 ? (
-          lineKeys.map((key, index) => {
-            const translatedText = t(key as any, { defaultValue: '' }) as string;
-            // Check if translation failed (empty, same as key, or contains "Not found")
-            const isTranslationMissing =
-              !translatedText ||
-              translatedText.trim().length === 0 ||
-              translatedText === key ||
-              translatedText.includes('Not found');
-
-            if (isTranslationMissing && index === 0) {
-              return (
-                <Text as={bulletLineKeys ? 'li' : undefined} fontSize="md" key={key}>
-                  {defaultContent}
-                </Text>
-              );
-            }
-            return !isTranslationMissing ? (
-              <Text as={bulletLineKeys ? 'li' : undefined} fontSize="md" key={key}>
-                <Trans
-                  i18nKey={key as any}
-                  values={{ email: email ?? '' }}
-                  components={
-                    email
-                      ? {
-                          1: (
-                            <Button
-                              as="a"
-                              href={`mailto:${email}`}
-                              variant="link"
-                              color="theme.blueAlt"
-                              textDecoration="underline"
-                              p={0}
-                              h="auto"
-                            />
-                          ),
-                        }
-                      : {}
-                  }
-                />
-              </Text>
-            ) : null;
-          })
-        ) : (
-          <Text fontSize="md">{defaultContent}</Text>
-        )}
+        {lineKeys.map((key) => (
+          <Text as={bulletLineKeys ? 'li' : undefined} fontSize="md" key={key}>
+            <Trans
+              i18nKey={key as any}
+              values={{ email: email ?? '' }}
+              components={
+                email
+                  ? {
+                      1: (
+                        <Button
+                          as="a"
+                          href={`mailto:${email}`}
+                          variant="link"
+                          color="theme.blueAlt"
+                          textDecoration="underline"
+                          p={0}
+                          h="auto"
+                        />
+                      ),
+                    }
+                  : {}
+              }
+            />
+          </Text>
+        ))}
       </VStack>
     </Box>
   );
@@ -243,39 +211,6 @@ const NeedHelpBlock = () => {
           i18nKey="energySavingsApplication.new.contactInstruction"
           values={{ email }}
           defaults="See the status of your application or your application history any time by logging in to the Better Homes Energy Savings Program. Contact <1>{{email}}</1> if you have any questions about your application."
-          components={{
-            1: (
-              <Button
-                as="a"
-                href={`mailto:${email}`}
-                variant="link"
-                color="theme.blueAlt"
-                textDecoration="underline"
-                p={0}
-                h="auto"
-                fontSize="md"
-              />
-            ),
-          }}
-        />
-      </Text>
-    </Box>
-  );
-};
-
-const NeedHelpContractorBlock = () => {
-  const { t } = useTranslation();
-  const email = t('site.support.contractorSupportEmail');
-
-  return (
-    <Box mb={6} p={8} borderRadius="md" backgroundColor="greys.grey10" width="100%">
-      <Text fontSize="md" mb={4}>
-        <Text as="span" fontWeight="bold">
-          {t('energySavingsApplication.new.hearBack', { defaultValue: 'Need help?' })}
-        </Text>{' '}
-        <Trans
-          i18nKey="energySavingsApplication.new.contractorContactInstruction"
-          values={{ email }}
           components={{
             1: (
               <Button
