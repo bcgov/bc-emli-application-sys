@@ -5,11 +5,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { useMst } from '../../../setup/root';
+import { EPermitApplicationStatus } from '../../../types/enums';
 import { GreenLineSmall } from '../base/decorative/green-line-small';
 import { RouterLinkButton } from '../navigation/router-link-button';
 import SandboxHeader from '../sandbox/sandbox-header';
 import { EnergySavingsApplicationStatusTag } from './energy-savings-application-status-tag';
-import { EPermitApplicationStatus } from '../../../types/enums';
 import SupportRequestList from './support-request-list';
 interface IEnergySavingsApplicationCardProps {
   energySavingsApplication: IEnergySavingsApplication;
@@ -44,6 +44,12 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
 
   const isSubmissionCollaboration = energySavingsApplication.submitter?.id !== currentUser?.id;
 
+  // Button labels read "View/Continue <type>" in sentence case. Contractors get the generic
+  // "submission" instead of the specific type name.
+  const buttonSubmissionType = currentUser?.isContractor
+    ? t('energySavingsApplication.card.genericSubmissionType')
+    : energySavingsApplication.submissionType?.name?.toLowerCase();
+
   const routingButtonText = (() => {
     if (
       [
@@ -55,14 +61,14 @@ export const EnergySavingsApplicationCard = ({ energySavingsApplication }: IEner
       ].some(Boolean)
     ) {
       return t('energySavingsApplication.card.viewActionButton', {
-        submissionType: energySavingsApplication.submissionType?.name,
+        submissionType: buttonSubmissionType,
       });
     }
 
     return isSubmissionCollaboration
       ? t('energySavingsApplication.card.collaborateButton')
       : t('ui.continue', {
-          submissionType: energySavingsApplication.submissionType?.name,
+          submissionType: buttonSubmissionType,
         });
   })();
 

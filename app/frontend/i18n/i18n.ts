@@ -1148,6 +1148,7 @@ const options = {
           newVersionPublished: 'New version of template has been published - please review changes',
           card: {
             viewActionButton: 'View {{submissionType}}',
+            genericSubmissionType: 'submission',
             viewApplication: 'View application',
             continueButton: 'Continue',
             collaborateButton: 'Collaborate',
