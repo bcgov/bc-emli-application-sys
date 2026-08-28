@@ -144,8 +144,7 @@ export const NotificationStoreModel = types
         case ENotificationActionType.applicationView:
         case ENotificationActionType.applicationIneligible:
         case ENotificationActionType.applicationAssignment:
-        case ENotificationActionType.participantIncompleteDraftNotification:
-        case ENotificationActionType.contractorInvoicePaid: {
+        case ENotificationActionType.participantIncompleteDraftNotification: {
           const data = objectData as IPermitNotificationObjectData;
           return [
             {
@@ -170,7 +169,8 @@ export const NotificationStoreModel = types
           ];
         }
 
-        case ENotificationActionType.contractorInvoiceApproved: {
+        case ENotificationActionType.contractorInvoiceApproved:
+        case ENotificationActionType.contractorInvoicePaid: {
           const data = objectData as IPermitNotificationObjectData;
           return [
             {
