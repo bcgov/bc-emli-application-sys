@@ -52,6 +52,10 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
   const confirmationRequired =
     currentUser.unconfirmedEmail || (currentUser.isUnconfirmed && currentUser.confirmationSentAt);
 
+  // Every field a Business BCeID user sees here comes from BCeID and is disabled, and
+  // the change-email link is gated off for them, so there is nothing for Save to submit.
+  const isViewOnlyAccount = currentUser.isBusBCEID && currentPath === '/profile';
+
   // Function to get defaults
   const getDefaults = () => {
     const { firstName, lastName, organization, preference, email, physicalAddress, mailingAddress } = currentUser;
@@ -358,16 +362,27 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
               </Flex>
             </Section>
             <Flex as="section" gap={4} mt={4}>
-              <Button variant="primary" type="submit" isLoading={isSubmitting} loadingText={t('ui.loading')}>
-                {currentPath === '/profile' ? <>{t('ui.save')}</> : <>{t('ui.createAccount')}</>}
-              </Button>
-              <Button
-                variant="secondary"
-                isDisabled={isSubmitting}
-                onClick={() => (currentPath === '/profile' ? navigate('/') : navigate(-1))}
-              >
-                {t('ui.cancel')}
-              </Button>
+              {/* Business BCeID accounts have nothing editable here - every field is
+                  BCeID-sourced and the change-email link is gated off - so the account
+                  page is view-only for them and only offers a way back. */}
+              {isViewOnlyAccount ? (
+                <Button variant="primary" onClick={() => navigate('/')}>
+                  {t('ui.back')}
+                </Button>
+              ) : (
+                <>
+                  <Button variant="primary" type="submit" isLoading={isSubmitting} loadingText={t('ui.loading')}>
+                    {currentPath === '/profile' ? <>{t('ui.save')}</> : <>{t('ui.createAccount')}</>}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    isDisabled={isSubmitting}
+                    onClick={() => (currentPath === '/profile' ? navigate('/') : navigate(-1))}
+                  >
+                    {t('ui.cancel')}
+                  </Button>
+                </>
+              )}
             </Flex>
           </Flex>
         </form>
