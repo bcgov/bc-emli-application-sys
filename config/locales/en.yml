@@ -839,6 +839,11 @@ en:
         professional_number: 'Professional number'
         organization: 'Organization'
         add_person_button: 'Add another person'
+      geocoder_address:
+        street_address: 'Street Address'
+        city: 'City'
+        province: 'Province'
+        country: 'Country'
   step_code_building_characteristics_summary:
     performance_type:
       error: '%{field_name} performance type must be one of %{accepted_values}'

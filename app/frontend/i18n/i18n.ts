@@ -1723,6 +1723,7 @@ const options = {
             checkbox: 'Checkbox',
             address: 'Address',
             bcaddress: 'BC address',
+            geocoderAddress: 'BC address (searchable)',
             date: 'Date',
             number: 'Number',
             textArea: 'Text area',

@@ -809,6 +809,28 @@ types" do
         end
       end
 
+      it "returns correct form json for geocoder address requirement" do
+        requirement =
+          create(
+            :requirement,
+            label: "Property Address",
+            input_type: "geocoder_address"
+          )
+        form_json = requirement.to_form_json.reject { |key| key == :id }
+        expected_form_json = {
+          key: "#{requirement.requirement_block.key}|property_address",
+          type: "geocoderaddress",
+          input: true,
+          label: "Property Address",
+          requirementInputType: "geocoder_address",
+          widget: {
+            type: "input"
+          }
+        }
+
+        expect(form_json).to eq(expected_form_json)
+      end
+
       context "validations" do
         it "returns a validation for required if it is a required field" do
         end

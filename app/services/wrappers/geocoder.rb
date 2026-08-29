@@ -2,7 +2,7 @@ class Wrappers::Geocoder < Wrappers::Base
   # https://openapi.apps.gov.bc.ca/?url=https://raw.githubusercontent.com/bcgov/api-specs/master/geocoder/geocoder-combined.json#/sites/get_addresses__outputFormat_
 
   def base_url
-    ENV["BCGOV_ADDRESS_GEOCODER_URL"]
+    ENV["BCGOV_ADDRESS_GEOCODER_URL"].gsub(/^["']|["']$/, "")
   end
 
   def default_headers
@@ -82,5 +82,37 @@ class Wrappers::Geocoder < Wrappers::Base
 
   def subsites(site_id)
     get("/sites/#{site_id}/subsites.json")
+  end
+
+  def address_search(address_string, max_results = 3)
+    # Search for addresses by string input, returning top scored results
+    # with component parts (street, city, province) for requirement block selection
+    params = {
+      addressString: address_string,
+      maxResults: max_results,
+      outputSRS: 4326,
+      minScore: 1,
+      provinceCode: "BC"
+    }
+
+    r = get("/addresses.json", params)
+
+    return [] unless r["features"].present?
+
+    # Sort by score (highest first) and map to requirement-friendly format
+    r["features"]
+      .sort_by { |f| -(f["properties"]["score"] || 0).to_f }
+      .take(max_results)
+      .map do |feature|
+        props = feature["properties"]
+        {
+          value: props["fullAddress"],
+          label: props["fullAddress"],
+          streetAddress: props["streetAddress"],
+          localityName: props["localityName"],
+          provinceCode: props["provinceCode"],
+          score: props["score"]
+        }
+      end
   end
 end

@@ -1,7 +1,8 @@
 class Api::GeocoderController < Api::ApplicationController
   skip_after_action :verify_policy_scoped
   after_action :verify_authorized
-  skip_before_action :authenticate_user!, only: %i[site_options jurisdiction]
+  skip_before_action :authenticate_user!,
+                     only: %i[site_options jurisdiction address_search]
 
   def site_options
     authorize :geocoder, :site_options?
@@ -105,6 +106,21 @@ class Api::GeocoderController < Api::ApplicationController
     end
   end
 
+  def address_search
+    authorize :geocoder, :address_search?
+    begin
+      if address_search_params[:address].present?
+        wrapper = Wrappers::Geocoder.new
+        options = wrapper.address_search(address_search_params[:address], 3)
+        render_success options, nil, { blueprint: GeocoderOptionBlueprint }
+      else
+        render_success [], nil, { blueprint: GeocoderOptionBlueprint }
+      end
+    rescue StandardError => e
+      render_error "geocoder.address_search_error", {}, e and return
+    end
+  end
+
   private
 
   def geocoder_params
@@ -113,5 +129,9 @@ class Api::GeocoderController < Api::ApplicationController
 
   def pin_params
     params.permit(:pin)
+  end
+
+  def address_search_params
+    params.permit(:address)
   end
 end

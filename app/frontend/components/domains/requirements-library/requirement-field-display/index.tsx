@@ -443,6 +443,22 @@ const requirementsComponentMap = {
       </Box>
     );
   },
+
+  [ERequirementType.geocoderAddress](props: TRequirementFieldDisplayProps) {
+    return (
+      <GenericFieldDisplay
+        inputDisplay={
+          <InputGroup>
+            <InputLeftElement>
+              <MapPin />
+            </InputLeftElement>
+            <Input bg={'white'} placeholder="Type address to search..." />
+          </InputGroup>
+        }
+        {...props}
+      />
+    );
+  },
 };
 
 export const RequirementFieldDisplay = observer(function RequirementFieldDisplay(props: TRequirementFieldDisplayProps) {

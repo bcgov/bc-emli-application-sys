@@ -270,6 +270,37 @@
     display: none !important;
   }
 
+  .geocoder-address-field-set > fieldset > legend {
+    display: none !important;
+  }
+
+  .geocoder-search-full-width {
+    .col-md-6 {
+      flex: 0 0 100% !important;
+      max-width: 100% !important;
+    }
+  }
+
+  .geocoder-address-dropdown {
+    width: 100%;
+
+    .form-group {
+      margin-bottom: 0;
+    }
+
+    .choices {
+      width: 100%;
+    }
+
+    .choices__inner {
+      width: 100%;
+    }
+
+    input.choices__input--cloned {
+      width: 100%;
+    }
+  }
+
   // tooltips
   .tooltip-inner {
     background-color: #606060;

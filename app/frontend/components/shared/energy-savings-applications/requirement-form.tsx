@@ -281,18 +281,159 @@ export const RequirementForm = observer(
       [api, formRef, permitApplication],
     );
 
+    const handleGeocoderAddressSelected = useCallback(
+      async (event) => {
+        console.log('geocoderAddressSelected event received:', event.detail);
+        const { value, parentKey } = event.detail || {};
+
+        if (!value || !formRef.current) {
+          console.log('Missing value or formRef');
+          return;
+        }
+
+        try {
+          console.log('Fetching geocoder data for selected value:', value);
+          const response = await fetch(`/api/geocoder/address_search?address=${encodeURIComponent(value)}`);
+          const result = await response.json();
+          console.log('API response:', result);
+
+          if (result.data && result.data.length > 0) {
+            // Find the matching result by value
+            const match = result.data.find((item) => item.value === value);
+            console.log('Found match:', match);
+
+            if (match) {
+              // Update the breakdown fields
+              const streetAddressKey = `${parentKey}|streetAddress`;
+              const cityKey = `${parentKey}|city`;
+              const provinceKey = `${parentKey}|province`;
+              const countryKey = `${parentKey}|country`;
+
+              const streetComponent = formRef.current?.getComponent(streetAddressKey);
+              const cityComponent = formRef.current?.getComponent(cityKey);
+              const provinceComponent = formRef.current?.getComponent(provinceKey);
+              const countryComponent = formRef.current?.getComponent(countryKey);
+
+              console.log('Components:', {
+                street: streetComponent?.key,
+                city: cityComponent?.key,
+                province: provinceComponent?.key,
+                country: countryComponent?.key,
+              });
+
+              if (streetComponent && match.streetAddress) {
+                streetComponent.setValue(match.streetAddress);
+              }
+              if (cityComponent && match.localityName) {
+                cityComponent.setValue(match.localityName);
+              }
+              if (provinceComponent && match.provinceCode) {
+                provinceComponent.setValue(match.provinceCode);
+              }
+              if (countryComponent) {
+                countryComponent.setValue('Canada');
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error handling geocoder address selection:', error);
+        }
+      },
+      [formRef],
+    );
+
+    // Debounced search handler for geocoder address
+    const handleSearchGeocoderAddressDebounced = useCallback(
+      (event) => {
+        const { searchTerm, searchKey, parentKey } = event.detail || {};
+
+        if (!searchTerm || !searchKey || !formRef.current) {
+          console.log('Missing searchTerm, searchKey, or formRef');
+          return;
+        }
+
+        console.log('Searching geocoder with term:', searchTerm);
+
+        (async () => {
+          try {
+            const response = await fetch(`/api/geocoder/address_search?address=${encodeURIComponent(searchTerm)}`);
+            const result = await response.json();
+            console.log('Geocoder API results:', result);
+
+            if (result.data && result.data.length > 0) {
+              // Get the geocoder component and update its choices
+              const geocoderComponent = formRef.current?.getComponent(searchKey);
+              if (geocoderComponent && geocoderComponent.choices) {
+                console.log('Updating choices with', result.data.length, 'results');
+                geocoderComponent.choices.clearStore();
+                geocoderComponent.choices.setChoices(result.data, 'value', 'label', true);
+
+                // Set up listener for when user selects an option
+                geocoderComponent.choices.passedElement.element.addEventListener(
+                  'change',
+                  () => {
+                    const selectedValue = geocoderComponent.getValue();
+                    if (selectedValue) {
+                      console.log('User selected geocoder value:', selectedValue);
+                      document.dispatchEvent(
+                        new CustomEvent('geocoderAddressSelected', {
+                          detail: {
+                            value: selectedValue,
+                            parentKey: parentKey,
+                          },
+                        }),
+                      );
+                    }
+                  },
+                  { once: true },
+                );
+              }
+            }
+          } catch (error) {
+            console.error('Error searching geocoder addresses:', error);
+          }
+        })();
+      },
+      [formRef],
+    );
+
+    // Create debounced version of the search handler
+    const debounceTimerRef = useRef(null);
+    const handleSearchGeocoderAddressWithDebounce = useCallback(
+      (event) => {
+        if (debounceTimerRef.current) {
+          clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+          handleSearchGeocoderAddressDebounced(event);
+        }, 500);
+      },
+      [handleSearchGeocoderAddressDebounced],
+    );
+
     useEffect(() => {
       document.addEventListener('openStepCode', handleOpenStepCode);
       document.addEventListener('openAutofillContact', handleOpenContactAutofill);
       document.addEventListener('openPreviousSubmission', handleOpenPreviousSubmission);
       document.addEventListener('lookupAhriNumber', handleLookupAhriNumber);
+      document.addEventListener('searchGeocoderAddress', handleSearchGeocoderAddressWithDebounce);
+      document.addEventListener('geocoderAddressSelected', handleGeocoderAddressSelected);
       return () => {
         document.removeEventListener('openStepCode', handleOpenStepCode);
         document.removeEventListener('openAutofillContact', handleOpenContactAutofill);
         document.removeEventListener('openPreviousSubmission', handleOpenPreviousSubmission);
         document.removeEventListener('lookupAhriNumber', handleLookupAhriNumber);
+        document.removeEventListener('searchGeocoderAddress', handleSearchGeocoderAddressWithDebounce);
+        document.removeEventListener('geocoderAddressSelected', handleGeocoderAddressSelected);
       };
-    }, [handleLookupAhriNumber, handleOpenContactAutofill, handleOpenPreviousSubmission, handleOpenStepCode]);
+    }, [
+      handleLookupAhriNumber,
+      handleSearchGeocoderAddressWithDebounce,
+      handleGeocoderAddressSelected,
+      handleOpenContactAutofill,
+      handleOpenPreviousSubmission,
+      handleOpenStepCode,
+    ]);
 
     const setIsCollapsedAll = (isCollapsedAll: boolean) => {
       if (isCollapsedAll) {
@@ -420,6 +561,7 @@ export const RequirementForm = observer(
         setErrorBoxData(mapErrorBoxData(formRef.current.errors));
       });
 
+      // Setup complete
       const firstComponent = rootComponent.form.components[0];
       setFirstComponentKey(firstComponent.key);
     };
