@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Api::SupportRequestsController, type: :controller do
-  # Regression cover for the request_supporting_files rescue. It used to be a single
+  # Regression coverage for the request_supporting_files rescue. It used to be a single
   # `rescue ActiveRecord::RecordNotFound` around the whole action, so a bad parent id or a
   # bad audience_type_code both reported "No published Supporting Files request template
   # was found" - sending whoever debugged it looking for a template that was fine.
