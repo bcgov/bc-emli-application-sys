@@ -2420,14 +2420,7 @@ const options = {
                 type: 'link',
                 content: { text: 'Manage your Business BCeID Account', href: 'https://www.bceid.ca/' },
               },
-              {
-                type: 'bold',
-                content: '. All notifications will be sent to the above email, the primary contact. ',
-              },
-              {
-                type: 'text',
-                content: 'Call us to change the primary contact.',
-              },
+              { type: 'text', content: '.' },
             ],
           },
           //changeBceid: 'If you want to change your BCeID information, please go to ',
@@ -2440,6 +2433,7 @@ const options = {
           notificationsEmail: 'Notification email address',
           firstName: 'First name',
           lastName: 'Last name',
+          userName: 'User name',
           address: 'Address',
           mailingAdress: 'Street address or PO Box',
           city: 'City',

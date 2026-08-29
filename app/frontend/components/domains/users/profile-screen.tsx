@@ -6,28 +6,26 @@ import {
   Divider,
   Flex,
   Heading,
-  InputGroup,
   InputRightElement,
-  Select,
   Tag,
   TagLabel,
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
-import { Info, Warning } from '@phosphor-icons/react';
+import { Warning } from '@phosphor-icons/react';
+import { format } from 'date-fns';
 import { observer } from 'mobx-react-lite';
 import React, { useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useCurrentUserLicenseAgreements } from '../../../hooks/resources/user-license-agreements';
 import { useMst } from '../../../setup/root';
+import { DescriptionPart } from '../../../types/types';
+import CustomAlert, { InformationAlert } from '../../shared/base/custom-alert';
 import { EmailFormControl } from '../../shared/form/email-form-control';
 import { TextFormControl } from '../../shared/form/input-form-control';
-import CustomAlert, { InformationAlert } from '../../shared/base/custom-alert';
-import { useCurrentUserLicenseAgreements } from '../../../hooks/resources/user-license-agreements';
-import { format } from 'date-fns';
 import { EulaViewModal } from '../../shared/modals/eula-view-modal';
-import { DescriptionPart } from '../../../types/types';
 
 interface IProfileScreenProps {}
 
@@ -149,6 +147,23 @@ export const ProfileScreen = observer(({}: IProfileScreenProps) => {
                   onChange={(e) => setFormValues({ ...formValues, lastName: e.target.value })}
                 />
               </Flex>
+              {/* Business BCeID login handle. Read-only, and deliberately without a
+                  fieldName so it is never registered into the update payload. */}
+              {currentUser.isBusBCEID && currentUser.omniauthUsername ? (
+                <TextFormControl
+                  label={t('user.userName')}
+                  showOptional={false}
+                  inputProps={{
+                    isDisabled: true,
+                    value: currentUser.omniauthUsername,
+                    _disabled: {
+                      color: 'text.primary',
+                      bg: 'greys.grey04',
+                      borderColor: 'border.light',
+                    },
+                  }}
+                />
+              ) : null}
               {currentUser.isParticipant && !currentUser.isBasicBCEID ? (
                 <>
                   <PhysicalAddressBlock formValues={formValues} />
