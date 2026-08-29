@@ -31,9 +31,17 @@ RSpec.describe Api::SupportRequestsController, type: :controller do
 
   # The controller renders the parent through the :extended blueprint, which pushes
   # form_json through FormJsonService - so the parent needs a usable form_json too.
+  #
+  # Give the parent its own requirement template. The :template_version factory falls back
+  # to `LiveRequirementTemplate.first`, which on an empty database is support_request_template
+  # - so this version would publish onto the very template the specs deprecate, and the
+  # "no published version" example would get a 201.
+  let(:parent_requirement_template) { create(:live_requirement_template) }
+
   let(:parent_template_version) do
     create(
       :template_version,
+      requirement_template: parent_requirement_template,
       status: "published",
       form_json: {
         "components" => []
