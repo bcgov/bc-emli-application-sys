@@ -62,6 +62,8 @@ module SupportRequests
     end
 
     # Lookup the RequirementTemplate that matches the combination of program and type codes.
+    # Raises SupportRequestTemplateError rather than RecordNotFound so the controller can tell
+    # a genuine template misconfiguration apart from unrelated missing records.
     def find_requirement!
       RequirementTemplate.find_by!(
         program_id: program.id,
@@ -71,6 +73,12 @@ module SupportRequests
         submission_type_id:
           SubmissionType.find_by!(code: submission_type_code).id
       )
+    rescue ActiveRecord::RecordNotFound
+      raise SupportRequestTemplateMissingError,
+            "No requirement template found for program=#{program.id} " \
+              "user_group=#{user_group_type_code} " \
+              "audience=#{audience_type_code} " \
+              "submission=#{submission_type_code}"
     end
 
     # Find the most recent published TemplateVersion for the requirement.
@@ -78,24 +86,26 @@ module SupportRequests
     def find_published_template!(requirement)
       requirement.template_versions.published.first!
     rescue ActiveRecord::RecordNotFound
-      raise ActiveRecord::RecordNotFound,
+      raise SupportRequestTemplateError,
             "No published template version found for submission_type=#{submission_type_code}"
     end
 
     # Create the new PermitApplication using the resolved template and type codes.
     def create_permit_application!(template)
-      submitter = @parent_app.submitter_type.constantize.find(@parent_app.submitter_id)
+      submitter =
+        @parent_app.submitter_type.constantize.find(@parent_app.submitter_id)
 
-      app = PermitApplication.create!(
-        submitter: submitter,
-        user_group_type: UserGroupType.find_by!(code: user_group_type_code),
-        audience_type: AudienceType.find_by!(code: audience_type_code),
-        submission_type: SubmissionType.find_by!(code: submission_type_code),
-        program: program,
-        status: :new_draft,
-        nickname: nickname,
-        template_version: template
-      )
+      app =
+        PermitApplication.create!(
+          submitter: submitter,
+          user_group_type: UserGroupType.find_by!(code: user_group_type_code),
+          audience_type: AudienceType.find_by!(code: audience_type_code),
+          submission_type: SubmissionType.find_by!(code: submission_type_code),
+          program: program,
+          status: :new_draft,
+          nickname: nickname,
+          template_version: template
+        )
 
       app
     end

@@ -605,7 +605,7 @@ const options = {
           clearAll: 'Clear All',
         },
         eula: {
-          title: 'Terms and Conditions',
+          title: 'Terms and conditions',
           accept: 'Accept',
         },
         userEulas: {
@@ -1148,6 +1148,7 @@ const options = {
           newVersionPublished: 'New version of template has been published - please review changes',
           card: {
             viewActionButton: 'View {{submissionType}}',
+            genericSubmissionType: 'submission',
             viewApplication: 'View application',
             continueButton: 'Continue',
             collaborateButton: 'Collaborate',
@@ -1158,7 +1159,12 @@ const options = {
             reviewActionText:
               'An agent has reviewed your {{submissionType}} and needs more information. Please review and update your {{submissionType}}.',
             supportingFileSubmissionText: 'An admin has submitted supporting files on your behalf.',
-            uploadFilesText: 'Please upload... {{additionalText}}',
+            supportingFileParticipantSubmissionText: 'You have submitted the requested supporting files.',
+            uploadFilesText: 'Please upload {{additionalText}}',
+            uploadFilesTextNoList: 'Please upload the requested supporting files.',
+            requestedOn: 'Requested: {{date}}',
+            submittedOn: 'Submitted: {{date}}',
+            submittedNoDate: 'Submitted',
           },
           referenceNumber: 'Reference #',
           pdf: {
@@ -1326,8 +1332,6 @@ const options = {
             hearBack: 'Need help?',
             contactInstruction:
               'See the status of your application or your application history any time by logging in to the Better Homes Energy Savings Program. Contact <1>{{ email }}</1> if you have any questions about your application.',
-            contractorContactInstruction:
-              'If you need to add, edit, or remove employees from your account in the future you will need to email the program at <1>{{ email }}</1>',
             contractorInvoiceContactInstruction:
               'You can log into the Better Homes Energy Savings Program to view your submitted forms. Please contact <1>{{ email }}</1> for questions related to your form.',
             whatsNextTitle: "What's next?",
@@ -2416,14 +2420,7 @@ const options = {
                 type: 'link',
                 content: { text: 'Manage your Business BCeID Account', href: 'https://www.bceid.ca/' },
               },
-              {
-                type: 'bold',
-                content: '. All notifications will be sent to the above email, the primary contact. ',
-              },
-              {
-                type: 'text',
-                content: 'Call us to change the primary contact.',
-              },
+              { type: 'text', content: '.' },
             ],
           },
           //changeBceid: 'If you want to change your BCeID information, please go to ',
@@ -2436,6 +2433,7 @@ const options = {
           notificationsEmail: 'Notification email address',
           firstName: 'First name',
           lastName: 'Last name',
+          userName: 'User name',
           address: 'Address',
           mailingAdress: 'Street address or PO Box',
           city: 'City',
@@ -3164,7 +3162,7 @@ const options = {
             welcome: 'Welcome',
             contractor: 'Contractor',
             getSupport: 'Get support',
-            terms: 'Terms and Conditions',
+            terms: 'Terms and conditions',
             sitewideBanner: 'Site-wide banner',
             apiSettings: 'API settings',
             create: 'Create',

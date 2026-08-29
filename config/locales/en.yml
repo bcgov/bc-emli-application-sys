@@ -414,7 +414,7 @@ en:
         message: 'End-User License Agreement accepted'
       terms_accepted:
         title: ''
-        message: 'Terms and Conditions accepted'
+        message: 'Terms and conditions accepted'
       get_super_admins_error:
         title: 'Error'
         message: 'Could not fetch super users'
@@ -758,6 +758,12 @@ en:
       no_published_template_version:
         title: 'Error'
         message: 'No published Supporting Files request template was found. Please contact an administrator.'
+      support_request_template_missing:
+        title: 'Error'
+        message: 'No Supporting Files request template is configured for this program. Please contact an administrator.'
+      support_request_record_not_found:
+        title: 'Error'
+        message: 'A record needed for this request could not be found. Please contact an administrator.'
       support_request_not_created:
         title: 'Error'
         message: 'The support request could not be created.'
