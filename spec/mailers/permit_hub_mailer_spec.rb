@@ -90,6 +90,32 @@ RSpec.describe PermitHubMailer, type: :mailer do
       end
     end
 
+    # The other admin branch: a first submission rather than a resubmission, so the copy says
+    # "submitted" not "resubmitted". Reached when a non-owner submits a draft - submit? allows that
+    # for a user holding :all submission edit permissions (permit_application_policy.rb:183), and
+    # submit moves new_draft to newly_submitted rather than resubmitted.
+    context "when an admin made the first submission on the applicant's behalf" do
+      let(:permit_application) { create(:permit_application, :newly_submitted) }
+
+      subject(:body) do
+        mail =
+          described_class.notify_submitter_application_submitted(
+            permit_application,
+            user,
+            true
+          )
+        (mail.html_part || mail).body.to_s
+      end
+
+      it "says an agent submitted, not resubmitted" do
+        expect(body).to include(
+          "An agent submitted your application on your behalf"
+        )
+        expect(body).not_to include("resubmitted")
+        expect(body).not_to include("We've received your application")
+      end
+    end
+
     # Counterpart to the above: proves the wording is driven by the flag, not simply present in
     # every resubmission email.
     context "when the applicant resubmitted their own application" do
