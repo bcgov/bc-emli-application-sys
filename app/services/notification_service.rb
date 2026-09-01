@@ -225,7 +225,10 @@ class NotificationService
     NotificationPushJob.perform_async(notification_user_hash)
   end
 
-  def self.publish_application_submission_event(permit_application)
+  def self.publish_application_submission_event(
+    permit_application,
+    submitted_by_admin: false
+  )
     notification_user_hash = {}
 
     users_that_can_submit = [permit_application.submitter]
@@ -255,7 +258,8 @@ class NotificationService
       #if user.preference&.enable_email_application_submission_notification
       PermitHubMailer.notify_submitter_application_submitted(
         permit_application,
-        user
+        user,
+        submitted_by_admin
       )&.deliver_later
       #end
     end
@@ -274,7 +278,8 @@ class NotificationService
       #if user.preference&.enable_email_collaboration_notification
       PermitHubMailer.notify_submitter_application_submitted(
         permit_application,
-        user
+        user,
+        submitted_by_admin
       )&.deliver_later
       #end
     end

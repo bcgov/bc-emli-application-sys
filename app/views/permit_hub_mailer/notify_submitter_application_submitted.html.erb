@@ -1,12 +1,26 @@
 <p>Hello <%= @user.first_name %> <%= @user.last_name %>,</p>
 
-<% if @permit_application.resubmitted? %>
+<% if @submitted_by_admin && @permit_application.resubmitted? %>
+<p>Your application has been resubmitted.</p>
+<% elsif @submitted_by_admin %>
+<p>Your application has been submitted.</p>
+<% elsif @permit_application.resubmitted? %>
 <p>Your permit application has been resubmitted.</p>
 <% end %>
 
 <p>
-  <%= @permit_application.resubmitted? ? "Thank you for revising your permit application. Your revised application has been received and is pending review." : "We've received your application to the Better Homes Energy Savings Program." %>
-<br>Your application number: <%= @permit_application.number %></p>
+  <%= if @submitted_by_admin && @permit_application.resubmitted?
+       "An agent updated and resubmitted your application on your behalf. It has been received and is pending review. You do not need to do anything."
+     elsif @submitted_by_admin
+       "An agent submitted your application on your behalf. It has been received and is pending review. You do not need to do anything."
+     elsif @permit_application.resubmitted?
+       "Thank you for revising your permit application. Your revised application has been received and is pending review."
+     else
+       "We've received your application to the Better Homes Energy Savings Program."
+     end %>
+</p>
+
+<p>Your application number: <%= @permit_application.number %></p>
 <!-- Button Start -->
 <div style="margin: 24px 0; text-align: left;">
   <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse: separate !important;">

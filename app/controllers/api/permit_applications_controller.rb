@@ -322,6 +322,14 @@ class Api::PermitApplicationsController < Api::ApplicationController
 
     update_success = @permit_application.update(params_to_use)
     @permit_application.send(:set_flow) if update_success
+    # Staff submitting an application they do not own means an admin acted on the
+    # applicant's behalf - the submission email says so rather than thanking them for work they did
+    # not do (BCHEP-775). Deliberately narrower than !is_current_user_submitter: a delegatee
+    # collaborator also submits for someone else, but they are not staff and the applicant should
+    # not be told an agent did it. owned_by? rather than an id comparison because submitter is
+    # polymorphic - a Contractor submitter never equals current_user.id.
+    @permit_application.submitted_by_admin =
+      current_user.staff? && !@permit_application.owned_by?(current_user)
     submit_success =
       if update_success
         @permit_application.with_lock { @permit_application.submit! }

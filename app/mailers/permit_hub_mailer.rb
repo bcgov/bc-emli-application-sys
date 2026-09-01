@@ -14,8 +14,13 @@ class PermitHubMailer < ApplicationMailer
     )
   end
 
-  def notify_submitter_application_submitted(permit_application, user)
+  def notify_submitter_application_submitted(
+    permit_application,
+    user,
+    submitted_by_admin = false
+  )
     @user = user
+    @submitted_by_admin = submitted_by_admin
     @permit_application = permit_application
     @submission_notice =
       SiteConfiguration.instance.try(:application_submission_notice)

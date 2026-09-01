@@ -83,6 +83,7 @@ module ApplicationFlow
 
     def handle_finalize_revision_requests
       application.update(revisions_requested_at: Time.current)
+      return if admin_on_behalf_finalize?
 
       application.process_contractor_invoice_updated!
     end

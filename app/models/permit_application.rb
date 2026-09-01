@@ -160,6 +160,11 @@ class PermitApplication < ApplicationRecord
 
   # The front end form update provides a json payload of items we want to force update on the front-end since form io maintains its own state and does not 'rerender' if we send the form data back
   attr_accessor :front_end_form_update
+
+  # Set by the controller when someone other than the submitter submits (admin acting on the
+  # applicant's behalf). In-memory only - it is read during the same request, before the mailer
+  # job is enqueued, and passed to the mailer explicitly since deliver_later reloads the record.
+  attr_accessor :submitted_by_admin
   has_one :step_code
   has_many :submission_versions, dependent: :destroy
   has_many :permit_collaborations, dependent: :destroy
@@ -638,7 +643,10 @@ class PermitApplication < ApplicationRecord
 
   def send_submit_notifications
     # Send application submission notifications to submitters and collaborators
-    NotificationService.publish_application_submission_event(self)
+    NotificationService.publish_application_submission_event(
+      self,
+      submitted_by_admin: submitted_by_admin.present?
+    )
 
     # Send notifications to jurisdiction contacts (commented out for now)
     # confirmed_permit_type_submission_contacts.each do |permit_type_submission_contact|
