@@ -855,7 +855,7 @@ en:
     permit_application:
       submission_notification: 'Your %{submission_type} %{number} has been received and is pending review.'
       resubmission_notification: 'Your revised %{submission_type} %{number} has been received by %{jurisdiction_name} and is pending review.'
-      revisions_request_notification: 'We need more information to continue processing your %{submission_type} %{number} for %{program_name}. Please log in to update your %{submission_type}.'
+      revisions_request_notification: 'We need more information to continue processing your %{submission_type} %{number} for %{program_name}. Your place in the queue is secure, but we cannot process your %{submission_type} until updates are made.'
       view_notification: '%{program_name} has viewed your %{submission_type} %{number}.'
       ineligible_notification: '%{submission_type_upper} %{number} has been marked as ineligible for %{program_name}'
       ineligible_notification_with_reason: '%{submission_type_upper} %{number} has been marked as ineligible for the %{program_name}. The reason is: %{reason}'

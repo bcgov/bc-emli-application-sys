@@ -81,6 +81,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
 
   const [completedBlocks, setCompletedBlocks] = useState({});
   const [performedBy, setPerformedBy] = useState(null);
+
   const { isOpen: isIneligibleOpen, onOpen: onIneligibleOpen, onClose: onIneligibleClose } = useDisclosure();
   const { isOpen: isScreenIn, onOpen: onScreenIn, onClose: onScreenInclose } = useDisclosure();
   const {
@@ -106,11 +107,26 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const [hideRevisionList, setHideRevisionList] = useState(false);
   const [hasUnsavedEdits, setHasUnsavedEdits] = useState(false);
   const [saveEditsCompleted, setSaveEditsCompleted] = useState(false);
+
   const [saveEditsDisabled, setSaveEditsDisabled] = useState(false);
   const [supportRequestDate, setSupportRequestDate] = useState(null);
   const sendRevisionContainerRef = useRef<HTMLDivElement | null>(null);
 
   const permitHeaderRef = useRef();
+  // --- Derived workflow state. Everything the render gates on is computed here, from the state
+  // --- above. isAdminUser / isEditContractor stay near the top because the display name and
+  // --- navigation right below them depend on those two.
+
+  // Applicant pathway = admin asks the submitter to make the changes; staff = admin makes them.
+  // Not qualified with isAdminUser - call sites add that where they already did.
+  const isApplicantPathway = performedBy === EUpdateRoles.applicant;
+  const isStaffPathway = performedBy === EUpdateRoles.staff;
+
+  // Saved but not yet resubmitted. Staff-pathway only: performedBy is null when an admin opens an
+  // application already in revisions_requested, and Review and submit is never enabled there, so
+  // hiding the action bar as well would leave no action at all.
+  const hasPendingStaffEdits = saveEditsCompleted && isStaffPathway;
+
   const submissionTypeCode = currentPermitApplication?.submissionType?.code as EPermitClassificationCode | undefined;
   const isInvoiceSubmission = submissionTypeCode === EPermitClassificationCode.invoice;
 
@@ -195,7 +211,9 @@ export const ReviewPermitApplicationScreen = observer(() => {
       return;
     }
 
-    // Apply revision requests (different method based on workflow type)
+    // The staff pathway still finalizes: `submit` only transitions from new_draft or
+    // revisions_requested, so skipping the state change strands the admin's own Review and submit.
+    // The wrong notification is suppressed backend-side instead - see handle_finalize_revision_requests.
     const finalizeOk = isEditContractor
       ? await currentPermitApplication.applyRevisionRequestsWithoutStateChange()
       : await currentPermitApplication.finalizeRevisionRequests();
@@ -205,12 +223,16 @@ export const ReviewPermitApplicationScreen = observer(() => {
         // Contractor: stay on page, keep fields editable, can make more changes
         // navigate(backNavigation);
         setSaveEditsDisabled(false);
-      } else if (performedBy === 'applicant') {
+      } else if (isApplicantPathway) {
         // Participant pathway: redirect to submissions inbox
         setSaveEditsCompleted(true);
         navigate('/applications');
       } else {
-        // Staff pathway: Exit revision mode and scroll to submit button
+        // Staff pathway: leave revision mode so the sidebar's Cancel request goes away - it
+        // destroys the revision requests AND rolls submission_data back to the last snapshot, which
+        // would discard the edits just saved. finalizeRevisionRequests sets revisionMode = true
+        // (energy-savings-application.ts), so this has to be turned off explicitly.
+        // saveEditsCompleted is what enables Review and submit (requirement-form staffCanSubmit).
         setSaveEditsCompleted(true);
         setRevisionMode(false);
         setTimeout(() => {
@@ -390,7 +412,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
               {isEditContractor ? t('ui.back') : t('ui.backToInbox')}
             </Button>
 
-            {revisionMode && !(isAdminUser && performedBy === EUpdateRoles.applicant) && (
+            {revisionMode && !(isAdminUser && isApplicantPathway) && (
               <Button
                 bg="white"
                 color="text.primary"
@@ -478,7 +500,10 @@ export const ReviewPermitApplicationScreen = observer(() => {
               renderTopButtons={() => {
                 return (
                   <>
-                    {(!revisionMode || isEditContractor) && (
+                    {/* Hidden between Save edits and Review and submit: the edits are in
+                        submission_data but not yet in a submission version, so screening in here
+                        would review changes missing from the history and PDF (BCHEP-775). */}
+                    {((!revisionMode && !hasPendingStaffEdits) || isEditContractor) && (
                       <HStack spacing={6}>
                         {!isEditContractor &&
                           !(

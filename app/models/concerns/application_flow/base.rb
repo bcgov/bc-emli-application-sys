@@ -94,9 +94,30 @@ module ApplicationFlow
     # --- Common handlers ---
     def handle_finalize_revision_requests
       application.update(revisions_requested_at: Time.current)
+      return if admin_on_behalf_finalize?
+
       NotificationService.publish_application_revisions_request_event(
         application
       )
+    end
+
+    # True when every outstanding revision request was raised on the staff pathway - an admin
+    # updating on the submitter's behalf. They are resolving their own edits, not asking the
+    # submitter for anything, so a "we need more information" notification would be wrong
+    # (BCHEP-775).
+    #
+    # The state change still happens: `submit` only transitions from new_draft or
+    # revisions_requested, so the admin's own Review and submit depends on reaching that state.
+    # Any applicant-pathway request in the set means the submitter genuinely is being asked for
+    # something, so the notification stands.
+    def admin_on_behalf_finalize?
+      requests =
+        application.latest_submission_version&.revision_requests&.where(
+          resolved_at: nil
+        )
+      return false if requests.blank?
+
+      requests.all? { |request| request.performed_by == "staff" }
     end
 
     def handle_ineligible_status
