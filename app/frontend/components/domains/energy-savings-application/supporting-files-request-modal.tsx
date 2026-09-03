@@ -32,10 +32,14 @@ export interface ISupportingFilesRequestModalProps {
   // off to it on the applicant route (BCHEP-496). Omit both and it manages itself as before.
   isOpen?: boolean;
   onClose?: () => void;
+  // Where focus goes on close in controlled mode. This modal's own trigger is not rendered then,
+  // and the element focused before it opened belongs to the pathway modal, which has already
+  // unmounted - so the caller has to supply something that outlives both.
+  finalFocusRef?: React.RefObject<HTMLElement>;
 }
 
 export const SupportingFilesRequestModal = observer(
-  ({ permitApplication, renderTrigger, isOpen, onClose }: ISupportingFilesRequestModalProps) => {
+  ({ permitApplication, renderTrigger, isOpen, onClose, finalFocusRef }: ISupportingFilesRequestModalProps) => {
     const { t } = useTranslation();
     const { permitApplicationStore } = useMst();
     const triggerRef = React.useRef<HTMLButtonElement>(null);
@@ -100,10 +104,9 @@ export const SupportingFilesRequestModal = observer(
         )}
 
         <Modal
-          // Only restore focus to the trigger when this modal owns one. In controlled mode the
-          // trigger lives in another component, so triggerRef is never attached and passing it
-          // would send focus nowhere on close (BCHEP-496).
-          finalFocusRef={isControlled ? undefined : triggerRef}
+          // Uncontrolled: this modal renders its own trigger, so return focus there. Controlled:
+          // triggerRef is never attached, so use the caller's persistent target (BCHEP-496).
+          finalFocusRef={isControlled ? finalFocusRef : triggerRef}
           onClose={requestDisclosure.onClose}
           isOpen={requestDisclosure.isOpen}
           scrollBehavior="inside"

@@ -66,20 +66,21 @@ const AddSupportingFilesPathwayModal = ({ isOpen, onClose, permitApplication, on
       };
       const response = await permitApplicationStore.requestSupportingFiles(permitApplication.id, params);
 
-      if (response && response.supportRequests?.length > 0) {
-        // Get the most recent support request (the one we just created)
-        const latestSupportRequest = response.supportRequests[response.supportRequests.length - 1];
-        const linkedAppId = latestSupportRequest.linkedApplication?.id;
+      // requestSupportingFiles resolves false on a non-2xx rather than throwing, so closing
+      // unconditionally told the admin the upload form had been created when it had not. The API
+      // layer surfaces the error; leave the modal open so they can retry (BCHEP-496).
+      if (!response || !(response.supportRequests?.length > 0)) {
+        return;
+      }
 
-        if (linkedAppId) {
-          if (selectedOption === EUpdateRoles.staff) {
-            // Admin pathway: Navigate to the supporting files upload form
-            navigate(`/applications/${linkedAppId}/edit`);
-          } else {
-            // Applicant pathway: Notification sent, stay on current page
-            // The participant will receive an email and can access the form
-          }
-        }
+      // Get the most recent support request (the one we just created)
+      const latestSupportRequest = response.supportRequests[response.supportRequests.length - 1];
+      const linkedAppId = latestSupportRequest.linkedApplication?.id;
+
+      if (linkedAppId) {
+        // Admin pathway: navigate to the supporting files upload form. Only the staff route
+        // reaches here, so there is no applicant branch to handle.
+        navigate(`/applications/${linkedAppId}/edit`);
       }
 
       onClose();

@@ -120,6 +120,11 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const [supportRequestDate, setSupportRequestDate] = useState(null);
   const sendRevisionContainerRef = useRef<HTMLDivElement | null>(null);
 
+  // The supporting-files flow spans two modals, so focus cannot return to whatever was focused
+  // before the second one opened - that element belongs to the first, now unmounted. Hand the
+  // trigger down so focus lands somewhere real on close (BCHEP-496).
+  const addSupportingFilesTriggerRef = useRef<HTMLButtonElement>(null);
+
   const permitHeaderRef = useRef();
   // --- Derived workflow state. Everything the render gates on is computed here, from the state
   // --- above. isAdminUser / isEditContractor stay near the top because the display name and
@@ -395,7 +400,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
               />
             )}
             {!isEditContractor && !isInvoiceSubmission && (
-              <Button variant="primary" onClick={onAddSupportingFilesPathwayOpen}>
+              <Button ref={addSupportingFilesTriggerRef} variant="primary" onClick={onAddSupportingFilesPathwayOpen}>
                 {t('energySavingsApplication.show.supportingFilesRequest.addSupportingFiles')}
               </Button>
             )}
@@ -699,6 +704,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
           isOpen={isSupportingFilesRequestOpen}
           onClose={onSupportingFilesRequestClose}
           permitApplication={currentPermitApplication}
+          finalFocusRef={addSupportingFilesTriggerRef}
         />
       )}
       {isScreenIn && (

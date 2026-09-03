@@ -38,6 +38,12 @@ class Api::SupportRequestsController < Api::ApplicationController
   def request_supporting_files
     parent_app = PermitApplication.find(params[:parent_application_id])
 
+    # Authorize before the validation below. All authorization for this action normally happens
+    # inside SupportingFilesService (hence the skip_after_action above), so returning early would
+    # otherwise answer an unauthorized caller with 422 for an application that exists and 404 for
+    # one that does not - an existence oracle. Same policy the service applies.
+    Pundit.authorize(pundit_user, parent_app, :request_supporting_files?)
+
     # Only the external pathway emails the participant a file list; on the internal one the admin
     # uploads the files themselves, so there is nothing to list.
     is_internal = params[:audience_type_code]&.to_sym == :internal

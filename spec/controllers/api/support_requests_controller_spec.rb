@@ -186,6 +186,27 @@ RSpec.describe Api::SupportRequestsController, type: :controller do
       )
     end
 
+    # The blank-list check above returns before SupportingFilesService runs, and that service is
+    # where this action's authorization lives (see skip_after_action :verify_authorized). Without
+    # an explicit authorize first, a participant probing ids would get 422 for an application that
+    # exists and 404 for one that does not - an existence oracle. Pins the ordering, not just the
+    # policy: move the authorize below the blank check and this fails.
+    it "authorizes before rejecting a blank file list" do
+      parent_id = parent_app.id
+      sign_in participant_user
+
+      expect {
+        post :request_supporting_files,
+             params: {
+               parent_application_id: parent_id,
+               note: "   "
+             }
+      }.not_to change(SupportRequest, :count)
+
+      expect(response).not_to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:forbidden)
+    end
+
     it "reports a missing record, not a missing template, for an unknown parent application" do
       post :request_supporting_files,
            params: {
