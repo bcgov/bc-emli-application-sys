@@ -73,8 +73,13 @@ const AddSupportingFilesPathwayModal = ({ isOpen, onClose, permitApplication, on
         return;
       }
 
-      // Get the most recent support request (the one we just created)
-      const latestSupportRequest = response.supportRequests[response.supportRequests.length - 1];
+      // Pick by createdAt, not array position: the support_requests association has no order
+      // clause (permit_application.rb:181), so on an application with several requests the last
+      // element can be an older one and the admin lands on the wrong upload form. Same reduce the
+      // model already uses for latestSupportRequestDate.
+      const latestSupportRequest = response.supportRequests.reduce((acc, sr) =>
+        new Date(sr.createdAt) > new Date(acc.createdAt) ? sr : acc,
+      );
       const linkedAppId = latestSupportRequest.linkedApplication?.id;
 
       if (linkedAppId) {
