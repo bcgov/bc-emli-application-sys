@@ -30,7 +30,8 @@ class Requirement < ApplicationRecord
          pid_info: 19,
          service_information: 20,
          utility_account_number: 21,
-         ahri_number: 22
+         ahri_number: 22,
+         geocoder_address: 23
        },
        prefix: true
 

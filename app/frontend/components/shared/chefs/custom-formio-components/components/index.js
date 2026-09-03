@@ -1,5 +1,7 @@
 import bcaddress from './BCAddress/Component.js';
+import geocoderaddress from './GeocoderAddress/Component.js';
 import orgbook from './OrgBook/Component.js';
+import serviceinformation from './ServiceInformation/Component.js';
 import simpleaddressadvanced from './SimpleAddressAdvanced/Component.js';
 import simplebcaddress from './SimpleBCAddress/Component.js';
 import simplebuttonadvanced from './SimpleButtonAdvanced/Component.js';
@@ -45,7 +47,6 @@ import simpletextfieldadvanced from './SimpleTextFieldAdvanced/Component.js';
 import simpletime from './SimpleTime/Component.js';
 import simpletimeadvanced from './SimpleTimeAdvanced/Component.js';
 import simpleurladvanced from './SimpleUrlAdvanced/Component.js';
-import serviceinformation from './ServiceInformation/Component.js';
 
 export default {
   orgbook,
@@ -95,5 +96,6 @@ export default {
   simplebuttonadvanced,
   bcaddress,
   simplebcaddress,
+  geocoderaddress,
   service_information: serviceinformation,
 };

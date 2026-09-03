@@ -273,6 +273,7 @@ export enum ERequirementType {
   radio = 'radio',
   address = 'address',
   bcaddress = 'bcaddress',
+  geocoderAddress = 'geocoder_address',
   signature = 'signature',
   textArea = 'textarea',
   energyStepCode = 'energy_step_code',

@@ -189,6 +189,7 @@ Rails.application.routes.draw do
       get "jurisdiction", on: :collection
       get "pin", on: :collection
       get "pid_details", on: :collection
+      get "address_search", on: :collection
     end
 
     resources :permit_applications, only: %i[create update show destroy] do

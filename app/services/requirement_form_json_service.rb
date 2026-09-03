@@ -101,6 +101,11 @@ class RequirementFormJsonService
         get_pid_info_components(requirement_block_key, requirement.required)
       elsif requirement.input_type_ahri_number?
         get_ahri_number_components(requirement_block_key, requirement.required)
+      elsif requirement.input_type_geocoder_address?
+        get_geocoder_address_components(
+          requirement_block_key,
+          requirement.required
+        )
       elsif requirement.input_type_service_information? ||
             requirement.input_type == "service_information" ||
             requirement.input_type.to_s == "service_information" ||
@@ -126,7 +131,8 @@ class RequirementFormJsonService
         }.merge!(formio_type_options)
       end
 
-    if requirement.hint && !requirement.input_type_ahri_number?
+    if requirement.hint && !requirement.input_type_ahri_number? &&
+         !requirement.input_type_geocoder_address?
       json.merge!({ description: requirement.hint })
     end
 
@@ -260,8 +266,8 @@ class RequirementFormJsonService
     form_json
   end
 
-  def get_columns_form_json(key, column_components = [])
-    {
+  def get_columns_form_json(key, column_components = [], custom_class = nil)
+    result = {
       label: "Columns",
       columns: column_components.map { |item| { components: [item] } },
       key: key,
@@ -269,6 +275,8 @@ class RequirementFormJsonService
       input: false,
       tableView: false
     }
+    result[:customClass] = custom_class if custom_class.present?
+    result
   end
 
   def get_contact_field_set_form_json(key, is_multi)
@@ -600,6 +608,95 @@ class RequirementFormJsonService
               :model,
               parent_key,
               I18n.t("formio.requirement.ahri_number.model"),
+              true
+            )
+          ]
+        )
+      ]
+    }
+  end
+
+  def get_geocoder_address_components(
+    requirement_block_key = requirement&.requirement_block&.key,
+    required = false
+  )
+    return {} unless requirement.input_type_geocoder_address?
+
+    parent_key = requirement.key(requirement_block_key)
+
+    {
+      id: requirement.id,
+      legend: requirement.label,
+      key: parent_key,
+      type: "fieldset",
+      custom_class: "geocoder-address-field-set",
+      label: requirement.label,
+      hideLabel: false,
+      input: false,
+      tableView: false,
+      components: [
+        get_columns_form_json(
+          "geocoder_search_columns",
+          [
+            {
+              type: "geocoderaddress",
+              label: "Address Lookup",
+              key: "#{parent_key}|geocoder_search",
+              dataSrc: "json",
+              dataType: "auto",
+              data: {
+                json: []
+              },
+              valueProperty: "value",
+              searchField: "label",
+              template: "<span>{{ item.label }}</span>",
+              filter: "address",
+              searchEnabled: true,
+              minSearch: 3,
+              widget: "choicesjs",
+              input: true,
+              tableView: false,
+              lazyLoad: true,
+              authenticate: false,
+              clearOnRefresh: false,
+              customClass: "geocoder-address-dropdown",
+              validate: {
+                required: required
+              }
+            }
+          ],
+          "geocoder-search-full-width"
+        ),
+        get_columns_form_json(
+          "geocoder_street_city_columns",
+          [
+            get_readonly_nested_info_component(
+              :street_address,
+              parent_key,
+              I18n.t("formio.requirement.geocoder_address.street_address"),
+              true
+            ),
+            get_readonly_nested_info_component(
+              :city,
+              parent_key,
+              I18n.t("formio.requirement.geocoder_address.city"),
+              true
+            )
+          ]
+        ),
+        get_columns_form_json(
+          "geocoder_province_country_columns",
+          [
+            get_readonly_nested_info_component(
+              :province,
+              parent_key,
+              I18n.t("formio.requirement.geocoder_address.province"),
+              true
+            ),
+            get_readonly_nested_info_component(
+              :country,
+              parent_key,
+              I18n.t("formio.requirement.geocoder_address.country"),
               true
             )
           ]

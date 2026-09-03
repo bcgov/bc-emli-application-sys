@@ -533,6 +533,22 @@ const requirementsComponentMap = {
       />
     );
   },
+
+  [ERequirementType.geocoderAddress]: function <TFieldValues>(props: TRequirementEditProps<TFieldValues>) {
+    return (
+      <EditableGroup
+        editableInput={
+          <InputGroup>
+            <InputLeftElement>
+              <MapPin />
+            </InputLeftElement>
+            <Input bg={'white'} isReadOnly placeholder="Type address to search..." />
+          </InputGroup>
+        }
+        {...props}
+      />
+    );
+  },
 };
 
 type TProps<TFieldValues> = {

@@ -18,4 +18,8 @@ class GeocoderPolicy < ApplicationPolicy
   def pid_details?
     site_options?
   end
+
+  def address_search?
+    site_options?
+  end
 end
