@@ -24,9 +24,12 @@ module ApplicationFlow
 
       # The SupportRequest linking this upload form to the participant's application already exists -
       # SupportingFilesService creates it when the admin picks a pathway. Use it rather than digging
-      # an "application_number" key out of submission_data: that key is never present on this form,
-      # so the lookup always failed and this method returned here, silently sending the participant
-      # nothing at all (BCHEP-496).
+      # an "application_number" key out of submission_data, which this used to do (BCHEP-496).
+      #
+      # That lookup depended on the template carrying such a field and on an admin typing it
+      # correctly. Absent, it returned nil and this method bailed here, sending the participant
+      # nothing; present, a typo matching another application would have notified the wrong person.
+      # The SupportRequest link is authoritative and untypeable.
       support_request =
         SupportRequest.find_by(linked_application_id: application.id)
       parent_application = support_request&.parent_application
