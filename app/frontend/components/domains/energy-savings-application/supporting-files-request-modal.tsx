@@ -1,6 +1,8 @@
 import {
-  Flex,
   Button,
+  Flex,
+  Grid,
+  GridItem,
   Heading,
   Modal,
   ModalBody,
@@ -13,30 +15,40 @@ import {
   Textarea,
   VStack,
   useDisclosure,
-  Grid,
-  GridItem,
 } from '@chakra-ui/react';
 import { DownloadIcon } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
-import { useTranslation, Trans } from 'react-i18next';
-import { SharedSpinner } from '../../shared/base/shared-spinner';
+import { useTranslation } from 'react-i18next';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { useMst } from '../../../setup/root';
+import { SharedSpinner } from '../../shared/base/shared-spinner';
 import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation-modal';
 
 export interface ISupportingFilesRequestModalProps {
   permitApplication: IEnergySavingsApplication;
   renderTrigger?: (onOpen: () => void) => React.ReactNode;
+  // Optional controlled mode, so another component can open this modal - the pathway modal hands
+  // off to it on the applicant route (BCHEP-496). Omit both and it manages itself as before.
+  isOpen?: boolean;
+  onClose?: () => void;
+  // Where focus goes on close in controlled mode. This modal's own trigger is not rendered then,
+  // and the element focused before it opened belongs to the pathway modal, which has already
+  // unmounted - so the caller has to supply something that outlives both.
+  finalFocusRef?: React.RefObject<HTMLElement>;
 }
 
 export const SupportingFilesRequestModal = observer(
-  ({ permitApplication, renderTrigger }: ISupportingFilesRequestModalProps) => {
+  ({ permitApplication, renderTrigger, isOpen, onClose, finalFocusRef }: ISupportingFilesRequestModalProps) => {
     const { t } = useTranslation();
     const { permitApplicationStore } = useMst();
     const triggerRef = React.useRef<HTMLButtonElement>(null);
 
-    const requestDisclosure = useDisclosure();
+    const internalDisclosure = useDisclosure();
+    const isControlled = isOpen !== undefined;
+    const requestDisclosure = isControlled
+      ? { isOpen, onOpen: () => {}, onClose: onClose ?? (() => {}) }
+      : internalDisclosure;
     const confirmDisclosure = useDisclosure();
     const {
       isOpen: requestConfirmIsOpen,
@@ -62,22 +74,28 @@ export const SupportingFilesRequestModal = observer(
     };
 
     const handleConfirm = async () => {
-      try {
-        const result = await permitApplicationStore.requestSupportingFiles(permitApplication.id, { note });
+      // requestSupportingFiles resolves false on a non-2xx rather than throwing, so the result has
+      // to be checked - closing regardless left the admin believing the participant had been
+      // notified when nothing was sent (BCHEP-496). The API layer surfaces the error itself; keep
+      // the modal open so the typed file list is not lost.
+      const result = await permitApplicationStore.requestSupportingFiles(permitApplication.id, { note });
 
+      if (!result) {
         confirmDisclosure.onClose();
-        requestDisclosure.onClose();
-
-        triggerRef.current?.focus();
-      } catch (err) {
-        console.error('Failed to request supporting files:', err);
-        // TODO: show a toast or error state here ?
+        return;
       }
+
+      confirmDisclosure.onClose();
+      requestDisclosure.onClose();
+
+      triggerRef.current?.focus();
     };
 
     return (
       <>
-        {renderTrigger ? (
+        {/* Controlled mode has its own trigger elsewhere, so render neither the custom nor the
+            default one - otherwise a stray Request supporting files button appears. */}
+        {isControlled ? null : renderTrigger ? (
           renderTrigger(requestDisclosure.onOpen)
         ) : (
           <Button ref={triggerRef} variant="primary" onClick={requestDisclosure.onOpen} leftIcon={<DownloadIcon />}>
@@ -86,7 +104,9 @@ export const SupportingFilesRequestModal = observer(
         )}
 
         <Modal
-          finalFocusRef={triggerRef}
+          // Uncontrolled: this modal renders its own trigger, so return focus there. Controlled:
+          // triggerRef is never attached, so use the caller's persistent target (BCHEP-496).
+          finalFocusRef={isControlled ? finalFocusRef : triggerRef}
           onClose={requestDisclosure.onClose}
           isOpen={requestDisclosure.isOpen}
           scrollBehavior="inside"
@@ -120,7 +140,7 @@ export const SupportingFilesRequestModal = observer(
                     name="supportingFilesNote"
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
-                    placeholder={''}
+                    placeholder={t('energySavingsApplication.show.supportingFilesRequest.listOfSupportingFiles')}
                   />
                 </ModalBody>
 

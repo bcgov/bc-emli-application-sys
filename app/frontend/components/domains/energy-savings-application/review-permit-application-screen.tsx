@@ -42,6 +42,7 @@ import { EnergySavingsApplicationStatusTag } from '../../shared/energy-savings-a
 import AddSupportingFilesPathwayModal from '../../shared/modals/add-supporting-files-pathway-modal';
 import UpdatePathwayModal from '../../shared/modals/application-update-pathway';
 import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation-modal';
+import { SupportingFilesRequestModal } from './supporting-files-request-modal';
 interface IReferenceNumberForm {
   referenceNumber?: string;
 }
@@ -104,6 +105,13 @@ export const ReviewPermitApplicationScreen = observer(() => {
     onOpen: onAddSupportingFilesPathwayOpen,
     onClose: onAddSupportingFilesPathwayClose,
   } = useDisclosure();
+  // Step two of the applicant route: the pathway modal hands off here so the admin can list the
+  // files being asked for (BCHEP-496).
+  const {
+    isOpen: isSupportingFilesRequestOpen,
+    onOpen: onSupportingFilesRequestOpen,
+    onClose: onSupportingFilesRequestClose,
+  } = useDisclosure();
   const [hideRevisionList, setHideRevisionList] = useState(false);
   const [hasUnsavedEdits, setHasUnsavedEdits] = useState(false);
   const [saveEditsCompleted, setSaveEditsCompleted] = useState(false);
@@ -111,6 +119,11 @@ export const ReviewPermitApplicationScreen = observer(() => {
   const [saveEditsDisabled, setSaveEditsDisabled] = useState(false);
   const [supportRequestDate, setSupportRequestDate] = useState(null);
   const sendRevisionContainerRef = useRef<HTMLDivElement | null>(null);
+
+  // The supporting-files flow spans two modals, so focus cannot return to whatever was focused
+  // before the second one opened - that element belongs to the first, now unmounted. Hand the
+  // trigger down so focus lands somewhere real on close (BCHEP-496).
+  const addSupportingFilesTriggerRef = useRef<HTMLButtonElement>(null);
 
   const permitHeaderRef = useRef();
   // --- Derived workflow state. Everything the render gates on is computed here, from the state
@@ -387,7 +400,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
               />
             )}
             {!isEditContractor && !isInvoiceSubmission && (
-              <Button variant="primary" onClick={onAddSupportingFilesPathwayOpen}>
+              <Button ref={addSupportingFilesTriggerRef} variant="primary" onClick={onAddSupportingFilesPathwayOpen}>
                 {t('energySavingsApplication.show.supportingFilesRequest.addSupportingFiles')}
               </Button>
             )}
@@ -683,6 +696,15 @@ export const ReviewPermitApplicationScreen = observer(() => {
           isOpen={isAddSupportingFilesPathwayOpen}
           onClose={onAddSupportingFilesPathwayClose}
           permitApplication={currentPermitApplication}
+          onRequestFiles={onSupportingFilesRequestOpen}
+        />
+      )}
+      {isSupportingFilesRequestOpen && (
+        <SupportingFilesRequestModal
+          isOpen={isSupportingFilesRequestOpen}
+          onClose={onSupportingFilesRequestClose}
+          permitApplication={currentPermitApplication}
+          finalFocusRef={addSupportingFilesTriggerRef}
         />
       )}
       {isScreenIn && (

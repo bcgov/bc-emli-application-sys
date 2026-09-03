@@ -173,6 +173,7 @@ en:
       notify_new_contractor_employee_welcome: 'Welcome to the Better Homes Energy Savings Program'
       notify_contractor_employee_invite_revoked: 'invitation revoked'
       notify_participant_supporting_files_requested: 'Supporting files requested for Application %{permit_application_number}'
+      notify_participant_supporting_files_added: 'Supporting files uploaded for Application %{permit_application_number}'
       contractor_suspended: '%{business_name} - Access Suspended'
       contractor_unsuspended: '%{business_name} - Access Restored'
       contractor_removed: '%{business_name} - Account Removed'
@@ -767,6 +768,9 @@ en:
       support_request_not_created:
         title: 'Error'
         message: 'The support request could not be created.'
+      support_request_no_files_listed:
+        title: 'Error'
+        message: 'List the supporting files you need before sending the request.'
     services:
     auto_compliance_configuration:
       digital_seal_validator:
@@ -866,7 +870,8 @@ en:
       participant_incomplete_draft_notification: 'This is a reminder that your %{submission_type} to the %{program_name} is still in draft. You can complete your %{submission_type} by viewing it here'
     support_request:
       supporting_files_uploaded: 'Supporting files added to application %{application_number} on %{uploaded_date}'
-      supporting_files_requested: 'Supporting files requested for form %{parent_application_number} on %{created_date}'
+      supporting_files_added_by_admin: 'An admin has uploaded supporting file(s) to your application.'
+      supporting_files_requested: "Your application is in progress, but we need more information to continue. Go to the \"File upload form\" in your application to see what documents we need.\n\nDate requested: %{created_date}"
     contractor:
       onboarding_approved: 'Congratulations! You are now a registered contractor for the Better Homes Energy Savings Program. You can now submit invoices and explore program resources.'
       invoice_submitted: 'Thank you for your invoice submission. If we need more information we will contact you by email.'

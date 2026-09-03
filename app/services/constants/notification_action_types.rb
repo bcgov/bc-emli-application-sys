@@ -25,8 +25,13 @@ module Constants
     PARTICIPANT_INCOMPLETE_DRAFT_NOTIFICATION =
       "participant_incomplete_draft_notification"
     NEW_PARTICIPANT_WELCOME = "new_participant_welcome"
+    # Participant uploaded the files an admin asked for; goes to the admin who asked.
     SUPPORTING_FILES_UPLOADED = "supporting_files_uploaded"
+    # Admin asked the participant to upload files; goes to the participant.
     SUPPORTING_FILES_REQUESTED = "supporting_files_requested"
+    # Admin uploaded files on the participant's behalf; goes to the participant. Distinct from
+    # SUPPORTING_FILES_UPLOADED above, which travels the opposite direction (BCHEP-496).
+    SUPPORTING_FILES_ADDED_BY_ADMIN = "supporting_files_added_by_admin"
     CONTRACTOR_ONBOARDING_APPROVED = "contractor_onboarding_approved"
     CONTRACTOR_INVOICE_SUBMITTED = "invoice_submitted"
     CONTRACTOR_INVOICE_UPDATED = "invoice_updated"

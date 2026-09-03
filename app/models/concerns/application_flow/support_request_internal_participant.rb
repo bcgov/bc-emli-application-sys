@@ -22,47 +22,33 @@ module ApplicationFlow
     def handle_submission
       application.update!(signed_off_at: Time.current)
 
-      data = application.submission_data
+      # The SupportRequest linking this upload form to the participant's application already exists -
+      # SupportingFilesService creates it when the admin picks a pathway. Use it rather than digging
+      # an "application_number" key out of submission_data: that key is never present on this form,
+      # so the lookup always failed and this method returned here, silently sending the participant
+      # nothing at all (BCHEP-496).
+      support_request =
+        SupportRequest.find_by(linked_application_id: application.id)
+      parent_application = support_request&.parent_application
+      return unless parent_application
 
-      application_number =
-        data["data"]
-          &.values
-          &.map do |section|
-            section.find { |k, _| k.include?("application_number") }&.last
-          end
-          &.compact
-          &.first
+      requested_by_user = support_request.requested_by
 
-      return unless application_number.present?
-
-      parent_application = PermitApplication.find_by(number: application_number)
-      unless parent_application
-        return
-      end
-
-      requested_by_user =
-        if application.submitter.is_a?(User)
-          application.submitter
-        elsif application.submitter_id.present?
-          User.find_by(id: application.submitter_id)
-        end
-
-      unless requested_by_user
-        return
-      end
-
-      SupportRequest.create!(
-        parent_application: parent_application,
-        requested_by: requested_by_user, # user instance
-        linked_application: application,
-        additional_text: ""
-      )
-
-      # Notify participant that supporting files have been added to their application
-      PermitHubMailer.notify_participant_supporting_files_added(
+      # Notify the participant that supporting files have been added to their application. The
+      # uploaded files live on this support-request submission, not on the parent application the
+      # notification is about, so resolve them here and pass them through - same shape as the
+      # controller passing missing_files on the request pathway.
+      NotificationService.publish_supporting_files_added_by_admin_event(
         parent_application,
-        admin_user: requested_by_user
-      )&.deliver_later
+        admin_user: requested_by_user,
+        # active_ rather than the bare association: supporting_documents rows are not destroyed
+        # when a file is removed from the form, so an admin who uploads the wrong file, removes it
+        # and uploads another would have both listed in the participant's email. active_ filters to
+        # what the submission data actually references (form_supporting_documents.rb).
+        uploaded_files:
+          application.active_supporting_documents.map(&:file_name).compact,
+        linked_application_id: application.id
+      )
     end
   end
 end

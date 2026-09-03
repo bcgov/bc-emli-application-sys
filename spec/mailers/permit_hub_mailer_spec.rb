@@ -118,6 +118,8 @@ RSpec.describe PermitHubMailer, type: :mailer do
 
     # Counterpart to the above: proves the wording is driven by the flag, not simply present in
     # every resubmission email.
+    #
+    # (see also #notify_participant_supporting_files_added below)
     context "when the applicant resubmitted their own application" do
       let(:permit_application) do
         # The :resubmitted trait builds a revision_request whose user factory still sets the legacy
@@ -130,6 +132,47 @@ RSpec.describe PermitHubMailer, type: :mailer do
         expect(body).to include("Thank you for revising")
         expect(body).not_to include("An agent")
       end
+    end
+  end
+
+  # BCHEP-496. This mailer had a call site but no template and no subject key, so it had never
+  # rendered - the failure was invisible because the flow returned before reaching it. The
+  # linked_application_id assertion matters most: the Log in button is built from it, and an
+  # omitted keyword used to produce a link to /applications//edit.
+  describe "#notify_participant_supporting_files_added" do
+    let(:permit_application) { create(:permit_application, :newly_submitted) }
+    let(:user) { permit_application.submitter }
+    let(:admin_user) { create(:user, role: :admin, confirmed_at: Time.current) }
+    let(:linked_application_id) { SecureRandom.uuid }
+
+    before { user.update!(confirmed_at: Time.current) }
+
+    subject(:mail) do
+      described_class.notify_participant_supporting_files_added(
+        permit_application,
+        admin_user: admin_user,
+        uploaded_files: %w[proof-of-income.pdf heat-pump-invoice.pdf],
+        linked_application_id: linked_application_id
+      )
+    end
+
+    it "names the application in the subject" do
+      expect(mail.subject).to include(
+        "Supporting files uploaded for Application #{permit_application.number}"
+      )
+    end
+
+    it "lists every uploaded file" do
+      body = (mail.html_part || mail).body.to_s
+      expect(body).to include("proof-of-income.pdf")
+      expect(body).to include("heat-pump-invoice.pdf")
+      expect(body).to include("An admin has uploaded supporting file(s)")
+    end
+
+    it "points the Log in button at the linked application" do
+      body = (mail.html_part || mail).body.to_s
+      expect(body).to include("/applications/#{linked_application_id}/edit")
+      expect(body).not_to include("/applications//edit")
     end
   end
 end

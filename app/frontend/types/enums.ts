@@ -529,6 +529,7 @@ export enum ENotificationActionType {
   templatePublished = 'template_published',
   newSupportingFilesRequested = 'supporting_files_requested',
   newSupportingFilesUploaded = 'supporting_files_uploaded',
+  newSupportingFilesAddedByAdmin = 'supporting_files_added_by_admin',
   contractorInvoiceIneligible = 'invoice_ineligible',
   contractorInvoiceApproved = 'invoice_approved',
   contractorInvoicePaid = 'invoice_paid',

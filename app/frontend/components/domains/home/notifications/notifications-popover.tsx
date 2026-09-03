@@ -172,7 +172,13 @@ export const NotificationsPopover: React.FC<INotificationsPopoverProps> = observ
                       onClick={(e) => handleDeleteNotification(n.id, e)}
                       _hover={{ bg: 'greys.grey04' }}
                     />
-                    <CustomMessageBox status={getSemanticKey(n)} description={n.actionText}>
+                    {/* Passed as a node rather than a string so line breaks in actionText render -
+                        CustomMessageBox wraps a plain string in <Text>, where \n collapses.
+                        Supporting-files notifications put "Date requested:" on its own line. */}
+                    <CustomMessageBox
+                      status={getSemanticKey(n)}
+                      description={<Text whiteSpace="pre-line">{n.actionText}</Text>}
+                    >
                       <UnorderedList pl={0} mb={0}>
                         {generateSpecificLinkData(n).map((link) => (
                           <ListItem whiteSpace={'normal'} key={link.href}>
