@@ -1,18 +1,18 @@
 <p>Hello <%= @user.first_name %> <%= @user.last_name %>,</p>
 
-<p>We need the below supporting file(s) to process your application <span style="white-space: nowrap;"><%= @permit_application.number %></span> to the Better Homes Energy Savings Program:</p>
+<p>An admin has uploaded supporting file(s) to your application <span style="white-space: nowrap;"><%= @permit_application.number %></span> for the Better Homes Energy Savings Program:</p>
 
 <ul style="color:#000000; font-family:'BC Sans','Segoe UI',Arial,sans-serif; font-size:16px; line-height:24px; margin:8px 0; padding-left:20px;">
-  <% @missing_files.each do |file| %>
+  <% @uploaded_files.each do |file| %>
     <li style="color:#000000; margin-bottom:4px;"><%= file %></li>
   <% end %>
 </ul>
 
-<p>Please log in to upload the requested file(s) by completing the Supporting files upload form.</p>
+<p>Please log in and view the supporting file(s) that were uploaded.</p>
 
 <!-- Button -->
 <div style="margin: 24px 0; text-align: left;">
-  <table border="0" cellpadding="0" cellspacing="0" role="presentation" 
+  <table border="0" cellpadding="0" cellspacing="0" role="presentation"
          style="mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse: separate !important;">
     <tr>
       <td align="center" bgcolor="#013366" role="presentation"
@@ -28,9 +28,9 @@
   </table>
 </div>
 
-<p>If you have any questions, please call us at 
+<p>If you have any questions, please call us at
   <a href="tel:1-833-856-0333" style="color:#013366; text-decoration:none;">1-833-856-0333</a>
-  or email us at 
+  or email us at
   <a href="mailto:BetterHomesESP@CLEAResult.com" style="color:#013366;">BetterHomesESP@CLEAResult.com</a>.
 </p>
 

@@ -881,6 +881,22 @@ class PermitApplication < ApplicationRecord
     }
   end
 
+  # An admin uploaded files on the participant's behalf. Distinct from
+  # publish_supporting_files_sumbitted__data, which notifies the *admin* when the *participant*
+  # uploads - opposite direction, different recipient (BCHEP-496).
+  def publish_supporting_files_added_by_admin__data(linked_application_id)
+    {
+      "id" => SecureRandom.uuid,
+      "action_type" =>
+        Constants::NotificationActionTypes::SUPPORTING_FILES_ADDED_BY_ADMIN,
+      "action_text" =>
+        I18n.t("notification.support_request.supporting_files_added_by_admin"),
+      "object_data" => {
+        "permit_application_id" => linked_application_id
+      }
+    }
+  end
+
   def publish_supporting_files_requested__data
     latest_sr =
       SupportRequest

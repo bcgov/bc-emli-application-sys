@@ -191,7 +191,20 @@ export const NotificationStoreModel = types
           const data = objectData as IPermitNotificationObjectData;
           return [
             {
-              text: t('ui.review'),
+              // Participant-facing, so it uses the content doc's wording rather than the staff
+              // "Review" below - they are being asked to upload files, not to review anything.
+              text: t('ui.updateYourApplication'),
+              href: `/applications/${data.permitApplicationId}/edit`,
+            },
+          ];
+        }
+        case ENotificationActionType.newSupportingFilesAddedByAdmin: {
+          const data = objectData as IPermitNotificationObjectData;
+          return [
+            {
+              // Participant-facing: an admin uploaded files for them, so the action is to look at
+              // them. Distinct from newSupportingFilesUploaded below, which is the admin's copy.
+              text: t('ui.viewSupportingFiles'),
               href: `/applications/${data.permitApplicationId}/edit`,
             },
           ];

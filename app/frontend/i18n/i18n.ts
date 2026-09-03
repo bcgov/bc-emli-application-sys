@@ -590,6 +590,8 @@ const options = {
           public: 'Public',
           comingSoon: 'Coming soon',
           review: 'Review',
+          updateYourApplication: 'Update your application',
+          viewSupportingFiles: 'View supporting file(s)',
           configure: 'Configure',
           start: 'Start',
           publishBanner: 'Ready to publish site-wide banner?',
@@ -1503,6 +1505,7 @@ const options = {
               addSupportingFiles: 'Add supporting files',
               selectionAction: 'Selection action',
               requestSupportingFiles: 'Request supporting files',
+              listOfSupportingFiles: 'List of supporting files',
               prompt:
                 'List the required files below, one line per file. Each line will be a bullet point in the email to the participant.',
               requestedHeader: 'Supporting files requested',

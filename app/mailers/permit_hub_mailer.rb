@@ -321,10 +321,22 @@ class PermitHubMailer < ApplicationMailer
     )
   end
 
-  def notify_participant_supporting_files_added(permit_application, admin_user:)
+  # uploaded_files and linked_application_id are passed in rather than derived here: the files hang
+  # off the support-request submission, not the parent application this mailer receives. Mirrors
+  # notify_participant_supporting_files_requested, where the controller passes missing_files.
+  # Both keywords are required: the template builds the Log in URL from linked_application_id, so a
+  # default of nil would render a link to /applications//edit rather than failing loudly.
+  def notify_participant_supporting_files_added(
+    permit_application,
+    admin_user:,
+    uploaded_files:,
+    linked_application_id:
+  )
     @permit_application = permit_application
     @user = permit_application.submitter
     @admin_user = admin_user
+    @uploaded_files = uploaded_files
+    @linked_application_id = linked_application_id
 
     send_user_mail(
       email: @user.email,

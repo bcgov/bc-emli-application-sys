@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
 import {
   Button,
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Select,
   Text,
 } from '@chakra-ui/react';
-import { useTranslation, Trans } from 'react-i18next';
+import React, { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { EUpdateRoles, EUserRoles, EPermitClassificationCode } from '../../../types/enums';
 import { useMst } from '../../../setup/root';
+import { EPermitClassificationCode, EUpdateRoles, EUserRoles } from '../../../types/enums';
 
-const AddSupportingFilesPathwayModal = ({ isOpen, onClose, permitApplication }) => {
+const AddSupportingFilesPathwayModal = ({ isOpen, onClose, permitApplication, onRequestFiles }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { userStore, permitApplicationStore } = useMst();
@@ -25,6 +25,8 @@ const AddSupportingFilesPathwayModal = ({ isOpen, onClose, permitApplication }) 
 
   const [selectedOption, setSelectedOption] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const isApplicantPathway = selectedOption === EUpdateRoles.applicant;
 
   // Reset state when modal opens
   React.useEffect(() => {
@@ -41,11 +43,23 @@ const AddSupportingFilesPathwayModal = ({ isOpen, onClose, permitApplication }) 
   const handleNext = async () => {
     if (!selectedOption) return;
 
+    // Applicant pathway: hand off to the Request supporting files modal, which collects the file
+    // list that becomes the bullet points in the participant's email. Creating the support request
+    // here instead posted an empty note, so the participant was emailed a request listing no files
+    // (BCHEP-496).
+    if (isApplicantPathway) {
+      onClose();
+      onRequestFiles?.();
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       // Create the support request with linked application
       // For staff pathway, use 'internal' audience type; otherwise use default 'external'
+      // Only the staff route reaches here; the applicant route returned above. The admin uploads
+      // the files themselves, so there is no list to send.
       const params = {
         note: '',
         ...(selectedOption === EUpdateRoles.staff && { audience_type_code: 'internal' }),

@@ -160,6 +160,32 @@ RSpec.describe Api::SupportRequestsController, type: :controller do
       )
     end
 
+    # The participant's email lists these files as bullets, so a blank note produced an email
+    # saying "we need the below supporting file(s)" followed by nothing - live from 2025-12-22
+    # until BCHEP-496. The check has to run *before* SupportingFilesService, which persists both
+    # the SupportRequest and a linked PermitApplication: failing after that left the participant
+    # with an unexplained upload form in their list and no email.
+    it "refuses a request with no file list, before anything is created" do
+      # parent_app is a lazy let - force it into existence before counting, or its own creation
+      # registers as the change this example is trying to rule out.
+      parent_id = parent_app.id
+
+      expect {
+        expect {
+          post :request_supporting_files,
+               params: {
+                 parent_application_id: parent_id,
+                 note: "   \n  \n"
+               }
+        }.not_to change(SupportRequest, :count)
+      }.not_to change(PermitApplication, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response_message).to eq(
+        copy_for("support_request_no_files_listed")
+      )
+    end
+
     it "reports a missing record, not a missing template, for an unknown parent application" do
       post :request_supporting_files,
            params: {

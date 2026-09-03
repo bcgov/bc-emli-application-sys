@@ -572,6 +572,9 @@ class NotificationService
   )
     notification_user_hash = {}
 
+    # missing_files is guaranteed non-empty by the caller - support_requests_controller rejects a
+    # blank list with a 422 before anything is created. Guarding again here would only raise after
+    # the records exist, which is the failure mode that guard avoids (BCHEP-496).
     PermitHubMailer.notify_participant_supporting_files_requested(
       permit_application,
       missing_files: missing_files,
@@ -585,6 +588,43 @@ class NotificationService
     notification_user_hash[
       permit_application.submitter.id
     ] = permit_application.publish_supporting_files_requested__data
+
+    unless notification_user_hash.empty?
+      NotificationPushJob.perform_async(notification_user_hash)
+    end
+  end
+
+  # Admin uploaded supporting files on the participant's behalf - tell the participant, by email and
+  # in app. Mirrors publish_supporting_files_requested_event above: both channels live here so they
+  # cannot drift apart. Neither half existed before BCHEP-496.
+  def self.publish_supporting_files_added_by_admin_event(
+    permit_application,
+    admin_user:,
+    uploaded_files:,
+    linked_application_id:
+  )
+    notification_user_hash = {}
+
+    submitter = permit_application.submitter
+    return unless submitter.is_a?(User)
+
+    # Telling a participant that files were uploaded, then listing none, is the same defect this
+    # ticket fixed on the request side. Send nothing rather than an empty list - the submission
+    # cannot have been a real upload if no active document survived (BCHEP-496).
+    return if uploaded_files.blank?
+
+    PermitHubMailer.notify_participant_supporting_files_added(
+      permit_application,
+      admin_user: admin_user,
+      uploaded_files: uploaded_files,
+      linked_application_id: linked_application_id
+    )&.deliver_later
+
+    notification_user_hash[
+      submitter.id
+    ] = permit_application.publish_supporting_files_added_by_admin__data(
+      linked_application_id
+    )
 
     unless notification_user_hash.empty?
       NotificationPushJob.perform_async(notification_user_hash)

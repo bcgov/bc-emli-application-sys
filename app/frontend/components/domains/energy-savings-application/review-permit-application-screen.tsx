@@ -42,6 +42,7 @@ import { EnergySavingsApplicationStatusTag } from '../../shared/energy-savings-a
 import AddSupportingFilesPathwayModal from '../../shared/modals/add-supporting-files-pathway-modal';
 import UpdatePathwayModal from '../../shared/modals/application-update-pathway';
 import { GlobalConfirmationModal } from '../../shared/modals/global-confirmation-modal';
+import { SupportingFilesRequestModal } from './supporting-files-request-modal';
 interface IReferenceNumberForm {
   referenceNumber?: string;
 }
@@ -103,6 +104,13 @@ export const ReviewPermitApplicationScreen = observer(() => {
     isOpen: isAddSupportingFilesPathwayOpen,
     onOpen: onAddSupportingFilesPathwayOpen,
     onClose: onAddSupportingFilesPathwayClose,
+  } = useDisclosure();
+  // Step two of the applicant route: the pathway modal hands off here so the admin can list the
+  // files being asked for (BCHEP-496).
+  const {
+    isOpen: isSupportingFilesRequestOpen,
+    onOpen: onSupportingFilesRequestOpen,
+    onClose: onSupportingFilesRequestClose,
   } = useDisclosure();
   const [hideRevisionList, setHideRevisionList] = useState(false);
   const [hasUnsavedEdits, setHasUnsavedEdits] = useState(false);
@@ -682,6 +690,14 @@ export const ReviewPermitApplicationScreen = observer(() => {
         <AddSupportingFilesPathwayModal
           isOpen={isAddSupportingFilesPathwayOpen}
           onClose={onAddSupportingFilesPathwayClose}
+          permitApplication={currentPermitApplication}
+          onRequestFiles={onSupportingFilesRequestOpen}
+        />
+      )}
+      {isSupportingFilesRequestOpen && (
+        <SupportingFilesRequestModal
+          isOpen={isSupportingFilesRequestOpen}
+          onClose={onSupportingFilesRequestClose}
           permitApplication={currentPermitApplication}
         />
       )}
