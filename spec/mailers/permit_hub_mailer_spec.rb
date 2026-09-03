@@ -136,8 +136,11 @@ RSpec.describe PermitHubMailer, type: :mailer do
   end
 
   # BCHEP-496. This mailer had a call site but no template and no subject key, so it had never
-  # rendered - the failure was invisible because the flow returned before reaching it. The
-  # linked_application_id assertion matters most: the Log in button is built from it, and an
+  # rendered. Invisible either way: the flow usually returned before reaching it, and where it did
+  # reach it the failure landed in a Sidekiq job after the request had already told the admin it
+  # had worked.
+  #
+  # The linked_application_id assertion matters most: the Log in button is built from it, and an
   # omitted keyword used to produce a link to /applications//edit.
   describe "#notify_participant_supporting_files_added" do
     let(:permit_application) { create(:permit_application, :newly_submitted) }

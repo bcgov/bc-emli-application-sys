@@ -596,7 +596,10 @@ class NotificationService
 
   # Admin uploaded supporting files on the participant's behalf - tell the participant, by email and
   # in app. Mirrors publish_supporting_files_requested_event above: both channels live here so they
-  # cannot drift apart. Neither half existed before BCHEP-496.
+  # cannot drift apart.
+  #
+  # Before BCHEP-496 the participant got neither. The in-app half did not exist at all; the email
+  # half had a mailer method and a call site but no template, so it could not render.
   def self.publish_supporting_files_added_by_admin_event(
     permit_application,
     admin_user:,
