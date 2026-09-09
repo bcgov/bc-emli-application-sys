@@ -98,7 +98,7 @@ app:
 
   env:
     'VITE_SUBMIT_INVOICE_ENABLED': 'true'
-    'ANYCABLE_URL': 'wss://hesp-anycable.apps.gold.devops.gov.bc.ca/cable'
+    'ANYCABLE_URL': 'wss://test-hesp-anycable.apps.gold.devops.gov.bc.ca/cable'
     'IS_APP_SERVER': true
     'CLAMAV_TIMEOUT': '30'
     'VIRUS_SCAN_TEMP_DIR': '/tmp/virus_scan'
@@ -540,7 +540,8 @@ anycableGo:
     anycableRedisSentinels: 'hesp-redis:26379'
 
   route:
-    enabled: false # Route handled by nginx proxy
+    enabled: true
+    host: test-hesp-anycable.apps.gold.devops.gov.bc.ca
 
   ingress:
     enable: false
