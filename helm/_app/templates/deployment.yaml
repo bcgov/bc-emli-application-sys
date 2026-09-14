@@ -141,13 +141,20 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.logVolume.enabled }}
           volumeMounts:
+            - name: aws-credentials
+              mountPath: /run/secrets/aws
+              readOnly: true
+            {{- if .Values.logVolume.enabled }}
             - name: log-volume
               mountPath: /app/log
-          {{- end }}
-      {{- with .Values.logVolume.enabled }}
+            {{- end }}
       volumes:
+        - name: aws-credentials
+          secret:
+            secretName: {{ .Values.global.s3CredentialsSecretName | default "hesp-s3-credentials" | quote }}
+            optional: false
+      {{- if .Values.logVolume.enabled }}
         - name: log-volume
           persistentVolumeClaim:
             claimName: {{ include "_.fullname" $root }}-log

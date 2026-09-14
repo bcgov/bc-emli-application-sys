@@ -1,0 +1,9 @@
+FROM ghcr.io/aquasecurity/trivy:latest
+
+# Set working directory for scans
+WORKDIR /app
+
+# Default to scanning filesystem, but can be overridden
+# Example: docker run -v /path/to/project:/workspace trivy-scanner fs .
+ENTRYPOINT ["trivy"]
+CMD ["fs", "/app"]

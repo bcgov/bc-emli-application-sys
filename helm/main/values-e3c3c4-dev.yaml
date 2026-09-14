@@ -291,7 +291,7 @@ crunchy-postgres:
       s3Secret: pgbackrest-s3-credentials
       s3Path: '/pgbackup-dev'
       s3UriStyle: path
-      bucket: 'hesp-dev-cacentral1-s3pgbackup'
+      bucket: 'hesp-dev-pgbackup'
       endpoint: 's3.ca-central-1.amazonaws.com'
       region: 'ca-central-1'
       # Credentials intentionally unused in DEV
@@ -638,7 +638,7 @@ sharedConfig:
     region: ca-central-1
     endpoint: https://s3.ca-central-1.amazonaws.com
     publicEndpoint: https://s3.ca-central-1.amazonaws.com
-    bucket: hesp-dev-cacentral1-bucket
+    bucket: hesp-dev-app-file-storage
 
   app:
     domain: dev-hesp.apps.gold.devops.gov.bc.ca
@@ -682,4 +682,4 @@ auditLogArchive:
     AUDIT_LOG_RETENTION_DAYS: '30'
     AUDIT_LOG_ARCHIVE_PREFIX: 'audit-log-archives/dev'
     # Dedicated archive bucket only for audit logs, separate from app uploads/db backups.
-    AUDIT_LOG_ARCHIVE_S3_BUCKET: 'hesp-dev-cacentral1-audit-storage'
+    AUDIT_LOG_ARCHIVE_S3_BUCKET: 'hesp-dev-audit-storage'

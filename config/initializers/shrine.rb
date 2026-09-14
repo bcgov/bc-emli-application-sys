@@ -1,6 +1,7 @@
 require "shrine"
 require "shrine/storage/file_system"
 require "shrine/storage/s3"
+require "digest"
 
 # TODO: CDN Cache images?
 # url_options = {
@@ -23,10 +24,8 @@ module Constants
 end
 
 SHRINE_USE_S3 =
-  !(
-    Rails.env.test? || ENV["IS_DOCKER_BUILD"].present? ||
-      ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"].blank?
-  )
+  !(Rails.env.test? || ENV["IS_DOCKER_BUILD"].present?) &&
+    ENV["BCGOV_OBJECT_STORAGE_BUCKET"].present?
 
 Rails.logger.info "Shrine S3 enabled: #{SHRINE_USE_S3}"
 if SHRINE_USE_S3
@@ -41,61 +40,12 @@ LOCAL_MINIO_S3 =
     )
 
 if SHRINE_USE_S3
-  # Simple credentials provider - database only, cron job handles refresh
-  def get_aws_credentials
-    if LOCAL_MINIO_S3
-      return(
-        {
-          access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
-          secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
-          session_token: nil
-        }
-      )
-    end
-
-    # Check if we can access the database and AwsCredential model during initialization
-    begin
-      db_credentials = AwsCredential.current_s3_credentials if defined?(
-        AwsCredential
-      ) && ActiveRecord::Base.connected?
-    rescue => e
-      Rails.logger.debug "Cannot access database during initialization: #{e.message}"
-      db_credentials = nil
-    end
-
-    if db_credentials && !Rails.env.test?
-      Rails.logger.info "Using AWS credentials from database (expires: #{db_credentials[:expires_at]})"
-      {
-        access_key_id: db_credentials[:access_key_id],
-        secret_access_key: db_credentials[:secret_access_key],
-        session_token: db_credentials[:session_token]
-      }
-    else
-      # During initialization, this is expected - log at debug level instead of error
-      if Rails.application.initialized?
-        Rails.logger.error "No database credentials found! S3 operations will fail."
-        Rails.logger.error "Check cron job 'aws_credential_refresh' is running."
-        Rails.logger.error "Manual fix: Run AwsCredentialRefreshService.new.refresh_credentials!"
-        Rails.logger.error "Ensure Parameter Store has credentials at: #{ENV["AWS_PARAMETER_BASE_PATH"]}/current/*"
-      else
-        Rails.logger.debug "Database credentials not available during initialization - this is expected"
-      end
-      # Return empty credentials - this will cause graceful failure with clear error messages
-      { access_key_id: nil, secret_access_key: nil, session_token: nil }
-    end
-  end
-
-  credentials = get_aws_credentials
-
   s3_options = {
     bucket: ENV["BCGOV_OBJECT_STORAGE_BUCKET"],
     endpoint: ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"],
     region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "no-region-needed",
-    access_key_id: credentials[:access_key_id],
-    secret_access_key: credentials[:secret_access_key],
-    session_token: credentials[:session_token],
     force_path_style: true
-  }.compact
+  }
 
   # Create bucket if using local MinIO (development)
   if LOCAL_MINIO_S3
@@ -129,7 +79,7 @@ if SHRINE_USE_S3
     end
   end
 
-  # Simplified S3 storage class - database credentials only, cron job handles refresh
+  # Rebuild the AWS client when the mounted Secret content changes.
   class DynamicS3Storage < Shrine::Storage::S3
     def initialize(**options)
       # Don't pass credentials to parent - we'll handle them dynamically
@@ -137,6 +87,7 @@ if SHRINE_USE_S3
         **options.except(:access_key_id, :secret_access_key, :session_token)
       )
       @client = nil
+      @credential_fingerprint = nil
       @dynamic_options = options
     end
 
@@ -153,26 +104,9 @@ if SHRINE_USE_S3
            Aws::Errors::MissingCredentialsError => e
       Rails.logger.error "S3 credential error during upload: #{e.message}"
 
-      # More aggressive recovery
+      Rails.logger.error "Retrying upload after invalidating client to reread mounted credentials"
       @client = nil
-      Rails.cache.delete("aws_credentials/s3")
-
-      # Force immediate refresh instead of just queuing
-      begin
-        service = AwsCredentialRefreshService.new
-        if service.refresh_credentials!
-          Rails.logger.info "Immediate credential refresh successful, retrying upload"
-          # Force new client creation with fresh credentials
-          @client = nil
-          super # Retry upload
-        else
-          Rails.logger.error "Immediate refresh failed, upload will fail"
-          raise e
-        end
-      rescue => retry_error
-        Rails.logger.error "All recovery attempts failed: #{retry_error.message}"
-        raise retry_error
-      end
+      super # Retry with fresh credentials from mounted files
     end
 
     # Override download method to handle credential errors
@@ -182,15 +116,9 @@ if SHRINE_USE_S3
            Aws::S3::Errors::SignatureDoesNotMatch,
            Aws::Errors::MissingCredentialsError => e
       Rails.logger.error "S3 credential error during download: #{e.message}"
+      Rails.logger.error "Retrying download after invalidating client to reread mounted credentials"
       @client = nil
-      Rails.cache.delete("aws_credentials/s3")
-      begin
-        AwsCredentialRefreshService.new.refresh_credentials!
-        super
-      rescue => retry_error
-        Rails.logger.error "Download retry failed after credential refresh: #{retry_error.message}"
-        raise retry_error
-      end
+      super # Retry with fresh credentials from mounted files
     end
 
     # Override exists? method to handle credential errors
@@ -200,15 +128,9 @@ if SHRINE_USE_S3
            Aws::S3::Errors::SignatureDoesNotMatch,
            Aws::Errors::MissingCredentialsError => e
       Rails.logger.error "S3 credential error during exists check: #{e.message}"
+      Rails.logger.error "Retrying exists check after invalidating client to reread mounted credentials"
       @client = nil
-      Rails.cache.delete("aws_credentials/s3")
-      begin
-        AwsCredentialRefreshService.new.refresh_credentials!
-        super
-      rescue => retry_error
-        Rails.logger.error "Exists check retry failed after credential refresh: #{retry_error.message}"
-        false # Return false on error rather than raising
-      end
+      super # Retry with fresh credentials from mounted files
     end
 
     # Override object method to ensure it uses our dynamic client
@@ -219,141 +141,43 @@ if SHRINE_USE_S3
 
     private
 
-    # Enhanced client method with real-time validation
     def client
-      # Always check for fresh credentials if client is nil or credentials are invalid
-      @client = create_s3_client if @client.nil? || credentials_invalid?
+      credentials = OpenshiftAwsCredentials.current
+      fingerprint =
+        Digest::SHA256.hexdigest(
+          [
+            credentials[:access_key_id],
+            credentials[:secret_access_key],
+            credentials[:session_token]
+          ].join("\0")
+        )
+
+      if @client.nil? || @credential_fingerprint != fingerprint
+        @client = create_s3_client(credentials)
+        @credential_fingerprint = fingerprint
+      end
+
       @client
     end
 
-    # Check if current client has invalid credentials
-    def credentials_invalid?
-      return false unless @client
-      return false if LOCAL_MINIO_S3
-      return false unless defined?(AwsCredential) && !Rails.env.test?
-
-      begin
-        db_credentials = AwsCredential.current_s3_credentials
-        return true unless db_credentials
-
-        # Check if credentials expire within 2 minutes
-        if db_credentials[:expires_at] < (Time.current + 2.minutes)
-          Rails.logger.info "Credentials expire soon, invalidating client"
-          return true
-        end
-
-        # Quick validation - check if current client credentials match database
-        current_key =
-          begin
-            @client.config.credentials.access_key_id
-          rescue StandardError
-            nil
-          end
-        db_key = db_credentials[:access_key_id]
-
-        if current_key != db_key
-          Rails.logger.info "Client credentials don't match database, invalidating"
-          return true
-        end
-
-        false
-      rescue => e
-        Rails.logger.debug "Error checking credential validity: #{e.message}"
-        true # Assume invalid on error
-      end
-    end
-
     # Create a new S3 client with current credentials
-    def create_s3_client
-      if LOCAL_MINIO_S3
-        return(
-          Aws::S3::Client.new(
-            endpoint: @dynamic_options[:endpoint],
-            region: @dynamic_options[:region],
-            access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
-            secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
-            session_token: nil,
-            force_path_style: @dynamic_options[:force_path_style]
-          )
-        )
-      end
+    def create_s3_client(credentials)
+      return super if LOCAL_MINIO_S3
 
-      if defined?(AwsCredential) && !Rails.env.test?
-        # Handle database connection issues during initialization
-        begin
-          db_credentials =
-            AwsCredential.current_s3_credentials if ActiveRecord::Base.connected?
-        rescue => e
-          Rails.logger.debug "Cannot access database for S3 credentials: #{e.message}"
-          db_credentials = nil
-        end
+      return super if Rails.env.test?
 
-        if db_credentials
-          # Check if credentials expire within 2 minutes (immediate refresh needed)
-          if db_credentials[:expires_at] < (Time.current + 2.minutes)
-            Rails.logger.warn "Credentials expire very soon (#{db_credentials[:expires_at]}), attempting immediate refresh"
-            begin
-              AwsCredentialRefreshService.new.refresh_credentials!
-              # Get refreshed credentials
-              db_credentials = AwsCredential.current_s3_credentials
-            rescue => e
-              Rails.logger.error "Emergency credential refresh failed: #{e.message}"
-            end
-          end
-
-          if db_credentials && db_credentials[:access_key_id].present?
-            Rails.logger.debug "Creating S3 client with database credentials (expires: #{db_credentials[:expires_at]})"
-            return(
-              Aws::S3::Client.new(
-                endpoint: @dynamic_options[:endpoint],
-                region: @dynamic_options[:region],
-                access_key_id: db_credentials[:access_key_id],
-                secret_access_key: db_credentials[:secret_access_key],
-                session_token: db_credentials[:session_token],
-                force_path_style: @dynamic_options[:force_path_style]
-              )
-            )
-          end
-        end
-
-        # If we reach here, try to refresh credentials
-        Rails.logger.warn "No valid database credentials, attempting refresh"
-        begin
-          AwsCredentialRefreshService.new.refresh_credentials!
-          db_credentials = AwsCredential.current_s3_credentials
-
-          if db_credentials && db_credentials[:access_key_id].present?
-            Rails.logger.info "Successfully refreshed credentials, creating client"
-            return(
-              Aws::S3::Client.new(
-                endpoint: @dynamic_options[:endpoint],
-                region: @dynamic_options[:region],
-                access_key_id: db_credentials[:access_key_id],
-                secret_access_key: db_credentials[:secret_access_key],
-                session_token: db_credentials[:session_token],
-                force_path_style: @dynamic_options[:force_path_style]
-              )
-            )
-          end
-        rescue => e
-          Rails.logger.error "Credential refresh failed: #{e.message}"
-        end
-
-        Rails.logger.error "No database credentials available! S3 operations will fail."
-        Rails.logger.error "Check cron job 'aws_credential_refresh' is running and Parameter Store access is working."
-        Rails.logger.error "Manual fix: Run AwsCredentialRefreshService.new.refresh_credentials!"
-
-        # Return a client with nil credentials - this will trigger proper AWS error
+      if credentials && credentials[:access_key_id].present?
+        Rails.logger.debug "Creating S3 client with mounted secret credentials"
         Aws::S3::Client.new(
           endpoint: @dynamic_options[:endpoint],
           region: @dynamic_options[:region],
-          access_key_id: nil,
-          secret_access_key: nil,
-          session_token: nil,
+          access_key_id: credentials[:access_key_id],
+          secret_access_key: credentials[:secret_access_key],
+          session_token: credentials[:session_token],
           force_path_style: @dynamic_options[:force_path_style]
         )
       else
-        super
+        raise "S3 credentials not available and OpenshiftAwsCredentials.current returned empty"
       end
     end
   end
@@ -425,34 +249,24 @@ class Shrine::Storage::S3
       # Create a temporary S3 client with public endpoint for presigned URLs
       # Get dynamic credentials from database
       begin
-        db_credentials = AwsCredential.current_s3_credentials if defined?(
-          AwsCredential
-        ) && ActiveRecord::Base.connected?
+        credentials = OpenshiftAwsCredentials.current
       rescue => e
         Rails.logger.debug "Cannot access database for presigned URL credentials: #{e.message}"
-        db_credentials = nil
+        credentials = nil
       end
 
-      if db_credentials
+      if credentials && credentials[:access_key_id].present?
         public_client =
           Aws::S3::Client.new(
             endpoint: ENV["BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT"],
             region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "no-region-needed",
-            access_key_id: db_credentials[:access_key_id],
-            secret_access_key: db_credentials[:secret_access_key],
-            session_token: db_credentials[:session_token],
+            access_key_id: credentials[:access_key_id],
+            secret_access_key: credentials[:secret_access_key],
+            session_token: credentials[:session_token],
             force_path_style: true
           )
       else
-        # Fallback to environment variables if database credentials unavailable
-        public_client =
-          Aws::S3::Client.new(
-            endpoint: ENV["BCGOV_OBJECT_STORAGE_PUBLIC_ENDPOINT"],
-            region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "no-region-needed",
-            access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
-            secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
-            force_path_style: true
-          )
+        raise "S3 credentials not available for presigned URL generation"
       end
       public_resource = Aws::S3::Resource.new(client: public_client)
       public_obj = public_resource.bucket(bucket.name).object(obj.key)
