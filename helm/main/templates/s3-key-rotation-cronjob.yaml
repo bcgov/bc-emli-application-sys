@@ -8,7 +8,7 @@ metadata:
   labels:
     {{- include "main.labels" . | nindent 4 }}
 ---
-# Role: allow the CronJob to read/patch the hesp secret and, optionally,
+# Role: allow the CronJob to read/patch the dedicated S3 credential secret and, optionally,
 # patch a pgbackrest credentials secret when pgBackRest S3 is in use.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -20,7 +20,7 @@ rules:
   - apiGroups: [""]
     resources: ["secrets"]
     resourceNames:
-      - {{ .Values.global.envSecretName | quote }}
+      - {{ .Values.s3KeyRotation.secretName | default "hesp-s3-credentials" | quote }}
       {{- if .Values.s3KeyRotation.syncPgbackrestSecret }}
       - {{ .Values.s3KeyRotation.pgbackrestSecretName | default "pgbackrest-s3-credentials" | quote }}
       {{- end }}
@@ -110,8 +110,8 @@ data:
 ---
 # CronJob: every 6 hours, fetch current credentials from AWS SSM Parameter Store
 # (where the BC Gov Lambda rotation function stores them), then sync into the
-# hesp secret and (optionally) the pgbackrest credentials secret.
-# Falls back to hesp secret directly if parameterStorePath is not set or SSM fails.
+# dedicated S3 credential secret and (optionally) the pgbackrest credentials secret.
+# Falls back to the dedicated S3 credential secret if parameterStorePath is not set or SSM fails.
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -145,12 +145,12 @@ spec:
                 - name: BOOT_KEY_ID
                   valueFrom:
                     secretKeyRef:
-                      name: {{ .Values.global.envSecretName | quote }}
+                      name: {{ .Values.s3KeyRotation.secretName | default "hesp-s3-credentials" | quote }}
                       key: BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID
                 - name: BOOT_SECRET
                   valueFrom:
                     secretKeyRef:
-                      name: {{ .Values.global.envSecretName | quote }}
+                      name: {{ .Values.s3KeyRotation.secretName | default "hesp-s3-credentials" | quote }}
                       key: BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY
               volumeMounts:
                 - name: scripts
@@ -170,13 +170,13 @@ spec:
                       KEY_SECRET=$(tail -1 /tmp/creds)
                       echo "SSM credentials fetched OK (key ID: ${KEY_ID:0:8}...)"
                     else
-                      echo "WARNING: SSM fetch failed, falling back to hesp secret"
+                      echo "WARNING: SSM fetch failed, falling back to dedicated S3 credential secret"
                       cat /tmp/creds_err || true
                       KEY_ID="$BOOT_KEY_ID"
                       KEY_SECRET="$BOOT_SECRET"
                     fi
                   else
-                    echo "No parameterStorePath set — using hesp secret credentials directly"
+                    echo "No parameterStorePath set — using dedicated S3 credential secret directly"
                     KEY_ID="$BOOT_KEY_ID"
                     KEY_SECRET="$BOOT_SECRET"
                   fi
@@ -197,10 +197,10 @@ spec:
                   KEY_ID_B64=$(echo -n "$KEY_ID" | base64 -w 0)
                   KEY_SECRET_B64=$(echo -n "$KEY_SECRET" | base64 -w 0)
 
-                  oc patch secret {{ .Values.global.envSecretName | quote }} \
+                  oc patch secret {{ .Values.s3KeyRotation.secretName | default "hesp-s3-credentials" | quote }} \
                     --type='json' \
                     -p="[{\"op\":\"replace\",\"path\":\"/data/BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID\",\"value\":\"${KEY_ID_B64}\"},{\"op\":\"replace\",\"path\":\"/data/BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY\",\"value\":\"${KEY_SECRET_B64}\"}]"
-                  echo "hesp secret patched successfully."
+                  echo "dedicated S3 credential secret patched successfully."
               resources:
                 requests:
                   cpu: 25m

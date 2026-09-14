@@ -25,6 +25,11 @@ spec:
           imagePullSecrets:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          volumes:
+            - name: aws-credentials
+              secret:
+                secretName: {{ .Values.s3KeyRotation.secretName | default "hesp-s3-credentials" | quote }}
+                optional: false
           containers:
             - name: audit-log-archive
               image: "{{ .Values.auditLogArchive.image.repository | default .Values.app.image.repository | default "ghcr.io/bcgov/hesp-app" }}:{{ .Values.auditLogArchive.image.tag | default .Values.app.image.tag | default "main" }}"
@@ -72,4 +77,8 @@ spec:
               {{- end }}
               resources:
                 {{- toYaml .Values.auditLogArchive.resources | nindent 16 }}
+              volumeMounts:
+                - name: aws-credentials
+                  mountPath: /run/secrets/aws
+                  readOnly: true
 {{- end }}

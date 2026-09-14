@@ -20,7 +20,7 @@ define set-app-version
     @if [ -n "${IMAGE_TAG}" ]; then \
         TAG="${IMAGE_TAG}"; \
         if [ $${#TAG} -eq 40 ]; then TAG=$${TAG:0:8}; fi; \
-        yq e ".appVersion = \"$$TAG\"" -i Chart.yaml; \
+		sed -i -E "s/^appVersion:.*/appVersion: '$$TAG'/" Chart.yaml; \
     fi
 endef
 

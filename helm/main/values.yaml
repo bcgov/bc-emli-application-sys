@@ -28,6 +28,7 @@ global:
     'SIDEKIQ_REDIS_DB': '0'
 
   envSecretName: hesp # pragma: allowlist secret
+  s3CredentialsSecretName: hesp-s3-credentials # pragma: allowlist secret
   serviceAccountName: bfc7dd-vault
   sharedConfig:
     enabled: true
@@ -520,6 +521,8 @@ s3KeyRotation:
   enabled: false
   # Run every 6 hours (well within the 24h overlap window)
   schedule: '0 */6 * * *'
+  # Dedicated Secret containing the rotating S3 access key pair.
+  secretName: 'hesp-s3-credentials'
   # If true, also sync credentials into a pgbackrest secret for repo2 S3 backups.
   # Set false in namespaces where pgBackRest S3 is not used (e.g. dev/test).
   syncPgbackrestSecret: true

@@ -26,6 +26,7 @@ global:
     'DATABASE_POOL': '10'
 
   envSecretName: hesp # Reference to OS Secret containing env vars
+  s3CredentialsSecretName: hesp-s3-credentials
   serviceAccountName: e3c3c4-vault # Or just use default
 
 nameOverride: hesp
@@ -631,7 +632,7 @@ sharedConfig:
   aws:
     region: ca-central-1
     defaultRegion: ca-central-1
-    parameterBasePath: '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
+    parameterBasePath: '/iam_users/a5c711-dev_HESPUser_keys'
 
   s3:
     region: ca-central-1
@@ -665,8 +666,9 @@ sharedConfig:
 s3KeyRotation:
   enabled: true
   schedule: '0 */2 * * *'
+  secretName: 'hesp-s3-credentials'
   syncPgbackrestSecret: false
-  parameterStorePath: '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
+  parameterStorePath: '/iam_users/a5c711-dev_HESPUser_keys'
 
 # ============================================================================
 # AUDIT LOG ARCHIVE + PRUNE
