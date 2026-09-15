@@ -386,6 +386,11 @@ Rails.application.routes.draw do
       get "invoices/summary", to: "invoices#summary"
       get "invoices/:id", to: "invoices#show", as: :external_api_invoice
 
+      # Inbound status events. Top-level rather than under
+      # applications/ because an event can target any submission - a participant
+      # application, a contractor invoice, an onboarding form.
+      post "status_events", to: "status_events#create"
+
       # Contractor data API endpoints
       get "contractors", to: "contractors#index"
       get "contractors/:id",

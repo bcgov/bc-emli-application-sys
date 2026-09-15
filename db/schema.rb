@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_11_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1007,6 +1007,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_000000) do
     t.index ["virus_scan_status"], name: "index_step_codes_on_virus_scan_status"
   end
 
+  create_table "submission_status_events",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
+    t.string "application_id"
+    t.datetime "created_at", null: false
+    t.string "event_id", null: false
+    t.uuid "external_api_key_id"
+    t.string "outcome"
+    t.text "outcome_detail"
+    t.jsonb "payload", null: false
+    t.uuid "permit_application_id"
+    t.datetime "processed_at"
+    t.datetime "updated_at", null: false
+    t.index ["application_id"],
+            name: "index_submission_status_events_on_application_id"
+    t.index ["event_id"],
+            name: "index_submission_status_events_on_event_id",
+            unique: true
+    t.index ["external_api_key_id"],
+            name: "index_submission_status_events_on_external_api_key_id"
+    t.index %w[permit_application_id created_at],
+            name: "idx_on_permit_application_id_created_at_a228ce7b1e"
+    t.index ["processed_at"],
+            name: "index_submission_status_events_unprocessed",
+            where: "(processed_at IS NULL)"
+  end
+
   create_table "submission_versions",
                id: :uuid,
                default: -> { "gen_random_uuid()" },
@@ -1378,6 +1406,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_000000) do
   add_foreign_key "step_code_checklists", "step_codes"
   add_foreign_key "step_code_data_entries", "step_codes"
   add_foreign_key "step_codes", "permit_applications"
+  add_foreign_key "submission_status_events", "external_api_keys"
+  add_foreign_key "submission_status_events", "permit_applications"
   add_foreign_key "submission_versions", "permit_applications"
   add_foreign_key "support_requests",
                   "permit_applications",
