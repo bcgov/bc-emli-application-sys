@@ -717,6 +717,12 @@ en:
       external_api_key_unauthorized_error:
         title: 'Unauthorized'
         message: '%{error_message}'
+      status_event_missing_event_id:
+        title: 'Unprocessable'
+        message: 'event_id is required.'
+      status_event_single_only:
+        title: 'Unprocessable'
+        message: 'Send one status event per request. Arrays are not accepted.'
       not_found_error:
         title: 'Error'
         message: 404 - The requested resource could not be found

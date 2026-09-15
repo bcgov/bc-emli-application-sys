@@ -55,7 +55,7 @@ Authorization: Bearer {Your_API_Key_Here}
 Please note that a unique API key is required for each jurisdiction you wish to access, enhancing security and data integrity.
 
 ### Rate limits:
-To ensure fair usage, the API is rate-limited to 100 requests per minute per API key and 300 requests per IP in a 3 minute interval. Exceeding these
+To ensure fair usage, the API is rate-limited to 100 requests per minute per API key and 300 requests per IP in a 5 minute interval. Exceeding these
 limits will result in a 429 response. If this occurs, we recommend spacing out your requests. Continued exceeding of rate limits
 may necessitate further contact with the building permit hub team.
 
@@ -668,6 +668,157 @@ in this document.
               }
             }
           },
+          # Errors raised by the application (401/403/404/422) nest a structured
+          # object under meta.message, unlike the rate-limit response above which
+          # puts a plain string there. Both shapes are real; this is the one you
+          # get from everything except a 429.
+          ResponseErrorDetailed: {
+            type: :object,
+            properties: {
+              data: {
+                type: :object,
+                properties: {
+                }
+              },
+              meta: {
+                type: :object,
+                properties: {
+                  message: {
+                    type: :object,
+                    properties: {
+                      title: {
+                        type: :string
+                      },
+                      message: {
+                        type: :string,
+                        description: "The error message."
+                      },
+                      type: {
+                        type: :string,
+                        enum: %w[error]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          StatusEvent: {
+            type: :object,
+            required: %w[
+              event_id
+              event_type
+              event_datetime
+              record_type
+              application_id
+              order_id
+            ],
+            properties: {
+              event_id: {
+                type: :string,
+                format: :uuid,
+                description:
+                  "The sender's event id. Must be stable across retries - it is the idempotency key. Re-sending an event with an event_id already received is a no-op and returns 200."
+              },
+              event_type: {
+                type: :string,
+                enum: %w[APPROVED APPROVED_PENDING PAID INELIGIBLE CANCELLED],
+                description: "The status being reported."
+              },
+              event_datetime: {
+                type: :string,
+                format: "date-time",
+                description:
+                  "ISO 8601, UTC. When the status was set in the sending system. Persisted on the record, so identical across retries."
+              },
+              record_type: {
+                type: :string,
+                enum: %w[PARTICIPANT CONTRACTOR],
+                description: "The kind of submission this event refers to."
+              },
+              application_id: {
+                type: :string,
+                pattern: "^[0-9]{3}-[0-9]{3}-[0-9]{3}$",
+                example: "123-456-789",
+                description:
+                  "The submission reference issued by this system - the number shown as 'Application #'. NOTE: the outbound webhook documented above uses `application_id` to mean the submission UUID instead; the two are not interchangeable."
+              },
+              order_id: {
+                type: :string,
+                format: :uuid,
+                description:
+                  "GUID from the original ESPAS submission. Stored for traceability; this system does not interpret it or use it to locate a submission."
+              },
+              eligibility_code: {
+                type: :string,
+                nullable: true,
+                description: "Eligibility code. Surfaced to the participant."
+              },
+              income_bracket: {
+                type: :string,
+                nullable: true,
+                enum: ["ESP Level 1", "ESP Level 2", "ESP Level 3", "N/A", nil],
+                description: "Sent for APPROVED and INELIGIBLE."
+              },
+              approved_date: {
+                type: :string,
+                format: :date,
+                nullable: true,
+                description: "Business date of approval. Required for APPROVED."
+              },
+              paid_date: {
+                type: :string,
+                format: :date,
+                nullable: true,
+                description:
+                  "Business date of payment. Required for PAID. Distinct from approved_date."
+              },
+              event_notes: {
+                type: :string,
+                nullable: true,
+                description:
+                  "Free text shown to the participant. Required for INELIGIBLE."
+              },
+              updated_by_user_id: {
+                type: :string,
+                nullable: true,
+                example: "0055f00000AbCdEfGHI",
+                description:
+                  "18-character user id of whoever set the status in the sending system. May be an automation user rather than a person."
+              }
+            }
+          },
+          StatusEventAck: {
+            type: :object,
+            properties: {
+              data: {
+                type: :object,
+                properties: {
+                  event_id: {
+                    type: :string,
+                    description: "The event_id that was received."
+                  },
+                  matched: {
+                    type: :boolean,
+                    description:
+                      "Whether application_id matched a known submission. False means the event was recorded but could not be linked - see the endpoint description."
+                  },
+                  application_id: {
+                    type: :string,
+                    description:
+                      "Present only when matched is false. Echoes the application_id exactly as we parsed it, so a field-mapping or formatting mistake can be told apart from a submission we genuinely do not have. Omitted on a match."
+                  }
+                },
+                required: %w[event_id matched]
+              },
+              meta: {
+                type: :object,
+                properties: {
+                }
+              }
+            },
+            required: %w[data meta]
+          },
           WebhookPayload: {
             type: :object,
             properties: {
@@ -681,7 +832,8 @@ in this document.
                 properties: {
                   application_id: {
                     type: :string,
-                    description: "The application ID."
+                    description:
+                      "The application UUID. NOTE: the inbound /status_events endpoint uses `application_id` to mean the 000-000-000 submission number instead; the two are not interchangeable."
                   },
                   submitted_at: {
                     type: :integer,

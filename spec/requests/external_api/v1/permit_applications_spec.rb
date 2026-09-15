@@ -230,7 +230,7 @@ RSpec.describe "external_api/v1/applications",
 
       response(
         429,
-        "Rate limit exceeded. Note: The rate limit is 100 requests per minute per API key and 300 requests per IP in a 3 minute interval"
+        "Rate limit exceeded. Note: The rate limit is 100 requests per minute per API key and 300 requests per IP in a 5 minute interval"
       ) do
         schema "$ref" => "#/components/schemas/ResponseError"
         around do |example|
@@ -364,7 +364,7 @@ RSpec.describe "external_api/v1/applications",
 
       response(
         429,
-        "Rate limit exceeded. Note: The rate limit is 100 requests per minute per API key and 300 requests per IP in a 3 minute interval"
+        "Rate limit exceeded. Note: The rate limit is 100 requests per minute per API key and 300 requests per IP in a 5 minute interval"
       ) do
         schema "$ref" => "#/components/schemas/ResponseError"
         around do |example|
@@ -629,7 +629,7 @@ RSpec.describe "external_api/v1/applications",
 
       response(
         429,
-        "Rate limit exceeded. Note: The rate limit is 100 requests per minute per API key and 300 requests per IP in a 3 minute interval"
+        "Rate limit exceeded. Note: The rate limit is 100 requests per minute per API key and 300 requests per IP in a 5 minute interval"
       ) do
         schema "$ref" => "#/components/schemas/ResponseError"
         run_test!

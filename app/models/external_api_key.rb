@@ -6,6 +6,13 @@ class ExternalApiKey < ApplicationRecord
            as: :notifiable,
            dependent: :destroy
 
+  # No dependent option on purpose. submission_status_events.external_api_key_id
+  # is a plain uuid with no foreign key - a record of who sent an event, not a
+  # live reference - so deleting a key leaves its events intact and still
+  # attributed. Do not add :destroy (loses the events) or :nullify (loses the
+  # attribution, which cannot be reconstructed).
+  has_many :submission_status_events
+
   url_validatable :webhook_url
 
   scope :active,

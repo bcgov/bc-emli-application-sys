@@ -141,10 +141,31 @@ class ExternalApi::ApplicationController < ActionController::API
     current_external_api_key.sandbox
   end
 
+  # Rails' own request log gives the status but not the reason, and its
+  # "Completed" line cannot be tied back to the request that produced it
+  # (log_tags is set in production.rb but MultiLogger has no tagged support, so
+  # tags are silently dropped). Each line here is therefore self-contained.
+  # Never logs the token itself - only whether one was supplied.
+  #
+  # Not called for 403: external_api_key_not_authorized already passes the
+  # exception to render_error, which logs it.
+  def log_external_api_rejection(status, reason)
+    Rails.logger.warn(
+      "[external_api] rejected " \
+        "status=#{status} " \
+        "path=#{request.path} " \
+        "ip=#{request.remote_ip} " \
+        "key_id=#{current_external_api_key&.id || "none"} " \
+        "token_supplied=#{request.headers["Authorization"].present?} " \
+        "reason=#{reason}"
+    )
+  end
+
   # Override rails default 401 response to return JSON content-type
   # with request for Bearer token
   # https://api.rubyonrails.org/classes/ActionController/HttpAuthentication/Token/ControllerMethods.html
   def request_http_token_authentication(realm = "Extern api", message = nil)
+    log_external_api_rejection(401, "authentication")
     headers["WWW-Authenticate"] = %(Bearer realm="#{realm.tr('"', "")}")
 
     render_error(
