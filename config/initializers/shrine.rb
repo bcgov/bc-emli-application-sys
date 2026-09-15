@@ -160,6 +160,8 @@ if SHRINE_USE_S3
       @client
     end
 
+    public :client
+
     # Create a new S3 client with current credentials
     def create_s3_client(credentials)
       return super if LOCAL_MINIO_S3

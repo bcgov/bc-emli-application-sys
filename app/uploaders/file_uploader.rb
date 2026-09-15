@@ -152,37 +152,48 @@ class FileUploader < Shrine
     end
   end
   Attacher.promote_block do |attacher|
-    # Store virus scan results immediately in database
-    if attacher.record.respond_to?(:virus_scan_status) &&
-         Thread.current[:virus_scan_result]
-      scan_result = Thread.current[:virus_scan_result]
+    scan_result = Thread.current[:virus_scan_result]
+    cached_file = attacher.file
+
+    begin
+      # The custom promote block replaces Shrine's default promotion path.
+      # The record has already been persisted when this background callback runs.
+      attacher.promote
 
       begin
-        # Use update_columns to avoid callbacks and potential infinite loops
-        attacher.record.update_columns(
-          virus_scan_status:
-            (
-              if scan_result[:status] == :clean
-                2
-              else
-                (scan_result[:status] == :infected ? 3 : 4)
-              end
-            ),
-          virus_scan_message: scan_result[:message],
-          virus_name: scan_result[:virus_name],
-          virus_scan_started_at: scan_result[:scanned_at],
-          virus_scan_completed_at: scan_result[:scanned_at],
-          updated_at: Time.current
-        )
-
-        Rails.logger.info "Virus scan #{scan_result[:status]}: #{scan_result[:original_filename]} (#{attacher.record.class.name}##{attacher.record.id})"
+        cached_file&.delete
       rescue => e
-        Rails.logger.error "Failed to store virus scan results: #{e.message}"
-        Rails.logger.error e.backtrace.join("\n")
-      ensure
-        # Clean up thread local variable
-        Thread.current[:virus_scan_result] = nil
+        Rails.logger.error "Failed to delete promoted cache file: #{e.message}"
       end
+
+      # Store virus scan results after the cache-to-store move succeeds.
+      if attacher.record.respond_to?(:virus_scan_status) && scan_result
+        begin
+          # Use update_columns to avoid callbacks and potential infinite loops
+          attacher.record.update_columns(
+            virus_scan_status:
+              (
+                if scan_result[:status] == :clean
+                  2
+                else
+                  (scan_result[:status] == :infected ? 3 : 4)
+                end
+              ),
+            virus_scan_message: scan_result[:message],
+            virus_name: scan_result[:virus_name],
+            virus_scan_started_at: scan_result[:scanned_at],
+            virus_scan_completed_at: scan_result[:scanned_at],
+            updated_at: Time.current
+          )
+
+          Rails.logger.info "Virus scan #{scan_result[:status]}: #{scan_result[:original_filename]} (#{attacher.record.class.name}##{attacher.record.id})"
+        rescue => e
+          Rails.logger.error "Failed to store virus scan results: #{e.message}"
+          Rails.logger.error e.backtrace.join("\n")
+        end
+      end
+    ensure
+      Thread.current[:virus_scan_result] = nil
     end
   end
 
