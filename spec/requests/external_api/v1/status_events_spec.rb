@@ -88,10 +88,11 @@ RSpec.describe "external_api/v1/status_events",
 
         run_test! do |res|
           expect(res.status).to eq(422)
+          # Scoped to this key, not to application_id - numbers are only unique
+          # within a program, and these specs run against the development
+          # database where an unrelated row could match.
           expect(
-            SubmissionStatusEvent.where(
-              application_id: permit_application.number
-            )
+            SubmissionStatusEvent.where(external_api_key: external_api_key)
           ).to be_empty
         end
       end

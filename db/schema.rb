@@ -1406,7 +1406,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_11_120000) do
   add_foreign_key "step_code_checklists", "step_codes"
   add_foreign_key "step_code_data_entries", "step_codes"
   add_foreign_key "step_codes", "permit_applications"
-  add_foreign_key "submission_status_events", "external_api_keys"
   add_foreign_key "submission_status_events", "permit_applications"
   add_foreign_key "submission_versions", "permit_applications"
   add_foreign_key "support_requests",

@@ -6,11 +6,12 @@ class ExternalApiKey < ApplicationRecord
            as: :notifiable,
            dependent: :destroy
 
-  # :nullify, not :destroy - these rows are a permanent record of what was
-  # sent to us and must outlive the key that delivered them. Without a dependent
-  # option at all, the database FK blocks deleting a key that has any events
-  # (ActiveRecord::InvalidForeignKey -> 500 in the admin UI).
-  has_many :submission_status_events, dependent: :nullify
+  # No dependent option on purpose. submission_status_events.external_api_key_id
+  # is a plain uuid with no foreign key - a record of who sent an event, not a
+  # live reference - so deleting a key leaves its events intact and still
+  # attributed. Do not add :destroy (loses the events) or :nullify (loses the
+  # attribution, which cannot be reconstructed).
+  has_many :submission_status_events
 
   url_validatable :webhook_url
 

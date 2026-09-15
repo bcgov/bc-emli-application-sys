@@ -173,12 +173,18 @@ class PermitApplication < ApplicationRecord
   has_many :assigned_users, through: :application_assignments, source: :user
   has_many :permit_block_statuses, dependent: :destroy
   has_many :internal_comments, dependent: :destroy
-  # :nullify, not :destroy - withdrawal hard-deletes a permit application
-  # (PermitApplicationsController#destroy). These rows are a permanent record of
-  # what was sent to us, and a row still at processed_at: nil is pending work
-  # rather than history - destroying either loses something, and we never
-  # reprocess, so nothing would notice. The application_id string column keeps
-  # the reference readable after the FK is nulled, which is why it exists.
+  # :nullify is a guard, not a live path. Deletion exists
+  # (PermitApplicationsController#destroy, used for withdrawal) but every branch
+  # of PermitApplicationPolicy#destroy? requires record.draft?, and a draft has
+  # no status events - the sender only knows a submission once it has a number
+  # to quote back. So this should never fire today.
+  #
+  # It is here because the guard lives in a policy, three files away, and could
+  # be relaxed without anyone thinking about this table. These rows are a
+  # permanent record of what was sent to us, and one still at processed_at: nil
+  # is pending work rather than history; we never reprocess, so destroying
+  # either would go unnoticed. application_id keeps the reference readable if
+  # the FK is ever nulled.
   has_many :submission_status_events, dependent: :nullify
   has_many :contractor_onboards,
            foreign_key: :onboard_application_id,

@@ -20,21 +20,32 @@ class CreateSubmissionStatusEvents < ActiveRecord::Migration[8.1]
       t.string :application_id
 
       # Nullable: an event naming a submission we do not have is still recorded.
+      #
+      # This one DOES get a foreign key, unlike external_api_key_id below. It is
+      # a live reference the processor dereferences to drive the state machine
+      # (event.permit_application.approve!), so a dangling id is a crash or a
+      # silent skip rather than a cosmetic problem. Integrity is worth enforcing
+      # on data we act on; the key id is only ever read by a human.
       t.references :permit_application,
                    null: true,
                    foreign_key: true,
                    type: :uuid,
                    index: false
 
-      # Which integration sent it - the key's id, never its token. Cannot be
-      # reconstructed later, which is why it is captured up front. Nullable, and
-      # ExternalApiKey has_many ... dependent: :nullify, or the FK would refuse
-      # to let a key with events be deleted.
-      t.references :external_api_key,
-                   null: true,
-                   foreign_key: true,
-                   type: :uuid,
-                   index: false
+      # Which integration sent it - the key's id, never its token.
+      #
+      # Deliberately a plain uuid with NO foreign key. This is a historical
+      # fact, not a live reference: it records who sent the event at the time,
+      # and must stay readable even if the key is later deleted. An FK asserts
+      # the opposite ("this must point at a live row") and would force a choice
+      # between blocking key deletion and nulling the column - and nulling it
+      # erases the only record of provenance, which cannot be reconstructed.
+      #
+      # audit_logs made the other choice and shows the cost: it has an FK on
+      # user_id, so Auditable has to rescue InvalidForeignKey and re-insert with
+      # user_id: nil - discarding attribution to save the row.
+      # contractor_imports.consumed_by_user_id is the precedent followed here.
+      t.uuid :external_api_key_id
 
       t.datetime :processed_at
       t.string :outcome
