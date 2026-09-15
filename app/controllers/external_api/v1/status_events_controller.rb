@@ -6,11 +6,10 @@ class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationControll
   # event_id is required, because this phase exists to capture what actually
   # arrives, including fields the published schema did not mention.
   def create
-    # Rails wraps a top-level JSON array into params[:_json]. key? not present?
-    # - an empty array is blank, and would otherwise fall through to
-    # "event_id is required", sending a batching integrator hunting for a
-    # field-mapping bug.
-    if params.key?(:_json)
+    # Checked against the parsed body, not params[:_json] - Rails wraps a
+    # top-level array under that key, but "_json" is also a legal field name in
+    # an ordinary object, and we deliberately accept fields we do not model.
+    if raw_payload.is_a?(Array)
       log_external_api_rejection(422, "array_payload")
       return render_error("misc.status_event_single_only", { status: 422 })
     end

@@ -188,6 +188,22 @@ RSpec.describe "external_api/v1/status_events",
       expect(stored).not_to have_key("status_event")
     end
 
+    # "_json" is the key Rails wraps a top-level array under, but it is also a
+    # legal field name. Detecting arrays from params would reject this.
+    it "accepts an event whose payload contains a _json field" do
+      payload = sample_payload("_json" => "a legal field name")
+
+      expect { post_event(payload) }.to change(
+        SubmissionStatusEvent,
+        :count
+      ).by(1)
+
+      expect(response).to have_http_status(:ok)
+      expect(recorded(payload[:event_id]).payload["_json"]).to eq(
+        "a legal field name"
+      )
+    end
+
     it "records which api key sent the event" do
       payload = sample_payload
       post_event(payload)
