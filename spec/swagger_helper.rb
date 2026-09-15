@@ -55,7 +55,7 @@ Authorization: Bearer {Your_API_Key_Here}
 Please note that a unique API key is required for each jurisdiction you wish to access, enhancing security and data integrity.
 
 ### Rate limits:
-To ensure fair usage, the API is rate-limited to 100 requests per minute per API key and 300 requests per IP in a 3 minute interval. Exceeding these
+To ensure fair usage, the API is rate-limited to 100 requests per minute per API key and 300 requests per IP in a 5 minute interval. Exceeding these
 limits will result in a 429 response. If this occurs, we recommend spacing out your requests. Continued exceeding of rate limits
 may necessitate further contact with the building permit hub team.
 
