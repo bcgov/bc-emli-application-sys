@@ -3,7 +3,7 @@ name: main
 description: A Helm chart for bc-emli-application-sys
 type: application
 version: 0.1.0
-appVersion: '774dbf00'
+appVersion: '338f3a3e'
 dependencies:
   - name: app
     version: '0.1.0'
