@@ -713,6 +713,7 @@ in this document.
               eventDatetime
               recordType
               applicationId
+              applicationGuid
             ],
             properties: {
               eventId: {

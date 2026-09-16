@@ -25,7 +25,7 @@ RSpec.describe "external_api/v1/status_events",
       eventDatetime: "2026-09-16T09:14:42.000Z",
       recordType: "Participant",
       applicationId: permit_application.number,
-      applicationGuid: SecureRandom.uuid,
+      applicationGuid: permit_application.id,
       eligibilityCode: "ESP3-NatGasbdbe80b0",
       incomeBracket: "ESP Level 3",
       approvedDate: "2026-09-16",
@@ -157,7 +157,9 @@ RSpec.describe "external_api/v1/status_events",
 
       stored = recorded(payload[:eventId]).payload
       expect(stored["some_future_field"]).to eq("surprise")
-      expect(stored["applicationGuid"]).to be_present
+      # applicationGuid is our permit_applications.id coming back - assert the
+      # actual value, not just presence, since Phase 2 may resolve on it.
+      expect(stored["applicationGuid"]).to eq(permit_application.id)
       expect(stored["updatedBy"]).to eq("005Hs00000ABCDEfGH")
 
       # ParamsWrapper re-inserts the whole body under the controller-derived key;

@@ -2128,6 +2128,7 @@ components:
       - eventDatetime
       - recordType
       - applicationId
+      - applicationGuid
       properties:
         eventId:
           type: string
