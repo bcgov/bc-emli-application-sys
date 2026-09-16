@@ -703,86 +703,93 @@ in this document.
               }
             }
           },
+          # Field names and enum values are taken from the payloads the sender
+          # emits - camelCase fields, Title-Case hyphenated enum values.
           StatusEvent: {
             type: :object,
             required: %w[
-              event_id
-              event_type
-              event_datetime
-              record_type
-              application_id
-              order_id
+              eventId
+              eventType
+              eventDatetime
+              recordType
+              applicationId
             ],
             properties: {
-              event_id: {
+              eventId: {
                 type: :string,
                 format: :uuid,
                 description:
-                  "The sender's event id. Must be stable across retries - it is the idempotency key. Re-sending an event with an event_id already received is a no-op and returns 200."
+                  "The sender's event id. Must be stable across retries and unique per event - it is the idempotency key. Re-sending an event with an eventId already received is a no-op and returns 200."
               },
-              event_type: {
+              eventType: {
                 type: :string,
-                enum: %w[APPROVED APPROVED_PENDING PAID INELIGIBLE CANCELLED],
+                enum: %w[
+                  Approved
+                  Approved-Pending
+                  Approved-Paid
+                  Ineligible
+                  Cancelled
+                ],
                 description: "The status being reported."
               },
-              event_datetime: {
+              eventDatetime: {
                 type: :string,
                 format: "date-time",
                 description:
                   "ISO 8601, UTC. When the status was set in the sending system. Persisted on the record, so identical across retries."
               },
-              record_type: {
+              recordType: {
                 type: :string,
-                enum: %w[PARTICIPANT CONTRACTOR],
+                enum: %w[Participant Contractor],
                 description: "The kind of submission this event refers to."
               },
-              application_id: {
+              applicationId: {
                 type: :string,
                 pattern: "^[0-9]{3}-[0-9]{3}-[0-9]{3}$",
-                example: "123-456-789",
+                example: "000-017-676",
                 description:
-                  "The submission reference issued by this system - the number shown as 'Application #'. NOTE: the outbound webhook documented above uses `application_id` to mean the submission UUID instead; the two are not interchangeable."
+                  "The submission reference issued by this system - the number shown as 'Application #'. Used to locate the submission. NOTE: the outbound webhook documented above uses `application_id` to mean the submission UUID instead; the two are not interchangeable."
               },
-              order_id: {
+              applicationGuid: {
                 type: :string,
                 format: :uuid,
                 description:
-                  "GUID from the original ESPAS submission. Stored for traceability; this system does not interpret it or use it to locate a submission."
+                  "This system's internal id for the same submission, as returned by the outbound webhook. Recorded for traceability; applicationId is what locates the submission."
               },
-              eligibility_code: {
+              eligibilityCode: {
                 type: :string,
                 nullable: true,
                 description: "Eligibility code. Surfaced to the participant."
               },
-              income_bracket: {
+              incomeBracket: {
                 type: :string,
                 nullable: true,
                 enum: ["ESP Level 1", "ESP Level 2", "ESP Level 3", "N/A", nil],
-                description: "Sent for APPROVED and INELIGIBLE."
+                description: "Sent for Approved and Ineligible."
               },
-              approved_date: {
+              approvedDate: {
                 type: :string,
                 format: :date,
                 nullable: true,
-                description: "Business date of approval. Required for APPROVED."
+                description: "Business date of approval. Sent for Approved."
               },
-              paid_date: {
+              paidDate: {
                 type: :string,
                 format: :date,
                 nullable: true,
                 description:
-                  "Business date of payment. Required for PAID. Distinct from approved_date."
+                  "Business date of payment. Sent for Approved-Paid. Distinct from approvedDate."
               },
-              event_notes: {
+              eventNotes: {
                 type: :string,
                 nullable: true,
                 description:
-                  "Free text shown to the participant. Required for INELIGIBLE."
+                  "Free text shown to the participant. Sent for Ineligible."
               },
-              updated_by_user_id: {
+              updatedBy: {
                 type: :string,
                 nullable: true,
-                example: "0055f00000AbCdEfGHI",
+                example: "005Hs00000ABCDEfGH",
                 description:
                   "18-character user id of whoever set the status in the sending system. May be an automation user rather than a person."
               }
@@ -794,22 +801,22 @@ in this document.
               data: {
                 type: :object,
                 properties: {
-                  event_id: {
+                  eventId: {
                     type: :string,
-                    description: "The event_id that was received."
+                    description: "The eventId that was received."
                   },
                   matched: {
                     type: :boolean,
                     description:
-                      "Whether application_id matched a known submission. False means the event was recorded but could not be linked - see the endpoint description."
+                      "Whether applicationId matched a known submission. False means the event was recorded but could not be linked - see the endpoint description."
                   },
-                  application_id: {
+                  applicationId: {
                     type: :string,
                     description:
-                      "Present only when matched is false. Echoes the application_id exactly as we parsed it, so a field-mapping or formatting mistake can be told apart from a submission we genuinely do not have. Omitted on a match."
+                      "Present only when matched is false. Echoes the applicationId exactly as we parsed it, so a field-mapping or formatting mistake can be told apart from a submission we genuinely do not have. Omitted on a match."
                   }
                 },
-                required: %w[event_id matched]
+                required: %w[eventId matched]
               },
               meta: {
                 type: :object,
@@ -833,7 +840,7 @@ in this document.
                   application_id: {
                     type: :string,
                     description:
-                      "The application UUID. NOTE: the inbound /status_events endpoint uses `application_id` to mean the 000-000-000 submission number instead; the two are not interchangeable."
+                      "The application UUID. NOTE: the inbound /status_events endpoint uses `applicationId` to mean the 000-000-000 submission number, and `applicationGuid` for this value; the names are not interchangeable."
                   },
                   submitted_at: {
                     type: :integer,

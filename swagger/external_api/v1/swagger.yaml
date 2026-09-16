@@ -1305,32 +1305,25 @@ paths:
                 "$ref": "#/components/schemas/ResponseError"
   "/status_events":
     post:
-      summary: 'Records a single status event. The event is stored and acknowledged;
-        it does not change submission status synchronously - a separate process applies
-        it. Send one event per request; a JSON array is rejected. Retries are safe
-        and expected: event_id is the idempotency key, so re-sending an event already
-        received is a no-op. IMPORTANT: a 200 means the event was recorded, not that
-        it was applied. An application_id that matches no known submission is still
-        recorded and still returns 200, with matched=false in the response - this
-        system issues the submission numbers, so an unrecognised one is investigated
-        on this side rather than reported back as an error.'
+      summary: Records a single status event. A separate process applies it later,
+        so 200 means recorded, not applied. One event per request; arrays are rejected.
+        An applicationId matching no known submission is still recorded and still
+        returns 200, with matched=false.
       tags:
       - Status Events
       parameters: []
       responses:
         '200':
-          description: 'Recorded. Check the matched flag: true means the event was
-            linked to a submission, false means application_id matched nothing and
-            the event was stored unlinked for investigation on our side. Both are
-            200 - neither indicates the status change has been applied yet.'
+          description: Recorded. matched=true means it was linked to a submission;
+            false means applicationId matched nothing and it was stored unlinked.
+            Neither means the status change has been applied.
           content:
             application/json:
               schema:
                 "$ref": "#/components/schemas/StatusEventAck"
         '422':
-          description: Rejected without being recorded. Either event_id was missing,
-            or a JSON array was sent - this endpoint takes one event per request.
-            The meta.message says which.
+          description: Rejected without being recorded - either eventId was missing,
+            or a JSON array was sent. The meta.message says which.
           content:
             application/json:
               schema:
@@ -2130,57 +2123,57 @@ components:
     StatusEvent:
       type: object
       required:
-      - event_id
-      - event_type
-      - event_datetime
-      - record_type
-      - application_id
-      - order_id
+      - eventId
+      - eventType
+      - eventDatetime
+      - recordType
+      - applicationId
       properties:
-        event_id:
+        eventId:
           type: string
           format: uuid
-          description: The sender's event id. Must be stable across retries - it is
-            the idempotency key. Re-sending an event with an event_id already received
-            is a no-op and returns 200.
-        event_type:
+          description: The sender's event id. Must be stable across retries and unique
+            per event - it is the idempotency key. Re-sending an event with an eventId
+            already received is a no-op and returns 200.
+        eventType:
           type: string
           enum:
-          - APPROVED
-          - APPROVED_PENDING
-          - PAID
-          - INELIGIBLE
-          - CANCELLED
+          - Approved
+          - Approved-Pending
+          - Approved-Paid
+          - Ineligible
+          - Cancelled
           description: The status being reported.
-        event_datetime:
+        eventDatetime:
           type: string
           format: date-time
           description: ISO 8601, UTC. When the status was set in the sending system.
             Persisted on the record, so identical across retries.
-        record_type:
+        recordType:
           type: string
           enum:
-          - PARTICIPANT
-          - CONTRACTOR
+          - Participant
+          - Contractor
           description: The kind of submission this event refers to.
-        application_id:
+        applicationId:
           type: string
           pattern: "^[0-9]{3}-[0-9]{3}-[0-9]{3}$"
-          example: 123-456-789
+          example: 000-017-676
           description: 'The submission reference issued by this system - the number
-            shown as ''Application #''. NOTE: the outbound webhook documented above
-            uses `application_id` to mean the submission UUID instead; the two are
-            not interchangeable.'
-        order_id:
+            shown as ''Application #''. Used to locate the submission. NOTE: the outbound
+            webhook documented above uses `application_id` to mean the submission
+            UUID instead; the two are not interchangeable.'
+        applicationGuid:
           type: string
           format: uuid
-          description: GUID from the original ESPAS submission. Stored for traceability;
-            this system does not interpret it or use it to locate a submission.
-        eligibility_code:
+          description: This system's internal id for the same submission, as returned
+            by the outbound webhook. Recorded for traceability; applicationId is what
+            locates the submission.
+        eligibilityCode:
           type: string
           nullable: true
           description: Eligibility code. Surfaced to the participant.
-        income_bracket:
+        incomeBracket:
           type: string
           nullable: true
           enum:
@@ -2189,26 +2182,26 @@ components:
           - ESP Level 3
           - N/A
           -
-          description: Sent for APPROVED and INELIGIBLE.
-        approved_date:
+          description: Sent for Approved and Ineligible.
+        approvedDate:
           type: string
           format: date
           nullable: true
-          description: Business date of approval. Required for APPROVED.
-        paid_date:
+          description: Business date of approval. Sent for Approved.
+        paidDate:
           type: string
           format: date
           nullable: true
-          description: Business date of payment. Required for PAID. Distinct from
-            approved_date.
-        event_notes:
+          description: Business date of payment. Sent for Approved-Paid. Distinct
+            from approvedDate.
+        eventNotes:
           type: string
           nullable: true
-          description: Free text shown to the participant. Required for INELIGIBLE.
-        updated_by_user_id:
+          description: Free text shown to the participant. Sent for Ineligible.
+        updatedBy:
           type: string
           nullable: true
-          example: 0055f00000AbCdEfGHI
+          example: 005Hs00000ABCDEfGH
           description: 18-character user id of whoever set the status in the sending
             system. May be an automation user rather than a person.
     StatusEventAck:
@@ -2217,22 +2210,22 @@ components:
         data:
           type: object
           properties:
-            event_id:
+            eventId:
               type: string
-              description: The event_id that was received.
+              description: The eventId that was received.
             matched:
               type: boolean
-              description: Whether application_id matched a known submission. False
+              description: Whether applicationId matched a known submission. False
                 means the event was recorded but could not be linked - see the endpoint
                 description.
-            application_id:
+            applicationId:
               type: string
-              description: Present only when matched is false. Echoes the application_id
+              description: Present only when matched is false. Echoes the applicationId
                 exactly as we parsed it, so a field-mapping or formatting mistake
                 can be told apart from a submission we genuinely do not have. Omitted
                 on a match.
           required:
-          - event_id
+          - eventId
           - matched
         meta:
           type: object
@@ -2254,8 +2247,8 @@ components:
             application_id:
               type: string
               description: 'The application UUID. NOTE: the inbound /status_events
-                endpoint uses `application_id` to mean the 000-000-000 submission
-                number instead; the two are not interchangeable.'
+                endpoint uses `applicationId` to mean the 000-000-000 submission number,
+                and `applicationGuid` for this value; the names are not interchangeable.'
             submitted_at:
               type: integer
               format: int64

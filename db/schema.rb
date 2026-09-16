@@ -1011,7 +1011,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_11_120000) do
                id: :uuid,
                default: -> { "gen_random_uuid()" },
                force: :cascade do |t|
-    t.string "application_id"
     t.datetime "created_at", null: false
     t.string "event_id", null: false
     t.uuid "external_api_key_id"
@@ -1020,9 +1019,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_11_120000) do
     t.jsonb "payload", null: false
     t.uuid "permit_application_id"
     t.datetime "processed_at"
+    t.string "submission_number"
     t.datetime "updated_at", null: false
-    t.index ["application_id"],
-            name: "index_submission_status_events_on_application_id"
     t.index ["event_id"],
             name: "index_submission_status_events_on_event_id",
             unique: true
@@ -1033,6 +1031,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_11_120000) do
     t.index ["processed_at"],
             name: "index_submission_status_events_unprocessed",
             where: "(processed_at IS NULL)"
+    t.index ["submission_number"],
+            name: "index_submission_status_events_on_submission_number"
   end
 
   create_table "submission_versions",

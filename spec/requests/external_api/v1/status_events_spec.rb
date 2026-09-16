@@ -17,18 +17,20 @@ RSpec.describe "external_api/v1/status_events",
   # allowlist rejects rack-test's default www.example.com with a 403.
   before { host! "localhost" }
 
+  # Shaped like the real payloads: camelCase fields, Title-Case enum values.
   def sample_payload(overrides = {})
     {
-      event_id: SecureRandom.uuid,
-      event_type: "APPROVED",
-      event_datetime: "2026-09-11T18:00:00Z",
-      record_type: "PARTICIPANT",
-      application_id: permit_application.number,
-      order_id: SecureRandom.uuid,
-      eligibility_code: "ESP1-ABC123",
-      income_bracket: "ESP Level 2",
-      approved_date: "2026-09-10",
-      updated_by_user_id: "0055f00000AbCdEfGHI"
+      eventId: SecureRandom.uuid,
+      eventType: "Approved",
+      eventDatetime: "2026-09-16T09:14:42.000Z",
+      recordType: "Participant",
+      applicationId: permit_application.number,
+      applicationGuid: SecureRandom.uuid,
+      eligibilityCode: "ESP3-NatGasbdbe80b0",
+      incomeBracket: "ESP Level 3",
+      approvedDate: "2026-09-16",
+      eventNotes: nil,
+      updatedBy: "005Hs00000ABCDEfGH"
     }.merge(overrides)
   end
 
@@ -40,7 +42,7 @@ RSpec.describe "external_api/v1/status_events",
   end
 
   path "/status_events" do
-    post "Records a single status event. The event is stored and acknowledged; it does not change submission status synchronously - a separate process applies it. Send one event per request; a JSON array is rejected. Retries are safe and expected: event_id is the idempotency key, so re-sending an event already received is a no-op. IMPORTANT: a 200 means the event was recorded, not that it was applied. An application_id that matches no known submission is still recorded and still returns 200, with matched=false in the response - this system issues the submission numbers, so an unrecognised one is investigated on this side rather than reported back as an error." do
+    post "Records a single status event. A separate process applies it later, so 200 means recorded, not applied. One event per request; arrays are rejected. An applicationId matching no known submission is still recorded and still returns 200, with matched=false." do
       tags "Status Events"
       consumes "application/json"
       produces "application/json"
@@ -57,7 +59,7 @@ RSpec.describe "external_api/v1/status_events",
       # unmatched case is covered in the behaviour specs below.
       response(
         200,
-        "Recorded. Check the matched flag: true means the event was linked to a submission, false means application_id matched nothing and the event was stored unlinked for investigation on our side. Both are 200 - neither indicates the status change has been applied yet."
+        "Recorded. matched=true means it was linked to a submission; false means applicationId matched nothing and it was stored unlinked. Neither means the status change has been applied."
       ) do
         schema "$ref" => "#/components/schemas/StatusEventAck"
 
@@ -65,14 +67,14 @@ RSpec.describe "external_api/v1/status_events",
 
         run_test! do |res|
           data = JSON.parse(res.body)
-          expect(data["data"]["event_id"]).to eq(body[:event_id])
+          expect(data["data"]["eventId"]).to eq(body[:eventId])
           expect(data["data"]["matched"]).to eq(true)
           # Echoed only on a miss - on a match it would be noise.
-          expect(data["data"]).not_to have_key("application_id")
+          expect(data["data"]).not_to have_key("applicationId")
 
-          event = recorded(body[:event_id])
+          event = recorded(body[:eventId])
           expect(event.permit_application).to eq(permit_application)
-          expect(event.application_id).to eq(permit_application.number)
+          expect(event.submission_number).to eq(permit_application.number)
           expect(event.processed_at).to be_nil
           expect(event.outcome).to be_nil
         end
@@ -80,15 +82,15 @@ RSpec.describe "external_api/v1/status_events",
 
       response(
         422,
-        "Rejected without being recorded. Either event_id was missing, or a JSON array was sent - this endpoint takes one event per request. The meta.message says which."
+        "Rejected without being recorded - either eventId was missing, or a JSON array was sent. The meta.message says which."
       ) do
         schema "$ref" => "#/components/schemas/ResponseErrorDetailed"
 
-        let(:body) { sample_payload.except(:event_id) }
+        let(:body) { sample_payload.except(:eventId) }
 
         run_test! do |res|
           expect(res.status).to eq(422)
-          # Scoped to this key, not to application_id - numbers are only unique
+          # Scoped to this key, not to submission_number - numbers are only unique
           # within a program, and these specs run against the development
           # database where an unrelated row could match.
           expect(
@@ -153,10 +155,10 @@ RSpec.describe "external_api/v1/status_events",
       payload = sample_payload(some_future_field: "surprise")
       post_event(payload)
 
-      stored = recorded(payload[:event_id]).payload
+      stored = recorded(payload[:eventId]).payload
       expect(stored["some_future_field"]).to eq("surprise")
-      expect(stored["order_id"]).to be_present
-      expect(stored["updated_by_user_id"]).to eq("0055f00000AbCdEfGHI")
+      expect(stored["applicationGuid"]).to be_present
+      expect(stored["updatedBy"]).to eq("005Hs00000ABCDEfGH")
 
       # ParamsWrapper re-inserts the whole body under the controller-derived key;
       # the payload must be the body as sent, not a copy of itself.
@@ -172,9 +174,9 @@ RSpec.describe "external_api/v1/status_events",
 
       post "/external_api/v1/status_events",
            params: {
-             event_id: event_id,
-             event_type: "APPROVED",
-             application_id: permit_application.number
+             eventId: event_id,
+             eventType: "Approved",
+             applicationId: permit_application.number
            },
            headers: {
              "Authorization" => "Bearer #{token}"
@@ -183,8 +185,8 @@ RSpec.describe "external_api/v1/status_events",
       expect(response).to have_http_status(:ok)
 
       stored = recorded(event_id).payload
-      expect(stored["event_id"]).to eq(event_id)
-      expect(stored["event_type"]).to eq("APPROVED")
+      expect(stored["eventId"]).to eq(event_id)
+      expect(stored["eventType"]).to eq("Approved")
       expect(stored).not_to have_key("status_event")
     end
 
@@ -199,8 +201,31 @@ RSpec.describe "external_api/v1/status_events",
       ).by(1)
 
       expect(response).to have_http_status(:ok)
-      expect(recorded(payload[:event_id]).payload["_json"]).to eq(
+      expect(recorded(payload[:eventId]).payload["_json"]).to eq(
         "a legal field name"
+      )
+    end
+
+    # params only sees fields Rails parsed for a registered JSON media type;
+    # raw_payload parses the body regardless. Reading identifiers from the body
+    # keeps the two from disagreeing.
+    it "accepts a valid JSON body sent with the wrong Content-Type" do
+      event_id = SecureRandom.uuid
+
+      post "/external_api/v1/status_events",
+           params: {
+             eventId: event_id,
+             applicationId: permit_application.number
+           }.to_json,
+           headers: {
+             "Authorization" => "Bearer #{token}",
+             "CONTENT_TYPE" => "text/plain"
+           }
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["data"]["matched"]).to eq(true)
+      expect(recorded(event_id).submission_number).to eq(
+        permit_application.number
       )
     end
 
@@ -208,7 +233,7 @@ RSpec.describe "external_api/v1/status_events",
       payload = sample_payload
       post_event(payload)
 
-      expect(recorded(payload[:event_id]).external_api_key).to eq(
+      expect(recorded(payload[:eventId]).external_api_key).to eq(
         external_api_key
       )
     end
@@ -229,7 +254,7 @@ RSpec.describe "external_api/v1/status_events",
       ).to include("one status event per request")
     end
 
-    it "is idempotent on a replayed event_id" do
+    it "is idempotent on a replayed eventId" do
       payload = sample_payload
       post_event(payload)
 
@@ -238,13 +263,13 @@ RSpec.describe "external_api/v1/status_events",
         :count
       )
       expect(response).to have_http_status(:ok)
-      expect(JSON.parse(response.body)["data"]["event_id"]).to eq(
-        payload[:event_id]
+      expect(JSON.parse(response.body)["data"]["eventId"]).to eq(
+        payload[:eventId]
       )
     end
 
-    it "records an event whose application_id matches nothing" do
-      payload = sample_payload(application_id: "999-999-999")
+    it "records an event whose applicationId matches nothing" do
+      payload = sample_payload(applicationId: "999-999-999")
 
       expect { post_event(payload) }.to change(
         SubmissionStatusEvent,
@@ -257,13 +282,13 @@ RSpec.describe "external_api/v1/status_events",
 
       # Echoed back on a miss so the sender can tell a field-mapping mistake
       # apart from a submission we genuinely do not have.
-      expect(data["application_id"]).to eq("999-999-999")
+      expect(data["applicationId"]).to eq("999-999-999")
 
-      # The point of the application_id column: an unmatched event still records
+      # The point of the submission_number column: an unmatched event still records
       # what we were asked to find, so it can be searched for later.
-      event = recorded(payload[:event_id])
+      event = recorded(payload[:eventId])
       expect(event.permit_application).to be_nil
-      expect(event.application_id).to eq("999-999-999")
+      expect(event.submission_number).to eq("999-999-999")
     end
 
     it "does not match a submission belonging to another program" do
@@ -271,13 +296,13 @@ RSpec.describe "external_api/v1/status_events",
       # per program - both programs' first submission would otherwise share a
       # number and this would assert nothing.
       other = create(:permit_application, number: "888-888-888")
-      payload = sample_payload(application_id: other.number)
+      payload = sample_payload(applicationId: other.number)
 
       post_event(payload)
 
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)["data"]["matched"]).to eq(false)
-      expect(recorded(payload[:event_id]).permit_application).to be_nil
+      expect(recorded(payload[:eventId]).permit_application).to be_nil
     end
   end
 end
