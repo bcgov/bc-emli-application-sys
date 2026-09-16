@@ -719,7 +719,7 @@ en:
         message: '%{error_message}'
       status_event_missing_event_id:
         title: 'Unprocessable'
-        message: 'event_id is required.'
+        message: 'eventId is required.'
       status_event_single_only:
         title: 'Unprocessable'
         message: 'Send one status event per request. Arrays are not accepted.'

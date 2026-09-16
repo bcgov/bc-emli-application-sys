@@ -13,11 +13,14 @@ class CreateSubmissionStatusEvents < ActiveRecord::Migration[8.1]
       t.string :event_id, null: false
       t.jsonb :payload, null: false
 
-      # The reference as it was sent, named to match the payload field.
-      # NOT permit_application_id below - this is what we were asked to find,
+      # The submission reference as it was sent - the same value as
+      # permit_applications.number, qualified because here it is a reference
+      # rather than this row's own number.
+      #
+      # NOT permit_application_id below: this is what we were asked to find,
       # that is what we found, and the gap between them is the only diagnostic
       # an unmatched event leaves.
-      t.string :application_id
+      t.string :submission_number
 
       # Nullable: an event naming a submission we do not have is still recorded.
       #
@@ -64,7 +67,7 @@ class CreateSubmissionStatusEvents < ActiveRecord::Migration[8.1]
 
     # How a human comes at this table, especially for unmatched rows where the
     # permit_application FK is nil.
-    add_index :submission_status_events, :application_id
+    add_index :submission_status_events, :submission_number
 
     add_index :submission_status_events, :external_api_key_id
 
