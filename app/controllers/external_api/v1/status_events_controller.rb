@@ -24,9 +24,7 @@ class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationControll
     existing = SubmissionStatusEvent.find_by(event_id: event_id)
     if existing.present?
       return replay(existing) if own_event?(existing)
-
-      log_external_api_rejection(422, "event_id_taken")
-      return render_error("misc.status_event_id_taken", { status: 422 })
+      return event_id_taken
     end
 
     event =
@@ -48,7 +46,10 @@ class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationControll
     # if no row is there, so an unrelated failure cannot become a silent 200.
     existing = SubmissionStatusEvent.find_by(event_id: scalar("eventId"))
     raise e if existing.blank?
-    raise e unless own_event?(existing)
+
+    # Same collision as the pre-insert check above, just lost the race to it -
+    # so it gets the same answer, not a 500.
+    return event_id_taken unless own_event?(existing)
 
     replay(existing)
   end
@@ -66,6 +67,11 @@ class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationControll
   # Only this key's program may replay a stored event. event_id is unique
   # globally, so the lookup above has to be global too - which would otherwise
   # let one program hand another program's event back, and now process it.
+  def event_id_taken
+    log_external_api_rejection(422, "event_id_taken")
+    render_error("misc.status_event_id_taken", { status: 422 })
+  end
+
   def own_event?(event)
     event.external_api_key&.program_id == current_external_api_key.program_id
   end
@@ -148,8 +154,16 @@ class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationControll
   # here so all five call sites move together if sandbox is ever revived or
   # removed.
   def matching_submission
-    in_program.find_by(id: scalar("applicationGuid")) ||
-      in_program.find_by(number: scalar("applicationId"))
+    guid = scalar("applicationGuid")
+
+    # A supplied guid is the answer, even when it resolves to nothing. Falling
+    # back to the number on a guid miss is what makes cross-environment traffic
+    # dangerous: their prod guid misses here, and their prod number can collide
+    # with a different submission of ours, which would then be transitioned.
+    # The number is only for a sender that sent no guid at all.
+    return in_program.find_by(id: guid) if guid.present?
+
+    in_program.find_by(number: scalar("applicationId"))
   end
 
   def in_program

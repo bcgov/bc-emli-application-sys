@@ -749,13 +749,13 @@ in this document.
                 pattern: "^[0-9]{3}-[0-9]{3}-[0-9]{3}$",
                 example: "000-017-676",
                 description:
-                  "The submission reference issued by this system - the number shown as 'Application #'. Used to locate the submission only if applicationGuid does not match, since a number can be reused after a submission is deleted. NOTE: the outbound webhook documented above uses `application_id` to mean the submission UUID instead; the two are not interchangeable."
+                  "The submission reference issued by this system - the number shown as 'Application #'. Used to locate the submission only when applicationGuid is omitted: a number can be reused after a submission is deleted, so it is never consulted to second-guess a guid that matched nothing. NOTE: the outbound webhook documented above uses `application_id` to mean the submission UUID instead; the two are not interchangeable."
               },
               applicationGuid: {
                 type: :string,
                 format: :uuid,
                 description:
-                  "This system's internal id for the same submission, as returned by the outbound webhook. This is what locates the submission: it is an immutable primary key, whereas applicationId can be reused. Send both; applicationId is used only as a fallback."
+                  "This system's internal id for the same submission, as returned by the outbound webhook. This is what locates the submission, and it is decisive: if it is supplied and matches nothing, the event is recorded as unmatched rather than falling back to applicationId."
               },
               eligibilityCode: {
                 type: :string,

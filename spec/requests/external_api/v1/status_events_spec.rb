@@ -47,7 +47,7 @@ RSpec.describe "external_api/v1/status_events",
   end
 
   path "/status_events" do
-    post "Records a single status event, then applies it in the same request. 200 means it was recorded - it does not tell you whether the status change succeeded, which is our problem to handle. One event per request; arrays are rejected. An event whose applicationGuid and applicationId both match no known submission is still recorded and still returns 200, with matched=false." do
+    post "Records a single status event, then applies it in the same request. 200 means it was recorded - it does not tell you whether the status change succeeded, which is our problem to handle. One event per request; arrays are rejected. An event that matches no known submission is still recorded and still returns 200, with matched=false." do
       tags "Status Events"
       consumes "application/json"
       produces "application/json"
@@ -398,6 +398,40 @@ RSpec.describe "external_api/v1/status_events",
       event = recorded(payload[:eventId])
       expect(event.permit_application).to be_nil
       expect(event.submission_number).to eq("999-999-999")
+    end
+
+    # The guid is decisive when supplied. Falling back to the number here is what
+    # makes cross-environment traffic dangerous - a sender's prod guid misses,
+    # and their prod number can collide with a different submission of ours.
+    it "does not fall back to applicationId when a supplied applicationGuid misses" do
+      payload =
+        sample_payload(
+          applicationId: permit_application.number,
+          applicationGuid: SecureRandom.uuid
+        )
+
+      post_event(payload)
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["data"]["matched"]).to eq(false)
+
+      event = recorded(payload[:eventId])
+      expect(event.permit_application).to be_nil
+      expect(event.outcome).to eq("unmatched")
+      expect(permit_application.reload.status).not_to eq("approved")
+    end
+
+    it "uses applicationId when no applicationGuid is sent" do
+      payload = sample_payload(applicationId: permit_application.number)
+      payload.delete(:applicationGuid)
+
+      post_event(payload)
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["data"]["matched"]).to eq(true)
+      expect(recorded(payload[:eventId]).permit_application).to eq(
+        permit_application
+      )
     end
 
     # Why applicationGuid resolves first: assign_unique_number takes max+1
