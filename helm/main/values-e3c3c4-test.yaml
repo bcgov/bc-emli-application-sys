@@ -281,7 +281,7 @@ crunchy-postgres:
       s3Secret: pgbackrest-s3-credentials
       s3Path: '/pgbackup-test'
       s3UriStyle: path
-      bucket: 'hesp-dev-pgbackup'
+      bucket: 'hesp-test-pgbackup'
       endpoint: 's3.ca-central-1.amazonaws.com'
       region: 'ca-central-1'
       key: ''
@@ -642,13 +642,13 @@ sharedConfig:
   aws:
     region: ca-central-1
     defaultRegion: ca-central-1
-    parameterBasePath: '/iam_users/a5c711-prod_HESPUser_keys'
+    parameterBasePath: '/iam_users/a5c711-dev_HESPUser_keys'
 
   s3:
     region: ca-central-1
     endpoint: https://s3.ca-central-1.amazonaws.com
     publicEndpoint: https://s3.ca-central-1.amazonaws.com
-    bucket: hesp-dev-app-file-storage
+    bucket: hesp-test-app-file-storage
 
   app:
     domain: test-hesp.apps.gold.devops.gov.bc.ca
@@ -677,7 +677,7 @@ s3KeyRotation:
   enabled: true
   schedule: '0 */2 * * *'
   syncPgbackrestSecret: true
-  parameterStorePath: '/iam_users/a5c711-prod_HESPUser_keys'
+  parameterStorePath: '/iam_users/a5c711-dev_HESPUser_keys'
 
 # ============================================================================
 # AUDIT LOG ARCHIVE + PRUNE
