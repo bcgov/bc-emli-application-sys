@@ -97,6 +97,25 @@ RSpec.describe PermitApplication::StatusEventProcessor do
   # set_status is a plain update, so a validation failure returns nil rather
   # than raising. Without the explicit raise, that silently records `applied`
   # for a status that never changed.
+  # A `failed` row has to mean the submission did not move. Without a savepoint
+  # the status write commits alongside the failure, because the processor
+  # swallows the exception inside the caller's transaction.
+  it "rolls back the status change when a transition callback raises" do
+    submission = participant(:in_review)
+    allow_any_instance_of(
+      ApplicationFlow::ApplicationExternalParticipant
+    ).to receive(:handle_approval).and_raise("notification blew up")
+
+    event =
+      ActiveRecord::Base.transaction do
+        process(event_for(submission, "Approved"))
+      end
+
+    expect(event.outcome).to eq("failed")
+    expect(event.outcome_detail).to include("notification blew up")
+    expect(submission.reload.status).to eq("in_review")
+  end
+
   it "records failed when set_status is rejected" do
     submission = participant(:in_review)
     allow_any_instance_of(PermitApplication).to receive(:set_status).and_return(

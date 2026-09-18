@@ -52,7 +52,13 @@ class PermitApplication::StatusEventProcessor
     action = ACTIONS.dig(event_type, submission.flow.class)
     return finish("skipped", skipped_detail(submission)) if action.nil?
 
-    apply(submission, action)
+    # Savepoint: the caller holds a transaction open for the row lock, so a
+    # raise part-way through apply would otherwise leave the status change
+    # committed alongside an outcome of "failed". A failed row has to mean the
+    # submission did not move.
+    ActiveRecord::Base.transaction(requires_new: true) do
+      apply(submission, action)
+    end
     finish("applied", nil)
   rescue StandardError, NotImplementedError => e
     # Broad on purpose: nothing retries this, so an unrescued exception leaves

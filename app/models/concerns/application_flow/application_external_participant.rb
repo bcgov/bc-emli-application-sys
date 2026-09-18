@@ -57,10 +57,11 @@ module ApplicationFlow
     # --- Flow-specific handlers ---
 
     # persist_state writes the status with update_column, which skips callbacks -
-    # so updated_at and the search index would both stay stale. A plain update
-    # covers both, the same way approve_invoice does on the contractor flow.
+    # so updated_at and the search index would both stay stale. touch covers both
+    # and skips validations, so it cannot silently return false and leave the
+    # index stale while the processor reports the approval as applied.
     def handle_approval
-      application.update(updated_at: Time.current)
+      application.touch
     end
 
     def handle_submission

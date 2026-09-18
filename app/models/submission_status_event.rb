@@ -6,8 +6,11 @@ class SubmissionStatusEvent < ApplicationRecord
   # writes them, the processor reads them and stamps `processed_at` + `outcome`.
   #
   # `unmatched` is distinct from `skipped` and `failed`: there was no submission
-  # to transition at all, so we neither chose not to act nor were refused. It is
-  # also the only outcome nobody outside can see, since the sender got a 200.
+  # to transition at all, so we neither chose not to act nor were refused.
+  #
+  # It is also the one outcome the sender CAN infer, from matched=false in the
+  # ack. applied, skipped and failed are indistinguishable behind the 200 - they
+  # are what nobody outside can see.
   OUTCOMES = %w[applied skipped failed unmatched].freeze
 
   # Optional on purpose - we record events for submission numbers we cannot

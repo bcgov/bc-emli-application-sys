@@ -139,8 +139,6 @@ class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationControll
   # (program_id, number) prevents two live rows sharing a number; it does not
   # prevent a number being reused over time.
   #
-  # A malformed guid casts to nil rather than raising, so it simply fails to
-  # match and the number is tried.
   #
   # Both are scoped to the key's program, which is also the access control:
   # another program's submission is unreachable either way.
