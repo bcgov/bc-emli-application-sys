@@ -109,8 +109,10 @@ spec:
           livenessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if or .Values.volumeMounts .Values.logVolume.enabled }}
           volumeMounts:
+            - name: aws-credentials
+              mountPath: /run/secrets/aws
+              readOnly: true
             {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -118,9 +120,11 @@ spec:
             - name: log-volume
               mountPath: /app/log
             {{- end }}
-          {{- end }}
-      {{- if or .Values.volumes .Values.logVolume.enabled }}
       volumes:
+        - name: aws-credentials
+          secret:
+            secretName: {{ .Values.global.s3CredentialsSecretName | default "hesp-s3-credentials" | quote }}
+            optional: false
         {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -129,7 +133,6 @@ spec:
           persistentVolumeClaim:
             claimName: {{ include "_.fullname" $root }}-log
         {{- end }}
-      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

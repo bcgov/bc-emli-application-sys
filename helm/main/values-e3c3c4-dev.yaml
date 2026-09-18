@@ -26,6 +26,7 @@ global:
     'DATABASE_POOL': '10'
 
   envSecretName: hesp # Reference to OS Secret containing env vars
+  s3CredentialsSecretName: hesp-s3-credentials
   serviceAccountName: e3c3c4-vault # Or just use default
 
 nameOverride: hesp
@@ -290,7 +291,7 @@ crunchy-postgres:
       s3Secret: pgbackrest-s3-credentials
       s3Path: '/pgbackup-dev'
       s3UriStyle: path
-      bucket: 'hesp-dev-cacentral1-s3pgbackup'
+      bucket: 'hesp-dev-pgbackup'
       endpoint: 's3.ca-central-1.amazonaws.com'
       region: 'ca-central-1'
       # Credentials intentionally unused in DEV
@@ -631,13 +632,13 @@ sharedConfig:
   aws:
     region: ca-central-1
     defaultRegion: ca-central-1
-    parameterBasePath: '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
+    parameterBasePath: '/iam_users/a5c711-dev_HESPUser_keys'
 
   s3:
     region: ca-central-1
     endpoint: https://s3.ca-central-1.amazonaws.com
     publicEndpoint: https://s3.ca-central-1.amazonaws.com
-    bucket: hesp-dev-cacentral1-bucket
+    bucket: hesp-dev-app-file-storage
 
   app:
     domain: dev-hesp.apps.gold.devops.gov.bc.ca
@@ -665,8 +666,9 @@ sharedConfig:
 s3KeyRotation:
   enabled: true
   schedule: '0 */2 * * *'
+  secretName: 'hesp-s3-credentials'
   syncPgbackrestSecret: false
-  parameterStorePath: '/iam_users/BCGOV_WORKLOAD_admin_709391fb7b5745eda96357051a2372cf_keys'
+  parameterStorePath: '/iam_users/a5c711-dev_HESPUser_keys'
 
 # ============================================================================
 # AUDIT LOG ARCHIVE + PRUNE
@@ -680,4 +682,4 @@ auditLogArchive:
     AUDIT_LOG_RETENTION_DAYS: '30'
     AUDIT_LOG_ARCHIVE_PREFIX: 'audit-log-archives/dev'
     # Dedicated archive bucket only for audit logs, separate from app uploads/db backups.
-    AUDIT_LOG_ARCHIVE_S3_BUCKET: 'hesp-dev-cacentral1-audit-storage'
+    AUDIT_LOG_ARCHIVE_S3_BUCKET: 'hesp-dev-audit-storage'
