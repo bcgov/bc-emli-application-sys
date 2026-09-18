@@ -1,0 +1,72 @@
+{
+  "contractor-approved-paid": {
+    "eventId": "22222222-0000-4000-8000-000000000002",
+    "eventType": "Approved-Paid",
+    "eventDatetime": "2026-09-16T16:05:14.000Z",
+    "recordType": "Contractor",
+    "applicationId": "000-000-003",
+    "applicationGuid": "00000000-0000-4000-8000-000000000003",
+    "eventNotes": null,
+    "paidDate": "2026-09-16",
+    "updatedBy": "005Hs00000ABCDEfGH"
+  },
+  "contractor-approved-pending": {
+    "eventId": "22222222-0000-4000-8000-000000000001",
+    "eventType": "Approved-Pending",
+    "eventDatetime": "2026-09-16T14:22:58.000Z",
+    "recordType": "Contractor",
+    "applicationId": "000-000-003",
+    "applicationGuid": "00000000-0000-4000-8000-000000000003",
+    "eventNotes": null,
+    "paidDate": null,
+    "updatedBy": "005Hs00000ABCDEfGH"
+  },
+  "contractor-cancelled": {
+    "eventId": "22222222-0000-4000-8000-000000000004",
+    "eventType": "Cancelled",
+    "eventDatetime": "2026-09-16T17:28:40.000Z",
+    "recordType": "Contractor",
+    "applicationId": "000-000-003",
+    "applicationGuid": "00000000-0000-4000-8000-000000000003",
+    "eventNotes": null,
+    "approvedDate": null,
+    "updatedBy": "005Hs00000ABCDEfGH"
+  },
+  "contractor-ineligible": {
+    "eventId": "22222222-0000-4000-8000-000000000003",
+    "eventType": "Ineligible",
+    "eventDatetime": "2026-09-16T11:47:20.000Z",
+    "recordType": "Contractor",
+    "applicationId": "000-000-003",
+    "applicationGuid": "00000000-0000-4000-8000-000000000003",
+    "eventNotes": "Ineligible reason",
+    "paidDate": null,
+    "updatedBy": "005Hs00000ABCDEfGH"
+  },
+  "participant-approved": {
+    "eventId": "11111111-0000-4000-8000-000000000001",
+    "eventType": "Approved",
+    "eventDatetime": "2026-09-16T09:14:42.000Z",
+    "recordType": "Participant",
+    "applicationId": "000-000-001",
+    "applicationGuid": "00000000-0000-4000-8000-000000000001",
+    "eventNotes": null,
+    "approvedDate": "2026-09-16",
+    "eligibilityCode": "ESP3-NatGas00000001",
+    "incomeBracket": "ESP Level 3",
+    "updatedBy": "005Hs00000ABCDEfGH"
+  },
+  "participant-ineligible": {
+    "eventId": "11111111-0000-4000-8000-000000000002",
+    "eventType": "Ineligible",
+    "eventDatetime": "2026-09-16T13:37:55.000Z",
+    "recordType": "Participant",
+    "applicationId": "000-000-002",
+    "applicationGuid": "00000000-0000-4000-8000-000000000002",
+    "eventNotes": "Income too high",
+    "approvedDate": null,
+    "eligibilityCode": "Ineligible-Income",
+    "incomeBracket": "N/A",
+    "updatedBy": "005UH00000IalxJYAR"
+  }
+}

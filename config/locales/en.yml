@@ -720,6 +720,9 @@ en:
       status_event_missing_event_id:
         title: 'Unprocessable'
         message: 'eventId is required.'
+      status_event_id_taken:
+        title: 'Unprocessable'
+        message: 'This eventId has already been used. Send a unique eventId per event.'
       status_event_single_only:
         title: 'Unprocessable'
         message: 'Send one status event per request. Arrays are not accepted.'
@@ -920,6 +923,8 @@ en:
     in_review: 'IN REVIEW'
     ineligible: 'INELIGIBLE'
     approved: 'APPROVED'
+    approved_pending: 'APPROVED - PENDING'
+    approved_paid: 'APPROVED - PAID'
   file_upload:
     virus_scan:
       virus_detected: 'File upload failed: The file appears to be corrupted or contains suspicious content. Please try a different file or contact support if you believe this is an error.'

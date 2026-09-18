@@ -44,7 +44,7 @@ module ApplicationFlow
       end
 
       event :approve do
-        transitions from: :in_review, to: :approved
+        transitions from: :in_review, to: :approved, after: :handle_approval
       end
 
       event :reject do
@@ -55,6 +55,15 @@ module ApplicationFlow
     end
 
     # --- Flow-specific handlers ---
+
+    # persist_state writes the status with update_column, which skips callbacks -
+    # so updated_at and the search index would both stay stale. touch covers both
+    # and skips validations, so it cannot silently return false and leave the
+    # index stale while the processor reports the approval as applied.
+    def handle_approval
+      application.touch
+    end
+
     def handle_submission
       application.update(
         signed_off_at: Time.current,

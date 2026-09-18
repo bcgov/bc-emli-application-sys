@@ -1,8 +1,9 @@
 require "swagger_helper"
 
-# Ingest only: these specs assert that events are *recorded*,
-# never that submission status changed - driving the state machine is the
-# processor's job and lands in a later phase.
+# The endpoint contract: a 200 means the event was recorded. It is also applied
+# inline, so these specs check the outcome too - but the response deliberately
+# says nothing about it, because whether a status change succeeded is our
+# problem, not the sender's.
 RSpec.describe "external_api/v1/status_events",
                type: :request,
                openapi_spec: "external_api/v1/swagger.yaml" do
@@ -10,7 +11,11 @@ RSpec.describe "external_api/v1/status_events",
   let!(:external_api_key) { create(:external_api_key, program: program) }
   let!(:token) { external_api_key.token }
   let!(:Authorization) { "Bearer #{token}" }
-  let(:permit_application) { create(:permit_application, program: program) }
+  # in_review so the documented 200 example exercises the whole path: the
+  # participant flow only reaches approved from there.
+  let(:permit_application) do
+    create(:permit_application, program: program, status: :in_review)
+  end
 
   # Specs run in the development environment here (RAILS_ENV is already set in the
   # container, so rails_helper's ||= "test" never applies), and development's host
@@ -42,7 +47,7 @@ RSpec.describe "external_api/v1/status_events",
   end
 
   path "/status_events" do
-    post "Records a single status event. A separate process applies it later, so 200 means recorded, not applied. One event per request; arrays are rejected. An applicationId matching no known submission is still recorded and still returns 200, with matched=false." do
+    post "Records a single status event, then applies it in the same request. 200 means it was recorded - it does not tell you whether the status change succeeded, which is our problem to handle. One event per request; arrays are rejected. An event that matches no known submission is still recorded and still returns 200, with matched=false." do
       tags "Status Events"
       consumes "application/json"
       produces "application/json"
@@ -59,7 +64,7 @@ RSpec.describe "external_api/v1/status_events",
       # unmatched case is covered in the behaviour specs below.
       response(
         200,
-        "Recorded. matched=true means it was linked to a submission; false means applicationId matched nothing and it was stored unlinked. Neither means the status change has been applied."
+        "Recorded. matched=true means it was linked to a submission; false means the identifier we resolved on matched nothing and it was stored unlinked. Neither value tells you whether the status change itself succeeded."
       ) do
         schema "$ref" => "#/components/schemas/StatusEventAck"
 
@@ -75,8 +80,10 @@ RSpec.describe "external_api/v1/status_events",
           event = recorded(body[:eventId])
           expect(event.permit_application).to eq(permit_application)
           expect(event.submission_number).to eq(permit_application.number)
-          expect(event.processed_at).to be_nil
-          expect(event.outcome).to be_nil
+          # The ack says only that we took it; the row records what became of it.
+          expect(event.processed_at).to be_present
+          expect(event.outcome).to eq("applied")
+          expect(permit_application.reload.status).to eq("approved")
         end
       end
 
@@ -256,6 +263,154 @@ RSpec.describe "external_api/v1/status_events",
       ).to include("one status event per request")
     end
 
+    # A crashed request leaves the row inserted but unprocessed, and nothing
+    # sweeps it. The sender's retry is the only recovery path, so it must
+    # process rather than short-circuit on the idempotency check.
+    it "processes a stranded row when the sender replays it" do
+      payload = sample_payload
+      post_event(payload)
+
+      event = recorded(payload[:eventId])
+      event.update!(processed_at: nil, outcome: nil, outcome_detail: nil)
+      permit_application.update_column(:status, "in_review")
+
+      expect { post_event(payload) }.not_to change(
+        SubmissionStatusEvent,
+        :count
+      )
+
+      puts "BODY: " + response.body[0, 200]
+      puts "EVENT: key=#{event.reload.external_api_key_id.inspect} pa=#{event.permit_application_id.inspect}"
+      expect(response).to have_http_status(:ok)
+      expect(event.reload.outcome).to eq("applied")
+      expect(permit_application.reload.status).to eq("approved")
+    end
+
+    it "does not reprocess a replayed row that already has an outcome" do
+      payload = sample_payload
+      post_event(payload)
+
+      event = recorded(payload[:eventId])
+      stamp = event.processed_at
+      permit_application.update_column(:status, "revisions_requested")
+
+      post_event(payload)
+
+      expect(event.reload.outcome).to eq("applied")
+      expect(event.processed_at).to eq(stamp)
+      expect(permit_application.reload.status).to eq("revisions_requested")
+    end
+
+    # A Hash where a string is expected used to reach find_by and raise
+    # TypeError against a string column - a 500 with nothing stored, on the
+    # endpoint whose whole point is capturing what we do not understand.
+    it "records an event whose applicationId is not a scalar" do
+      payload =
+        sample_payload(
+          applicationId: {
+            "value" => "000-017-676"
+          },
+          applicationGuid: SecureRandom.uuid
+        )
+
+      expect { post_event(payload) }.to change(
+        SubmissionStatusEvent,
+        :count
+      ).by(1)
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["data"]["matched"]).to eq(false)
+
+      event = recorded(payload[:eventId])
+      expect(event.submission_number).to be_nil
+      expect(event.payload["applicationId"]).to eq({ "value" => "000-017-676" })
+    end
+
+    it "rejects a non-scalar eventId rather than raising" do
+      expect {
+        post_event(sample_payload(eventId: { "value" => "x" }))
+      }.not_to change(SubmissionStatusEvent, :count)
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    # event_id is unique globally, so the idempotency lookup has to be global -
+    # which would otherwise hand one program another program's event back, and
+    # now process it.
+    # Events outlive their API keys on purpose - external_api_key_id has no FK.
+    # Identity must therefore survive the key being deleted, or the owner is
+    # locked out of replaying, and replay is the only way a stranded row is
+    # recovered.
+    it "still lets the owner replay after their original key is deleted" do
+      first = sample_payload
+      post_event(first)
+      event = recorded(first[:eventId])
+      event.update!(processed_at: nil, outcome: nil)
+      permit_application.update_column(:status, "in_review")
+
+      external_api_key.destroy
+      replacement = create(:external_api_key, program: program)
+
+      post "/external_api/v1/status_events",
+           params: first.to_json,
+           headers: {
+             "Authorization" => "Bearer #{replacement.token}",
+             "CONTENT_TYPE" => "application/json"
+           }
+
+      expect(response).to have_http_status(:ok)
+      expect(event.reload.outcome).to eq("applied")
+      expect(permit_application.reload.status).to eq("approved")
+    end
+
+    it "refuses an eventId already stored by another program" do
+      other_program = create(:program, external_api_state: "j_on")
+      other_key = create(:external_api_key, program: other_program)
+      theirs =
+        create(
+          :submission_status_event,
+          external_api_key: other_key,
+          payload: {
+            "eventId" => "shared-id"
+          }
+        )
+      theirs.update!(event_id: "shared-id")
+
+      expect { post_event(sample_payload(eventId: "shared-id")) }.not_to change(
+        SubmissionStatusEvent,
+        :count
+      )
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(theirs.reload.processed_at).to be_nil
+    end
+
+    # event_id and submission_number are indexed, and a btree entry cannot exceed
+    # ~2704 bytes. Past that Postgres raises ProgramLimitExceeded - a 500 with the
+    # payload unstored, on the endpoint whose point is capturing what arrives.
+    it "rejects an over-long eventId rather than raising" do
+      expect {
+        post_event(sample_payload(eventId: SecureRandom.hex(2000)))
+      }.not_to change(SubmissionStatusEvent, :count)
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it "truncates an over-long applicationId but keeps the payload whole" do
+      long = SecureRandom.hex(2000)
+      payload = sample_payload(applicationId: long)
+
+      expect { post_event(payload) }.to change(
+        SubmissionStatusEvent,
+        :count
+      ).by(1)
+      expect(response).to have_http_status(:ok)
+
+      event = recorded(payload[:eventId])
+      expect(event.submission_number.length).to eq(255)
+      expect(event.payload["applicationId"]).to eq(long)
+    end
+
     it "is idempotent on a replayed eventId" do
       payload = sample_payload
       post_event(payload)
@@ -271,7 +426,13 @@ RSpec.describe "external_api/v1/status_events",
     end
 
     it "records an event whose applicationId matches nothing" do
-      payload = sample_payload(applicationId: "999-999-999")
+      # Both identifiers must miss. Overriding applicationId alone would still
+      # match on applicationGuid, which is the resolution order working.
+      payload =
+        sample_payload(
+          applicationId: "999-999-999",
+          applicationGuid: SecureRandom.uuid
+        )
 
       expect { post_event(payload) }.to change(
         SubmissionStatusEvent,
@@ -293,12 +454,93 @@ RSpec.describe "external_api/v1/status_events",
       expect(event.submission_number).to eq("999-999-999")
     end
 
+    # The guid is decisive when supplied. Falling back to the number here is what
+    # makes cross-environment traffic dangerous - a sender's prod guid misses,
+    # and their prod number can collide with a different submission of ours.
+    it "does not fall back to applicationId when a supplied applicationGuid misses" do
+      payload =
+        sample_payload(
+          applicationId: permit_application.number,
+          applicationGuid: SecureRandom.uuid
+        )
+
+      post_event(payload)
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["data"]["matched"]).to eq(false)
+
+      event = recorded(payload[:eventId])
+      expect(event.permit_application).to be_nil
+      expect(event.outcome).to eq("unmatched")
+      expect(permit_application.reload.status).not_to eq("approved")
+    end
+
+    # A malformed guid is still a guid they sent. It must not fall through to
+    # the number, or cross-environment traffic can transition the wrong record.
+    it "treats a malformed applicationGuid as decisive, not as absent" do
+      payload =
+        sample_payload(
+          applicationId: permit_application.number,
+          applicationGuid: {
+            "value" => "not-a-uuid"
+          }
+        )
+
+      post_event(payload)
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["data"]["matched"]).to eq(false)
+
+      event = recorded(payload[:eventId])
+      expect(event.permit_application).to be_nil
+      expect(event.outcome_detail).to include("applicationId not consulted")
+      expect(permit_application.reload.status).not_to eq("approved")
+    end
+
+    it "uses applicationId when no applicationGuid is sent" do
+      payload = sample_payload(applicationId: permit_application.number)
+      payload.delete(:applicationGuid)
+
+      post_event(payload)
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["data"]["matched"]).to eq(true)
+      expect(recorded(payload[:eventId]).permit_application).to eq(
+        permit_application
+      )
+    end
+
+    # Why applicationGuid resolves first: assign_unique_number takes max+1
+    # within the program, so deleting the highest-numbered submission hands
+    # that number to the next one created, and a sender holding the old number
+    # would have its event applied to a different submission.
+    it "resolves on applicationGuid when applicationId is stale" do
+      stale =
+        create(:permit_application, program: program, number: "777-777-777")
+      payload =
+        sample_payload(
+          applicationId: stale.number,
+          applicationGuid: permit_application.id
+        )
+
+      post_event(payload)
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["data"]["matched"]).to eq(true)
+
+      event = recorded(payload[:eventId])
+      expect(event.permit_application).to eq(permit_application)
+      # What they sent is kept, so the disagreement stays visible.
+      expect(event.submission_number).to eq("777-777-777")
+    end
+
     it "does not match a submission belonging to another program" do
       # An explicit number, because assign_unique_number restarts at 000-000-001
       # per program - both programs' first submission would otherwise share a
       # number and this would assert nothing.
       other = create(:permit_application, number: "888-888-888")
-      payload = sample_payload(applicationId: other.number)
+      payload =
+        sample_payload(applicationId: other.number, applicationGuid: other.id)
 
       post_event(payload)
 

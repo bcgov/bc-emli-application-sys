@@ -720,7 +720,7 @@ in this document.
                 type: :string,
                 format: :uuid,
                 description:
-                  "The sender's event id. Must be stable across retries and unique per event - it is the idempotency key. Re-sending an event with an eventId already received is a no-op and returns 200."
+                  "The sender's event id. Must be stable across retries and unique per event - it is the idempotency key. Re-sending one already received returns 200 without recording a second event; it is only re-applied if the original was stored but never processed."
               },
               eventType: {
                 type: :string,
@@ -737,7 +737,7 @@ in this document.
                 type: :string,
                 format: "date-time",
                 description:
-                  "ISO 8601, UTC. When the status was set in the sending system. Persisted on the record, so identical across retries."
+                  "ISO 8601, UTC. When the status was set in the sending system. Stored with the event; not otherwise interpreted."
               },
               recordType: {
                 type: :string,
@@ -749,18 +749,19 @@ in this document.
                 pattern: "^[0-9]{3}-[0-9]{3}-[0-9]{3}$",
                 example: "000-017-676",
                 description:
-                  "The submission reference issued by this system - the number shown as 'Application #'. Used to locate the submission. NOTE: the outbound webhook documented above uses `application_id` to mean the submission UUID instead; the two are not interchangeable."
+                  "The submission reference issued by this system - the number shown as 'Application #'. Recorded for diagnostics and for searching unmatched events; applicationGuid is what locates the submission, and a number is never consulted to second-guess a guid that matched nothing, because numbers are reused after a deletion. NOTE: the outbound webhook documented above uses `application_id` to mean the submission UUID instead; the two are not interchangeable."
               },
               applicationGuid: {
                 type: :string,
                 format: :uuid,
                 description:
-                  "This system's internal id for the same submission, as returned by the outbound webhook. Recorded for traceability; applicationId is what locates the submission."
+                  "This system's internal id for the same submission, as returned by the outbound webhook. This is what locates the submission, and it is decisive: if it is supplied and matches nothing, the event is recorded as unmatched rather than falling back to applicationId."
               },
               eligibilityCode: {
                 type: :string,
                 nullable: true,
-                description: "Eligibility code. Surfaced to the participant."
+                description:
+                  "Eligibility code. Stored with the event; not otherwise interpreted."
               },
               incomeBracket: {
                 type: :string,
