@@ -1,6 +1,12 @@
 class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationController
   before_action :ensure_external_api_key_authorized!
 
+  # event_id and submission_number are both indexed, and a btree entry cannot
+  # exceed ~2704 bytes - past that Postgres raises ProgramLimitExceeded, which is
+  # a 500 with the payload unstored. Well under the limit, and far past anything
+  # a real identifier needs.
+  MAX_IDENTIFIER_LENGTH = 255
+
   # Records what was sent, then applies it in the same request. The row is
   # written first and committed regardless, so a processing failure never costs
   # us the payload.
@@ -16,7 +22,7 @@ class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationControll
     end
 
     event_id = scalar("eventId")
-    if event_id.blank?
+    if event_id.blank? || event_id.length > MAX_IDENTIFIER_LENGTH
       log_external_api_rejection(422, "missing_event_id")
       return render_error("misc.status_event_missing_event_id", { status: 422 })
     end
@@ -31,7 +37,8 @@ class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationControll
       SubmissionStatusEvent.create!(
         event_id: event_id,
         payload: raw_payload,
-        submission_number: scalar("applicationId"),
+        submission_number:
+          scalar("applicationId")&.first(MAX_IDENTIFIER_LENGTH),
         permit_application: matching_submission,
         external_api_key: current_external_api_key
       )

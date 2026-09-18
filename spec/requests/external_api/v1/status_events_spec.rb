@@ -357,6 +357,32 @@ RSpec.describe "external_api/v1/status_events",
       expect(theirs.reload.processed_at).to be_nil
     end
 
+    # event_id and submission_number are indexed, and a btree entry cannot exceed
+    # ~2704 bytes. Past that Postgres raises ProgramLimitExceeded - a 500 with the
+    # payload unstored, on the endpoint whose point is capturing what arrives.
+    it "rejects an over-long eventId rather than raising" do
+      expect {
+        post_event(sample_payload(eventId: SecureRandom.hex(2000)))
+      }.not_to change(SubmissionStatusEvent, :count)
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it "truncates an over-long applicationId but keeps the payload whole" do
+      long = SecureRandom.hex(2000)
+      payload = sample_payload(applicationId: long)
+
+      expect { post_event(payload) }.to change(
+        SubmissionStatusEvent,
+        :count
+      ).by(1)
+      expect(response).to have_http_status(:ok)
+
+      event = recorded(payload[:eventId])
+      expect(event.submission_number.length).to eq(255)
+      expect(event.payload["applicationId"]).to eq(long)
+    end
+
     it "is idempotent on a replayed eventId" do
       payload = sample_payload
       post_event(payload)
