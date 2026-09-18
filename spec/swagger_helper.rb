@@ -737,7 +737,7 @@ in this document.
                 type: :string,
                 format: "date-time",
                 description:
-                  "ISO 8601, UTC. When the status was set in the sending system. Persisted on the record, so identical across retries."
+                  "ISO 8601, UTC. When the status was set in the sending system. Stored with the event; not otherwise interpreted."
               },
               recordType: {
                 type: :string,
@@ -749,18 +749,19 @@ in this document.
                 pattern: "^[0-9]{3}-[0-9]{3}-[0-9]{3}$",
                 example: "000-017-676",
                 description:
-                  "The submission reference issued by this system - the number shown as 'Application #'. Used to locate the submission. NOTE: the outbound webhook documented above uses `application_id` to mean the submission UUID instead; the two are not interchangeable."
+                  "The submission reference issued by this system - the number shown as 'Application #'. Used to locate the submission only if applicationGuid does not match, since a number can be reused after a submission is deleted. NOTE: the outbound webhook documented above uses `application_id` to mean the submission UUID instead; the two are not interchangeable."
               },
               applicationGuid: {
                 type: :string,
                 format: :uuid,
                 description:
-                  "This system's internal id for the same submission, as returned by the outbound webhook. Recorded for traceability; applicationId is what locates the submission."
+                  "This system's internal id for the same submission, as returned by the outbound webhook. This is what locates the submission: it is an immutable primary key, whereas applicationId can be reused. Send both; applicationId is used only as a fallback."
               },
               eligibilityCode: {
                 type: :string,
                 nullable: true,
-                description: "Eligibility code. Surfaced to the participant."
+                description:
+                  "Eligibility code. Stored with the event; not otherwise interpreted."
               },
               incomeBracket: {
                 type: :string,

@@ -914,12 +914,17 @@ en:
     step_code_summary_csv_headers: 'Jurisdiction,Permit type,Enabled/disabled,Energy step code level,Zero carbon level'
     application_metrics_csv_headers: 'Jurisdiction,Permit type,Work type,First Nations,In draft,In inbox,Average days before first submit,Average days before latest submit'
   statuses:
+    new_draft: 'DRAFT'
     newly_submitted: 'UNREAD'
     revisions_requested: 'UPDATE NEEDED'
+    update_needed: 'UPDATE NEEDED'
     resubmitted: 'RESUBMITTED'
     in_review: 'IN REVIEW'
-    ineligible: 'INELIGIBLE'
+    training_pending: 'TRAINING PENDING'
     approved: 'APPROVED'
+    approved_pending: 'APPROVED - PENDING'
+    approved_paid: 'APPROVED - PAID'
+    ineligible: 'INELIGIBLE'
   file_upload:
     virus_scan:
       virus_detected: 'File upload failed: The file appears to be corrupted or contains suspicious content. Please try a different file or contact support if you believe this is an error.'

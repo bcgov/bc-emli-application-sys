@@ -535,6 +535,11 @@ export const ReviewPermitApplicationScreen = observer(() => {
                               borderColor="theme.yellow"
                               isDisabled={
                                 currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
+                                // Approved is terminal for a participant application. Invoices
+                                // hide this button outright above; onboarding is deliberately
+                                // left editable, since approved contractors are re-synced.
+                                (currentPermitApplication?.status === EPermitApplicationStatus.approved &&
+                                  submissionTypeCode === EPermitClassificationCode.application) ||
                                 (currentPermitApplication?.status === EPermitApplicationStatus.inReview &&
                                   !isInvoiceSubmission)
                               }
