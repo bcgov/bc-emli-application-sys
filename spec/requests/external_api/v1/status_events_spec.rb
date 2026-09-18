@@ -279,6 +279,8 @@ RSpec.describe "external_api/v1/status_events",
         :count
       )
 
+      puts "BODY: " + response.body[0, 200]
+      puts "EVENT: key=#{event.reload.external_api_key_id.inspect} pa=#{event.permit_application_id.inspect}"
       expect(response).to have_http_status(:ok)
       expect(event.reload.outcome).to eq("applied")
       expect(permit_application.reload.status).to eq("approved")
@@ -335,6 +337,32 @@ RSpec.describe "external_api/v1/status_events",
     # event_id is unique globally, so the idempotency lookup has to be global -
     # which would otherwise hand one program another program's event back, and
     # now process it.
+    # Events outlive their API keys on purpose - external_api_key_id has no FK.
+    # Identity must therefore survive the key being deleted, or the owner is
+    # locked out of replaying, and replay is the only way a stranded row is
+    # recovered.
+    it "still lets the owner replay after their original key is deleted" do
+      first = sample_payload
+      post_event(first)
+      event = recorded(first[:eventId])
+      event.update!(processed_at: nil, outcome: nil)
+      permit_application.update_column(:status, "in_review")
+
+      external_api_key.destroy
+      replacement = create(:external_api_key, program: program)
+
+      post "/external_api/v1/status_events",
+           params: first.to_json,
+           headers: {
+             "Authorization" => "Bearer #{replacement.token}",
+             "CONTENT_TYPE" => "application/json"
+           }
+
+      expect(response).to have_http_status(:ok)
+      expect(event.reload.outcome).to eq("applied")
+      expect(permit_application.reload.status).to eq("approved")
+    end
+
     it "refuses an eventId already stored by another program" do
       other_program = create(:program, external_api_state: "j_on")
       other_key = create(:external_api_key, program: other_program)

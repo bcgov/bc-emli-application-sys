@@ -71,16 +71,27 @@ class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationControll
     render_event(event)
   end
 
-  # Only this key's program may replay a stored event. event_id is unique
-  # globally, so the lookup above has to be global too - which would otherwise
-  # let one program hand another program's event back, and now process it.
   def event_id_taken
     log_external_api_rejection(422, "event_id_taken")
     render_error("misc.status_event_id_taken", { status: 422 })
   end
 
+  # Only this key's program may replay a stored event. event_id is unique
+  # globally, so the lookup has to be global too - which would otherwise let
+  # one program hand another program's event back, and now process it.
+  #
+  # The key is the usual answer, but events outlive keys on purpose (no FK on
+  # external_api_key_id), so a deleted key would lock the rightful owner out of
+  # replaying - and replay is the only way a stranded row is ever recovered.
+  # The matched submission carries the same program, so it answers just as well.
+  #
+  # Neither available means the event matched nothing, so replaying it can only
+  # re-record `unmatched`. There is no submission to transition.
   def own_event?(event)
-    event.external_api_key&.program_id == current_external_api_key.program_id
+    program =
+      event.external_api_key&.program_id || event.permit_application&.program_id
+
+    program.nil? || program == current_external_api_key.program_id
   end
 
   # Inline rather than on a queue: one human clicking a button, so there is no
