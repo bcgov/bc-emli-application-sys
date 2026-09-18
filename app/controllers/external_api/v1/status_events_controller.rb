@@ -22,7 +22,12 @@ class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationControll
     end
 
     existing = SubmissionStatusEvent.find_by(event_id: event_id)
-    return replay(existing) if existing.present?
+    if existing.present?
+      return replay(existing) if own_event?(existing)
+
+      log_external_api_rejection(422, "event_id_taken")
+      return render_error("misc.status_event_id_taken", { status: 422 })
+    end
 
     event =
       SubmissionStatusEvent.create!(
@@ -43,6 +48,7 @@ class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationControll
     # if no row is there, so an unrelated failure cannot become a silent 200.
     existing = SubmissionStatusEvent.find_by(event_id: scalar("eventId"))
     raise e if existing.blank?
+    raise e unless own_event?(existing)
 
     replay(existing)
   end
@@ -51,14 +57,17 @@ class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationControll
 
   # A replay is the one natural retry we get. If the first request died between
   # the insert and the processing, the row is stranded - nothing sweeps it - so
-  # process it now. Safe on an already-processed row: the processor returns
-  # early on processed_at.
+  # process it now.
   def replay(event)
-    # with_lock, not `if processed_at.nil?`: that is a check-then-act, and two
-    # deliveries of the same event can both pass it and apply the transition
-    # twice. The lock rolls back on a crash, so the row stays retryable.
-    event.with_lock { process_event(event) if event.processed_at.nil? }
+    process_event(event)
     render_event(event)
+  end
+
+  # Only this key's program may replay a stored event. event_id is unique
+  # globally, so the lookup above has to be global too - which would otherwise
+  # let one program hand another program's event back, and now process it.
+  def own_event?(event)
+    event.external_api_key&.program_id == current_external_api_key.program_id
   end
 
   # Inline rather than on a queue: one human clicking a button, so there is no
@@ -66,7 +75,14 @@ class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationControll
   # failures on the row, and this rescue covers the row being unwritable, which
   # would turn an event we accepted into a 500.
   def process_event(event)
-    PermitApplication::StatusEventProcessor.new(event).process!
+    # The lock covers first delivery and replay alike: a bare processed_at check
+    # is check-then-act, and two deliveries could otherwise both apply the
+    # transition. It rolls back on a crash, so the row stays retryable.
+    event.with_lock do
+      if event.processed_at.nil?
+        PermitApplication::StatusEventProcessor.new(event).process!
+      end
+    end
   rescue StandardError => e
     Rails.logger.error(
       "SubmissionStatusEvent #{event.id} could not be processed: #{e.class}: #{e.message}"

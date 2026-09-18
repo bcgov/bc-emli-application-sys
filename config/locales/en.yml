@@ -720,6 +720,9 @@ en:
       status_event_missing_event_id:
         title: 'Unprocessable'
         message: 'eventId is required.'
+      status_event_id_taken:
+        title: 'Unprocessable'
+        message: 'This eventId has already been used. Send a unique eventId per event.'
       status_event_single_only:
         title: 'Unprocessable'
         message: 'Send one status event per request. Arrays are not accepted.'

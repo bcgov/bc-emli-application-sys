@@ -47,7 +47,7 @@ RSpec.describe "external_api/v1/status_events",
   end
 
   path "/status_events" do
-    post "Records a single status event, then applies it in the same request. 200 means it was recorded - it does not tell you whether the status change succeeded, which is our problem to handle. One event per request; arrays are rejected. An applicationId matching no known submission is still recorded and still returns 200, with matched=false." do
+    post "Records a single status event, then applies it in the same request. 200 means it was recorded - it does not tell you whether the status change succeeded, which is our problem to handle. One event per request; arrays are rejected. An event whose applicationGuid and applicationId both match no known submission is still recorded and still returns 200, with matched=false." do
       tags "Status Events"
       consumes "application/json"
       produces "application/json"
@@ -330,6 +330,31 @@ RSpec.describe "external_api/v1/status_events",
       }.not_to change(SubmissionStatusEvent, :count)
 
       expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    # event_id is unique globally, so the idempotency lookup has to be global -
+    # which would otherwise hand one program another program's event back, and
+    # now process it.
+    it "refuses an eventId already stored by another program" do
+      other_program = create(:program, external_api_state: "j_on")
+      other_key = create(:external_api_key, program: other_program)
+      theirs =
+        create(
+          :submission_status_event,
+          external_api_key: other_key,
+          payload: {
+            "eventId" => "shared-id"
+          }
+        )
+      theirs.update!(event_id: "shared-id")
+
+      expect { post_event(sample_payload(eventId: "shared-id")) }.not_to change(
+        SubmissionStatusEvent,
+        :count
+      )
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(theirs.reload.processed_at).to be_nil
     end
 
     it "is idempotent on a replayed eventId" do

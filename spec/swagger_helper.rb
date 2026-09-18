@@ -720,7 +720,7 @@ in this document.
                 type: :string,
                 format: :uuid,
                 description:
-                  "The sender's event id. Must be stable across retries and unique per event - it is the idempotency key. Re-sending an event with an eventId already received is a no-op and returns 200."
+                  "The sender's event id. Must be stable across retries and unique per event - it is the idempotency key. Re-sending one already received returns 200 without recording a second event; it is only re-applied if the original was stored but never processed."
               },
               eventType: {
                 type: :string,

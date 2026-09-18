@@ -1308,8 +1308,8 @@ paths:
       summary: Records a single status event, then applies it in the same request.
         200 means it was recorded - it does not tell you whether the status change
         succeeded, which is our problem to handle. One event per request; arrays are
-        rejected. An applicationId matching no known submission is still recorded
-        and still returns 200, with matched=false.
+        rejected. An event whose applicationGuid and applicationId both match no known
+        submission is still recorded and still returns 200, with matched=false.
       tags:
       - Status Events
       parameters: []
@@ -2136,8 +2136,9 @@ components:
           type: string
           format: uuid
           description: The sender's event id. Must be stable across retries and unique
-            per event - it is the idempotency key. Re-sending an event with an eventId
-            already received is a no-op and returns 200.
+            per event - it is the idempotency key. Re-sending one already received
+            returns 200 without recording a second event; it is only re-applied if
+            the original was stored but never processed.
         eventType:
           type: string
           enum:
