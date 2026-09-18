@@ -201,14 +201,15 @@ class FileUploader < Shrine
     record = options[:record]
     if record
       # The default is (supporting document) model, but we want to ignore it: model = record.class.name.underscore
-      parent_model = record.permit_application.class.name.underscore # permit application nesting
+      #parent_model = record.permit_application.class.name.underscore # permit application nesting
+      parent_model = "applications"
       parent_id = record.permit_application.id
       identifier = record.id || "temp" # Use 'temp' if record ID is nil
       # Construct the path with support for derivatives
       path = [parent_model, parent_id, identifier]
       path << derivative.to_s if derivative # Append derivative name if present
       if record.file_data && record.file_data["storage"] == "cache"
-        path << record[:file_data]["id"] # get the same name as it did in the cache
+        path << File.basename(record[:file_data]["id"]) # avoid nesting the cache path itself
       else
         path << super # Call the original generate_location method for the filename
       end
@@ -220,3 +221,5 @@ class FileUploader < Shrine
     end
   end
 end
+
+# remove no longer neccesary PDF
