@@ -279,8 +279,6 @@ RSpec.describe "external_api/v1/status_events",
         :count
       )
 
-      puts "BODY: " + response.body[0, 200]
-      puts "EVENT: key=#{event.reload.external_api_key_id.inspect} pa=#{event.permit_application_id.inspect}"
       expect(response).to have_http_status(:ok)
       expect(event.reload.outcome).to eq("applied")
       expect(permit_application.reload.status).to eq("approved")
