@@ -92,13 +92,17 @@ class PermitApplication::StatusEventProcessor
     submission.flow.public_send("#{action}!")
   end
 
-  # Names both identifiers: resolution tries applicationGuid first, so a row
-  # that reported only applicationId would say nothing about the lookup that
-  # actually ran.
+  # Reports the identifier that was actually used. A supplied guid is decisive,
+  # so saying "neither matched" would be false - the number is not consulted.
   def unmatched_detail
     guid = @event.payload.is_a?(Hash) ? @event.payload["applicationGuid"] : nil
-    "no submission matches applicationGuid=#{guid.inspect} or " \
-      "applicationId=#{@event.submission_number.inspect}"
+    if guid.present?
+      "no submission matches applicationGuid=#{guid.inspect} " \
+        "(applicationId not consulted)"
+    else
+      "no applicationGuid sent; no submission matches " \
+        "applicationId=#{@event.submission_number.inspect}"
+    end
   end
 
   def skipped_detail(submission)

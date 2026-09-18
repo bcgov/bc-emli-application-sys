@@ -154,14 +154,14 @@ class ExternalApi::V1::StatusEventsController < ExternalApi::ApplicationControll
   # here so all five call sites move together if sandbox is ever revived or
   # removed.
   def matching_submission
-    guid = scalar("applicationGuid")
-
-    # A supplied guid is the answer, even when it resolves to nothing. Falling
-    # back to the number on a guid miss is what makes cross-environment traffic
-    # dangerous: their prod guid misses here, and their prod number can collide
-    # with a different submission of ours, which would then be transitioned.
-    # The number is only for a sender that sent no guid at all.
-    return in_program.find_by(id: guid) if guid.present?
+    # Decided on what they SENT, not on what survives coercion: a malformed guid
+    # is still a guid they supplied, and must not fall through to the number.
+    # That fallthrough is what makes cross-environment traffic dangerous - their
+    # prod guid misses here, and their prod number can collide with a different
+    # submission of ours, which would then be transitioned.
+    if payload_fields["applicationGuid"].present?
+      return in_program.find_by(id: scalar("applicationGuid"))
+    end
 
     in_program.find_by(number: scalar("applicationId"))
   end

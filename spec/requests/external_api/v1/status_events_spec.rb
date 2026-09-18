@@ -64,7 +64,7 @@ RSpec.describe "external_api/v1/status_events",
       # unmatched case is covered in the behaviour specs below.
       response(
         200,
-        "Recorded. matched=true means it was linked to a submission; false means neither applicationGuid nor applicationId matched and it was stored unlinked. Neither value tells you whether the status change itself succeeded."
+        "Recorded. matched=true means it was linked to a submission; false means the identifier we resolved on matched nothing and it was stored unlinked. Neither value tells you whether the status change itself succeeded."
       ) do
         schema "$ref" => "#/components/schemas/StatusEventAck"
 
@@ -418,6 +418,28 @@ RSpec.describe "external_api/v1/status_events",
       event = recorded(payload[:eventId])
       expect(event.permit_application).to be_nil
       expect(event.outcome).to eq("unmatched")
+      expect(permit_application.reload.status).not_to eq("approved")
+    end
+
+    # A malformed guid is still a guid they sent. It must not fall through to
+    # the number, or cross-environment traffic can transition the wrong record.
+    it "treats a malformed applicationGuid as decisive, not as absent" do
+      payload =
+        sample_payload(
+          applicationId: permit_application.number,
+          applicationGuid: {
+            "value" => "not-a-uuid"
+          }
+        )
+
+      post_event(payload)
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["data"]["matched"]).to eq(false)
+
+      event = recorded(payload[:eventId])
+      expect(event.permit_application).to be_nil
+      expect(event.outcome_detail).to include("applicationId not consulted")
       expect(permit_application.reload.status).not_to eq("approved")
     end
 

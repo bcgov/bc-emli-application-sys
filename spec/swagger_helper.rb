@@ -749,7 +749,7 @@ in this document.
                 pattern: "^[0-9]{3}-[0-9]{3}-[0-9]{3}$",
                 example: "000-017-676",
                 description:
-                  "The submission reference issued by this system - the number shown as 'Application #'. Used to locate the submission only when applicationGuid is omitted: a number can be reused after a submission is deleted, so it is never consulted to second-guess a guid that matched nothing. NOTE: the outbound webhook documented above uses `application_id` to mean the submission UUID instead; the two are not interchangeable."
+                  "The submission reference issued by this system - the number shown as 'Application #'. Recorded for diagnostics and for searching unmatched events; applicationGuid is what locates the submission, and a number is never consulted to second-guess a guid that matched nothing, because numbers are reused after a deletion. NOTE: the outbound webhook documented above uses `application_id` to mean the submission UUID instead; the two are not interchangeable."
               },
               applicationGuid: {
                 type: :string,
