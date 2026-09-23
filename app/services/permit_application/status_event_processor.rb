@@ -28,7 +28,10 @@ class PermitApplication::StatusEventProcessor
       ApplicationFlow::InvoiceExternalContractor => :approve_paid
     },
     "Ineligible" => {
-      ApplicationFlow::ApplicationExternalParticipant => :ineligible,
+      # `reject`, not `ineligible`: a decline after review is its own state, and
+      # going through AASM means it is refused anywhere but in_review. The admin
+      # keeps `ineligible` for screening a submission out beforehand.
+      ApplicationFlow::ApplicationExternalParticipant => :reject,
       ApplicationFlow::InvoiceExternalContractor => :ineligible
     },
     # We have no cancelled status. Empty rather than omitted so an unknown
@@ -38,6 +41,10 @@ class PermitApplication::StatusEventProcessor
   }.freeze
 
   KNOWN_EVENT_TYPES = ACTIONS.keys.freeze
+
+  # The actions that settle a participant application's outcome, and so carry a
+  # decision date.
+  DECIDING_ACTIONS = %i[approve reject].freeze
 
   def initialize(event)
     @event = event
@@ -83,9 +90,10 @@ class PermitApplication::StatusEventProcessor
 
   def apply(submission, action)
     if action == :ineligible
-      # Not an AASM event - a plain update, exactly what the admin ineligible
-      # button does. It trips check_ineligible_transition and notifies, and it
-      # has no state guard, so it is the one action that cannot be refused.
+      # Contractor invoices only. Not an AASM event - a plain update, exactly what
+      # the admin ineligible button does. It trips check_ineligible_transition and
+      # notifies the contractor, and it has no state guard, so it is the one
+      # action that cannot be refused.
       return if submission.set_status(:ineligible, event_notes).present?
 
       raise "set_status(:ineligible) rejected: #{submission.errors.full_messages.to_sentence.presence || "no error recorded"}"
@@ -96,6 +104,46 @@ class PermitApplication::StatusEventProcessor
     # event the flow does not define, so a wrong ACTIONS entry would record
     # `applied` for something that never happened. This raises instead.
     submission.flow.public_send("#{action}!")
+
+    # set_status wrote status_update_reason for us; the AASM path does not, so
+    # write it after the transition succeeds. update_column because persist_state
+    # has already written the status the same way - nothing here for callbacks.
+    #
+    # This reaches the applicant, by agreement: the integration spec defines
+    # eventNotes as "free text shown to the participant", sourced from Salesforce
+    # Rejected_Reasons__c and required for INELIGIBLE. It renders on their page
+    # as "Ineligible reason", the same place an admin's pre-review reason shows.
+    if action == :reject
+      submission.update_column(:status_update_reason, event_notes)
+    end
+
+    record_decision_date(submission) if decides_outcome?(submission, action)
+  end
+
+  # Participant applications only. `:approve` is also the invoice action, where it
+  # lands on approved_pending rather than approved - the timeline reads the label
+  # off `status`, so a decided_at on an invoice renders it as declined. Invoices
+  # have no decision line and this must not give them a half-built one.
+  def decides_outcome?(submission, action)
+    DECIDING_ACTIONS.include?(action) &&
+      submission.flow.is_a?(ApplicationFlow::ApplicationExternalParticipant)
+  end
+
+  # When the sender decided, not when we received it. Those diverge whenever they
+  # batch or hold events, and the participant's timeline should show the date the
+  # decision was made.
+  #
+  # Left nil if the field is absent or unparseable: the timeline entry is
+  # conditional on it, so the line is simply omitted. A decision with no date
+  # beats one with a confidently wrong date.
+  def record_decision_date(submission)
+    raw = @event.payload.is_a?(Hash) ? @event.payload["eventDatetime"] : nil
+    return unless raw.is_a?(String)
+
+    decided = Time.zone.parse(raw)
+    submission.update_column(:decided_at, decided) if decided
+  rescue ArgumentError
+    nil
   end
 
   # Reports the identifier that was actually used. A supplied guid is decisive,

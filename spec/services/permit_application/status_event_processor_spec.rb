@@ -77,8 +77,8 @@ RSpec.describe PermitApplication::StatusEventProcessor do
       expect(submission.reload.status).to eq("in_review")
     end
 
-    it "applies Ineligible from any state, carrying eventNotes as the reason" do
-      submission = participant(:new_draft)
+    it "applies Ineligible from in_review" do
+      submission = participant(:in_review)
       event =
         process(
           event_for(
@@ -89,8 +89,112 @@ RSpec.describe PermitApplication::StatusEventProcessor do
         )
 
       expect(event.outcome).to eq("applied")
+      expect(submission.reload.status).to eq("declined")
+    end
+
+    # By agreement: the integration spec defines eventNotes as free text shown
+    # to the participant (Salesforce Rejected_Reasons__c, required for
+    # INELIGIBLE). It renders on their page as "Ineligible reason".
+    it "carries eventNotes through as the ineligible reason" do
+      submission = participant(:in_review)
+
+      process(
+        event_for(
+          submission,
+          "Ineligible",
+          "eventNotes" => "Income above threshold"
+        )
+      )
+
+      expect(submission.reload.status_update_reason).to eq(
+        "Income above threshold"
+      )
+    end
+
+    # The sender decides this after review and emails the applicant itself, so
+    # ours would be a second message about the same decision.
+    it "does not notify the applicant when Ineligible arrives from the sender" do
+      submission = participant(:in_review)
+
+      expect(NotificationService).not_to receive(
+        :publish_application_ineligible_event
+      )
+
+      event = process(event_for(submission, "Ineligible"))
+
+      expect(event.outcome).to eq("applied")
+      expect(submission.reload.status).to eq("declined")
+    end
+
+    # The date the sender decided, not the date we received it. They diverge
+    # whenever the sender batches or holds events.
+    it "records decided_at from eventDatetime, not from now" do
+      submission = participant(:in_review)
+      sent = "2026-09-01T10:30:00.000Z"
+
+      process(event_for(submission, "Ineligible", "eventDatetime" => sent))
+
+      expect(submission.reload.decided_at).to eq(Time.zone.parse(sent))
+    end
+
+    it "records decided_at on an approval too" do
+      submission = participant(:in_review)
+      sent = "2026-09-02T08:00:00.000Z"
+
+      process(event_for(submission, "Approved", "eventDatetime" => sent))
+
+      expect(submission.reload.decided_at).to eq(Time.zone.parse(sent))
+    end
+
+    # Better no date than a wrong one - the timeline entry is conditional on it.
+    it "leaves decided_at nil when eventDatetime is unusable" do
+      submission = participant(:in_review)
+
+      event =
+        process(
+          event_for(submission, "Ineligible", "eventDatetime" => "not a date")
+        )
+
+      expect(event.outcome).to eq("applied")
+      expect(submission.reload.status).to eq("declined")
+      expect(submission.decided_at).to be_nil
+    end
+
+    # persist_state writes the status with update_column, which skips callbacks -
+    # so without the after: hook the record is declined in the database and
+    # still in_review in Elasticsearch, invisible to every inbox and filter.
+    it "bumps updated_at so the search index is refreshed" do
+      submission = participant(:in_review)
+      before = submission.updated_at
+
+      process(event_for(submission, "Ineligible"))
+
+      expect(submission.reload.updated_at).to be > before
+    end
+
+    # The guard. Before this change set_status had none, so a decline applied
+    # to anything - including an application nobody had reviewed.
+    it "refuses Ineligible outside in_review" do
+      submission = participant(:newly_submitted)
+
+      event = process(event_for(submission, "Ineligible"))
+
+      expect(event.outcome).to eq("failed")
+      expect(event.outcome_detail).to include("AASM::InvalidTransition")
+      expect(submission.reload.status).to eq("newly_submitted")
+    end
+
+    # The admin's pre-review path is untouched and still notifies.
+    it "still notifies when an admin sets ineligible directly" do
+      submission = participant(:newly_submitted)
+
+      expect(NotificationService).to receive(
+        :publish_application_ineligible_event
+      ).once
+
+      submission.set_status(:ineligible, "Did not qualify")
+
       expect(submission.reload.status).to eq("ineligible")
-      expect(submission.status_update_reason).to eq("Income above threshold")
     end
   end
 
@@ -116,8 +220,12 @@ RSpec.describe PermitApplication::StatusEventProcessor do
     expect(submission.reload.status).to eq("in_review")
   end
 
+  # Contractor invoices are the only flow still routed through set_status, which
+  # is a plain update returning nil on a validation failure rather than raising.
+  # Without the explicit raise that silently records `applied` for a status that
+  # never changed.
   it "records failed when set_status is rejected" do
-    submission = participant(:in_review)
+    submission = contractor_invoice(:in_review)
     allow_any_instance_of(PermitApplication).to receive(:set_status).and_return(
       nil
     )
@@ -130,6 +238,27 @@ RSpec.describe PermitApplication::StatusEventProcessor do
   end
 
   describe "contractor invoices" do
+    # decided_at drives the participant timeline's decision line, and that line
+    # picks its wording off `status`. An invoice approval lands on
+    # approved_pending, so a decided_at here would render the invoice as
+    # declined. Invoices have no decision line - they must not get a date.
+    it "does not record decided_at for an invoice approval" do
+      submission = contractor_invoice(:in_review)
+
+      event =
+        process(
+          event_for(
+            submission,
+            "Approved-Pending",
+            "eventDatetime" => "2026-07-01T09:00:00.000Z"
+          )
+        )
+
+      expect(event.outcome).to eq("applied")
+      expect(submission.reload.status).to eq("approved_pending")
+      expect(submission.decided_at).to be_nil
+    end
+
     it "applies Approved-Pending from in_review" do
       submission = contractor_invoice(:in_review)
       event = process(event_for(submission, "Approved-Pending"))

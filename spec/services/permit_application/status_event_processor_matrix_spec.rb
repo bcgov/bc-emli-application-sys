@@ -81,6 +81,7 @@ RSpec.describe PermitApplication::StatusEventProcessor, "action matrix" do
         in_review
         approved
         ineligible
+        declined
       ]
     end
 
@@ -112,15 +113,15 @@ RSpec.describe PermitApplication::StatusEventProcessor, "action matrix" do
       )
     end
 
-    # set_status is not AASM - it has no guard, so it applies from anywhere,
-    # including from approved. That matches the admin path, which has no guard
-    # either (Api::PermitApplicationsController#change_status).
-    it "Ineligible applies from every state, including approved" do
-      sweep(
-        submission,
-        "Ineligible",
-        states.index_with { %w[applied ineligible] }
-      )
+    # Maps to the AASM `reject` event now, not set_status, so it is guarded the
+    # same way Approved is: in_review only. Before this it applied from anywhere,
+    # including from approved.
+    it "Ineligible applies from in_review and fails everywhere else" do
+      expectations =
+        states
+          .index_with { |s| ["failed", s] }
+          .merge("in_review" => %w[applied declined])
+      sweep(submission, "Ineligible", expectations)
     end
 
     it "Cancelled is skipped from every state" do

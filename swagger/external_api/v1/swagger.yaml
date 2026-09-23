@@ -889,6 +889,7 @@ paths:
                         - training_pending
                         - approved_pending
                         - approved_paid
+                        - declined
                       description: Filter by application status. Omit to return applications
                         of ALL statuses. Accepts a single status code or an array
                         of codes (e.g. "in_review" or ["in_review", "resubmitted"]).
@@ -904,6 +905,7 @@ paths:
                       - training_pending
                       - approved_pending
                       - approved_paid
+                      - declined
                     permit_classifications:
                       type: string
                       description: Filter by permit classification keywords (composite
@@ -1152,6 +1154,7 @@ paths:
             - training_pending
             - approved_pending
             - approved_paid
+            - declined
         style: form
         explode: false
         description: Filter applications by status. Omit to return all applications
@@ -1169,6 +1172,7 @@ paths:
         - training_pending
         - approved_pending
         - approved_paid
+        - declined
         required: false
       - name: page
         in: query

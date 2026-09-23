@@ -49,6 +49,7 @@ class PermitApplicationBlueprint < Blueprinter::Base
            :submitted_for,
            :resubmitted_at,
            :screened_in_at,
+           :decided_at,
            :revisions_requested_at,
            :missing_pdfs,
            :status_update_reason

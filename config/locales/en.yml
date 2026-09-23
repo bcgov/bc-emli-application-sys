@@ -922,6 +922,7 @@ en:
     resubmitted: 'RESUBMITTED'
     in_review: 'IN REVIEW'
     ineligible: 'INELIGIBLE'
+    declined: 'DECLINED'
     approved: 'APPROVED'
     approved_pending: 'APPROVED - PENDING'
     approved_paid: 'APPROVED - PAID'

@@ -88,6 +88,7 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
       formCustomizations: types.maybeNull(types.frozen<ITemplateCustomization>()),
       submittedAt: types.maybeNull(types.Date),
       screenedInAt: types.maybeNull(types.Date),
+      decidedAt: types.maybeNull(types.Date),
       resubmittedAt: types.maybeNull(types.Date),
       revisionsRequestedAt: types.maybeNull(types.Date),
       selectedTabIndex: types.optional(types.number, 0),
@@ -142,7 +143,10 @@ export const EnergySavingsApplicationModel = types.snapshotProcessor(
         return self.status === EPermitApplicationStatus.inReview;
       },
       get isIneligible() {
-        return self.status === EPermitApplicationStatus.ineligible;
+        // Both: a decline after review reads as ineligible to the participant, and
+        // anything keyed off this getter means "not going ahead", not "which of
+        // the two ways it stopped".
+        return self.status === EPermitApplicationStatus.ineligible || self.status === EPermitApplicationStatus.declined;
       },
       get isScreenedIn() {
         return self.status === EPermitApplicationStatus.inReview;

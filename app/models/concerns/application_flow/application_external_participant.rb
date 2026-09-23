@@ -9,6 +9,9 @@ module ApplicationFlow
       state :in_review
       state :approved
       state :ineligible
+      # `ineligible` stays for the admin's pre-review screen-out - the one that
+      # still notifies the applicant.
+      state :declined
 
       # --- Events ---
       event :submit do
@@ -47,10 +50,11 @@ module ApplicationFlow
         transitions from: :in_review, to: :approved, after: :handle_approval
       end
 
+      # handle_declined, NOT handle_ineligible_status - this deliberately does
+      # not notify the applicant. The CRM is the only caller and has already told
+      # them itself.
       event :reject do
-        transitions from: :in_review,
-                    to: :ineligible,
-                    after: :handle_ineligible_status
+        transitions from: :in_review, to: :declined, after: :handle_declined
       end
     end
 
@@ -61,6 +65,13 @@ module ApplicationFlow
     # and skips validations, so it cannot silently return false and leave the
     # index stale while the processor reports the approval as applied.
     def handle_approval
+      application.touch
+    end
+
+    # Same reason as handle_approval, and nothing else: persist_state's
+    # update_column leaves updated_at and the search index stale, so without this
+    # a declined application still reads as in_review in every inbox and filter.
+    def handle_declined
       application.touch
     end
 
