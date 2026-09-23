@@ -68,8 +68,11 @@ module ApplicationFlow
         transitions from: :in_review, to: :approved
       end
 
+      # No `after:` hook - the CRM is the only caller and has already emailed
+      # the applicant. `ineligible` stays for an admin's pre-review screen-out,
+      # which does still notify.
       event :reject do
-        transitions from: :in_review, to: :ineligible, after: :handle_ineligible_status
+        transitions from: :in_review, to: :declined, after: :handle_declined
       end
     end
   end
@@ -187,5 +190,7 @@ Here are some useful articles on state machines, inheritance, and composition:
 - _Composition Over Inheritance — Ruby Science_[^3]
 
 [^1]: https://medium.com/%40Seif_Eddine.N/mastering-state-machines-in-ruby-on-rails-060123b27a47
+
 [^2]: https://blog.appsignal.com/2022/06/22/state-machines-in-ruby-an-introduction.html
+
 [^3]: https://thoughtbot.com/ruby-science/composition-over-inheritance.html
