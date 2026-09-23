@@ -133,16 +133,20 @@ class PermitApplication::StatusEventProcessor
   # batch or hold events, and the participant's timeline should show the date the
   # decision was made.
   #
-  # Left nil if the field is absent or unparseable: the timeline entry is
-  # conditional on it, so the line is simply omitted. A decision with no date
-  # beats one with a confidently wrong date.
+  # Left nil when absent or malformed: the timeline entry is conditional on it,
+  # and no date beats a wrong one. Time.iso8601 rather than Time.zone.parse,
+  # which invents a date from junk - "Sept" parses as the 1st.
   def record_decision_date(submission)
     raw = @event.payload.is_a?(Hash) ? @event.payload["eventDatetime"] : nil
     return unless raw.is_a?(String)
 
-    decided = Time.zone.parse(raw)
-    submission.update_column(:decided_at, decided) if decided
+    submission.update_column(:decided_at, Time.iso8601(raw).in_time_zone)
   rescue ArgumentError
+    # Warn rather than swallow: the row still applies, but a format change at the
+    # sender would otherwise cost every decision date with nothing to notice.
+    Rails.logger.warn(
+      "SubmissionStatusEvent #{@event.id} has an unparseable eventDatetime: #{raw.inspect}"
+    )
     nil
   end
 

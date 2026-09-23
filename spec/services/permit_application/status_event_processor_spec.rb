@@ -147,17 +147,20 @@ RSpec.describe PermitApplication::StatusEventProcessor do
     end
 
     # Better no date than a wrong one - the timeline entry is conditional on it.
-    it "leaves decided_at nil when eventDatetime is unusable" do
-      submission = participant(:in_review)
+    # Time.zone.parse would invent one from several of these: "10:30" becomes
+    # today and "Sept" becomes the 1st, both then shown to the participant as
+    # the date they were declined.
+    ["not a date", "10:30", "Sept", "2026-09-01", "", "5"].each do |bad|
+      it "leaves decided_at nil when eventDatetime is #{bad.inspect}" do
+        submission = participant(:in_review)
 
-      event =
-        process(
-          event_for(submission, "Ineligible", "eventDatetime" => "not a date")
-        )
+        event =
+          process(event_for(submission, "Ineligible", "eventDatetime" => bad))
 
-      expect(event.outcome).to eq("applied")
-      expect(submission.reload.status).to eq("declined")
-      expect(submission.decided_at).to be_nil
+        expect(event.outcome).to eq("applied")
+        expect(submission.reload.status).to eq("declined")
+        expect(submission.decided_at).to be_nil
+      end
     end
 
     # persist_state writes the status with update_column, which skips callbacks -
