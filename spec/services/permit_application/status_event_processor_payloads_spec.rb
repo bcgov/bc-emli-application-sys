@@ -82,7 +82,7 @@ RSpec.describe PermitApplication::StatusEventProcessor, "with real payloads" do
       event = process(staged("participant-ineligible", submission))
 
       expect(event.outcome).to eq("applied")
-      expect(submission.reload.status).to eq("ineligible")
+      expect(submission.reload.status).to eq("declined")
       expect(submission.status_update_reason).to eq("Income too high")
     end
   end
@@ -174,17 +174,24 @@ RSpec.describe PermitApplication::StatusEventProcessor, "with real payloads" do
   end
 
   # ApplicationFlow::Base#persist_state uses update_column, which skips
-  # callbacks - and both applying paths depend on a hook firing: Ineligible on
-  # the Rails after_update callback, contractor approval on an AASM after: hook.
-  describe "notifications still fire when a machine drives the transition" do
-    it "publishes the ineligible event via the after_update callback" do
+  # callbacks, so anything that has to happen on a transition needs a hook that
+  # actually runs - for contractor approval, an AASM after: hook.
+  describe "machine-driven transitions" do
+    # The participant decline deliberately notifies nobody: the sender makes this
+    # decision after review and emails the applicant itself. It reaches
+    # declined, which check_ineligible_transition does not match, so the
+    # callback never fires - no suppression flag needed.
+    it "does not publish the ineligible event for a participant decline" do
       submission = participant(:in_review)
 
-      expect(NotificationService).to receive(
+      expect(NotificationService).not_to receive(
         :publish_application_ineligible_event
-      ).with(submission_matching(submission))
+      )
 
-      process(staged("participant-ineligible", submission))
+      event = process(staged("participant-ineligible", submission))
+
+      expect(event.outcome).to eq("applied")
+      expect(submission.reload.status).to eq("declined")
     end
 
     # On the hook rather than the notification: the factory's submitter is a

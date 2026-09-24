@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMountStatus } from '../../../hooks/use-mount-status';
 import { IEnergySavingsApplication } from '../../../models/energy-savings-application';
 import { useMst, useServerAPI } from '../../../setup/root';
+import { EPermitApplicationStatus } from '../../../types/enums';
 import { IErrorsBoxData } from '../../../types/types';
 import { getCompletedBlocksFromForm, getRequirementByKey } from '../../../utils/formio-component-traversal';
 import { singleRequirementFormJson, singleRequirementSubmissionData } from '../../../utils/formio-helpers';
@@ -139,6 +140,21 @@ export const RequirementForm = observer(
             label: t('energySavingsApplication.show.applicationScreenedIn', {
               submissionType: permitApplication?.submissionType.name,
               date: format(permitApplication.screenedInAt, 'MMM d, yyyy h:mm a'),
+            }),
+          });
+        }
+        // The decision itself. Both audiences read "marked ineligible" - the
+        // status tag is where staff see "Not Approved". decidedAt is the date
+        // the CRM decided, not the date we recorded it.
+        if (permitApplication?.decidedAt) {
+          const decisionKey =
+            permitApplication.status === EPermitApplicationStatus.approved
+              ? 'applicationApproved'
+              : 'applicationIneligible';
+          statuses.push({
+            label: t(`energySavingsApplication.show.${decisionKey}`, {
+              submissionType: permitApplication?.submissionType.name,
+              date: format(permitApplication.decidedAt, 'MMM d, yyyy h:mm a'),
             }),
           });
         }

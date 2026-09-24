@@ -10,7 +10,6 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Text,
 } from '@chakra-ui/react';
 import { CaretDown, Funnel } from '@phosphor-icons/react';
 import { observer } from 'mobx-react-lite';
@@ -47,7 +46,8 @@ export const EnergySavingsApplicationFilter = observer(function ToggleArchivedBu
   const approvedPendingFilters = [EPermitApplicationStatus.approvedPending];
   const approvedPaidFilters = [EPermitApplicationStatus.approvedPaid];
   const trainingPendingFilters = [EPermitApplicationStatus.trainingPending];
-  const ineligibleFilters = [EPermitApplicationStatus.ineligible];
+  // One checkbox, two statuses - see EPermitApplicationStatus.declined.
+  const ineligibleFilters = [EPermitApplicationStatus.ineligible, EPermitApplicationStatus.declined];
   const revisionRequestedFilters = [EPermitApplicationStatus.revisionsRequested];
   const resubmittedFilters = [EPermitApplicationStatus.resubmitted];
 

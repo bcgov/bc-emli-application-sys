@@ -48,6 +48,7 @@ export const PermitApplicationStoreModel = types
         EPermitApplicationStatus.inReview,
         EPermitApplicationStatus.approved,
         EPermitApplicationStatus.ineligible,
+        EPermitApplicationStatus.declined,
         EPermitApplicationStatus.revisionsRequested,
       ]),
       userGroupTypeIdFilter: types.maybeNull(types.string),

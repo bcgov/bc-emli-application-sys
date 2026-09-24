@@ -737,7 +737,7 @@ in this document.
                 type: :string,
                 format: "date-time",
                 description:
-                  "ISO 8601, UTC. When the status was set in the sending system. Stored with the event; not otherwise interpreted."
+                  "ISO 8601, UTC. When the status was set in the sending system. For a participant Approved or Ineligible this becomes the decision date shown on the applicant's timeline; a value that is not ISO 8601 is ignored and no date is shown."
               },
               recordType: {
                 type: :string,

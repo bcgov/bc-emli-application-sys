@@ -40,6 +40,7 @@ export const EnergySavingsApplicationStatusTag = ({
     [EPermitApplicationStatus.approvedPaid]: 'theme.lightGreen',
     [EPermitApplicationStatus.trainingPending]: 'theme.orangeLight02',
     [EPermitApplicationStatus.ineligible]: 'greys.grey50',
+    [EPermitApplicationStatus.declined]: 'greys.grey50',
   };
 
   const colorMap = {
@@ -54,6 +55,7 @@ export const EnergySavingsApplicationStatusTag = ({
     [EPermitApplicationStatus.approvedPaid]: 'greys.anotherGrey',
     [EPermitApplicationStatus.trainingPending]: 'greys.anotherGrey',
     [EPermitApplicationStatus.ineligible]: 'greys.anotherGrey',
+    [EPermitApplicationStatus.declined]: 'greys.anotherGrey',
   };
 
   const borderColorMap = {
@@ -68,6 +70,7 @@ export const EnergySavingsApplicationStatusTag = ({
     [EPermitApplicationStatus.approvedPaid]: 'theme.darkGreen',
     [EPermitApplicationStatus.trainingPending]: 'theme.orange',
     [EPermitApplicationStatus.ineligible]: 'border.randomBorderColorforthePublishModal',
+    [EPermitApplicationStatus.declined]: 'border.randomBorderColorforthePublishModal',
   };
 
   const getStatusText = (status: EPermitApplicationStatus) => {
@@ -80,6 +83,13 @@ export const EnergySavingsApplicationStatusTag = ({
     }
     if (status === EPermitApplicationStatus.inReview && currentUser.isParticipant) {
       return t(`energySavingsApplication.statusGroup.underReview`);
+    }
+    // A participant must never see "Declined" - they are told "Ineligible", the
+    // same word as a pre-review screen-out. Defaults to Ineligible and requires
+    // positive staff identification, so a not-yet-loaded currentUser fails safe.
+    if (status === EPermitApplicationStatus.declined) {
+      const isStaff = [EUserRoles.admin, EUserRoles.adminManager, EUserRoles.systemAdmin].includes(currentUser?.role);
+      return isStaff ? t(`energySavingsApplication.status.declined`) : t(`energySavingsApplication.status.ineligible`);
     }
     return t(`energySavingsApplication.status.${status}`);
   };

@@ -69,6 +69,9 @@ export enum EPermitApplicationStatus {
   approvedPaid = 'approved_paid',
   approved = 'approved',
   ineligible = 'ineligible',
+  // Deliberately absent from EPermitApplicationStatusGroup below - a group
+  // value would add a second "Ineligible" filter checkbox.
+  declined = 'declined',
 }
 
 export enum EPermitApplicationStatusGroup {

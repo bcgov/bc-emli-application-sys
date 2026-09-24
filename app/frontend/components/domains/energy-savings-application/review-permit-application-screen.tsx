@@ -535,6 +535,7 @@ export const ReviewPermitApplicationScreen = observer(() => {
                               borderColor="theme.yellow"
                               isDisabled={
                                 currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
+                                currentPermitApplication?.status === EPermitApplicationStatus.declined ||
                                 // Approved is terminal for a participant application. Invoices
                                 // hide this button outright above; onboarding is deliberately
                                 // left editable, since approved contractors are re-synced.
@@ -560,7 +561,10 @@ export const ReviewPermitApplicationScreen = observer(() => {
                               px={14}
                               onClick={onScreenIn}
                               borderColor="green"
-                              isDisabled={currentPermitApplication?.status === EPermitApplicationStatus.ineligible}
+                              isDisabled={
+                                currentPermitApplication?.status === EPermitApplicationStatus.ineligible ||
+                                currentPermitApplication?.status === EPermitApplicationStatus.declined
+                              }
                             >
                               {t('energySavingsApplication.show.screenIn')}
                             </Button>
@@ -636,6 +640,10 @@ export const ReviewPermitApplicationScreen = observer(() => {
                             !isInvoiceSubmission
                           ) &&
                           currentPermitApplication?.status !== EPermitApplicationStatus.ineligible &&
+                          // A CRM decline is terminal. set_status(:ineligible) here would
+                          // trip check_ineligible_transition and email the applicant a
+                          // second time - the sender has already told them.
+                          currentPermitApplication?.status !== EPermitApplicationStatus.declined &&
                           currentPermitApplication?.status !== EPermitApplicationStatus.approved &&
                           currentPermitApplication?.status !== EPermitApplicationStatus.approvedPending &&
                           currentPermitApplication?.status !== EPermitApplicationStatus.approvedPaid && (

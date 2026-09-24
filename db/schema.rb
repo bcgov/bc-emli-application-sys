@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_11_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_22_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -441,6 +441,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_11_120000) do
     t.uuid "audience_type_id"
     t.jsonb "compliance_data", default: {}, null: false
     t.datetime "created_at", null: false
+    t.datetime "decided_at"
     t.boolean "first_nations", default: false
     t.jsonb "form_customizations_snapshot"
     t.string "full_address"

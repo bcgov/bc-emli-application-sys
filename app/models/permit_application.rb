@@ -11,7 +11,11 @@ class PermitApplication < ApplicationRecord
          ineligible: 8,
          training_pending: 9,
          approved_pending: 10,
-         approved_paid: 11
+         approved_paid: 11,
+         # Declined after review, by the CRM. Distinct from `ineligible`, which is
+         # an admin screening a submission out before review. Staff see "Declined";
+         # participants see "Ineligible", the same word as a pre-review screen-out.
+         declined: 12
        },
        default: 0
 
@@ -131,6 +135,7 @@ class PermitApplication < ApplicationRecord
     "resubmitted" => 3,
     "in_review" => 4,
     "ineligible" => 5,
+    "declined" => 5,
     "approved" => 6
   }.freeze
 
