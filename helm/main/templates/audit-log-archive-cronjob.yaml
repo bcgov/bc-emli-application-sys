@@ -48,6 +48,16 @@ spec:
                     secretKeyRef:
                       name: {{ .Values.auditLogArchive.crunchydbSecret | default "hesp-crunchydb-pguser-postgres" }}
                       key: host
+                - name: BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.s3KeyRotation.secretName | default "hesp-s3-credentials" | quote }}
+                      key: BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID
+                - name: BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.s3KeyRotation.secretName | default "hesp-s3-credentials" | quote }}
+                      key: BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY
               {{- $env := merge (.Values.global.env | default dict) (.Values.app.env | default dict) (.Values.auditLogArchive.env | default dict) -}}
                 {{- range $k, $v := $env }}
                 - name: {{ $k | quote }}

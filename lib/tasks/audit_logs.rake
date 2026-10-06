@@ -65,10 +65,11 @@ namespace :audit_logs do
 
     puts "Exported #{exported} audit logs into #{gz_path}"
 
+    credentials = OpenshiftAwsCredentials.current
     s3_client =
       Aws::S3::Client.new(
-        access_key_id: ENV["BCGOV_OBJECT_STORAGE_ACCESS_KEY_ID"],
-        secret_access_key: ENV["BCGOV_OBJECT_STORAGE_SECRET_ACCESS_KEY"],
+        access_key_id: credentials[:access_key_id],
+        secret_access_key: credentials[:secret_access_key],
         region: ENV["BCGOV_OBJECT_STORAGE_REGION"] || "ca-central-1",
         endpoint: ENV["BCGOV_OBJECT_STORAGE_ENDPOINT"],
         force_path_style: true
