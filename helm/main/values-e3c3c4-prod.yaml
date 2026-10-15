@@ -207,10 +207,10 @@ anycable-rpc:
   resources:
     limits:
       cpu: 400m
-      memory: 512Mi
+      memory: 768Mi
     requests:
       cpu: 200m
-      memory: 256Mi
+      memory: 512Mi
 
   dependencyWait:
     enabled: true
