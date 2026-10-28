@@ -172,7 +172,8 @@ services:
       - clamav_db:/var/lib/clamav
       - virus_scan_tmp:/tmp/virus_scan
     healthcheck:
-      test: ["CMD", "/usr/local/bin/health-check.sh"]
+      test: ["CMD", "/usr/local/bin/clamdcheck.sh"]
+      start_period: 120s
       interval: 30s
       timeout: 10s
       retries: 3
